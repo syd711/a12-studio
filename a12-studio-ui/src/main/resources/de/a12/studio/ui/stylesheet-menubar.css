@@ -2,7 +2,24 @@
  * Menu Bar
  */
 .menu-bar {
-    -fx-background-color: #333333;
+    -fx-background-color: -fx-panel-color;
+}
+
+.menu-bar .label,
+.menu-item .label {
+    -fx-text-fill: -fx-text-color;
+}
+
+.menu-item:focused,
+.menu:showing,
+.menu:hover {
+    -fx-background-color: -fx-accent-color;
+}
+
+.menu-item:focused .label,
+.menu:showing .label,
+.menu:hover .label {
+    -fx-text-fill: -fx-text-color-inverse;
 }
 
 .menu-bar,

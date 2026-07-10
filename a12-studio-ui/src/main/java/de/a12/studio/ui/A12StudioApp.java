@@ -44,6 +44,13 @@ public class A12StudioApp extends Application {
         FXResizeHelper.install(stage, 30, 6);
         stage.show();
 
+        // Windows denies focus/z-order to windows created by a background process (e.g. launched
+        // from IDEA), so the stage can open behind the IDE. Toggling always-on-top forces it front.
+        stage.setAlwaysOnTop(true);
+        stage.toFront();
+        stage.requestFocus();
+        stage.setAlwaysOnTop(false);
+
         new UpdateController(stage).checkForUpdateAsync();
     }
 }

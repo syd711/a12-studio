@@ -1,0 +1,28 @@
+/**
+ * Color Palette
+ * Single source of truth for all colors used across the theme.
+ * Modeled after the IntelliJ IDEA standard "Light" theme.
+ */
+* {
+    /* Raw palette */
+    -fx-base-1: #FFFFFF;
+    -fx-base-2: #F2F2F2;
+    -fx-base-3: #3574F0;
+    -fx-base-4: #D1D1D1;
+    -fx-base-5: #1E1E1E;
+
+    /* Semantic roles */
+    -fx-surface-color: -fx-base-1;
+    -fx-panel-color: -fx-base-2;
+    -fx-accent-color: -fx-base-3;
+    -fx-border-color-theme: -fx-base-4;
+    -fx-dark-color: -fx-base-5;
+
+    -fx-primary-color: -fx-base-3;
+    -fx-secondary-color: -fx-base-2;
+
+    -fx-text-color: -fx-base-5;
+    -fx-text-color-inverse: -fx-base-1;
+
+    -fx-header-color: #272828;
+}
