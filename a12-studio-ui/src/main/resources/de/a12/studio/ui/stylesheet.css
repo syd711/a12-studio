@@ -1,6 +1,9 @@
 @import "stylesheet-colors.css";
 @import "stylesheet-buttons.css";
 @import "stylesheet-menubar.css";
+@import "stylesheet-tab-pane.css";
+@import "stylesheet-tree-view.css";
+@import "stylesheet-textfield.css";
 
 /**
  * Main
@@ -55,4 +58,8 @@
 
 .header-icon {
     -fx-icon-color: -fx-text-color-inverse;
+}
+
+.toolbar-icon {
+    -fx-icon-color: -fx-text-color;
 }

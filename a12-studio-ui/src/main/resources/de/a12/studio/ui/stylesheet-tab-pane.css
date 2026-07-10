@@ -1,0 +1,6 @@
+/**
+ * Tab Pane
+ */
+.tab-pane .tab-label {
+    -fx-font-size: 14px;
+}

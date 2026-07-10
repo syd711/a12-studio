@@ -1,0 +1,109 @@
+10-07 20:28:35.286 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 20:28:35.292 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 20:31:13.046 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 20:31:13.048 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 20:33:17.431 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 20:33:17.437 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 20:33:18.842 WARN  [JavaFX Application Thread] d.a.s.c.u.PropertiesStore - No properties file found C:\workspace\a12-studio\.\config\settings.properties
+10-07 20:33:41.657 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 20:33:41.659 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 20:33:43.137 WARN  [JavaFX Application Thread] d.a.s.c.u.PropertiesStore - No properties file found C:\workspace\a12-studio\.\config\settings.properties
+10-07 20:34:28.785 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 20:34:28.787 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 20:34:31.594 WARN  [JavaFX Application Thread] d.a.s.c.u.PropertiesStore - No properties file found C:\workspace\a12-studio\.\config\settings.properties
+10-07 20:34:45.115 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 20:34:45.117 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 20:39:23.568 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 20:39:23.572 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 21:45:57.180 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 21:45:57.182 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 21:46:14.809 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 21:46:14.812 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 21:46:43.639 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 21:46:43.644 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:13:38.683 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:13:38.686 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:14:40.281 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:14:40.283 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:15:11.031 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:15:11.034 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:16:49.450 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:16:49.452 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:18:03.807 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:18:03.809 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:18:53.602 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:18:53.604 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:19:06.949 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:19:06.952 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:20:04.984 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:20:04.986 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:21:38.233 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:21:38.235 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:21:54.325 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:21:54.327 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:23:16.687 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:23:16.690 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:27:09.808 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:27:09.811 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:31:12.444 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:31:12.446 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:31:36.691 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:31:36.693 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:32:14.656 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:32:14.659 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:40:25.579 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:40:25.580 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:41:48.601 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:41:48.602 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:43:40.296 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:43:40.297 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:44:30.500 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:44:30.502 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:44:56.725 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:44:56.727 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:46:18.470 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:46:18.471 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:46:42.637 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:46:42.639 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:48:13.035 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:48:13.037 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:51:08.598 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:51:08.600 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:54:29.493 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:54:29.495 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:55:12.444 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:55:12.446 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:56:29.414 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:56:29.416 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:58:29.372 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:58:29.374 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 22:59:09.036 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 22:59:09.038 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:00:32.696 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:00:32.697 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:01:25.601 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:01:25.603 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:03:33.544 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:03:33.547 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:08:41.698 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:08:41.700 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:09:07.316 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:09:07.318 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:09:27.103 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:09:27.105 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:12:18.253 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:12:18.255 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:12:48.423 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:12:48.426 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:13:59.364 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:13:59.366 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:14:19.649 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:14:19.651 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:18:03.219 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:18:03.221 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:21:46.518 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:21:46.520 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:28:34.808 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:28:34.810 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+10-07 23:28:40.016 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+10-07 23:28:40.018 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)

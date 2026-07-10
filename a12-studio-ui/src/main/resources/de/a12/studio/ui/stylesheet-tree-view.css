@@ -1,0 +1,10 @@
+/**
+ * Tree View
+ */
+.tree-view .tree-cell {
+    -fx-font-size: 14px;
+}
+
+.tree-cell:selected .tree-icon {
+    -fx-icon-color: white;
+}

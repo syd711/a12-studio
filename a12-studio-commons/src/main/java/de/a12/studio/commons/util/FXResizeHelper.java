@@ -291,6 +291,15 @@ public class FXResizeHelper {
         fireAction(Cursor.DEFAULT);
       }
     });
+
+    // Once the pointer leaves the window, no further MOUSE_MOVED events arrive on this scene,
+    // so a cursor set while hovering the drag/resize zones (e.g. OPEN_HAND) would otherwise stay
+    // stuck. Skip the reset while a drag/resize is in progress (button held) to avoid glitching it.
+    SCENE.setOnMouseExited(event -> {
+      if (!event.isPrimaryButtonDown()) {
+        fireAction(Cursor.DEFAULT);
+      }
+    });
   }
 
   private void fireAction(Cursor c) {

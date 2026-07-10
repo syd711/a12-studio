@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class A12StudioAppTest {
+class StudioTest {
 
     @Test
     void applicationClassExists() {
-        assertNotNull(A12StudioApp.class);
+        assertNotNull(Studio.class);
     }
 }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOG_PATH" value="${OSLOG_PATH:-.}"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{dd-MM HH:mm:ss.SSS} %-5level [%thread] %logger{5} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/vpin-studio-ui.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/vpin-studio-ui.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>3</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{dd-MM HH:mm:ss.SSS} %-5level [%thread] %logger{5} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="javafx.fxml" level="ERROR"/>
+    <logger name="javafx" level="ERROR"/>
+    <logger name="org.jnativehook" level="ERROR"/>
+    <logger name="org.htmlunit" level="ERROR"/>
+    <logger name="net.java.games.input" level="ERROR"/>
+    <logger name="net.dv8tion.jda.api" level="ERROR"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

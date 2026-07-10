@@ -1,6 +1,7 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.commons.util.FXResizeHelper;
+import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -65,7 +66,7 @@ public class HeaderController implements Initializable {
   }
 
   private void refreshWindowMaximizedState(boolean isMaximized) {
-    FontIcon icon = new FontIcon(isMaximized ? "mdi2w-window-restore" : "mdi2w-window-maximize");
+    FontIcon icon = new FontIcon(isMaximized ? Icons.WINDOW_RESTORE : Icons.WINDOW_MAXIMIZE);
     icon.setIconColor(javafx.scene.paint.Color.WHITE);
     icon.setIconSize(16);
     maximizeBtn.setGraphic(icon);

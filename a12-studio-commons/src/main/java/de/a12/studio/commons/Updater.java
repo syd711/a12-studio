@@ -21,9 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Checks GitHub releases for newer versions of a12-studio and downloads/installs
- * server and client updates. Ported from vpin-studio's
- * de.mephisto.vpin.commons.utils.Updater.
+ *
  */
 public class Updater {
   private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

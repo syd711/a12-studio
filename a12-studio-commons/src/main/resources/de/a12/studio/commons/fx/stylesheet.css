@@ -1,0 +1,42 @@
+/**
+ * Dialog chrome styles for de.a12.studio.commons.fx.
+ *
+ * Color variables mirror a12-studio-ui/stylesheet-colors.css (the commons module cannot
+ * depend on the ui module's resources, so the small subset of vars used here is duplicated -
+ * keep the two files in sync if the palette changes).
+ */
+* {
+    -fx-surface-color: #FFFFFF;
+    -fx-panel-color: #F2F2F2;
+    -fx-accent-color: #3574F0;
+    -fx-border-color-theme: #D1D1D1;
+    -fx-text-color: #1E1E1E;
+    -fx-text-color-inverse: #FFFFFF;
+    -fx-header-color: #272828;
+}
+
+.navigation-panel {
+    -fx-background-color: -fx-surface-color;
+    -fx-border-color: -fx-border-color-theme;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.base-component {
+    -fx-background-color: -fx-surface-color;
+}
+
+.dialog-header {
+    -fx-background-color: -fx-header-color;
+    -fx-border-radius: 6 6 0 0;
+    -fx-background-radius: 6 6 0 0;
+}
+
+.header-title {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.header-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}

@@ -4,3 +4,20 @@
 .button {
     -fx-font-size: 14px;
 }
+
+.header-button {
+    -fx-background-color: -fx-header-color;
+    -fx-border-style: hidden;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.header-button:hover {
+    -fx-background-color: -fx-accent-color;
+    -fx-border-style: hidden;
+    -fx-text-fill: -fx-text-color-inverse;
+    -fx-cursor: hand;
+}
+
+.default-button FontIcon {
+    -fx-icon-color: #000000;
+}
