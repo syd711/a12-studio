@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<BorderPane fx:id="root" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.RootController">
+   <top>
+       <fx:include fx:id="header" source="scene-header.fxml" />
+   </top>
+   <center>
+      <StackPane fx:id="main" styleClass="main" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

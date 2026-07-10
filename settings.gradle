@@ -1,3 +1,5 @@
 rootProject.name = 'a12-studio'
 
 include 'a12-studio-ui'
+include 'a12-studio-server'
+include 'a12-studio-commons'

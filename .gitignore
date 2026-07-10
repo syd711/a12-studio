@@ -4,3 +4,9 @@ build/
 .idea/
 *.iml
 out/
+/.gradle/
+/.idea/
+/build/
+/gradle/
+/a12-studio-ui/build/
+/Output/

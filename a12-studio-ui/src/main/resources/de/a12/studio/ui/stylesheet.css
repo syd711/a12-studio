@@ -1,0 +1,62 @@
+/**
+ * Colors
+ * Trimmed subset of vpin-studio's stylesheet.css, extracted for just the window shell
+ * (undecorated frame + header bar). Add more selectors here as real screens are built.
+ */
+* {
+   -fx-base-1: #FFF8F8;
+   -fx-base-2: #C7C3C3;
+   -fx-base-3: #B0ABAB;
+   -fx-base-4: #888585;
+   -fx-base-5: #605E5E;
+   -fx-base-6: #222222;
+   -fx-base-7: #111111;
+   -fx-info-background: #333366;
+
+   -fx-font-1: #FFF8F8;
+   -fx-font-2: #B0ABAB;
+   -fx-font-hover: #333344;
+
+   -fx-primary-color: #333366;
+   -fx-secondary-color: #111111;
+   -fx-green: #33CC00;
+}
+
+/**
+ * Main
+ */
+.root {
+    -fx-border-style: solid;
+    -fx-border-color: #605E5E;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.main, .root {
+    -fx-background-color: -fx-base-6;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.window-header {
+    -fx-background-color: -fx-base-7;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+/**
+ * Window Toolbar
+ */
+.header-button {
+    -fx-background-color: -fx-base-7;
+    -fx-border-style: hidden hidden hidden hidden;
+    -fx-text-fill: #DDDDDD;
+}
+
+.header-button:hover {
+    -fx-background-color: #333366;
+    -fx-border-style: hidden hidden hidden hidden;
+    -fx-text-fill: #fff8f8;
+    -fx-cursor: hand;
+}

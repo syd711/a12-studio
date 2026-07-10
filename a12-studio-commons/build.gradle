@@ -1,0 +1,20 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+javafx {
+    version = '21.0.4'
+    modules = ['javafx.controls']
+}
+
+dependencies {
+    implementation 'org.jspecify:jspecify:1.0.0'
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'ch.qos.logback:logback-classic:1.5.32'
+    implementation 'commons-io:commons-io:2.22.0'
+    implementation 'org.jsoup:jsoup:1.18.1'
+
+    testImplementation platform('org.junit:junit-bom:5.11.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}

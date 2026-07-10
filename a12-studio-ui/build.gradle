@@ -1,5 +1,69 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'com.gradleup.shadow' version '9.5.1'
+    id 'edu.sc.seis.launch4j' version '4.0.0'
+}
+
+application {
+    mainClass = 'de.a12.studio.ui.Launcher'
+}
+
+javafx {
+    version = '21.0.4'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
 dependencies {
+    implementation project(':a12-studio-commons')
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'ch.qos.logback:logback-classic:1.5.32'
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
+    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0'
+
     testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+shadowJar {
+    archiveFileName = 'a12-studio-ui.jar'
+    manifest {
+        attributes 'Main-Class': 'de.a12.studio.ui.Launcher', 'Implementation-Version': project.version
+    }
+}
+
+launch4j {
+    outfile = 'A12-Studio.exe'
+    mainClassName = 'de.a12.studio.ui.Launcher'
+    jarTask = tasks.named('shadowJar')
+    headerType = 'gui'
+    copyConfigurable = files()
+    libraryDir = ''
+}
+createExe.dependsOn shadowJar
+
+tasks.register('copyToOutput', Copy) {
+    dependsOn createExe
+    from(layout.buildDirectory.dir('launch4j')) {
+        include 'A12-Studio.exe'
+    }
+    from(layout.buildDirectory.dir('libs')) {
+        include 'a12-studio-ui.jar'
+    }
+    into "${rootDir}/Output/A12-Studio"
+}
+
+assemble.dependsOn copyToOutput
+
+tasks.register('prepareInstallerScript', Copy) {
+    from 'src/main/resources/inno-installer-a12-studio-full.iss'
+    into layout.buildDirectory.dir('installer')
+    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: project.version.toString()])
+}
+
+tasks.register('buildInstaller', Exec) {
+    dependsOn prepareInstallerScript, copyToOutput, ':a12-studio-server:copyToOutput'
+    onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows() }
+    commandLine 'ISCC.exe', layout.buildDirectory.file('installer/inno-installer-a12-studio-full.iss').get().asFile
 }
