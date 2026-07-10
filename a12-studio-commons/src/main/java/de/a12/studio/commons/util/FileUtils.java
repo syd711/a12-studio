@@ -10,8 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 
 /**
- * File helpers used by the self-updater. Trimmed port of vpin-studio's
- * de.mephisto.vpin.restclient.util.FileUtils to just the pieces Updater needs.
+ *
  */
 public class FileUtils {
   private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

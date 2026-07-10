@@ -13,8 +13,7 @@ import java.util.HashMap;
 
 /**
  * Adds drag-to-move and edge-drag-to-resize behavior to an undecorated (StageStyle.TRANSPARENT)
- * JavaFX Stage. Ported verbatim from vpin-studio's de.mephisto.vpin.commons.utils.FXResizeHelper -
- * generic window-chrome utility, no vpin-specific dependencies.
+ * JavaFX Stage.
  *
  * @author Simon Reinisch
  * @version 0.0.2

@@ -1,5 +1,5 @@
 ; Inno Setup script for the A12 Studio full installer (server + UI).
-; Ported/trimmed from vpin-studio's inno-installer-studio-full.iss.
+; Ported/trimmed from a12-studio's inno-installer-studio-full.iss.
 ; Templated by Gradle's Copy + ReplaceTokens filter (see :a12-studio-ui:prepareInstallerScript) -
 ; @version@ below is an Ant-style token placeholder, not an Inno Setup preprocessor directive.
 

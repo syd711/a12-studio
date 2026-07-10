@@ -22,9 +22,7 @@ import java.io.IOException;
 
 /**
  * App bootstrap - undecorated window shell (custom draggable/resizable header, empty main
- * region). Trimmed port of vpin-studio's de.mephisto.vpin.ui.Studio: no splash screen, no
- * REST-client connection bootstrap, no single-instance check - a12-studio-server has none of
- * that machinery yet.
+ * region).
  */
 public class Studio extends Application implements StudioEventListener {
 

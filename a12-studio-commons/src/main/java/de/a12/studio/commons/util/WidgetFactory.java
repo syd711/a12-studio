@@ -43,11 +43,7 @@ import java.util.Optional;
 
 /**
  * Icon factory and dialog infrastructure (stage creation, confirmation/alert/input/output
- * dialogs). Trimmed port of vpin-studio's de.mephisto.vpin.commons.utils.WidgetFactory: dropped
- * the media-preview, playlist-icon, VPS-table and highscore-background helpers (they depend on
- * VPin REST-client model classes a12-studio doesn't have), the custom scoreboard font loading
- * (needs vpin-studio's bundled .ttf assets), and window-position persistence (a12-studio has no
- * local-settings store yet - see [[de.a12.studio.commons.fx.DialogHeaderController]]).
+ * dialogs).
  */
 public class WidgetFactory {
   private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

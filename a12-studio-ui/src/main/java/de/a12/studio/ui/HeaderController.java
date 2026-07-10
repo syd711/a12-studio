@@ -18,8 +18,7 @@ import java.util.ResourceBundle;
 
 /**
  * Controller for the draggable/resizable window header (title, minimize/maximize/close).
- * Trimmed port of vpin-studio's HeaderResizeableController: no VPin Mania integration,
- * no window-position persistence.
+ *
  */
 public class HeaderController implements Initializable {
 

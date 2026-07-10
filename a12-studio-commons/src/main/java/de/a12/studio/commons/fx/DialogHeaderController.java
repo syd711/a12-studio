@@ -16,9 +16,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
- * Controller for a dialog's draggable title bar (title, dirty indicator, close-with-confirmation).
- * Trimmed port of vpin-studio's de.mephisto.vpin.commons.fx.DialogHeaderController: no
- * window-position persistence, no modal-pin toggle - a12-studio has no local-settings store yet.
+ *
  */
 public class DialogHeaderController implements Initializable {
 

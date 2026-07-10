@@ -15,8 +15,7 @@ import java.lang.invoke.MethodHandles;
 
 /**
  * Exposes the self-update flow (check/download/install) over REST so a12-studio-ui
- * can trigger a server update remotely. Trimmed port of vpin-studio's
- * de.mephisto.vpin.server.system.SystemResource - only the update-related endpoints.
+ * can trigger a server update remotely.
  */
 @RestController
 @RequestMapping("/api/system")

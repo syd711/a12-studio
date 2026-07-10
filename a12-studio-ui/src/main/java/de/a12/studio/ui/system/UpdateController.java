@@ -12,9 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 /**
- * Client-side update check/download/install flow, trimmed from vpin-studio's
- * de.mephisto.vpin.ui.UpdateDialogController down to the update logic itself
- * (no progress bar UI yet - just a confirm dialog before installing).
+ *
  */
 public class UpdateController {
   private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
