@@ -1,0 +1,12 @@
+/**
+ * Menu Bar
+ */
+.menu-bar {
+    -fx-background-color: #333333;
+}
+
+.menu-bar,
+.menu-bar .label,
+.menu-item .label {
+    -fx-font-size: 14px;
+}

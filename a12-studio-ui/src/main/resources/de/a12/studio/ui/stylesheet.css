@@ -1,3 +1,6 @@
+@import "stylesheet-buttons.css";
+@import "stylesheet-menubar.css";
+
 /**
  * Colors
  * Trimmed subset of vpin-studio's stylesheet.css, extracted for just the window shell
@@ -43,6 +46,14 @@
     -fx-background-color: -fx-base-7;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
+}
+
+/**
+ * Common Component Theme
+ */
+.base-component {
+    -fx-text-fill: #FFFFFF;
+    -fx-base : #111111;
 }
 
 /**
