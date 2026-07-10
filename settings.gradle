@@ -1,0 +1,3 @@
+rootProject.name = 'a12-studio'
+
+include 'a12-studio-ui'
