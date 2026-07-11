@@ -45,6 +45,10 @@ public class ProjectSettings extends JsonSettings {
     openedFiles.add(path);
   }
 
+  public void removeOpenedFile(@NonNull String path) {
+    openedFiles.remove(path);
+  }
+
   public static ProjectSettings load(@NonNull File projectFolder) {
     File settingsFile = new File(projectFolder, new ProjectSettings().getSettingsName());
     ProjectSettings settings = null;

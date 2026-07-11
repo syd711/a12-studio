@@ -23,6 +23,7 @@
 
     -fx-text-color: -fx-base-5;
     -fx-text-color-inverse: -fx-base-1;
+    -fx-text-color-disabled: derive(-fx-text-color, 60%);
 
     -fx-header-color: #272828;
 }

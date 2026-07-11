@@ -1,6 +1,7 @@
 package de.a12.studio.ui.tabs;
 
 import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.events.ModelOpenedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
@@ -9,7 +10,6 @@ import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -35,8 +35,11 @@ public class TabPaneController implements Initializable, StudioEventListener {
   @FXML
   private TabPane tabPane;
 
+  private Project project;
+
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
+    this.project = event.getProject();
     tabPane.getTabs().clear();
 
     for (String path : event.getProject().getSettings().getOpenedFiles()) {
@@ -69,6 +72,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
       icon.setIconColor(Color.valueOf(WidgetFactory.DEFAULT_COLOR));
       tab.setGraphic(icon);
       tab.setContextMenu(createTabContextMenu(tab));
+      tab.setOnClosed(closeEvent -> onTabClosed(tab));
       tabPane.getTabs().add(tab);
       tabPane.getSelectionModel().select(tab);
       installDoubleClickHandler(tab);
@@ -94,38 +98,41 @@ public class TabPaneController implements Initializable, StudioEventListener {
     });
   }
 
+  private void onTabClosed(@NonNull Tab tab) {
+    ProjectItem projectItem = (ProjectItem) tab.getUserData();
+    if (project != null && projectItem != null) {
+      project.getSettings().removeOpenedFile(projectItem.getPath());
+      project.getSettings().save();
+    }
+    StudioEventManager.getInstance().fireModelClosedEvent(projectItem);
+  }
+
   private ContextMenu createTabContextMenu(@NonNull Tab tab) {
     MenuItem close = new MenuItem("Close");
-    close.setOnAction(event -> {
-      ProjectItem projectItem = (ProjectItem) tab.getUserData();
-      tabPane.getTabs().remove(tab);
-      StudioEventManager.getInstance().fireModelClosedEvent(projectItem);
-    });
+    close.setOnAction(event -> closeTab(tab));
 
     MenuItem closeAll = new MenuItem("Close All");
     closeAll.setOnAction(event -> {
-
-      ObservableList<Tab> tabs = tabPane.getTabs();
-      for (Tab t : new ArrayList<>(tabs)) {
-        ProjectItem projectItem = (ProjectItem) t.getUserData();
-        tabPane.getTabs().remove(t);
-        StudioEventManager.getInstance().fireModelClosedEvent(projectItem);
+      for (Tab t : new ArrayList<>(tabPane.getTabs())) {
+        closeTab(t);
       }
     });
 
     MenuItem closeOthers = new MenuItem("Close Others");
     closeOthers.setOnAction(event -> {
-      ObservableList<Tab> tabs = tabPane.getTabs();
-      for (Tab t : new ArrayList<>(tabs)) {
+      for (Tab t : new ArrayList<>(tabPane.getTabs())) {
         if (t != tab) {
-          ProjectItem projectItem = (ProjectItem) t.getUserData();
-          tabPane.getTabs().remove(t);
-          StudioEventManager.getInstance().fireModelClosedEvent(projectItem);
+          closeTab(t);
         }
       }
     });
 
     return new ContextMenu(close, closeAll, closeOthers);
+  }
+
+  private void closeTab(@NonNull Tab tab) {
+    tabPane.getTabs().remove(tab);
+    onTabClosed(tab);
   }
 
   @Override

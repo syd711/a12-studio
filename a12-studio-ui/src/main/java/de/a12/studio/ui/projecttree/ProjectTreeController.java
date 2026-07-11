@@ -173,7 +173,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   }
 
   private void openItem(@NonNull ProjectItemViewModel viewModel) {
-    if (!viewModel.isFolder()) {
+    if (!viewModel.isFolder() && viewModel.hasModel()) {
       if (project != null) {
         project.getSettings().addOpenedFile(viewModel.getProjectItem().getPath());
         project.getSettings().save();
@@ -330,12 +330,22 @@ public class ProjectTreeController implements Initializable, StudioEventListener
           setGraphic(null);
           setTooltip(null);
           setContextMenu(null);
+          getStyleClass().remove("model-missing");
           return;
         }
 
         setText(item.toString());
         setTooltip(new Tooltip(item.getName()));
-        setContextMenu(createTreeItemContextMenu(item));
+        boolean missingModel = !item.isFolder() && !item.hasModel();
+        setContextMenu(missingModel ? null : createTreeItemContextMenu(item));
+        if (missingModel) {
+          if (!getStyleClass().contains("model-missing")) {
+            getStyleClass().add("model-missing");
+          }
+        }
+        else {
+          getStyleClass().remove("model-missing");
+        }
         if (item.isFolder()) {
           boundTreeItem = getTreeItem();
           icon.setIconLiteral(boundTreeItem.isExpanded() ? Icons.FOLDER_OPEN : Icons.FOLDER);
@@ -344,7 +354,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         }
         else {
           icon.setIconSize(18);
-          icon.setIconLiteral(Icons.FILE_OUTLINE);
+          icon.setIconLiteral(item.getIcon());
         }
         setGraphic(icon);
       }

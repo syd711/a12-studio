@@ -8,3 +8,12 @@
 .tree-cell:selected .tree-icon {
     -fx-icon-color: white;
 }
+
+.tree-cell.model-missing {
+    -fx-text-fill: -fx-text-color-disabled;
+    -fx-font-style: italic;
+}
+
+.tree-cell.model-missing:selected {
+    -fx-text-fill: -fx-text-color-inverse;
+}

@@ -24,6 +24,10 @@ public class ProjectItemViewModel {
     return projectItem.isFolder();
   }
 
+  public boolean hasModel() {
+    return projectItem.getModel() != null;
+  }
+
   public ProjectItem getProjectItem() {
     return projectItem;
   }
