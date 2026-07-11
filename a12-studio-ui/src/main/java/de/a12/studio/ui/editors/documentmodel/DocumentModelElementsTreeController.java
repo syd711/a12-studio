@@ -161,7 +161,8 @@ public class DocumentModelElementsTreeController implements Initializable {
         ElementViewModel viewModel = getTableRow().getItem();
         if (viewModel == null) {
           setGraphic(null);
-        } else {
+        }
+        else {
           FontIcon icon = WidgetFactory.createIcon(viewModel.getIcon());
           icon.getStyleClass().add("tree-icon");
           setGraphic(icon);
@@ -173,6 +174,10 @@ public class DocumentModelElementsTreeController implements Initializable {
     typeColumn.setCellValueFactory(param -> {
       String type = param.getValue().getValue().getType();
       type = type.replaceAll("Type", "");
+      if (type.equalsIgnoreCase("Rule")) {
+        type = "Validation Rule";
+      }
+
       return new ReadOnlyStringWrapper(type);
     });
 
@@ -233,7 +238,7 @@ public class DocumentModelElementsTreeController implements Initializable {
   }
 
   private void applyColumnWidth(@NonNull TreeTableColumn<ElementViewModel, String> column,
-                                 BaseTableSettings tableSettings, @NonNull String columnId) {
+                                BaseTableSettings tableSettings, @NonNull String columnId) {
     if (tableSettings == null) {
       return;
     }

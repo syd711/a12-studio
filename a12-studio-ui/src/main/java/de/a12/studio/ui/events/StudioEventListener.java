@@ -22,4 +22,8 @@ public interface StudioEventListener {
   default void modelFocusRequested(@NonNull ModelFocusRequestedEvent event) {
 
   }
+
+  default void modelSaved(@NonNull ModelSaveEvent event) {
+
+  }
 }

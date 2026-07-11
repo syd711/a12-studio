@@ -3,6 +3,7 @@ package de.a12.studio.ui;
 import de.a12.studio.commons.util.FXResizeHelper;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.projects.Project;
+import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -13,6 +14,8 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
@@ -52,6 +55,7 @@ public class Studio extends Application implements StudioEventListener {
     }
 
     Scene scene = new Scene(root, width, height, Color.TRANSPARENT);
+    scene.addEventFilter(KeyEvent.KEY_PRESSED, this::onKeyPressed);
     stage.setTitle("A12 Studio");
     stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-150.png")));
     stage.setScene(scene);
@@ -81,6 +85,15 @@ public class Studio extends Application implements StudioEventListener {
     new UpdateController(stage).checkForUpdateAsync();
   }
 
+  private void onKeyPressed(@NonNull KeyEvent event) {
+    if (event.isControlDown() && event.getCode() == KeyCode.S) {
+      ProjectItem projectItem = rootController.getSelectedProjectItem();
+      if (projectItem != null) {
+        StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+      }
+      event.consume();
+    }
+  }
 
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {

@@ -13,9 +13,8 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelElementsTreeController">
     <top>
-        <ToolBar fx:id="modelTreeToolbarBar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <ToolBar fx:id="modelTreeToolbarBar" BorderPane.alignment="CENTER">
             <items>
-                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" text="Add" />
                 <Button fx:id="undoButton" accessibleText="Undo" mnemonicParsing="false" onAction="#onUndo" styleClass="default-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2u-undo" iconSize="18" styleClass="toolbar-icon" />
@@ -33,6 +32,8 @@
                     </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL" />
+                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" text="Add" />
+            <Separator layoutX="145.0" layoutY="10.0" orientation="VERTICAL" />
                 <TextField fx:id="searchField" prefWidth="160.0" promptText="Search" />
                 <Button fx:id="resetSearchButton" accessibleText="Clear search" mnemonicParsing="false" onAction="#onResetSearch" styleClass="default-button">
                     <graphic>
@@ -46,7 +47,7 @@
         </ToolBar>
     </top>
    <center>
-      <TreeTableView fx:id="elementsTreeTable" prefHeight="200.0" prefWidth="200.0">
+      <TreeTableView fx:id="elementsTreeTable">
         <columns>
           <TreeTableColumn fx:id="nameColumn" prefWidth="350.0" text="Name" />
           <TreeTableColumn fx:id="typeColumn" prefWidth="80.0" text="Data Type" />

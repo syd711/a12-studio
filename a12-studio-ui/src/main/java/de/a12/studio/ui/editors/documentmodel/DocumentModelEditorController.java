@@ -1,10 +1,12 @@
 package de.a12.studio.ui.editors.documentmodel;
 
+import de.a12.studio.commons.util.localsettings.BaseTableSettings;
+import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
-import de.a12.studio.commons.util.localsettings.BaseTableSettings;
-import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.ui.editors.AbstractEditorController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.SplitPane;
@@ -13,7 +15,7 @@ import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class DocumentModelEditorController implements Initializable {
+public class DocumentModelEditorController extends AbstractEditorController implements Initializable {
 
   private static final String TABLE_SETTINGS_ID = ModelType.DOCUMENT.getValue();
 
@@ -28,11 +30,11 @@ public class DocumentModelEditorController implements Initializable {
   @FXML
   private DocumentModelFieldEditorController fieldEditorController;
 
-  public void load(@NonNull DocumentModel model) {
-    load(model.getContent().getModelRoot());
+  public void loadModel(@NonNull A12Model model) {
+    load(((DocumentModel) model).getContent().getModelRoot());
   }
 
-  public void load(@NonNull ModelRoot modelRoot) {
+  private void load(@NonNull ModelRoot modelRoot) {
     elementsTreeController.load(modelRoot);
   }
 

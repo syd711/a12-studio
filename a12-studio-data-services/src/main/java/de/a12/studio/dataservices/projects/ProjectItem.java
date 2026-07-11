@@ -1,8 +1,11 @@
 package de.a12.studio.dataservices.projects;
 
+import de.a12.studio.commons.util.JsonSettings;
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.ModelFactory;
-import org.jspecify.annotations.Nullable;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,19 +15,35 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
+@Slf4j
 public class ProjectItem {
 
   private File file;
+  @Getter
   private ProjectItem parent;
   private List<ProjectItem> children;
+  @Getter
+  @Setter
   private boolean root = false;
+  @Getter
   private A12Model model;
   private boolean loaded = false;
 
   public ProjectItem(File listFile) {
     this.file = listFile;
     this.load();
+  }
+
+  public void save() {
+    try {
+      JsonSettings.objectMapper.writeValue(new File(getPath()), getModel());
+      log.info("Saved {}", getPath());
+    }
+    catch (Exception e) {
+      log.error("Failed to save '{}': {}", getPath(), e.getMessage(), e);
+    }
   }
 
   private void load() {
@@ -36,24 +55,12 @@ public class ProjectItem {
     }
   }
 
-  public A12Model getModel() {
-    return model;
-  }
-
-  public void setRoot(boolean root) {
-    this.root = root;
-  }
-
   public boolean isFolder() {
     return file.isDirectory();
   }
 
   public String getName() {
     return file.getName();
-  }
-
-  public ProjectItem getParent() {
-    return parent;
   }
 
   public List<ProjectItem> getChildren() {
@@ -76,10 +83,6 @@ public class ProjectItem {
 
   public String getPath() {
     return this.file.getAbsolutePath();
-  }
-
-  public boolean isRoot() {
-    return root;
   }
 
   public ProjectItem createChildFolder(String name) throws IOException {
@@ -207,5 +210,17 @@ public class ProjectItem {
       }
     }
     Files.delete(directory);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    ProjectItem that = (ProjectItem) o;
+    return Objects.equals(file, that.file);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(file);
   }
 }

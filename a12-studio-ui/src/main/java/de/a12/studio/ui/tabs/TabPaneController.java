@@ -4,10 +4,7 @@ import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
-import de.a12.studio.ui.events.ModelOpenedEvent;
-import de.a12.studio.ui.events.ProjectOpenedEvent;
-import de.a12.studio.ui.events.StudioEventListener;
-import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
@@ -46,9 +43,14 @@ public class TabPaneController implements Initializable, StudioEventListener {
     for (String path : event.getProject().getSettings().getOpenedFiles()) {
       File file = new File(path);
       if (file.exists()) {
-        StudioEventManager.getInstance().fireModelOpenEvent(new ProjectItem(file));
+        open(new ProjectItem(file));
       }
     }
+  }
+
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    getSelectedProjectItem().save();
   }
 
   @Override
@@ -61,17 +63,21 @@ public class TabPaneController implements Initializable, StudioEventListener {
       }
     }
 
+    open(event.getItem());
+  }
+
+  private void open(@NonNull ProjectItem item) {
     try {
       FXMLLoader loader = new FXMLLoader(DocumentModelEditorController.class.getResource("document-model-editor.fxml"));
       Parent content = loader.load();
 
-      if (event.getItem().getModel() instanceof DocumentModel documentModel) {
+      if (item.getModel() instanceof DocumentModel documentModel) {
         DocumentModelEditorController controller = loader.getController();
-        controller.load(documentModel);
+        controller.load(item);
       }
 
-      Tab tab = new Tab(event.getItem().getName(), content);
-      tab.setUserData(event.getItem());
+      Tab tab = new Tab(item.getName(), content);
+      tab.setUserData(item);
       tab.setClosable(true);
 
       FontIcon icon = WidgetFactory.createIcon(Icons.FILE_OUTLINE);
@@ -139,6 +145,11 @@ public class TabPaneController implements Initializable, StudioEventListener {
   private void closeTab(@NonNull Tab tab) {
     tabPane.getTabs().remove(tab);
     onTabClosed(tab);
+  }
+
+  public ProjectItem getSelectedProjectItem() {
+    Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+    return selectedTab == null ? null : (ProjectItem) selectedTab.getUserData();
   }
 
   @Override

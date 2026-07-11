@@ -1,6 +1,7 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.dataservices.projects.Project;
+import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
@@ -69,5 +70,9 @@ public class RootController implements Initializable, StudioEventListener {
 
   public void setTitle(String s) {
     headerController.setTitle(s);
+  }
+
+  public ProjectItem getSelectedProjectItem() {
+    return tabPaneController.getSelectedProjectItem();
   }
 }

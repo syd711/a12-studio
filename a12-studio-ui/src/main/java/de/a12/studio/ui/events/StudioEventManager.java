@@ -22,7 +22,7 @@ public class StudioEventManager {
 
   public void fireProjectOpenEvent(@NonNull Project project) {
     ProjectOpenedEvent event = new ProjectOpenedEvent(project);
-    for (StudioEventListener listener : listeners) {
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.projectOpened(event);
     }
   }
@@ -36,7 +36,7 @@ public class StudioEventManager {
 
   public void fireModelOpenEvent(@NonNull ProjectItem projectItem) {
     ModelOpenedEvent event = new ModelOpenedEvent(projectItem);
-    for (StudioEventListener listener : listeners) {
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.modelOpened(event);
     }
   }
@@ -45,6 +45,13 @@ public class StudioEventManager {
     ModelClosedEvent event = new ModelClosedEvent(projectItem);
     for (StudioEventListener listener : listeners) {
       listener.modelClosed(event);
+    }
+  }
+
+  public void fireModelSaveEvent(@NonNull ProjectItem projectItem) {
+    ModelSaveEvent event = new ModelSaveEvent(projectItem);
+    for (StudioEventListener listener : listeners) {
+      listener.modelSaved(event);
     }
   }
 
