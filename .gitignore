@@ -10,3 +10,4 @@ out/
 /gradle/
 /a12-studio-ui/build/
 /Output/
+/*.log

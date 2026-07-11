@@ -10,4 +10,8 @@ public interface StudioEventListener {
   default void modelOpened(@NonNull ModelOpenedEvent event) {
 
   }
+
+  default void modelClosed(@NonNull ModelClosedEvent event) {
+
+  }
 }

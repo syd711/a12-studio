@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -16,28 +17,40 @@
     <top>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
-                <Button mnemonicParsing="false" onAction="#onReload" styleClass="default-button">
+                <Button mnemonicParsing="false" onAction="#onReload" styleClass="default-button" accessibleText="Reload project tree">
                     <graphic>
                         <FontIcon iconLiteral="mdi2r-refresh" iconSize="18" styleClass="toolbar-icon"/>
                     </graphic>
+                    <tooltip>
+                        <Tooltip text="Reload project tree"/>
+                    </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL"/>
-                <Button mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
+                <Button mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button" accessibleText="Expand all">
                     <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-expand-vertical" iconSize="18" styleClass="toolbar-icon"/>
                     </graphic>
+                    <tooltip>
+                        <Tooltip text="Expand all"/>
+                    </tooltip>
                 </Button>
-                <Button mnemonicParsing="false" onAction="#onCollapseAll" styleClass="default-button">
+                <Button mnemonicParsing="false" onAction="#onCollapseAll" styleClass="default-button" accessibleText="Collapse all">
                     <graphic>
                         <FontIcon iconLiteral="mdi2a-arrow-collapse-vertical" iconSize="18" styleClass="toolbar-icon"/>
                     </graphic>
+                    <tooltip>
+                        <Tooltip text="Collapse all"/>
+                    </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL"/>
                 <TextField fx:id="searchField" prefWidth="160.0" promptText="Search"/>
-                <Button fx:id="resetSearchButton" mnemonicParsing="false" onAction="#onResetSearch" styleClass="default-button">
+                <Button fx:id="resetSearchButton" mnemonicParsing="false" onAction="#onResetSearch" styleClass="default-button" accessibleText="Clear search">
                     <graphic>
                         <FontIcon iconLiteral="mdi2c-close" iconSize="14" styleClass="toolbar-icon"/>
                     </graphic>
+                    <tooltip>
+                        <Tooltip text="Clear search"/>
+                    </tooltip>
                 </Button>
             </items>
         </ToolBar>
