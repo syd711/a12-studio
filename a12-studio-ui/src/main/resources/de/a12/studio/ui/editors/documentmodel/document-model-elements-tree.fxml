@@ -32,9 +32,9 @@
                     </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL" />
-                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" text="Add" />
+                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="primary-button" text="Add" />
             <Separator layoutX="145.0" layoutY="10.0" orientation="VERTICAL" />
-                <TextField fx:id="searchField" prefWidth="160.0" promptText="Search" />
+                <TextField fx:id="searchField" prefWidth="160.0" promptText="Search" styleClass="search-field" />
                 <Button fx:id="resetSearchButton" accessibleText="Clear search" mnemonicParsing="false" onAction="#onResetSearch" styleClass="default-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2c-close" iconSize="14" styleClass="toolbar-icon" />
@@ -49,8 +49,9 @@
    <center>
       <TreeTableView fx:id="elementsTreeTable">
         <columns>
-          <TreeTableColumn fx:id="nameColumn" prefWidth="350.0" text="Name" />
-          <TreeTableColumn fx:id="typeColumn" prefWidth="80.0" text="Data Type" />
+          <TreeTableColumn fx:id="nameColumn" prefWidth="350.0" text="NAME" />
+          <TreeTableColumn fx:id="typeColumn" prefWidth="80.0" text="DATA TYPE" />
+            <TreeTableColumn fx:id="spacerColumn" prefWidth="400.0" />
         </columns>
       </TreeTableView>
    </center>

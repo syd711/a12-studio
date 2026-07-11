@@ -1,15 +1,14 @@
 /**
  * Color Palette
  * Single source of truth for all colors used across the theme.
- * Modeled after the IntelliJ IDEA standard "Light" theme.
  */
 * {
     /* Raw palette */
     -fx-base-1: #FFFFFF;
-    -fx-base-2: #F2F2F2;
-    -fx-base-3: #3574F0;
-    -fx-base-4: #D1D1D1;
-    -fx-base-5: #1E1E1E;
+    -fx-base-2: #F1F2F5;
+    -fx-base-3: #3B6FE0;
+    -fx-base-4: #E2E4E8;
+    -fx-base-5: #2C2F36;
 
     /* Semantic roles */
     -fx-surface-color: -fx-base-1;
@@ -26,4 +25,33 @@
     -fx-text-color-disabled: derive(-fx-text-color, 60%);
 
     -fx-header-color: #272828;
+
+    /* Chrome surfaces (menu bar, toolbars, sidebar, properties panel) */
+    -fx-chrome-bg: #FCFCFD;
+    -fx-content-bg: -fx-base-1;
+
+    /* Borders */
+    -fx-border-subtle: #E7E9ED;
+    -fx-border-divider: #EEEFF2;
+    -fx-border-header: #E5E7EB;
+    -fx-border-input: #DEE1E6;
+    -fx-border-checkbox: #BFC3CA;
+
+    /* Text */
+    -fx-text-secondary: #111111;
+    -fx-text-muted: #7A7F89;
+    -fx-text-faint: #8A8F99;
+    -fx-text-table-header: #5C6270;
+    -fx-text-section-header: #4A4F58;
+    -fx-icon-color-theme: #565C68;
+
+    /* Selection / accent-driven state */
+    -fx-selection-bg: #E4E9FB;
+    -fx-selection-text: #2A3E9C;
+
+    /* Component surfaces */
+    -fx-input-bg: -fx-base-1;
+    -fx-input-readonly-bg: #F5F6F8;
+    -fx-search-bg: #F3F4F6;
+    -fx-table-header-bg: #F8F9FA;
 }

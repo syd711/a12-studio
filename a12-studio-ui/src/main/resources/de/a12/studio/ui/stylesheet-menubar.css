@@ -1,13 +1,27 @@
 /**
  * Menu Bar
  */
+.menu-bar {
+    -fx-background-color: -fx-chrome-bg;
+    -fx-border-color: transparent transparent -fx-border-subtle transparent;
+    -fx-border-width: 0 0 0 0;
+    -fx-min-height: 36px;
+}
+
 .menu-bar,
 .menu-bar .label,
 .menu-item .label {
     -fx-font-size: 14px;
+    -fx-text-fill: -fx-text-secondary;
 }
 
 .menu-item:hover .menu-icon,
 .menu-item:focused .menu-icon {
     -fx-icon-color: white;
+    -fx-text-fill: white;
+}
+
+.menu-item:hover .label,
+.menu-item:focused .label {
+    -fx-text-fill: white;
 }

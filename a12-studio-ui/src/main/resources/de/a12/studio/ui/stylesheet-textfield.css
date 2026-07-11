@@ -2,5 +2,36 @@
  * Text Fields
  */
 .text-field {
-    -fx-font-size: 14px;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -fx-text-color;
+    -fx-background-color: -fx-input-bg;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: -fx-border-input;
+    -fx-border-width: 1px;
+    -fx-pref-height: 36px;
+    -fx-prompt-text-fill: -fx-text-faint;
+}
+
+.text-field:focused {
+    -fx-border-color: -fx-accent-color;
+}
+
+/**
+ * Read-only fields (e.g. ID, Path)
+ */
+.readonly-field,
+.readonly-field:focused {
+    -fx-background-color: -fx-input-readonly-bg;
+    -fx-text-fill: -fx-text-muted;
+    -fx-border-color: -fx-border-input;
+}
+
+/**
+ * Search input
+ */
+.search-field {
+    -fx-background-color: -fx-search-bg;
+    -fx-border-color: -fx-border-color-theme;
+    -fx-pref-height: 34px;
 }

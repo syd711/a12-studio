@@ -21,3 +21,51 @@
 .default-button FontIcon {
     -fx-icon-color: #000000;
 }
+
+/**
+ * Toolbar icon buttons (secondary / neutral)
+ */
+.default-button {
+    -fx-background-color: -fx-panel-color;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 0;
+    -fx-pref-width: 34px;
+    -fx-pref-height: 34px;
+    -fx-min-width: 34px;
+    -fx-min-height: 34px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.default-button:hover {
+    -fx-background-color: derive(-fx-panel-color, -6%);
+}
+
+/**
+ * Primary action button (e.g. "+ Add")
+ */
+.primary-button {
+    -fx-background-color: -fx-accent-color;
+    -fx-background-radius: 7px;
+    -fx-border-radius: 7px;
+    -fx-border-width: 0;
+    -fx-text-fill: -fx-text-color-inverse;
+    -fx-font-weight: bold;
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-padding: 0 12px;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: derive(-fx-accent-color, -10%);
+}
+
+.primary-button .label {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.primary-button .arrow {
+    -fx-background-color: -fx-text-color-inverse;
+}

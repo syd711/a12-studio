@@ -4,3 +4,17 @@
 .label {
     -fx-font-size: 14px;
 }
+
+/**
+ * Form field labels (right properties panel)
+ */
+.field-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-text-muted;
+    -fx-padding: 0 0 6px 0;
+}
+
+.placeholder-label {
+    -fx-text-fill: -fx-text-faint;
+    -fx-font-style: italic;
+}

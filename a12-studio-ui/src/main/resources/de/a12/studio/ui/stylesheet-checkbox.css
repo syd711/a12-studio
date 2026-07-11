@@ -4,3 +4,21 @@
 .check-box {
     -fx-font-size: 14px;
 }
+
+.check-box .box {
+    -fx-background-color: -fx-input-bg;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: -fx-border-checkbox;
+    -fx-border-width: 1.5px;
+    -fx-padding: 1px;
+}
+
+.check-box:selected .box {
+    -fx-background-color: -fx-accent-color;
+    -fx-border-color: -fx-accent-color;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: -fx-text-color-inverse;
+}

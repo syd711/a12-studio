@@ -19,9 +19,13 @@
 }
 
 .titled-pane > .title > .text {
-    -fx-font-size: 16px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-fill: -fx-text-color;
+    -fx-fill: -fx-text-section-header;
+}
+
+.titled-pane:collapsed > .title > .text {
+    -fx-fill: -fx-text-faint;
 }
 
 .titled-pane > .title > .arrow-button {
