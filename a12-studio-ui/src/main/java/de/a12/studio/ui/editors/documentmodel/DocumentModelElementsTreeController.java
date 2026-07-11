@@ -10,20 +10,17 @@ import de.a12.studio.commons.util.localsettings.BaseTableSettings;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.ui.util.Icons;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableRow;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.*;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class DocumentModelElementsTreeController implements Initializable {
@@ -33,6 +30,12 @@ public class DocumentModelElementsTreeController implements Initializable {
   private static final String NAME_COLUMN_ID = "name";
 
   private static final String TYPE_COLUMN_ID = "type";
+
+  @FXML
+  private ToolBar modelTreeToolbarBar;
+
+  @FXML
+  private MenuButton modelTreeAddButton;
 
   @FXML
   private TreeTableView<ElementViewModel> elementsTreeTable;
@@ -75,7 +78,16 @@ public class DocumentModelElementsTreeController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    modelTreeAddButton.setDisable(true);
+
     elementsTreeTable.setShowRoot(false);
+    elementsTreeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    elementsTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ElementViewModel>>() {
+      @Override
+      public void changed(ObservableValue<? extends TreeItem<ElementViewModel>> observable, TreeItem<ElementViewModel> oldValue, TreeItem<ElementViewModel> newValue) {
+        modelTreeAddButton.setDisable(newValue == null);
+      }
+    });
     elementsTreeTable.setRowFactory(treeTable -> new TreeTableRow<>() {
       @Override
       protected void updateItem(ElementViewModel item, boolean empty) {
@@ -105,7 +117,13 @@ public class DocumentModelElementsTreeController implements Initializable {
         }
       }
     });
-    typeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().getType()));
+
+
+    typeColumn.setCellValueFactory(param -> {
+      String type = param.getValue().getValue().getType();
+      type = type.replaceAll("Type", "");
+      return new ReadOnlyStringWrapper(type);
+    });
 
     BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
     applyColumnWidth(nameColumn, tableSettings, NAME_COLUMN_ID);
@@ -115,17 +133,52 @@ public class DocumentModelElementsTreeController implements Initializable {
         saveColumnWidth(NAME_COLUMN_ID, newValue.doubleValue()));
     typeColumn.widthProperty().addListener((observable, oldValue, newValue) ->
         saveColumnWidth(TYPE_COLUMN_ID, newValue.doubleValue()));
+
+    modelTreeAddButton.getItems().addAll(createElementToolbarMenuItems());
   }
 
   private ContextMenu createContextMenu(@NonNull ElementViewModel viewModel) {
-    MenuItem cut = new MenuItem("_Cut");
-    cut.setGraphic(WidgetFactory.createIcon(Icons.CUT));
-    MenuItem copy = new MenuItem("Cop_y");
-    copy.setGraphic(WidgetFactory.createIcon(Icons.COPY));
-    MenuItem paste = new MenuItem("_Paste");
-    MenuItem delete = new MenuItem("_Delete");
-    delete.setGraphic(WidgetFactory.createIcon(Icons.TRASH));
-    return new ContextMenu(cut, copy, paste, new SeparatorMenuItem(), delete);
+    ContextMenu contextMenu = new ContextMenu();
+    contextMenu.getItems().addAll(createElementMenuItems());
+    return contextMenu;
+  }
+
+  private List<MenuItem> createElementMenuItems() {
+    List<MenuItem> items = new ArrayList<>();
+    items.add(createMenuItem("_Group", Icons.ELEMENT_GROUP));
+    items.add(createMenuItem("_Field", Icons.ELEMENT_FIELD));
+    items.add(createMenuItem("_Validation Rule", Icons.ELEMENT_RULE));
+    items.add(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION));
+    items.add(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT));
+    items.add(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT));
+    items.add(createMenuItem("_Include", Icons.ELEMENT_INCLUDE));
+    items.add(new SeparatorMenuItem());
+    items.add(createMenuItem("_Cut", Icons.CUT));
+    items.add(createMenuItem("Cop_y", Icons.COPY));
+    items.add(createMenuItem("_Paste", Icons.PASTE));
+    items.add(new SeparatorMenuItem());
+    items.add(createMenuItem("_Delete", Icons.TRASH));
+    return items;
+  }
+
+  private List<MenuItem> createElementToolbarMenuItems() {
+    List<MenuItem> items = new ArrayList<>();
+    items.add(createMenuItem("_Group", Icons.ELEMENT_GROUP));
+    items.add(createMenuItem("_Field", Icons.ELEMENT_FIELD));
+    items.add(createMenuItem("_Validation Rule", Icons.ELEMENT_RULE));
+    items.add(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION));
+    items.add(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT));
+    items.add(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT));
+    items.add(createMenuItem("_Include", Icons.ELEMENT_INCLUDE));
+    return items;
+  }
+
+  private MenuItem createMenuItem(@NonNull String text, @NonNull String icon) {
+    MenuItem menuItem = new MenuItem(text);
+    FontIcon fontIcon = WidgetFactory.createIcon(icon);
+    fontIcon.getStyleClass().add("menu-icon");
+    menuItem.setGraphic(fontIcon);
+    return menuItem;
   }
 
   private void applyColumnWidth(@NonNull TreeTableColumn<ElementViewModel, String> column,

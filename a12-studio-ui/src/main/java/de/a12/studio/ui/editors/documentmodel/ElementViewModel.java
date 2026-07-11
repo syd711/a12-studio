@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.dataservices.models.documentmodel.Element;
+import de.a12.studio.dataservices.models.documentmodel.FieldElement;
 import de.a12.studio.dataservices.models.documentmodel.GroupElement;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
@@ -25,6 +26,11 @@ public class ElementViewModel {
   }
 
   public String getType() {
+    if (element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() != null) {
+      return fieldElement.getField().getFieldType().getType();
+    }
     return element.getType();
   }
 

@@ -11,3 +11,5 @@ out/
 /a12-studio-ui/build/
 /Output/
 /*.log
+config/*.json
+config/*.settings

@@ -6,3 +6,8 @@
 .menu-item .label {
     -fx-font-size: 14px;
 }
+
+.menu-item:hover .menu-icon,
+.menu-item:focused .menu-icon {
+    -fx-icon-color: white;
+}

@@ -22,10 +22,14 @@ public interface Icons {
   String TRASH = "mdi2t-trash-can-outline";
   String COPY = "mdi2c-content-copy";
   String CUT = "mdi2c-content-cut";
+  String PASTE = "mdi2c-content-paste";
 
   String ELEMENT_GROUP = "mdi2f-folder-outline";
   String ELEMENT_FIELD = "mdi2f-form-textbox";
   String ELEMENT_RULE = "mdi2a-alert-circle-outline";
   String ELEMENT_COMPUTATION = "mdi2f-function-variant";
+  String ELEMENT_ATTACHMENT = "mdi2p-paperclip";
+  String ELEMENT_MULTI_SELECT = "mdi2c-checkbox-multiple-marked-outline";
+  String ELEMENT_INCLUDE = "mdi2f-file-import-outline";
   String ELEMENT_GENERIC = "mdi2s-shape-outline";
 }
