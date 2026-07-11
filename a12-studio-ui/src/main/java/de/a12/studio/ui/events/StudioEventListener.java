@@ -14,4 +14,8 @@ public interface StudioEventListener {
   default void modelClosed(@NonNull ModelClosedEvent event) {
 
   }
+
+  default void modelFocusRequested(@NonNull ModelFocusRequestedEvent event) {
+
+  }
 }

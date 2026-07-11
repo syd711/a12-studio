@@ -1,6 +1,7 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.commons.util.FXResizeHelper;
+import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
@@ -13,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -43,16 +45,28 @@ public class Studio extends Application implements StudioEventListener {
     double width = 1480;
     double height = 900;
 
+    Rectangle position = LocalUISettings.getPosition();
+    if (position.getWidth() > width && position.getHeight() > height) {
+      width = position.getWidth();
+      height = position.getHeight();
+    }
+
     Scene scene = new Scene(root, width, height, Color.TRANSPARENT);
     stage.setTitle("A12 Studio");
     stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-150.png")));
     stage.setScene(scene);
-    stage.setMinWidth(width);
-    stage.setMinHeight(height);
+    stage.setMinWidth(1480);
+    stage.setMinHeight(900);
     stage.setResizable(true);
     stage.initStyle(StageStyle.TRANSPARENT);
-    stage.setX((screenBounds.getWidth() / 2) - (width / 2));
-    stage.setY((screenBounds.getHeight() / 2) - (height / 2));
+    if (position.getX() != -1) {
+      stage.setX(position.getX());
+      stage.setY(position.getY());
+    }
+    else {
+      stage.setX((screenBounds.getWidth() / 2) - (width / 2));
+      stage.setY((screenBounds.getHeight() / 2) - (height / 2));
+    }
 
     FXResizeHelper.install(stage, 30, 6);
     stage.show();

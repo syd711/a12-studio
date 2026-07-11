@@ -40,4 +40,11 @@ public class StudioEventManager {
       listener.modelClosed(event);
     }
   }
+
+  public void fireModelFocusRequestedEvent(@NonNull ProjectItem projectItem) {
+    ModelFocusRequestedEvent event = new ModelFocusRequestedEvent(projectItem);
+    for (StudioEventListener listener : listeners) {
+      listener.modelFocusRequested(event);
+    }
+  }
 }

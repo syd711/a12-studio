@@ -3,6 +3,7 @@ package de.a12.studio.ui.projecttree;
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.events.ModelFocusRequestedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -122,6 +123,45 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
     load(event.getProject());
+  }
+
+  @Override
+  public void modelFocusRequested(@NonNull ModelFocusRequestedEvent event) {
+    revealItem(event.getItem());
+  }
+
+  private void revealItem(@NonNull ProjectItem item) {
+    if (!searchField.getText().isEmpty()) {
+      searchField.clear();
+    }
+
+    TreeItem<ProjectItemViewModel> treeItem = findTreeItem(projectTree.getRoot(), item);
+    if (treeItem == null) {
+      return;
+    }
+
+    for (TreeItem<ProjectItemViewModel> parent = treeItem.getParent(); parent != null; parent = parent.getParent()) {
+      parent.setExpanded(true);
+    }
+
+    projectTree.getSelectionModel().select(treeItem);
+    projectTree.scrollTo(projectTree.getRow(treeItem));
+  }
+
+  private TreeItem<ProjectItemViewModel> findTreeItem(TreeItem<ProjectItemViewModel> treeItem, @NonNull ProjectItem target) {
+    if (treeItem == null) {
+      return null;
+    }
+    if (treeItem.getValue().getProjectItem().getPath().equals(target.getPath())) {
+      return treeItem;
+    }
+    for (TreeItem<ProjectItemViewModel> child : treeItem.getChildren()) {
+      TreeItem<ProjectItemViewModel> found = findTreeItem(child, target);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
   }
 
   private TreeItem<ProjectItemViewModel> toTreeItem(@NonNull ProjectItemViewModel viewModel) {

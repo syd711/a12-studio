@@ -1,6 +1,8 @@
 package de.a12.studio.ui;
 
+import de.a12.studio.commons.fx.Debouncer;
 import de.a12.studio.commons.util.FXResizeHelper;
+import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -21,6 +23,7 @@ import java.util.ResourceBundle;
  *
  */
 public class HeaderController implements Initializable {
+  private final Debouncer debouncer = new Debouncer();
 
   @FXML
   private Button maximizeBtn;
@@ -58,6 +61,19 @@ public class HeaderController implements Initializable {
   }
 
   @FXML
+  private void onDragDone() {
+    debouncer.debounce("position", () -> {
+      int y = (int) getStage().getY();
+      int x = (int) getStage().getX();
+      int width = (int) getStage().getWidth();
+      int height = (int) getStage().getHeight();
+      if (width > 0 && height > 0) {
+        LocalUISettings.saveLocation(x, y, width, height);
+      }
+    }, 500);
+  }
+
+  @FXML
   private void onMaximize() {
     FXResizeHelper helper = (FXResizeHelper) getStage().getUserData();
     boolean isMaximize = helper.switchWindowedMode(event);
@@ -87,6 +103,11 @@ public class HeaderController implements Initializable {
     Platform.runLater(() -> {
       Stage stage = getStage();
       if (stage != null) {
+        stage.xProperty().addListener((observable, oldValue, newValue) -> onDragDone());
+        stage.yProperty().addListener((observable, oldValue, newValue) -> onDragDone());
+        stage.widthProperty().addListener((observable, oldValue, newValue) -> onDragDone());
+        stage.heightProperty().addListener((observable, oldValue, newValue) -> onDragDone());
+
         header.setOnMouseMoved(new EventHandler<MouseEvent>() {
           @Override
           public void handle(MouseEvent event) {

@@ -8,10 +8,12 @@ import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.util.Icons;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -69,10 +71,27 @@ public class TabPaneController implements Initializable, StudioEventListener {
       tab.setContextMenu(createTabContextMenu(tab));
       tabPane.getTabs().add(tab);
       tabPane.getSelectionModel().select(tab);
+      installDoubleClickHandler(tab);
     }
     catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  private void installDoubleClickHandler(@NonNull Tab tab) {
+    Platform.runLater(() -> {
+      Node tabNode = tab.getTabPane();
+      if (tabNode != null) {
+        tabNode.setOnMouseClicked(event -> {
+          if (event.getClickCount() == 2) {
+            ProjectItem projectItem = (ProjectItem) tab.getUserData();
+            if (projectItem != null) {
+              StudioEventManager.getInstance().fireModelFocusRequestedEvent(projectItem);
+            }
+          }
+        });
+      }
+    });
   }
 
   private ContextMenu createTabContextMenu(@NonNull Tab tab) {
