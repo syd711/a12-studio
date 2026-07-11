@@ -243,10 +243,20 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     StudioEventManager.getInstance().addListener(this);
     searchField.textProperty().addListener((observable, oldValue, newValue) -> applyFilter(newValue));
     projectTree.setOnKeyPressed(event -> {
+      TreeItem<ProjectItemViewModel> selected = projectTree.getSelectionModel().getSelectedItem();
       if (event.getCode() == KeyCode.ENTER) {
-        TreeItem<ProjectItemViewModel> selected = projectTree.getSelectionModel().getSelectedItem();
         if (selected != null) {
           openItem(selected.getValue());
+        }
+      }
+      else if (event.getCode() == KeyCode.DELETE) {
+        if (selected != null && !selected.getValue().getProjectItem().isRoot()) {
+          onDeleteItem(selected.getValue().getProjectItem());
+        }
+      }
+      else if (event.getCode() == KeyCode.F2) {
+        if (selected != null && !selected.getValue().getProjectItem().isRoot()) {
+          onRenameItem(selected.getValue().getProjectItem());
         }
       }
     });

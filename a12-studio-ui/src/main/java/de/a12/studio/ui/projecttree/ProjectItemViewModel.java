@@ -36,10 +36,6 @@ public class ProjectItemViewModel {
 
   @Override
   public String toString() {
-    if (projectItem.isRoot()) {
-      return getName() + " (" + projectItem.getPath() + ")";
-    }
-
     return getName();
   }
 }

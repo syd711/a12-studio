@@ -72,6 +72,6 @@ public class Studio extends Application implements StudioEventListener {
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
     Project project = event.getProject();
     stage.setTitle("A12 Studio - " + project.getName());
-    rootController.setTitle("A12 Studio - " + project.getName());
+    rootController.setTitle("A12 Studio - " + project.getName() + " (" + project.getRoot().getPath() + ")");
   }
 }
