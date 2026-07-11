@@ -8,7 +8,11 @@ import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.commons.util.localsettings.BaseTableSettings;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.util.commandstack.Command;
 import de.a12.studio.ui.editors.util.commandstack.CommandStack;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
@@ -56,15 +60,17 @@ public class DocumentModelElementsTreeController implements Initializable {
   @FXML
   private TreeTableColumn<ElementViewModel, String> typeColumn;
 
+  private ProjectItem projectItem;
   private ModelRoot modelRoot;
 
   private final CommandStack commandStack = new CommandStack();
 
   public void load(@NonNull DocumentModel model) {
-    load(model.getContent().getModelRoot());
+    load(projectItem, model.getContent().getModelRoot());
   }
 
-  public void load(@NonNull ModelRoot modelRoot) {
+  public void load(ProjectItem projectItem, @NonNull ModelRoot modelRoot) {
+    this.projectItem = projectItem;
     this.modelRoot = modelRoot;
     applyFilter(searchField.getText());
   }
@@ -73,12 +79,16 @@ public class DocumentModelElementsTreeController implements Initializable {
   private void onUndo() {
     commandStack.undo();
     updateUndoRedoState();
+    applyFilter(searchField.getText());
+    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 
   @FXML
   private void onRedo() {
     commandStack.redo();
     updateUndoRedoState();
+    applyFilter(searchField.getText());
+    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 
   private void updateUndoRedoState() {
@@ -232,8 +242,61 @@ public class DocumentModelElementsTreeController implements Initializable {
     items.add(createMenuItem("Cop_y", Icons.COPY));
     items.add(createMenuItem("_Paste", Icons.PASTE));
     items.add(new SeparatorMenuItem());
-    items.add(createMenuItem("_Delete", Icons.TRASH));
+    MenuItem deleteItem = createMenuItem("_Delete", Icons.TRASH);
+    deleteItem.setOnAction(event -> onDeleteModelItem());
+    items.add(deleteItem);
     return items;
+  }
+
+  private void onDeleteModelItem() {
+    List<TreeItem<ElementViewModel>> selection =
+        new ArrayList<>(elementsTreeTable.getSelectionModel().getSelectedItems());
+    for (TreeItem<ElementViewModel> treeItem : topLevelSelection(selection)) {
+      Command command = createDeleteCommand(treeItem);
+      if (command != null) {
+        commandStack.execute(command);
+      }
+    }
+
+    updateUndoRedoState();
+    applyFilter(searchField.getText());
+    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+  }
+
+  private List<TreeItem<ElementViewModel>> topLevelSelection(@NonNull List<TreeItem<ElementViewModel>> selection) {
+    List<TreeItem<ElementViewModel>> result = new ArrayList<>();
+    for (TreeItem<ElementViewModel> treeItem : selection) {
+      if (treeItem != null && !hasSelectedAncestor(treeItem, selection)) {
+        result.add(treeItem);
+      }
+    }
+    return result;
+  }
+
+  private boolean hasSelectedAncestor(@NonNull TreeItem<ElementViewModel> treeItem,
+                                       @NonNull List<TreeItem<ElementViewModel>> selection) {
+    TreeItem<ElementViewModel> ancestor = treeItem.getParent();
+    while (ancestor != null) {
+      if (selection.contains(ancestor)) {
+        return true;
+      }
+      ancestor = ancestor.getParent();
+    }
+    return false;
+  }
+
+  private Command createDeleteCommand(@NonNull TreeItem<ElementViewModel> treeItem) {
+    Element element = treeItem.getValue().getElement();
+    TreeItem<ElementViewModel> parentItem = treeItem.getParent();
+    if (parentItem == null || parentItem.getValue() == null) {
+      return new DeleteNodeCommand<>(modelRoot.getRootGroups(), (GroupElement) element);
+    }
+
+    Element parentElement = parentItem.getValue().getElement();
+    if (parentElement instanceof GroupElement groupElement && groupElement.getGroup() != null) {
+      return new DeleteNodeCommand<>(groupElement.getGroup().getElements(), element);
+    }
+    return null;
   }
 
   private List<MenuItem> createElementToolbarMenuItems() {

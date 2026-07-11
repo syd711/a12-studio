@@ -12,14 +12,19 @@
     -fx-background-color: -fx-content-bg;
 }
 
-.tree-cell:selected {
-    -fx-background-color: -fx-selection-bg;
-    -fx-text-fill: -fx-selection-text;
+.tree-cell:filled:selected,
+.tree-cell:filled:selected:focused,
+.tree-cell:filled:selected:hover {
+    -fx-background: -fx-accent-color;
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill: -fx-text-color-inverse;
     -fx-font-weight: 600;
 }
 
-.tree-cell:selected .tree-icon {
-    -fx-icon-color: -fx-selection-text;
+.tree-cell:filled:selected .tree-icon,
+.tree-cell:filled:selected:focused .tree-icon,
+.tree-cell:filled:selected:hover .tree-icon {
+    -fx-icon-color: -fx-text-color-inverse;
 }
 
 /**
@@ -47,7 +52,7 @@
 .tree-table-view .column-header,
 .tree-table-view .filler {
     -fx-background-color: transparent;
-    -fx-border-color: transparent transparent -fx-border-header transparent;
+    -fx-border-color: -fx-border-header -fx-border-header -fx-border-header transparent;
     -fx-border-width: 1px;
 }
 
@@ -58,17 +63,48 @@
     -fx-border-width: 1px;
 }
 
-.tree-table-row-cell:selected {
-    -fx-background-color: -fx-selection-bg;
+.tree-table-row-cell:filled:selected,
+.tree-table-row-cell:filled:selected:focused,
+.tree-table-row-cell:filled:selected:hover {
+    -fx-background: -fx-accent-color;
+    -fx-background-color: -fx-accent-color;
 }
 
-.tree-table-row-cell:selected .tree-table-cell {
-    -fx-text-fill: -fx-selection-text;
+.tree-table-row-cell:filled:selected .tree-table-cell,
+.tree-table-row-cell:filled:selected:focused .tree-table-cell,
+.tree-table-row-cell:filled:selected:hover .tree-table-cell {
+    -fx-text-fill: -fx-text-color-inverse;
     -fx-font-weight: 600;
 }
 
 .tree-table-cell:selected .tree-icon {
-    -fx-icon-color: -fx-selection-text;
+    -fx-icon-color: -fx-text-color-inverse;
+}
+
+/*
+ * ID-scoped overrides for the document model elements TreeTableView
+ * (fx:id="elementsTreeTable"). An id selector always outranks Modena's
+ * built-in class/pseudo-class selectors, so this is used as a guaranteed
+ * override for row selection background/text regardless of focus state.
+ */
+#elementsTreeTable .tree-table-row-cell:filled:selected,
+#elementsTreeTable .tree-table-row-cell:filled:selected:focused,
+#elementsTreeTable .tree-table-row-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+}
+
+#elementsTreeTable .tree-table-row-cell:filled:selected .tree-table-cell,
+#elementsTreeTable .tree-table-row-cell:filled:selected:focused .tree-table-cell,
+#elementsTreeTable .tree-table-row-cell:filled:selected:hover .tree-table-cell {
+    -fx-text-fill: -fx-text-color-inverse;
+    -fx-font-weight: 600;
+}
+
+#elementsTreeTable .tree-table-row-cell:filled:selected .tree-table-cell .tree-icon,
+#elementsTreeTable .tree-table-row-cell:filled:selected:focused .tree-table-cell .tree-icon,
+#elementsTreeTable .tree-table-row-cell:filled:selected:hover .tree-table-cell .tree-icon {
+    -fx-icon-color: -fx-text-color-inverse;
 }
 
 .tree-cell.model-missing {
@@ -76,6 +112,26 @@
     -fx-font-style: italic;
 }
 
-.tree-cell.model-missing:selected {
-    -fx-text-fill: -fx-selection-text;
+.tree-cell.model-missing:filled:selected,
+.tree-cell.model-missing:filled:selected:focused,
+.tree-cell.model-missing:filled:selected:hover {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+/*
+ * ID-scoped overrides for the plain project TreeView (fx:id="projectTree").
+ * Uses a softer, more muted blue than the vivid accent color used elsewhere.
+ */
+#projectTree .tree-cell:filled:selected,
+#projectTree .tree-cell:filled:selected:focused,
+#projectTree .tree-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+#projectTree .tree-cell:filled:selected .tree-icon,
+#projectTree .tree-cell:filled:selected:focused .tree-icon,
+#projectTree .tree-cell:filled:selected:hover .tree-icon {
+    -fx-icon-color: -fx-text-color-inverse;
 }

@@ -48,6 +48,15 @@
     /* Selection / accent-driven state */
     -fx-selection-bg: #E4E9FB;
     -fx-selection-text: #2A3E9C;
+    -fx-selection-bar-soft: derive(-fx-accent-color, 30%);
+
+    /* JavaFX built-in accent/selection variables consumed by Modena's default
+       control styling (e.g. TreeCell/TreeTableRow selection) - point these at
+       our theme color so default component selection colors match the theme. */
+    -fx-accent: -fx-accent-color;
+    -fx-selection-bar: -fx-accent-color;
+    -fx-selection-bar-non-focused: -fx-accent-color;
+    -fx-selection-bar-text: -fx-text-color-inverse;
 
     /* Component surfaces */
     -fx-input-bg: -fx-base-1;

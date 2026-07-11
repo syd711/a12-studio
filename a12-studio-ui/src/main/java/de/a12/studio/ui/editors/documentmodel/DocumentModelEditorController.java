@@ -35,7 +35,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   }
 
   private void load(@NonNull ModelRoot modelRoot) {
-    elementsTreeController.load(modelRoot);
+    elementsTreeController.load(projectItem, modelRoot);
   }
 
   @Override
