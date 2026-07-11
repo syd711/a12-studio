@@ -27,6 +27,7 @@ public class MenuBarController implements Initializable {
 
   @FXML
   private Menu recentProjectsMenu;
+  private Project project;
 
   @FXML
   private void onNew() {
@@ -55,7 +56,7 @@ public class MenuBarController implements Initializable {
 
   private void openProject(File file) {
     LocalUISettings.saveProject(file);
-    Project project = new Project();
+    project = new Project();
     project.load(file);
 
     StudioEventManager.getInstance().fireProjectOpenEvent(project);
@@ -85,6 +86,7 @@ public class MenuBarController implements Initializable {
 
   @FXML
   private void onCloseProject() {
+    StudioEventManager.getInstance().fireProjectClosedEvent(project);
   }
 
   @FXML

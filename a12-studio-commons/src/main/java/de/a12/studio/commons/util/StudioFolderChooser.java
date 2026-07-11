@@ -3,14 +3,12 @@ package de.a12.studio.commons.util;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.lang.invoke.MethodHandles;
 
+@Slf4j
 public class StudioFolderChooser {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private DirectoryChooser folderChooser;
 
@@ -23,7 +21,7 @@ public class StudioFolderChooser {
       }
     }
     catch (Exception e) {
-      LOG.error("Error creating folder chooser: " + e.getMessage(), e);
+      log.error("Error creating folder chooser: " + e.getMessage(), e);
     }
   }
 
@@ -45,7 +43,7 @@ public class StudioFolderChooser {
       return file;
     }
     catch (Exception e) {
-      LOG.error("Error saving file location: " + e.getMessage(), e);
+      log.error("Error saving file location: " + e.getMessage(), e);
     }
     return null;
   }

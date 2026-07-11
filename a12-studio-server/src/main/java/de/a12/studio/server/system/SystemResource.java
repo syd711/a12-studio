@@ -2,8 +2,7 @@ package de.a12.studio.server.system;
 
 import de.a12.studio.commons.Updater;
 import de.a12.studio.server.A12StudioServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,16 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
 /**
  * Exposes the self-update flow (check/download/install) over REST so a12-studio-ui
  * can trigger a server update remotely.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/system")
 public class SystemResource {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   @GetMapping("/version")
   public String version() {
@@ -52,7 +50,7 @@ public class SystemResource {
 
   @PostMapping("/update/install")
   public boolean installUpdate() throws IOException {
-    LOG.info("Installing server update and restarting.");
+    log.info("Installing server update and restarting.");
     Updater.installServerUpdate();
     new Thread(() -> {
       try {

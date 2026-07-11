@@ -27,6 +27,13 @@ public class StudioEventManager {
     }
   }
 
+  public void fireProjectClosedEvent(@NonNull Project project) {
+    ProjectClosedEvent event = new ProjectClosedEvent(project);
+    for (StudioEventListener listener : listeners) {
+      listener.projectClosed(event);
+    }
+  }
+
   public void fireModelOpenEvent(@NonNull ProjectItem projectItem) {
     ModelOpenedEvent event = new ModelOpenedEvent(projectItem);
     for (StudioEventListener listener : listeners) {

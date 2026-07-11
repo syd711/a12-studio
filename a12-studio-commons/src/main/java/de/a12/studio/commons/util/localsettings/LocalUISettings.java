@@ -5,19 +5,17 @@ import de.a12.studio.commons.util.PropertiesStore;
 import javafx.scene.shape.Rectangle;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class LocalUISettings {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   public static final String LAST_FOLDER_SELECTION = "lastFolderSelection";
 
@@ -53,7 +51,7 @@ public class LocalUISettings {
       return (T) jsonSettingsCache.get(clazzName);
     }
     catch (Exception e) {
-      LOG.error("Failed to read preferences: {}", e.getMessage(), e);
+      log.error("Failed to read preferences: {}", e.getMessage(), e);
     }
     return null;
   }
@@ -75,7 +73,7 @@ public class LocalUISettings {
       saveProperty(key, json);
     }
     catch (Exception e) {
-      LOG.warn("Failed to write json preference for {}: {}", key, e.getMessage(), e);
+      log.warn("Failed to write json preference for {}: {}", key, e.getMessage(), e);
     }
   }
 
@@ -87,7 +85,7 @@ public class LocalUISettings {
       }
     }
     catch (Exception e) {
-      LOG.warn("Failed to read json preference for {}: {}", key, e.getMessage(), e);
+      log.warn("Failed to read json preference for {}: {}", key, e.getMessage(), e);
     }
     return defaultValue;
   }
@@ -156,7 +154,7 @@ public class LocalUISettings {
       store.set("y", y);
       store.set("width", width);
       store.set("height", height);
-      LOG.info("Saved window position to store.");
+      log.info("Saved window position to store.");
     }
   }
 
@@ -166,7 +164,7 @@ public class LocalUISettings {
       store.set(id + ".y", y);
       store.set(id + ".width", width);
       store.set(id + ".height", height);
-      LOG.info("Saved window position to store for " + id);
+      log.info("Saved window position to store for " + id);
     }
   }
 
@@ -215,10 +213,10 @@ public class LocalUISettings {
   public static void reset() {
     store.getProperties().clear();
     if (!propertiesFile.delete()) {
-      LOG.error("Reset failed.");
+      log.error("Reset failed.");
     }
     else {
-      LOG.info("Deleted {}", propertiesFile.getAbsolutePath());
+      log.info("Deleted {}", propertiesFile.getAbsolutePath());
     }
   }
 }

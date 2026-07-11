@@ -3,12 +3,10 @@ package de.a12.studio.commons;
 import de.a12.studio.commons.util.FileUtils;
 import de.a12.studio.commons.util.OSUtil;
 import de.a12.studio.commons.util.SystemCommandExecutor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.lang.invoke.MethodHandles;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -23,8 +21,8 @@ import java.util.Set;
 /**
  *
  */
+@Slf4j
 public class Updater {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   public final static String BASE_URL = "https://github.com/syd711/a12-studio/releases/download/%s/";
   private final static String LATEST_RELEASE_URL = "https://github.com/syd711/a12-studio/releases/latest";
@@ -62,7 +60,7 @@ public class Updater {
       percentage = 99;
     }
 
-    LOG.info("{} download at {}%", tmp.getAbsolutePath(), percentage);
+    log.info("{} download at {}%", tmp.getAbsolutePath(), percentage);
     return percentage;
   }
 
@@ -72,7 +70,7 @@ public class Updater {
 
   public static void downloadAndOverwrite(String downloadUrl, File target, boolean overwrite) {
     try {
-      LOG.info("Downloading {}", downloadUrl);
+      log.info("Downloading {}", downloadUrl);
       URL url = URI.create(downloadUrl).toURL();
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setReadTimeout(5000);
@@ -95,23 +93,23 @@ public class Updater {
       fileOutputStream.close();
 
       if (overwrite && target.exists() && !target.delete()) {
-        LOG.error("Failed to overwrite target file \"{}\"", target.getAbsolutePath());
+        log.error("Failed to overwrite target file \"{}\"", target.getAbsolutePath());
         return;
       }
 
       if (!FileUtils.checkedCopy(tmp, target)) {
-        LOG.error("Failed to copy download temp file {} to {}", tmp.getAbsolutePath(), target.getAbsolutePath());
+        log.error("Failed to copy download temp file {} to {}", tmp.getAbsolutePath(), target.getAbsolutePath());
       }
-      LOG.info("Download of {}/({}) finished", target.getAbsolutePath(), target.length());
+      log.info("Download of {}/({}) finished", target.getAbsolutePath(), target.length());
       if (tmp.delete()) {
-        LOG.info("Deleted downloaded temp file {}", tmp.getAbsolutePath());
+        log.info("Deleted downloaded temp file {}", tmp.getAbsolutePath());
       }
       else {
-        LOG.info("Failed to deleted downloaded temp file {}", tmp.getAbsolutePath());
+        log.info("Failed to deleted downloaded temp file {}", tmp.getAbsolutePath());
       }
     }
     catch (Exception e) {
-      LOG.error("Updater Failed to execute download: {}", e.getMessage(), e);
+      log.error("Updater Failed to execute download: {}", e.getMessage(), e);
     }
   }
 
@@ -137,7 +135,7 @@ public class Updater {
     if (OSUtil.isWindows()) {
       String cmds = loadTemplate("update-client-windows.bat");
       FileUtils.writeBatch("update-client.bat", cmds);
-      LOG.info("Written temporary batch: {}", cmds);
+      log.info("Written temporary batch: {}", cmds);
       List<String> commands = Arrays.asList("cmd", "/c", "start", "update-client.bat");
       SystemCommandExecutor executor = new SystemCommandExecutor(commands);
       executor.setDir(getWriteableBaseFolder());
@@ -156,14 +154,14 @@ public class Updater {
       try {
         String cmds = loadTemplate("update-client-linux.sh");
         File file = FileUtils.writeBatch("update-client.sh", cmds);
-        LOG.info("Written temporary bash: {}", cmds);
+        log.info("Written temporary bash: {}", cmds);
 
         Set<PosixFilePermission> perms = new HashSet<>();
         perms.add(PosixFilePermission.OWNER_READ);
         perms.add(PosixFilePermission.OWNER_WRITE);
         perms.add(PosixFilePermission.OWNER_EXECUTE);
         Files.setPosixFilePermissions(file.toPath(), perms);
-        LOG.info("Applied execute permissions to : {}", file.getAbsolutePath());
+        log.info("Applied execute permissions to : {}", file.getAbsolutePath());
 
         List<String> commands = List.of("./update-client.sh");
         SystemCommandExecutor executor = new SystemCommandExecutor(commands, false);
@@ -172,7 +170,7 @@ public class Updater {
         executor.executeCommandAsync();
         new Thread(() -> {
           try {
-            LOG.info("Exiting a12-studio");
+            log.info("Exiting a12-studio");
             Thread.sleep(2000);
             System.exit(0);
           }
@@ -182,7 +180,7 @@ public class Updater {
         }).start();
       }
       catch (Exception e) {
-        LOG.error("Failed to execute update: {}", e.getMessage(), e);
+        log.error("Failed to execute update: {}", e.getMessage(), e);
       }
     }
     else if (OSUtil.isMac()) {
@@ -191,11 +189,11 @@ public class Updater {
         MacOSUpdater.createUpdateScript();
         MacOSUpdater.updateAppVersion(oldVersion, newVersion);
 
-        LOG.info("Exiting a12-studio to perform update...");
+        log.info("Exiting a12-studio to perform update...");
         MacOSUpdater.launchUpdateScript();
       }
       catch (Exception e) {
-        LOG.error("Failed to execute update and restart: {}", e.getMessage(), e);
+        log.error("Failed to execute update and restart: {}", e.getMessage(), e);
       }
     }
     return true;
@@ -225,14 +223,14 @@ public class Updater {
       String segment = s.substring(s.lastIndexOf("/") + 1);
       if (segment.equals("latest")) {
         // GitHub didn't redirect to a tag, meaning the repo has no releases yet.
-        LOG.info("No releases found at {}", LATEST_RELEASE_URL);
+        log.info("No releases found at {}", LATEST_RELEASE_URL);
         return null;
       }
       LATEST_VERSION = segment;
       return LATEST_VERSION;
     }
     catch (Exception e) {
-      LOG.error("Update check failed: {}", e.getMessage());
+      log.error("Update check failed: {}", e.getMessage());
     }
     return null;
   }
@@ -271,7 +269,7 @@ public class Updater {
       return new File("./");
     }
     else {
-      LOG.info("Setting base path for Mac download to {}", System.getProperty("MAC_WRITE_PATH"));
+      log.info("Setting base path for Mac download to {}", System.getProperty("MAC_WRITE_PATH"));
       return new File(System.getProperty("MAC_WRITE_PATH"));
     }
   }

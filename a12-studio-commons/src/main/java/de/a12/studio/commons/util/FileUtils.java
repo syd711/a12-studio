@@ -1,34 +1,32 @@
 package de.a12.studio.commons.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
 
 /**
  *
  */
+@Slf4j
 public class FileUtils {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   public static boolean checkedCopy(@NonNull File source, @NonNull File target) {
     try {
       if (!target.exists() || source.length() != target.length()) {
         if (target.exists() && !target.delete()) {
-          LOG.error("Failed to delete target file {} of checked copy {}", target.getAbsolutePath(), source.getAbsolutePath());
+          log.error("Failed to delete target file {} of checked copy {}", target.getAbsolutePath(), source.getAbsolutePath());
           return false;
         }
         org.apache.commons.io.FileUtils.copyFile(source, target);
-        LOG.info("Copied {}/({}) to {}", source.getAbsolutePath(), source.length(), target.getAbsolutePath());
+        log.info("Copied {}/({}) to {}", source.getAbsolutePath(), source.length(), target.getAbsolutePath());
         return true;
       }
     }
     catch (Exception e) {
-      LOG.error("Failed to execute checked copy: {}", e.getMessage(), e);
+      log.error("Failed to execute checked copy: {}", e.getMessage(), e);
     }
     return true;
   }
@@ -43,10 +41,10 @@ public class FileUtils {
     }
 
     if (path.exists() && !path.delete()) {
-      LOG.error("Failed to delete existing script file {}", path.getAbsolutePath());
+      log.error("Failed to delete existing script file {}", path.getAbsolutePath());
     }
     Files.write(path.toPath(), content.getBytes());
-    LOG.info("Written script file {}", path.getAbsolutePath());
+    log.info("Written script file {}", path.getAbsolutePath());
     return path;
   }
 }

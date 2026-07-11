@@ -1,6 +1,7 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.dataservices.projects.Project;
+import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -55,9 +56,15 @@ public class RootController implements Initializable, StudioEventListener {
 
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
+    this.mainSplitPane.setVisible(true);
     this.project = event.getProject();
     double dividerPosition = project.getSettings().getDividerPosition();
     Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
+  }
+
+  @Override
+  public void projectClosed(@NonNull ProjectClosedEvent event) {
+    this.mainSplitPane.setVisible(false);
   }
 
   public void setTitle(String s) {

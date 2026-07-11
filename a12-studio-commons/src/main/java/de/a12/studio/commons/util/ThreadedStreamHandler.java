@@ -1,17 +1,15 @@
 package de.a12.studio.commons.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
-import java.lang.invoke.MethodHandles;
 
 /**
  * Reads a process' stdout/stderr on a background thread so the process doesn't block
  * once its output buffer fills up. Used by SystemCommandExecutor.
  */
+@Slf4j
 class ThreadedStreamHandler extends Thread {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final InputStream inputStream;
   private final StringBuilder outputBuffer = new StringBuilder();
@@ -32,12 +30,12 @@ class ThreadedStreamHandler extends Thread {
       while (!stopped && (line = bufferedReader.readLine()) != null) {
         outputBuffer.append(line).append("\n");
         if (enableLog) {
-          LOG.info("System Command Output: {}", line);
+          log.info("System Command Output: {}", line);
         }
       }
     }
     catch (Exception ioe) {
-      LOG.warn("Error reading process stream: {}", ioe.getMessage());
+      log.warn("Error reading process stream: {}", ioe.getMessage());
     }
   }
 

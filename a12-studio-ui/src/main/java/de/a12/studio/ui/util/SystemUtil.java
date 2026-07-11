@@ -3,19 +3,16 @@ package de.a12.studio.ui.util;
 
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.ui.Studio;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
 import static de.a12.studio.commons.util.OSUtil.isMac;
 import static de.a12.studio.commons.util.OSUtil.isWindows;
 
+@Slf4j
 public class SystemUtil {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
 
   public static long getMemorySize(String value) {
     long size = 8 * (int) ((((value.length()) * 2) + 45) / 8);
@@ -42,7 +39,7 @@ public class SystemUtil {
       }
     }
     catch (IOException e) {
-      LOG.error("Failed to open system file: " + e.getMessage(), e);
+      log.error("Failed to open system file: " + e.getMessage(), e);
     }
   }
 
@@ -72,7 +69,7 @@ public class SystemUtil {
       }
     }
     catch (IOException e) {
-      LOG.error("Failed to open folder: " + e.getMessage(), e);
+      log.error("Failed to open folder: " + e.getMessage(), e);
     }
   }
 

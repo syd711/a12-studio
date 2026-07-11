@@ -1,6 +1,8 @@
 package de.a12.studio.ui.projecttree;
 
+import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -24,6 +26,18 @@ public class ProjectItemViewModel {
 
   public ProjectItem getProjectItem() {
     return projectItem;
+  }
+
+  public String getIcon() {
+    A12Model model = projectItem.getModel();
+    if (model == null) {
+      return Icons.FILE_OUTLINE;
+    }
+
+    return switch (model.getModelType()) {
+      case DOCUMENT -> Icons.FILE_TABLE_OUTLINE;
+      default -> Icons.FILE_OUTLINE;
+    };
   }
 
   public List<ProjectItemViewModel> getChildren() {

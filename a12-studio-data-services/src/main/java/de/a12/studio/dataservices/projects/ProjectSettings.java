@@ -1,19 +1,17 @@
 package de.a12.studio.dataservices.projects;
 
 import de.a12.studio.commons.util.JsonSettings;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class ProjectSettings extends JsonSettings {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private double dividerPosition = 0.3;
 
@@ -57,7 +55,7 @@ public class ProjectSettings extends JsonSettings {
         settings = fromJson(ProjectSettings.class, json);
       }
       catch (Exception e) {
-        LOG.warn("Failed to read project settings from {}: {}", settingsFile.getAbsolutePath(), e.getMessage(), e);
+        log.warn("Failed to read project settings from {}: {}", settingsFile.getAbsolutePath(), e.getMessage(), e);
       }
     }
 
@@ -77,7 +75,7 @@ public class ProjectSettings extends JsonSettings {
       Files.writeString(settingsFile.toPath(), toJson(), StandardCharsets.UTF_8);
     }
     catch (Exception e) {
-      LOG.error("Failed to write project settings to {}: {}", settingsFile.getAbsolutePath(), e.getMessage(), e);
+      log.error("Failed to write project settings to {}: {}", settingsFile.getAbsolutePath(), e.getMessage(), e);
     }
   }
 }

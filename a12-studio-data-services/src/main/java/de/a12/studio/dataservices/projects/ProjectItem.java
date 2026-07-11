@@ -1,5 +1,9 @@
 package de.a12.studio.dataservices.projects;
 
+import de.a12.studio.dataservices.models.A12Model;
+import de.a12.studio.dataservices.models.ModelFactory;
+import org.jspecify.annotations.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,9 +19,25 @@ public class ProjectItem {
   private ProjectItem parent;
   private List<ProjectItem> children;
   private boolean root = false;
+  private A12Model model;
+  private boolean loaded = false;
 
   public ProjectItem(File listFile) {
     this.file = listFile;
+    this.load();
+  }
+
+  private void load() {
+    if (!loaded) {
+      this.loaded = true;
+      if (!this.isFolder()) {
+        this.model = ModelFactory.load(this);
+      }
+    }
+  }
+
+  public A12Model getModel() {
+    return model;
   }
 
   public void setRoot(boolean root) {

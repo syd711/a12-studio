@@ -1,11 +1,9 @@
 package de.a12.studio.commons.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +12,8 @@ import java.util.List;
  * so the child process never blocks on a full output buffer. Used by the self-updater
  * to launch the update scripts and restart the app.
  */
+@Slf4j
 public class SystemCommandExecutor {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final List<String> commandInformation;
   private final boolean prependCmd;
@@ -48,7 +46,7 @@ public class SystemCommandExecutor {
         execute();
       }
       catch (Exception e) {
-        LOG.error("Failed to execute command {}: {}", String.join(" ", commandInformation), e.getMessage(), e);
+        log.error("Failed to execute command {}: {}", String.join(" ", commandInformation), e.getMessage(), e);
       }
     });
     t.setName("Async Executor for " + String.join(" ", commandInformation));
@@ -65,7 +63,7 @@ public class SystemCommandExecutor {
       commandInformation.addFirst("cmd.exe");
     }
 
-    LOG.info("System Command: {}> {}", dir != null ? dir.getAbsolutePath() : "", String.join(" ", commandInformation));
+    log.info("System Command: {}> {}", dir != null ? dir.getAbsolutePath() : "", String.join(" ", commandInformation));
 
     ProcessBuilder pb = new ProcessBuilder(commandInformation);
     if (dir != null) {

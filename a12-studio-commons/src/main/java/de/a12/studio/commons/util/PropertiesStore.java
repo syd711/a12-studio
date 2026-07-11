@@ -1,19 +1,17 @@
 package de.a12.studio.commons.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.*;
 
+@Slf4j
 public class PropertiesStore {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   protected final Properties properties = new SortedProperties();
 
@@ -34,10 +32,10 @@ public class PropertiesStore {
         fileInputStream.close();
       }
       else {
-        LOG.warn("No properties file found " + file.getAbsolutePath());
+        log.warn("No properties file found " + file.getAbsolutePath());
       }
     } catch (Exception e) {
-      LOG.error("Failed to load data store: " + e.getMessage(), e);
+      log.error("Failed to load data store: " + e.getMessage(), e);
     }
     return store;
   }
@@ -61,7 +59,7 @@ public class PropertiesStore {
       properties.load(fileInputStream);
       fileInputStream.close();
     } catch (IOException e) {
-      LOG.error("Failed to reload " + propertiesFile.getAbsolutePath() + ": " + e.getMessage(), e);
+      log.error("Failed to reload " + propertiesFile.getAbsolutePath() + ": " + e.getMessage(), e);
     }
   }
 
@@ -189,7 +187,7 @@ public class PropertiesStore {
         fileOutputStream.close();
       }
     } catch (Exception e) {
-      LOG.error("Failed to store data store: " + e.getMessage(), e);
+      log.error("Failed to store data store: " + e.getMessage(), e);
     }
   }
 

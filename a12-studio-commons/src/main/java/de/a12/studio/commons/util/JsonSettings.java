@@ -1,7 +1,6 @@
 package de.a12.studio.commons.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
@@ -9,10 +8,8 @@ import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.json.JsonMapper;
 
-import java.lang.invoke.MethodHandles;
-
+@Slf4j
 public abstract class JsonSettings {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   public final static ObjectMapper objectMapper;
 
   static {
@@ -31,7 +28,7 @@ public abstract class JsonSettings {
         return t;
       }
     } catch (Exception e) {
-      LOG.warn("Error parsing settings json \"{}\" for class \"{}\": {}. Creating a plain new instance instead.", json, clazz, e.getMessage());
+      log.warn("Error parsing settings json \"{}\" for class \"{}\": {}. Creating a plain new instance instead.", json, clazz, e.getMessage());
     }
     return clazz.getDeclaredConstructor().newInstance();
   }

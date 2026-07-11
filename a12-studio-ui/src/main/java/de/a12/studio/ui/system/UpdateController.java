@@ -5,17 +5,15 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 /**
  *
  */
+@Slf4j
 public class UpdateController {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final Stage owner;
 
@@ -34,7 +32,7 @@ public class UpdateController {
     String currentVersion = currentVersion();
     String latestVersion = Updater.checkForUpdate();
     if (!Updater.isLargerVersionThan(latestVersion, currentVersion)) {
-      LOG.info("No update available (current: {}, latest: {})", currentVersion, latestVersion);
+      log.info("No update available (current: {}, latest: {})", currentVersion, latestVersion);
       return;
     }
 
@@ -61,7 +59,7 @@ public class UpdateController {
         Updater.installClientUpdate(currentVersion, latestVersion);
       }
       catch (Exception e) {
-        LOG.error("Failed to install client update: {}", e.getMessage(), e);
+        log.error("Failed to install client update: {}", e.getMessage(), e);
       }
     });
     t.setName("Update Installer");

@@ -34,19 +34,17 @@ import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 /**
  * Icon factory and dialog infrastructure (stage creation, confirmation/alert/input/output
  * dialogs).
  */
+@Slf4j
 public class WidgetFactory {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   public static final String DISABLED_TEXT_STYLE = "-fx-font-color: #B0ABAB;-fx-text-fill:#B0ABAB;";
   public static final String DEFAULT_TEXT_STYLE = "-fx-font-color: #FFFFFF;-fx-text-fill:#FFFFFF;";
@@ -262,7 +260,7 @@ public class WidgetFactory {
       root = fxmlLoader.load();
     }
     catch (IOException e) {
-      LOG.error("Error loading: " + e.getMessage(), e);
+      log.error("Error loading: " + e.getMessage(), e);
     }
 
     DialogController controller = fxmlLoader.getController();

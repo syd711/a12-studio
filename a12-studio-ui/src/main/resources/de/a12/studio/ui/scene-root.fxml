@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 
 <BorderPane fx:id="root" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.RootController">
    <top>
@@ -13,12 +15,21 @@
             <fx:include fx:id="menuBar" source="scene-menu-bar.fxml" BorderPane.alignment="CENTER" />
          </top>
          <center>
-            <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <items>
-                  <fx:include fx:id="projectTree" source="projecttree/scene-project-tree.fxml" />
-                  <fx:include fx:id="tabPane" source="tabs/scene-tab-pane.fxml" />
-               </items>
-            </SplitPane>
+            <StackPane BorderPane.alignment="CENTER">
+               <children>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <center>
+                        <Label text="Open project from the menu" BorderPane.alignment="CENTER" />
+                     </center>
+                  </BorderPane>
+                  <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" prefHeight="200.0" prefWidth="200.0">
+                     <items>
+                        <fx:include fx:id="projectTree" source="projecttree/scene-project-tree.fxml" />
+                        <fx:include fx:id="tabPane" source="tabs/scene-tab-pane.fxml" />
+                     </items>
+                  </SplitPane>
+               </children>
+            </StackPane>
          </center>
       </BorderPane>
    </center>

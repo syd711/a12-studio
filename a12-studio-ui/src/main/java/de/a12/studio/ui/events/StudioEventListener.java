@@ -7,6 +7,10 @@ public interface StudioEventListener {
 
   }
 
+  default void projectClosed(@NonNull ProjectClosedEvent event) {
+
+  }
+
   default void modelOpened(@NonNull ModelOpenedEvent event) {
 
   }

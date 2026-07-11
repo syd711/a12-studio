@@ -1,8 +1,7 @@
 package de.a12.studio.commons.util.localsettings;
 
 import de.a12.studio.commons.Updater;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.SerializationFeature;
@@ -12,10 +11,9 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
+@Slf4j
 abstract public class LocalJsonSettings {
-  private final static Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   public final static ObjectMapper objectMapper;
 
@@ -49,7 +47,7 @@ abstract public class LocalJsonSettings {
       return t;
     }
     catch (Exception e) {
-      LOG.error("Failed to json: " + e.getMessage());
+      log.error("Failed to json: " + e.getMessage());
     }
     finally {
       try {
@@ -80,7 +78,7 @@ abstract public class LocalJsonSettings {
       objectMapper.writeValue(settingsFile, this);
     }
     catch (Exception e) {
-      LOG.error("Failed to write {}: {}", settingsFile.getName(), e.getMessage(), e);
+      log.error("Failed to write {}: {}", settingsFile.getName(), e.getMessage(), e);
     }
   }
 }
