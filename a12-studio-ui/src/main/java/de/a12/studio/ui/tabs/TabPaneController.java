@@ -6,7 +6,7 @@ import de.a12.studio.ui.events.ModelOpenedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
-import de.a12.studio.ui.modeleditor.ModelEditorController;
+import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.util.Icons;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -56,7 +56,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
 
     try {
-      FXMLLoader loader = new FXMLLoader(ModelEditorController.class.getResource("scene-model-editor.fxml"));
+      FXMLLoader loader = new FXMLLoader(DocumentModelEditorController.class.getResource("document-model-editor.fxml"));
       Parent content = loader.load();
 
       Tab tab = new Tab(event.getItem().getName(), content);

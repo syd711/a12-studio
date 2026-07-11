@@ -15,6 +15,15 @@
     -fx-header-color: #272828;
 }
 
+.root {
+    -fx-border-style: solid;
+    -fx-border-color: -fx-border-color-theme;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+
 .base-component {
     -fx-background-color: -fx-surface-color;
 }
@@ -36,40 +45,70 @@
 
 .submit-button {
     -fx-border-style: solid solid solid solid;
-    -fx-border-color: #6666FF;
+    -fx-border-color: -fx-accent-color;
     -fx-border-width: 1;
     -fx-font-size : 14px;
-    -fx-background-color: #333366;
-    -fx-text-fill: #fff8f8;
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill: -fx-text-color-inverse;
     -fx-border-radius: 3px;
 }
 
 .submit-button:hover {
     -fx-border-style: solid solid solid solid;
-    -fx-border-color: #4D4DB3;
+    -fx-border-color: derive(-fx-accent-color, -15%);
     -fx-border-width: 1;
     -fx-font-size : 14px;
-    -fx-background-color: #6666FF;
-    -fx-text-fill: #fff8f8;
+    -fx-background-color: derive(-fx-accent-color, -15%);
+    -fx-text-fill: -fx-text-color-inverse;
     -fx-cursor: hand;
 }
 
 .default-button {
     -fx-border-radius: 3px;
     -fx-border-style: solid solid solid solid;
-    -fx-border-color: #111111;
+    -fx-border-color: -fx-border-color-theme;
     -fx-border-width: 1;
     -fx-font-size : 14px;
-    -fx-background-color: #272b2f;
-    -fx-text-fill: #fff8f8;
+    -fx-background-color: -fx-surface-color;
+    -fx-text-fill: -fx-text-color;
 }
 
 .default-button:hover {
     -fx-border-style: solid solid solid solid;
-    -fx-border-color: #4D4DB3;
+    -fx-border-color: -fx-accent-color;
     -fx-border-width: 1;
     -fx-font-size : 14px;
-    -fx-background-color: #3d434a;
-    -fx-text-fill: #fff8f8;
+    -fx-background-color: -fx-panel-color;
+    -fx-text-fill: -fx-text-color;
     -fx-cursor: hand;
+}
+
+
+
+/**
+ * Window Toolbar
+ */
+.header-button {
+    -fx-background-color: -fx-header-color;
+    -fx-border-style: hidden hidden hidden hidden;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.header-button:hover {
+    -fx-background-color: -fx-accent-color;
+    -fx-border-style: hidden hidden hidden hidden;
+    -fx-text-fill: -fx-text-color-inverse;
+    -fx-cursor: hand;
+}
+
+.header-title {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.header-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}
+
+.toolbar-icon {
+    -fx-icon-color: -fx-text-color;
 }
