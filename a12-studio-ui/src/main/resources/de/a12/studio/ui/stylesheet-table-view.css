@@ -1,0 +1,8 @@
+/**
+ * Table View
+ */
+.table-view,
+.table-view .cell,
+.table-view .column-header .label {
+    -fx-font-size: 14px;
+}

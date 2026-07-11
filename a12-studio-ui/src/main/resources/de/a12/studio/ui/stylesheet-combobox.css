@@ -1,0 +1,9 @@
+/**
+ * Combo Box
+ */
+.combo-box,
+.combo-box-base,
+.combo-box .list-cell,
+.combo-box-popup .list-view .list-cell {
+    -fx-font-size: 14px;
+}

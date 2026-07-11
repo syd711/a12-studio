@@ -1,0 +1,41 @@
+/**
+ * Titled Pane
+ *
+ * No border around the pane or its content, and a header that only
+ * shows the expand/collapse arrow and the title (no header bar background).
+ */
+.titled-pane {
+    -fx-text-fill: -fx-text-color;
+}
+
+.titled-pane > .title,
+.titled-pane:collapsed > .title,
+.titled-pane:focused > .title {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-padding: 6px 0 6px 0;
+}
+
+.titled-pane > .title > .text {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-text-color;
+}
+
+.titled-pane > .title > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 4px 4px 4px 0;
+}
+
+.titled-pane > .title > .arrow-button > .arrow {
+    -fx-background-color: -fx-text-color;
+}
+
+.titled-pane > *.content {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+}

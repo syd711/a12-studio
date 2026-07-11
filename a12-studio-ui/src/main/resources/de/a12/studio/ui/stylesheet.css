@@ -4,6 +4,12 @@
 @import "stylesheet-tab-pane.css";
 @import "stylesheet-tree-view.css";
 @import "stylesheet-textfield.css";
+@import "stylesheet-text-area.css";
+@import "stylesheet-label.css";
+@import "stylesheet-checkbox.css";
+@import "stylesheet-combobox.css";
+@import "stylesheet-table-view.css";
+@import "stylesheet-titled-pane.css";
 
 /**
  * Main

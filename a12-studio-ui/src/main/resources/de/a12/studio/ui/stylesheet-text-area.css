@@ -1,0 +1,7 @@
+/**
+ * Text Area
+ */
+.text-area,
+.text-area .content {
+    -fx-font-size: 14px;
+}
