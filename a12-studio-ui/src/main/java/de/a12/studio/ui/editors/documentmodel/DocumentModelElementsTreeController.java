@@ -8,6 +8,7 @@ import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.commons.util.localsettings.BaseTableSettings;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.ui.editors.util.commandstack.CommandStack;
 import de.a12.studio.ui.util.Icons;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
@@ -35,6 +36,12 @@ public class DocumentModelElementsTreeController implements Initializable {
   private ToolBar modelTreeToolbarBar;
 
   @FXML
+  private Button undoButton;
+
+  @FXML
+  private Button redoButton;
+
+  @FXML
   private MenuButton modelTreeAddButton;
 
   @FXML
@@ -51,6 +58,8 @@ public class DocumentModelElementsTreeController implements Initializable {
 
   private ModelRoot modelRoot;
 
+  private final CommandStack commandStack = new CommandStack();
+
   public void load(@NonNull DocumentModel model) {
     load(model.getContent().getModelRoot());
   }
@@ -62,10 +71,19 @@ public class DocumentModelElementsTreeController implements Initializable {
 
   @FXML
   private void onUndo() {
+    commandStack.undo();
+    updateUndoRedoState();
   }
 
   @FXML
   private void onRedo() {
+    commandStack.redo();
+    updateUndoRedoState();
+  }
+
+  private void updateUndoRedoState() {
+    undoButton.setDisable(!commandStack.canUndo());
+    redoButton.setDisable(!commandStack.canRedo());
   }
 
   @FXML
@@ -129,6 +147,7 @@ public class DocumentModelElementsTreeController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     modelTreeAddButton.setDisable(true);
+    updateUndoRedoState();
     searchField.textProperty().addListener((observable, oldValue, newValue) -> applyFilter(newValue));
 
     elementsTreeTable.setShowRoot(false);

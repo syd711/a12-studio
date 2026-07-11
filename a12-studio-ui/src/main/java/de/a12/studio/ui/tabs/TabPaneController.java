@@ -49,11 +49,6 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   @Override
-  public void modelSaved(@NonNull ModelSaveEvent event) {
-    getSelectedProjectItem().save();
-  }
-
-  @Override
   public void modelOpened(@NonNull ModelOpenedEvent event) {
     for (Tab existingTab : tabPane.getTabs()) {
       ProjectItem existingItem = (ProjectItem) existingTab.getUserData();

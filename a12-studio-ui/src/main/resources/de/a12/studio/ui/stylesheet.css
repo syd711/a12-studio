@@ -34,6 +34,11 @@
     -fx-background-radius: 6px 6px 0 0;
 }
 
+.window-header-title {
+    -fx-font-family: "Impact";
+    -fx-font-size: 18px;
+}
+
 /**
  * Common Component Theme
  */
@@ -99,4 +104,12 @@
     -fx-border-width: 0 0 1px 0;
     -fx-padding: 6px 10px;
     -fx-spacing: 6px;
+}
+
+.tool-bar.panel-toolbar {
+    -fx-background-color: -fx-panel-color;
+}
+
+.tool-bar.panel-toolbar .search-field {
+    -fx-background-color: white;
 }

@@ -11,7 +11,7 @@
 .field-label {
     -fx-font-size: 12px;
     -fx-text-fill: -fx-text-muted;
-    -fx-padding: 0 0 6px 0;
+    -fx-padding: 3px 0 3px 0;
 }
 
 .placeholder-label {
