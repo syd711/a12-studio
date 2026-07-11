@@ -1,6 +1,8 @@
 package de.a12.studio.dataservices.models.documentmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.a12.studio.dataservices.models.Annotation;
@@ -23,10 +25,16 @@ import java.util.List;
 @Setter
 public abstract class Element {
 
+  // visible = true above also exposes the type id as this plain property; WRITE_ONLY keeps it settable on
+  // deserialization without Jackson also emitting it a second time as a regular property on serialization.
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String type;
   private String id;
   private String name;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Annotation> annotations = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> externalDescription = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> internalDescription = new ArrayList<>();
 }

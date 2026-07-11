@@ -1,6 +1,7 @@
 package de.a12.studio.dataservices.models.documentmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,5 +12,6 @@ public class ModelInfo {
 
   private String name;
   private boolean immutable;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String comment;
 }

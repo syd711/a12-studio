@@ -1,5 +1,6 @@
 package de.a12.studio.dataservices.models.documentmodel;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,5 +10,6 @@ import lombok.Setter;
 public class StringFieldType extends FieldType {
 
   @JsonProperty("StringType")
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private StringTypeOptions stringType;
 }
