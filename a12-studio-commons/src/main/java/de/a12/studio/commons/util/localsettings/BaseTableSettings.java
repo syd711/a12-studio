@@ -13,6 +13,8 @@ public class BaseTableSettings extends LocalJsonSettings {
 
   private List<String> columnOrder = new ArrayList<>();
 
+  private Map<String, Double> dividerPositions = new HashMap<>();
+
   public List<String> getColumnOrder() {
     return columnOrder;
   }
@@ -34,5 +36,20 @@ public class BaseTableSettings extends LocalJsonSettings {
       return columnWith.get(key);
     }
     return 0;
+  }
+
+  public Map<String, Double> getDividerPositions() {
+    return dividerPositions;
+  }
+
+  public void setDividerPositions(Map<String, Double> dividerPositions) {
+    this.dividerPositions = dividerPositions;
+  }
+
+  public double getDividerPosition(@NonNull String key) {
+    if (dividerPositions.containsKey(key)) {
+      return dividerPositions.get(key);
+    }
+    return -1;
   }
 }

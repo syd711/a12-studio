@@ -1,6 +1,7 @@
 package de.a12.studio.ui.tabs;
 
 import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.events.ModelOpenedEvent;
@@ -64,6 +65,11 @@ public class TabPaneController implements Initializable, StudioEventListener {
       FXMLLoader loader = new FXMLLoader(DocumentModelEditorController.class.getResource("document-model-editor.fxml"));
       Parent content = loader.load();
 
+      if (event.getItem().getModel() instanceof DocumentModel documentModel) {
+        DocumentModelEditorController controller = loader.getController();
+        controller.load(documentModel);
+      }
+
       Tab tab = new Tab(event.getItem().getName(), content);
       tab.setUserData(event.getItem());
       tab.setClosable(true);
@@ -108,17 +114,17 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   private ContextMenu createTabContextMenu(@NonNull Tab tab) {
-    MenuItem close = new MenuItem("Close");
+    MenuItem close = new MenuItem("_Close");
     close.setOnAction(event -> closeTab(tab));
 
-    MenuItem closeAll = new MenuItem("Close All");
+    MenuItem closeAll = new MenuItem("Close _All");
     closeAll.setOnAction(event -> {
       for (Tab t : new ArrayList<>(tabPane.getTabs())) {
         closeTab(t);
       }
     });
 
-    MenuItem closeOthers = new MenuItem("Close Others");
+    MenuItem closeOthers = new MenuItem("Close _Others");
     closeOthers.setOnAction(event -> {
       for (Tab t : new ArrayList<>(tabPane.getTabs())) {
         if (t != tab) {

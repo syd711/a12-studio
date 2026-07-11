@@ -185,26 +185,28 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private ContextMenu createTreeItemContextMenu(@NonNull ProjectItemViewModel viewModel) {
     ProjectItem projectItem = viewModel.getProjectItem();
 
-    Menu newMenu = new Menu("New...");
-    MenuItem newFolder = new MenuItem("Folder");
+    Menu newMenu = new Menu("_New...");
+    MenuItem newFolder = new MenuItem("_Folder");
     newFolder.setOnAction(event -> onCreateNewItem(projectItem, true));
-    MenuItem newModel = new MenuItem("Model");
+    MenuItem newModel = new MenuItem("_Model");
     newModel.setOnAction(event -> onCreateNewItem(projectItem, false));
     newMenu.getItems().addAll(newFolder, newModel);
 
-    MenuItem open = new MenuItem("Open");
+    MenuItem open = new MenuItem("_Open");
     open.setDisable(viewModel.isFolder());
     open.setOnAction(event -> openItem(viewModel));
 
-    MenuItem rename = new MenuItem("Rename");
+    MenuItem rename = new MenuItem("_Rename");
     rename.setDisable(projectItem.isRoot());
     rename.setOnAction(event -> onRenameItem(projectItem));
 
-    MenuItem createCopy = new MenuItem("Create Copy");
+    MenuItem createCopy = new MenuItem("_Create Copy");
+    createCopy.setGraphic(WidgetFactory.createIcon(Icons.COPY));
     createCopy.setDisable(projectItem.isRoot());
     createCopy.setOnAction(event -> onCreateCopy(projectItem));
 
-    MenuItem delete = new MenuItem("Delete");
+    MenuItem delete = new MenuItem("_Delete");
+    delete.setGraphic(WidgetFactory.createIcon(Icons.TRASH));
     delete.setDisable(projectItem.isRoot());
     delete.setOnAction(event -> onDeleteItem(projectItem));
 

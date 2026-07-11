@@ -42,13 +42,16 @@ public class LocalUISettings {
   }
 
   public static <T> T getTablePreference(Class<?> clazz) {
+    return getTablePreference(clazz.getSimpleName());
+  }
+
+  public static <T> T getTablePreference(@NonNull String id) {
     try {
-      String clazzName = clazz.getSimpleName();
-      if (!jsonSettingsCache.containsKey(clazzName)) {
-        BaseTableSettings baseTableSettings = LocalJsonSettings.load(clazz.getSimpleName(), BaseTableSettings.class);
-        jsonSettingsCache.put(clazzName, baseTableSettings);
+      if (!jsonSettingsCache.containsKey(id)) {
+        BaseTableSettings baseTableSettings = LocalJsonSettings.load(id, BaseTableSettings.class);
+        jsonSettingsCache.put(id, baseTableSettings);
       }
-      return (T) jsonSettingsCache.get(clazzName);
+      return (T) jsonSettingsCache.get(id);
     }
     catch (Exception e) {
       log.error("Failed to read preferences: {}", e.getMessage(), e);

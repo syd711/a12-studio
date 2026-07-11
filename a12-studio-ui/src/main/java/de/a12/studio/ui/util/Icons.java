@@ -19,4 +19,13 @@ public interface Icons {
 
   String RELOAD = "mdi2r-refresh";
   String CLOSE = "mdi2c-close";
+  String TRASH = "mdi2t-trash-can-outline";
+  String COPY = "mdi2c-content-copy";
+  String CUT = "mdi2c-content-cut";
+
+  String ELEMENT_GROUP = "mdi2f-folder-outline";
+  String ELEMENT_FIELD = "mdi2f-form-textbox";
+  String ELEMENT_RULE = "mdi2a-alert-circle-outline";
+  String ELEMENT_COMPUTATION = "mdi2f-function-variant";
+  String ELEMENT_GENERIC = "mdi2s-shape-outline";
 }

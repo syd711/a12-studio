@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelFieldEditorController">
+  <content>
+    <VBox spacing="12.0" styleClass="field-editor">
+      <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+      </padding>
+
+      <!-- General Information -->
+      <TitledPane expanded="true" text="General Information" maxWidth="Infinity">
+        <GridPane hgap="10.0" vgap="8.0">
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <columnConstraints>
+            <ColumnConstraints minWidth="90.0" prefWidth="90.0" />
+            <ColumnConstraints hgrow="ALWAYS" />
+            <ColumnConstraints minWidth="90.0" prefWidth="90.0" />
+            <ColumnConstraints hgrow="ALWAYS" />
+          </columnConstraints>
+
+          <Label prefWidth="90.0" text="Name*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+          <TextField fx:id="nameField" text="Country" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+          <Label prefWidth="90.0" text="ID" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+          <TextField fx:id="idField" editable="false" text="field_2f4c1" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+          <Label prefWidth="90.0" text="Path" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+          <TextField fx:id="pathField" editable="false" text="/Company/Addresses/Country" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="3" />
+
+          <CheckBox fx:id="typeDefinitionCheckBox" text="Type Definition" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="4" />
+
+          <Label prefWidth="90.0" text="Data Type*" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+          <ComboBox fx:id="dataTypeComboBox" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+          <HBox spacing="15.0" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="4">
+            <CheckBox fx:id="globalCheckBox" text="Global" />
+            <CheckBox fx:id="transientCheckBox" text="Transient" />
+            <CheckBox fx:id="requiredCheckBox" text="Required" />
+          </HBox>
+        </GridPane>
+      </TitledPane>
+
+      <!-- Data Type Configuration -->
+      <TitledPane expanded="true" text="Data Type Configuration" maxWidth="Infinity">
+        <GridPane hgap="10.0" vgap="8.0">
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <columnConstraints>
+            <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+            <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+            <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+          </columnConstraints>
+
+          <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <Label text="Min. Length" />
+            <TextField fx:id="minLengthField" />
+          </VBox>
+          <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <Label text="Max. Length" />
+            <TextField fx:id="maxLengthField" />
+          </VBox>
+          <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+            <Label text="Pattern" />
+            <TextField fx:id="patternField" />
+          </VBox>
+
+          <HBox spacing="15.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="3">
+            <CheckBox fx:id="lineBreaksCheckBox" text="Line Breaks Permitted" />
+            <CheckBox fx:id="alphabeticalSortingCheckBox" text="Alphabetical Sorting" />
+          </HBox>
+        </GridPane>
+      </TitledPane>
+
+      <!-- Suggestions -->
+      <TitledPane expanded="false" text="Suggestions" maxWidth="Infinity">
+        <VBox>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <Label styleClass="placeholder-label" text="No suggestions available yet." />
+        </VBox>
+      </TitledPane>
+
+      <!-- Label -->
+      <TitledPane expanded="true" text="Label" maxWidth="Infinity">
+        <VBox>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <TableView fx:id="labelsTable" editable="true" prefHeight="120.0">
+            <columns>
+              <TableColumn fx:id="labelsLocaleColumn" text="Locale" prefWidth="80.0" />
+              <TableColumn fx:id="labelsTextColumn" text="Text" />
+            </columns>
+          </TableView>
+        </VBox>
+      </TitledPane>
+
+      <!-- Description (Internal) -->
+      <TitledPane expanded="false" text="Description (Internal)" maxWidth="Infinity">
+        <VBox>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <TextArea fx:id="internalDescriptionArea" prefRowCount="5" wrapText="true" />
+        </VBox>
+      </TitledPane>
+
+      <!-- Description (External) -->
+      <TitledPane expanded="false" text="Description (External)" maxWidth="Infinity">
+        <VBox>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <TextArea fx:id="externalDescriptionArea" prefRowCount="5" wrapText="true" />
+        </VBox>
+      </TitledPane>
+
+      <!-- Helper Text -->
+      <TitledPane expanded="true" text="Helper Text" maxWidth="Infinity">
+        <VBox>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <TableView fx:id="helperTextTable" editable="true" prefHeight="120.0">
+            <columns>
+              <TableColumn fx:id="helperTextLocaleColumn" text="Locale" prefWidth="80.0" />
+              <TableColumn fx:id="helperTextTextColumn" text="Text" />
+            </columns>
+          </TableView>
+        </VBox>
+      </TitledPane>
+
+      <!-- Annotations -->
+      <TitledPane expanded="false" text="Annotations" maxWidth="Infinity">
+        <VBox>
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <Label styleClass="placeholder-label" text="No annotations defined." />
+        </VBox>
+      </TitledPane>
+    </VBox>
+  </content>
+</ScrollPane>

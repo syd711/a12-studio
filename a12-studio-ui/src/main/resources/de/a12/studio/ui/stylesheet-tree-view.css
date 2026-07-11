@@ -5,6 +5,17 @@
     -fx-font-size: 14px;
 }
 
+/**
+ * Tree Table View
+ */
+.tree-table-view .tree-table-cell {
+    -fx-font-size: 14px;
+}
+
+.tree-table-cell:selected .tree-icon {
+    -fx-icon-color: white;
+}
+
 .tree-cell:selected .tree-icon {
     -fx-icon-color: white;
 }
