@@ -38,6 +38,9 @@ public class DocumentModelElementsTreeController implements Initializable {
   private MenuButton modelTreeAddButton;
 
   @FXML
+  private TextField searchField;
+
+  @FXML
   private TreeTableView<ElementViewModel> elementsTreeTable;
 
   @FXML
@@ -46,15 +49,42 @@ public class DocumentModelElementsTreeController implements Initializable {
   @FXML
   private TreeTableColumn<ElementViewModel, String> typeColumn;
 
+  private ModelRoot modelRoot;
+
   public void load(@NonNull DocumentModel model) {
     load(model.getContent().getModelRoot());
   }
 
   public void load(@NonNull ModelRoot modelRoot) {
+    this.modelRoot = modelRoot;
+    applyFilter(searchField.getText());
+  }
+
+  @FXML
+  private void onUndo() {
+  }
+
+  @FXML
+  private void onRedo() {
+  }
+
+  @FXML
+  private void onResetSearch() {
+    searchField.clear();
+  }
+
+  private void applyFilter(String filter) {
+    if (modelRoot == null) {
+      return;
+    }
+
+    String term = filter == null ? "" : filter.trim().toLowerCase();
     TreeItem<ElementViewModel> root = new TreeItem<>();
-    root.setExpanded(true);
     for (GroupElement group : modelRoot.getRootGroups()) {
-      root.getChildren().add(toTreeItem(group));
+      TreeItem<ElementViewModel> treeItem = term.isEmpty() ? toTreeItem(group) : toFilteredTreeItem(group, term);
+      if (treeItem != null) {
+        root.getChildren().add(treeItem);
+      }
     }
     elementsTreeTable.setRoot(root);
     expandAll(root);
@@ -76,9 +106,30 @@ public class DocumentModelElementsTreeController implements Initializable {
     return treeItem;
   }
 
+  private TreeItem<ElementViewModel> toFilteredTreeItem(@NonNull Element element, @NonNull String term) {
+    ElementViewModel viewModel = new ElementViewModel(element);
+    List<TreeItem<ElementViewModel>> matchingChildren = new ArrayList<>();
+    for (ElementViewModel child : viewModel.getChildren()) {
+      TreeItem<ElementViewModel> filteredChild = toFilteredTreeItem(child.getElement(), term);
+      if (filteredChild != null) {
+        matchingChildren.add(filteredChild);
+      }
+    }
+
+    boolean selfMatches = viewModel.getName() != null && viewModel.getName().toLowerCase().contains(term);
+    if (!selfMatches && matchingChildren.isEmpty()) {
+      return null;
+    }
+
+    TreeItem<ElementViewModel> treeItem = new TreeItem<>(viewModel);
+    treeItem.getChildren().addAll(matchingChildren);
+    return treeItem;
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     modelTreeAddButton.setDisable(true);
+    searchField.textProperty().addListener((observable, oldValue, newValue) -> applyFilter(newValue));
 
     elementsTreeTable.setShowRoot(false);
     elementsTreeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

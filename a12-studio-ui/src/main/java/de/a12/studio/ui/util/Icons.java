@@ -23,6 +23,8 @@ public interface Icons {
   String COPY = "mdi2c-content-copy";
   String CUT = "mdi2c-content-cut";
   String PASTE = "mdi2c-content-paste";
+  String UNDO = "mdi2u-undo";
+  String REDO = "mdi2r-redo";
 
   String ELEMENT_GROUP = "mdi2f-folder-outline";
   String ELEMENT_FIELD = "mdi2f-form-textbox";
