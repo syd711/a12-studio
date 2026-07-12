@@ -7,6 +7,8 @@ import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelFactory;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.SplitPane;
@@ -29,6 +31,11 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   @FXML
   private DocumentModelFieldEditorController fieldEditorController;
+
+  @FXML
+  public void onSettings(ActionEvent actionEvent) {
+    DocumentModelFactory.openSettings();
+  }
 
   public void loadModel(@NonNull A12Model model) {
     load(((DocumentModel) model).getContent().getModelRoot());

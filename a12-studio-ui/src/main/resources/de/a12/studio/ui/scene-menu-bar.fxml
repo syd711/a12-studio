@@ -13,8 +13,6 @@
         <MenuItem mnemonicParsing="true" text="_Open" onAction="#onOpen" />
         <Menu fx:id="recentProjectsMenu" mnemonicParsing="true" text="_Recent Projects" />
         <MenuItem mnemonicParsing="true" text="Close _Project" onAction="#onCloseProject" />
-        <MenuItem mnemonicParsing="true" text="Close _All Projects" onAction="#onCloseAllProjects" />
-        <MenuItem mnemonicParsing="true" text="Close Ot_her Projects" onAction="#onCloseOtherProjects" />
         <SeparatorMenuItem />
         <MenuItem mnemonicParsing="true" text="E_xit" onAction="#onExit" />
       </items>

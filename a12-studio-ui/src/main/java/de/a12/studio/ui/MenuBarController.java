@@ -90,14 +90,6 @@ public class MenuBarController implements Initializable {
   }
 
   @FXML
-  private void onCloseAllProjects() {
-  }
-
-  @FXML
-  private void onCloseOtherProjects() {
-  }
-
-  @FXML
   private void onExit() {
     System.exit(0);
   }

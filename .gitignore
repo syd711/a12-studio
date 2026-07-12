@@ -13,3 +13,4 @@ out/
 /*.log
 config/*.json
 config/*.settings
+config/*.properties
