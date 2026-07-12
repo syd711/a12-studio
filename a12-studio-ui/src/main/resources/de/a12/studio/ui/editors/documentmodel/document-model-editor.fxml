@@ -1,44 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController">
+<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
                 <Button mnemonicParsing="false" onAction="#onSettings" styleClass="default-button">
                     <graphic>
-                        <FontIcon iconLiteral="mdi2c-cog" iconSize="18"/>
+                        <FontIcon iconLiteral="mdi2c-cog" iconSize="18" />
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Model Settings"/>
+                        <Tooltip text="Model Settings" />
                     </tooltip>
                 </Button>
                 <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="default-button">
                     <graphic>
-                        <FontIcon iconLiteral="mdi2p-puzzle" iconSize="18"/>
+                        <FontIcon iconLiteral="mdi2p-puzzle" iconSize="18" />
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Type Definitions"/>
+                        <Tooltip text="Type Definitions" />
                     </tooltip>
                 </Button>
+            <Separator prefHeight="0.0" prefWidth="0.0" />
+            <Button layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onAction="#onFileEdit" styleClass="default-button">
+               <graphic>
+                  <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
+               </graphic>
+               <tooltip>
+                  <Tooltip text="Type Definitions" />
+               </tooltip>
+            </Button>
+            <Button layoutX="10.0" layoutY="51.0" mnemonicParsing="false" onAction="#onFileOpen" styleClass="default-button">
+               <graphic>
+                  <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="18" />
+               </graphic>
+               <tooltip>
+                  <Tooltip text="Type Definitions" />
+               </tooltip>
+            </Button>
             </items>
         </ToolBar>
     </right>
     <center>
         <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <center>
-                <SplitPane fx:id="splitPane" dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0"
-                           BorderPane.alignment="CENTER">
+                <SplitPane fx:id="splitPane" dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <items>
-                        <fx:include fx:id="elementsTree" source="document-model-elements-tree.fxml"/>
-                        <fx:include fx:id="fieldEditor" source="document-model-field-editor.fxml"/>
+                        <fx:include fx:id="elementsTree" source="document-model-elements-tree.fxml" />
+                        <fx:include fx:id="fieldEditor" source="document-model-field-editor.fxml" />
                     </items>
                 </SplitPane>
             </center>

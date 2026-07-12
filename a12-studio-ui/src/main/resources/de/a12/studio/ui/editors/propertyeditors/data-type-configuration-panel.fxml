@@ -8,9 +8,10 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane expanded="true" text="DATA TYPE CONFIGURATION" maxWidth="Infinity" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeConfigurationPanelController">
+<TitledPane expanded="true" maxWidth="Infinity" text="DATA TYPE CONFIGURATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeConfigurationPanelController">
   <GridPane hgap="10.0" vgap="8.0">
     <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -21,22 +22,29 @@
       <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
     </columnConstraints>
 
-    <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-      <Label text="Min. Length" styleClass="field-label" />
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+      <Label styleClass="field-label" text="Min. Length" />
       <TextField fx:id="minLengthField" />
     </VBox>
-    <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-      <Label text="Max. Length" styleClass="field-label" />
+    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+      <Label styleClass="field-label" text="Max. Length" />
       <TextField fx:id="maxLengthField" />
     </VBox>
-    <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-      <Label text="Pattern" styleClass="field-label" />
+    <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
+      <Label styleClass="field-label" text="Pattern" />
       <TextField fx:id="patternField" />
     </VBox>
 
-    <HBox spacing="15.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="3">
+    <HBox spacing="15.0" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1">
       <CheckBox fx:id="lineBreaksCheckBox" text="Line Breaks Permitted" />
       <CheckBox fx:id="alphabeticalSortingCheckBox" text="Alphabetical Sorting" />
+         <GridPane.margin>
+            <Insets top="6.0" />
+         </GridPane.margin>
     </HBox>
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
   </GridPane>
 </TitledPane>

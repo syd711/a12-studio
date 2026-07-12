@@ -14,6 +14,9 @@
       <!-- General Information -->
       <fx:include source="../propertyeditors/general-information-panel.fxml" />
 
+      <!-- Data Def Configuration -->
+      <fx:include source="../propertyeditors/type-definition-panel.fxml" />
+
       <!-- Data Type Configuration -->
       <fx:include source="../propertyeditors/data-type-configuration-panel.fxml" />
 

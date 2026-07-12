@@ -10,20 +10,31 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class GeneralInformationPanelController implements Initializable {
+public class TypeDefinitionPanelController implements Initializable {
 
   private static final List<String> DATA_TYPES = List.of("String", "Number", "Boolean", "Date", "Object");
 
   @FXML
-  private TextField nameField;
+  private ComboBox dataTypeCombo;
 
   @FXML
-  private TextField idField;
+  private CheckBox typeDefinitionCheckBox;
 
   @FXML
-  private TextField pathField;
+  private ComboBox<String> dataTypeComboBox;
+
+  @FXML
+  private CheckBox globalCheckBox;
+
+  @FXML
+  private CheckBox transientCheckBox;
+
+  @FXML
+  private CheckBox requiredCheckBox;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    dataTypeComboBox.getItems().addAll(DATA_TYPES);
+    dataTypeComboBox.getSelectionModel().selectFirst();
   }
 }

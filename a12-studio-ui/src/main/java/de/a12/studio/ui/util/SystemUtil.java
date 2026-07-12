@@ -4,6 +4,7 @@ package de.a12.studio.ui.util;
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.ui.Studio;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,43 @@ public class SystemUtil {
     return size;
   }
 
+
+  public static boolean editFile(@Nullable File file) {
+    if (file != null && file.exists()) {
+      String osName = System.getProperty("os.name");
+      if (osName.contains("Windows")) {
+//        Studio.hostServices.showDocument(file.getAbsolutePath());
+        try {
+          new ProcessBuilder("cmd", "/c", "start", "", file.getAbsolutePath()).start();
+        }
+        catch (IOException e) {
+          log.error("Open failed: {}", e.getMessage());
+        }
+      }
+      else if (osName.toLowerCase().contains("mac")) {
+        try {
+          Runtime.getRuntime().exec(new String[]{"/usr/bin/open", "-t", file.getAbsolutePath()});
+        }
+        catch (IOException e) {
+          log.error("Error opening browser: " + e.getMessage(), e);
+          WidgetFactory.showAlert(Studio.stage, "Error", "Error opening browser: " + e.getMessage());
+        }
+      }
+      else if (osName.toLowerCase().contains("nux")) {
+        try {
+          Runtime.getRuntime().exec(new String[]{"xdg-open", file.getAbsolutePath()});
+        }
+        catch (IOException e) {
+          log.error("Error opening browser: " + e.getMessage(), e);
+          WidgetFactory.showAlert(Studio.stage, "Error", "Error opening browser: " + e.getMessage());
+        }
+      }
+      else {
+        WidgetFactory.showAlert(Studio.stage, "Error", "Failed to determine operating system for name \"" + osName + "\".");
+      }
+    }
+    return false;
+  }
 
   public static void openFolder(File folder) {
     openFolder(folder, null);

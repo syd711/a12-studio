@@ -6,14 +6,17 @@ import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelFactory;
+import de.a12.studio.ui.util.SystemUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.SplitPane;
 import org.jspecify.annotations.NonNull;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -31,6 +34,18 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   @FXML
   private DocumentModelFieldEditorController fieldEditorController;
+
+  @FXML
+  public void onFileOpen(ActionEvent actionEvent) {
+    File file = projectItem.getFile();
+    SystemUtil.openFile(file);
+  }
+
+  @FXML
+  public void onFileEdit(ActionEvent actionEvent) {
+    File file = projectItem.getFile();
+    SystemUtil.editFile(file);
+  }
 
   @FXML
   public void onSettings(ActionEvent actionEvent) {

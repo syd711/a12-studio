@@ -20,6 +20,7 @@ import java.util.Objects;
 @Slf4j
 public class ProjectItem {
 
+  @Getter
   private File file;
   @Getter
   private ProjectItem parent;
