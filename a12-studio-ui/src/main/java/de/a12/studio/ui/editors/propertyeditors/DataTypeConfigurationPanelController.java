@@ -1,10 +1,11 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
-public class DataTypeConfigurationPanelController {
+public class DataTypeConfigurationPanelController extends AbstractPropertyEditor {
 
   @FXML
   private TextField minLengthField;

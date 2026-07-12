@@ -36,19 +36,19 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   private DocumentModelFieldEditorController fieldEditorController;
 
   @FXML
-  public void onFileOpen(ActionEvent actionEvent) {
+  public void onFileOpen(ActionEvent e) {
     File file = projectItem.getFile();
     SystemUtil.openFile(file);
   }
 
   @FXML
-  public void onFileEdit(ActionEvent actionEvent) {
+  public void onFileEdit(ActionEvent e) {
     File file = projectItem.getFile();
     SystemUtil.editFile(file);
   }
 
   @FXML
-  public void onSettings(ActionEvent actionEvent) {
+  public void onSettings(ActionEvent e) {
     DocumentModelFactory.openSettings();
   }
 

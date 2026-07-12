@@ -18,3 +18,8 @@
     -fx-text-fill: -fx-text-faint;
     -fx-font-style: italic;
 }
+
+.editor-type-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}

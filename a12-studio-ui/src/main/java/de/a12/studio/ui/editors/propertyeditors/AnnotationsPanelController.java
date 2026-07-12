@@ -1,4 +1,6 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-public class AnnotationsPanelController {
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
+
+public class AnnotationsPanelController extends AbstractPropertyEditor {
 }

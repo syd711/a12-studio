@@ -28,33 +28,37 @@
                         <Tooltip text="Type Definitions" />
                     </tooltip>
                 </Button>
-            <Separator prefHeight="0.0" prefWidth="0.0" />
-            <Button layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onAction="#onFileEdit" styleClass="default-button">
-               <graphic>
-                  <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
-               </graphic>
-               <tooltip>
-                  <Tooltip text="Type Definitions" />
-               </tooltip>
-            </Button>
-            <Button layoutX="10.0" layoutY="51.0" mnemonicParsing="false" onAction="#onFileOpen" styleClass="default-button">
-               <graphic>
-                  <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="18" />
-               </graphic>
-               <tooltip>
-                  <Tooltip text="Type Definitions" />
-               </tooltip>
-            </Button>
+                <Separator prefHeight="0.0" prefWidth="0.0" />
+                <Button layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onAction="#onFileEdit" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Type Definitions" />
+                    </tooltip>
+                </Button>
+                <Button layoutX="10.0" layoutY="51.0" mnemonicParsing="false" onAction="#onFileOpen" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="18" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Type Definitions" />
+                    </tooltip>
+                </Button>
             </items>
         </ToolBar>
     </right>
     <center>
-        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <BorderPane BorderPane.alignment="CENTER">
             <center>
                 <SplitPane fx:id="splitPane" dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <items>
                         <fx:include fx:id="elementsTree" source="document-model-elements-tree.fxml" />
-                        <fx:include fx:id="fieldEditor" source="document-model-field-editor.fxml" />
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                            <center>
+                                <fx:include fx:id="fieldEditor" source="document-model-field-editor.fxml" />
+                            </center>
+                        </BorderPane>
                     </items>
                 </SplitPane>
             </center>

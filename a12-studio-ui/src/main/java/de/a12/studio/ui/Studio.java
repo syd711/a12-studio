@@ -32,7 +32,7 @@ import java.io.IOException;
 public class Studio extends Application implements StudioEventListener {
 
   public static Stage stage;
-  private RootController rootController;
+  private static RootController rootController;
 
   @Override
   public void start(Stage stage) throws IOException {
@@ -83,6 +83,10 @@ public class Studio extends Application implements StudioEventListener {
     stage.setAlwaysOnTop(false);
 
     new UpdateController(stage).checkForUpdateAsync();
+  }
+
+  public static ProjectItem getSelectedProjectItem() {
+    return rootController.getSelectedProjectItem();
   }
 
   private void onKeyPressed(@NonNull KeyEvent event) {
