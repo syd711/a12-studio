@@ -2,19 +2,24 @@ package de.a12.studio.ui;
 
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.preferences.PreferencesController;
 import de.a12.studio.ui.projecttree.ProjectTreeController;
 import de.a12.studio.ui.tabs.TabPaneController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -74,5 +79,19 @@ public class RootController implements Initializable, StudioEventListener {
 
   public ProjectItem getSelectedProjectItem() {
     return tabPaneController.getSelectedProjectItem();
+  }
+
+  @Override
+  public void preferencesOpenRequested(@NonNull PreferencesOpenRequestedEvent event) {
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("preferences/scene-preferences.fxml"));
+      Parent preferencesRoot = loader.load();
+      PreferencesController controller = loader.getController();
+      controller.setOnCloseRequested(() -> main.getChildren().remove(preferencesRoot));
+      main.getChildren().add(preferencesRoot);
+    }
+    catch (IOException e) {
+      throw new IllegalStateException("Could not load preferences", e);
+    }
   }
 }

@@ -54,6 +54,15 @@
                               <Tooltip text="Clear search" />
                           </tooltip>
                       </Button>
+                      <Separator orientation="VERTICAL" />
+                      <Button accessibleText="Preferences" mnemonicParsing="false" onAction="#onPreferences" styleClass="default-button">
+                          <graphic>
+                              <FontIcon iconLiteral="mdi2c-cog-outline" iconSize="18" styleClass="toolbar-icon" />
+                          </graphic>
+                          <tooltip>
+                              <Tooltip text="Preferences" />
+                          </tooltip>
+                      </Button>
                   </items>
               </ToolBar>
          </children>

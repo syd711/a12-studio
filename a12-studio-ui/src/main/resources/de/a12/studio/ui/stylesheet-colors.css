@@ -50,6 +50,10 @@
     -fx-selection-text: #2A3E9C;
     -fx-selection-bar-soft: derive(-fx-accent-color, 30%);
 
+    /* Error / validation state */
+    -fx-error-bg: #FF3333;
+    -fx-error-text: -fx-text-color-inverse;
+
     /* JavaFX built-in accent/selection variables consumed by Modena's default
        control styling (e.g. TreeCell/TreeTableRow selection) - point these at
        our theme color so default component selection colors match the theme. */

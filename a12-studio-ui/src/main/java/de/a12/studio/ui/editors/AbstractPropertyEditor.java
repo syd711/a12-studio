@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors;
 
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
@@ -8,14 +9,21 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TitledPane;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AbstractPropertyEditor implements Initializable {
+abstract public class AbstractPropertyEditor implements Initializable {
 
   @FXML
   private TitledPane root;
+
+  protected A12Model a12Model;
+
+  public void setData(@Nullable A12Model model) {
+
+  }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {

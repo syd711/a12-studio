@@ -113,3 +113,31 @@
 .tool-bar.panel-toolbar .search-field {
     -fx-background-color: white;
 }
+
+.error-container {
+    -fx-padding: 6px 12px;
+    -fx-background-color: -fx-error-bg;
+    -fx-text-fill: -fx-error-text;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6px;
+}
+
+.error-title {
+    -fx-text-fill: -fx-error-text;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.error-message {
+    -fx-text-fill: -fx-error-text;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+}
+
+/**
+ * Preferences overlay
+ */
+.preferences-overlay {
+    -fx-background-color: -fx-surface-color;
+}

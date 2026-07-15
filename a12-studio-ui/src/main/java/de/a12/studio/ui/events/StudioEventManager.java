@@ -61,4 +61,11 @@ public class StudioEventManager {
       listener.modelFocusRequested(event);
     }
   }
+
+  public void firePreferencesOpenRequestedEvent() {
+    PreferencesOpenRequestedEvent event = new PreferencesOpenRequestedEvent();
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.preferencesOpenRequested(event);
+    }
+  }
 }

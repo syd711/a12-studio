@@ -26,4 +26,8 @@ public interface StudioEventListener {
   default void modelSaved(@NonNull ModelSaveEvent event) {
 
   }
+
+  default void preferencesOpenRequested(@NonNull PreferencesOpenRequestedEvent event) {
+
+  }
 }

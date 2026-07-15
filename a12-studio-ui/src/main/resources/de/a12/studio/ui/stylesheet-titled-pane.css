@@ -15,7 +15,7 @@
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-border-width: 0;
-    -fx-padding: 6px 0 6px 0;
+    -fx-padding: 6px 0 2px 0;
 }
 
 .titled-pane > .title > .text {

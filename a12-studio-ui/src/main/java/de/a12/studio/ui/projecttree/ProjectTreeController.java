@@ -1,6 +1,8 @@
 package de.a12.studio.ui.projecttree;
 
+import de.a12.studio.commons.util.StudioFolderChooser;
 import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.commons.util.zip.ZipUtil;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.events.ModelFocusRequestedEvent;
@@ -26,8 +28,11 @@ import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +113,11 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       project.reload();
       load(project);
     }
+  }
+
+  @FXML
+  private void onPreferences() {
+    StudioEventManager.getInstance().firePreferencesOpenRequestedEvent();
   }
 
   private void setExpandedRecursive(TreeItem<ProjectItemViewModel> treeItem, boolean expanded) {
@@ -205,12 +215,17 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     createCopy.setDisable(projectItem.isRoot());
     createCopy.setOnAction(event -> onCreateCopy(projectItem));
 
+    MenuItem zipFolder = new MenuItem("_Zip Folder");
+    zipFolder.setGraphic(WidgetFactory.createIcon(Icons.ZIP));
+    zipFolder.setDisable(!viewModel.isFolder());
+    zipFolder.setOnAction(event -> onZipFolder(projectItem));
+
     MenuItem delete = new MenuItem("_Delete");
     delete.setGraphic(WidgetFactory.createIcon(Icons.TRASH));
     delete.setDisable(projectItem.isRoot());
     delete.setOnAction(event -> onDeleteItem(projectItem));
 
-    return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), delete);
+    return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, new SeparatorMenuItem(), delete);
   }
 
   private void onCreateNewItem(@NonNull ProjectItem parent, boolean folder) {
@@ -256,6 +271,25 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
     catch (IOException e) {
       showError("Could not copy '" + item.getName() + "'", e);
+    }
+  }
+
+  private void onZipFolder(@NonNull ProjectItem item) {
+    StudioFolderChooser chooser = new StudioFolderChooser();
+    chooser.setTitle("Choose Destination Folder");
+    File destinationFolder = chooser.showOpenDialog(getStage());
+    if (destinationFolder == null) {
+      return;
+    }
+
+    String dateSuffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"));
+    File zipFile = new File(destinationFolder, item.getName() + "_" + dateSuffix + ".zip");
+
+    try {
+      ZipUtil.zipFolder(item.getFile(), zipFile, (file, path) -> { });
+    }
+    catch (IOException e) {
+      showError("Could not zip '" + item.getName() + "'", e);
     }
   }
 

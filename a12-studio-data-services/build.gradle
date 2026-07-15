@@ -8,8 +8,38 @@ dependencyManagement {
     }
 }
 
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        // Some print/dataservices artifacts pull in kernel 30.8.5 transitively, which isn't published
+        // in this repo (only 30.8.1 is). Align everything on 30.8.1.
+        if (details.requested.group == 'com.mgmtp.a12.kernel' && details.requested.version == '30.8.5') {
+            details.useVersion '30.8.1'
+            details.because 'kernel 30.8.5 is not published in a12-community-maven; align on 30.8.1'
+        }
+    }
+}
+
 dependencies {
     implementation project(':a12-studio-commons')
+
+    implementation("com.mgmtp.a12.kernel:kernel-md-facade:30.8.1")
+    implementation("com.mgmtp.a12.base:base-model-consistency:29.3.0")
+    implementation("com.mgmtp.a12.kernel:kernel-md-join:30.8.1")
+    implementation("com.mgmtp.a12.kernel:kernel-md-combination-model:30.8.1")
+    implementation("com.mgmtp.a12.kernel:kernel-md-structuralmapping-tool:30.8.1")
+    implementation("com.mgmtp.a12.kernel:kernel-md-datatransfer-codegen:30.8.1")
+    implementation("com.mgmtp.a12.kernel:kernel-md-model-migration:30.8.1")
+    implementation("com.mgmtp.a12.base:base-model-migration-api:29.3.0")
+    implementation("com.mgmtp.a12.dataservices:dataservices-core-metadata:38.4.2")
+    implementation("com.mgmtp.a12.print:print-engine-api:3.2.3")
+    implementation("com.mgmtp.a12.print:print-engine-runtime:3.2.3")
+    implementation("com.mgmtp.a12.print:print-typesetting:3.2.3")
+
+    implementation("org.apache.pdfbox:pdfbox:2.0.25")
+    implementation("org.apache.pdfbox:fontbox:2.0.25")
+    implementation("org.apache.pdfbox:xmpbox:2.0.25")
+    implementation("org.apache.pdfbox:pdfbox-tools:2.0.25")
+
     implementation 'org.slf4j:slf4j-api:2.0.17'
     implementation 'tools.jackson.core:jackson-databind:3.1.4'
 

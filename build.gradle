@@ -9,7 +9,20 @@ subprojects {
     }
 
     repositories {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name "mgmart"
+                    url 'https://artifacts.geta12.com/artifactory/a12-community-maven/'
+                }
+            }
+            filter {
+                includeGroupByRegex "com\\.mgmtp\\.a12.*"
+            }
+        }
+
         mavenCentral()
+        maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" }
     }
 
     dependencies {
