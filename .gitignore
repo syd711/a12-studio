@@ -14,3 +14,4 @@ out/
 config/*.json
 config/*.settings
 config/*.properties
+/a12-studio-data-services/a12-studio-ui.log
