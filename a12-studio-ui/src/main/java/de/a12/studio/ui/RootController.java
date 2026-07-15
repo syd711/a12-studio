@@ -57,8 +57,8 @@ public class RootController implements Initializable, StudioEventListener {
 
     mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
       if (project != null) {
-        project.getSettings().setDividerPosition(newValue.doubleValue());
-        project.getSettings().save();
+        project.getSettings().getUISettings().setDividerPosition(newValue.doubleValue());
+        project.getSettings().getUISettings().save();
       }
     });
   }
@@ -67,7 +67,7 @@ public class RootController implements Initializable, StudioEventListener {
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
     this.mainSplitPane.setVisible(true);
     this.project = event.getProject();
-    double dividerPosition = project.getSettings().getDividerPosition();
+    double dividerPosition = project.getSettings().getUISettings().getDividerPosition();
     Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
   }
 

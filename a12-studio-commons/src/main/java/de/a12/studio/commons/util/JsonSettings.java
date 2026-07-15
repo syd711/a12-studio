@@ -1,6 +1,7 @@
 package de.a12.studio.commons.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.util.DefaultIndenter;
 import tools.jackson.core.util.DefaultPrettyPrinter;
@@ -12,9 +13,15 @@ import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
 @Slf4j
 public abstract class JsonSettings {
   public final static ObjectMapper objectMapper;
+
+  protected File settingsFile;
 
   static {
     Separators separators = Separators.createDefaultInstance()
@@ -57,4 +64,30 @@ public abstract class JsonSettings {
   }
 
   public abstract String getSettingsName();
+
+  public static <T extends JsonSettings> T load(@NonNull File settingsFile, @NonNull Class<T> clazz) {
+    T settings;
+    try {
+      String json = settingsFile.exists() ? Files.readString(settingsFile.toPath(), StandardCharsets.UTF_8) : "{}";
+      settings = fromJson(clazz, json);
+    }
+    catch (Exception e) {
+      throw new RuntimeException("Failed to load settings from " + settingsFile.getAbsolutePath(), e);
+    }
+
+    settings.settingsFile = settingsFile;
+    if (!settingsFile.exists()) {
+      settings.save();
+    }
+    return settings;
+  }
+
+  public void save() {
+    try {
+      Files.writeString(settingsFile.toPath(), toJson(), StandardCharsets.UTF_8);
+    }
+    catch (Exception e) {
+      log.error("Failed to write settings to {}: {}", settingsFile.getAbsolutePath(), e.getMessage(), e);
+    }
+  }
 }

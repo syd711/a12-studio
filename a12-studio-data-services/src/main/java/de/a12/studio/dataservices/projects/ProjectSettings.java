@@ -1,85 +1,38 @@
 package de.a12.studio.dataservices.projects;
 
-import de.a12.studio.commons.util.JsonSettings;
-import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
-@Slf4j
-public class ProjectSettings extends JsonSettings {
+public class ProjectSettings {
 
-  private double dividerPosition = 0.3;
+  static final String SETTINGS_FOLDER_NAME = ".studio";
 
-  private List<String> openedFiles = new ArrayList<>();
+  private final UISettings uiSettings;
 
-  private File settingsFile;
+  private final AISettings aiSettings;
 
-  @Override
-  public String getSettingsName() {
-    return ".studio.settings";
+  private ProjectSettings(UISettings uiSettings, AISettings aiSettings) {
+    this.uiSettings = uiSettings;
+    this.aiSettings = aiSettings;
   }
 
-  public double getDividerPosition() {
-    return dividerPosition;
+  public UISettings getUISettings() {
+    return uiSettings;
   }
 
-  public void setDividerPosition(double dividerPosition) {
-    this.dividerPosition = dividerPosition;
-  }
-
-  public List<String> getOpenedFiles() {
-    return openedFiles;
-  }
-
-  public void setOpenedFiles(List<String> openedFiles) {
-    this.openedFiles = openedFiles;
-  }
-
-  public void addOpenedFile(@NonNull String path) {
-    openedFiles.remove(path);
-    openedFiles.add(path);
-  }
-
-  public void removeOpenedFile(@NonNull String path) {
-    openedFiles.remove(path);
+  public AISettings getAISettings() {
+    return aiSettings;
   }
 
   public static ProjectSettings load(@NonNull File projectFolder) {
-    File settingsFile = new File(projectFolder, new ProjectSettings().getSettingsName());
-    ProjectSettings settings = null;
-
-    if (settingsFile.exists()) {
-      try {
-        String json = Files.readString(settingsFile.toPath(), StandardCharsets.UTF_8);
-        settings = fromJson(ProjectSettings.class, json);
-      }
-      catch (Exception e) {
-        log.warn("Failed to read project settings from {}: {}", settingsFile.getAbsolutePath(), e.getMessage(), e);
-      }
+    File settingsFolder = new File(projectFolder, SETTINGS_FOLDER_NAME);
+    if (!settingsFolder.exists()) {
+      settingsFolder.mkdirs();
     }
 
-    if (settings == null) {
-      settings = new ProjectSettings();
-    }
-
-    settings.settingsFile = settingsFile;
-    if (!settingsFile.exists()) {
-      settings.save();
-    }
-    return settings;
-  }
-
-  public void save() {
-    try {
-      Files.writeString(settingsFile.toPath(), toJson(), StandardCharsets.UTF_8);
-    }
-    catch (Exception e) {
-      log.error("Failed to write project settings to {}: {}", settingsFile.getAbsolutePath(), e.getMessage(), e);
-    }
+    UISettings uiSettings = UISettings.load(settingsFolder);
+    AISettings aiSettings = AISettings.load(settingsFolder);
+    return new ProjectSettings(uiSettings, aiSettings);
   }
 }

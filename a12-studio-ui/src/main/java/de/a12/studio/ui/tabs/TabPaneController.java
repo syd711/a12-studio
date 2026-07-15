@@ -40,7 +40,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
     this.project = event.getProject();
     tabPane.getTabs().clear();
 
-    for (String path : event.getProject().getSettings().getOpenedFiles()) {
+    for (String path : event.getProject().getSettings().getUISettings().getOpenedFiles()) {
       File file = new File(path);
       if (file.exists()) {
         open(new ProjectItem(file));
@@ -108,8 +108,8 @@ public class TabPaneController implements Initializable, StudioEventListener {
   private void onTabClosed(@NonNull Tab tab) {
     ProjectItem projectItem = (ProjectItem) tab.getUserData();
     if (project != null && projectItem != null) {
-      project.getSettings().removeOpenedFile(projectItem.getPath());
-      project.getSettings().save();
+      project.getSettings().getUISettings().removeOpenedFile(projectItem.getPath());
+      project.getSettings().getUISettings().save();
     }
     StudioEventManager.getInstance().fireModelClosedEvent(projectItem);
   }

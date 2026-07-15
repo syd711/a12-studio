@@ -14,31 +14,31 @@
          <Label styleClass="editor-type-label" text="Field Editor" />
 
       <!-- General Information -->
-      <fx:include source="../propertyeditors/general-information-panel.fxml" />
+      <fx:include fx:id="generalInformation" source="../propertyeditors/general-information-panel.fxml" />
 
       <!-- Data Def Configuration -->
-      <fx:include source="../propertyeditors/type-definition-panel.fxml" />
+      <fx:include fx:id="typeDefinition" source="../propertyeditors/type-definition-panel.fxml" />
 
       <!-- Data Type Configuration -->
-      <fx:include source="../propertyeditors/data-type-configuration-panel.fxml" />
+      <fx:include fx:id="dataTypeConfiguration" source="../propertyeditors/data-type-configuration-panel.fxml" />
 
       <!-- Suggestions -->
-      <fx:include source="../propertyeditors/suggestions-panel.fxml" />
+      <fx:include fx:id="suggestions" source="../propertyeditors/suggestions-panel.fxml" />
 
       <!-- Label -->
-      <fx:include source="../propertyeditors/label-panel.fxml" />
+      <fx:include fx:id="label" source="../propertyeditors/label-panel.fxml" />
 
       <!-- Description (Internal) -->
-      <fx:include source="../propertyeditors/description-internal-panel.fxml" />
+      <fx:include fx:id="descriptionInternal" source="../propertyeditors/description-internal-panel.fxml" />
 
       <!-- Description (External) -->
-      <fx:include source="../propertyeditors/description-external-panel.fxml" />
+      <fx:include fx:id="descriptionExternal" source="../propertyeditors/description-external-panel.fxml" />
 
       <!-- Helper Text -->
-      <fx:include source="../propertyeditors/helper-text-panel.fxml" />
+      <fx:include fx:id="helperText" source="../propertyeditors/helper-text-panel.fxml" />
 
       <!-- Annotations -->
-      <fx:include source="../propertyeditors/annotations-panel.fxml" />
+      <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
     </VBox>
   </content>
 </ScrollPane>

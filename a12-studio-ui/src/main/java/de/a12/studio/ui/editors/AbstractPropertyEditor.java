@@ -1,15 +1,15 @@
 package de.a12.studio.ui.editors;
 
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
-import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TitledPane;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,10 +19,10 @@ abstract public class AbstractPropertyEditor implements Initializable {
   @FXML
   private TitledPane root;
 
-  protected A12Model a12Model;
+  protected Element element;
 
-  public void setData(@Nullable A12Model model) {
-
+  public void setElement(@NonNull Element element) {
+    this.element = element;
   }
 
   @Override

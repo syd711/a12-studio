@@ -89,13 +89,17 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
     Element selected = selectedElements.get(0);
     String editorFxml = selected instanceof GroupElement ? GROUP_EDITOR_FXML : FIELD_EDITOR_FXML;
-    editorContainer.setCenter(loadEditor(editorFxml));
+    editorContainer.setCenter(loadEditor(editorFxml, selected));
   }
 
-  private Node loadEditor(@NonNull String fxml) {
+  private Node loadEditor(@NonNull String fxml, @NonNull Element selected) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-      return loader.load();
+      Node node = loader.load();
+      if (loader.getController() instanceof ElementEditorController elementEditorController) {
+        elementEditorController.setElement(selected);
+      }
+      return node;
     }
     catch (IOException e) {
       throw new UncheckedIOException(e);

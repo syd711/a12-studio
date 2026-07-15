@@ -1,13 +1,13 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.dataservices.models.A12Model;
+import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
 import java.util.List;
@@ -29,5 +29,12 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor im
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
+  }
+
+  @Override
+  public void setElement(@NonNull Element element) {
+    super.setElement(element);
+    nameField.setText(element.getName());
+    idField.setText(element.getId());
   }
 }

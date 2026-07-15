@@ -180,8 +180,8 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private void openItem(@NonNull ProjectItemViewModel viewModel) {
     if (!viewModel.isFolder() && viewModel.hasModel()) {
       if (project != null) {
-        project.getSettings().addOpenedFile(viewModel.getProjectItem().getPath());
-        project.getSettings().save();
+        project.getSettings().getUISettings().addOpenedFile(viewModel.getProjectItem().getPath());
+        project.getSettings().getUISettings().save();
       }
       StudioEventManager.getInstance().fireModelOpenEvent(viewModel.getProjectItem());
     }
