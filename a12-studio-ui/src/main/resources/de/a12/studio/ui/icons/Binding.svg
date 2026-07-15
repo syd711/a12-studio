@@ -1,0 +1,27 @@
+<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        stroke: #219884;
+        stroke-miterlimit: 10;
+        stroke-width: 1.15px;
+      }
+
+      .cls-3 {
+        fill: #219884;
+      }
+    </style>
+  </defs>
+  <g id="Binding">
+    <rect class="cls-1" width="20" height="20"/>
+    <g id="Kontur">
+      <rect class="cls-2" x="2.5" y="2.5" width="15" height="15"/>
+    </g>
+    <path id="B" class="cls-3" d="M13.12,10.61A2.32,2.32,0,0,1,13.5,12a2,2,0,0,1-.79,1.72,3.66,3.66,0,0,1-2.29.61H6.5V5.7h3.69a3.38,3.38,0,0,1,2.15.6,2,2,0,0,1,.75,1.64,2.33,2.33,0,0,1-.27,1.13,1.93,1.93,0,0,1-.74.76A2,2,0,0,1,13.12,10.61ZM8,7.31V9.24H10A2.36,2.36,0,0,0,11.21,9a.84.84,0,0,0,0-1.44A2.25,2.25,0,0,0,10,7.31ZM12,11.83c0-.68-.57-1-1.7-1H8v1.8h2.37C11.46,12.67,12,12.51,12,11.83Z"/>
+  </g>
+</svg>

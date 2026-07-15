@@ -1,0 +1,13 @@
+<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#A9B3BC;}
+</style>
+<g id="Model-Form-CDM_x5F_disabled">
+	<rect id="area" class="st0" width="20" height="20"/>
+	<path id="borders" class="st1" d="M19,19H1V1h18V19z M2,18h16V2H2V18z"/>
+	<rect id="bg" x="2" y="2" class="st0" width="16" height="16"/>
+	<path id="character" class="st1" d="M4,14V6h4v1.1H4.9v2.6h2.9v1.1H4.9V14H4z
+		 M9,14V8h5.6c1,0,1.4,0.6,1.4,1.8V14h-0.9V9.6c0-0.4-0.2-0.7-0.5-0.7H13v5h-1V9H9.9v5H9z"/>
+</g>
+</svg>

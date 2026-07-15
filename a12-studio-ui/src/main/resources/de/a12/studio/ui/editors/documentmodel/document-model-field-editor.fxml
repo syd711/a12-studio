@@ -14,7 +14,7 @@
          <Label styleClass="editor-type-label" text="Field Editor" />
 
       <!-- General Information -->
-      <fx:include fx:id="generalInformation" source="../propertyeditors/general-information-panel.fxml" />
+      <fx:include fx:id="generalInformation" source="../propertyeditors/field-information-panel.fxml" />
 
       <!-- Data Def Configuration -->
       <fx:include fx:id="typeDefinition" source="../propertyeditors/type-definition-panel.fxml" />

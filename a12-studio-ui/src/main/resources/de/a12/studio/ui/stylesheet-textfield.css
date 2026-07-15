@@ -17,6 +17,11 @@
     -fx-border-color: -fx-accent-color;
 }
 
+.text-field:error,
+.text-field:error:focused {
+    -fx-border-color: -fx-error-bg;
+}
+
 /**
  * Read-only fields (e.g. ID, Path)
  */
@@ -34,4 +39,20 @@
     -fx-background-color: -fx-search-bg;
     -fx-border-color: -fx-border-color-theme;
     -fx-pref-height: 34px;
+}
+
+/**
+ * Search field reset button (shown above the field, only while it has text)
+ */
+.search-reset-button,
+.search-reset-button:hover {
+    -fx-background-color: -fx-search-bg;
+    -fx-border-width: 0;
+    -fx-background-radius: 4px;
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+    -fx-min-width: 20px;
+    -fx-min-height: 20px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
 }

@@ -1,0 +1,15 @@
+<svg id="Ebene_1" data-name="Ebene 1" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+<style type="text/css">
+	.st0{fill:none;}
+	.st1{fill:#A9B3BC;}
+	.st2{opacity:0.99;fill:#F1F2F4;enable-background:new    ;}
+</style>
+<g id="Model-Overview_x5F_disabled">
+	<rect id="area" class="st0" width="20" height="20"/>
+	<rect id="bg" x="1" y="1" class="st1" width="18" height="18"/>
+	<path id="character" class="st2" d="M4,12.2V7.8C4,6.6,4.6,6,5.7,6h2.5
+		C9.4,6,10,6.6,10,7.8v4.3c0,1.2-0.6,1.8-1.7,1.8H5.7C4.6,14,4,13.4,4,12.2z M5.1,12.3c0,0.4,0.2,0.6,0.6,0.6h2.5
+		c0.4,0,0.6-0.2,0.6-0.6V7.7c0-0.4-0.2-0.6-0.6-0.6H5.7c-0.4,0-0.6,0.2-0.6,0.6V12.3z M11,8.2L11.1,8H12l1.4,5h0.2L15,8h0.8L16,8.2
+		L14.3,14h-1.5L11,8.2z"/>
+</g>
+</svg>
