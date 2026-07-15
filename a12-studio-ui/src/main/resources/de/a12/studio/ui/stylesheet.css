@@ -141,3 +141,29 @@
 .preferences-overlay {
     -fx-background-color: -fx-surface-color;
 }
+
+.preferences-nav {
+    -fx-background-color: -fx-panel-color;
+}
+
+.preferences-content {
+    -fx-background-color: -fx-surface-color;
+}
+
+.preference-button {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-color: transparent;
+    -fx-border-style: hidden;
+    -fx-background-radius: 4px;
+    -fx-text-fill: -fx-text-color;
+    -fx-pref-width: 260px;
+    -fx-padding: 4px;
+    -fx-cursor: hand;
+}
+
+.preference-button:hover,
+.preference-button-selected {
+    -fx-background-color: -fx-selection-bg;
+    -fx-text-fill: -fx-selection-text;
+}

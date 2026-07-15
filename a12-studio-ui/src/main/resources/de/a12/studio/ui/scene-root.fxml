@@ -10,28 +10,32 @@
        <fx:include fx:id="header" source="scene-header.fxml" />
    </top>
    <center>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <top>
-            <fx:include fx:id="menuBar" source="scene-menu-bar.fxml" BorderPane.alignment="CENTER" />
-         </top>
-         <center>
-            <StackPane fx:id="main" BorderPane.alignment="CENTER">
-               <children>
-                  <BorderPane prefHeight="200.0" prefWidth="200.0">
-                     <center>
-                        <Label text="Open project from the menu" BorderPane.alignment="CENTER" />
-                     </center>
-                  </BorderPane>
-                  <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" prefHeight="200.0" prefWidth="200.0">
-                     <items>
-                        <fx:include fx:id="projectTree" source="projecttree/scene-project-tree.fxml" />
-                        <fx:include fx:id="tabPane" source="tabs/scene-tab-pane.fxml" />
-                     </items>
-                  </SplitPane>
-               </children>
-            </StackPane>
-         </center>
-      </BorderPane>
+      <StackPane fx:id="rootStack" BorderPane.alignment="CENTER">
+         <children>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <top>
+                  <fx:include fx:id="menuBar" source="scene-menu-bar.fxml" BorderPane.alignment="CENTER" />
+               </top>
+               <center>
+                  <StackPane fx:id="main" BorderPane.alignment="CENTER">
+                     <children>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <center>
+                              <Label text="Open project from the menu" BorderPane.alignment="CENTER" />
+                           </center>
+                        </BorderPane>
+                        <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" prefHeight="200.0" prefWidth="200.0">
+                           <items>
+                              <fx:include fx:id="projectTree" source="projecttree/scene-project-tree.fxml" />
+                              <fx:include fx:id="tabPane" source="tabs/scene-tab-pane.fxml" />
+                           </items>
+                        </SplitPane>
+                     </children>
+                  </StackPane>
+               </center>
+            </BorderPane>
+         </children>
+      </StackPane>
    </center>
     <bottom>
         <fx:include fx:id="footer" source="scene-footer.fxml" />

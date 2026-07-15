@@ -46,6 +46,9 @@ public class RootController implements Initializable, StudioEventListener {
   @FXML
   private FooterController footerController;
 
+  @FXML
+  private StackPane rootStack;
+
   private Project project;
 
   @Override
@@ -87,8 +90,8 @@ public class RootController implements Initializable, StudioEventListener {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("preferences/scene-preferences.fxml"));
       Parent preferencesRoot = loader.load();
       PreferencesController controller = loader.getController();
-      controller.setOnCloseRequested(() -> main.getChildren().remove(preferencesRoot));
-      main.getChildren().add(preferencesRoot);
+      controller.setOnCloseRequested(() -> rootStack.getChildren().remove(preferencesRoot));
+      rootStack.getChildren().add(preferencesRoot);
     }
     catch (IOException e) {
       throw new IllegalStateException("Could not load preferences", e);

@@ -4,27 +4,29 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.ListView;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 public class PreferencesController implements Initializable {
 
-  private static final String AI_SETTINGS = "AI Settings";
-  private static final String ANNOTATION_SETS = "Annotation Sets";
+  @FXML
+  private Button aiSettingsBtn;
 
   @FXML
-  private ListView<String> categoryList;
+  private Button annotationSetsBtn;
 
   @FXML
   private StackPane contentStack;
 
-  private final Map<String, Parent> pages = new LinkedHashMap<>();
+  private final Map<String, Parent> pages = new HashMap<>();
+
+  private Button selectedButton;
 
   private Runnable onCloseRequested;
 
@@ -34,27 +36,36 @@ public class PreferencesController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    categoryList.getItems().addAll(AI_SETTINGS, ANNOTATION_SETS);
-    categoryList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-      if (newValue != null) {
-        showPage(newValue);
-      }
-    });
-    categoryList.getSelectionModel().selectFirst();
+    showPage(aiSettingsBtn, "ai-settings-panel.fxml");
   }
 
-  private void showPage(String category) {
-    Parent page = pages.computeIfAbsent(category, this::loadPage);
+  @FXML
+  private void onAiSettings() {
+    showPage(aiSettingsBtn, "ai-settings-panel.fxml");
+  }
+
+  @FXML
+  private void onAnnotationSets() {
+    showPage(annotationSetsBtn, "annotation-sets-panel.fxml");
+  }
+
+  private void showPage(Button button, String fxml) {
+    if (selectedButton != null) {
+      selectedButton.getStyleClass().remove("preference-button-selected");
+    }
+    button.getStyleClass().add("preference-button-selected");
+    selectedButton = button;
+
+    Parent page = pages.computeIfAbsent(fxml, this::loadPage);
     contentStack.getChildren().setAll(page);
   }
 
-  private Parent loadPage(String category) {
-    String fxml = AI_SETTINGS.equals(category) ? "ai-settings-panel.fxml" : "annotation-sets-panel.fxml";
+  private Parent loadPage(String fxml) {
     try {
       return FXMLLoader.load(getClass().getResource(fxml));
     }
     catch (IOException e) {
-      throw new IllegalStateException("Could not load preferences page '" + category + "'", e);
+      throw new IllegalStateException("Could not load preferences page '" + fxml + "'", e);
     }
   }
 
