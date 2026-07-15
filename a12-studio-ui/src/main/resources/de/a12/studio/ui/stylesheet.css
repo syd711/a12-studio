@@ -114,13 +114,16 @@
     -fx-background-color: white;
 }
 
+/**
+ * Error Container
+ */
 .error-container {
     -fx-padding: 6px 12px;
     -fx-background-color: -fx-error-bg;
     -fx-text-fill: -fx-error-text;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
 }
 
 .error-title {
@@ -164,6 +167,18 @@
 
 .preference-button:hover,
 .preference-button-selected {
-    -fx-background-color: -fx-selection-bg;
-    -fx-text-fill: -fx-selection-text;
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.ghost-button-default {
+    -fx-background-color: transparent;
+    -fx-border-style: hidden;
+    -fx-background-radius: 4px;
+    -fx-text-fill: -fx-text-muted;
+    -fx-cursor: hand;
+}
+
+.ghost-button-default:hover {
+    -fx-background-color: transparent;
 }

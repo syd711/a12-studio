@@ -33,11 +33,11 @@
                      </children>
                   </StackPane>
                </center>
+                <bottom>
+                    <fx:include fx:id="footer" source="scene-footer.fxml" />
+                </bottom>
             </BorderPane>
          </children>
       </StackPane>
    </center>
-    <bottom>
-        <fx:include fx:id="footer" source="scene-footer.fxml" />
-    </bottom>
 </BorderPane>

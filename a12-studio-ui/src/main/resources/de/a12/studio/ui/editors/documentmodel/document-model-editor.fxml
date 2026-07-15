@@ -54,11 +54,7 @@
                 <SplitPane fx:id="splitPane" dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <items>
                         <fx:include fx:id="elementsTree" source="document-model-elements-tree.fxml" />
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
-                            <center>
-                                <fx:include fx:id="fieldEditor" source="document-model-field-editor.fxml" />
-                            </center>
-                        </BorderPane>
+                        <BorderPane fx:id="editorContainer" />
                     </items>
                 </SplitPane>
             </center>

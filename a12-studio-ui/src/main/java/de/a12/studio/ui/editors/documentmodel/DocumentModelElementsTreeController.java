@@ -5,6 +5,7 @@ import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.GroupElement;
 import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
+import de.a12.studio.commons.components.SearchFieldController;
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.commons.util.localsettings.BaseTableSettings;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
@@ -17,6 +18,7 @@ import de.a12.studio.ui.util.Icons;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -27,6 +29,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class DocumentModelElementsTreeController implements Initializable {
 
@@ -49,7 +52,7 @@ public class DocumentModelElementsTreeController implements Initializable {
   private MenuButton modelTreeAddButton;
 
   @FXML
-  private TextField searchField;
+  private SearchFieldController searchController;
 
   @FXML
   private TreeTableView<ElementViewModel> elementsTreeTable;
@@ -65,21 +68,27 @@ public class DocumentModelElementsTreeController implements Initializable {
 
   private final CommandStack commandStack = new CommandStack();
 
+  private Consumer<List<Element>> selectionListener;
+
   public void load(@NonNull DocumentModel model) {
     load(projectItem, model.getContent().getModelRoot());
+  }
+
+  public void setSelectionListener(Consumer<List<Element>> selectionListener) {
+    this.selectionListener = selectionListener;
   }
 
   public void load(ProjectItem projectItem, @NonNull ModelRoot modelRoot) {
     this.projectItem = projectItem;
     this.modelRoot = modelRoot;
-    applyFilter(searchField.getText());
+    applyFilter(searchController.getText());
   }
 
   @FXML
   private void onUndo() {
     commandStack.undo();
     updateUndoRedoState();
-    applyFilter(searchField.getText());
+    applyFilter(searchController.getText());
     StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 
@@ -87,7 +96,7 @@ public class DocumentModelElementsTreeController implements Initializable {
   private void onRedo() {
     commandStack.redo();
     updateUndoRedoState();
-    applyFilter(searchField.getText());
+    applyFilter(searchController.getText());
     StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 
@@ -96,9 +105,18 @@ public class DocumentModelElementsTreeController implements Initializable {
     redoButton.setDisable(!commandStack.canRedo());
   }
 
-  @FXML
-  private void onResetSearch() {
-    searchField.clear();
+  private void notifySelectionChanged() {
+    if (selectionListener == null) {
+      return;
+    }
+
+    List<Element> selectedElements = new ArrayList<>();
+    for (TreeItem<ElementViewModel> treeItem : elementsTreeTable.getSelectionModel().getSelectedItems()) {
+      if (treeItem != null && treeItem.getValue() != null) {
+        selectedElements.add(treeItem.getValue().getElement());
+      }
+    }
+    selectionListener.accept(selectedElements);
   }
 
   private void applyFilter(String filter) {
@@ -158,7 +176,7 @@ public class DocumentModelElementsTreeController implements Initializable {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     modelTreeAddButton.setDisable(true);
     updateUndoRedoState();
-    searchField.textProperty().addListener((observable, oldValue, newValue) -> applyFilter(newValue));
+    searchController.setOnSearch(this::applyFilter);
 
     elementsTreeTable.setShowRoot(false);
     elementsTreeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -168,6 +186,7 @@ public class DocumentModelElementsTreeController implements Initializable {
         modelTreeAddButton.setDisable(newValue == null);
       }
     });
+    elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());
     elementsTreeTable.setRowFactory(treeTable -> new TreeTableRow<>() {
       @Override
       protected void updateItem(ElementViewModel item, boolean empty) {
@@ -259,7 +278,7 @@ public class DocumentModelElementsTreeController implements Initializable {
     }
 
     updateUndoRedoState();
-    applyFilter(searchField.getText());
+    applyFilter(searchController.getText());
     StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 

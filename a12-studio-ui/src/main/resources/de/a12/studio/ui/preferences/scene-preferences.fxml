@@ -26,11 +26,11 @@
                         <StackPane fx:id="contentStack" BorderPane.alignment="CENTER" />
                     </center>
                 </BorderPane>
-                <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
+                <VBox alignment="TOP_CENTER">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#onClose" styleClass="default-button">
+                        <Button mnemonicParsing="false" onAction="#onClose" styleClass="ghost-button-default">
                             <graphic>
-                                <FontIcon iconLiteral="mdi2c-close" iconSize="18" />
+                                <FontIcon iconColor="#272828" iconLiteral="mdi2c-close-circle-outline" iconSize="48" />
                             </graphic>
                         </Button>
                     </children>

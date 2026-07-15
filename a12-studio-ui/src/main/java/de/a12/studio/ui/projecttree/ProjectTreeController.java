@@ -1,5 +1,6 @@
 package de.a12.studio.ui.projecttree;
 
+import de.a12.studio.commons.components.SearchFieldController;
 import de.a12.studio.commons.util.StudioFolderChooser;
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.commons.util.zip.ZipUtil;
@@ -18,7 +19,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
@@ -44,7 +44,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private TreeView<ProjectItemViewModel> projectTree;
 
   @FXML
-  private TextField searchField;
+  private SearchFieldController searchController;
 
   private Project project;
   private ProjectItemViewModel rootViewModel;
@@ -52,12 +52,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   public void load(@NonNull Project project) {
     this.project = project;
     this.rootViewModel = new ProjectItemViewModel(project.getRoot());
-    applyFilter(searchField.getText());
-  }
-
-  @FXML
-  private void onResetSearch() {
-    searchField.clear();
+    applyFilter(searchController.getText());
   }
 
   private void applyFilter(String filter) {
@@ -141,8 +136,8 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   }
 
   private void revealItem(@NonNull ProjectItem item) {
-    if (!searchField.getText().isEmpty()) {
-      searchField.clear();
+    if (!searchController.getText().isEmpty()) {
+      searchController.clear();
     }
 
     TreeItem<ProjectItemViewModel> treeItem = findTreeItem(projectTree.getRoot(), item);
@@ -317,7 +312,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
-    searchField.textProperty().addListener((observable, oldValue, newValue) -> applyFilter(newValue));
+    searchController.setOnSearch(this::applyFilter);
     projectTree.setOnKeyPressed(event -> {
       TreeItem<ProjectItemViewModel> selected = projectTree.getSelectionModel().getSelectedItem();
       if (event.getCode() == KeyCode.ENTER) {

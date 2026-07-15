@@ -4,39 +4,12 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" styleClass="properties-panel" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelFieldEditorController">
+<ScrollPane fitToWidth="true" styleClass="properties-panel" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelGroupEditorController">
   <content>
     <VBox spacing="12.0" styleClass="field-editor">
       <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
       </padding>
-
-      <!-- General Information -->
-      <fx:include source="../propertyeditors/general-information-panel.fxml" />
-
-      <!-- Data Def Configuration -->
-      <fx:include source="../propertyeditors/type-definition-panel.fxml" />
-
-      <!-- Data Type Configuration -->
-      <fx:include source="../propertyeditors/data-type-configuration-panel.fxml" />
-
-      <!-- Suggestions -->
-      <fx:include source="../propertyeditors/suggestions-panel.fxml" />
-
-      <!-- Label -->
-      <fx:include source="../propertyeditors/label-panel.fxml" />
-
-      <!-- Description (Internal) -->
-      <fx:include source="../propertyeditors/description-internal-panel.fxml" />
-
-      <!-- Description (External) -->
-      <fx:include source="../propertyeditors/description-external-panel.fxml" />
-
-      <!-- Helper Text -->
-      <fx:include source="../propertyeditors/helper-text-panel.fxml" />
-
-      <!-- Annotations -->
-      <fx:include source="../propertyeditors/annotations-panel.fxml" />
     </VBox>
   </content>
 </ScrollPane>

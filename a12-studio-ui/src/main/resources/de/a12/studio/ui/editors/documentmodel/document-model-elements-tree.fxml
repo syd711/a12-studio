@@ -3,7 +3,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeTableColumn?>
@@ -34,15 +33,7 @@
                 <Separator orientation="VERTICAL" />
                 <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="primary-button" text="Add" />
             <Separator layoutX="145.0" layoutY="10.0" orientation="VERTICAL" />
-                <TextField fx:id="searchField" prefWidth="160.0" promptText="Search" styleClass="search-field" />
-                <Button fx:id="resetSearchButton" accessibleText="Clear search" mnemonicParsing="false" onAction="#onResetSearch" styleClass="default-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2c-close" iconSize="14" styleClass="toolbar-icon" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Clear search" />
-                    </tooltip>
-                </Button>
+                <fx:include fx:id="search" source="/de/a12/studio/commons/components/search-field.fxml" />
             </items>
         </ToolBar>
     </top>
