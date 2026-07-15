@@ -6,7 +6,7 @@ import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DataTypeConfigurationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DescriptionExternalPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DescriptionInternalPanelController;
-import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController;
+import de.a12.studio.ui.editors.propertyeditors.FieldInformationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.HelperTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LabelPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SuggestionsPanelController;
@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 public class DocumentModelFieldEditorController implements ElementEditorController, Initializable {
 
   @FXML
-  private GeneralInformationPanelController generalInformationController;
+  private FieldInformationPanelController generalInformationController;
 
   @FXML
   private TypeDefinitionPanelController typeDefinitionController;

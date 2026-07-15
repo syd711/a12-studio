@@ -13,16 +13,36 @@ import com.mgmtp.a12.kernel.md.model.a12internal.visitor.DocumentModelVisitor;
 import com.mgmtp.a12.kernel.md.model.a12internal.visitor.DocumentModelWalker;
 import com.mgmtp.a12.kernel.md.model.api.visitor.DocumentModelWalker.VisitProcess;
 import com.mgmtp.a12.model.notification.Severity;
+import de.a12.studio.commons.util.JsonSettings;
 import de.a12.studio.dataservices.services.support.DocumentModelSupport;
 import de.a12.studio.dataservices.services.support.InMemoryDocumentModelReferenceResolver;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DMValidationService {
+
+  /**
+   * UI-safe entry point: takes/returns only data-services model types and plain strings, so callers that
+   * don't have the kernel jars on their classpath (e.g. a12-studio-ui) can still trigger validation.
+   */
+  public Optional<ElementValidationError> validateElement(
+      de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
+      String elementId,
+      List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
+    DocumentModel model = DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(documentModel));
+    List<DocumentModel> otherModels = otherDocumentModels.stream()
+        .map(other -> DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(other)))
+        .toList();
+    return validate(model, otherModels).stream()
+        .filter(error -> error.getId().equals(elementId))
+        .findFirst()
+        .map(error -> new ElementValidationError(error.getId(), error.getMessage(), error.getSeverity().name()));
+  }
 
   public List<DocumentModelErrors> validate(DocumentModel model, List<DocumentModel> otherModels) {
     List<DocumentModelErrors> elementErrorsThatKernelDoesNotFind = checkMissingErrors(model, otherModels);

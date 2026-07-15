@@ -15,12 +15,14 @@ import de.a12.studio.ui.editors.util.commandstack.Command;
 import de.a12.studio.ui.editors.util.commandstack.CommandStack;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.SvgIcon;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -211,7 +213,9 @@ public class DocumentModelElementsTreeController implements Initializable {
           setGraphic(null);
         }
         else {
-          FontIcon icon = WidgetFactory.createIcon(viewModel.getIcon());
+          Node icon = viewModel.isGroup()
+              ? SvgIcon.load(Icons.SVG_ELEMENT_GROUP, WidgetFactory.DEFAULT_ICON_SIZE)
+              : WidgetFactory.createIcon(viewModel.getIcon());
           icon.getStyleClass().add("tree-icon");
           setGraphic(icon);
         }
@@ -249,7 +253,7 @@ public class DocumentModelElementsTreeController implements Initializable {
 
   private List<MenuItem> createElementMenuItems() {
     List<MenuItem> items = new ArrayList<>();
-    items.add(createMenuItem("_Group", Icons.ELEMENT_GROUP));
+    items.add(createMenuItem("_Group", SvgIcon.load(Icons.SVG_ELEMENT_GROUP, WidgetFactory.DEFAULT_ICON_SIZE)));
     items.add(createMenuItem("_Field", Icons.ELEMENT_FIELD));
     items.add(createMenuItem("_Validation Rule", Icons.ELEMENT_RULE));
     items.add(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION));
@@ -320,7 +324,7 @@ public class DocumentModelElementsTreeController implements Initializable {
 
   private List<MenuItem> createElementToolbarMenuItems() {
     List<MenuItem> items = new ArrayList<>();
-    items.add(createMenuItem("_Group", Icons.ELEMENT_GROUP));
+    items.add(createMenuItem("_Group", SvgIcon.load(Icons.SVG_ELEMENT_GROUP, WidgetFactory.DEFAULT_ICON_SIZE)));
     items.add(createMenuItem("_Field", Icons.ELEMENT_FIELD));
     items.add(createMenuItem("_Validation Rule", Icons.ELEMENT_RULE));
     items.add(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION));
@@ -335,6 +339,13 @@ public class DocumentModelElementsTreeController implements Initializable {
     FontIcon fontIcon = WidgetFactory.createIcon(icon);
     fontIcon.getStyleClass().add("menu-icon");
     menuItem.setGraphic(fontIcon);
+    return menuItem;
+  }
+
+  private MenuItem createMenuItem(@NonNull String text, @NonNull Node icon) {
+    MenuItem menuItem = new MenuItem(text);
+    icon.getStyleClass().add("menu-icon");
+    menuItem.setGraphic(icon);
     return menuItem;
   }
 

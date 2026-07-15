@@ -34,6 +34,10 @@ public class ElementViewModel {
     return element.getType();
   }
 
+  public boolean isGroup() {
+    return element instanceof GroupElement;
+  }
+
   public String getIcon() {
     if (element instanceof GroupElement) {
       return Icons.ELEMENT_GROUP;
