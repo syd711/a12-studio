@@ -67,17 +67,18 @@
                           "value": "true"
                         },
                         {
-                          "name": "test",
-                          "value": null
+                          "name": "abc",
+                          "value": "def"
                         },
                         {
-                          "name": "def",
-                          "value": "fsdfsdf"
+                          "name": "test",
+                          "value": null
                         }
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType"
+                          "type": "StringType",
+                          "StringType": {}
                         },
                         "label": [
                           {

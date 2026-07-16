@@ -85,18 +85,22 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     nameField.setMaxWidth(Double.MAX_VALUE);
     nameField.getItems().setAll(suggestedNames);
     setFieldValue(nameField, annotation.getName());
-    bindComboBox(nameField, (element, value) -> {
-      String oldName = annotation.getName();
-      annotation.setName(value);
-      onAnnotationNameChanged(oldName, value);
-    });
-    nameFields.add(nameField);
 
     TextField valueField = new TextField();
     valueField.setId("annotationValue-" + index);
     valueField.setMaxWidth(Double.MAX_VALUE);
     setFieldValue(valueField, annotation.getValue());
-    bindTextField(valueField, (element, value) -> annotation.setValue(value));
+    bindTextField(valueField, (element, value) -> {
+      annotation.setValue(value);
+      AnnotationFieldRegistry.getInstance().setValue(currentModelType, currentFieldType, annotation.getName(), value);
+    });
+
+    bindComboBox(nameField, (element, value) -> {
+      String oldName = annotation.getName();
+      annotation.setName(value);
+      onAnnotationNameChanged(annotation, valueField, oldName, value);
+    });
+    nameFields.add(nameField);
 
     annotationsGrid.addRow(index + 1, nameField, valueField, createActionsBox(annotation, index, rowCount));
   }
@@ -104,15 +108,21 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   /**
    * Keeps the {@link AnnotationFieldRegistry} in sync as an annotation's name is typed/selected, then refreshes
    * every visible row's suggestions so the new name is immediately offered elsewhere (and a name that's no
-   * longer used anywhere stops being suggested).
+   * longer used anywhere stops being suggested). When {@code newName} is a previously used name, also
+   * prefills {@code valueField} with the value it was last used with.
    */
-  private void onAnnotationNameChanged(String oldName, String newName) {
+  private void onAnnotationNameChanged(Annotation annotation, TextField valueField, String oldName, String newName) {
     if (Objects.equals(oldName, newName)) {
       return;
     }
     AnnotationFieldRegistry registry = AnnotationFieldRegistry.getInstance();
+    String suggestedValue = registry.getValue(currentModelType, currentFieldType, newName);
+    if (suggestedValue != null && !suggestedValue.equals(annotation.getValue())) {
+      annotation.setValue(suggestedValue);
+      setFieldValue(valueField, suggestedValue);
+    }
     registry.removeName(currentModelType, currentFieldType, oldName);
-    registry.addName(currentModelType, currentFieldType, newName);
+    registry.addName(currentModelType, currentFieldType, newName, annotation.getValue());
     refreshNameSuggestions();
   }
 
@@ -135,7 +145,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
       copy.setName(annotation.getName());
       copy.setValue(annotation.getValue());
       element.getAnnotations().add(index + 1, copy);
-      AnnotationFieldRegistry.getInstance().addName(currentModelType, currentFieldType, copy.getName());
+      AnnotationFieldRegistry.getInstance().addName(currentModelType, currentFieldType, copy.getName(), copy.getValue());
       rebuildRows();
       commitChange();
     });
