@@ -1,12 +1,15 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.dataservices.models.Annotation;
 import de.a12.studio.dataservices.models.documentmodel.Element;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.Icons;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
@@ -15,6 +18,7 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AnnotationsPanelController extends AbstractPropertyEditor {
 
@@ -79,9 +83,12 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     });
 
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
-      element.getAnnotations().remove(index);
-      rebuildRows();
-      commitChange();
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this annotation?", null, null, "Delete");
+      if (result.isPresent() && result.get() == ButtonType.OK) {
+        element.getAnnotations().remove(index);
+        rebuildRows();
+        commitChange();
+      }
     });
 
     HBox actionsBox = new HBox(4.0, moveUpButton, moveDownButton, copyButton, deleteButton);
