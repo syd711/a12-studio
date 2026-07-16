@@ -2,6 +2,7 @@ package de.a12.studio.ui.events;
 
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -52,6 +53,13 @@ public class StudioEventManager {
     ModelSaveEvent event = new ModelSaveEvent(projectItem);
     for (StudioEventListener listener : listeners) {
       listener.modelSaved(event);
+    }
+  }
+
+  public void fireElementValidatedEvent(@NonNull String elementId, ElementValidationError error) {
+    ElementValidatedEvent event = new ElementValidatedEvent(elementId, error);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.elementValidated(event);
     }
   }
 

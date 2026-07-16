@@ -27,6 +27,10 @@ public interface StudioEventListener {
 
   }
 
+  default void elementValidated(@NonNull ElementValidatedEvent event) {
+
+  }
+
   default void preferencesOpenRequested(@NonNull PreferencesOpenRequestedEvent event) {
 
   }

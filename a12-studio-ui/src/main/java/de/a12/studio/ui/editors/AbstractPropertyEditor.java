@@ -9,6 +9,7 @@ import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.events.StudioEventManager;
 import javafx.application.Platform;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
@@ -128,6 +129,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
   private void applyValidationResult(@NonNull TextField textField, @NonNull Optional<ElementValidationError> error) {
     textField.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, error.isPresent());
     showValidationError(error.orElse(null));
+    StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
   }
 
   private void showValidationError(ElementValidationError error) {

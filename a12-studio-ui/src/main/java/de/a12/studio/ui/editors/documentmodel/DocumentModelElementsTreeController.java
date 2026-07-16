@@ -13,6 +13,8 @@ import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
 import de.a12.studio.ui.editors.util.commandstack.Command;
 import de.a12.studio.ui.editors.util.commandstack.CommandStack;
+import de.a12.studio.ui.events.ElementValidatedEvent;
+import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.SvgIcon;
@@ -33,7 +35,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-public class DocumentModelElementsTreeController implements Initializable {
+public class DocumentModelElementsTreeController implements Initializable, StudioEventListener {
 
   private static final String TABLE_SETTINGS_ID = ModelType.DOCUMENT.getValue();
 
@@ -84,6 +86,33 @@ public class DocumentModelElementsTreeController implements Initializable {
     this.projectItem = projectItem;
     this.modelRoot = modelRoot;
     applyFilter(searchController.getText());
+    StudioEventManager.getInstance().addListener(this);
+  }
+
+  @Override
+  public void elementValidated(@NonNull ElementValidatedEvent event) {
+    TreeItem<ElementViewModel> treeItem = findTreeItem(elementsTreeTable.getRoot(), event.getElementId());
+    if (treeItem == null) {
+      return;
+    }
+    treeItem.getValue().setHasError(event.getError().isPresent());
+    elementsTreeTable.refresh();
+  }
+
+  private TreeItem<ElementViewModel> findTreeItem(TreeItem<ElementViewModel> treeItem, @NonNull String elementId) {
+    if (treeItem == null) {
+      return null;
+    }
+    if (treeItem.getValue() != null && elementId.equals(treeItem.getValue().getElement().getId())) {
+      return treeItem;
+    }
+    for (TreeItem<ElementViewModel> child : treeItem.getChildren()) {
+      TreeItem<ElementViewModel> found = findTreeItem(child, elementId);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
   }
 
   @FXML
@@ -204,6 +233,7 @@ public class DocumentModelElementsTreeController implements Initializable {
         if (empty || name == null) {
           setText(null);
           setGraphic(null);
+          getStyleClass().remove("validation-error");
           return;
         }
 
@@ -211,6 +241,7 @@ public class DocumentModelElementsTreeController implements Initializable {
         ElementViewModel viewModel = getTableRow().getItem();
         if (viewModel == null) {
           setGraphic(null);
+          getStyleClass().remove("validation-error");
         }
         else {
           Node icon = viewModel.isGroup()
@@ -218,6 +249,15 @@ public class DocumentModelElementsTreeController implements Initializable {
               : WidgetFactory.createIcon(viewModel.getIcon());
           icon.getStyleClass().add("tree-icon");
           setGraphic(icon);
+
+          if (viewModel.hasError()) {
+            if (!getStyleClass().contains("validation-error")) {
+              getStyleClass().add("validation-error");
+            }
+          }
+          else {
+            getStyleClass().remove("validation-error");
+          }
         }
       }
     });

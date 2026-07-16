@@ -81,6 +81,17 @@
     -fx-icon-color: -fx-text-color-inverse;
 }
 
+.tree-table-cell.validation-error {
+    -fx-text-fill: -fx-error-bg;
+    -fx-font-weight: bold;
+}
+
+.tree-table-row-cell:filled:selected .tree-table-cell.validation-error,
+.tree-table-row-cell:filled:selected:focused .tree-table-cell.validation-error,
+.tree-table-row-cell:filled:selected:hover .tree-table-cell.validation-error {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
 /*
  * ID-scoped overrides for the document model elements TreeTableView
  * (fx:id="elementsTreeTable"). An id selector always outranks Modena's
@@ -99,6 +110,13 @@
 #elementsTreeTable .tree-table-row-cell:filled:selected:hover .tree-table-cell {
     -fx-text-fill: -fx-text-color-inverse;
     -fx-font-weight: 600;
+}
+
+#elementsTreeTable .tree-table-row-cell:filled:selected .tree-table-cell.validation-error,
+#elementsTreeTable .tree-table-row-cell:filled:selected:focused .tree-table-cell.validation-error,
+#elementsTreeTable .tree-table-row-cell:filled:selected:hover .tree-table-cell.validation-error {
+    -fx-text-fill: -fx-text-color-inverse;
+    -fx-font-weight: bold;
 }
 
 #elementsTreeTable .tree-table-row-cell:filled:selected .tree-table-cell .tree-icon,

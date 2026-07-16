@@ -13,12 +13,22 @@ public class ElementViewModel {
 
   private final Element element;
 
+  private boolean hasError;
+
   public ElementViewModel(@NonNull Element element) {
     this.element = element;
   }
 
   public Element getElement() {
     return element;
+  }
+
+  public boolean hasError() {
+    return hasError;
+  }
+
+  public void setHasError(boolean hasError) {
+    this.hasError = hasError;
   }
 
   public String getName() {
