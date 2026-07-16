@@ -66,7 +66,7 @@ public class WidgetFactory {
   public static Tooltip createTooltip(String text) {
     Tooltip tooltip = new Tooltip(text);
     tooltip.setWrapText(true);
-    tooltip.setPrefWidth(DEFAULT_TOOLTIP_WIDTH);
+    tooltip.setMaxWidth(DEFAULT_TOOLTIP_WIDTH);
     return tooltip;
   }
 
