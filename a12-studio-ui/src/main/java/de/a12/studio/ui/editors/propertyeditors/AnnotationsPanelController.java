@@ -2,14 +2,20 @@ package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.dataservices.models.Annotation;
+import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.Element;
+import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.AnnotationFieldRegistry;
+import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
@@ -38,24 +44,43 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     commitChange();
   }
 
+  @FXML
+  private void onAnnotationDatasets() {
+    StudioEventManager.getInstance().firePreferencesOpenRequestedEvent(PreferencesOpenRequestedEvent.Section.ANNOTATION_SETS);
+  }
+
   private void rebuildRows() {
     annotationsGrid.getChildren().removeIf(node -> {
       Integer rowIndex = GridPane.getRowIndex(node);
       return rowIndex != null && rowIndex > 0;
     });
 
+    List<String> suggestedNames = resolveSuggestedNames();
     List<Annotation> annotations = element.getAnnotations();
     for (int index = 0; index < annotations.size(); index++) {
-      addRow(annotations.get(index), index, annotations.size());
+      addRow(annotations.get(index), index, annotations.size(), suggestedNames);
     }
   }
 
-  private void addRow(Annotation annotation, int index, int rowCount) {
-    TextField nameField = new TextField();
+  /**
+   * Annotation names previously used elsewhere in the project for the same model type and field type as the
+   * element currently being edited (see {@link AnnotationFieldRegistry}), offered as suggestions in the Name
+   * combo box.
+   */
+  private List<String> resolveSuggestedNames() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    ModelType modelType = projectItem == null || projectItem.getModel() == null ? null : projectItem.getModel().getModelType();
+    return AnnotationFieldRegistry.getInstance().getNames(modelType, AnnotationFieldRegistry.resolveFieldType(element));
+  }
+
+  private void addRow(Annotation annotation, int index, int rowCount, List<String> suggestedNames) {
+    ComboBox<String> nameField = new ComboBox<>();
     nameField.setId("annotationName-" + index);
+    nameField.setEditable(true);
     nameField.setMaxWidth(Double.MAX_VALUE);
+    nameField.getItems().setAll(suggestedNames);
     setFieldValue(nameField, annotation.getName());
-    bindTextField(nameField, (element, value) -> annotation.setName(value));
+    bindComboBox(nameField, (element, value) -> annotation.setName(value));
 
     TextField valueField = new TextField();
     valueField.setId("annotationValue-" + index);

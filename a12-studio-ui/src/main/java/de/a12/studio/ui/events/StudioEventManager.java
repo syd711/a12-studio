@@ -71,7 +71,11 @@ public class StudioEventManager {
   }
 
   public void firePreferencesOpenRequestedEvent() {
-    PreferencesOpenRequestedEvent event = new PreferencesOpenRequestedEvent();
+    firePreferencesOpenRequestedEvent(PreferencesOpenRequestedEvent.Section.AI_SETTINGS);
+  }
+
+  public void firePreferencesOpenRequestedEvent(PreferencesOpenRequestedEvent.@NonNull Section section) {
+    PreferencesOpenRequestedEvent event = new PreferencesOpenRequestedEvent(section);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.preferencesOpenRequested(event);
     }

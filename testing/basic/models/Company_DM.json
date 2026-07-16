@@ -83,7 +83,8 @@
                         ],
                         "requirednessConfig": {
                           "mode": "absoluteOrRelativeToNextRepAncestor"
-                        }
+                        },
+                        "transient": true
                       }
                     },
                     {
@@ -615,6 +616,10 @@
                         {
                           "name": "enable_approximate_match_search",
                           "value": "true"
+                        },
+                        {
+                          "name": "test",
+                          "value": "abc"
                         }
                       ],
                       "Field": {

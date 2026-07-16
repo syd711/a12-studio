@@ -15,6 +15,13 @@ import lombok.Setter;
     @JsonSubTypes.Type(value = EnumerationFieldType.class, name = "EnumerationType"),
     @JsonSubTypes.Type(value = BooleanFieldType.class, name = "BooleanType"),
     @JsonSubTypes.Type(value = DateFieldType.class, name = "DateType"),
+    @JsonSubTypes.Type(value = DateTimeFieldType.class, name = "DateTimeType"),
+    @JsonSubTypes.Type(value = DateRangeFieldType.class, name = "DateRangeType"),
+    @JsonSubTypes.Type(value = DateFragmentFieldType.class, name = "DateFragmentType"),
+    @JsonSubTypes.Type(value = TimeFieldType.class, name = "TimeType"),
+    @JsonSubTypes.Type(value = CustomFieldFieldType.class, name = "CustomFieldType"),
+    @JsonSubTypes.Type(value = ConfirmFieldType.class, name = "ConfirmType"),
+    @JsonSubTypes.Type(value = UnspecifiedFieldType.class, name = "UnspecifiedType"),
     @JsonSubTypes.Type(value = TypeDefFieldType.class, name = "TypeDefType")
 })
 @Getter

@@ -6,10 +6,12 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="ANNOTATIONS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController">
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="ANNOTATIONS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
@@ -25,7 +27,10 @@
       <Label styleClass="field-label" text="Name*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
       <Label styleClass="field-label" text="Value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
     </GridPane>
-    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" />
+    <HBox spacing="8.0">
+      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" />
+      <Button fx:id="annotationDatasetsButton" mnemonicParsing="false" onAction="#onAnnotationDatasets" styleClass="secondary-button" text="Annotation Datasets" />
+    </HBox>
   </VBox>
  </center>
  <top>

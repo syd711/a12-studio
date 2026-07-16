@@ -1,6 +1,8 @@
 {
   "dividerPosition": 0.2999472388322196,
-  "openedFiles": [],
-  "selectedFile": null,
+  "openedFiles": [
+    "C:\\workspace\\a12-studio\\testing\\basic\\models\\Company_DM.json"
+  ],
+  "selectedFile": "C:\\workspace\\a12-studio\\testing\\basic\\models\\Company_DM.json",
   "settingsName": "ui-settings.json"
 }

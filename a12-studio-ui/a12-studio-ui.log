@@ -1,0 +1,4 @@
+16-07 22:06:22.850 WARN  [JavaFX Application Thread] d.a.s.c.u.PropertiesStore - No properties file found C:\workspace\a12-studio\a12-studio-ui\.\config\settings.properties
+16-07 22:06:23.654 INFO  [Update Check] d.a.s.c.Updater - No releases found at https://github.com/syd711/a12-studio/releases/latest
+16-07 22:06:23.655 INFO  [Update Check] d.a.s.u.s.UpdateController - No update available (current: 0.0.0, latest: null)
+16-07 22:06:32.481 INFO  [pool-2-thread-1] d.a.s.c.u.l.LocalUISettings - Saved window position to store.

@@ -1,11 +1,13 @@
 package de.a12.studio.ui.preferences;
 
+import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.net.URL;
@@ -37,6 +39,15 @@ public class PreferencesController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     showPage(aiSettingsBtn, "ai-settings-panel.fxml");
+  }
+
+  public void showSection(PreferencesOpenRequestedEvent.@NonNull Section section) {
+    if (section == PreferencesOpenRequestedEvent.Section.ANNOTATION_SETS) {
+      onAnnotationSets();
+    }
+    else {
+      onAiSettings();
+    }
   }
 
   @FXML
