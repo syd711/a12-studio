@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane  xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.dialogs.TypeDefinitionSettingsDialog">
+    <top>
+        <fx:include fx:id="header" source="/de/a12/studio/commons/fx/scene-dialog-header.fxml" />
+    </top>
+</BorderPane>

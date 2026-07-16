@@ -1,50 +1,35 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.commons.components.SearchFieldController;
-import de.a12.studio.commons.util.StudioFolderChooser;
-import de.a12.studio.commons.util.WidgetFactory;
-import de.a12.studio.commons.util.zip.ZipUtil;
+import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.ui.events.ModelFocusRequestedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
-import de.a12.studio.ui.util.Icons;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCode;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
+@Slf4j
 public class ProjectTreeController implements Initializable, StudioEventListener {
 
-  private static final Map<String, Image> MODEL_ICON_CACHE = new HashMap<>();
+  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   @FXML
   private TreeView<ProjectItemViewModel> projectTree;
@@ -54,11 +39,55 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   private Project project;
   private ProjectItemViewModel rootViewModel;
+  private ProjectTreeMenuActions menuFactory;
 
   public void load(@NonNull Project project) {
     this.project = project;
-    this.rootViewModel = new ProjectItemViewModel(project.getRoot());
+    Map<String, List<ElementValidationError>> validationErrorsByPath = validateAllDocuments(project);
+    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
     applyFilter(searchController.getText());
+  }
+
+  /**
+   * Validates every document in the project, including cross-document include references, so the tree can
+   * flag documents with problems as soon as the project is opened.
+   */
+  private Map<String, List<ElementValidationError>> validateAllDocuments(@NonNull Project project) {
+    List<ProjectItem> documentItems = new ArrayList<>();
+    collectDocumentItems(project.getRoot(), documentItems);
+
+    List<DocumentModel> allModels = documentItems.stream()
+        .map(item -> (DocumentModel) item.getModel())
+        .toList();
+
+    Map<String, List<ElementValidationError>> validationErrorsByPath = new HashMap<>();
+    for (int i = 0; i < documentItems.size(); i++) {
+      List<DocumentModel> otherModels = new ArrayList<>(allModels);
+      otherModels.remove(i);
+      try {
+        List<ElementValidationError> errors = VALIDATION_SERVICE.validateDocument(allModels.get(i), otherModels);
+        if (!errors.isEmpty()) {
+          validationErrorsByPath.put(documentItems.get(i).getPath(), errors);
+        }
+      }
+      catch (Exception e) {
+        log.warn("Failed to validate '{}': {}", documentItems.get(i).getPath(), e.getMessage(), e);
+        validationErrorsByPath.put(documentItems.get(i).getPath(),
+            List.of(new ElementValidationError(null, "Failed to parse document: " + e.getMessage(), "ERROR")));
+      }
+    }
+    return validationErrorsByPath;
+  }
+
+  private void collectDocumentItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
+    if (item.isFolder()) {
+      for (ProjectItem child : item.getChildren()) {
+        collectDocumentItems(child, result);
+      }
+    }
+    else if (item.getModel() instanceof DocumentModel) {
+      result.add(item);
+    }
   }
 
   private void applyFilter(String filter) {
@@ -193,135 +222,13 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
   }
 
-  private ContextMenu createTreeItemContextMenu(@NonNull ProjectItemViewModel viewModel) {
-    ProjectItem projectItem = viewModel.getProjectItem();
-
-    Menu newMenu = new Menu("_New...");
-    MenuItem newFolder = new MenuItem("_Folder");
-    newFolder.setOnAction(event -> onCreateNewItem(projectItem, true));
-    MenuItem newModel = new MenuItem("_Model");
-    newModel.setOnAction(event -> onCreateNewItem(projectItem, false));
-    newMenu.getItems().addAll(newFolder, newModel);
-
-    MenuItem open = new MenuItem("_Open");
-    open.setDisable(viewModel.isFolder());
-    open.setOnAction(event -> openItem(viewModel));
-
-    MenuItem rename = new MenuItem("_Rename");
-    rename.setDisable(projectItem.isRoot());
-    rename.setOnAction(event -> onRenameItem(projectItem));
-
-    MenuItem createCopy = new MenuItem("_Create Copy");
-    createCopy.setGraphic(WidgetFactory.createIcon(Icons.COPY));
-    createCopy.setDisable(projectItem.isRoot());
-    createCopy.setOnAction(event -> onCreateCopy(projectItem));
-
-    MenuItem zipFolder = new MenuItem("_Zip Folder");
-    zipFolder.setGraphic(WidgetFactory.createIcon(Icons.ZIP));
-    zipFolder.setDisable(!viewModel.isFolder());
-    zipFolder.setOnAction(event -> onZipFolder(projectItem));
-
-    MenuItem delete = new MenuItem("_Delete");
-    delete.setGraphic(WidgetFactory.createIcon(Icons.TRASH));
-    delete.setDisable(projectItem.isRoot());
-    delete.setOnAction(event -> onDeleteItem(projectItem));
-
-    return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, new SeparatorMenuItem(), delete);
-  }
-
-  private void onCreateNewItem(@NonNull ProjectItem parent, boolean folder) {
-    String title = folder ? "New Folder" : "New Model";
-    String name = WidgetFactory.showInputDialog(getStage(), title, title, null, null, null);
-    if (name == null || name.isBlank()) {
-      return;
-    }
-
-    try {
-      if (folder) {
-        parent.createChildFolder(name.trim());
-      }
-      else {
-        parent.createChildModel(name.trim());
-      }
-      onReload();
-    }
-    catch (IOException e) {
-      showError("Could not create '" + name + "'", e);
-    }
-  }
-
-  private void onRenameItem(@NonNull ProjectItem item) {
-    String name = WidgetFactory.showInputDialog(getStage(), "Rename", "Rename", null, null, item.getName());
-    if (name == null || name.isBlank() || name.equals(item.getName())) {
-      return;
-    }
-
-    try {
-      item.renameTo(name.trim());
-      onReload();
-    }
-    catch (IOException e) {
-      showError("Could not rename to '" + name + "'", e);
-    }
-  }
-
-  private void onCreateCopy(@NonNull ProjectItem item) {
-    try {
-      item.createCopy();
-      onReload();
-    }
-    catch (IOException e) {
-      showError("Could not copy '" + item.getName() + "'", e);
-    }
-  }
-
-  private void onZipFolder(@NonNull ProjectItem item) {
-    StudioFolderChooser chooser = new StudioFolderChooser();
-    chooser.setTitle("Choose Destination Folder");
-    File destinationFolder = chooser.showOpenDialog(getStage());
-    if (destinationFolder == null) {
-      return;
-    }
-
-    String dateSuffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"));
-    File zipFile = new File(destinationFolder, item.getName() + "_" + dateSuffix + ".zip");
-
-    try {
-      ZipUtil.zipFolder(item.getFile(), zipFile, (file, path) -> { });
-    }
-    catch (IOException e) {
-      showError("Could not zip '" + item.getName() + "'", e);
-    }
-  }
-
-  private void onDeleteItem(@NonNull ProjectItem item) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(getStage(), "Delete '" + item.getName() + "'?", null, null, "Delete");
-    if (result.isPresent() && result.get() == ButtonType.OK) {
-      try {
-        item.delete();
-        onReload();
-      }
-      catch (IOException e) {
-        showError("Could not delete '" + item.getName() + "'", e);
-      }
-    }
-  }
-
-  private void showError(@NonNull String message, @NonNull Exception e) {
-    WidgetFactory.showAlert(getStage(), message, e.getMessage());
-  }
-
   private Stage getStage() {
     return (Stage) projectTree.getScene().getWindow();
   }
 
-  private static Image loadModelIcon(@NonNull String iconPath) {
-    return MODEL_ICON_CACHE.computeIfAbsent(iconPath,
-        path -> new Image(ProjectTreeController.class.getResourceAsStream(path), 18, 18, true, true));
-  }
-
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem);
     StudioEventManager.getInstance().addListener(this);
     searchController.setOnSearch(this::applyFilter);
     projectTree.setOnKeyPressed(event -> {
@@ -333,86 +240,15 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       }
       else if (event.getCode() == KeyCode.DELETE) {
         if (selected != null && !selected.getValue().getProjectItem().isRoot()) {
-          onDeleteItem(selected.getValue().getProjectItem());
+          menuFactory.onDeleteItem(selected.getValue().getProjectItem());
         }
       }
       else if (event.getCode() == KeyCode.F2) {
         if (selected != null && !selected.getValue().getProjectItem().isRoot()) {
-          onRenameItem(selected.getValue().getProjectItem());
+          menuFactory.onRenameItem(selected.getValue().getProjectItem());
         }
       }
     });
-    projectTree.setCellFactory(treeView -> new TreeCell<>() {
-      private final FontIcon icon = new FontIcon();
-      private final ImageView modelIcon = new ImageView();
-
-      {
-        icon.getStyleClass().add("tree-icon");
-        modelIcon.getStyleClass().add("tree-icon");
-        modelIcon.setFitWidth(18);
-        modelIcon.setFitHeight(18);
-        modelIcon.setPreserveRatio(true);
-        setOnMouseClicked(event -> {
-          if (event.getClickCount() == 2 && !isEmpty() && getItem() != null) {
-            openItem(getItem());
-          }
-        });
-      }
-
-      private final ChangeListener<Boolean> expandedListener = (observable, wasExpanded, expanded) ->
-          icon.setIconLiteral(expanded ? Icons.FOLDER_OPEN_OUTLINE : Icons.FOLDER_OUTLINE);
-      private TreeItem<ProjectItemViewModel> boundTreeItem;
-
-      @Override
-      protected void updateItem(ProjectItemViewModel item, boolean empty) {
-        super.updateItem(item, empty);
-
-        if (boundTreeItem != null) {
-          boundTreeItem.expandedProperty().removeListener(expandedListener);
-          boundTreeItem = null;
-        }
-
-        if (empty || item == null) {
-          setText(null);
-          setGraphic(null);
-          setTooltip(null);
-          setContextMenu(null);
-          getStyleClass().remove("model-missing");
-          return;
-        }
-
-        setText(item.toString());
-        setTooltip(new Tooltip(item.getName()));
-        boolean missingModel = !item.isFolder() && !item.hasModel();
-        setContextMenu(missingModel ? null : createTreeItemContextMenu(item));
-        if (missingModel) {
-          if (!getStyleClass().contains("model-missing")) {
-            getStyleClass().add("model-missing");
-          }
-        }
-        else {
-          getStyleClass().remove("model-missing");
-        }
-        if (item.isFolder()) {
-          boundTreeItem = getTreeItem();
-          icon.setIconLiteral(boundTreeItem.isExpanded() ? Icons.FOLDER_OPEN : Icons.FOLDER);
-          icon.setIconSize(18);
-          boundTreeItem.expandedProperty().addListener(expandedListener);
-          setGraphic(icon);
-        }
-        else {
-          String iconPath = item.getIconPath();
-          if (iconPath != null) {
-            modelIcon.setImage(loadModelIcon(iconPath));
-            setGraphic(modelIcon);
-          }
-          else {
-            icon.setIconSize(18);
-            icon.setIconLiteral(Icons.FILE_OUTLINE);
-            setGraphic(icon);
-          }
-        }
-      }
-    });
+    projectTree.setCellFactory(treeView -> new ProjectTreeCell(this::openItem, menuFactory));
   }
 }

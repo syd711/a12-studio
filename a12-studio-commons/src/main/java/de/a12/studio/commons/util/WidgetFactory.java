@@ -61,6 +61,15 @@ public class WidgetFactory {
   public static final String OK_STYLE = "-fx-font-color: " + OK_COLOR + ";-fx-text-fill:" + OK_COLOR + ";";
   public static final int DEFAULT_ICON_SIZE = 18;
 
+  public static final int DEFAULT_TOOLTIP_WIDTH = 500;
+
+  public static Tooltip createTooltip(String text) {
+    Tooltip tooltip = new Tooltip(text);
+    tooltip.setWrapText(true);
+    tooltip.setPrefWidth(DEFAULT_TOOLTIP_WIDTH);
+    return tooltip;
+  }
+
   public static Label createDefaultLabel(String msg) {
     Label label = new Label(msg);
     label.setStyle("-fx-font-size: 14px;");
@@ -129,7 +138,7 @@ public class WidgetFactory {
 
   public static Label createCheckboxIcon(@Nullable String color, @NonNull String tooltip) {
     Label label = new Label();
-    label.setTooltip(new Tooltip(tooltip));
+    label.setTooltip(createTooltip(tooltip));
     label.setGraphic(createCheckboxIcon(color));
     return label;
   }
@@ -156,7 +165,7 @@ public class WidgetFactory {
 
   public static Label wrapIcon(FontIcon icon, @NonNull String tooltip) {
     Label label = new Label();
-    label.setTooltip(new Tooltip(tooltip));
+    label.setTooltip(createTooltip(tooltip));
     label.setGraphic(icon);
     return label;
   }
@@ -183,7 +192,7 @@ public class WidgetFactory {
     fontIcon.setIconSize(DEFAULT_ICON_SIZE);
     fontIcon.setIconColor(Paint.valueOf(DEFAULT_COLOR));
     fontIcon.setIconLiteral("mdi2h-help-circle-outline");
-    Tooltip tt = new Tooltip(tooltip);
+    Tooltip tt = createTooltip(tooltip);
     tt.setWrapText(true);
     tt.setMaxWidth(350);
     label.setTooltip(tt);

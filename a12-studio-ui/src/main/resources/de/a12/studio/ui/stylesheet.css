@@ -12,6 +12,13 @@
 @import "stylesheet-titled-pane.css";
 
 /**
+ * Tooltips
+ */
+.tooltip {
+    -fx-font-size: 14px;
+}
+
+/**
  * Font Icons (org.kordamp.ikonli)
  */
 .ikonli-font-icon {
@@ -127,6 +134,7 @@
 .error-container {
     -fx-padding: 6px 12px;
     -fx-background-color: -fx-error-bg;
+    -fx-background-radius: 6px;
     -fx-text-fill: -fx-error-text;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
@@ -137,12 +145,14 @@
     -fx-text-fill: -fx-error-text;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
+    -fx-border-radius: 6px;
 }
 
 .error-message {
     -fx-text-fill: -fx-error-text;
     -fx-font-size: 14px;
     -fx-font-weight: normal;
+    -fx-border-radius: 6px;
 }
 
 /**

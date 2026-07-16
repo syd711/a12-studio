@@ -2,6 +2,7 @@ package de.a12.studio.dataservices.models.documentmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.a12.studio.dataservices.models.Label;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,4 +22,9 @@ public class FieldConfig {
   private List<Label> helperText = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private RequirednessConfig requirednessConfig;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean global;
+  @JsonProperty("transient")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean transientField;
 }

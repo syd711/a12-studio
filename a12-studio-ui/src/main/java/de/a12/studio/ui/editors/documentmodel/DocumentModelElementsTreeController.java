@@ -313,7 +313,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     items.add(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)));
     items.add(createMenuItem("_Validation Rule", createPngIcon(Icons.PNG_DMM_VALIDATION_RULE_WARNING)));
     items.add(createMenuItem("Co_mputation Rule", createPngIcon(Icons.PNG_DMM_COMPUTATION_RULE)));
-    items.add(createMenuItem("_Attachment", createPngIcon(Icons.PNG_ATTACHMENT)));
+    items.add(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT));
     items.add(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT));
     items.add(createMenuItem("_Include", Icons.ELEMENT_INCLUDE));
     items.add(new SeparatorMenuItem());
@@ -384,7 +384,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     items.add(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)));
     items.add(createMenuItem("_Validation Rule", createPngIcon(Icons.PNG_DMM_VALIDATION_RULE_WARNING)));
     items.add(createMenuItem("Co_mputation Rule", createPngIcon(Icons.PNG_DMM_COMPUTATION_RULE)));
-    items.add(createMenuItem("_Attachment", createPngIcon(Icons.PNG_ATTACHMENT)));
+    items.add(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT));
     items.add(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT));
     items.add(createMenuItem("_Include", Icons.ELEMENT_INCLUDE));
     return items;
@@ -406,7 +406,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   }
 
   private Node createGroupIcon() {
-    return createPngIcon(Icons.PNG_GROUP);
+    return WidgetFactory.createIcon(Icons.ELEMENT_GROUP);
   }
 
   private Node createElementIcon(@NonNull ElementViewModel viewModel) {

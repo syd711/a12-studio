@@ -5,12 +5,19 @@ import de.a12.studio.ui.Studio;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
-public class DocumentModelFactory {
+public class Dialogs {
 
   public static void openSettings() {
     FXMLLoader fxmlLoader = new FXMLLoader(DocumentModelSettingsDialog.class.getResource("document-model-settings-dialog.fxml"));
     Stage stage = WidgetFactory.createDialogStage("document-mode-settings", fxmlLoader, Studio.stage, "Settings");
     DocumentModelSettingsDialog controller = (DocumentModelSettingsDialog) stage.getUserData();
+    stage.showAndWait();
+  }
+
+  public static void openTypeDefinitions() {
+    FXMLLoader fxmlLoader = new FXMLLoader(TypeDefinitionSettingsDialog.class.getResource("document-model-typedefinitions-dialog.fxml"));
+    Stage stage = WidgetFactory.createDialogStage("document-mode-settings", fxmlLoader, Studio.stage, "Type Definitions");
+    TypeDefinitionSettingsDialog controller = (TypeDefinitionSettingsDialog) stage.getUserData();
     stage.showAndWait();
   }
 }

@@ -16,6 +16,8 @@ public interface Icons {
 
   String ARROW_EXPAND_ALL = "mdi2a-arrow-expand-vertical";
   String ARROW_COLLAPSE_ALL = "mdi2a-arrow-collapse-vertical";
+  String ARROW_UP = "mdi2a-arrow-up";
+  String ARROW_DOWN = "mdi2a-arrow-down";
 
   String RELOAD = "mdi2r-refresh";
   String CLOSE = "mdi2c-close";
@@ -43,11 +45,8 @@ public interface Icons {
   String PNG_DMM_VALIDATION_RULE_WARNING = "/de/a12/studio/ui/icons/dmm/ValidationRule-Warning.png";
   String PNG_DMM_VALIDATION_RULE_INFO = "/de/a12/studio/ui/icons/dmm/ValidationRule-Info.png";
 
-
-  String PNG_GROUP = "/de/a12/studio/ui/icons/Group.png";
-  String PNG_ATTACHMENT = "/de/a12/studio/ui/icons/Attachments.png";
-
   String ELEMENT_MULTI_SELECT = "mdi2c-checkbox-multiple-marked-outline";
-  String ELEMENT_INCLUDE = "mdi2f-file-import-outline";
+  String ELEMENT_INCLUDE = "mdi2l-link";
   String ELEMENT_GENERIC = "mdi2s-shape-outline";
+  String ELEMENT_ATTACHMENT = "mdi2d-database-plus-outline";
 }

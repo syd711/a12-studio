@@ -12,6 +12,7 @@
 .menu-bar .label,
 .menu-item .label {
     -fx-font-size: 14px;
+    -fx-font-weight: normal;
     -fx-text-fill: -fx-text-secondary;
 }
 

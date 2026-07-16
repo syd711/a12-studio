@@ -26,16 +26,16 @@
       <fx:include fx:id="suggestions" source="../propertyeditors/suggestions-panel.fxml" />
 
       <!-- Label -->
-      <fx:include fx:id="label" source="../propertyeditors/label-panel.fxml" />
+      <fx:include fx:id="label" source="../propertyeditors/localized-text-panel.fxml" />
 
       <!-- Description (Internal) -->
-      <fx:include fx:id="descriptionInternal" source="../propertyeditors/description-panel.fxml" />
+      <fx:include fx:id="descriptionInternal" source="../propertyeditors/localized-text-panel.fxml" />
 
       <!-- Description (External) -->
-      <fx:include fx:id="descriptionExternal" source="../propertyeditors/description-panel.fxml" />
+      <fx:include fx:id="descriptionExternal" source="../propertyeditors/localized-text-panel.fxml" />
 
       <!-- Helper Text -->
-      <fx:include fx:id="helperText" source="../propertyeditors/helper-text-panel.fxml" />
+      <fx:include fx:id="helperText" source="../propertyeditors/localized-text-panel.fxml" />
 
       <!-- Annotations -->
       <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />

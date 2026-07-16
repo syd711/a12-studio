@@ -17,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,10 @@ abstract public class AbstractPropertyEditor implements Initializable {
   // programmatic updates don't get mistaken for user edits and trigger a save/validation cycle.
   private boolean updatingFromModel;
 
+  // Appended to the expanded-state settings key so multiple instances of the same controller class (e.g. a
+  // panel reused for both an internal and external variant) don't share persisted expanded/collapsed state.
+  private String settingsKeySuffix = "";
+
   public void setElement(@NonNull Element element) {
     this.element = element;
     showValidationError(null);
@@ -70,6 +75,22 @@ abstract public class AbstractPropertyEditor implements Initializable {
       }
     });
     showValidationError(null);
+  }
+
+  /**
+   * Overrides this panel's title, e.g. when the same controller class is reused for multiple variants of a
+   * panel (see {@link #setSettingsKeySuffix}).
+   */
+  protected void setTitle(@NonNull String title) {
+    root.setText(title);
+  }
+
+  /**
+   * Distinguishes the persisted expanded/collapsed state of multiple instances of the same controller class,
+   * which would otherwise collide on the same settings key (derived from the class name).
+   */
+  protected void setSettingsKeySuffix(@NonNull String suffix) {
+    this.settingsKeySuffix = suffix;
   }
 
   /**
@@ -95,6 +116,20 @@ abstract public class AbstractPropertyEditor implements Initializable {
     updatingFromModel = true;
     try {
       checkBox.setSelected(value);
+    } finally {
+      updatingFromModel = false;
+    }
+  }
+
+  /**
+   * Sets a combo box's value without triggering the save/validation cycle registered by {@link
+   * #bindComboBox}. Property editors should use this (instead of {@code comboBox.setValue(...)})
+   * whenever they repopulate a field from the model, e.g. in {@link #setElement}.
+   */
+  protected void setFieldValue(@NonNull ComboBox<String> comboBox, String value) {
+    updatingFromModel = true;
+    try {
+      comboBox.setValue(value);
     } finally {
       updatingFromModel = false;
     }
@@ -130,6 +165,19 @@ abstract public class AbstractPropertyEditor implements Initializable {
     });
   }
 
+  /**
+   * Same as {@link #bindTextField} but for a combo box's value.
+   */
+  protected void bindComboBox(@NonNull ComboBox<String> comboBox, @NonNull BiConsumer<Element, String> setter) {
+    comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      setter.accept(element, newValue);
+      debouncer.debounce(comboBox.getId(), () -> commitChange(comboBox), COMMIT_DEBOUNCE_MS, true);
+    });
+  }
+
   private void commitChange(@NonNull Node field) {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem == null) {
@@ -137,6 +185,22 @@ abstract public class AbstractPropertyEditor implements Initializable {
     }
     projectItem.save();
     applyValidationResult(field, validateElement(projectItem));
+  }
+
+  /**
+   * Same as {@link #commitChange(Node)} but for structural changes (e.g. adding/removing a row in a
+   * dynamic list) that aren't tied to a single field, so there's no field to mark with the error
+   * pseudo-class.
+   */
+  protected void commitChange() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem == null) {
+      return;
+    }
+    projectItem.save();
+    Optional<ElementValidationError> error = validateElement(projectItem);
+    showValidationError(error.orElse(null));
+    StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
   }
 
   private Optional<ElementValidationError> validateElement(@NonNull ProjectItem projectItem) {
@@ -176,6 +240,6 @@ abstract public class AbstractPropertyEditor implements Initializable {
       return null;
     }
 
-    return modelType.getValue() + "." + getClass().getSimpleName() + ".expanded";
+    return modelType.getValue() + "." + getClass().getSimpleName() + settingsKeySuffix + ".expanded";
   }
 }

@@ -2,18 +2,22 @@ package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ProjectItemViewModel {
 
   private final ProjectItem projectItem;
+  private final Map<String, List<ElementValidationError>> validationErrorsByPath;
 
-  public ProjectItemViewModel(@NonNull ProjectItem projectItem) {
+  public ProjectItemViewModel(@NonNull ProjectItem projectItem, @NonNull Map<String, List<ElementValidationError>> validationErrorsByPath) {
     this.projectItem = projectItem;
+    this.validationErrorsByPath = validationErrorsByPath;
   }
 
   public String getName() {
@@ -51,9 +55,17 @@ public class ProjectItemViewModel {
   public List<ProjectItemViewModel> getChildren() {
     List<ProjectItemViewModel> children = new ArrayList<>();
     for (ProjectItem child : projectItem.getChildren()) {
-      children.add(new ProjectItemViewModel(child));
+      children.add(new ProjectItemViewModel(child, validationErrorsByPath));
     }
     return children;
+  }
+
+  public List<ElementValidationError> getValidationErrors() {
+    return validationErrorsByPath.getOrDefault(projectItem.getPath(), List.of());
+  }
+
+  public boolean hasValidationErrors() {
+    return !getValidationErrors().isEmpty();
   }
 
   @Override

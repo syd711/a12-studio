@@ -34,14 +34,25 @@ public class DMValidationService {
       de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
       String elementId,
       List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
+    return validateDocument(documentModel, otherDocumentModels).stream()
+        .filter(error -> error.elementId().equals(elementId))
+        .findFirst();
+  }
+
+  /**
+   * UI-safe entry point: validates every element of a document model, e.g. for whole-project validation
+   * where there's no single element to check (see {@link #validateElement} for that narrower case).
+   */
+  public List<ElementValidationError> validateDocument(
+      de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
+      List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
     DocumentModel model = DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(documentModel));
     List<DocumentModel> otherModels = otherDocumentModels.stream()
         .map(other -> DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(other)))
         .toList();
     return validate(model, otherModels).stream()
-        .filter(error -> error.getId().equals(elementId))
-        .findFirst()
-        .map(error -> new ElementValidationError(error.getId(), error.getMessage(), error.getSeverity().name()));
+        .map(error -> new ElementValidationError(error.getId(), error.getMessage(), error.getSeverity().name()))
+        .toList();
   }
 
   public List<DocumentModelErrors> validate(DocumentModel model, List<DocumentModel> otherModels) {

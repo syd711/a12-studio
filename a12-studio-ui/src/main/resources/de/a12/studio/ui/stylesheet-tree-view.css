@@ -8,7 +8,6 @@
 .tree-view .tree-cell {
     -fx-font-size: 13.5px;
     -fx-text-fill: -fx-text-color;
-    -fx-border-color: transparent transparent -fx-border-divider transparent;
     -fx-background-color: -fx-content-bg;
 }
 
@@ -133,6 +132,17 @@
 .tree-cell.model-missing:filled:selected,
 .tree-cell.model-missing:filled:selected:focused,
 .tree-cell.model-missing:filled:selected:hover {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.tree-cell.validation-error {
+    -fx-text-fill: -fx-error-bg;
+    -fx-font-weight: bold;
+}
+
+.tree-cell.validation-error:filled:selected,
+.tree-cell.validation-error:filled:selected:focused,
+.tree-cell.validation-error:filled:selected:hover {
     -fx-text-fill: -fx-text-color-inverse;
 }
 

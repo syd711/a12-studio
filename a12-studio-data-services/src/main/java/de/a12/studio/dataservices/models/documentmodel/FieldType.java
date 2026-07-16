@@ -12,7 +12,10 @@ import lombok.Setter;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = StringFieldType.class, name = "StringType"),
     @JsonSubTypes.Type(value = NumberFieldType.class, name = "NumberType"),
-    @JsonSubTypes.Type(value = EnumerationFieldType.class, name = "EnumerationType")
+    @JsonSubTypes.Type(value = EnumerationFieldType.class, name = "EnumerationType"),
+    @JsonSubTypes.Type(value = BooleanFieldType.class, name = "BooleanType"),
+    @JsonSubTypes.Type(value = DateFieldType.class, name = "DateType"),
+    @JsonSubTypes.Type(value = TypeDefFieldType.class, name = "TypeDefType")
 })
 @Getter
 @Setter

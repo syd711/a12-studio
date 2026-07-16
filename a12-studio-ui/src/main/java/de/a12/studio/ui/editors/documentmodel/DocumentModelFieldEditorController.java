@@ -4,10 +4,8 @@ import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DataTypeConfigurationPanelController;
-import de.a12.studio.ui.editors.propertyeditors.DescriptionPanelController;
 import de.a12.studio.ui.editors.propertyeditors.FieldInformationPanelController;
-import de.a12.studio.ui.editors.propertyeditors.HelperTextPanelController;
-import de.a12.studio.ui.editors.propertyeditors.LabelPanelController;
+import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SuggestionsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TypeDefinitionPanelController;
 import javafx.fxml.FXML;
@@ -33,16 +31,16 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
   private SuggestionsPanelController suggestionsController;
 
   @FXML
-  private LabelPanelController labelController;
+  private LocalizedTextPanelController labelController;
 
   @FXML
-  private DescriptionInternalPanelController descriptionInternalController;
+  private LocalizedTextPanelController descriptionInternalController;
 
   @FXML
-  private DescriptionPanelController descriptionExternalController;
+  private LocalizedTextPanelController descriptionExternalController;
 
   @FXML
-  private HelperTextPanelController helperTextController;
+  private LocalizedTextPanelController helperTextController;
 
   @FXML
   private AnnotationsPanelController annotationsController;
@@ -51,6 +49,11 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    labelController.configureLabel();
+    descriptionInternalController.configureInternal();
+    descriptionExternalController.configureExternal();
+    helperTextController.configureHelperText();
+
     propertyEditors = List.of(generalInformationController, typeDefinitionController, dataTypeConfigurationController,
         suggestionsController, labelController, descriptionInternalController, descriptionExternalController,
         helperTextController, annotationsController);
