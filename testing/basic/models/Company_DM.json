@@ -65,6 +65,14 @@
                         {
                           "name": "enable_approximate_match_search",
                           "value": "true"
+                        },
+                        {
+                          "name": "test",
+                          "value": null
+                        },
+                        {
+                          "name": "def",
+                          "value": "fsdfsdf"
                         }
                       ],
                       "Field": {

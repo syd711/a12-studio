@@ -23,13 +23,24 @@ import javafx.scene.layout.HBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private GridPane annotationsGrid;
+
+  // The model type / field type of the element currently being edited, i.e. the key under which suggested
+  // names are looked up in and reported to the AnnotationFieldRegistry. Recomputed on every rebuildRows().
+  private ModelType currentModelType;
+  private String currentFieldType;
+
+  // The name combo boxes for the rows currently displayed, kept around so a name edit (which doesn't rebuild
+  // the rows) can still refresh every row's suggestions once the registry changes.
+  private final List<ComboBox<String>> nameFields = new ArrayList<>();
 
   @Override
   public void setElement(@NonNull Element element) {
@@ -54,23 +65,17 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
       Integer rowIndex = GridPane.getRowIndex(node);
       return rowIndex != null && rowIndex > 0;
     });
+    nameFields.clear();
 
-    List<String> suggestedNames = resolveSuggestedNames();
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    currentModelType = projectItem == null || projectItem.getModel() == null ? null : projectItem.getModel().getModelType();
+    currentFieldType = AnnotationFieldRegistry.resolveFieldType(element);
+
+    List<String> suggestedNames = AnnotationFieldRegistry.getInstance().getNames(currentModelType, currentFieldType);
     List<Annotation> annotations = element.getAnnotations();
     for (int index = 0; index < annotations.size(); index++) {
       addRow(annotations.get(index), index, annotations.size(), suggestedNames);
     }
-  }
-
-  /**
-   * Annotation names previously used elsewhere in the project for the same model type and field type as the
-   * element currently being edited (see {@link AnnotationFieldRegistry}), offered as suggestions in the Name
-   * combo box.
-   */
-  private List<String> resolveSuggestedNames() {
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
-    ModelType modelType = projectItem == null || projectItem.getModel() == null ? null : projectItem.getModel().getModelType();
-    return AnnotationFieldRegistry.getInstance().getNames(modelType, AnnotationFieldRegistry.resolveFieldType(element));
   }
 
   private void addRow(Annotation annotation, int index, int rowCount, List<String> suggestedNames) {
@@ -80,7 +85,12 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     nameField.setMaxWidth(Double.MAX_VALUE);
     nameField.getItems().setAll(suggestedNames);
     setFieldValue(nameField, annotation.getName());
-    bindComboBox(nameField, (element, value) -> annotation.setName(value));
+    bindComboBox(nameField, (element, value) -> {
+      String oldName = annotation.getName();
+      annotation.setName(value);
+      onAnnotationNameChanged(oldName, value);
+    });
+    nameFields.add(nameField);
 
     TextField valueField = new TextField();
     valueField.setId("annotationValue-" + index);
@@ -89,6 +99,28 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     bindTextField(valueField, (element, value) -> annotation.setValue(value));
 
     annotationsGrid.addRow(index + 1, nameField, valueField, createActionsBox(annotation, index, rowCount));
+  }
+
+  /**
+   * Keeps the {@link AnnotationFieldRegistry} in sync as an annotation's name is typed/selected, then refreshes
+   * every visible row's suggestions so the new name is immediately offered elsewhere (and a name that's no
+   * longer used anywhere stops being suggested).
+   */
+  private void onAnnotationNameChanged(String oldName, String newName) {
+    if (Objects.equals(oldName, newName)) {
+      return;
+    }
+    AnnotationFieldRegistry registry = AnnotationFieldRegistry.getInstance();
+    registry.removeName(currentModelType, currentFieldType, oldName);
+    registry.addName(currentModelType, currentFieldType, newName);
+    refreshNameSuggestions();
+  }
+
+  private void refreshNameSuggestions() {
+    List<String> suggestedNames = AnnotationFieldRegistry.getInstance().getNames(currentModelType, currentFieldType);
+    for (ComboBox<String> nameField : nameFields) {
+      nameField.getItems().setAll(suggestedNames);
+    }
   }
 
   private HBox createActionsBox(Annotation annotation, int index, int rowCount) {
@@ -103,6 +135,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
       copy.setName(annotation.getName());
       copy.setValue(annotation.getValue());
       element.getAnnotations().add(index + 1, copy);
+      AnnotationFieldRegistry.getInstance().addName(currentModelType, currentFieldType, copy.getName());
       rebuildRows();
       commitChange();
     });
@@ -111,6 +144,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this annotation?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         element.getAnnotations().remove(index);
+        AnnotationFieldRegistry.getInstance().removeName(currentModelType, currentFieldType, annotation.getName());
         rebuildRows();
         commitChange();
       }

@@ -17,8 +17,8 @@
   <VBox spacing="10.0">
     <GridPane fx:id="annotationsGrid" hgap="10.0" vgap="6.0">
       <columnConstraints>
-        <ColumnConstraints hgrow="ALWAYS" percentWidth="35.0" />
         <ColumnConstraints hgrow="ALWAYS" percentWidth="39.0" />
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="35.0" />
         <ColumnConstraints hgrow="NEVER" minWidth="150.0" prefWidth="150.0" />
       </columnConstraints>
       <rowConstraints>

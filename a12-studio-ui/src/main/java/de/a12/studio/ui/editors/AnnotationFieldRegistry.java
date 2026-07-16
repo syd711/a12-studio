@@ -18,20 +18,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.TreeMap;
 
 /**
  * Collects the annotation names used across the whole project, grouped by model type and field type, so
  * property editors can suggest previously used annotation names instead of requiring users to retype them.
  * "Field type" is the field's data type (e.g. "StringType") for {@link FieldElement}s, or the element's own
  * type (e.g. "Group", "Rule") for every other element, since annotations can be attached to any element.
+ * Names are reference-counted per key so callers can incrementally {@link #addName} / {@link #removeName} as
+ * annotations are edited, without requiring a full {@link #rebuild} of the project.
  */
 public final class AnnotationFieldRegistry implements StudioEventListener {
 
   private static final AnnotationFieldRegistry INSTANCE = new AnnotationFieldRegistry();
 
-  private Map<Key, SortedSet<String>> namesByKey = Map.of();
+  private Map<Key, TreeMap<String, Integer>> countsByKey = new HashMap<>();
 
   private AnnotationFieldRegistry() {
     StudioEventManager.getInstance().addListener(this);
@@ -50,7 +51,7 @@ public final class AnnotationFieldRegistry implements StudioEventListener {
     List<ProjectItem> documentItems = new ArrayList<>();
     collectDocumentItems(project.getRoot(), documentItems);
 
-    Map<Key, SortedSet<String>> collected = new HashMap<>();
+    Map<Key, TreeMap<String, Integer>> collected = new HashMap<>();
     for (ProjectItem item : documentItems) {
       if (item.getModel() instanceof DocumentModel documentModel
           && documentModel.getContent() != null && documentModel.getContent().getModelRoot() != null) {
@@ -59,7 +60,7 @@ public final class AnnotationFieldRegistry implements StudioEventListener {
         }
       }
     }
-    this.namesByKey = collected;
+    this.countsByKey = collected;
   }
 
   /**
@@ -67,8 +68,42 @@ public final class AnnotationFieldRegistry implements StudioEventListener {
    * alphabetically. Never {@code null}.
    */
   public @NonNull List<String> getNames(@Nullable ModelType modelType, @Nullable String fieldType) {
-    SortedSet<String> names = namesByKey.get(new Key(modelType, fieldType));
-    return names == null ? List.of() : new ArrayList<>(names);
+    Map<String, Integer> counts = countsByKey.get(new Key(modelType, fieldType));
+    return counts == null ? List.of() : new ArrayList<>(counts.keySet());
+  }
+
+  /**
+   * Registers a new use of {@code name} for the given key, so it's offered as a suggestion even before the
+   * next full {@link #rebuild}. Blank names are ignored. Callers should pair this with {@link #removeName}
+   * when an annotation's name changes or the annotation is deleted, so the registry stays in sync with what's
+   * actually used in the project.
+   */
+  public void addName(@Nullable ModelType modelType, @Nullable String fieldType, @Nullable String name) {
+    if (name == null || name.isBlank()) {
+      return;
+    }
+    countsByKey.computeIfAbsent(new Key(modelType, fieldType), k -> new TreeMap<>()).merge(name, 1, Integer::sum);
+  }
+
+  /**
+   * Reverses a previous {@link #addName} call, dropping {@code name} from the suggestions for this key once
+   * its last use is gone. Blank names are ignored.
+   */
+  public void removeName(@Nullable ModelType modelType, @Nullable String fieldType, @Nullable String name) {
+    if (name == null || name.isBlank()) {
+      return;
+    }
+    Key key = new Key(modelType, fieldType);
+    TreeMap<String, Integer> counts = countsByKey.get(key);
+    if (counts == null) {
+      return;
+    }
+    if (counts.merge(name, -1, Integer::sum) <= 0) {
+      counts.remove(name);
+    }
+    if (counts.isEmpty()) {
+      countsByKey.remove(key);
+    }
   }
 
   /**
@@ -94,11 +129,11 @@ public final class AnnotationFieldRegistry implements StudioEventListener {
   }
 
   private static void collectFromElement(@NonNull Element element, ModelType modelType,
-      @NonNull Map<Key, SortedSet<String>> collected) {
+      @NonNull Map<Key, TreeMap<String, Integer>> collected) {
     Key key = new Key(modelType, resolveFieldType(element));
     for (Annotation annotation : element.getAnnotations()) {
       if (annotation.getName() != null && !annotation.getName().isBlank()) {
-        collected.computeIfAbsent(key, k -> new TreeSet<>()).add(annotation.getName());
+        collected.computeIfAbsent(key, k -> new TreeMap<>()).merge(annotation.getName(), 1, Integer::sum);
       }
     }
 
