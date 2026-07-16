@@ -36,7 +36,7 @@
                <children>
             
                 <Label prefWidth="90.0" styleClass="field-label" text="Path" />
-                <TextField fx:id="pathField" editable="false" styleClass="readonly-field" text="/Company/Addresses/Country" />
+                <TextField fx:id="pathField" editable="false" styleClass="readonly-field" text="" />
                </children>
             </VBox>
             <rowConstraints>
@@ -46,12 +46,7 @@
         </GridPane>
       </center>
       <top>
-         <VBox fx:id="errorContainer" styleClass="error-container" BorderPane.alignment="CENTER">
-            <children>
-               <Label fx:id="errorTitle" styleClass="error-title" />
-               <Label fx:id="errorMessage" styleClass="error-message" />
-            </children>
-         </VBox>
+         <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
       </top>
    </BorderPane>
 </TitledPane>

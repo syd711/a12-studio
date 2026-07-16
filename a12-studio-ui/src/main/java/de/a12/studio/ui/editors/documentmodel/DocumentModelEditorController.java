@@ -97,7 +97,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
       FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
       Node node = loader.load();
       if (loader.getController() instanceof ElementEditorController elementEditorController) {
-        elementEditorController.setElement(selected);
+        elementEditorController.setElement(selected, elementsTreeController.getAncestors(selected));
       }
       return node;
     }

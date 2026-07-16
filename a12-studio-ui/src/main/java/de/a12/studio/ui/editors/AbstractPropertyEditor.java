@@ -9,15 +9,14 @@ import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.application.Platform;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.VBox;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
@@ -30,7 +29,7 @@ import java.util.function.BiConsumer;
 @Slf4j
 abstract public class AbstractPropertyEditor implements Initializable {
 
-  private static final int COMMIT_DEBOUNCE_MS = 50;
+  private static final int COMMIT_DEBOUNCE_MS = 150;
 
   private static final PseudoClass ERROR_PSEUDO_CLASS = PseudoClass.getPseudoClass("error");
 
@@ -42,13 +41,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
   private TitledPane root;
 
   @FXML
-  private VBox errorContainer;
-
-  @FXML
-  private Label errorTitle;
-
-  @FXML
-  private Label errorMessage;
+  private ErrorContainerController errorContainerController;
 
   protected Element element;
 
@@ -91,7 +84,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
   /**
    * Reusable pattern for property editor fields: whenever the text field's value changes, applies it to the
    * element via {@code setter}, saves the owning model's json file, and re-validates the element via the
-   * data service api, reflecting the result on the field's styling and in {@link #errorContainer}. The
+   * data service api, reflecting the result on the field's styling and in the error container. The
    * actual save/validate is debounced so rapid typing doesn't trigger a file write and validation per
    * keystroke.
    */
@@ -133,17 +126,11 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   private void showValidationError(ElementValidationError error) {
-    boolean hasError = error != null;
-    errorContainer.setManaged(hasError);
-    errorContainer.setVisible(hasError);
-    if (hasError) {
-      errorTitle.setText(capitalize(error.severity()));
-      errorMessage.setText(error.message());
+    if (error == null) {
+      errorContainerController.hide();
+    } else {
+      errorContainerController.show(error.severity(), error.message());
     }
-  }
-
-  private static String capitalize(@NonNull String value) {
-    return value.isEmpty() ? value : Character.toUpperCase(value.charAt(0)) + value.substring(1).toLowerCase();
   }
 
   private String getExpandedSettingsKey() {

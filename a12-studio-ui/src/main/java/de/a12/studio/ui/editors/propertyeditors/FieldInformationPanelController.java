@@ -24,10 +24,17 @@ public class FieldInformationPanelController extends AbstractPropertyEditor impl
   @FXML
   private TextField pathField;
 
+  private List<Element> ancestors = List.of();
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
     bindTextField(nameField, Element::setName);
+    nameField.textProperty().addListener((observable, oldValue, newValue) -> updatePathField(newValue));
+  }
+
+  public void setAncestors(@NonNull List<Element> ancestors) {
+    this.ancestors = ancestors;
   }
 
   @Override
@@ -35,5 +42,15 @@ public class FieldInformationPanelController extends AbstractPropertyEditor impl
     super.setElement(element);
     setFieldValue(nameField, element.getName());
     idField.setText(element.getId());
+    updatePathField(element.getName());
+  }
+
+  private void updatePathField(String name) {
+    StringBuilder path = new StringBuilder();
+    for (Element ancestor : ancestors) {
+      path.append("/").append(ancestor.getName());
+    }
+    path.append("/").append(name == null ? "" : name);
+    pathField.setText(path.toString());
   }
 }

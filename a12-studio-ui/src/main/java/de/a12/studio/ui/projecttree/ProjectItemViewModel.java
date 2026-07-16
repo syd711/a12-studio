@@ -32,15 +32,19 @@ public class ProjectItemViewModel {
     return projectItem;
   }
 
-  public String getIcon() {
+  public String getIconPath() {
     A12Model model = projectItem.getModel();
     if (model == null) {
-      return Icons.FILE_OUTLINE;
+      return null;
     }
 
     return switch (model.getModelType()) {
-      case DOCUMENT -> Icons.FILE_TABLE_OUTLINE;
-      default -> Icons.FILE_OUTLINE;
+      case DOCUMENT -> Icons.PNG_MODEL_DOCUMENT;
+      case FORM -> Icons.PNG_MODEL_FORM;
+      case OVERVIEW -> Icons.PNG_MODEL_OVERVIEW;
+      case RELATIONSHIP -> Icons.PNG_MODEL_RELATIONSHIP;
+      case APPLICATION -> Icons.PNG_MODEL_APPLICATION;
+      case CONTENT -> Icons.PNG_MODEL_CONTENT;
     };
   }
 

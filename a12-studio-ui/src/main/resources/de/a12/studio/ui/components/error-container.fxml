@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="root" styleClass="error-container" managed="false" visible="false" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.ErrorContainerController">
+   <children>
+      <Label fx:id="errorTitle" styleClass="error-title" />
+      <Label fx:id="errorMessage" styleClass="error-message" />
+   </children>
+</VBox>

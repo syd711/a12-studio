@@ -15,6 +15,8 @@ public class UISettings extends JsonSettings {
 
   private List<String> openedFiles = new ArrayList<>();
 
+  private String selectedFile;
+
   @Override
   public String getSettingsName() {
     return SETTINGS_FILE_NAME;
@@ -43,6 +45,14 @@ public class UISettings extends JsonSettings {
 
   public void removeOpenedFile(@NonNull String path) {
     openedFiles.remove(path);
+  }
+
+  public String getSelectedFile() {
+    return selectedFile;
+  }
+
+  public void setSelectedFile(String selectedFile) {
+    this.selectedFile = selectedFile;
   }
 
   static UISettings load(@NonNull File studioFolder) {

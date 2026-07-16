@@ -35,16 +35,32 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
   private Project project;
 
+  private boolean restoringSelection;
+
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
     this.project = event.getProject();
     tabPane.getTabs().clear();
 
-    for (String path : event.getProject().getSettings().getUISettings().getOpenedFiles()) {
-      File file = new File(path);
-      if (file.exists()) {
-        open(new ProjectItem(file));
+    restoringSelection = true;
+    try {
+      String selectedFile = event.getProject().getSettings().getUISettings().getSelectedFile();
+      Tab tabToSelect = null;
+      for (String path : event.getProject().getSettings().getUISettings().getOpenedFiles()) {
+        File file = new File(path);
+        if (file.exists()) {
+          open(new ProjectItem(file));
+          if (path.equals(selectedFile)) {
+            tabToSelect = tabPane.getTabs().get(tabPane.getTabs().size() - 1);
+          }
+        }
       }
+      if (tabToSelect != null) {
+        tabPane.getSelectionModel().select(tabToSelect);
+      }
+    }
+    finally {
+      restoringSelection = false;
     }
   }
 
@@ -150,5 +166,15 @@ public class TabPaneController implements Initializable, StudioEventListener {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
+    tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> onSelectionChanged(newTab));
+  }
+
+  private void onSelectionChanged(Tab newTab) {
+    if (restoringSelection || project == null) {
+      return;
+    }
+    ProjectItem item = newTab == null ? null : (ProjectItem) newTab.getUserData();
+    project.getSettings().getUISettings().setSelectedFile(item == null ? null : item.getPath());
+    project.getSettings().getUISettings().save();
   }
 }

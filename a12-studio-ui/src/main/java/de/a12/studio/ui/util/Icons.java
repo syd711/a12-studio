@@ -28,8 +28,14 @@ public interface Icons {
   String REDO = "mdi2r-redo";
 
   String ELEMENT_GROUP = "mdi2f-folder-outline";
-  // SVG asset (in de/a12/studio/ui/icons), not an Ikonli glyph literal like the constants above.
-  String SVG_ELEMENT_GROUP = "Group.svg";
+  // PNG assets (in de/a12/studio/ui/icons), not Ikonli glyph literals like the constants above.
+  String PNG_ELEMENT_GROUP = "/de/a12/studio/ui/icons/Group.png";
+  String PNG_MODEL_DOCUMENT = "/de/a12/studio/ui/icons/Model-Document.png";
+  String PNG_MODEL_FORM = "/de/a12/studio/ui/icons/Model-Form.png";
+  String PNG_MODEL_OVERVIEW = "/de/a12/studio/ui/icons/Model-Overview.png";
+  String PNG_MODEL_RELATIONSHIP = "/de/a12/studio/ui/icons/Model-Relationship.png";
+  String PNG_MODEL_APPLICATION = "/de/a12/studio/ui/icons/Model-App.png";
+  String PNG_MODEL_CONTENT = "/de/a12/studio/ui/icons/Model-Content.png";
   String ELEMENT_FIELD = "mdi2f-form-textbox";
   String ELEMENT_RULE = "mdi2a-alert-circle-outline";
   String ELEMENT_COMPUTATION = "mdi2f-function-variant";

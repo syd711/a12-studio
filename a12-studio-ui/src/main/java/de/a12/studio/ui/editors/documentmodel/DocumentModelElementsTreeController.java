@@ -17,7 +17,6 @@ import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
-import de.a12.studio.ui.util.SvgIcon;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -26,6 +25,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -97,6 +98,21 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     }
     treeItem.getValue().setHasError(event.getError().isPresent());
     elementsTreeTable.refresh();
+  }
+
+  public List<Element> getAncestors(@NonNull Element element) {
+    List<Element> ancestors = new ArrayList<>();
+    TreeItem<ElementViewModel> treeItem = findTreeItem(elementsTreeTable.getRoot(), element.getId());
+    if (treeItem == null) {
+      return ancestors;
+    }
+
+    TreeItem<ElementViewModel> parent = treeItem.getParent();
+    while (parent != null && parent.getValue() != null) {
+      ancestors.add(0, parent.getValue().getElement());
+      parent = parent.getParent();
+    }
+    return ancestors;
   }
 
   private TreeItem<ElementViewModel> findTreeItem(TreeItem<ElementViewModel> treeItem, @NonNull String elementId) {
@@ -245,7 +261,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         }
         else {
           Node icon = viewModel.isGroup()
-              ? SvgIcon.load(Icons.SVG_ELEMENT_GROUP, WidgetFactory.DEFAULT_ICON_SIZE)
+              ? createGroupIcon()
               : WidgetFactory.createIcon(viewModel.getIcon());
           icon.getStyleClass().add("tree-icon");
           setGraphic(icon);
@@ -293,7 +309,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private List<MenuItem> createElementMenuItems() {
     List<MenuItem> items = new ArrayList<>();
-    items.add(createMenuItem("_Group", SvgIcon.load(Icons.SVG_ELEMENT_GROUP, WidgetFactory.DEFAULT_ICON_SIZE)));
+    items.add(createMenuItem("_Group", createGroupIcon()));
     items.add(createMenuItem("_Field", Icons.ELEMENT_FIELD));
     items.add(createMenuItem("_Validation Rule", Icons.ELEMENT_RULE));
     items.add(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION));
@@ -364,7 +380,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private List<MenuItem> createElementToolbarMenuItems() {
     List<MenuItem> items = new ArrayList<>();
-    items.add(createMenuItem("_Group", SvgIcon.load(Icons.SVG_ELEMENT_GROUP, WidgetFactory.DEFAULT_ICON_SIZE)));
+    items.add(createMenuItem("_Group", createGroupIcon()));
     items.add(createMenuItem("_Field", Icons.ELEMENT_FIELD));
     items.add(createMenuItem("_Validation Rule", Icons.ELEMENT_RULE));
     items.add(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION));
@@ -387,6 +403,12 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     icon.getStyleClass().add("menu-icon");
     menuItem.setGraphic(icon);
     return menuItem;
+  }
+
+  private Node createGroupIcon() {
+    Image image = new Image(getClass().getResourceAsStream(Icons.PNG_ELEMENT_GROUP),
+        WidgetFactory.DEFAULT_ICON_SIZE, WidgetFactory.DEFAULT_ICON_SIZE, true, true);
+    return new ImageView(image);
   }
 
   private void applyColumnWidth(@NonNull TreeTableColumn<ElementViewModel, String> column,

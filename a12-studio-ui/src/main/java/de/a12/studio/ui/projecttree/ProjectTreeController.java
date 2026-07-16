@@ -24,6 +24,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -34,11 +36,15 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ProjectTreeController implements Initializable, StudioEventListener {
+
+  private static final Map<String, Image> MODEL_ICON_CACHE = new HashMap<>();
 
   @FXML
   private TreeView<ProjectItemViewModel> projectTree;
@@ -309,6 +315,11 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     return (Stage) projectTree.getScene().getWindow();
   }
 
+  private static Image loadModelIcon(@NonNull String iconPath) {
+    return MODEL_ICON_CACHE.computeIfAbsent(iconPath,
+        path -> new Image(ProjectTreeController.class.getResourceAsStream(path), 18, 18, true, true));
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
@@ -333,9 +344,14 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     });
     projectTree.setCellFactory(treeView -> new TreeCell<>() {
       private final FontIcon icon = new FontIcon();
+      private final ImageView modelIcon = new ImageView();
 
       {
         icon.getStyleClass().add("tree-icon");
+        modelIcon.getStyleClass().add("tree-icon");
+        modelIcon.setFitWidth(18);
+        modelIcon.setFitHeight(18);
+        modelIcon.setPreserveRatio(true);
         setOnMouseClicked(event -> {
           if (event.getClickCount() == 2 && !isEmpty() && getItem() != null) {
             openItem(getItem());
@@ -382,12 +398,20 @@ public class ProjectTreeController implements Initializable, StudioEventListener
           icon.setIconLiteral(boundTreeItem.isExpanded() ? Icons.FOLDER_OPEN : Icons.FOLDER);
           icon.setIconSize(18);
           boundTreeItem.expandedProperty().addListener(expandedListener);
+          setGraphic(icon);
         }
         else {
-          icon.setIconSize(18);
-          icon.setIconLiteral(item.getIcon());
+          String iconPath = item.getIconPath();
+          if (iconPath != null) {
+            modelIcon.setImage(loadModelIcon(iconPath));
+            setGraphic(modelIcon);
+          }
+          else {
+            icon.setIconSize(18);
+            icon.setIconLiteral(Icons.FILE_OUTLINE);
+            setGraphic(icon);
+          }
         }
-        setGraphic(icon);
       }
     });
   }

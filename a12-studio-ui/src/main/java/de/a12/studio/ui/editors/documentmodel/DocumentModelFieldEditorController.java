@@ -58,7 +58,8 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
   }
 
   @Override
-  public void setElement(@NonNull Element element) {
+  public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
+    generalInformationController.setAncestors(ancestors);
     propertyEditors.forEach(propertyEditor -> propertyEditor.setElement(element));
   }
 }
