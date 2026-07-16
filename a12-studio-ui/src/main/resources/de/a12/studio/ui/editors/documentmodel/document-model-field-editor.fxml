@@ -29,10 +29,10 @@
       <fx:include fx:id="label" source="../propertyeditors/label-panel.fxml" />
 
       <!-- Description (Internal) -->
-      <fx:include fx:id="descriptionInternal" source="../propertyeditors/description-internal-panel.fxml" />
+      <fx:include fx:id="descriptionInternal" source="../propertyeditors/description-panel.fxml" />
 
       <!-- Description (External) -->
-      <fx:include fx:id="descriptionExternal" source="../propertyeditors/description-external-panel.fxml" />
+      <fx:include fx:id="descriptionExternal" source="../propertyeditors/description-panel.fxml" />
 
       <!-- Helper Text -->
       <fx:include fx:id="helperText" source="../propertyeditors/helper-text-panel.fxml" />

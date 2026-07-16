@@ -29,17 +29,24 @@ public interface Icons {
 
   String ELEMENT_GROUP = "mdi2f-folder-outline";
   // PNG assets (in de/a12/studio/ui/icons), not Ikonli glyph literals like the constants above.
-  String PNG_ELEMENT_GROUP = "/de/a12/studio/ui/icons/Group.png";
   String PNG_MODEL_DOCUMENT = "/de/a12/studio/ui/icons/Model-Document.png";
   String PNG_MODEL_FORM = "/de/a12/studio/ui/icons/Model-Form.png";
   String PNG_MODEL_OVERVIEW = "/de/a12/studio/ui/icons/Model-Overview.png";
   String PNG_MODEL_RELATIONSHIP = "/de/a12/studio/ui/icons/Model-Relationship.png";
   String PNG_MODEL_APPLICATION = "/de/a12/studio/ui/icons/Model-App.png";
   String PNG_MODEL_CONTENT = "/de/a12/studio/ui/icons/Model-Content.png";
-  String ELEMENT_FIELD = "mdi2f-form-textbox";
-  String ELEMENT_RULE = "mdi2a-alert-circle-outline";
-  String ELEMENT_COMPUTATION = "mdi2f-function-variant";
-  String ELEMENT_ATTACHMENT = "mdi2p-paperclip";
+
+  // Document model editor (dmm) node icons.
+  String PNG_DMM_FIELD = "/de/a12/studio/ui/icons/dmm/Field.png";
+  String PNG_DMM_COMPUTATION_RULE = "/de/a12/studio/ui/icons/dmm/ComputationRule.png";
+  String PNG_DMM_VALIDATION_RULE_ERROR = "/de/a12/studio/ui/icons/dmm/ValidationRule-Error.png";
+  String PNG_DMM_VALIDATION_RULE_WARNING = "/de/a12/studio/ui/icons/dmm/ValidationRule-Warning.png";
+  String PNG_DMM_VALIDATION_RULE_INFO = "/de/a12/studio/ui/icons/dmm/ValidationRule-Info.png";
+
+
+  String PNG_GROUP = "/de/a12/studio/ui/icons/Group.png";
+  String PNG_ATTACHMENT = "/de/a12/studio/ui/icons/Attachments.png";
+
   String ELEMENT_MULTI_SELECT = "mdi2c-checkbox-multiple-marked-outline";
   String ELEMENT_INCLUDE = "mdi2f-file-import-outline";
   String ELEMENT_GENERIC = "mdi2s-shape-outline";

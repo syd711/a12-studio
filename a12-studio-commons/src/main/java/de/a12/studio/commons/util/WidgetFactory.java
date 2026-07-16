@@ -19,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -38,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /**
  * Icon factory and dialog infrastructure (stage creation, confirmation/alert/input/output
@@ -231,6 +233,18 @@ public class WidgetFactory {
         }
       }
     });
+  }
+
+  /**
+   * Restricts a text field to non-negative integer input, rejecting any keystroke that would result in a
+   * non-numeric value.
+   */
+  public static void restrictToNumericInput(TextField textField) {
+    UnaryOperator<TextFormatter.Change> filter = change -> {
+      String newText = change.getControlNewText();
+      return (newText.isEmpty() || newText.matches("\\d*")) ? change : null;
+    };
+    textField.setTextFormatter(new TextFormatter<>(filter));
   }
 
   //---------------------------------------------

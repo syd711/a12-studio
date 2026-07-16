@@ -4,8 +4,7 @@ import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DataTypeConfigurationPanelController;
-import de.a12.studio.ui.editors.propertyeditors.DescriptionExternalPanelController;
-import de.a12.studio.ui.editors.propertyeditors.DescriptionInternalPanelController;
+import de.a12.studio.ui.editors.propertyeditors.DescriptionPanelController;
 import de.a12.studio.ui.editors.propertyeditors.FieldInformationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.HelperTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LabelPanelController;
@@ -40,7 +39,7 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
   private DescriptionInternalPanelController descriptionInternalController;
 
   @FXML
-  private DescriptionExternalPanelController descriptionExternalController;
+  private DescriptionPanelController descriptionExternalController;
 
   @FXML
   private HelperTextPanelController helperTextController;

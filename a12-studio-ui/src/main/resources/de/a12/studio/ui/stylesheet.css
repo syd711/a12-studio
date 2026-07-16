@@ -12,6 +12,13 @@
 @import "stylesheet-titled-pane.css";
 
 /**
+ * Font Icons (org.kordamp.ikonli)
+ */
+.ikonli-font-icon {
+    -fx-icon-color: -fx-text-color;
+}
+
+/**
  * Main
  */
 .root {

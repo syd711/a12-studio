@@ -262,7 +262,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         else {
           Node icon = viewModel.isGroup()
               ? createGroupIcon()
-              : WidgetFactory.createIcon(viewModel.getIcon());
+              : createElementIcon(viewModel);
           icon.getStyleClass().add("tree-icon");
           setGraphic(icon);
 
@@ -310,10 +310,10 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private List<MenuItem> createElementMenuItems() {
     List<MenuItem> items = new ArrayList<>();
     items.add(createMenuItem("_Group", createGroupIcon()));
-    items.add(createMenuItem("_Field", Icons.ELEMENT_FIELD));
-    items.add(createMenuItem("_Validation Rule", Icons.ELEMENT_RULE));
-    items.add(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION));
-    items.add(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT));
+    items.add(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)));
+    items.add(createMenuItem("_Validation Rule", createPngIcon(Icons.PNG_DMM_VALIDATION_RULE_WARNING)));
+    items.add(createMenuItem("Co_mputation Rule", createPngIcon(Icons.PNG_DMM_COMPUTATION_RULE)));
+    items.add(createMenuItem("_Attachment", createPngIcon(Icons.PNG_ATTACHMENT)));
     items.add(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT));
     items.add(createMenuItem("_Include", Icons.ELEMENT_INCLUDE));
     items.add(new SeparatorMenuItem());
@@ -381,10 +381,10 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private List<MenuItem> createElementToolbarMenuItems() {
     List<MenuItem> items = new ArrayList<>();
     items.add(createMenuItem("_Group", createGroupIcon()));
-    items.add(createMenuItem("_Field", Icons.ELEMENT_FIELD));
-    items.add(createMenuItem("_Validation Rule", Icons.ELEMENT_RULE));
-    items.add(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION));
-    items.add(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT));
+    items.add(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)));
+    items.add(createMenuItem("_Validation Rule", createPngIcon(Icons.PNG_DMM_VALIDATION_RULE_WARNING)));
+    items.add(createMenuItem("Co_mputation Rule", createPngIcon(Icons.PNG_DMM_COMPUTATION_RULE)));
+    items.add(createMenuItem("_Attachment", createPngIcon(Icons.PNG_ATTACHMENT)));
     items.add(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT));
     items.add(createMenuItem("_Include", Icons.ELEMENT_INCLUDE));
     return items;
@@ -406,7 +406,16 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   }
 
   private Node createGroupIcon() {
-    Image image = new Image(getClass().getResourceAsStream(Icons.PNG_ELEMENT_GROUP),
+    return createPngIcon(Icons.PNG_GROUP);
+  }
+
+  private Node createElementIcon(@NonNull ElementViewModel viewModel) {
+    String iconPath = viewModel.getIconPath();
+    return iconPath != null ? createPngIcon(iconPath) : WidgetFactory.createIcon(viewModel.getIcon());
+  }
+
+  private Node createPngIcon(@NonNull String path) {
+    Image image = new Image(getClass().getResourceAsStream(path),
         WidgetFactory.DEFAULT_ICON_SIZE, WidgetFactory.DEFAULT_ICON_SIZE, true, true);
     return new ImageView(image);
   }

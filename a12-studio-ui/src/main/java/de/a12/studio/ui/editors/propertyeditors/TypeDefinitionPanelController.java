@@ -6,6 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 
 import java.net.URL;
 import java.util.List;
@@ -20,6 +21,12 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
   @FXML
   private CheckBox typeDefinitionCheckBox;
+
+  @FXML
+  private CheckBox requiredParentCheckBox;
+
+  @FXML
+  private HBox requiredParentBox;
 
   @FXML
   private ComboBox<String> dataTypeComboBox;
@@ -39,5 +46,11 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
     dataTypeComboBox.getItems().addAll(DATA_TYPES);
     dataTypeComboBox.getSelectionModel().selectFirst();
+
+    dataTypeCombo.managedProperty().bind(dataTypeComboBox.visibleProperty());
+    dataTypeCombo.visibleProperty().bind(typeDefinitionCheckBox.selectedProperty());
+
+    requiredParentBox.managedProperty().bind(requiredParentBox.visibleProperty());
+    requiredParentBox.visibleProperty().bind(requiredCheckBox.selectedProperty());
   }
 }

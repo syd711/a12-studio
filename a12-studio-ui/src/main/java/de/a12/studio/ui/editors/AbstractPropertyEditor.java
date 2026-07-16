@@ -15,6 +15,8 @@ import javafx.application.Platform;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +61,10 @@ abstract public class AbstractPropertyEditor implements Initializable {
     Platform.runLater(() -> {
       String settingsKey = getExpandedSettingsKey();
       if (settingsKey != null) {
+        boolean animated = root.isAnimated();
+        root.setAnimated(false);
         root.setExpanded(LocalUISettings.getBoolean(settingsKey));
+        root.setAnimated(animated);
         root.expandedProperty().addListener((observable, oldValue, newValue) ->
             LocalUISettings.saveProperty(settingsKey, String.valueOf(newValue)));
       }
@@ -82,6 +87,20 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   /**
+   * Sets a checkbox's value without triggering the save/validation cycle registered by {@link
+   * #bindCheckBox}. Property editors should use this (instead of {@code checkBox.setSelected(...)})
+   * whenever they repopulate a field from the model, e.g. in {@link #setElement}.
+   */
+  protected void setFieldValue(@NonNull CheckBox checkBox, boolean value) {
+    updatingFromModel = true;
+    try {
+      checkBox.setSelected(value);
+    } finally {
+      updatingFromModel = false;
+    }
+  }
+
+  /**
    * Reusable pattern for property editor fields: whenever the text field's value changes, applies it to the
    * element via {@code setter}, saves the owning model's json file, and re-validates the element via the
    * data service api, reflecting the result on the field's styling and in the error container. The
@@ -98,13 +117,26 @@ abstract public class AbstractPropertyEditor implements Initializable {
     });
   }
 
-  private void commitChange(@NonNull TextField textField) {
+  /**
+   * Same as {@link #bindTextField} but for a checkbox's selected state.
+   */
+  protected void bindCheckBox(@NonNull CheckBox checkBox, @NonNull BiConsumer<Element, Boolean> setter) {
+    checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      setter.accept(element, newValue);
+      debouncer.debounce(checkBox.getId(), () -> commitChange(checkBox), COMMIT_DEBOUNCE_MS, true);
+    });
+  }
+
+  private void commitChange(@NonNull Node field) {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem == null) {
       return;
     }
     projectItem.save();
-    applyValidationResult(textField, validateElement(projectItem));
+    applyValidationResult(field, validateElement(projectItem));
   }
 
   private Optional<ElementValidationError> validateElement(@NonNull ProjectItem projectItem) {
@@ -119,8 +151,8 @@ abstract public class AbstractPropertyEditor implements Initializable {
     }
   }
 
-  private void applyValidationResult(@NonNull TextField textField, @NonNull Optional<ElementValidationError> error) {
-    textField.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, error.isPresent());
+  private void applyValidationResult(@NonNull Node field, @NonNull Optional<ElementValidationError> error) {
+    field.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, error.isPresent());
     showValidationError(error.orElse(null));
     StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
   }

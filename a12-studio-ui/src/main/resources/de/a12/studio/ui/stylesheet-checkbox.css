@@ -9,8 +9,8 @@
     -fx-background-color: -fx-input-bg;
     -fx-background-radius: 4px;
     -fx-border-radius: 4px;
-    -fx-border-color: -fx-border-checkbox;
-    -fx-border-width: 1.5px;
+    -fx-border-color: -fx-border-input;
+    -fx-border-width: 1px;
     -fx-padding: 1px;
 }
 

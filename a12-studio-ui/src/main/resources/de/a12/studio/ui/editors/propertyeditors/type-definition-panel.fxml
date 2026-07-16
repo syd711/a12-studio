@@ -5,12 +5,15 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TYPE DEFINITION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.TypeDefinitionPanelController">
  <BorderPane>
@@ -42,18 +45,39 @@
          </children>
       </VBox>
 
-    <HBox spacing="15.0" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="2">
-      <CheckBox fx:id="globalCheckBox" text="Global" />
+    <HBox spacing="16.0" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="2">
+      <CheckBox fx:id="globalCheckBox" prefWidth="100.0" text="Global" />
       <CheckBox fx:id="transientCheckBox" text="Transient" />
-      <CheckBox fx:id="requiredCheckBox" text="Required" />
          <GridPane.margin>
             <Insets top="6.0" />
          </GridPane.margin>
     </HBox>
+            <HBox layoutX="10.0" layoutY="152.0" spacing="16.0" GridPane.columnSpan="4" GridPane.rowIndex="3">
+               <children>
+                  <CheckBox fx:id="requiredCheckBox" prefWidth="100.0" text="Required" />
+                  <HBox fx:id="requiredParentBox" alignment="CENTER_LEFT" spacing="6.0">
+                     <children>
+                        <CheckBox fx:id="requiredParentCheckBox" text="Only if the Parent Group is filled?" />
+                        <Label prefHeight="9.0" prefWidth="7.0">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                           <tooltip>
+                              <Tooltip prefWidth="300.0" text="If set to &quot;yes&quot;, the condition &quot;GroupFilled(RuleGroup)&quot; will be added to the requiredness evaluation. This is always done for Required Fields that are a direct child of a repeatable Group. The Field will then only be mandatory, if, for example, data is present in any sibling Field or a new repetition of the parent Group is created. To test this property, at least one field in the parent group must be selected along with the field in the Ad Hoc Test. Please check the Document Modeling Documentation for more information." wrapText="true" />
+                           </tooltip>
+                           <graphic>
+                              <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                           </graphic>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
       <rowConstraints>
          <RowConstraints />
          <RowConstraints />
          <RowConstraints />
+               <RowConstraints minHeight="10.0" />
       </rowConstraints>
   </GridPane>
  </center>
