@@ -1,0 +1,461 @@
+{
+  "header": {
+    "id": "PreviewApp_AM",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Basic"
+      },
+      {
+        "locale": "de",
+        "text": "Basic"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "workspaceName",
+        "value": "A12 - Basic workspace"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "WelcomeModule",
+        "menu": {
+          "name": "welcome",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Welcome"
+            },
+            {
+              "locale": "de",
+              "text": "Willkommen"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "engine": "content",
+              "name": "WelcomePage"
+            },
+            "withoutData": true
+          }
+        },
+        "flows": [
+          {
+            "name": "WelcomeModuleFlow",
+            "scenes": [
+              {
+                "name": "WelcomeModuleContent",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "content"
+                  },
+                  {
+                    "key": "name",
+                    "mustEqual": "WelcomePage"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ContentEngine",
+                      "models": [
+                        {
+                          "modelType": "content",
+                          "name": "WelcomePage_CM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "PersonModule",
+        "menu": {
+          "name": "PersonModule",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Persons"
+            },
+            {
+              "locale": "de",
+              "text": "Personen"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "module": "PersonModule",
+              "engine": "overview"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "PersonModuleFlow",
+            "scenes": [
+              {
+                "name": "PersonModuleOverview",
+                "description": "Overview type: overview",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "overview"
+                  },
+                  {
+                    "key": "module",
+                    "mustEqual": "PersonModule"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewEngine",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Person_OM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "PersonModule_Detail_Person_DM",
+                "priorScene": "PersonModuleOverview",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "overview"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "linkForm",
+                    "isSet": false
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Person_DM"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      },
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Person_FM",
+                          "documentModel": "Person_DM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "CompanyModule",
+        "menu": {
+          "name": "CompanyModule",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Companies"
+            },
+            {
+              "locale": "de",
+              "text": "Firmen"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "module": "CompanyModule",
+              "engine": "overview"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "CompanyModuleFlow",
+            "scenes": [
+              {
+                "name": "CompanyModuleOverview",
+                "description": "Overview type: overview",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "overview"
+                  },
+                  {
+                    "key": "module",
+                    "mustEqual": "CompanyModule"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewEngine",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Company_OM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "CompanyModule_Detail_Company_DM",
+                "priorScene": "CompanyModuleOverview",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "overview"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "linkForm",
+                    "isSet": false
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Company_DM"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      },
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Company_FM",
+                          "documentModel": "Company_DM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "InvoiceModule",
+        "menu": {
+          "name": "InvoiceModule",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Invoices"
+            },
+            {
+              "locale": "de",
+              "text": "Rechnungen"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "module": "InvoiceModule",
+              "engine": "overview"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "InvoiceModuleFlow",
+            "scenes": [
+              {
+                "name": "InvoiceModuleOverview",
+                "description": "Overview type: overview",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "overview"
+                  },
+                  {
+                    "key": "module",
+                    "mustEqual": "InvoiceModule"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewEngine",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Invoice_OM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "InvoiceModule_Detail_Invoice_DM",
+                "priorScene": "InvoiceModuleOverview",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "overview"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "linkForm",
+                    "isSet": false
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Invoice_DM"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      },
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Invoice_FM",
+                          "documentModel": "Invoice_DM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "SIDEBAR",
+          "layout": {
+            "name": "Null"
+          }
+        },
+        {
+          "name": "MODAL",
+          "layout": {
+            "name": "Stack"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "initialActivity": {
+      "descriptor": {
+        "engine": "content",
+        "name": "WelcomePage"
+      },
+      "withoutData": true
+    }
+  }
+}

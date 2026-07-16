@@ -1,0 +1,1155 @@
+{
+  "header": {
+    "id": "Addresses_DM",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Addresses_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_78e20",
+          "name": "Addresses",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_42edb",
+                "name": "BillingAddress",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_fbf75",
+                      "name": "FormOfAddress",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "mr",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Mr"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Herr"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "mrs",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Mrs"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Frau"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "mx",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Mx"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Mx"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Form of Address"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Anrede"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_126a1",
+                      "name": "FirstName",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "minLength": 2
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "First Name"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Vorname"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_7a0f2",
+                      "name": "LastName",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "minLength": 2
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Surname"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Nachname"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_d7150",
+                      "name": "Company",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Company Name"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Firmenname"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_a9bf7",
+                      "name": "Street",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Street"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Straße"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_433e6",
+                      "name": "Nr",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "Please enter number. Address additions a-j are permitted."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Bitte geben eine Hausnummer ein. Adresszusätze a-j sind zulässig."
+                              }
+                            ],
+                            "pattern": "[0-9]+([A-Ja-j]?)"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Number"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Hausnummer"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_72ca0",
+                      "name": "PostalCode",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "Pleaser enter a five-digit postal code."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Bitte geben Sie eine fünf-stellige Postleitzahl an."
+                              }
+                            ],
+                            "pattern": "[0-9]{5}"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Postal Code"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Postleizahl"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_229c9",
+                      "name": "City",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "City"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Stadt"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_73456",
+                      "name": "NamesFilledTogether",
+                      "Rule": {
+                        "errorEntityRelPath": "../FirstName",
+                        "errorCode": "Error rule_73456",
+                        "errorCondition": "FieldsNotCollectivelyFilled(FirstName, LastName)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "$FirstName$ and $LastName$ must be filled together."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "$FirstName$ und $LastName$ müssen gemeinsam angegeben werden."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_586d2",
+                      "name": "NamesOrCompanyFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../FirstName",
+                        "errorCode": "Error rule_586d2",
+                        "errorCondition": "FieldNotFilled(Company) And FieldsNotCollectivelyFilled(FirstName, LastName)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "You either need to enter a company name or your complete name."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte geben sie entweder eine Firma oder ihren vollständigen Namen an."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_16a1a",
+                      "name": "NamesOrCompanyFilled2",
+                      "Rule": {
+                        "errorEntityRelPath": "../FirstName",
+                        "errorCode": "Error rule_16a1a",
+                        "errorCondition": "FieldNotFilled(FirstName) and FieldNotFilled(LastName) and FieldNotFilled(Company)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Please enter either your full name or a company name."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte geben Sie entweder Ihren vollständigen Namen oder den einer Firma an."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_0b84d",
+                      "name": "NameOverview",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Name"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Name"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_c89c3",
+                      "name": "NameOverviewComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../NameOverview",
+                        "computationAlternatives": [
+                          {
+                            "operation": "[FirstName] + \" \" + [LastName] + \", \" + [Company]",
+                            "precondition": "AllFieldsFilled(FirstName, LastName, Company)"
+                          },
+                          {
+                            "operation": "[FirstName] + \" \" + [LastName]",
+                            "precondition": "AllFieldsFilled(FirstName,LastName) and FieldNotFilled(Company)"
+                          },
+                          {
+                            "operation": "[Company]",
+                            "precondition": "FieldFilled(Company) and FieldNotFilled(FirstName) and FieldNotFilled(LastName)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of NameOverviewComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of NameOverviewComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_8bd8d",
+                      "name": "PronounMs",
+                      "externalDescription": [
+                        {
+                          "locale": "en",
+                          "text": "Please indicate how you would like to be addressed."
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bitte geben Sie an, wie Sie angesprochen werden möchten."
+                        }
+                      ],
+                      "Group": {
+                        "repeatability": 999999,
+                        "usageType": "multi-select",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_703b0",
+                            "name": "Pronouns",
+                            "Field": {
+                              "fieldType": {
+                                "type": "EnumerationType",
+                                "EnumerationType": {
+                                  "values": [
+                                    {
+                                      "value": "SHE",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "she"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "sie"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "HER",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "her"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "ihr"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "HE",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "he"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "er"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "HIM/HIS",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "him, his"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "ihm"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "THEY",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "they"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "they"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "THEM",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "them"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "them"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Pronouns"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Pronomen"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_a3345",
+                "name": "ShippingAddress",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_9f1e2",
+                      "name": "FormOfAddress",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "mr",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Mr"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Herr"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "mrs",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Mrs"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Frau"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "mx",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Mx"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Mx"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Form of Address"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Anrede"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_c7498",
+                      "name": "FirstName",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "minLength": 2
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "First Name"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Vorname"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_fb9fa",
+                      "name": "LastName",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "minLength": 2
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Surname"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Nachname"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_184df",
+                      "name": "Company",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Company Name"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Firmenname"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_14918",
+                      "name": "Street",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Street"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Straße"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_70555",
+                      "name": "Nr",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "Please enter number. Address additions a-j are permitted."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Bitte geben eine Hausnummer ein. Adresszusätze a-j sind zulässig."
+                              }
+                            ],
+                            "pattern": "[0-9]+([A-Ja-j]?)"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Number"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Hausnummer"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_dc3fd",
+                      "name": "PostalCode",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "Pleaser enter a five-digit postal code."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Bitte geben Sie eine fünf-stellige Postleitzahl an."
+                              }
+                            ],
+                            "pattern": "[0-9]{5}"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Postal Code"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Postleizahl"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_384bd",
+                      "name": "City",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "City"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Stadt"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_eee86",
+                      "name": "NamesFilledTogether",
+                      "Rule": {
+                        "errorEntityRelPath": "../FirstName",
+                        "errorCode": "Error rule_eee86",
+                        "errorCondition": "FieldsNotCollectivelyFilled(FirstName, LastName)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "$FirstName$ and $LastName$ must be filled together."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "$FirstName$ und $LastName$ müssen gemeinsam angegeben werden."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_54175",
+                      "name": "NamesOrCompanyFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../FirstName",
+                        "errorCode": "Error rule_54175",
+                        "errorCondition": "FieldNotFilled(Company) And FieldsNotCollectivelyFilled(FirstName, LastName)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "You either need to enter a company name or your complete name."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte geben sie entweder eine Firma oder ihren vollständigen Namen an."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_de524",
+                      "name": "NamesOrCompanyFilled2",
+                      "Rule": {
+                        "errorEntityRelPath": "../FirstName",
+                        "errorCode": "Error rule_de524",
+                        "errorCondition": "FieldFilled(/Addresses/DifferentShippingAddress) and [/Addresses/DifferentShippingAddress] == True and\r\nFieldNotFilled(FirstName) and FieldNotFilled(LastName) and FieldNotFilled(Company)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Please enter either your full name or a company name."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte geben Sie entweder Ihren vollständigen Namen oder den einer Firma an."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "multi-select_00f5e",
+                      "name": "PronounMs",
+                      "externalDescription": [
+                        {
+                          "locale": "en",
+                          "text": "Please indicate how you would like to be addressed."
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bitte geben Sie an, wie Sie angesprochen werden möchten."
+                        }
+                      ],
+                      "Group": {
+                        "repeatability": 999999,
+                        "usageType": "multi-select",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "multiSelectChild_e2c56",
+                            "name": "Pronouns",
+                            "Field": {
+                              "fieldType": {
+                                "type": "EnumerationType",
+                                "EnumerationType": {
+                                  "values": [
+                                    {
+                                      "value": "SHE",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "she"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "sie"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "HER",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "her"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "ihr"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "HE",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "he"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "er"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "HIM/HIS",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "him, his"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "ihm"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "THEY",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "they"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "they"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "value": "THEM",
+                                      "label": [
+                                        {
+                                          "locale": "en",
+                                          "text": "them"
+                                        },
+                                        {
+                                          "locale": "de",
+                                          "text": "them"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Pronouns"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Pronomen"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_9b3e4",
+                "name": "DifferentShippingAddress",
+                "Field": {
+                  "fieldType": {
+                    "type": "BooleanType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Different Shipping Address"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abweichende Lieferadresse"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_b0a04",
+                "name": "ShippingAddressFilled",
+                "Rule": {
+                  "errorEntityRelPath": "../DifferentShippingAddress",
+                  "errorCode": "Error rule_b0a04",
+                  "errorCondition": "[DifferentShippingAddress] == True and GroupNotFilled(ShippingAddress)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "If $DifferentShippingAddress$ is selected, a shipping address must be filled in."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Wenn $DifferentShippingAddress$ ausgewählt wurde, muss eine Lieferadresse angegeben werden."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_9cd46",
+                "name": "DifferentShippingAddressFilled",
+                "Rule": {
+                  "errorEntityRelPath": "../DifferentShippingAddress",
+                  "errorCode": "Error rule_9cd46",
+                  "errorCondition": "[DifferentShippingAddress] == True and NotAllFieldsFilled(ShippingAddress/Street, ShippingAddress/Nr, ShippingAddress/PostalCode, ShippingAddress/City)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Please fill out $ShippingAddress/Street$, $ShippingAddress/Nr$ as well as $ShippingAddress/PostalCode$ and $ShippingAddress/City$ if the shipping address differs."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bitte geben Sie die $ShippingAddress/Street$, $ShippingAddress/Nr$ sowie $ShippingAddress/PostalCode$ und $ShippingAddress/City$ der abweichenden Lieferadresse an."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_189a4",
+                "name": "DifferentShippingAddressDiffers",
+                "Rule": {
+                  "errorEntityRelPath": "../DifferentShippingAddress",
+                  "errorCode": "Error rule_189a4",
+                  "errorCondition": "[DifferentShippingAddress] == True and GroupFilled(ShippingAddress) and [BillingAddress/Street] == [ShippingAddress/Street] and [BillingAddress/Nr] == [ShippingAddress/Nr] and [BillingAddress/PostalCode] == [ShippingAddress/PostalCode] and [BillingAddress/City] == [ShippingAddress/City]",
+                  "severity": "INFO",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "The different shipping address may not be the same as the billing address."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Die Angaben bei einer abweichenden Lieferadresse dürfen nicht mit der Rechnungsadresse übereinstimmen."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

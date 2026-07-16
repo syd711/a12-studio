@@ -1,0 +1,83 @@
+{
+  "header": {
+    "id": "PersonCompany_Person_AvailableItems_OM",
+    "modelType": "overview",
+    "modelVersion": "38.3.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Available Persons"
+      },
+      {
+        "locale": "de",
+        "text": "Verfügbare Personen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Person_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all"
+      }
+    },
+    "subHeaderBox": {
+      "majorElements": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ],
+      "minorElements": []
+    },
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "columns": [
+      {
+        "id": "column-469a4",
+        "width": 1,
+        "elementRef": "F4",
+        "sortable": false
+      },
+      {
+        "id": "column-de25d",
+        "width": 1,
+        "elementRef": "F3",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {
+      "actions": []
+    }
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "header": {
+    "id": "Invoice_OM",
+    "modelType": "overview",
+    "modelVersion": "38.3.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Invoices"
+      },
+      {
+        "locale": "de",
+        "text": "Rechnungen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Invoice_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "buttons": [
+          {
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Delete Selected"
+                },
+                {
+                  "locale": "de",
+                  "text": "Ausgewählte Löschen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Do you want to delete all selected elements?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Möchten Sie alle ausgewählten Elemente löschen?"
+                }
+              ]
+            },
+            "icon": {
+              "name": "delete_forever",
+              "theme": "rounded"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Delete"
+              },
+              {
+                "locale": "de",
+                "text": "Löschen"
+              }
+            ],
+            "description": [
+              {
+                "locale": "en",
+                "text": "Delete Selected Elements"
+              },
+              {
+                "locale": "de",
+                "text": "Ausgewählte Elemente löschen"
+              }
+            ],
+            "event": "delete_selected",
+            "destructive": true,
+            "primary": false
+          }
+        ],
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "showRowCount": true
+    },
+    "subHeaderBox": {
+      "majorElements": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ],
+      "minorElements": [
+        {
+          "type": "button",
+          "label": [
+            {
+              "locale": "en",
+              "text": "New"
+            },
+            {
+              "locale": "de",
+              "text": "Neu"
+            }
+          ],
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "destructive": false,
+          "primary": false
+        },
+        {
+          "type": "multi_selection"
+        }
+      ]
+    },
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "columns": [
+      {
+        "id": "column-7aca2",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "width": 1,
+        "elementRef": "include_7c34e_field_0b84d",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-cad21",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Ordering Date"
+          },
+          {
+            "locale": "de",
+            "text": "Bestelldatum"
+          }
+        ],
+        "width": 1,
+        "elementRef": "include_d7e3e_field_e0d50",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-95652",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Method of Payment"
+          },
+          {
+            "locale": "de",
+            "text": "Zahlungsmethode"
+          }
+        ],
+        "width": 1,
+        "elementRef": "include_591ce_field_dda25",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-c15aa",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Order"
+          },
+          {
+            "locale": "de",
+            "text": "Bestellung"
+          }
+        ],
+        "width": 2,
+        "pinDirection": "RIGHT",
+        "styles": {},
+        "name": "ExpressionColumn",
+        "expression": "kontext(Invoice){\n    kontext(Order){\n        kontext(OrderInformation, delimiter = \", \"){\n            case [Quantity] != \"1\" {\n            [Quantity] \" \" (en: \"\", de:\"mal\") \" \" [Product] (en: \"s\", de:\"\")\n            }\n            case [Quantity] = \"1\" {\n            [Quantity] \" \" [Product]\n            }\n        }\n        case [TotalPrice] != \"\" {\n    \n\n        \"* * *\"\n    \n        }\n        kontext(OrderInformation){\n            case [Product] != \"\" {\n        \n            \"* \" [Product] \"\"(en: \"s:\", de:\":\")\" \" [TotalPriceProduct] \"€\"\n            \"  \"\n           }\n        }    \n        case [TotalPrice] != \"\" {\n    \n       \"* * *\"\n    \n        (en: \"Total Price of Ordered Products: \", de: \"Gesamtpreis der bestellten Artikel: \") [TotalPrice] \"€\"\n\n            \"* * *\"\n    \n        (en: \"Price including shipping costs: \", de: \"Preis inklusive der anfallenden Versandkosten: \") [TotalPriceWithShippingCosts] \"€\"\n        }\n\n           \"* * *\"\n    \n        (en: \"Granted discount: \", de: \"Gewährter Rabatt: \") [AmountOfGivenDiscount] \"€\"\n        }\n    }"
+      },
+      {
+        "id": "column-8e484",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Final Price"
+          },
+          {
+            "locale": "de",
+            "text": "Endpreis"
+          }
+        ],
+        "width": 1,
+        "pinDirection": "RIGHT",
+        "styles": {},
+        "elementRef": "include_d7e3e_field_0680a",
+        "sortable": false,
+        "suffix": [
+          {
+            "locale": "en",
+            "text": "€"
+          },
+          {
+            "locale": "de",
+            "text": "€"
+          }
+        ],
+        "summary": [
+          {
+            "operation": "sum"
+          }
+        ]
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Wollen Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    }
+  }
+}
