@@ -230,7 +230,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     elementsTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ElementViewModel>>() {
       @Override
       public void changed(ObservableValue<? extends TreeItem<ElementViewModel>> observable, TreeItem<ElementViewModel> oldValue, TreeItem<ElementViewModel> newValue) {
-        modelTreeAddButton.setDisable(newValue == null);
+        modelTreeAddButton.setDisable(newValue == null || isWithinFixedChildrenGroup(newValue.getValue().getElement()));
       }
     });
     elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());
@@ -238,7 +238,16 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       @Override
       protected void updateItem(ElementViewModel item, boolean empty) {
         super.updateItem(item, empty);
-        setContextMenu(empty || item == null ? null : createContextMenu(item));
+        setContextMenu(empty || item == null || isWithinFixedChildrenGroup(item.getElement()) ? null : createContextMenu());
+        boolean fixedChildLeaf = !empty && item != null && hasFixedChildrenAncestor(item.getElement());
+        if (fixedChildLeaf) {
+          if (!getStyleClass().contains("fixed-child-row")) {
+            getStyleClass().add("fixed-child-row");
+          }
+        }
+        else {
+          getStyleClass().remove("fixed-child-row");
+        }
       }
     });
     nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
@@ -261,7 +270,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         }
         else {
           Node icon = viewModel.isGroup()
-              ? createGroupIcon()
+              ? WidgetFactory.createIcon(viewModel.getIcon())
               : createElementIcon(viewModel);
           icon.getStyleClass().add("tree-icon");
           setGraphic(icon);
@@ -298,24 +307,39 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     typeColumn.widthProperty().addListener((observable, oldValue, newValue) ->
         saveColumnWidth(TYPE_COLUMN_ID, newValue.doubleValue()));
 
-    modelTreeAddButton.getItems().addAll(createElementToolbarMenuItems());
+    modelTreeAddButton.getItems().addAll(createAddMenuItems());
   }
 
-  private ContextMenu createContextMenu(@NonNull ElementViewModel viewModel) {
+  private ContextMenu createContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
     contextMenu.getItems().addAll(createElementMenuItems());
     return contextMenu;
   }
 
+  /**
+   * Whether {@code element} is a group with fixed children (attachment, multi-select), or a descendant
+   * of one. Such groups have a fixed set of children, so nothing may be added inside them.
+   */
+  private boolean isWithinFixedChildrenGroup(@NonNull Element element) {
+    return new ElementViewModel(element).hasFixedChildren() || hasFixedChildrenAncestor(element);
+  }
+
+  /**
+   * Whether any ancestor of {@code element} (not {@code element} itself) is a group with fixed
+   * children (attachment, multi-select).
+   */
+  private boolean hasFixedChildrenAncestor(@NonNull Element element) {
+    for (Element ancestor : getAncestors(element)) {
+      if (new ElementViewModel(ancestor).hasFixedChildren()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private List<MenuItem> createElementMenuItems() {
     List<MenuItem> items = new ArrayList<>();
-    items.add(createMenuItem("_Group", createGroupIcon()));
-    items.add(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)));
-    items.add(createMenuItem("_Validation Rule", createPngIcon(Icons.PNG_DMM_VALIDATION_RULE_WARNING)));
-    items.add(createMenuItem("Co_mputation Rule", createPngIcon(Icons.PNG_DMM_COMPUTATION_RULE)));
-    items.add(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT));
-    items.add(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT));
-    items.add(createMenuItem("_Include", Icons.ELEMENT_INCLUDE));
+    items.addAll(createAddMenuItems());
     items.add(new SeparatorMenuItem());
     items.add(createMenuItem("_Cut", Icons.CUT));
     items.add(createMenuItem("Cop_y", Icons.COPY));
@@ -378,7 +402,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return null;
   }
 
-  private List<MenuItem> createElementToolbarMenuItems() {
+  private List<MenuItem> createAddMenuItems() {
     List<MenuItem> items = new ArrayList<>();
     items.add(createMenuItem("_Group", createGroupIcon()));
     items.add(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)));

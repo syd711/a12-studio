@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.FieldElement;
+import de.a12.studio.dataservices.models.documentmodel.GroupConfig;
 import de.a12.studio.dataservices.models.documentmodel.GroupElement;
 import de.a12.studio.dataservices.models.documentmodel.RuleElement;
 import de.a12.studio.ui.util.Icons;
@@ -50,10 +51,30 @@ public class ElementViewModel {
   }
 
   public String getIcon() {
-    if (element instanceof GroupElement) {
+    if (element instanceof GroupElement groupElement) {
+      if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)) {
+        return Icons.ELEMENT_ATTACHMENT;
+      }
+      if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_MULTI_SELECT)) {
+        return Icons.ELEMENT_MULTI_SELECT;
+      }
       return Icons.ELEMENT_GROUP;
     }
     return Icons.ELEMENT_GENERIC;
+  }
+
+  /**
+   * Whether this element is a group whose children are fixed by its usage type (attachment, multi-select),
+   * so no elements may be added to or removed from it.
+   */
+  public boolean hasFixedChildren() {
+    return element instanceof GroupElement groupElement
+        && (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)
+            || hasUsageType(groupElement, GroupConfig.USAGE_TYPE_MULTI_SELECT));
+  }
+
+  private static boolean hasUsageType(GroupElement groupElement, String usageType) {
+    return groupElement.getGroup() != null && usageType.equals(groupElement.getGroup().getUsageType());
   }
 
   /**

@@ -124,6 +124,29 @@
     -fx-icon-color: -fx-text-color-inverse;
 }
 
+/*
+ * Leaf elements (fields/rules) inside attachment/multi-select groups have a fixed
+ * structure - they can't be added to or removed independently. A soft tint marks
+ * them as behaving differently from regular, freely editable elements.
+ */
+.tree-table-row-cell.fixed-child-row,
+.tree-table-row-cell.fixed-child-row .tree-table-cell {
+    -fx-background-color: -fx-fixed-child-bg;
+}
+
+/*
+ * When a fixed-child row is selected, the cell background above must be restored to the
+ * normal blue selection color (cells paint over the row and would otherwise keep showing
+ * the tint). Text-fill is intentionally left undeclared here so it falls back to the
+ * ID-scoped selection rule above (white, like every other selected row).
+ * The extra ".fixed-child-row" class outranks the ID-scoped selection rule above.
+ */
+#elementsTreeTable .tree-table-row-cell.fixed-child-row:filled:selected .tree-table-cell,
+#elementsTreeTable .tree-table-row-cell.fixed-child-row:filled:selected:focused .tree-table-cell,
+#elementsTreeTable .tree-table-row-cell.fixed-child-row:filled:selected:hover .tree-table-cell {
+    -fx-background-color: -fx-selection-bar-soft;
+}
+
 .tree-cell.model-missing {
     -fx-text-fill: -fx-text-color-disabled;
     -fx-font-style: italic;

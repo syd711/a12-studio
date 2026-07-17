@@ -53,6 +53,10 @@
     -fx-error-bg: #FF3333;
     -fx-error-text: -fx-text-color-inverse;
 
+    /* Fixed-structure elements (children of attachment/multi-select groups) -
+       soft, low-saturation tint distinguishing them from regular, freely editable elements. */
+    -fx-fixed-child-bg: #FCF8FF;
+
     /* JavaFX built-in accent/selection variables consumed by Modena's default
        control styling (e.g. TreeCell/TreeTableRow selection) - point these at
        our theme color so default component selection colors match the theme. */

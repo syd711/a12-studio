@@ -13,6 +13,9 @@ import java.util.List;
 @Setter
 public class GroupConfig {
 
+  public static final String USAGE_TYPE_ATTACHMENT = "attachment";
+  public static final String USAGE_TYPE_MULTI_SELECT = "multi-select";
+
   private Integer repeatability;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String usageType;

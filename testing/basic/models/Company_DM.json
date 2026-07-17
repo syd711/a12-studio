@@ -69,10 +69,6 @@
                         {
                           "name": "abc",
                           "value": "def"
-                        },
-                        {
-                          "name": "test",
-                          "value": null
                         }
                       ],
                       "Field": {
