@@ -25,6 +25,10 @@ public class Project {
     return settings;
   }
 
+  public File getFolder() {
+    return folder;
+  }
+
   public void reload() {
     this.root = null;
   }

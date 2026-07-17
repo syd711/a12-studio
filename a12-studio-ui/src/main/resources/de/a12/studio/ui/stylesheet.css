@@ -166,6 +166,24 @@
     -fx-pref-width: 260;
  }
 
+.preference-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size: 13px;
+}
+
+.preference-subtitle {
+    -fx-padding: 4 0 0 0;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+    -fx-font-size: 22px;
+}
+
+.preference-description {
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size: 15px;
+}
+
 .preferences-overlay {
     -fx-background-color: -fx-panel-color;
 }

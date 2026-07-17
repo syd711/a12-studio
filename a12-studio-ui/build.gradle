@@ -31,6 +31,7 @@ dependencies {
 
 shadowJar {
     archiveFileName = 'a12-studio-ui.jar'
+    zip64 = true
     manifest {
         attributes 'Main-Class': 'de.a12.studio.ui.Launcher', 'Implementation-Version': project.version
     }

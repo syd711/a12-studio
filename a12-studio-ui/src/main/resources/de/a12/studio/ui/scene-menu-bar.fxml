@@ -8,6 +8,8 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -52,6 +54,18 @@
    <right>
       <HBox fx:id="menuBarRightPanel" alignment="CENTER_RIGHT" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
+            <Button accessibleText="Claude Console" mnemonicParsing="false" onAction="#onOpenClaudeConsole" styleClass="menu-bar-button">
+                <graphic>
+                    <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                            <Image url="@icons/ext/claude.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Open Claude Console" />
+                </tooltip>
+            </Button>
             <MenuButton fx:id="versionMenuButton" accessibleText="Version Info" mnemonicParsing="false" styleClass="version-menu-button">
                 <graphic>
                     <FontIcon iconLiteral="mdi2i-information-outline" iconSize="18" styleClass="toolbar-icon" />

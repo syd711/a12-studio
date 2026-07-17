@@ -6,6 +6,7 @@ import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.SystemUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -108,6 +109,13 @@ public class MenuBarController implements Initializable {
   @FXML
   private void onPreferences() {
     StudioEventManager.getInstance().firePreferencesOpenRequestedEvent();
+  }
+
+  @FXML
+  private void onOpenClaudeConsole() {
+    if (project != null) {
+      SystemUtil.openClaudeConsole(project.getFolder());
+    }
   }
 
   @Override

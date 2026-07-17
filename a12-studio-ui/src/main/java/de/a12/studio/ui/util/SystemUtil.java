@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 
+import static de.a12.studio.commons.util.OSUtil.isLinux;
 import static de.a12.studio.commons.util.OSUtil.isMac;
 import static de.a12.studio.commons.util.OSUtil.isWindows;
 
@@ -131,6 +132,47 @@ public class SystemUtil {
     }
     else if (isMac()) {
       new ProcessBuilder("open", absolutePath).start();  // macOS command
+    }
+    else {
+      throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os.name"));
+    }
+  }
+
+  /**
+   * Opens a new terminal window running the Claude Code console in the given directory.
+   *
+   * @param folder The project directory to start the Claude console in.
+   */
+  public static void openClaudeConsole(File folder) {
+    if (folder == null || !folder.exists()) {
+      return;
+    }
+
+    try {
+      openClaudeConsoleWithOS(folder);
+    }
+    catch (IOException e) {
+      log.error("Failed to open Claude console: " + e.getMessage(), e);
+    }
+  }
+
+  private static void openClaudeConsoleWithOS(File folder) throws IOException {
+    if (isWindows()) {
+      new ProcessBuilder("cmd.exe", "/c", "start", "", "cmd.exe", "/k", "claude")
+          .directory(folder)
+          .start();
+    }
+    else if (isMac()) {
+      String innerCommand = "cd '" + folder.getAbsolutePath() + "' && claude";
+      String appleScriptCommand = innerCommand.replace("\\", "\\\\").replace("\"", "\\\"");
+      new ProcessBuilder("osascript", "-e",
+          "tell application \"Terminal\" to do script \"" + appleScriptCommand + "\"")
+          .start();
+    }
+    else if (isLinux()) {
+      new ProcessBuilder("x-terminal-emulator", "-e", "bash", "-c",
+          "cd '" + folder.getAbsolutePath() + "' && claude; exec bash")
+          .start();
     }
     else {
       throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os.name"));

@@ -1,0 +1,1 @@
+gradlew.bat :a12-studio-ui:buildInstaller
