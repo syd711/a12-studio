@@ -65,18 +65,11 @@
                         {
                           "name": "enable_approximate_match_search",
                           "value": "true"
-                        },
-                        {
-                          "name": "abc",
-                          "value": "def"
                         }
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "TypeDefType",
-                          "TypeDefType": {
-                            "typeDefinitionId": null
-                          }
+                          "type": "StringType"
                         },
                         "label": [
                           {
@@ -90,8 +83,7 @@
                         ],
                         "requirednessConfig": {
                           "mode": "absoluteOrRelativeToNextRepAncestor"
-                        },
-                        "transient": true
+                        }
                       }
                     },
                     {
@@ -270,8 +262,8 @@
                             "name": "description",
                             "annotations": [
                               {
-                                "name": "enable_approximate_match_search",
-                                "value": "true"
+                                "name": null,
+                                "value": null
                               }
                             ],
                             "Field": {
@@ -623,10 +615,6 @@
                         {
                           "name": "enable_approximate_match_search",
                           "value": "true"
-                        },
-                        {
-                          "name": "test",
-                          "value": "abc"
                         }
                       ],
                       "Field": {
