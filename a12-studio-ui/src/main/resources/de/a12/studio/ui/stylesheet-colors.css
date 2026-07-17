@@ -25,6 +25,7 @@
     -fx-text-color-disabled: derive(-fx-text-color, 60%);
 
     -fx-header-color: #272828;
+    -fx-menu-bar-color: derive(-fx-header-color, 15%);
 
     /* Chrome surfaces (menu bar, toolbars, sidebar, properties panel) */
     -fx-chrome-bg: #FCFCFD;

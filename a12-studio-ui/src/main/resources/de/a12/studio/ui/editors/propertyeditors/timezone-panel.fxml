@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TIMEZONE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.TimezonePanelController">
+ <BorderPane>
+ <center>
+  <HBox alignment="CENTER_LEFT" spacing="6.0">
+    <children>
+      <ComboBox fx:id="timezoneCombo" prefWidth="200.0" />
+      <Label prefHeight="9.0" prefWidth="7.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <tooltip>
+            <Tooltip prefWidth="300.0" text="The time zone is an expert feature that is only relevant for cross-over projects and does not offer a general handling of time zones" wrapText="true" />
+         </tooltip>
+         <graphic>
+            <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+         </graphic>
+      </Label>
+    </children>
+  </HBox>
+ </center>
+ </BorderPane>
+</TitledPane>

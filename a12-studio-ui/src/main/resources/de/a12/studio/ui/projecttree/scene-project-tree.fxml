@@ -45,15 +45,6 @@
                       </Button>
                       <Separator orientation="VERTICAL" />
                       <fx:include fx:id="search" source="/de/a12/studio/commons/components/search-field.fxml" />
-                      <Separator orientation="VERTICAL" />
-                      <Button accessibleText="Preferences" mnemonicParsing="false" onAction="#onPreferences" styleClass="default-button">
-                          <graphic>
-                              <FontIcon iconLiteral="mdi2c-cog-outline" iconSize="18" styleClass="toolbar-icon" />
-                          </graphic>
-                          <tooltip>
-                              <Tooltip text="Preferences" />
-                          </tooltip>
-                      </Button>
                   </items>
               </ToolBar>
          </children>

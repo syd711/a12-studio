@@ -82,7 +82,7 @@ public class HeaderController implements Initializable {
 
   private void refreshWindowMaximizedState(boolean isMaximized) {
     FontIcon icon = new FontIcon(isMaximized ? Icons.WINDOW_RESTORE : Icons.WINDOW_MAXIMIZE);
-    icon.setIconColor(javafx.scene.paint.Color.WHITE);
+    icon.getStyleClass().add("header-icon");
     icon.setIconSize(16);
     maximizeBtn.setGraphic(icon);
   }

@@ -145,11 +145,6 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
   }
 
-  @FXML
-  private void onPreferences() {
-    StudioEventManager.getInstance().firePreferencesOpenRequestedEvent();
-  }
-
   private void setExpandedRecursive(TreeItem<ProjectItemViewModel> treeItem, boolean expanded) {
     if (treeItem == null) {
       return;

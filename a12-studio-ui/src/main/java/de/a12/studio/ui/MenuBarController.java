@@ -94,6 +94,11 @@ public class MenuBarController implements Initializable {
     System.exit(0);
   }
 
+  @FXML
+  private void onPreferences() {
+    StudioEventManager.getInstance().firePreferencesOpenRequestedEvent();
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     refreshRecentProjectsMenu();

@@ -57,7 +57,10 @@
             </BorderPane>
                 <BorderPane maxWidth="900.0" minWidth="900.0" prefWidth="900.0">
                     <center>
-                        <StackPane fx:id="contentStack" styleClass="preferences-content" BorderPane.alignment="CENTER" />
+                        <StackPane fx:id="contentStack" maxWidth="900.0" minWidth="900.0" prefWidth="900.0" styleClass="preferences-content" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets top="32.0" />
+                     </BorderPane.margin></StackPane>
                     </center>
                 </BorderPane>
                 <VBox alignment="TOP_CENTER">
@@ -69,10 +72,13 @@
                         </Button>
                     </children>
                     <HBox.margin>
-                        <Insets left="18.0" top="18.0" />
+                        <Insets left="18.0" top="32.0" />
                     </HBox.margin>
                 </VBox>
             </children>
         </HBox>
     </center>
+   <padding>
+      <Insets bottom="12.0" />
+   </padding>
 </BorderPane>
