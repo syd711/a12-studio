@@ -1,15 +1,29 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.dataservices.models.documentmodel.ComputationConfig;
+import de.a12.studio.dataservices.models.documentmodel.ComputationElement;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.Element;
+import de.a12.studio.dataservices.models.documentmodel.EnumerationFieldType;
+import de.a12.studio.dataservices.models.documentmodel.EnumerationTypeOptions;
+import de.a12.studio.dataservices.models.documentmodel.EnumerationValue;
+import de.a12.studio.dataservices.models.documentmodel.FieldConfig;
+import de.a12.studio.dataservices.models.documentmodel.FieldElement;
+import de.a12.studio.dataservices.models.documentmodel.GroupConfig;
 import de.a12.studio.dataservices.models.documentmodel.GroupElement;
 import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
+import de.a12.studio.dataservices.models.documentmodel.NumberFieldType;
+import de.a12.studio.dataservices.models.documentmodel.RequirednessConfig;
+import de.a12.studio.dataservices.models.documentmodel.RuleConfig;
+import de.a12.studio.dataservices.models.documentmodel.RuleElement;
+import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
 import de.a12.studio.commons.components.SearchFieldController;
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.commons.util.localsettings.BaseTableSettings;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
 import de.a12.studio.ui.editors.util.commandstack.Command;
 import de.a12.studio.ui.editors.util.commandstack.CommandStack;
@@ -23,20 +37,23 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class DocumentModelElementsTreeController implements Initializable, StudioEventListener {
 
@@ -45,6 +62,17 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private static final String NAME_COLUMN_ID = "name";
 
   private static final String TYPE_COLUMN_ID = "type";
+
+  private static final String ID_PREFIX_GROUP = "group";
+  private static final String ID_PREFIX_FIELD = "field";
+  private static final String ID_PREFIX_RULE = "rule";
+  private static final String ID_PREFIX_COMPUTATION = "computation";
+  private static final String ID_PREFIX_ATTACHMENT = "attachment";
+  private static final String ID_PREFIX_MULTI_SELECT = "multi-select";
+  private static final String ID_PREFIX_MULTI_SELECT_CHILD = "multiSelectChild";
+  private static final String ID_PREFIX_INCLUDE = "include";
+
+  private static final Random ID_RANDOM = new SecureRandom();
 
   @FXML
   private ToolBar modelTreeToolbarBar;
@@ -253,57 +281,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       }
     });
     nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
-    nameColumn.setCellFactory(column -> new TreeTableCell<>() {
-      @Override
-      protected void updateItem(String name, boolean empty) {
-        super.updateItem(name, empty);
-        if (empty || name == null) {
-          setText(null);
-          setGraphic(null);
-          getStyleClass().remove("validation-error");
-          return;
-        }
-
-        ElementViewModel viewModel = getTableRow().getItem();
-        if (viewModel == null) {
-          setText(name);
-          setGraphic(null);
-          getStyleClass().remove("validation-error");
-        }
-        else {
-          Node icon = viewModel.isGroup()
-              ? WidgetFactory.createIcon(viewModel.getIcon())
-              : createElementIcon(viewModel);
-          icon.getStyleClass().add("tree-icon");
-
-          Label nameLabel = new Label(name);
-          nameLabel.getStyleClass().add("tree-cell-name-label");
-          HBox graphic = new HBox(4, icon, nameLabel);
-          graphic.setAlignment(Pos.CENTER_LEFT);
-          if (viewModel.hasAnnotations()) {
-            Node annotationIcon = WidgetFactory.createIcon(Icons.ELEMENT_ANNOTATION);
-            annotationIcon.getStyleClass().addAll("tree-icon", "tree-icon-badge");
-            graphic.getChildren().add(annotationIcon);
-          }
-          if (viewModel.isRequired()) {
-            Node requiredIcon = WidgetFactory.createIcon(Icons.ELEMENT_REQUIRED);
-            requiredIcon.getStyleClass().addAll("tree-icon", "tree-icon-badge");
-            graphic.getChildren().add(requiredIcon);
-          }
-          setText(null);
-          setGraphic(graphic);
-
-          if (viewModel.hasError()) {
-            if (!getStyleClass().contains("validation-error")) {
-              getStyleClass().add("validation-error");
-            }
-          }
-          else {
-            getStyleClass().remove("validation-error");
-          }
-        }
-      }
-    });
+    nameColumn.setCellFactory(column -> new ElementNameTreeCell());
 
 
     typeColumn.setCellValueFactory(param -> {
@@ -422,14 +400,296 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private List<MenuItem> createAddMenuItems() {
     List<MenuItem> items = new ArrayList<>();
-    items.add(createMenuItem("_Group", createGroupIcon()));
-    items.add(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)));
-    items.add(createMenuItem("_Validation Rule", createPngIcon(Icons.PNG_DMM_VALIDATION_RULE_WARNING)));
-    items.add(createMenuItem("Co_mputation Rule", createPngIcon(Icons.PNG_DMM_COMPUTATION_RULE)));
-    items.add(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT));
-    items.add(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT));
-    items.add(createMenuItem("_Include", Icons.ELEMENT_INCLUDE));
+    items.add(createAddMenuItem(createMenuItem("_Group", createGroupIcon()), this::newGroupElement));
+    items.add(createAddMenuItem(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)), this::newFieldElement));
+    items.add(createAddMenuItem(createMenuItem("_Validation Rule", createPngIcon(Icons.PNG_DMM_VALIDATION_RULE_WARNING)), this::newRuleElement));
+    items.add(createAddMenuItem(createMenuItem("Co_mputation Rule", createPngIcon(Icons.PNG_DMM_COMPUTATION_RULE)), this::newComputationElement));
+    items.add(createAddMenuItem(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT), this::newAttachmentElement));
+    items.add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT), this::newMultiSelectElement));
+    items.add(createAddMenuItem(createMenuItem("_Include", Icons.ELEMENT_INCLUDE), this::newIncludeElement));
     return items;
+  }
+
+  private MenuItem createAddMenuItem(@NonNull MenuItem menuItem, @NonNull Function<List<Element>, Element> elementFactory) {
+    menuItem.setOnAction(event -> onAddElement(elementFactory));
+    return menuItem;
+  }
+
+  private void onAddElement(@NonNull Function<List<Element>, Element> elementFactory) {
+    TreeItem<ElementViewModel> selectedItem = elementsTreeTable.getSelectionModel().getSelectedItem();
+    if (selectedItem == null || selectedItem.getValue() == null) {
+      return;
+    }
+
+    InsertionPoint insertionPoint = resolveInsertionPoint(selectedItem);
+    if (insertionPoint == null) {
+      return;
+    }
+
+    Element newElement = elementFactory.apply(insertionPoint.siblings());
+    commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), newElement, insertionPoint.index()));
+
+    updateUndoRedoState();
+    applyFilter(searchController.getText());
+    selectElement(newElement);
+    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+  }
+
+  /**
+   * Where a new element should land: as the last child of the selected group, or as a sibling
+   * directly after the selected element if a non-group (leaf) element is selected.
+   */
+  private record InsertionPoint(List<Element> siblings, int index) {
+  }
+
+  private InsertionPoint resolveInsertionPoint(@NonNull TreeItem<ElementViewModel> selectedItem) {
+    Element selected = selectedItem.getValue().getElement();
+    if (selected instanceof GroupElement groupElement && groupElement.getGroup() != null) {
+      List<Element> siblings = groupElement.getGroup().getElements();
+      return new InsertionPoint(siblings, siblings.size());
+    }
+
+    TreeItem<ElementViewModel> parentItem = selectedItem.getParent();
+    if (parentItem == null || parentItem.getValue() == null) {
+      return null;
+    }
+    Element parentElement = parentItem.getValue().getElement();
+    if (parentElement instanceof GroupElement parentGroup && parentGroup.getGroup() != null) {
+      List<Element> siblings = parentGroup.getGroup().getElements();
+      return new InsertionPoint(siblings, siblings.indexOf(selected) + 1);
+    }
+    return null;
+  }
+
+  private void selectElement(@NonNull Element element) {
+    TreeItem<ElementViewModel> treeItem = findTreeItem(elementsTreeTable.getRoot(), element.getId());
+    if (treeItem == null) {
+      return;
+    }
+    elementsTreeTable.getSelectionModel().clearSelection();
+    elementsTreeTable.getSelectionModel().select(treeItem);
+    int row = elementsTreeTable.getRow(treeItem);
+    if (row >= 0) {
+      elementsTreeTable.scrollTo(row);
+    }
+  }
+
+  private Element newGroupElement(@NonNull List<Element> siblings) {
+    GroupElement group = new GroupElement();
+    group.setId(generateId(ID_PREFIX_GROUP));
+    group.setName(uniqueName("Group", siblings));
+    GroupConfig config = new GroupConfig();
+    config.setRepeatability(1);
+    group.setGroup(config);
+    return group;
+  }
+
+  private Element newFieldElement(@NonNull List<Element> siblings) {
+    FieldElement field = new FieldElement();
+    field.setId(generateId(ID_PREFIX_FIELD));
+    field.setName(uniqueName("Field", siblings));
+    field.setField(newStringFieldConfig());
+    return field;
+  }
+
+  private Element newRuleElement(@NonNull List<Element> siblings) {
+    RuleElement rule = new RuleElement();
+    String id = generateId(ID_PREFIX_RULE);
+    rule.setId(id);
+    rule.setName(uniqueName("ValidationRule", siblings));
+    RuleConfig config = new RuleConfig();
+    config.setErrorCode("Error " + id);
+    rule.setRule(config);
+    return rule;
+  }
+
+  private Element newComputationElement(@NonNull List<Element> siblings) {
+    ComputationElement computation = new ComputationElement();
+    computation.setId(generateId(ID_PREFIX_COMPUTATION));
+    computation.setName(uniqueName("ComputationRule", siblings));
+    computation.setComputation(new ComputationConfig());
+    return computation;
+  }
+
+  /**
+   * A group with a fixed set of children (attachment). Field/rule names, error conditions and
+   * messages mirror what the kernel expects for the "attachment" usage type.
+   */
+  private Element newAttachmentElement(@NonNull List<Element> siblings) {
+    GroupElement attachment = new GroupElement();
+    attachment.setId(generateId(ID_PREFIX_ATTACHMENT));
+    attachment.setName(uniqueName("Attachment", siblings));
+    GroupConfig config = new GroupConfig();
+    config.setRepeatability(1);
+    config.setUsageType(GroupConfig.USAGE_TYPE_ATTACHMENT);
+    config.getElements().addAll(createAttachmentFixedChildren());
+    attachment.setGroup(config);
+    return attachment;
+  }
+
+  private List<Element> createAttachmentFixedChildren() {
+    List<Element> children = new ArrayList<>();
+    children.add(newFixedField("original_filename", newStringFieldConfig()));
+    children.add(newFixedField("internal_filename", newStringFieldConfig()));
+    children.add(newFixedField("content", newStringFieldConfig()));
+    children.add(newFixedField("attachment_id", newStringFieldConfig()));
+    children.add(newFixedField("size", newNumberFieldConfig()));
+    children.add(newFixedField("mime_type", newStringFieldConfig()));
+    children.add(newFixedField("category", newStringFieldConfig()));
+    children.add(newFixedField("description", newStringFieldConfig()));
+    children.add(newAttachmentRule("AttachmentInternalFilenameRequired", "../internal_filename",
+        "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+        "Internal Error: Field $internal_filename$ of customType attachment is not filled."));
+    children.add(newAttachmentRule("AttachmentMimeTypeRequired", "../mime_type",
+        "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+        "Internal Error: Field $mime_type$ of customType attachment is not filled."));
+    children.add(newAttachmentRule("AttachmentIdOrContentFilled", "../content",
+        "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+        "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."));
+    children.add(newAttachmentRule("SizeOfContentFilled", "../content",
+        "FieldFilled(content) and FieldNotFilled(size)",
+        "Internal Error: If the content is filled, the size must be also filled."));
+    return children;
+  }
+
+  private RuleElement newAttachmentRule(@NonNull String name, @NonNull String errorEntityRelPath,
+                                         @NonNull String errorCondition, @NonNull String errorMessageText) {
+    RuleElement rule = new RuleElement();
+    String id = generateId(ID_PREFIX_RULE);
+    rule.setId(id);
+    rule.setName(name);
+    RuleConfig config = new RuleConfig();
+    config.setErrorEntityRelPath(errorEntityRelPath);
+    config.setErrorCode("Error " + id);
+    config.setErrorCondition(errorCondition);
+    config.setSeverity("ERROR");
+    config.getErrorMessage().add(newLabel("en", errorMessageText));
+    config.getErrorMessage().add(newLabel("de", errorMessageText));
+    rule.setRule(config);
+    return rule;
+  }
+
+  /**
+   * A group with a fixed single "value" enumeration child, forced to the maximum repeatability
+   * (999999) that the kernel treats as "unbounded" for the "multi-select" usage type.
+   */
+  private Element newMultiSelectElement(@NonNull List<Element> siblings) {
+    GroupElement multiSelect = new GroupElement();
+    multiSelect.setId(generateId(ID_PREFIX_MULTI_SELECT));
+    multiSelect.setName(uniqueName("New Multi-Select", siblings));
+    GroupConfig config = new GroupConfig();
+    config.setRepeatability(999_999);
+    config.setUsageType(GroupConfig.USAGE_TYPE_MULTI_SELECT);
+    config.getElements().add(newMultiSelectFixedChild());
+    multiSelect.setGroup(config);
+    return multiSelect;
+  }
+
+  private FieldElement newMultiSelectFixedChild() {
+    FieldElement field = new FieldElement();
+    field.setId(generateId(ID_PREFIX_MULTI_SELECT_CHILD));
+    field.setName("value");
+    FieldConfig config = new FieldConfig();
+    RequirednessConfig requirednessConfig = new RequirednessConfig();
+    requirednessConfig.setMode(RequirednessConfig.MODE_REQUIRED);
+    config.setRequirednessConfig(requirednessConfig);
+    EnumerationTypeOptions options = new EnumerationTypeOptions();
+    options.getValues().add(newEnumerationValue("key1"));
+    options.getValues().add(newEnumerationValue("key2"));
+    EnumerationFieldType fieldType = new EnumerationFieldType();
+    fieldType.setEnumerationType(options);
+    config.setFieldType(fieldType);
+    field.setField(config);
+    return field;
+  }
+
+  private EnumerationValue newEnumerationValue(@NonNull String value) {
+    EnumerationValue enumerationValue = new EnumerationValue();
+    enumerationValue.setValue(value);
+    return enumerationValue;
+  }
+
+  /**
+   * A group referencing another Document Model. The reference itself ({@code modelAlias}) has no
+   * picker in the UI yet, so it's left unset here, same as a plain group, until that reference can
+   * be assigned (surfaces as a "Missing Include Reference" validation error until then).
+   */
+  private Element newIncludeElement(@NonNull List<Element> siblings) {
+    GroupElement include = new GroupElement();
+    include.setId(generateId(ID_PREFIX_INCLUDE));
+    include.setName(uniqueName("New Include", siblings));
+    GroupConfig config = new GroupConfig();
+    config.setRepeatability(1);
+    include.setGroup(config);
+    return include;
+  }
+
+  private FieldElement newFixedField(@NonNull String name, @NonNull FieldConfig config) {
+    FieldElement field = new FieldElement();
+    field.setId(generateId(ID_PREFIX_FIELD));
+    field.setName(name);
+    field.setField(config);
+    return field;
+  }
+
+  private FieldConfig newStringFieldConfig() {
+    FieldConfig config = new FieldConfig();
+    config.setFieldType(new StringFieldType());
+    return config;
+  }
+
+  private FieldConfig newNumberFieldConfig() {
+    FieldConfig config = new FieldConfig();
+    config.setFieldType(new NumberFieldType());
+    return config;
+  }
+
+  private de.a12.studio.dataservices.models.Label newLabel(@NonNull String locale, @NonNull String text) {
+    de.a12.studio.dataservices.models.Label label = new de.a12.studio.dataservices.models.Label();
+    label.setLocale(locale);
+    label.setText(text);
+    return label;
+  }
+
+  private String uniqueName(@NonNull String baseName, @NonNull List<Element> siblings) {
+    Set<String> usedNames = new HashSet<>();
+    for (Element sibling : siblings) {
+      usedNames.add(sibling.getName());
+    }
+    if (!usedNames.contains(baseName)) {
+      return baseName;
+    }
+    int suffix = 2;
+    while (usedNames.contains(baseName + "_" + suffix)) {
+      suffix++;
+    }
+    return baseName + "_" + suffix;
+  }
+
+  private String generateId(@NonNull String prefix) {
+    Set<String> usedIds = collectIds();
+    String id;
+    do {
+      id = prefix + "_" + String.format("%05x", ID_RANDOM.nextInt(0x100000));
+    } while (usedIds.contains(id));
+    return id;
+  }
+
+  private Set<String> collectIds() {
+    Set<String> ids = new HashSet<>();
+    for (GroupElement rootGroup : modelRoot.getRootGroups()) {
+      collectIds(rootGroup, ids);
+    }
+    return ids;
+  }
+
+  private void collectIds(@NonNull Element element, @NonNull Set<String> ids) {
+    ids.add(element.getId());
+    if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
+      for (Element child : groupElement.getGroup().getElements()) {
+        collectIds(child, ids);
+      }
+    }
   }
 
   private MenuItem createMenuItem(@NonNull String text, @NonNull String icon) {
@@ -449,11 +709,6 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private Node createGroupIcon() {
     return WidgetFactory.createIcon(Icons.ELEMENT_GROUP);
-  }
-
-  private Node createElementIcon(@NonNull ElementViewModel viewModel) {
-    String iconPath = viewModel.getIconPath();
-    return iconPath != null ? createPngIcon(iconPath) : WidgetFactory.createIcon(viewModel.getIcon());
   }
 
   private Node createPngIcon(@NonNull String path) {

@@ -157,7 +157,7 @@ public final class AnnotationFieldRegistry implements StudioEventListener {
         && fieldElement.getField().getFieldType() != null) {
       return fieldElement.getField().getFieldType().getType();
     }
-    return element.getType();
+    return element.getType() == null ? null : element.getType().getValue();
   }
 
   private static void collectDocumentItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {

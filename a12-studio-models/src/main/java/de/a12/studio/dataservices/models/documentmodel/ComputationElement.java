@@ -10,4 +10,8 @@ public class ComputationElement extends Element {
 
   @JsonProperty("Computation")
   private ComputationConfig computation;
+
+  public ComputationElement() {
+    setType(ElementType.COMPUTATION);
+  }
 }

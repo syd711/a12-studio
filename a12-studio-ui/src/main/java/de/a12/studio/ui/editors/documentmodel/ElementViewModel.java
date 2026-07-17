@@ -51,7 +51,7 @@ public class ElementViewModel {
         return "Multi-Select";
       }
     }
-    return element.getType();
+    return element.getType() == null ? null : element.getType().getValue();
   }
 
   public boolean isGroup() {
@@ -109,8 +109,8 @@ public class ElementViewModel {
       };
     }
     return switch (element.getType()) {
-      case "Field" -> Icons.PNG_DMM_FIELD;
-      case "Computation" -> Icons.PNG_DMM_COMPUTATION_RULE;
+      case FIELD -> Icons.PNG_DMM_FIELD;
+      case COMPUTATION -> Icons.PNG_DMM_COMPUTATION_RULE;
       default -> null;
     };
   }

@@ -45,7 +45,7 @@ class DocumentModelLoadTest {
 
     assertEquals(1, model.getContent().getModelRoot().getRootGroups().size());
     GroupElement companyGroup = model.getContent().getModelRoot().getRootGroups().get(0);
-    assertEquals("Group", companyGroup.getType());
+    assertEquals(ElementType.GROUP, companyGroup.getType());
     assertEquals("Company", companyGroup.getName());
     assertEquals(1, companyGroup.getGroup().getRepeatability());
     assertEquals(3, companyGroup.getGroup().getElements().size());

@@ -10,4 +10,8 @@ public class RuleElement extends Element {
 
   @JsonProperty("Rule")
   private RuleConfig rule;
+
+  public RuleElement() {
+    setType(ElementType.RULE);
+  }
 }

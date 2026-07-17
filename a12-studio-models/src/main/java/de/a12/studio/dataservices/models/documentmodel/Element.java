@@ -28,7 +28,7 @@ public abstract class Element {
   // visible = true above also exposes the type id as this plain property; WRITE_ONLY keeps it settable on
   // deserialization without Jackson also emitting it a second time as a regular property on serialization.
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  private String type;
+  private ElementType type;
   private String id;
   private String name;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)

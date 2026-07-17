@@ -10,4 +10,8 @@ public class FieldElement extends Element {
 
   @JsonProperty("Field")
   private FieldConfig field;
+
+  public FieldElement() {
+    setType(ElementType.FIELD);
+  }
 }

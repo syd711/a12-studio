@@ -34,7 +34,6 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   private static final String MAIN_DIVIDER_ID = "mainDivider";
 
   private static final String FIELD_EDITOR_FXML = "document-model-field-editor.fxml";
-
   private static final String GROUP_EDITOR_FXML = "document-model-group-editor.fxml";
 
   @FXML

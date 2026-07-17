@@ -12,7 +12,7 @@
             <padding>
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
             </padding>
-            <Label styleClass="editor-type-label" text="Field Editor"/>
+            <Label styleClass="editor-type-label" text="Group Editor"/>
 
             <!-- General Information -->
             <fx:include fx:id="generalInformation" source="../propertyeditors/field-information-panel.fxml"/>

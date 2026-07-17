@@ -10,4 +10,8 @@ public class GroupElement extends Element {
 
   @JsonProperty("Group")
   private GroupConfig group;
+
+  public GroupElement() {
+    setType(ElementType.GROUP);
+  }
 }
