@@ -1,5 +1,7 @@
 package de.a12.studio.dataservices.projects;
 
+import de.a12.studio.dataservices.projects.settings.AISettings;
+import de.a12.studio.dataservices.projects.settings.UISettings;
 import org.jspecify.annotations.NonNull;
 
 import java.io.File;

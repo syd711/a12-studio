@@ -9,6 +9,20 @@ application {
     mainClass = 'de.a12.studio.ui.Launcher'
 }
 
+// Written at configuration time (not inside a task) so it's regenerated on every Gradle
+// sync/build, including a plain IDE project import - not just when a packaging task like
+// shadowJar runs. This lets StudioVersion read the real version when running Launcher
+// straight from the IDE, where classes come from an exploded output dir with no jar manifest.
+def versionResourcesDir = layout.buildDirectory.dir('generated/resources/version').get().asFile
+versionResourcesDir.mkdirs()
+new File(versionResourcesDir, 'version.properties').text = "version=${project.version}\n"
+
+sourceSets {
+    main {
+        resources.srcDir(versionResourcesDir)
+    }
+}
+
 javafx {
     version = '21.0.4'
     modules = ['javafx.controls', 'javafx.fxml']

@@ -43,6 +43,14 @@ public class ElementViewModel {
         && fieldElement.getField().getFieldType() != null) {
       return fieldElement.getField().getFieldType().getType();
     }
+    if (element instanceof GroupElement groupElement) {
+      if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)) {
+        return "Attachment";
+      }
+      if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_MULTI_SELECT)) {
+        return "Multi-Select";
+      }
+    }
     return element.getType();
   }
 

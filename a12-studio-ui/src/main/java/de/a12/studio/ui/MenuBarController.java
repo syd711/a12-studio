@@ -6,6 +6,7 @@ import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.StudioVersion;
 import de.a12.studio.ui.util.SystemUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -137,7 +138,7 @@ public class MenuBarController implements Initializable {
   }
 
   private void initializeVersionMenu() {
-    String studioVersion = studioVersion();
+    String studioVersion = StudioVersion.get();
     versionMenuButton.setText(studioVersion);
 
     versionMenuButton.getItems().addAll(
@@ -152,11 +153,6 @@ public class MenuBarController implements Initializable {
     for (ModelType modelType : ModelType.values()) {
       versionMenuButton.getItems().add(versionValueItem(modelType.getDisplayName() + " " + modelType.getCurrentVersion()));
     }
-  }
-
-  private String studioVersion() {
-    String version = getClass().getPackage().getImplementationVersion();
-    return version != null ? version : "dev";
   }
 
   private static CustomMenuItem versionHeaderItem(String text) {

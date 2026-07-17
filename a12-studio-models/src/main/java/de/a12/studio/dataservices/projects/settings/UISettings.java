@@ -1,4 +1,4 @@
-package de.a12.studio.dataservices.projects;
+package de.a12.studio.dataservices.projects.settings;
 
 import de.a12.studio.commons.util.JsonSettings;
 import org.jspecify.annotations.NonNull;

@@ -1,6 +1,7 @@
 package de.a12.studio.ui.system;
 
 import de.a12.studio.commons.Updater;
+import de.a12.studio.ui.util.StudioVersion;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -67,7 +68,9 @@ public class UpdateController {
   }
 
   private String currentVersion() {
-    String version = getClass().getPackage().getImplementationVersion();
-    return version != null ? version : "0.0.0";
+    String version = StudioVersion.get();
+    // "dev" isn't a parseable version segment for Updater.isLargerVersionThan(), unlike the
+    // manifest-based lookup this replaces, so fall back to a comparable sentinel here.
+    return "dev".equals(version) ? "0.0.0" : version;
   }
 }
