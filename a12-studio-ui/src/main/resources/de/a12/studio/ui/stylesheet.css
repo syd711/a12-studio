@@ -158,12 +158,24 @@
 /**
  * Preferences overlay
  */
+ .preference-section {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size : 13px;
+    -fx-padding: 0 8 3 4;
+    -fx-pref-width: 260;
+ }
+
 .preferences-overlay {
-    -fx-background-color: -fx-surface-color;
+    -fx-background-color: -fx-panel-color;
 }
 
 .preferences-nav {
     -fx-background-color: -fx-panel-color;
+}
+
+.preferences-nav > .viewport {
+    -fx-background-color: transparent;
 }
 
 .preferences-content {

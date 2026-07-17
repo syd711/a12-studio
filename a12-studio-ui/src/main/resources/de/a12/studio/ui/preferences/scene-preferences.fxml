@@ -2,28 +2,62 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane styleClass="base-component, preferences-overlay" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreferencesController">
+<BorderPane styleClass="preferences-overlay" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreferencesController">
     <center>
-        <HBox alignment="TOP_CENTER" BorderPane.alignment="CENTER">
+        <HBox alignment="TOP_CENTER">
             <children>
-                <VBox fx:id="navigationBox" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" styleClass="preferences-nav">
-                    <children>
-                        <Button fx:id="aiSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAiSettings" styleClass="preference-button" text="AI Settings" />
-                        <Button fx:id="annotationSetsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAnnotationSets" styleClass="preference-button" text="Annotation Sets" />
-                    </children>
-                    <padding>
-                        <Insets left="18.0" top="18.0" />
-                    </padding>
-                </VBox>
-                <BorderPane maxWidth="900.0" minWidth="900.0" prefWidth="900.0" styleClass="preferences-content">
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <center>
+                  <ScrollPane hbarPolicy="NEVER" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" styleClass="preferences-nav" BorderPane.alignment="CENTER">
+                     <content>
+                            <VBox fx:id="navigationBox" maxWidth="300.0" minWidth="300.0" prefWidth="300.0">
+                                <children>
+                              <VBox>
+                                 <children>
+                                    <Label styleClass="preference-section" text="A12 STUDIO SETTINGS">
+                                       <VBox.margin>
+                                          <Insets bottom="6.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="24.0" />
+                                 </VBox.margin>
+                              </VBox>
+                              <VBox>
+                                 <children>
+                                    <Label styleClass="preference-section" text="PROJECT SETTINGS">
+                                       <VBox.margin>
+                                          <Insets bottom="6.0" top="24.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                          <Button fx:id="aiSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAiSettings" styleClass="preference-button" text="AI Settings" />
+                                          <Button fx:id="annotationSetsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAnnotationSets" styleClass="preference-button" text="Annotation Sets" />
+                                 </children>
+                              </VBox>
+                                </children>
+                                <padding>
+                                    <Insets left="18.0" />
+                                </padding>
+                            </VBox>
+                     </content>
+                  </ScrollPane>
+               </center>
+               <HBox.margin>
+                  <Insets top="24.0" />
+               </HBox.margin>
+            </BorderPane>
+                <BorderPane maxWidth="900.0" minWidth="900.0" prefWidth="900.0">
                     <center>
-                        <StackPane fx:id="contentStack" BorderPane.alignment="CENTER" />
+                        <StackPane fx:id="contentStack" styleClass="preferences-content" BorderPane.alignment="CENTER" />
                     </center>
                 </BorderPane>
                 <VBox alignment="TOP_CENTER">

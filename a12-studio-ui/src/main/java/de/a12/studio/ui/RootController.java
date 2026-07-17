@@ -3,6 +3,7 @@ package de.a12.studio.ui;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.editors.AnnotationFieldRegistry;
+import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
@@ -56,6 +57,7 @@ public class RootController implements Initializable, StudioEventListener {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
     AnnotationFieldRegistry.getInstance(); // eagerly registers as a listener so it's ready before a project loads
+    AnnotationHeaderRegistry.getInstance(); // eagerly registers as a listener so it's ready before a project loads
 
     mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
       if (project != null) {

@@ -16,3 +16,4 @@ config/*.settings
 config/*.properties
 /a12-studio-commons/*.log
 /a12-studio-data-services/*.log
+/a12-studio-models/*.log
