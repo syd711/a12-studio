@@ -2,6 +2,7 @@ package de.a12.studio.dataservices.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,9 @@ abstract public class A12Model {
   private String modelVersion;
 
   @JsonIgnore
+  private String description;
+
+  @JsonIgnore
   private List<Locale> locales = new ArrayList<>();
 
   @JsonIgnore
@@ -43,6 +47,7 @@ abstract public class A12Model {
     header.setId(id);
     header.setModelType(modelType);
     header.setModelVersion(modelVersion);
+    header.setDescription(description);
     header.setLocales(locales);
     header.setLabels(labels);
     header.setAnnotations(annotations);
@@ -55,6 +60,7 @@ abstract public class A12Model {
     this.id = header.getId();
     this.modelType = header.getModelType();
     this.modelVersion = header.getModelVersion();
+    this.description = header.getDescription();
     this.locales = header.getLocales();
     this.labels = header.getLabels();
     this.annotations = header.getAnnotations();
@@ -69,6 +75,8 @@ abstract public class A12Model {
     private String id;
     private ModelType modelType;
     private String modelVersion;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String description;
     private List<Locale> locales = new ArrayList<>();
     private List<Label> labels = new ArrayList<>();
     private List<Annotation> annotations = new ArrayList<>();

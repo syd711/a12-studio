@@ -28,7 +28,7 @@
             <VBox GridPane.columnSpan="4">
                <children>
                   <Label styleClass="field-label" text="Type Definition" />
-            <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="42.0" spacing="12.0">
                <children>
             
                 <CheckBox fx:id="typeDefinitionCheckBox" text="Use Custom Type" />

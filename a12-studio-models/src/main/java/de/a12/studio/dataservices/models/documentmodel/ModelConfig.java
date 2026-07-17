@@ -12,4 +12,5 @@ public class ModelConfig {
   private String timeZone;
   private String decimalSeparator;
   private ConditionLanguage conditionLanguage;
+  private String supportedCharacters;
 }

@@ -1,6 +1,9 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.dataservices.models.documentmodel.Element;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
+import de.a12.studio.ui.editors.propertyeditors.FieldInformationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,6 +14,10 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class DocumentModelGroupEditorController implements ElementEditorController, Initializable {
+
+  @FXML
+  private FieldInformationPanelController generalInformationController;
+
   @FXML
   private LocalizedTextPanelController labelController;
 
@@ -20,17 +27,24 @@ public class DocumentModelGroupEditorController implements ElementEditorControll
   @FXML
   private LocalizedTextPanelController descriptionExternalController;
 
-  private Element element;
+  @FXML
+  private AnnotationsPanelController annotationsController;
+
+  private List<AbstractPropertyEditor> propertyEditors;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     labelController.configureLabel();
     descriptionInternalController.configureInternal();
     descriptionExternalController.configureExternal();
+
+    propertyEditors = List.of(generalInformationController, labelController, descriptionInternalController,
+        descriptionExternalController, annotationsController);
   }
 
   @Override
   public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
-    this.element = element;
+    generalInformationController.setAncestors(ancestors);
+    propertyEditors.forEach(propertyEditor -> propertyEditor.setElement(element));
   }
 }

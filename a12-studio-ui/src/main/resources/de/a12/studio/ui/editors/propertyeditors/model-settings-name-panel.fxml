@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="GENERAL INFORMATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController">
+ <BorderPane>
+ <center>
+  <GridPane hgap="16.0" vgap="8.0">
+    <columnConstraints>
+      <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+      <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+    </columnConstraints>
+
+    <VBox spacing="8.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+      <children>
+        <VBox>
+          <children>
+            <Label styleClass="field-label" text="Name*" />
+            <TextField fx:id="nameField" />
+          </children>
+        </VBox>
+        <VBox>
+          <children>
+            <Label styleClass="field-label" text="Model Version" />
+            <TextField fx:id="versionField" editable="false" styleClass="readonly-field" />
+          </children>
+        </VBox>
+      </children>
+    </VBox>
+
+    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+      <children>
+        <Label styleClass="field-label" text="Description (internal)" />
+        <TextArea fx:id="descriptionArea" prefRowCount="4" wrapText="true" VBox.vgrow="ALWAYS" />
+      </children>
+    </VBox>
+  </GridPane>
+ </center>
+ </BorderPane>
+</TitledPane>
