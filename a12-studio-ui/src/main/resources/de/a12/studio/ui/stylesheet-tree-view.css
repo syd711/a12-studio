@@ -26,6 +26,14 @@
     -fx-icon-color: -fx-text-color-inverse;
 }
 
+/*
+ * Lightweight badge icons (annotation marker, required marker) shown alongside the main
+ * element icon - brighter/lighter than the default icon color so they read as secondary info.
+ */
+.tree-icon-badge {
+    -fx-icon-color: -fx-text-faint;
+}
+
 /**
  * Tree Table View
  */
@@ -37,6 +45,16 @@
     -fx-font-size: 13.5px;
     -fx-text-fill: -fx-text-color;
     -fx-border-color: transparent transparent -fx-border-divider transparent;
+}
+
+/*
+ * The name column renders its text via a Label inside a custom HBox graphic (icon + name +
+ * badges) rather than the cell's own text, so it doesn't automatically pick up the cell's
+ * -fx-text-fill on selection (e.g. white text on the blue selected background). Forcing
+ * inheritance makes it track whatever -fx-text-fill the row/cell selection rules resolve to.
+ */
+.tree-cell-name-label {
+    -fx-text-fill: inherit;
 }
 
 .tree-table-view .table-row-cell,

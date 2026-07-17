@@ -39,8 +39,12 @@
                                           <Insets bottom="6.0" top="24.0" />
                                        </VBox.margin>
                                     </Label>
-                                          <Button fx:id="aiSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAiSettings" styleClass="preference-button" text="AI Settings" />
-                                          <Button fx:id="annotationSetsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAnnotationSets" styleClass="preference-button" text="Annotation Sets" />
+                                    <VBox spacing="3.0">
+                                       <children>
+                                                <Button fx:id="aiSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAiSettings" styleClass="preference-button" text="AI Settings" />
+                                                <Button fx:id="annotationSetsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAnnotationSets" styleClass="preference-button" text="Annotation Sets" />
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
                                 </children>

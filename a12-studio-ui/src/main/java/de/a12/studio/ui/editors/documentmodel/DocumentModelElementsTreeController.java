@@ -276,12 +276,19 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
               : createElementIcon(viewModel);
           icon.getStyleClass().add("tree-icon");
 
-          HBox graphic = new HBox(4, icon, new Label(name));
+          Label nameLabel = new Label(name);
+          nameLabel.getStyleClass().add("tree-cell-name-label");
+          HBox graphic = new HBox(4, icon, nameLabel);
           graphic.setAlignment(Pos.CENTER_LEFT);
           if (viewModel.hasAnnotations()) {
             Node annotationIcon = WidgetFactory.createIcon(Icons.ELEMENT_ANNOTATION);
-            annotationIcon.getStyleClass().add("tree-icon");
+            annotationIcon.getStyleClass().addAll("tree-icon", "tree-icon-badge");
             graphic.getChildren().add(annotationIcon);
+          }
+          if (viewModel.isRequired()) {
+            Node requiredIcon = WidgetFactory.createIcon(Icons.ELEMENT_REQUIRED);
+            requiredIcon.getStyleClass().addAll("tree-icon", "tree-icon-badge");
+            graphic.getChildren().add(requiredIcon);
           }
           setText(null);
           setGraphic(graphic);

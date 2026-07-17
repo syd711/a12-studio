@@ -59,7 +59,7 @@ public class ProjectTreeMenuActions {
 
     MenuItem zipFolder = new MenuItem("_Zip Folder");
     zipFolder.setGraphic(WidgetFactory.createIcon(Icons.ZIP));
-    zipFolder.setDisable(!viewModel.isFolder());
+    zipFolder.setVisible(projectItem.isRoot());
     zipFolder.setOnAction(event -> onZipFolder(projectItem));
 
     MenuItem delete = new MenuItem("_Delete");
@@ -67,7 +67,7 @@ public class ProjectTreeMenuActions {
     delete.setDisable(projectItem.isRoot());
     delete.setOnAction(event -> onDeleteItem(projectItem));
 
-    return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, new SeparatorMenuItem(), delete);
+    return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
   }
 
   void onCreateNewItem(@NonNull ProjectItem parent, boolean folder) {

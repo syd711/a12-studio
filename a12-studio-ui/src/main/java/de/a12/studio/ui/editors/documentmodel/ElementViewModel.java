@@ -62,6 +62,12 @@ public class ElementViewModel {
     return !element.getAnnotations().isEmpty();
   }
 
+  public boolean isRequired() {
+    return element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getRequirednessConfig() != null;
+  }
+
   public String getIcon() {
     if (element instanceof GroupElement groupElement) {
       if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)) {

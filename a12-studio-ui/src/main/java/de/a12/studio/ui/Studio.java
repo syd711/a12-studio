@@ -13,7 +13,6 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -54,7 +53,7 @@ public class Studio extends Application implements StudioEventListener {
     }
 
     Scene scene = new Scene(root, width, height, Color.TRANSPARENT);
-    scene.addEventFilter(KeyEvent.KEY_PRESSED, this::onKeyPressed);
+    scene.addEventHandler(KeyEvent.KEY_PRESSED, new StudioKeyEventHandler(stage));
     stage.setTitle("A12 Studio");
     stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-150.png")));
     stage.setScene(scene);
@@ -84,16 +83,6 @@ public class Studio extends Application implements StudioEventListener {
 
   public static ProjectItem getSelectedProjectItem() {
     return rootController.getSelectedProjectItem();
-  }
-
-  private void onKeyPressed(@NonNull KeyEvent event) {
-    if (event.isControlDown() && event.getCode() == KeyCode.S) {
-      ProjectItem projectItem = rootController.getSelectedProjectItem();
-      if (projectItem != null) {
-        StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
-      }
-      event.consume();
-    }
   }
 
   @Override
