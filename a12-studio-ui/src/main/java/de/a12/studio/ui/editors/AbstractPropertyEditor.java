@@ -46,6 +46,10 @@ abstract public class AbstractPropertyEditor implements Initializable {
   @FXML
   private ErrorContainerController errorContainerController;
 
+  // Non-null while this editor is bound to a single Element via setElement(). Subclasses that also support
+  // editing a whole model's header (via their own setModel()) leave this null in that mode, which disables
+  // the per-element validation/error-container plumbing below (there is no single Element to validate) while
+  // still saving on every change like the Element-bound case.
   protected Element element;
 
   // Set while a field's value is being repopulated from the model (e.g. on element selection), so those
@@ -198,13 +202,16 @@ abstract public class AbstractPropertyEditor implements Initializable {
       return;
     }
     projectItem.save();
+    if (element == null) {
+      return;
+    }
     Optional<ElementValidationError> error = validateElement(projectItem);
     showValidationError(error.orElse(null));
     StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
   }
 
   private Optional<ElementValidationError> validateElement(@NonNull ProjectItem projectItem) {
-    if (!(projectItem.getModel() instanceof DocumentModel documentModel)) {
+    if (element == null || !(projectItem.getModel() instanceof DocumentModel documentModel)) {
       return Optional.empty();
     }
     try {
@@ -218,7 +225,9 @@ abstract public class AbstractPropertyEditor implements Initializable {
   private void applyValidationResult(@NonNull Node field, @NonNull Optional<ElementValidationError> error) {
     field.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, error.isPresent());
     showValidationError(error.orElse(null));
-    StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
+    if (element != null) {
+      StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
+    }
   }
 
   private void showValidationError(ElementValidationError error) {

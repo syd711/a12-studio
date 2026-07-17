@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.Locale;
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.FieldElement;
@@ -18,17 +19,24 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Edits a per-locale text (a list of {@link de.a12.studio.dataservices.models.Label}). Reused for the label, internal
- * description, external description and helper text, distinguished via {@link #configureLabel} / {@link
- * #configureInternal} / {@link #configureExternal} / {@link #configureHelperText}, one of which must be called once
- * after this controller is loaded from FXML.
+ * Edits a per-locale text (a list of {@link de.a12.studio.dataservices.models.Label}). Reused for the label,
+ * internal description, external description and helper text of a single {@link Element} (via {@link
+ * #setElement}, distinguished via {@link #configureLabel} / {@link #configureInternal} / {@link
+ * #configureExternal} / {@link #configureHelperText}), as well as for a model's own header labels (via {@link
+ * #setModel} after {@link #configureModelLabels}). Exactly one configure method must be called once after this
+ * controller is loaded from FXML, before setElement/setModel; {@code element} and {@link #model} are mutually
+ * exclusive.
  */
 public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   @FXML
   private GridPane localesGrid;
 
-  private Function<Element, List<de.a12.studio.dataservices.models.Label>> textsAccessor = Element::getExternalDescription;
+  private A12Model model;
+
+  private Function<Element, List<de.a12.studio.dataservices.models.Label>> elementTextsAccessor = Element::getExternalDescription;
+
+  private Function<A12Model, List<de.a12.studio.dataservices.models.Label>> modelTextsAccessor = A12Model::getLabels;
 
   private String fieldKey = "external";
 
@@ -50,8 +58,15 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     configure(LocalizedTextPanelController::getLabel, "label", "LABEL");
   }
 
+  public void configureModelLabels() {
+    this.modelTextsAccessor = A12Model::getLabels;
+    this.fieldKey = "labels";
+    setTitle("LABELS");
+    setSettingsKeySuffix("." + fieldKey);
+  }
+
   private void configure(Function<Element, List<de.a12.studio.dataservices.models.Label>> textsAccessor, String fieldKey, String title) {
-    this.textsAccessor = textsAccessor;
+    this.elementTextsAccessor = textsAccessor;
     this.fieldKey = fieldKey;
     setTitle(title);
     setSettingsKeySuffix("." + fieldKey);
@@ -59,9 +74,21 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   @Override
   public void setElement(@NonNull Element element) {
+    this.model = null;
     super.setElement(element);
     buildLocaleFields();
     populateLocaleFields();
+  }
+
+  public void setModel(@NonNull A12Model model) {
+    this.element = null;
+    this.model = model;
+    buildLocaleFields();
+    populateLocaleFields();
+  }
+
+  private List<de.a12.studio.dataservices.models.Label> getTexts() {
+    return model != null ? modelTextsAccessor.apply(model) : elementTextsAccessor.apply(element);
   }
 
   private void buildLocaleFields() {
@@ -77,7 +104,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
       TextField textField = new TextField();
       textField.setId(fieldKey + "-" + locale.getCode());
       textField.setMaxWidth(Double.MAX_VALUE);
-      bindTextField(textField, (element, value) -> setLocaleText(element, locale.getCode(), value));
+      bindTextField(textField, (el, value) -> setLocaleText(locale.getCode(), value));
 
       localesGrid.addRow(row, localeLabel, textField);
       textFieldsByLocale.put(locale.getCode(), textField);
@@ -86,7 +113,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   private void populateLocaleFields() {
-    List<de.a12.studio.dataservices.models.Label> texts = textsAccessor.apply(element);
+    List<de.a12.studio.dataservices.models.Label> texts = getTexts();
     textFieldsByLocale.forEach((localeCode, textField) -> {
       String text = texts.stream()
           .filter(label -> localeCode.equals(label.getLocale()))
@@ -97,8 +124,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     });
   }
 
-  private void setLocaleText(Element element, String localeCode, String value) {
-    List<de.a12.studio.dataservices.models.Label> texts = textsAccessor.apply(element);
+  private void setLocaleText(String localeCode, String value) {
+    List<de.a12.studio.dataservices.models.Label> texts = getTexts();
     Optional<de.a12.studio.dataservices.models.Label> existing = texts.stream()
         .filter(label -> localeCode.equals(label.getLocale()))
         .findFirst();

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.dialogs.DocumentModelSettingsDialog">
+    <top>
+        <fx:include fx:id="header" source="/de/a12/studio/commons/fx/scene-dialog-header.fxml" />
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@../../stylesheet.css">
+            <content>
+                <VBox spacing="12.0" styleClass="field-editor">
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                    <Label styleClass="editor-type-label" text="Model Settings" />
+
+                    <!-- Name / Version / Description -->
+                    <fx:include fx:id="modelSettingsName" source="../propertyeditors/model-settings-name-panel.fxml" />
+
+                    <!-- Supported Characters -->
+                    <fx:include fx:id="supportedCharacters" source="../propertyeditors/supported-characters-panel.fxml" />
+
+                    <!-- Locales -->
+                    <fx:include fx:id="locales" source="../propertyeditors/locales-panel.fxml" />
+
+                    <!-- Labels -->
+                    <fx:include fx:id="labels" source="../propertyeditors/localized-text-panel.fxml" />
+
+                    <!-- Roles -->
+                    <fx:include fx:id="roles" source="../propertyeditors/roles-panel.fxml" />
+
+                    <!-- Annotations -->
+                    <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
+
+                    <!-- Timezone -->
+                    <fx:include fx:id="timezone" source="../propertyeditors/timezone-panel.fxml" />
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+   <styleClass>
+      <String fx:value="root" />
+      <String fx:value="main" />
+   </styleClass>
+</BorderPane>

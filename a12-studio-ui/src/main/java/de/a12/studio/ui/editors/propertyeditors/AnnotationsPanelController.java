@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.Annotation;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.Element;
@@ -8,6 +9,7 @@ import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.AnnotationFieldRegistry;
+import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
@@ -28,13 +30,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Edits either a single {@link Element}'s annotations (via {@link #setElement}, suggestions sourced from
+ * {@link AnnotationFieldRegistry}) or a model's header annotations (via {@link #setModel}, suggestions sourced
+ * from {@link AnnotationHeaderRegistry}). Which mode is active is determined by which of {@code element}
+ * (inherited from {@link AbstractPropertyEditor}) / {@link #model} is currently set; the two are mutually
+ * exclusive.
+ */
 public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private GridPane annotationsGrid;
 
+  private A12Model model;
+
   // The model type / field type of the element currently being edited, i.e. the key under which suggested
-  // names are looked up in and reported to the AnnotationFieldRegistry. Recomputed on every rebuildRows().
+  // names are looked up in and reported to the AnnotationFieldRegistry (or just the model type, for
+  // AnnotationHeaderRegistry in model mode). Recomputed on every rebuildRows().
   private ModelType currentModelType;
   private String currentFieldType;
 
@@ -44,13 +56,20 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   @Override
   public void setElement(@NonNull Element element) {
+    this.model = null;
     super.setElement(element);
+    rebuildRows();
+  }
+
+  public void setModel(@NonNull A12Model model) {
+    this.element = null;
+    this.model = model;
     rebuildRows();
   }
 
   @FXML
   private void onAdd() {
-    element.getAnnotations().add(new Annotation());
+    getAnnotations().add(new Annotation());
     rebuildRows();
     commitChange();
   }
@@ -60,6 +79,10 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     StudioEventManager.getInstance().firePreferencesOpenRequestedEvent(PreferencesOpenRequestedEvent.Section.ANNOTATION_SETS);
   }
 
+  private List<Annotation> getAnnotations() {
+    return model != null ? model.getAnnotations() : element.getAnnotations();
+  }
+
   private void rebuildRows() {
     annotationsGrid.getChildren().removeIf(node -> {
       Integer rowIndex = GridPane.getRowIndex(node);
@@ -67,12 +90,19 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     });
     nameFields.clear();
 
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
-    currentModelType = projectItem == null || projectItem.getModel() == null ? null : projectItem.getModel().getModelType();
-    currentFieldType = AnnotationFieldRegistry.resolveFieldType(element);
+    List<String> suggestedNames;
+    if (model != null) {
+      currentModelType = model.getModelType();
+      currentFieldType = null;
+      suggestedNames = AnnotationHeaderRegistry.getInstance().getNames(currentModelType);
+    } else {
+      ProjectItem projectItem = Studio.getSelectedProjectItem();
+      currentModelType = projectItem == null || projectItem.getModel() == null ? null : projectItem.getModel().getModelType();
+      currentFieldType = AnnotationFieldRegistry.resolveFieldType(element);
+      suggestedNames = AnnotationFieldRegistry.getInstance().getNames(currentModelType, currentFieldType);
+    }
 
-    List<String> suggestedNames = AnnotationFieldRegistry.getInstance().getNames(currentModelType, currentFieldType);
-    List<Annotation> annotations = element.getAnnotations();
+    List<Annotation> annotations = getAnnotations();
     for (int index = 0; index < annotations.size(); index++) {
       addRow(annotations.get(index), index, annotations.size(), suggestedNames);
     }
@@ -90,12 +120,12 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     valueField.setId("annotationValue-" + index);
     valueField.setMaxWidth(Double.MAX_VALUE);
     setFieldValue(valueField, annotation.getValue());
-    bindTextField(valueField, (element, value) -> {
+    bindTextField(valueField, (el, value) -> {
       annotation.setValue(value);
-      AnnotationFieldRegistry.getInstance().setValue(currentModelType, currentFieldType, annotation.getName(), value);
+      setSuggestionValue(annotation.getName(), value);
     });
 
-    bindComboBox(nameField, (element, value) -> {
+    bindComboBox(nameField, (el, value) -> {
       String oldName = annotation.getName();
       annotation.setName(value);
       onAnnotationNameChanged(annotation, valueField, oldName, value);
@@ -106,30 +136,61 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   }
 
   /**
-   * Keeps the {@link AnnotationFieldRegistry} in sync as an annotation's name is typed/selected, then refreshes
-   * every visible row's suggestions so the new name is immediately offered elsewhere (and a name that's no
-   * longer used anywhere stops being suggested). When {@code newName} is a previously used name, also
-   * prefills {@code valueField} with the value it was last used with.
+   * Keeps the suggestion registry in sync as an annotation's name is typed/selected, then refreshes every
+   * visible row's suggestions so the new name is immediately offered elsewhere (and a name that's no longer
+   * used anywhere stops being suggested). When {@code newName} is a previously used name, also prefills
+   * {@code valueField} with the value it was last used with.
    */
   private void onAnnotationNameChanged(Annotation annotation, TextField valueField, String oldName, String newName) {
     if (Objects.equals(oldName, newName)) {
       return;
     }
-    AnnotationFieldRegistry registry = AnnotationFieldRegistry.getInstance();
-    String suggestedValue = registry.getValue(currentModelType, currentFieldType, newName);
+    String suggestedValue = getSuggestionValue(newName);
     if (suggestedValue != null && !suggestedValue.equals(annotation.getValue())) {
       annotation.setValue(suggestedValue);
       setFieldValue(valueField, suggestedValue);
     }
-    registry.removeName(currentModelType, currentFieldType, oldName);
-    registry.addName(currentModelType, currentFieldType, newName, annotation.getValue());
+    removeSuggestionName(oldName);
+    addSuggestionName(newName, annotation.getValue());
     refreshNameSuggestions();
   }
 
   private void refreshNameSuggestions() {
-    List<String> suggestedNames = AnnotationFieldRegistry.getInstance().getNames(currentModelType, currentFieldType);
+    List<String> suggestedNames = model != null
+        ? AnnotationHeaderRegistry.getInstance().getNames(currentModelType)
+        : AnnotationFieldRegistry.getInstance().getNames(currentModelType, currentFieldType);
     for (ComboBox<String> nameField : nameFields) {
       nameField.getItems().setAll(suggestedNames);
+    }
+  }
+
+  private String getSuggestionValue(String name) {
+    return model != null
+        ? AnnotationHeaderRegistry.getInstance().getValue(currentModelType, name)
+        : AnnotationFieldRegistry.getInstance().getValue(currentModelType, currentFieldType, name);
+  }
+
+  private void setSuggestionValue(String name, String value) {
+    if (model != null) {
+      AnnotationHeaderRegistry.getInstance().setValue(currentModelType, name, value);
+    } else {
+      AnnotationFieldRegistry.getInstance().setValue(currentModelType, currentFieldType, name, value);
+    }
+  }
+
+  private void addSuggestionName(String name, String value) {
+    if (model != null) {
+      AnnotationHeaderRegistry.getInstance().addName(currentModelType, name, value);
+    } else {
+      AnnotationFieldRegistry.getInstance().addName(currentModelType, currentFieldType, name, value);
+    }
+  }
+
+  private void removeSuggestionName(String name) {
+    if (model != null) {
+      AnnotationHeaderRegistry.getInstance().removeName(currentModelType, name);
+    } else {
+      AnnotationFieldRegistry.getInstance().removeName(currentModelType, currentFieldType, name);
     }
   }
 
@@ -144,8 +205,8 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
       Annotation copy = new Annotation();
       copy.setName(annotation.getName());
       copy.setValue(annotation.getValue());
-      element.getAnnotations().add(index + 1, copy);
-      AnnotationFieldRegistry.getInstance().addName(currentModelType, currentFieldType, copy.getName(), copy.getValue());
+      getAnnotations().add(index + 1, copy);
+      addSuggestionName(copy.getName(), copy.getValue());
       rebuildRows();
       commitChange();
     });
@@ -153,8 +214,8 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this annotation?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
-        element.getAnnotations().remove(index);
-        AnnotationFieldRegistry.getInstance().removeName(currentModelType, currentFieldType, annotation.getName());
+        getAnnotations().remove(index);
+        removeSuggestionName(annotation.getName());
         rebuildRows();
         commitChange();
       }
@@ -166,7 +227,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   }
 
   private void moveRow(int fromIndex, int toIndex) {
-    List<Annotation> annotations = element.getAnnotations();
+    List<Annotation> annotations = getAnnotations();
     annotations.add(toIndex, annotations.remove(fromIndex));
     rebuildRows();
     commitChange();

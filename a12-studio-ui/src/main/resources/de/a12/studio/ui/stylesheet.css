@@ -11,6 +11,7 @@
 @import "stylesheet-combobox.css";
 @import "stylesheet-table-view.css";
 @import "stylesheet-titled-pane.css";
+@import "stylesheet-toolbar.css";
 
 /**
  * Tooltips
@@ -75,6 +76,7 @@
     -fx-background-color: -fx-chrome-bg;
     -fx-border-color: transparent transparent transparent -fx-border-subtle;
     -fx-border-width: 0 0 0 1px;
+    -fx-background-radius: 6px;
 }
 
 .properties-panel > .viewport {
@@ -83,50 +85,6 @@
 
 .field-editor {
     -fx-background-color: transparent;
-}
-
-/**
- * Window Toolbar
- */
-.header-button {
-    -fx-background-color: -fx-header-color;
-    -fx-border-style: hidden hidden hidden hidden;
-    -fx-text-fill: -fx-text-color-inverse;
-}
-
-.header-button:hover {
-    -fx-background-color: -fx-accent-color;
-    -fx-border-style: hidden hidden hidden hidden;
-    -fx-text-fill: -fx-text-color-inverse;
-    -fx-cursor: hand;
-}
-
-.header-title {
-    -fx-text-fill: -fx-text-color-inverse;
-}
-
-.header-icon {
-    -fx-icon-color: -fx-text-color-inverse;
-}
-
-.toolbar-icon {
-    -fx-icon-color: -fx-icon-color-theme;
-}
-
-.tool-bar {
-    -fx-background-color: -fx-chrome-bg;
-    -fx-border-color: transparent transparent -fx-border-subtle transparent;
-    -fx-border-width: 0 0 1px 0;
-    -fx-padding: 6px 10px;
-    -fx-spacing: 6px;
-}
-
-.tool-bar.panel-toolbar {
-    -fx-background-color: -fx-panel-color;
-}
-
-.tool-bar.panel-toolbar .search-field {
-    -fx-background-color: white;
 }
 
 /**
