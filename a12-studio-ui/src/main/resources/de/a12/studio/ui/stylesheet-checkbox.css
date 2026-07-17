@@ -11,12 +11,23 @@
     -fx-border-radius: 4px;
     -fx-border-color: -fx-border-input;
     -fx-border-width: 1px;
-    -fx-padding: 1px;
+    -fx-padding: 3px;
+    -fx-min-width: 20px;
+    -fx-min-height: 20px;
+    -fx-max-width: 20px;
+    -fx-max-height: 20px;
 }
 
 .check-box:selected .box {
     -fx-background-color: -fx-accent-color;
     -fx-border-color: -fx-accent-color;
+}
+
+.check-box .mark {
+    -fx-background-color: transparent;
+    -fx-shape: "M16.7 5.3a1 1 0 0 1 0 1.4l-8 8a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L8 12.6l7.3-7.3a1 1 0 0 1 1.4 0z";
+    -fx-scale-shape: true;
+    -fx-padding: 3.5px;
 }
 
 .check-box:selected .mark {

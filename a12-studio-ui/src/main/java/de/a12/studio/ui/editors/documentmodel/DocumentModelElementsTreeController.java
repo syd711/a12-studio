@@ -23,10 +23,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -262,9 +264,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
           return;
         }
 
-        setText(name);
         ElementViewModel viewModel = getTableRow().getItem();
         if (viewModel == null) {
+          setText(name);
           setGraphic(null);
           getStyleClass().remove("validation-error");
         }
@@ -273,7 +275,16 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
               ? WidgetFactory.createIcon(viewModel.getIcon())
               : createElementIcon(viewModel);
           icon.getStyleClass().add("tree-icon");
-          setGraphic(icon);
+
+          HBox graphic = new HBox(4, icon, new Label(name));
+          graphic.setAlignment(Pos.CENTER_LEFT);
+          if (viewModel.hasAnnotations()) {
+            Node annotationIcon = WidgetFactory.createIcon(Icons.ELEMENT_ANNOTATION);
+            annotationIcon.getStyleClass().add("tree-icon");
+            graphic.getChildren().add(annotationIcon);
+          }
+          setText(null);
+          setGraphic(graphic);
 
           if (viewModel.hasError()) {
             if (!getStyleClass().contains("validation-error")) {

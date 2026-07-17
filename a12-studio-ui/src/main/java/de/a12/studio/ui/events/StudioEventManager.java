@@ -2,6 +2,7 @@ package de.a12.studio.ui.events;
 
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.dataservices.projects.settings.JsonSettings;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import org.jspecify.annotations.NonNull;
 
@@ -78,6 +79,13 @@ public class StudioEventManager {
     PreferencesOpenRequestedEvent event = new PreferencesOpenRequestedEvent(section);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.preferencesOpenRequested(event);
+    }
+  }
+
+  public void fireSettingsChangedEvent(@NonNull JsonSettings settings) {
+    SettingsChangedEvent event = new SettingsChangedEvent(settings);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.settingsChanged(event);
     }
   }
 }

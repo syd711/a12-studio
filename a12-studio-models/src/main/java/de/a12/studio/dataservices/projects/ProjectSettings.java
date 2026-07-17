@@ -1,6 +1,7 @@
 package de.a12.studio.dataservices.projects;
 
-import de.a12.studio.dataservices.projects.settings.AISettings;
+import de.a12.studio.dataservices.projects.settings.JsonSettings;
+import de.a12.studio.dataservices.projects.settings.AnnotationSettings;
 import de.a12.studio.dataservices.projects.settings.UISettings;
 import org.jspecify.annotations.NonNull;
 
@@ -12,29 +13,34 @@ public class ProjectSettings {
 
   private final UISettings uiSettings;
 
-  private final AISettings aiSettings;
+  private final JsonSettings jsonSettings;
 
-  private ProjectSettings(UISettings uiSettings, AISettings aiSettings) {
+  private final AnnotationSettings annotationSettings;
+
+  private ProjectSettings(UISettings uiSettings, JsonSettings jsonSettings, AnnotationSettings annotationSettings) {
     this.uiSettings = uiSettings;
-    this.aiSettings = aiSettings;
+    this.jsonSettings = jsonSettings;
+    this.annotationSettings = annotationSettings;
   }
 
   public UISettings getUISettings() {
     return uiSettings;
   }
 
-  public AISettings getAISettings() {
-    return aiSettings;
+  public JsonSettings getAISettings() {
+    return jsonSettings;
+  }
+
+  public AnnotationSettings getAnnotationSettings() {
+    return annotationSettings;
   }
 
   public static ProjectSettings load(@NonNull File projectFolder) {
-    File settingsFolder = new File(projectFolder, SETTINGS_FOLDER_NAME);
-    if (!settingsFolder.exists()) {
-      settingsFolder.mkdirs();
-    }
+    File settingsFolder = de.a12.studio.commons.util.JsonSettings.resolveSettingsFolder(projectFolder, SETTINGS_FOLDER_NAME);
 
-    UISettings uiSettings = UISettings.load(settingsFolder);
-    AISettings aiSettings = AISettings.load(settingsFolder);
-    return new ProjectSettings(uiSettings, aiSettings);
+    UISettings uiSettings = UISettings.load();
+    JsonSettings jsonSettings = JsonSettings.load();
+    AnnotationSettings annotationSettings = AnnotationSettings.load(settingsFolder);
+    return new ProjectSettings(uiSettings, jsonSettings, annotationSettings);
   }
 }

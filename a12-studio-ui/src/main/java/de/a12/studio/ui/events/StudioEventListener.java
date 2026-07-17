@@ -34,4 +34,8 @@ public interface StudioEventListener {
   default void preferencesOpenRequested(@NonNull PreferencesOpenRequestedEvent event) {
 
   }
+
+  default void settingsChanged(@NonNull SettingsChangedEvent event) {
+
+  }
 }

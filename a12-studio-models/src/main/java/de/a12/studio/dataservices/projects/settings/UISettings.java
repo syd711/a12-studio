@@ -9,6 +9,8 @@ import java.util.List;
 
 public class UISettings extends JsonSettings {
 
+  static final String SETTINGS_FOLDER_NAME = ".a12-studio";
+
   static final String SETTINGS_FILE_NAME = "ui-settings.json";
 
   private double dividerPosition = 0.3;
@@ -20,6 +22,11 @@ public class UISettings extends JsonSettings {
   @Override
   public String getSettingsName() {
     return SETTINGS_FILE_NAME;
+  }
+
+  @Override
+  public SettingsType getSettingsType() {
+    return SettingsType.UI;
   }
 
   public double getDividerPosition() {
@@ -55,7 +62,8 @@ public class UISettings extends JsonSettings {
     this.selectedFile = selectedFile;
   }
 
-  static UISettings load(@NonNull File studioFolder) {
-    return JsonSettings.load(new File(studioFolder, SETTINGS_FILE_NAME), UISettings.class);
+  public static UISettings load() {
+    File homeFolder = resolveSettingsFolder(new File(System.getProperty("user.home")), SETTINGS_FOLDER_NAME);
+    return JsonSettings.load(new File(homeFolder, SETTINGS_FILE_NAME), UISettings.class);
   }
 }

@@ -19,6 +19,13 @@ import java.nio.file.Files;
 
 @Slf4j
 public abstract class JsonSettings {
+
+  public enum SettingsType {
+    AI,
+    UI,
+    ANNOTATION
+  }
+
   public final static ObjectMapper objectMapper;
 
   protected File settingsFile;
@@ -64,6 +71,16 @@ public abstract class JsonSettings {
   }
 
   public abstract String getSettingsName();
+
+  public abstract SettingsType getSettingsType();
+
+  public static File resolveSettingsFolder(@NonNull File parentFolder, @NonNull String folderName) {
+    File folder = new File(parentFolder, folderName);
+    if (!folder.exists()) {
+      folder.mkdirs();
+    }
+    return folder;
+  }
 
   public static <T extends JsonSettings> T load(@NonNull File settingsFile, @NonNull Class<T> clazz) {
     T settings;

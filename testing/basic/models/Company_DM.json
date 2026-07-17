@@ -74,7 +74,9 @@
                       "Field": {
                         "fieldType": {
                           "type": "StringType",
-                          "StringType": {}
+                          "StringType": {
+                            "lineBreaksPermitted": true
+                          }
                         },
                         "label": [
                           {

@@ -14,7 +14,12 @@ public class AnnotationSettings extends JsonSettings {
     return SETTINGS_FILE_NAME;
   }
 
-  static AnnotationSettings load(@NonNull File studioFolder) {
+  @Override
+  public SettingsType getSettingsType() {
+    return SettingsType.ANNOTATION;
+  }
+
+  public static AnnotationSettings load(@NonNull File studioFolder) {
     return JsonSettings.load(new File(studioFolder, SETTINGS_FILE_NAME), AnnotationSettings.class);
   }
 }

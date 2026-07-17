@@ -58,6 +58,10 @@ public class ElementViewModel {
     return element instanceof GroupElement;
   }
 
+  public boolean hasAnnotations() {
+    return !element.getAnnotations().isEmpty();
+  }
+
   public String getIcon() {
     if (element instanceof GroupElement groupElement) {
       if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)) {

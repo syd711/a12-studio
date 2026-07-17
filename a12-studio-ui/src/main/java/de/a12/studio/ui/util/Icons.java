@@ -49,4 +49,5 @@ public interface Icons {
   String ELEMENT_INCLUDE = "mdi2l-link";
   String ELEMENT_GENERIC = "mdi2s-shape-outline";
   String ELEMENT_ATTACHMENT = "mdi2d-database-plus-outline";
+  String ELEMENT_ANNOTATION = "mdi2a-alpha-a-box-outline";
 }

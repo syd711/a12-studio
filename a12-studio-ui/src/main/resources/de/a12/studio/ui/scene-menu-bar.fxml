@@ -54,7 +54,15 @@
    <right>
       <HBox fx:id="menuBarRightPanel" alignment="CENTER_RIGHT" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
-            <Button accessibleText="Claude Console" mnemonicParsing="false" onAction="#onOpenClaudeConsole" styleClass="menu-bar-button">
+            <Button fx:id="updateBtn" accessibleText="Update available" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button" visible="false" managed="false">
+                <graphic>
+                    <FontIcon iconColor="#03A905" iconLiteral="mdi2a-arrow-down-bold" iconSize="18" />
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Update available" />
+                </tooltip>
+            </Button>
+            <Button fx:id="claudeConsoleBtn" accessibleText="Claude Console" mnemonicParsing="false" onAction="#onOpenClaudeConsole" styleClass="menu-bar-button">
                 <graphic>
                     <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                         <image>

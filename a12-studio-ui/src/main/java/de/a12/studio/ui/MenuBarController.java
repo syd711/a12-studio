@@ -4,13 +4,18 @@ import de.a12.studio.commons.util.StudioFolderChooser;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.projects.Project;
+import de.a12.studio.dataservices.projects.settings.JsonSettings;
+import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.updater.Dialogs;
+import de.a12.studio.ui.updater.UpdaterService;
 import de.a12.studio.ui.util.StudioVersion;
 import de.a12.studio.ui.util.SystemUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -18,6 +23,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.net.URL;
@@ -27,7 +33,7 @@ import java.util.ResourceBundle;
 /**
  * Controller for the app's main menu bar (File/Edit/Help).
  */
-public class MenuBarController implements Initializable {
+public class MenuBarController implements Initializable, StudioEventListener {
 
   // No published a12-release-line concept exists yet for the Java stack; update by hand until one does.
   private static final String A12_RELEASE_VERSION = "2025.06";
@@ -39,8 +45,17 @@ public class MenuBarController implements Initializable {
   private MenuButton versionMenuButton;
 
   @FXML
+  private Button updateBtn;
+
+  @FXML
+  private Button claudeConsoleBtn;
+
+  @FXML
   private Menu recentProjectsMenu;
   private Project project;
+
+  private final UpdaterService updaterService = new UpdaterService();
+  private String newVersion;
 
   @FXML
   private void onNew() {
@@ -115,8 +130,31 @@ public class MenuBarController implements Initializable {
   @FXML
   private void onOpenClaudeConsole() {
     if (project != null) {
-      SystemUtil.openClaudeConsole(project.getFolder());
+      SystemUtil.openClaudeConsole(project.getFolder(), resolveClaudeCommand());
     }
+  }
+
+  private static String resolveClaudeCommand() {
+    JsonSettings settings = JsonSettings.load();
+    if (settings.getClaudePathMode() == JsonSettings.ClaudePathMode.CONFIGURE_PATH
+        && settings.getClaudeExecutablePath() != null
+        && !settings.getClaudeExecutablePath().isEmpty()) {
+      return settings.getClaudeExecutablePath();
+    }
+    return "claude";
+  }
+
+  @Override
+  public void settingsChanged(@NonNull SettingsChangedEvent event) {
+    if (event.getSettings().getSettingsType().equals(JsonSettings.SettingsType.AI)) {
+      refreshClaudeConsoleButton(event.getSettings());
+    }
+  }
+
+  private void refreshClaudeConsoleButton(JsonSettings settings) {
+    boolean visible = settings.isAddClaudeConsoleButton();
+    claudeConsoleBtn.setVisible(visible);
+    claudeConsoleBtn.setManaged(visible);
   }
 
   @FXML
@@ -124,17 +162,43 @@ public class MenuBarController implements Initializable {
     SystemUtil.openUrl("https://github.com/syd711/a12-studio");
   }
 
+  @FXML
+  private void onUpdate() {
+    Dialogs.openUpdateInfoDialog(newVersion);
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     refreshRecentProjectsMenu();
     initializeVersionMenu();
+    updateBtn.managedProperty().bind(updateBtn.visibleProperty());
+    runUpdateCheck();
+
+    StudioEventManager.getInstance().addListener(this);
+    refreshClaudeConsoleButton(JsonSettings.load());
 
     Platform.runLater(() -> {
       File lastFolderSelection = LocalUISettings.getLastFolderSelection();
-      if(lastFolderSelection != null) {
+      if (lastFolderSelection != null) {
         openProject(lastFolderSelection);
       }
     });
+  }
+
+  private void runUpdateCheck() {
+    Thread t = new Thread(() -> {
+      String latestVersion = updaterService.checkForNewerVersion();
+      if (latestVersion != null) {
+        Platform.runLater(() -> {
+          newVersion = latestVersion;
+          updateBtn.getTooltip().setText("Version " + newVersion + " available");
+          updateBtn.setVisible(true);
+        });
+      }
+    });
+    t.setName("Update Check");
+    t.setDaemon(true);
+    t.start();
   }
 
   private void initializeVersionMenu() {

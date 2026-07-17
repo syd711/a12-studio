@@ -146,26 +146,36 @@ public class SystemUtil {
    * @param folder The project directory to start the Claude console in.
    */
   public static void openClaudeConsole(File folder) {
+    openClaudeConsole(folder, "claude");
+  }
+
+  /**
+   * Opens a new terminal window running the Claude Code console in the given directory.
+   *
+   * @param folder The project directory to start the Claude console in.
+   * @param claudeCommand The command (or absolute path to the executable) used to launch Claude.
+   */
+  public static void openClaudeConsole(File folder, String claudeCommand) {
     if (folder == null || !folder.exists()) {
       return;
     }
 
     try {
-      openClaudeConsoleWithOS(folder);
+      openClaudeConsoleWithOS(folder, claudeCommand);
     }
     catch (IOException e) {
       log.error("Failed to open Claude console: " + e.getMessage(), e);
     }
   }
 
-  private static void openClaudeConsoleWithOS(File folder) throws IOException {
+  private static void openClaudeConsoleWithOS(File folder, String claudeCommand) throws IOException {
     if (isWindows()) {
-      new ProcessBuilder("cmd.exe", "/c", "start", "", "cmd.exe", "/k", "claude")
+      new ProcessBuilder("cmd.exe", "/c", "start", "", "cmd.exe", "/k", claudeCommand)
           .directory(folder)
           .start();
     }
     else if (isMac()) {
-      String innerCommand = "cd '" + folder.getAbsolutePath() + "' && claude";
+      String innerCommand = "cd '" + folder.getAbsolutePath() + "' && '" + claudeCommand + "'";
       String appleScriptCommand = innerCommand.replace("\\", "\\\\").replace("\"", "\\\"");
       new ProcessBuilder("osascript", "-e",
           "tell application \"Terminal\" to do script \"" + appleScriptCommand + "\"")
@@ -173,7 +183,7 @@ public class SystemUtil {
     }
     else if (isLinux()) {
       new ProcessBuilder("x-terminal-emulator", "-e", "bash", "-c",
-          "cd '" + folder.getAbsolutePath() + "' && claude; exec bash")
+          "cd '" + folder.getAbsolutePath() + "' && '" + claudeCommand + "'; exec bash")
           .start();
     }
     else {
