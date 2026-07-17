@@ -9,7 +9,8 @@ import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.GroupElement;
 import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
+import de.a12.studio.ui.editors.dialogs.EditorDialogs;
+import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;
 import de.a12.studio.ui.util.SystemUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -59,12 +60,12 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   @FXML
   public void onSettings(ActionEvent e) {
-    Dialogs.openSettings();
+    EditorDialogs.openSettings();
   }
 
   @FXML
   public void onTypeDefinitions(ActionEvent e) {
-    Dialogs.openTypeDefinitions();
+    DocumentModelDialogs.openTypeDefinitions();
   }
 
   public void loadModel(@NonNull A12Model model) {

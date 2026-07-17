@@ -7,10 +7,10 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="GENERAL INFORMATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController">
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="GENERAL INFORMATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController">
  <BorderPane>
  <center>
   <GridPane hgap="16.0" vgap="8.0">
@@ -42,6 +42,9 @@
         <TextArea fx:id="descriptionArea" prefRowCount="4" wrapText="true" VBox.vgrow="ALWAYS" />
       </children>
     </VBox>
+            <rowConstraints>
+               <RowConstraints />
+            </rowConstraints>
   </GridPane>
  </center>
  </BorderPane>

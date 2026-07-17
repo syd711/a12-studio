@@ -23,6 +23,10 @@
     ],
     "annotations": [
       {
+        "name": "a",
+        "value": "b"
+      },
+      {
         "name": "roles",
         "value": "tester,reviewer"
       }
@@ -262,8 +266,7 @@
                             "name": "description",
                             "annotations": [
                               {
-                                "name": null,
-                                "value": null
+                                "name": null
                               }
                             ],
                             "Field": {

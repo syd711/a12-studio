@@ -7,9 +7,9 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="header" styleClass="dialog-header" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.commons.fx.DialogHeaderController">
+<BorderPane fx:id="header" styleClass="dialog-header" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.commons.fx.DialogHeaderController">
    <left>
-      <Label fx:id="titleLabel" text="A12 Studio" styleClass="header-title" BorderPane.alignment="TOP_LEFT">
+      <Label fx:id="titleLabel" text="A12 Studio" textFill="WHITE" BorderPane.alignment="TOP_LEFT">
          <font>
             <Font name="Impact" size="18.0" />
          </font>
@@ -24,7 +24,7 @@
    <right>
       <Button mnemonicParsing="false" onAction="#onCloseClick" prefHeight="24.0" prefWidth="24.0" styleClass="header-button" stylesheets="@stylesheet.css" BorderPane.alignment="CENTER">
          <graphic>
-            <FontIcon styleClass="header-icon" iconLiteral="mdi2w-window-close" iconSize="16" />
+            <FontIcon iconLiteral="mdi2w-window-close" iconSize="16" styleClass="header-icon" />
          </graphic>
          <BorderPane.margin>
             <Insets bottom="3.0" left="3.0" right="6.0" top="6.0" />

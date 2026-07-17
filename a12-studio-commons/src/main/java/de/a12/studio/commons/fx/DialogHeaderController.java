@@ -69,10 +69,18 @@ public class DialogHeaderController implements Initializable {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     header.setUserData(this);
     header.setOnMousePressed(event -> {
+      if (isResizeHelperInstalled()) {
+        // FXResizeHelper (installed after this dialog's stage was created) already handles
+        // drag-to-move via its Scene-level listeners - don't fight it with a second X/Y update.
+        return;
+      }
       xOffset = stage.getX() - event.getScreenX();
       yOffset = stage.getY() - event.getScreenY();
     });
     header.setOnMouseDragged(event -> {
+      if (isResizeHelperInstalled()) {
+        return;
+      }
       stage.setX(event.getScreenX() + xOffset);
       stage.setY(event.getScreenY() + yOffset);
     });
@@ -86,6 +94,10 @@ public class DialogHeaderController implements Initializable {
 
   public Stage getStage() {
     return stage;
+  }
+
+  private boolean isResizeHelperInstalled() {
+    return stage != null && stage.getUserData() instanceof FXResizeHelper;
   }
 
   public void setTitle(String title) {

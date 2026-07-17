@@ -6,8 +6,10 @@ import de.a12.studio.commons.fx.ConfirmationDialogWithOptionController;
 import de.a12.studio.commons.fx.ConfirmationResult;
 import de.a12.studio.commons.fx.DialogController;
 import de.a12.studio.commons.fx.DialogHeaderController;
+import de.a12.studio.commons.fx.Debouncer;
 import de.a12.studio.commons.fx.InputDialogController;
 import de.a12.studio.commons.fx.OutputDialogController;
+import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,6 +30,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -265,6 +268,9 @@ public class WidgetFactory {
     return stage;
   }
 
+  // shared across all dialogs so opening a dialog doesn't spin up a new executor thread each time
+  private static final Debouncer dialogPositionDebouncer = new Debouncer();
+
   public static Stage createDialogStage(Class clazz, Stage owner, String title, String fxml) {
     FXMLLoader fxmlLoader = new FXMLLoader(clazz.getResource(fxml));
     String stateId = FilenameUtils.getBaseName(fxml);
@@ -316,7 +322,45 @@ public class WidgetFactory {
       }
     });
 
+    restoreStagePosition(stateId, stage);
+    installStatePersistence(stateId, stage, controller);
+
     return stage;
+  }
+
+  private static void restoreStagePosition(String stateId, Stage stage) {
+    Rectangle position = LocalUISettings.getPosition(stateId);
+    if (position != null && position.getX() >= 0) {
+      stage.setX(position.getX());
+      stage.setY(position.getY());
+      if (position.getWidth() > 0) {
+        stage.setWidth(position.getWidth());
+      }
+      if (position.getHeight() > 0) {
+        stage.setHeight(position.getHeight());
+      }
+    }
+  }
+
+  private static void installStatePersistence(String stateId, Stage stage, DialogController controller) {
+    ChangeListener<Number> listener = (observable, oldValue, newValue) -> {
+      int x = (int) stage.getX();
+      int y = (int) stage.getY();
+      int width = (int) stage.getWidth();
+      int height = (int) stage.getHeight();
+      dialogPositionDebouncer.debounce(stateId, () -> {
+        if (width > 0 && height > 0) {
+          LocalUISettings.saveLocation(stateId, x, y, width, height);
+        }
+        if (controller != null) {
+          controller.onResized(x, y, width, height);
+        }
+      }, 500, true);
+    };
+    stage.xProperty().addListener(listener);
+    stage.yProperty().addListener(listener);
+    stage.widthProperty().addListener(listener);
+    stage.heightProperty().addListener(listener);
   }
 
   //---------------------------------------------

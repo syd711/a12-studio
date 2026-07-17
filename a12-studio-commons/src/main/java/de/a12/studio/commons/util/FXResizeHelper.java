@@ -78,18 +78,27 @@ public class FXResizeHelper {
     STAGE.setIconified(true);
   }
 
+  // tolerance for comparing stage size against screen bounds, to absorb DPI-scaling rounding
+  private static final double MAXIMIZED_EPSILON = 1.0;
+
   private static Screen getScreen(Stage stage) {
     double centerX = stage.getX() + stage.getWidth() / 2;
     double centerY = stage.getY() + stage.getHeight() / 2;
 
     ObservableList<Screen> screensForRectangle = Screen.getScreensForRectangle(centerX, centerY, 1, 1);
+    if (screensForRectangle.isEmpty()) {
+      return Screen.getPrimary();
+    }
     return screensForRectangle.getFirst();
   }
 
+  private static boolean isMaximized(Stage stage, Screen screen) {
+    return Math.abs(stage.getWidth() - screen.getVisualBounds().getWidth()) < MAXIMIZED_EPSILON
+        && Math.abs(stage.getHeight() - screen.getVisualBounds().getHeight()) < MAXIMIZED_EPSILON;
+  }
+
   public static boolean isMaximized(Stage stage) {
-    Screen screen = getScreen(stage);
-    return stage.getWidth() == screen.getVisualBounds().getWidth()
-        && stage.getHeight() == screen.getVisualBounds().getHeight();
+    return isMaximized(stage, getScreen(stage));
   }
 
   /**
@@ -99,8 +108,7 @@ public class FXResizeHelper {
   public boolean switchWindowedMode(MouseEvent e) {
     Screen screen = getScreen(STAGE);
 
-    boolean mIsMaximized = STAGE.getWidth() == screen.getVisualBounds().getWidth()
-        && STAGE.getHeight() == screen.getVisualBounds().getHeight();
+    boolean mIsMaximized = isMaximized(STAGE, screen);
 
     if (mIsMaximized) {
       STAGE.setX(mXStore);
@@ -131,8 +139,8 @@ public class FXResizeHelper {
         STAGE.setX(screenInsets.left);
       }
       else {
-        STAGE.setX(screen.getBounds().getMinX());
-        STAGE.setY(screen.getBounds().getMinY());
+        STAGE.setX(screen.getVisualBounds().getMinX());
+        STAGE.setY(screen.getVisualBounds().getMinY());
       }
 
 

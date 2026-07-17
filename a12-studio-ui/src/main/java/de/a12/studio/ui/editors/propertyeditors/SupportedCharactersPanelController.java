@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.commons.fx.Debouncer;
+import de.a12.studio.commons.util.JsonSettings;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModelContent;
@@ -15,7 +16,10 @@ import javafx.scene.control.TitledPane;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * Edits {@link ModelConfig#getSupportedCharacters()}. Not an {@link de.a12.studio.ui.editors.AbstractPropertyEditor}
@@ -65,13 +69,13 @@ public class SupportedCharactersPanelController implements Initializable {
     ModelConfig modelConfig = getModelConfig(model);
     updatingFromModel = true;
     try {
-      supportedCharactersField.setText(modelConfig != null ? modelConfig.getSupportedCharacters() : null);
+      supportedCharactersField.setText(modelConfig != null ? toText(modelConfig.getSupportedCharacters()) : "");
     } finally {
       updatingFromModel = false;
     }
   }
 
-  private void commitChange(String supportedCharacters) {
+  private void commitChange(String text) {
     if (model == null) {
       return;
     }
@@ -80,9 +84,43 @@ public class SupportedCharactersPanelController implements Initializable {
     if (modelConfig == null) {
       return;
     }
-    modelConfig.setSupportedCharacters(supportedCharacters);
+
+    // Invalid input (e.g. mid-edit, not yet valid JSON) is left uncommitted rather than written to the model.
+    List<String> parsed = parseText(text);
+    if (parsed == null) {
+      return;
+    }
+    modelConfig.setSupportedCharacters(parsed);
 
     debouncer.debounce(getClass().getSimpleName(), this::save, COMMIT_DEBOUNCE_MS, true);
+  }
+
+  private static String toText(List<String> supportedCharacters) {
+    if (supportedCharacters == null || supportedCharacters.isEmpty()) {
+      return "[]";
+    }
+    return supportedCharacters.stream()
+        .map(character -> JsonSettings.objectMapper.writeValueAsString(character))
+        .collect(Collectors.joining(", ", "[", "]"));
+  }
+
+  private static List<String> parseText(String text) {
+    if (text == null || text.isBlank()) {
+      return new ArrayList<>();
+    }
+    try {
+      List<?> raw = JsonSettings.objectMapper.readValue(text, List.class);
+      List<String> result = new ArrayList<>();
+      for (Object entry : raw) {
+        if (!(entry instanceof String value)) {
+          return null;
+        }
+        result.add(value);
+      }
+      return result;
+    } catch (RuntimeException e) {
+      return null;
+    }
   }
 
   private void save() {
