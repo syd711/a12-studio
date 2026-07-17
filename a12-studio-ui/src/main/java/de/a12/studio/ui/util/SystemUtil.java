@@ -6,8 +6,10 @@ import de.a12.studio.ui.Studio;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 import static de.a12.studio.commons.util.OSUtil.isLinux;
 import static de.a12.studio.commons.util.OSUtil.isMac;
@@ -176,6 +178,31 @@ public class SystemUtil {
     }
     else {
       throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os.name"));
+    }
+  }
+
+  /**
+   * Opens the given URL in the system's default web browser.
+   *
+   * @param url The URL to open.
+   */
+  public static void openUrl(String url) {
+    try {
+      if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        Desktop.getDesktop().browse(URI.create(url));
+      }
+      else if (isWindows()) {
+        new ProcessBuilder("cmd.exe", "/c", "start", "", url).start();
+      }
+      else if (isMac()) {
+        new ProcessBuilder("open", url).start();
+      }
+      else if (isLinux()) {
+        new ProcessBuilder("xdg-open", url).start();
+      }
+    }
+    catch (IOException e) {
+      log.error("Failed to open URL: " + e.getMessage(), e);
     }
   }
 

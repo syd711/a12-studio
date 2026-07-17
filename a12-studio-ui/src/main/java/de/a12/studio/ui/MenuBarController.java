@@ -118,6 +118,11 @@ public class MenuBarController implements Initializable {
     }
   }
 
+  @FXML
+  private void onAbout() {
+    SystemUtil.openUrl("https://github.com/syd711/a12-studio");
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     refreshRecentProjectsMenu();
