@@ -55,10 +55,10 @@ var
   Msg: String;
 begin
   Result := True;
-  while IsProcessRunning('A12-Studio.exe') or IsProcessRunning('A12-Studio-Server.exe') do
+  while IsProcessRunning('A12-Studio.exe') do
   begin
     Msg := 'A12 Studio is still running.' + #13#10 + #13#10 +
-           'Please close A12-Studio.exe and A12-Studio-Server.exe before continuing.' + #13#10 + #13#10 +
+           'Please close A12-Studio.exe before continuing.' + #13#10 + #13#10 +
            'Click Retry to check again, or Cancel to abort the installation.';
     case MsgBox(Msg, mbError, MB_RETRYCANCEL) of
       IDCANCEL:
@@ -79,13 +79,11 @@ Name: "{app}"; Permissions: users-full
 [Files]
 Source: "..\..\..\Output\A12-Studio\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "..\..\..\Output\A12-Studio\a12-studio-ui.jar"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
-Source: "..\..\..\Output\A12-Studio\A12-Studio-Server.exe"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "..\..\..\Output\A12-Studio\a12-studio-server.jar"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{autoprograms}\A12-Studio\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autoprograms}\A12-Studio\A12-Studio-Server.exe"; Filename: "{app}\A12-Studio-Server.exe"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]

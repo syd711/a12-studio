@@ -2,15 +2,20 @@ package de.a12.studio.ui;
 
 import de.a12.studio.commons.util.StudioFolderChooser;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 
 import java.io.File;
 import java.net.URL;
@@ -22,8 +27,14 @@ import java.util.ResourceBundle;
  */
 public class MenuBarController implements Initializable {
 
+  // No published a12-release-line concept exists yet for the Java stack; update by hand until one does.
+  private static final String A12_RELEASE_VERSION = "2025.06";
+
   @FXML
   private MenuBar menuBar;
+
+  @FXML
+  private MenuButton versionMenuButton;
 
   @FXML
   private Menu recentProjectsMenu;
@@ -102,6 +113,7 @@ public class MenuBarController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     refreshRecentProjectsMenu();
+    initializeVersionMenu();
 
     Platform.runLater(() -> {
       File lastFolderSelection = LocalUISettings.getLastFolderSelection();
@@ -109,5 +121,48 @@ public class MenuBarController implements Initializable {
         openProject(lastFolderSelection);
       }
     });
+  }
+
+  private void initializeVersionMenu() {
+    String studioVersion = studioVersion();
+    versionMenuButton.setText(studioVersion);
+
+    versionMenuButton.getItems().addAll(
+        versionHeaderItem("A12 Studio Version"),
+        versionValueItem(studioVersion),
+        new SeparatorMenuItem(),
+        versionHeaderItem("A12 Release Version"),
+        versionValueItem(A12_RELEASE_VERSION),
+        new SeparatorMenuItem(),
+        versionHeaderItem("Model Versions"));
+
+    for (ModelType modelType : ModelType.values()) {
+      versionMenuButton.getItems().add(versionValueItem(modelType.getDisplayName() + " " + modelType.getCurrentVersion()));
+    }
+  }
+
+  private String studioVersion() {
+    String version = getClass().getPackage().getImplementationVersion();
+    return version != null ? version : "dev";
+  }
+
+  private static CustomMenuItem versionHeaderItem(String text) {
+    Label label = new Label(text);
+    label.getStyleClass().add("version-menu-header");
+    return versionMenuItem(label);
+  }
+
+  private static CustomMenuItem versionValueItem(String text) {
+    Label label = new Label(text);
+    label.getStyleClass().add("version-menu-value");
+    return versionMenuItem(label);
+  }
+
+  private static CustomMenuItem versionMenuItem(Label label) {
+    CustomMenuItem item = new CustomMenuItem(label, false);
+    item.setHideOnClick(false);
+    // Marks read-only rows so CSS can suppress the standard hover/focus highlight for just this menu.
+    item.getStyleClass().add("version-menu-item");
+    return item;
   }
 }

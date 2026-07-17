@@ -43,6 +43,64 @@
 }
 
 /**
+ * Toolbar icon buttons on dark surfaces (e.g. the menu bar's right panel) -
+ * white icon/text on a dark background, mirroring .default-button.
+ */
+.menu-bar-button {
+    -fx-background-color: -fx-menu-bar-color;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 0;
+    -fx-pref-width: 34px;
+    -fx-pref-height: 34px;
+    -fx-min-width: 34px;
+    -fx-min-height: 34px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.menu-bar-button:hover {
+    -fx-background-color: derive(-fx-menu-bar-color, 30%);
+}
+
+.menu-bar-button .toolbar-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}
+
+/**
+ * Version menu button (right panel) - text variant of .menu-bar-button,
+ * sized to fit its version label instead of being icon-only square.
+ */
+.version-menu-button {
+    -fx-background-color: -fx-menu-bar-color;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 0;
+    -fx-padding: 0 10px;
+    -fx-pref-height: 34px;
+    -fx-min-height: 34px;
+    -fx-cursor: hand;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.version-menu-button:hover {
+    -fx-background-color: derive(-fx-menu-bar-color, 30%);
+}
+
+.version-menu-button .label {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.version-menu-button .arrow {
+    -fx-background-color: -fx-text-color-inverse;
+}
+
+.version-menu-button .toolbar-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}
+
+/**
  * Primary action button (e.g. "+ Add")
  */
 .primary-button {

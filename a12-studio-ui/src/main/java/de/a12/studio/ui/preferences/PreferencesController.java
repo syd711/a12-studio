@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -26,6 +27,9 @@ public class PreferencesController implements Initializable {
   @FXML
   private StackPane contentStack;
 
+  @FXML
+  private VBox projectSettingsNav;
+
   private final Map<String, Parent> pages = new HashMap<>();
 
   private Button selectedButton;
@@ -34,6 +38,11 @@ public class PreferencesController implements Initializable {
 
   public void setOnCloseRequested(Runnable onCloseRequested) {
     this.onCloseRequested = onCloseRequested;
+  }
+
+  public void setProjectOpen(boolean projectOpen) {
+    projectSettingsNav.setVisible(projectOpen);
+    projectSettingsNav.setManaged(projectOpen);
   }
 
   @Override

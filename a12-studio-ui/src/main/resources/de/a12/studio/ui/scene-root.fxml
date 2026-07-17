@@ -17,7 +17,7 @@
                   <fx:include fx:id="menuBar" source="scene-menu-bar.fxml" BorderPane.alignment="CENTER" />
                </top>
                <center>
-                  <StackPane fx:id="main" styleClass="dark-panel" BorderPane.alignment="CENTER">
+                  <StackPane fx:id="main" BorderPane.alignment="CENTER">
                      <children>
                         <BorderPane prefHeight="200.0" prefWidth="200.0">
                            <center>

@@ -33,6 +33,46 @@
 }
 
 /**
+ * Version menu popup (versionMenuButton in scene-menu-bar.fxml) - read-only
+ * section headers/values rendered via CustomMenuItem, styled to override the
+ * generic .menu-item .label rule above (equal specificity, later wins).
+ */
+.menu-item .version-menu-header {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-secondary;
+    -fx-padding: 6px 12px 2px 12px;
+}
+
+.menu-item .version-menu-value {
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+    -fx-text-fill: -fx-text-color;
+    -fx-padding: 2px 12px 2px 24px;
+}
+
+/**
+ * These rows are read-only, not actionable, so suppress the standard blue
+ * hover/focus highlight - scoped to .version-menu-item only, other menus keep it.
+ * Selectors are one class more specific than the generic .menu-item:hover rules
+ * above so they win regardless of stylesheet order.
+ */
+.menu-item.version-menu-item:hover,
+.menu-item.version-menu-item:focused {
+    -fx-background-color: transparent;
+}
+
+.menu-item.version-menu-item:hover .version-menu-header,
+.menu-item.version-menu-item:focused .version-menu-header {
+    -fx-text-fill: -fx-text-secondary;
+}
+
+.menu-item.version-menu-item:hover .version-menu-value,
+.menu-item.version-menu-item:focused .version-menu-value {
+    -fx-text-fill: -fx-text-color;
+}
+
+/**
  * Right-side panel of the menu bar row (e.g. Preferences button) - shares the
  * menu bar's background so the row reads as one continuous panel.
  */

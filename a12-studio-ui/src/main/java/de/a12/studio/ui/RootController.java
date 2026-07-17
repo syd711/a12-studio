@@ -78,6 +78,7 @@ public class RootController implements Initializable, StudioEventListener {
   @Override
   public void projectClosed(@NonNull ProjectClosedEvent event) {
     this.mainSplitPane.setVisible(false);
+    this.project = null;
   }
 
   public void setTitle(String s) {
@@ -95,6 +96,7 @@ public class RootController implements Initializable, StudioEventListener {
       Parent preferencesRoot = loader.load();
       PreferencesController controller = loader.getController();
       controller.setOnCloseRequested(() -> rootStack.getChildren().remove(preferencesRoot));
+      controller.setProjectOpen(project != null);
       controller.showSection(event.getSection());
       rootStack.getChildren().add(preferencesRoot);
     }
