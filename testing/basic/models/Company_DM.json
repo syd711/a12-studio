@@ -23,12 +23,12 @@
     ],
     "annotations": [
       {
-        "name": "a",
-        "value": "b"
-      },
-      {
         "name": "roles",
         "value": "tester,reviewer"
+      },
+      {
+        "name": "application",
+        "value": "dsfd"
       }
     ],
     "modelReferences": []
@@ -43,7 +43,8 @@
       "decimalSeparator": ".",
       "conditionLanguage": {
         "code": "en_US"
-      }
+      },
+      "supportedCharacters": []
     },
     "modelRoot": {
       "rootGroups": [
@@ -266,7 +267,8 @@
                             "name": "description",
                             "annotations": [
                               {
-                                "name": null
+                                "name": null,
+                                "value": null
                               }
                             ],
                             "Field": {

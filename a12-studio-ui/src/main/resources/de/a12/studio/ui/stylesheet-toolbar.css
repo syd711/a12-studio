@@ -38,6 +38,11 @@
     -fx-background-color: -fx-panel-color;
 }
 
+.tool-bar.footer-toolbar {
+    -fx-background-color: -fx-panel-color;
+    -fx-border-radius: 0 0 6px 6px;
+}
+
 .tool-bar.panel-toolbar .search-field {
     -fx-background-color: white;
 }

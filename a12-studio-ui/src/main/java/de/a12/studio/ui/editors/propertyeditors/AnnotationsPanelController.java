@@ -26,6 +26,7 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,6 +39,9 @@ import java.util.Optional;
  * exclusive.
  */
 public class AnnotationsPanelController extends AbstractPropertyEditor {
+
+  // Managed separately by RoleEditorPanelController; hidden here so it isn't shown/edited twice.
+  private static final String ROLES_ANNOTATION_NAME = "roles";
 
   @FXML
   private GridPane annotationsGrid;
@@ -69,7 +73,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    getAnnotations().add(new Annotation());
+    getBackingAnnotations().add(new Annotation());
     rebuildRows();
     commitChange();
   }
@@ -79,8 +83,23 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     StudioEventManager.getInstance().firePreferencesOpenRequestedEvent(PreferencesOpenRequestedEvent.Section.ANNOTATION_SETS);
   }
 
-  private List<Annotation> getAnnotations() {
+  private List<Annotation> getBackingAnnotations() {
     return model != null ? model.getAnnotations() : element.getAnnotations();
+  }
+
+  // Excludes the "roles" annotation in header mode; it is edited via RoleEditorPanelController instead.
+  private List<Annotation> getAnnotations() {
+    List<Annotation> backing = getBackingAnnotations();
+    if (model == null) {
+      return backing;
+    }
+    List<Annotation> visible = new ArrayList<>();
+    for (Annotation annotation : backing) {
+      if (!ROLES_ANNOTATION_NAME.equals(annotation.getName())) {
+        visible.add(annotation);
+      }
+    }
+    return visible;
   }
 
   private void rebuildRows() {
@@ -205,7 +224,8 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
       Annotation copy = new Annotation();
       copy.setName(annotation.getName());
       copy.setValue(annotation.getValue());
-      getAnnotations().add(index + 1, copy);
+      List<Annotation> backing = getBackingAnnotations();
+      backing.add(backing.indexOf(annotation) + 1, copy);
       addSuggestionName(copy.getName(), copy.getValue());
       rebuildRows();
       commitChange();
@@ -214,7 +234,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this annotation?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
-        getAnnotations().remove(index);
+        getBackingAnnotations().remove(annotation);
         removeSuggestionName(annotation.getName());
         rebuildRows();
         commitChange();
@@ -227,8 +247,11 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   }
 
   private void moveRow(int fromIndex, int toIndex) {
-    List<Annotation> annotations = getAnnotations();
-    annotations.add(toIndex, annotations.remove(fromIndex));
+    List<Annotation> visible = getAnnotations();
+    Annotation moved = visible.get(fromIndex);
+    Annotation neighbor = visible.get(toIndex);
+    List<Annotation> backing = getBackingAnnotations();
+    Collections.swap(backing, backing.indexOf(moved), backing.indexOf(neighbor));
     rebuildRows();
     commitChange();
   }

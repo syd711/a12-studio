@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.dialogs.TypeDefinitionSettingsDialog">
     <top>
@@ -18,7 +19,11 @@
          <top>
             <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
               <items>
-                <Button mnemonicParsing="false" text="Button" />
+                <Button mnemonicParsing="false" styleClass="primary-button" text="Add">
+                     <graphic>
+                        <FontIcon fill="WHITE" iconColor="WHITE" iconLiteral="mdi2p-plus-circle" iconSize="18" />
+                     </graphic></Button>
+                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="default-button" text="Button" />
               </items>
             </ToolBar>
          </top>
@@ -27,9 +32,9 @@
                <items>
                   <TableView>
                     <columns>
-                      <TableColumn prefWidth="75.0" text="Name" />
-                      <TableColumn prefWidth="75.0" text="Base Type" />
-                        <TableColumn prefWidth="75.0" text="Source" />
+                      <TableColumn prefWidth="75.0" text="NAME" />
+                      <TableColumn prefWidth="75.0" text="BASE TYPE" />
+                        <TableColumn prefWidth="75.0" text="SOURCE" />
                     </columns>
                   </TableView>
                   <ScrollPane prefHeight="200.0" prefWidth="200.0">
