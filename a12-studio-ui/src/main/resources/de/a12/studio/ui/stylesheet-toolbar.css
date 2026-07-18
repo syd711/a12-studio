@@ -18,7 +18,7 @@
     -fx-text-fill: -fx-text-color-inverse;
 }
 
-.header-icon {
+.ikonli-font-icon.header-icon {
     -fx-icon-color: -fx-text-color-inverse;
 }
 
@@ -40,6 +40,7 @@
 
 .tool-bar.footer-toolbar {
     -fx-background-color: -fx-panel-color;
+    -fx-background-radius: 0 0 6px 6px;
     -fx-border-radius: 0 0 6px 6px;
 }
 

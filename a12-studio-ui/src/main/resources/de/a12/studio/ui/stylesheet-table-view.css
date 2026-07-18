@@ -6,7 +6,6 @@
     -fx-background-color: -fx-input-bg;
     -fx-border-color: -fx-border-color-theme;
     -fx-border-width: 1px;
-    -fx-border-radius: 10px;
     -fx-background-radius: 10px;
     -fx-table-cell-border-color: -fx-border-divider;
 }

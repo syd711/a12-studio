@@ -38,7 +38,12 @@
     -fx-text-fill: -fx-text-color-inverse;
 }
 
-.header-icon {
+.dialog-header-title {
+    -fx-font-family: "Impact";
+    -fx-font-size: 18px;
+}
+
+.ikonli-font-icon.header-icon {
     -fx-icon-color: -fx-text-color-inverse;
 }
 
@@ -105,7 +110,7 @@
     -fx-text-fill: -fx-text-color-inverse;
 }
 
-.header-icon {
+.ikonli-font-icon.header-icon {
     -fx-icon-color: -fx-text-color-inverse;
 }
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
@@ -15,7 +16,7 @@
         <fx:include fx:id="header" source="/de/a12/studio/commons/fx/scene-dialog-header.fxml" />
     </top>
    <center>
-      <BorderPane BorderPane.alignment="CENTER">
+      <BorderPane styleClass="properties-panel" BorderPane.alignment="CENTER">
          <top>
             <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
               <items>
@@ -47,4 +48,15 @@
          </center>
       </BorderPane>
    </center>
+   <bottom>
+      <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="panel-toolbar" BorderPane.alignment="CENTER">
+        <items>
+          <Button mnemonicParsing="false" text="Button" />
+        </items>
+      </ToolBar>
+   </bottom>
+   <styleClass>
+      <String fx:value="root" />
+      <String fx:value="main" />
+   </styleClass>
 </BorderPane>

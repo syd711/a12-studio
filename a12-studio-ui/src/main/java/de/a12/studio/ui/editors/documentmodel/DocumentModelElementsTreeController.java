@@ -27,6 +27,7 @@ import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
 import de.a12.studio.ui.editors.util.commandstack.Command;
 import de.a12.studio.ui.editors.util.commandstack.CommandStack;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -41,6 +42,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -49,6 +51,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -264,6 +267,11 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       }
     });
     elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());
+    elementsTreeTable.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.DELETE) {
+        onDeleteKeyPressed();
+      }
+    });
     elementsTreeTable.setRowFactory(treeTable -> new TreeTableRow<>() {
       @Override
       protected void updateItem(ElementViewModel item, boolean empty) {
@@ -345,6 +353,25 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     deleteItem.setOnAction(event -> onDeleteModelItem());
     items.add(deleteItem);
     return items;
+  }
+
+  private void onDeleteKeyPressed() {
+    List<TreeItem<ElementViewModel>> selection =
+        new ArrayList<>(elementsTreeTable.getSelectionModel().getSelectedItems());
+    if (selection.isEmpty()) {
+      return;
+    }
+
+    boolean hasChildren = topLevelSelection(selection).stream().anyMatch(treeItem -> !treeItem.getChildren().isEmpty());
+    if (hasChildren) {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
+          "Delete the selected element(s)?", "Child elements will be deleted as well.", null, "Delete");
+      if (result.isEmpty() || result.get() != ButtonType.OK) {
+        return;
+      }
+    }
+
+    onDeleteModelItem();
   }
 
   private void onDeleteModelItem() {
