@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.commons.fx.Debouncer;
-import de.a12.studio.commons.util.JsonSettings;
+import de.a12.studio.ui.util.Debouncer;
+import de.a12.studio.dataservices.util.JsonSettings;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModelContent;
 import de.a12.studio.dataservices.models.documentmodel.ModelConfig;

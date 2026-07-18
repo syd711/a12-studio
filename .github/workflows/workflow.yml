@@ -19,6 +19,9 @@ jobs:
   build:
     name: Packaging
     runs-on: windows-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Install Inno Setup
         run: choco install innosetup --yes
@@ -49,3 +52,14 @@ jobs:
           name: A12-Studio-Installer-${{ steps.project.outputs.version }}
           path: |
             ./Output/A12-Studio/A12-Studio-Full-Installer-*.exe
+            ./Output/A12-Studio/A12-Studio.exe
+
+      - name: Draft Release
+        uses: softprops/action-gh-release@v3
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+        with:
+          draft: true
+          tag_name: ${{ steps.project.outputs.version }}
+          files: |
+            ./Output/A12-Studio/A12-Studio-Full-Installer-*.exe
+            ./Output/A12-Studio/A12-Studio.exe

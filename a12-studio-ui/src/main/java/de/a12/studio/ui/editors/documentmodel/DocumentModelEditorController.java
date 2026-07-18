@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors.documentmodel;
 
-import de.a12.studio.commons.util.localsettings.BaseTableSettings;
-import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.ui.util.localsettings.BaseTableSettings;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;

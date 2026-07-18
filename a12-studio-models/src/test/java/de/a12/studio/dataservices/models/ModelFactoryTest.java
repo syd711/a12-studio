@@ -1,6 +1,7 @@
 package de.a12.studio.dataservices.models;
 
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
+import de.a12.studio.dataservices.models.overviewmodel.OverviewModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +20,15 @@ class ModelFactoryTest {
 
     DocumentModel documentModel = assertInstanceOf(DocumentModel.class, model);
     assertEquals("Company_DM", documentModel.getId());
+  }
+
+  @Test
+  void loadsSupportedOverviewModel() {
+    File file = resource("/typedefinitionmodel/Company_OM.json");
+    A12Model model = ModelFactory.load(new ProjectItem(file));
+
+    OverviewModel overviewModel = assertInstanceOf(OverviewModel.class, model);
+    assertEquals("Company_OM", overviewModel.getId());
   }
 
   @Test

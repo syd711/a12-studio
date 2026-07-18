@@ -20,7 +20,6 @@ configurations.all {
 }
 
 dependencies {
-    implementation project(':a12-studio-commons')
     implementation project(':a12-studio-models')
 
     implementation("com.mgmtp.a12.kernel:kernel-md-facade:30.8.1")

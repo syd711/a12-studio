@@ -4,6 +4,8 @@ import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.Locale;
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.FieldElement;
+import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
+import de.a12.studio.dataservices.models.documentmodel.StringTypeOptions;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -36,6 +38,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   private Function<Element, List<de.a12.studio.dataservices.models.Label>> elementTextsAccessor = Element::getExternalDescription;
 
+  private Function<Element, List<de.a12.studio.dataservices.models.Label>> elementTextsWriteAccessor = elementTextsAccessor;
+
   private Function<A12Model, List<de.a12.studio.dataservices.models.Label>> modelTextsAccessor = A12Model::getLabels;
 
   private String fieldKey = "external";
@@ -44,6 +48,11 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   public void configureInternal() {
     configure(Element::getInternalDescription, "internal", "DESCRIPTION (INTERNAL)");
+  }
+
+  public void configureErrorMessages() {
+    configure(LocalizedTextPanelController::getErrorMessages, LocalizedTextPanelController::getOrCreateErrorMessages, "errorMessages",
+        "ERROR MESSAGES");
   }
 
   public void configureExternal() {
@@ -66,7 +75,13 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   private void configure(Function<Element, List<de.a12.studio.dataservices.models.Label>> textsAccessor, String fieldKey, String title) {
-    this.elementTextsAccessor = textsAccessor;
+    configure(textsAccessor, textsAccessor, fieldKey, title);
+  }
+
+  private void configure(Function<Element, List<de.a12.studio.dataservices.models.Label>> readAccessor,
+      Function<Element, List<de.a12.studio.dataservices.models.Label>> writeAccessor, String fieldKey, String title) {
+    this.elementTextsAccessor = readAccessor;
+    this.elementTextsWriteAccessor = writeAccessor;
     this.fieldKey = fieldKey;
     setTitle(title);
     setSettingsKeySuffix("." + fieldKey);
@@ -124,8 +139,12 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     });
   }
 
+  private List<de.a12.studio.dataservices.models.Label> getWriteTexts() {
+    return model != null ? modelTextsAccessor.apply(model) : elementTextsWriteAccessor.apply(element);
+  }
+
   private void setLocaleText(String localeCode, String value) {
-    List<de.a12.studio.dataservices.models.Label> texts = getTexts();
+    List<de.a12.studio.dataservices.models.Label> texts = getWriteTexts();
     Optional<de.a12.studio.dataservices.models.Label> existing = texts.stream()
         .filter(label -> localeCode.equals(label.getLocale()))
         .findFirst();
@@ -151,6 +170,34 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
       return fieldElement.getField().getLabel();
     }
     return List.of();
+  }
+
+  private static List<de.a12.studio.dataservices.models.Label> getErrorMessages(Element element) {
+    StringTypeOptions options = getStringTypeOptions(element).orElse(null);
+    return options != null ? options.getErrorMessage() : List.of();
+  }
+
+  private static List<de.a12.studio.dataservices.models.Label> getOrCreateErrorMessages(Element element) {
+    if (element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() instanceof StringFieldType stringFieldType) {
+      StringTypeOptions options = stringFieldType.getStringType();
+      if (options == null) {
+        options = new StringTypeOptions();
+        stringFieldType.setStringType(options);
+      }
+      return options.getErrorMessage();
+    }
+    return List.of();
+  }
+
+  private static Optional<StringTypeOptions> getStringTypeOptions(Element element) {
+    if (element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() instanceof StringFieldType stringFieldType) {
+      return Optional.ofNullable(stringFieldType.getStringType());
+    }
+    return Optional.empty();
   }
 
   private List<Locale> getModelLocales() {

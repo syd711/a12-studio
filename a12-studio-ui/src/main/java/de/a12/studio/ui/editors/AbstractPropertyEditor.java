@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors;
 
-import de.a12.studio.commons.fx.Debouncer;
-import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.ui.util.Debouncer;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.Element;

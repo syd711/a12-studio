@@ -1,6 +1,6 @@
 package de.a12.studio.dataservices.projects;
 
-import de.a12.studio.commons.util.JsonSettings;
+import de.a12.studio.dataservices.util.JsonSettings;
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.ModelFactory;
 import lombok.Getter;

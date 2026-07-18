@@ -133,6 +133,17 @@
 }
 
 /*
+ * The element name is rendered via a Label set as the cell's graphic (see
+ * ElementNameTreeCell), not as the cell's own text. -fx-text-fill on .tree-table-cell
+ * above does not cascade into that child Label, so it needs its own override here.
+ */
+#elementsTreeTable .tree-table-row-cell:filled:selected .tree-table-cell .tree-cell-name-label,
+#elementsTreeTable .tree-table-row-cell:filled:selected:focused .tree-table-cell .tree-cell-name-label,
+#elementsTreeTable .tree-table-row-cell:filled:selected:hover .tree-table-cell .tree-cell-name-label {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+/*
  * Leaf elements (fields/rules) inside attachment/multi-select groups have a fixed
  * structure - they can't be added to or removed independently. A soft tint marks
  * them as behaving differently from regular, freely editable elements.

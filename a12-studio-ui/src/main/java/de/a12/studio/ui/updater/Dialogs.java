@@ -1,6 +1,6 @@
 package de.a12.studio.ui.updater;
 
-import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.Studio;
 import javafx.stage.Stage;
 

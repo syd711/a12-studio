@@ -1,6 +1,5 @@
 package de.a12.studio.ui.updater;
 
-import de.a12.studio.commons.Updater;
 import de.a12.studio.ui.util.StudioVersion;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;

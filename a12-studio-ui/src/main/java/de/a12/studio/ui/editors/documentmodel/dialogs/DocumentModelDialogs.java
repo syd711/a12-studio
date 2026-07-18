@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors.documentmodel.dialogs;
 
-import de.a12.studio.commons.util.FXResizeHelper;
-import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.ui.util.FXResizeHelper;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.Studio;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;

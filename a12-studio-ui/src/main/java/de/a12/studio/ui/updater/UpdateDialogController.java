@@ -1,6 +1,6 @@
 package de.a12.studio.ui.updater;
 
-import de.a12.studio.commons.fx.DialogController;
+import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.util.StudioVersion;
 import javafx.application.Platform;
 import javafx.concurrent.Service;

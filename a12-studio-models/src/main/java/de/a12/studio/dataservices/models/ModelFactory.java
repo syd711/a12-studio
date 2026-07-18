@@ -1,7 +1,8 @@
 package de.a12.studio.dataservices.models;
 
-import de.a12.studio.commons.util.JsonSettings;
+import de.a12.studio.dataservices.util.JsonSettings;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
+import de.a12.studio.dataservices.models.overviewmodel.OverviewModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -29,6 +30,7 @@ public class ModelFactory {
       ModelType modelType = ModelType.fromValue(modelTypeValue);
       return switch (modelType) {
         case DOCUMENT -> JsonSettings.objectMapper.treeToValue(root, DocumentModel.class);
+        case OVERVIEW -> JsonSettings.objectMapper.treeToValue(root, OverviewModel.class);
         default -> {
           log.warn("Model type '{}' of '{}' is not supported yet", modelType, projectItem.getPath());
           yield null;

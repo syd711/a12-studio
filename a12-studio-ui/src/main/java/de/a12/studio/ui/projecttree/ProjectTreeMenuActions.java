@@ -1,8 +1,8 @@
 package de.a12.studio.ui.projecttree;
 
-import de.a12.studio.commons.util.StudioFolderChooser;
-import de.a12.studio.commons.util.WidgetFactory;
-import de.a12.studio.commons.util.zip.ZipUtil;
+import de.a12.studio.ui.components.StudioFolderChooser;
+import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.ui.util.zip.ZipUtil;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.NewModelFactory;
 import de.a12.studio.dataservices.projects.ProjectItem;

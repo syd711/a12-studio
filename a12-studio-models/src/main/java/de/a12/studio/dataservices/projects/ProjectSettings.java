@@ -36,7 +36,7 @@ public class ProjectSettings {
   }
 
   public static ProjectSettings load(@NonNull File projectFolder) {
-    File settingsFolder = de.a12.studio.commons.util.JsonSettings.resolveSettingsFolder(projectFolder, SETTINGS_FOLDER_NAME);
+    File settingsFolder = de.a12.studio.dataservices.util.JsonSettings.resolveSettingsFolder(projectFolder, SETTINGS_FOLDER_NAME);
 
     UISettings uiSettings = UISettings.load();
     JsonSettings jsonSettings = JsonSettings.load();

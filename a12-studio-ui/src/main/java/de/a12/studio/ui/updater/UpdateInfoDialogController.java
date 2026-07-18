@@ -1,6 +1,6 @@
 package de.a12.studio.ui.updater;
 
-import de.a12.studio.commons.fx.DialogController;
+import de.a12.studio.ui.components.DialogController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

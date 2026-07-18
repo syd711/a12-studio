@@ -1,7 +1,7 @@
 package de.a12.studio.ui;
 
-import de.a12.studio.commons.util.StudioFolderChooser;
-import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.ui.components.StudioFolderChooser;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.settings.JsonSettings;

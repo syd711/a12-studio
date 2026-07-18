@@ -29,14 +29,16 @@ javafx {
 }
 
 dependencies {
-    implementation project(':a12-studio-commons')
     implementation project(':a12-studio-models')
     implementation project(':a12-studio-data-services')
     implementation 'org.slf4j:slf4j-api:2.0.17'
     implementation 'ch.qos.logback:logback-classic:1.5.32'
+    implementation 'commons-io:commons-io:2.22.0'
+    implementation 'org.apache.commons:commons-lang3:3.16.0'
     implementation 'tools.jackson.core:jackson-databind:3.1.4'
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0'
+    implementation 'org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.4.0'
 
     testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

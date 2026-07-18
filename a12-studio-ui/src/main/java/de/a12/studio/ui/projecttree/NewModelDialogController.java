@@ -1,7 +1,7 @@
 package de.a12.studio.ui.projecttree;
 
-import de.a12.studio.commons.fx.DialogController;
-import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.dataservices.models.ModelType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

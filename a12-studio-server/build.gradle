@@ -10,7 +10,6 @@ application {
 }
 
 dependencies {
-    implementation project(':a12-studio-commons')
     implementation project(':a12-studio-data-services')
     implementation 'org.springframework.boot:spring-boot-starter-web'
 

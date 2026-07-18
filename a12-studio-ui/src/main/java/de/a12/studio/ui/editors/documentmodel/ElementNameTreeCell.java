@@ -1,6 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel;
 
-import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.Icons;
 import javafx.geometry.Pos;
 import javafx.scene.Node;

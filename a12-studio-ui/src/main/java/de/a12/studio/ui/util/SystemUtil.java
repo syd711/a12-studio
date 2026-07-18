@@ -1,7 +1,6 @@
 package de.a12.studio.ui.util;
 
 
-import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.ui.Studio;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -11,9 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
-import static de.a12.studio.commons.util.OSUtil.isLinux;
-import static de.a12.studio.commons.util.OSUtil.isMac;
-import static de.a12.studio.commons.util.OSUtil.isWindows;
+import static de.a12.studio.ui.util.OSUtil.isLinux;
+import static de.a12.studio.ui.util.OSUtil.isMac;
+import static de.a12.studio.ui.util.OSUtil.isWindows;
 
 @Slf4j
 public class SystemUtil {

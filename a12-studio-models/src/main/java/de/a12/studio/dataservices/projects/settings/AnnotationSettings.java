@@ -1,6 +1,6 @@
 package de.a12.studio.dataservices.projects.settings;
 
-import de.a12.studio.commons.util.JsonSettings;
+import de.a12.studio.dataservices.util.JsonSettings;
 import org.jspecify.annotations.NonNull;
 
 import java.io.File;

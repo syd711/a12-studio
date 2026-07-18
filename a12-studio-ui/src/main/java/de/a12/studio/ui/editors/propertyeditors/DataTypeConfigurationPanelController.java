@@ -1,11 +1,12 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.FieldElement;
 import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
 import de.a12.studio.dataservices.models.documentmodel.StringTypeOptions;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
@@ -46,6 +47,10 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     bindTextField(patternField, (element, value) -> withStringTypeOptions(element, options -> options.setPattern(value.isEmpty() ? null : value)));
     bindCheckBox(lineBreaksCheckBox, (element, value) -> withStringTypeOptions(element, options -> options.setLineBreaksPermitted(value ? true : null)));
     bindCheckBox(alphabeticalSortingCheckBox, (element, value) -> withStringTypeOptions(element, options -> options.setAlphabeticalSorting(value ? true : null)));
+  }
+
+  public ReadOnlyStringProperty patternProperty() {
+    return patternField.textProperty();
   }
 
   @Override

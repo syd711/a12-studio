@@ -13,7 +13,7 @@ import com.mgmtp.a12.kernel.md.model.a12internal.visitor.DocumentModelVisitor;
 import com.mgmtp.a12.kernel.md.model.a12internal.visitor.DocumentModelWalker;
 import com.mgmtp.a12.kernel.md.model.api.visitor.DocumentModelWalker.VisitProcess;
 import com.mgmtp.a12.model.notification.Severity;
-import de.a12.studio.commons.util.JsonSettings;
+import de.a12.studio.dataservices.util.JsonSettings;
 import de.a12.studio.dataservices.services.support.DocumentModelSupport;
 import de.a12.studio.dataservices.services.support.InMemoryDocumentModelReferenceResolver;
 

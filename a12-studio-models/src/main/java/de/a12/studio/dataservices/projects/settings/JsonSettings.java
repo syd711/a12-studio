@@ -2,7 +2,7 @@ package de.a12.studio.dataservices.projects.settings;
 
 import java.io.File;
 
-public class JsonSettings extends de.a12.studio.commons.util.JsonSettings {
+public class JsonSettings extends de.a12.studio.dataservices.util.JsonSettings {
 
   static final String SETTINGS_FOLDER_NAME = ".a12-studio";
 
@@ -55,6 +55,6 @@ public class JsonSettings extends de.a12.studio.commons.util.JsonSettings {
 
   public static JsonSettings load() {
     File homeFolder = resolveSettingsFolder(new File(System.getProperty("user.home")), SETTINGS_FOLDER_NAME);
-    return de.a12.studio.commons.util.JsonSettings.load(new File(homeFolder, SETTINGS_FILE_NAME), JsonSettings.class);
+    return de.a12.studio.dataservices.util.JsonSettings.load(new File(homeFolder, SETTINGS_FILE_NAME), JsonSettings.class);
   }
 }

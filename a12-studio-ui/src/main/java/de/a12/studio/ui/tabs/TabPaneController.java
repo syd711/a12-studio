@@ -1,6 +1,6 @@
 package de.a12.studio.ui.tabs;
 
-import de.a12.studio.commons.util.WidgetFactory;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;

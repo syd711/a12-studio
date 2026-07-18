@@ -1,8 +1,8 @@
 package de.a12.studio.ui;
 
-import de.a12.studio.commons.fx.Debouncer;
-import de.a12.studio.commons.util.FXResizeHelper;
-import de.a12.studio.commons.util.localsettings.LocalUISettings;
+import de.a12.studio.ui.util.Debouncer;
+import de.a12.studio.ui.util.FXResizeHelper;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
