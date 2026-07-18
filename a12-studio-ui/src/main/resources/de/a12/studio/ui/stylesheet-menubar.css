@@ -23,8 +23,8 @@
 
 .menu-item:hover .menu-icon,
 .menu-item:focused .menu-icon {
-    -fx-icon-color: white;
-    -fx-text-fill: white;
+    -fx-icon-color: white !important;
+    -fx-text-fill: white !important;
 }
 
 .menu-item:hover .label,

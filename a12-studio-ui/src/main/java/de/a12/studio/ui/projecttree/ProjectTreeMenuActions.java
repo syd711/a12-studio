@@ -8,6 +8,7 @@ import de.a12.studio.dataservices.models.NewModelFactory;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.projecttree.NewModelDialogController.NewModelInput;
 import de.a12.studio.ui.util.Icons;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -43,8 +44,10 @@ public class ProjectTreeMenuActions {
     Menu newMenu = new Menu("_New...");
     MenuItem newFolder = new MenuItem("_Folder");
     newFolder.setOnAction(event -> onCreateNewFolder(projectItem));
+    newFolder.setGraphic(withMenuIconStyle(WidgetFactory.createIcon("mdi2f-folder-plus-outline")));
     MenuItem newModel = new MenuItem("_Model");
     newModel.setOnAction(event -> onCreateNewModel(projectItem));
+    newModel.setGraphic(withMenuIconStyle(WidgetFactory.createIcon("mdi2f-file-document-plus-outline")));
     newMenu.getItems().addAll(newFolder, newModel);
 
     MenuItem open = new MenuItem("_Open");
@@ -56,21 +59,26 @@ public class ProjectTreeMenuActions {
     rename.setOnAction(event -> onRenameItem(projectItem));
 
     MenuItem createCopy = new MenuItem("_Create Copy");
-    createCopy.setGraphic(WidgetFactory.createIcon(Icons.COPY));
+    createCopy.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.COPY)));
     createCopy.setDisable(projectItem.isRoot());
     createCopy.setOnAction(event -> onCreateCopy(projectItem));
 
     MenuItem zipFolder = new MenuItem("_Zip Folder");
-    zipFolder.setGraphic(WidgetFactory.createIcon(Icons.ZIP));
+    zipFolder.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.ZIP)));
     zipFolder.setVisible(projectItem.isRoot());
     zipFolder.setOnAction(event -> onZipFolder(projectItem));
 
     MenuItem delete = new MenuItem("_Delete");
-    delete.setGraphic(WidgetFactory.createIcon(Icons.TRASH));
+    delete.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.TRASH)));
     delete.setDisable(projectItem.isRoot());
     delete.setOnAction(event -> onDeleteItem(projectItem));
 
     return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
+  }
+
+  private static Node withMenuIconStyle(@NonNull Node icon) {
+    icon.getStyleClass().add("menu-icon");
+    return icon;
   }
 
   void onCreateNewFolder(@NonNull ProjectItem parent) {
