@@ -23,7 +23,8 @@ public abstract class JsonSettings {
   public enum SettingsType {
     AI,
     UI,
-    ANNOTATION
+    ANNOTATION,
+    PREVIEW
   }
 
   public final static ObjectMapper objectMapper;

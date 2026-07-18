@@ -5,6 +5,7 @@ import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -44,6 +45,14 @@ public class ModelSettingsNamePanelController implements Initializable {
   // Set while setModel() is repopulating the fields from the model, so the listeners below don't mistake
   // that programmatic change for a user edit and write it straight back.
   private boolean updatingFromModel;
+
+  // Immediate by default; switched to a shared PropertyEditorSaveMode.Deferred by dialogs with their own
+  // Save button, see setSaveMode().
+  private PropertyEditorSaveMode saveMode = PropertyEditorSaveMode.IMMEDIATE;
+
+  public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
+    this.saveMode = saveMode;
+  }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -94,7 +103,7 @@ public class ModelSettingsNamePanelController implements Initializable {
   private void save() {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null) {
-      projectItem.save();
+      saveMode.commit(projectItem);
     }
   }
 

@@ -7,6 +7,7 @@ import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.Locale;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -44,6 +45,14 @@ public class LocalesPanelController implements Initializable {
   private final Debouncer debouncer = new Debouncer();
 
   private A12Model model;
+
+  // Immediate by default; switched to a shared PropertyEditorSaveMode.Deferred by dialogs with their own
+  // Save button, see setSaveMode().
+  private PropertyEditorSaveMode saveMode = PropertyEditorSaveMode.IMMEDIATE;
+
+  public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
+    this.saveMode = saveMode;
+  }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -113,7 +122,7 @@ public class LocalesPanelController implements Initializable {
   private void commitChange() {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null) {
-      projectItem.save();
+      saveMode.commit(projectItem);
     }
   }
 

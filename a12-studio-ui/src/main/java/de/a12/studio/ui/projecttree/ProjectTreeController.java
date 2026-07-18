@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class ProjectTreeController implements Initializable, StudioEventListener {
@@ -244,6 +245,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         }
       }
     });
-    projectTree.setCellFactory(treeView -> new ProjectTreeCell(this::openItem, menuFactory));
+    AtomicReference<ProjectItemViewModel> dragSource = new AtomicReference<>();
+    projectTree.setCellFactory(treeView -> new ProjectTreeCell(this::openItem, menuFactory, dragSource));
   }
 }

@@ -27,7 +27,7 @@
         <VBox spacing="6.0" BorderPane.alignment="TOP_LEFT">
             <children>
             <Label styleClass="field-label" text="Claude Support" />
-                <CheckBox fx:id="claudeConsoleButtonCheckBox" text="Add Claude Console Button to the menu bar" />
+                <CheckBox fx:id="claudeConsoleButtonCheckBox" text="Add Claude console button to the menu bar" />
 
                 <VBox spacing="6.0">
                     <children>

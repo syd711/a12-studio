@@ -24,6 +24,16 @@ public class ProjectItemViewModel {
     return projectItem.getName();
   }
 
+  public String getDisplayName() {
+    String name = getName();
+    if (!hasModel()) {
+      return name;
+    }
+
+    int dot = name.lastIndexOf('.');
+    return dot > 0 ? name.substring(0, dot) : name;
+  }
+
   public boolean isFolder() {
     return projectItem.isFolder();
   }

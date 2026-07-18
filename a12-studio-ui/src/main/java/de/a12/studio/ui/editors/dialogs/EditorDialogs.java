@@ -12,6 +12,7 @@ public class EditorDialogs {
     FXMLLoader fxmlLoader = new FXMLLoader(DocumentModelSettingsDialog.class.getResource("/de/a12/studio/ui/editors/dialogs/document-model-settings-dialog.fxml"));
     Stage stage = WidgetFactory.createDialogStage("document-mode-settings", fxmlLoader, Studio.stage, "Model Settings");
     DocumentModelSettingsDialog controller = (DocumentModelSettingsDialog) stage.getUserData();
+    controller.setStage(stage);
 
     FXResizeHelper.install(stage, 30, 6);
     stage.setMinWidth(800);

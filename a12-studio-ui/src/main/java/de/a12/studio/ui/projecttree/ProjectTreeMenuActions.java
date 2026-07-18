@@ -135,6 +135,30 @@ public class ProjectTreeMenuActions {
     }
   }
 
+  boolean canMoveItem(@NonNull ProjectItem source, @NonNull ProjectItem targetFolder) {
+    if (source.isRoot() || !targetFolder.isFolder()) {
+      return false;
+    }
+    if (source.equals(targetFolder) || source.isAncestorOf(targetFolder)) {
+      return false;
+    }
+    return !targetFolder.equals(source.getParent());
+  }
+
+  void onMoveItem(@NonNull ProjectItem source, @NonNull ProjectItem targetFolder) {
+    if (!canMoveItem(source, targetFolder)) {
+      return;
+    }
+
+    try {
+      source.moveTo(targetFolder);
+      onReload.run();
+    }
+    catch (IOException e) {
+      showError("Could not move '" + source.getName() + "' to '" + targetFolder.getName() + "'", e);
+    }
+  }
+
   void onDeleteItem(@NonNull ProjectItem item) {
     Optional<ButtonType> result = WidgetFactory.showConfirmation(getStage(), "Delete '" + item.getName() + "'?", null, null, "Delete");
     if (result.isPresent() && result.get() == ButtonType.OK) {

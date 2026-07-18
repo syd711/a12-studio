@@ -60,6 +60,15 @@ abstract public class AbstractPropertyEditor implements Initializable {
   // panel reused for both an internal and external variant) don't share persisted expanded/collapsed state.
   private String settingsKeySuffix = "";
 
+  // Immediate by default: a commit is persisted right away. Panels embedded in a dialog with its own Save
+  // button are switched to a shared PropertyEditorSaveMode.Deferred instance via setSaveMode(), so their
+  // commits are only persisted once that button is pressed.
+  private PropertyEditorSaveMode saveMode = PropertyEditorSaveMode.IMMEDIATE;
+
+  public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
+    this.saveMode = saveMode;
+  }
+
   public void setElement(@NonNull Element element) {
     this.element = element;
     showValidationError(null);
@@ -187,7 +196,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
     if (projectItem == null) {
       return;
     }
-    projectItem.save();
+    saveMode.commit(projectItem);
     applyValidationResult(field, validateElement(projectItem));
   }
 
@@ -201,7 +210,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
     if (projectItem == null) {
       return;
     }
-    projectItem.save();
+    saveMode.commit(projectItem);
     if (element == null) {
       return;
     }

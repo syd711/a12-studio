@@ -9,6 +9,7 @@ import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
+import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -61,6 +62,14 @@ public class RoleEditorPanelController implements Initializable {
   // Rows added via onAdd() during the current editing session, rendered as a plain text field rather than a
   // combobox until the panel is reloaded from the model (setModel), at which point they become regular rows.
   private final Set<Integer> newRowIndices = new HashSet<>();
+
+  // Immediate by default; switched to a shared PropertyEditorSaveMode.Deferred by dialogs with their own
+  // Save button, see setSaveMode().
+  private PropertyEditorSaveMode saveMode = PropertyEditorSaveMode.IMMEDIATE;
+
+  public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
+    this.saveMode = saveMode;
+  }
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -205,7 +214,7 @@ public class RoleEditorPanelController implements Initializable {
 
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null) {
-      projectItem.save();
+      saveMode.commit(projectItem);
     }
   }
 

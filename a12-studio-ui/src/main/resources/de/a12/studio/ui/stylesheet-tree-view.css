@@ -194,3 +194,21 @@
 #projectTree .tree-cell:filled:selected:hover .tree-icon {
     -fx-icon-color: -fx-text-color-inverse;
 }
+
+/*
+ * Highlights the folder currently under the cursor during a project tree drag-and-drop move.
+ * Uses the vivid accent color (rather than the softer selection color) so it reads as distinct
+ * from the currently selected row even when the drop target happens to also be selected.
+ */
+#projectTree .tree-cell.drag-over-target,
+#projectTree .tree-cell.drag-over-target:filled,
+#projectTree .tree-cell.drag-over-target:hover,
+#projectTree .tree-cell.drag-over-target:filled:selected {
+    -fx-background: -fx-accent-color;
+    -fx-background-color: -fx-accent-color;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+#projectTree .tree-cell.drag-over-target .tree-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}

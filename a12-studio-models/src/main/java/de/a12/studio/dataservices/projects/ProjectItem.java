@@ -130,6 +130,33 @@ public class ProjectItem {
     this.file = newFile;
   }
 
+  public boolean isAncestorOf(ProjectItem other) {
+    for (ProjectItem current = other.parent; current != null; current = current.parent) {
+      if (current.equals(this)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void moveTo(ProjectItem newParent) throws IOException {
+    File newFile = new File(newParent.file, file.getName());
+    if (newFile.exists()) {
+      throw new IOException("'" + file.getName() + "' already exists in '" + newParent.getName() + "'");
+    }
+
+    Files.move(file.toPath(), newFile.toPath());
+
+    if (parent != null && parent.children != null) {
+      parent.children.remove(this);
+    }
+    this.file = newFile;
+    this.parent = newParent;
+    if (newParent.children != null) {
+      newParent.children.add(this);
+    }
+  }
+
   public ProjectItem createCopy() throws IOException {
     File copyFile = new File(file.getParentFile(), buildCopyName());
     if (isFolder()) {

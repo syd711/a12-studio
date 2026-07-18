@@ -25,6 +25,9 @@ public class PreferencesController implements Initializable {
   private Button annotationSetsBtn;
 
   @FXML
+  private Button previewSettingsBtn;
+
+  @FXML
   private StackPane contentStack;
 
   @FXML
@@ -67,6 +70,11 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onAnnotationSets() {
     showPage(annotationSetsBtn, "annotation-sets-panel.fxml");
+  }
+
+  @FXML
+  private void onPreviewSettings() {
+    showPage(previewSettingsBtn, "preview-settings-panel.fxml");
   }
 
   private void showPage(Button button, String fxml) {
