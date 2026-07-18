@@ -2,18 +2,13 @@ package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.commons.fx.Debouncer;
 import de.a12.studio.commons.util.JsonSettings;
-import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModelContent;
 import de.a12.studio.dataservices.models.documentmodel.ModelConfig;
-import de.a12.studio.dataservices.projects.ProjectItem;
-import de.a12.studio.ui.Studio;
-import de.a12.studio.ui.editors.PropertyEditorSaveMode;
-import javafx.application.Platform;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -23,17 +18,17 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
- * Edits {@link ModelConfig#getSupportedCharacters()}. Not an {@link de.a12.studio.ui.editors.AbstractPropertyEditor}
- * since supported characters live on the model's {@link ModelConfig} rather than a single Element.
+ * Edits {@link ModelConfig#getSupportedCharacters()}. Not bound to a single {@link de.a12.studio.dataservices.models.documentmodel.Element}
+ * (supported characters live on the model's {@link ModelConfig}), so {@link #setElement} is never called and
+ * only {@link #setModel} is used.
  */
-public class SupportedCharactersPanelController implements Initializable {
+public class SupportedCharactersPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final int COMMIT_DEBOUNCE_MS = 150;
 
-  private final Debouncer debouncer = new Debouncer();
+  private static final String INVALID_JSON_MESSAGE = "Please enter a valid JSON array of strings, e.g. [\"A\", \"B\"].";
 
-  @FXML
-  private TitledPane root;
+  private final Debouncer debouncer = new Debouncer();
 
   @FXML
   private TextField supportedCharactersField;
@@ -44,31 +39,13 @@ public class SupportedCharactersPanelController implements Initializable {
   // does not mistake that programmatic change for a user edit and write it straight back.
   private boolean updatingFromModel;
 
-  // Immediate by default; switched to a shared PropertyEditorSaveMode.Deferred by dialogs with their own
-  // Save button, see setSaveMode().
-  private PropertyEditorSaveMode saveMode = PropertyEditorSaveMode.IMMEDIATE;
-
-  public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
-    this.saveMode = saveMode;
-  }
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    Platform.runLater(() -> {
-      String settingsKey = getExpandedSettingsKey();
-      if (settingsKey != null) {
-        boolean animated = root.isAnimated();
-        root.setAnimated(false);
-        root.setExpanded(LocalUISettings.getBoolean(settingsKey));
-        root.setAnimated(animated);
-        root.expandedProperty().addListener((observable, oldValue, newValue) ->
-            LocalUISettings.saveProperty(settingsKey, String.valueOf(newValue)));
-      }
-    });
+    super.initialize(location, resources);
 
     supportedCharactersField.textProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
-        commitChange(newValue);
+        commitCharactersChange(newValue);
       }
     });
   }
@@ -82,9 +59,10 @@ public class SupportedCharactersPanelController implements Initializable {
     } finally {
       updatingFromModel = false;
     }
+    hideError();
   }
 
-  private void commitChange(String text) {
+  private void commitCharactersChange(String text) {
     if (model == null) {
       return;
     }
@@ -94,14 +72,15 @@ public class SupportedCharactersPanelController implements Initializable {
       return;
     }
 
-    // Invalid input (e.g. mid-edit, not yet valid JSON) is left uncommitted rather than written to the model.
     List<String> parsed = parseText(text);
     if (parsed == null) {
+      showError("ERROR", INVALID_JSON_MESSAGE);
       return;
     }
+    hideError();
     modelConfig.setSupportedCharacters(parsed);
 
-    debouncer.debounce(getClass().getSimpleName(), this::save, COMMIT_DEBOUNCE_MS, true);
+    debouncer.debounce(getClass().getSimpleName(), this::commitChange, COMMIT_DEBOUNCE_MS, true);
   }
 
   private static String toText(List<String> supportedCharacters) {
@@ -132,23 +111,8 @@ public class SupportedCharactersPanelController implements Initializable {
     }
   }
 
-  private void save() {
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
-    if (projectItem != null) {
-      saveMode.commit(projectItem);
-    }
-  }
-
   private static ModelConfig getModelConfig(DocumentModel model) {
     DocumentModelContent content = model.getContent();
     return content != null ? content.getModelConfig() : null;
-  }
-
-  private String getExpandedSettingsKey() {
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
-    if (projectItem == null || projectItem.getModel() == null || projectItem.getModel().getModelType() == null) {
-      return null;
-    }
-    return projectItem.getModel().getModelType().getValue() + "." + getClass().getSimpleName() + ".expanded";
   }
 }

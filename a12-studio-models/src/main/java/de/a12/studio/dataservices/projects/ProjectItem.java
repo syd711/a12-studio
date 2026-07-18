@@ -29,6 +29,7 @@ public class ProjectItem {
   @Setter
   private boolean root = false;
   @Getter
+  @Setter
   private A12Model model;
   private boolean loaded = false;
 

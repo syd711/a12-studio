@@ -2,16 +2,13 @@ package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.commons.fx.Debouncer;
 import de.a12.studio.commons.util.WidgetFactory;
-import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.Annotation;
 import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
-import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.util.Icons;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -20,35 +17,29 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Edits the comma-separated {@code roles} header annotation (see {@code /header/annotations} in a model's
- * json), e.g. {@code "tester,reviewer"}. Not an {@link de.a12.studio.ui.editors.AbstractPropertyEditor}
- * since roles live on the model header rather than a single {@link de.a12.studio.dataservices.models.documentmodel.Element}.
+ * json), e.g. {@code "tester,reviewer"}. Not bound to a single {@link de.a12.studio.dataservices.models.documentmodel.Element}
+ * (roles live on the model header), so {@link #setElement} is never called and only {@link #setModel} is used.
  */
-public class RoleEditorPanelController implements Initializable {
+public class RoleEditorPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final String ROLES_ANNOTATION_NAME = "roles";
   private static final int COMMIT_DEBOUNCE_MS = 150;
-
-  @FXML
-  private TitledPane root;
 
   @FXML
   private GridPane rolesGrid;
@@ -62,29 +53,6 @@ public class RoleEditorPanelController implements Initializable {
   // Rows added via onAdd() during the current editing session, rendered as a plain text field rather than a
   // combobox until the panel is reloaded from the model (setModel), at which point they become regular rows.
   private final Set<Integer> newRowIndices = new HashSet<>();
-
-  // Immediate by default; switched to a shared PropertyEditorSaveMode.Deferred by dialogs with their own
-  // Save button, see setSaveMode().
-  private PropertyEditorSaveMode saveMode = PropertyEditorSaveMode.IMMEDIATE;
-
-  public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
-    this.saveMode = saveMode;
-  }
-
-  @Override
-  public void initialize(URL location, ResourceBundle resources) {
-    Platform.runLater(() -> {
-      String settingsKey = getExpandedSettingsKey();
-      if (settingsKey != null) {
-        boolean animated = root.isAnimated();
-        root.setAnimated(false);
-        root.setExpanded(LocalUISettings.getBoolean(settingsKey));
-        root.setAnimated(animated);
-        root.expandedProperty().addListener((observable, oldValue, newValue) ->
-            LocalUISettings.saveProperty(settingsKey, String.valueOf(newValue)));
-      }
-    });
-  }
 
   public void setModel(@NonNull A12Model model) {
     this.model = model;
@@ -121,7 +89,7 @@ public class RoleEditorPanelController implements Initializable {
     textField.setPromptText("New role");
     textField.textProperty().addListener((observable, oldValue, newValue) -> {
       roles.set(index, newValue);
-      debouncer.debounce(textField.getId(), this::commitChange, COMMIT_DEBOUNCE_MS, true);
+      debouncer.debounce(textField.getId(), this::commitRolesChange, COMMIT_DEBOUNCE_MS, true);
     });
     return textField;
   }
@@ -135,7 +103,7 @@ public class RoleEditorPanelController implements Initializable {
     comboBox.setValue(roles.get(index));
     comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
       roles.set(index, newValue);
-      debouncer.debounce(comboBox.getId(), this::commitChange, COMMIT_DEBOUNCE_MS, true);
+      debouncer.debounce(comboBox.getId(), this::commitRolesChange, COMMIT_DEBOUNCE_MS, true);
     });
     return comboBox;
   }
@@ -163,7 +131,7 @@ public class RoleEditorPanelController implements Initializable {
         roles.remove(index);
         shiftNewRowIndices(index);
         rebuildRows();
-        commitChange();
+        commitRolesChange();
       }
     });
 
@@ -185,7 +153,7 @@ public class RoleEditorPanelController implements Initializable {
     newRowIndices.addAll(shifted);
   }
 
-  private void commitChange() {
+  private void commitRolesChange() {
     if (model == null) {
       return;
     }
@@ -212,10 +180,7 @@ public class RoleEditorPanelController implements Initializable {
       AnnotationHeaderRegistry.getInstance().addName(currentModelType, ROLES_ANNOTATION_NAME, joined);
     }
 
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
-    if (projectItem != null) {
-      saveMode.commit(projectItem);
-    }
+    commitChange();
   }
 
   private static Annotation findRolesAnnotation(A12Model model) {
@@ -249,13 +214,5 @@ public class RoleEditorPanelController implements Initializable {
     button.setTooltip(new Tooltip(tooltip));
     button.setOnAction(event -> action.run());
     return button;
-  }
-
-  private String getExpandedSettingsKey() {
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
-    if (projectItem == null || projectItem.getModel() == null || projectItem.getModel().getModelType() == null) {
-      return null;
-    }
-    return projectItem.getModel().getModelType().getValue() + "." + getClass().getSimpleName() + ".expanded";
   }
 }

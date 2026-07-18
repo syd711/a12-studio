@@ -3,7 +3,10 @@ package de.a12.studio.ui.projecttree;
 import de.a12.studio.commons.util.StudioFolderChooser;
 import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.commons.util.zip.ZipUtil;
+import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.dataservices.models.NewModelFactory;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.projecttree.NewModelDialogController.NewModelInput;
 import de.a12.studio.ui.util.Icons;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
@@ -39,9 +42,9 @@ public class ProjectTreeMenuActions {
 
     Menu newMenu = new Menu("_New...");
     MenuItem newFolder = new MenuItem("_Folder");
-    newFolder.setOnAction(event -> onCreateNewItem(projectItem, true));
+    newFolder.setOnAction(event -> onCreateNewFolder(projectItem));
     MenuItem newModel = new MenuItem("_Model");
-    newModel.setOnAction(event -> onCreateNewItem(projectItem, false));
+    newModel.setOnAction(event -> onCreateNewModel(projectItem));
     newMenu.getItems().addAll(newFolder, newModel);
 
     MenuItem open = new MenuItem("_Open");
@@ -70,20 +73,31 @@ public class ProjectTreeMenuActions {
     return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
   }
 
-  void onCreateNewItem(@NonNull ProjectItem parent, boolean folder) {
-    String title = folder ? "New Folder" : "New Model";
-    String name = WidgetFactory.showInputDialog(getStage(), title, title, null, null, null);
+  void onCreateNewFolder(@NonNull ProjectItem parent) {
+    String name = WidgetFactory.showInputDialog(getStage(), "New Folder", "New Folder", null, null, null);
     if (name == null || name.isBlank()) {
       return;
     }
 
     try {
-      if (folder) {
-        parent.createChildFolder(name.trim());
-      }
-      else {
-        parent.createChildModel(name.trim());
-      }
+      parent.createChildFolder(name.trim());
+      onReload.run();
+    }
+    catch (IOException e) {
+      showError("Could not create '" + name + "'", e);
+    }
+  }
+
+  void onCreateNewModel(@NonNull ProjectItem parent) {
+    Optional<NewModelInput> input = NewModelDialogController.show(getStage());
+    if (input.isEmpty()) {
+      return;
+    }
+
+    ModelType modelType = input.get().modelType();
+    String name = input.get().name();
+    try {
+      NewModelFactory.createModel(parent, modelType, name);
       onReload.run();
     }
     catch (IOException e) {

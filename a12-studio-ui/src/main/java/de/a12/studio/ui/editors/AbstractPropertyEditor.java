@@ -12,12 +12,14 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +74,15 @@ abstract public class AbstractPropertyEditor implements Initializable {
   public void setElement(@NonNull Element element) {
     this.element = element;
     showValidationError(null);
+  }
+
+  /**
+   * Reflects whether this panel is currently showing an error in its own error container, so an owning
+   * dialog that embeds several panels can observe and aggregate their error state into its own, dialog-level
+   * error container.
+   */
+  public ReadOnlyBooleanProperty errorProperty() {
+    return errorContainerController.errorProperty();
   }
 
   @Override
@@ -149,6 +160,20 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   /**
+   * Sets a text area's value without triggering the save/validation cycle registered by {@link
+   * #bindTextArea}. Property editors should use this (instead of {@code textArea.setText(...)}) whenever
+   * they repopulate a field from the model, e.g. in {@link #setElement}.
+   */
+  protected void setFieldValue(@NonNull TextArea textArea, String value) {
+    updatingFromModel = true;
+    try {
+      textArea.setText(value);
+    } finally {
+      updatingFromModel = false;
+    }
+  }
+
+  /**
    * Reusable pattern for property editor fields: whenever the text field's value changes, applies it to the
    * element via {@code setter}, saves the owning model's json file, and re-validates the element via the
    * data service api, reflecting the result on the field's styling and in the error container. The
@@ -162,6 +187,19 @@ abstract public class AbstractPropertyEditor implements Initializable {
       }
       setter.accept(element, newValue);
       debouncer.debounce(textField.getId(), () -> commitChange(textField), COMMIT_DEBOUNCE_MS, true);
+    });
+  }
+
+  /**
+   * Same as {@link #bindTextField} but for a text area.
+   */
+  protected void bindTextArea(@NonNull TextArea textArea, @NonNull BiConsumer<Element, String> setter) {
+    textArea.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      setter.accept(element, newValue);
+      debouncer.debounce(textArea.getId(), () -> commitChange(textArea), COMMIT_DEBOUNCE_MS, true);
     });
   }
 
@@ -245,6 +283,22 @@ abstract public class AbstractPropertyEditor implements Initializable {
     } else {
       errorContainerController.show(error.severity(), error.message());
     }
+  }
+
+  /**
+   * For subclasses whose validation isn't expressed as an {@link ElementValidationError} (e.g. a model-header
+   * panel that isn't bound to a single {@link Element}, so {@link #commitChange()}'s element-based validation
+   * never runs): shows this panel's own error container directly.
+   */
+  protected void showError(@NonNull String severity, @NonNull String message) {
+    errorContainerController.show(severity, message);
+  }
+
+  /**
+   * Counterpart to {@link #showError}.
+   */
+  protected void hideError() {
+    errorContainerController.hide();
   }
 
   private String getExpandedSettingsKey() {

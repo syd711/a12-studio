@@ -4,6 +4,7 @@ import de.a12.studio.commons.fx.DialogController;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
@@ -12,14 +13,19 @@ import de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController
 import de.a12.studio.ui.editors.propertyeditors.RoleEditorPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SupportedCharactersPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TimezonePanelController;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class DocumentModelSettingsDialog implements Initializable, DialogController {
+
+  private static final String GENERIC_ERROR_MESSAGE =
+      "One or more of the panels below contain an error. Please review them before saving.";
 
   @FXML
   private ModelSettingsNamePanelController modelSettingsNameController;
@@ -40,9 +46,12 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
   private AnnotationsPanelController annotationsController;
 
   @FXML
+  private ErrorContainerController errorContainerController;
+
+  @FXML
   private TimezonePanelController timezoneController;
 
-  // Shared by every property editor panel above so their commits are only persisted once #onSave is
+  // Shared by every property editor panel above so their comm/its are only persisted once #onSave is
   // triggered, rather than immediately as they would be outside of this dialog.
   private final PropertyEditorSaveMode.Deferred saveMode = new PropertyEditorSaveMode.Deferred();
 
@@ -80,6 +89,35 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
       annotationsController.setModel(documentModel);
       timezoneController.setModel(documentModel);
     }
+
+    bindErrorContainer();
+  }
+
+  /**
+   * Shows this dialog's own error container, with a generic title/message, whenever any of the property
+   * editor panels it embeds is showing a validation error in its own (panel-level) error container.
+   */
+  private void bindErrorContainer() {
+    List<ReadOnlyBooleanProperty> panelErrorProperties = List.of(
+        modelSettingsNameController.errorProperty(),
+        supportedCharactersController.errorProperty(),
+        localesController.errorProperty(),
+        labelsController.errorProperty(),
+        rolesController.errorProperty(),
+        annotationsController.errorProperty(),
+        timezoneController.errorProperty());
+
+    Runnable updateErrorContainer = () -> {
+      boolean anyPanelHasError = panelErrorProperties.stream().anyMatch(ReadOnlyBooleanProperty::get);
+      if (anyPanelHasError) {
+        errorContainerController.show("ERROR", GENERIC_ERROR_MESSAGE);
+      } else {
+        errorContainerController.hide();
+      }
+    };
+
+    panelErrorProperties.forEach(property -> property.addListener((observable, oldValue, newValue) -> updateErrorContainer.run()));
+    updateErrorContainer.run();
   }
 
   @FXML

@@ -1,5 +1,6 @@
 package de.a12.studio.ui.components;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -15,6 +16,15 @@ public class ErrorContainerController {
 
   @FXML
   private Label errorMessage;
+
+  /**
+   * Reflects whether this container is currently showing an error, i.e. whether {@link #show} (rather than
+   * {@link #hide}) was called last. Lets an outer container (e.g. a dialog whose panels each have their own
+   * error container) observe and aggregate the error state of the panels it embeds.
+   */
+  public ReadOnlyBooleanProperty errorProperty() {
+    return root.visibleProperty();
+  }
 
   public void show(@NonNull String severity, @NonNull String message) {
     root.setManaged(true);

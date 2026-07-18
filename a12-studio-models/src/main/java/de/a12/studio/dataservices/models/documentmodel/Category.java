@@ -1,7 +1,6 @@
 package de.a12.studio.dataservices.models.documentmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +10,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class EnumerationTypeOptions {
+public class Category {
 
-  private List<EnumerationValue> values = new ArrayList<>();
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private List<Category> categories = new ArrayList<>();
+  private String name;
+  private List<String> values = new ArrayList<>();
+  private String description;
 }
