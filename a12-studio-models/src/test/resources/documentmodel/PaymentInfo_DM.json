@@ -1,0 +1,457 @@
+{
+  "header": {
+    "id": "PaymentInfo_DM",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "PaymentInfo_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_86200",
+          "name": "PaymentInfo",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_dda25",
+                "name": "MethodOfPayment",
+                "annotations": [
+                  {
+                    "name": "enable_approximate_match_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "credit",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Credit card"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Kreditkarte"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "debit",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Direct debit"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Bankeinzug"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "invoice",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Invoice"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Rechnung"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Method of Payment"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Zahlungsmethode"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_8ff43",
+                "name": "MethodOfPaymentCreditCard",
+                "Rule": {
+                  "errorEntityRelPath": "../MethodOfPayment",
+                  "errorCode": "Error rule_8ff43",
+                  "errorCondition": "GroupFilled(CreditCard) AND [MethodOfPayment] != \"credit\"",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Please do not give credit card information, if you did not choose credit card as a method of payment."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bitte geben Sie keine Kreditkarteninformationen an, wenn Sie nicht die Kreditkarte als Bezahlmethode gewählt haben."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_4bdfc",
+                "name": "MethodOfPaymentDirectDebit",
+                "Rule": {
+                  "errorEntityRelPath": "../MethodOfPayment",
+                  "errorCode": "Error rule_4bdfc",
+                  "errorCondition": "GroupFilled(DirectDebit) AND GroupFilled(RuleGroup) AND [MethodOfPayment] != \"debit\"",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Please do not give direct debit information, if you did not choose direct debit as a method of payment."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bitte geben Sie keine Bankinformationen an, wenn Sie nicht den Bankeinzug als Bezahlmethode gewählt haben."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_ce8ea",
+                "name": "CreditCard",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_9a37a",
+                      "name": "Name",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Card Holder"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Karteninhaber"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_a103b",
+                      "name": "Number",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "The credit card number must contain 16 digits."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Die Kreditkartennummer muss aus 16 Ziffern bestehen."
+                              }
+                            ],
+                            "pattern": "[0-9]{16}"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Credit Card Number"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Kreditkartennummer"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_d5e7f",
+                      "name": "Approval",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "The approval number must consist of three digits."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Die Prüfnummer muss aus drei Ziffern bestehen."
+                              }
+                            ],
+                            "pattern": "[0-9]{3}"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Approval Number"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Prüfnummer"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_238df",
+                      "name": "DueDate",
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Valid Until"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Gültigkeit"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_bc4aa",
+                      "name": "CreditCardValid",
+                      "Rule": {
+                        "errorEntityRelPath": "../DueDate",
+                        "errorCode": "Error rule_bc4aa",
+                        "errorCondition": "FieldFilled(DueDate) and [DueDate] < Today",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Your credit card is not valid anymore."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Die Gültigkeit Ihrer Kreditkarte ist abgelaufen."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_aeada",
+                "name": "CompleteCreditCardInformation",
+                "Rule": {
+                  "errorEntityRelPath": "../MethodOfPayment",
+                  "errorCode": "Error rule_aeada",
+                  "errorCondition": "FieldFilled(MethodOfPayment) and [MethodOfPayment]==\"credit\" and NotAllFieldsFilled(CreditCard)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Please enter the complete credit card information."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bitte gaben Sie alle Informationen zu Ihrer Kreditkarte an."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_7321f",
+                "name": "CompleteDirectDebitInformation",
+                "Rule": {
+                  "errorEntityRelPath": "../MethodOfPayment",
+                  "errorCode": "Error rule_7321f",
+                  "errorCondition": "FieldFilled(MethodOfPayment) and [MethodOfPayment]==\"debit\" and NotAllFieldsFilled(DirectDebit)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Please enter your complete direct debit information."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bitte gaben Sie alle Informationen zu Ihrer Bankverbindung an."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_81dc9",
+                "name": "DirectDebit",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_46539",
+                      "name": "Name",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Account Holder"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Kontoinhaber"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_4e717",
+                      "name": "BIC",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "minLength": 8,
+                            "maxLength": 11
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "BIC"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "BIC"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_6047c",
+                      "name": "IBAN",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "minLength": 16,
+                            "maxLength": 28
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "IBAN"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "IBAN"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
