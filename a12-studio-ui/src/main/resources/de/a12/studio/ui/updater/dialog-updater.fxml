@@ -11,7 +11,7 @@
 
 <BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="640.0" styleClass="base-component" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.updater.UpdateDialogController">
    <top>
-      <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
+      <fx:include fx:id="header" source="../components/scene-dialog-header.fxml" />
    </top>
    <center>
       <VBox spacing="3.0" BorderPane.alignment="TOP_LEFT">

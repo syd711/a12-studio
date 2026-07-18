@@ -1,6 +1,7 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.dataservices.models.ModelType;
 import javafx.fxml.FXML;
@@ -26,6 +27,9 @@ public class NewModelDialogController implements DialogController {
   private TextField nameField;
 
   @FXML
+  private Button okButton;
+
+  @FXML
   private Button cancelButton;
 
   private Stage stage;
@@ -47,6 +51,7 @@ public class NewModelDialogController implements DialogController {
       }
     });
     typeComboBox.getSelectionModel().selectFirst();
+    okButton.disableProperty().bind(nameField.textProperty().map(name -> !FileUtils.isValidWindowsFilename(name)));
     nameField.requestFocus();
   }
 
