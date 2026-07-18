@@ -38,17 +38,14 @@ public interface Icons {
   String PNG_MODEL_APPLICATION = "/de/a12/studio/ui/icons/Model-App.png";
   String PNG_MODEL_CONTENT = "/de/a12/studio/ui/icons/Model-Content.png";
 
-  // Document model editor (dmm) node icons.
-  String PNG_DMM_FIELD = "/de/a12/studio/ui/icons/dmm/Field.png";
-  String PNG_DMM_COMPUTATION_RULE = "/de/a12/studio/ui/icons/dmm/ComputationRule.png";
-  String PNG_DMM_VALIDATION_RULE_ERROR = "/de/a12/studio/ui/icons/dmm/ValidationRule-Error.png";
-  String PNG_DMM_VALIDATION_RULE_WARNING = "/de/a12/studio/ui/icons/dmm/ValidationRule-Warning.png";
-  String PNG_DMM_VALIDATION_RULE_INFO = "/de/a12/studio/ui/icons/dmm/ValidationRule-Info.png";
-
   String ELEMENT_MULTI_SELECT = "mdi2c-checkbox-multiple-marked-outline";
   String ELEMENT_INCLUDE = "mdi2l-link";
   String ELEMENT_GENERIC = "mdi2s-shape-outline";
+  String ELEMENT_FIELD = "mdi2a-alpha-f-box";
+  String ELEMENT_COMPUTATION = "mdi2a-alpha-c-circle";
   String ELEMENT_ATTACHMENT = "mdi2d-database-plus-outline";
   String ELEMENT_ANNOTATION = "mdi2a-alpha-a-box-outline";
   String ELEMENT_REQUIRED = "mdi2a-asterisk-circle-outline";
+
+  String ELEMENT_VALIDATION_RULE = "mdi2a-alpha-v-circle";
 }

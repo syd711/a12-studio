@@ -39,7 +39,7 @@
       "immutable": false
     },
     "modelConfig": {
-      "timeZone": "UTC",
+      "timeZone": "Europe/Berlin",
       "decimalSeparator": ".",
       "conditionLanguage": {
         "code": "en_US"

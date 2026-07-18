@@ -7,8 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
@@ -30,9 +28,7 @@ class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
       getStyleClass().remove("validation-error");
     }
     else {
-      Node icon = viewModel.isGroup()
-          ? WidgetFactory.createIcon(viewModel.getIcon())
-          : createElementIcon(viewModel);
+      Node icon = WidgetFactory.createIcon(viewModel.getIcon());
       icon.getStyleClass().add("tree-icon");
 
       Label nameLabel = new Label(name);
@@ -63,16 +59,5 @@ class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
         getStyleClass().remove("validation-error");
       }
     }
-  }
-
-  private Node createElementIcon(ElementViewModel viewModel) {
-    String iconPath = viewModel.getIconPath();
-    return iconPath != null ? createPngIcon(iconPath) : WidgetFactory.createIcon(viewModel.getIcon());
-  }
-
-  private Node createPngIcon(String path) {
-    Image image = new Image(getClass().getResourceAsStream(path),
-        WidgetFactory.DEFAULT_ICON_SIZE, WidgetFactory.DEFAULT_ICON_SIZE, true, true);
-    return new ImageView(image);
   }
 }

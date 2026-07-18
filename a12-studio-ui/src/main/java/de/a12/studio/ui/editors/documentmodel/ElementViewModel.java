@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel;
 
+import de.a12.studio.dataservices.models.documentmodel.ComputationElement;
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.FieldElement;
 import de.a12.studio.dataservices.models.documentmodel.GroupConfig;
@@ -78,6 +79,15 @@ public class ElementViewModel {
       }
       return Icons.ELEMENT_GROUP;
     }
+    if (element instanceof FieldElement) {
+      return Icons.ELEMENT_FIELD;
+    }
+    if (element instanceof ComputationElement) {
+      return Icons.ELEMENT_COMPUTATION;
+    }
+    if (element instanceof RuleElement) {
+      return Icons.ELEMENT_VALIDATION_RULE;
+    }
     return Icons.ELEMENT_GENERIC;
   }
 
@@ -93,26 +103,6 @@ public class ElementViewModel {
 
   private static boolean hasUsageType(GroupElement groupElement, String usageType) {
     return groupElement.getGroup() != null && usageType.equals(groupElement.getGroup().getUsageType());
-  }
-
-  /**
-   * PNG icon for this element's node in the document model tree, or {@code null} if it should fall back to
-   * the Ikonli glyph returned by {@link #getIcon()} (groups are handled separately by the tree controller).
-   */
-  public String getIconPath() {
-    if (element instanceof RuleElement ruleElement) {
-      String severity = ruleElement.getRule() != null ? ruleElement.getRule().getSeverity() : null;
-      return switch (severity == null ? "" : severity.toUpperCase()) {
-        case "ERROR" -> Icons.PNG_DMM_VALIDATION_RULE_ERROR;
-        case "INFO" -> Icons.PNG_DMM_VALIDATION_RULE_INFO;
-        default -> Icons.PNG_DMM_VALIDATION_RULE_WARNING;
-      };
-    }
-    return switch (element.getType()) {
-      case FIELD -> Icons.PNG_DMM_FIELD;
-      case COMPUTATION -> Icons.PNG_DMM_COMPUTATION_RULE;
-      default -> null;
-    };
   }
 
   public List<ElementViewModel> getChildren() {

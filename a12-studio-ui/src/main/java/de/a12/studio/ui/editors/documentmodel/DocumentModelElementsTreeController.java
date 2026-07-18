@@ -428,9 +428,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private List<MenuItem> createAddMenuItems() {
     List<MenuItem> items = new ArrayList<>();
     items.add(createAddMenuItem(createMenuItem("_Group", createGroupIcon()), this::newGroupElement));
-    items.add(createAddMenuItem(createMenuItem("_Field", createPngIcon(Icons.PNG_DMM_FIELD)), this::newFieldElement));
-    items.add(createAddMenuItem(createMenuItem("_Validation Rule", createPngIcon(Icons.PNG_DMM_VALIDATION_RULE_WARNING)), this::newRuleElement));
-    items.add(createAddMenuItem(createMenuItem("Co_mputation Rule", createPngIcon(Icons.PNG_DMM_COMPUTATION_RULE)), this::newComputationElement));
+    items.add(createAddMenuItem(createMenuItem("_Field", Icons.ELEMENT_FIELD), this::newFieldElement));
+    items.add(createAddMenuItem(createMenuItem("_Validation Rule", Icons.ELEMENT_VALIDATION_RULE), this::newRuleElement));
+    items.add(createAddMenuItem(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION), this::newComputationElement));
     items.add(createAddMenuItem(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT), this::newAttachmentElement));
     items.add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT), this::newMultiSelectElement));
     items.add(createAddMenuItem(createMenuItem("_Include", Icons.ELEMENT_INCLUDE), this::newIncludeElement));
