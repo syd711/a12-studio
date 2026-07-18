@@ -21,5 +21,7 @@ public class GroupConfig {
   private String usageType;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String modelAlias;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String indexFieldName;
   private List<Element> elements = new ArrayList<>();
 }
