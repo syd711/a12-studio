@@ -1,6 +1,8 @@
 package de.a12.studio.dataservices.models;
 
+import de.a12.studio.dataservices.models.applicationmodel.ApplicationModel;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
+import de.a12.studio.dataservices.models.formmodel.FormModel;
 import de.a12.studio.dataservices.models.overviewmodel.OverviewModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,24 @@ class ModelFactoryTest {
 
     OverviewModel overviewModel = assertInstanceOf(OverviewModel.class, model);
     assertEquals("Company_OM", overviewModel.getId());
+  }
+
+  @Test
+  void loadsSupportedApplicationModel() {
+    File file = resource("/applicationmodel/PreviewApp_AM.json");
+    A12Model model = ModelFactory.load(new ProjectItem(file));
+
+    ApplicationModel applicationModel = assertInstanceOf(ApplicationModel.class, model);
+    assertEquals("PreviewApp_AM", applicationModel.getId());
+  }
+
+  @Test
+  void loadsSupportedFormModel() {
+    File file = resource("/formmodel/Company_FM.json");
+    A12Model model = ModelFactory.load(new ProjectItem(file));
+
+    FormModel formModel = assertInstanceOf(FormModel.class, model);
+    assertEquals("Company_FM", formModel.getId());
   }
 
   @Test

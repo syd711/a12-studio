@@ -9,18 +9,22 @@ import de.a12.studio.dataservices.services.documentmodel.features.validation.DMV
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.Icons;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +39,30 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
   private static final int COMMIT_DEBOUNCE_MS = 150;
 
   private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
+
+  private static final List<java.util.Locale> AVAILABLE_LOCALES = Arrays.stream(java.util.Locale.getAvailableLocales())
+      .filter(locale -> !locale.toLanguageTag().isEmpty() && !locale.toLanguageTag().equals("und"))
+      .sorted(Comparator.comparing(java.util.Locale::getDisplayName))
+      .toList();
+
+  private static final StringConverter<java.util.Locale> LOCALE_CONVERTER = new StringConverter<>() {
+    @Override
+    public String toString(java.util.Locale locale) {
+      return locale == null ? "" : locale.getDisplayName() + " (" + locale.toLanguageTag() + ")";
+    }
+
+    @Override
+    public java.util.Locale fromString(String text) {
+      if (text == null || text.isBlank()) {
+        return null;
+      }
+      String trimmed = text.trim();
+      return AVAILABLE_LOCALES.stream()
+          .filter(locale -> locale.toLanguageTag().equalsIgnoreCase(trimmed) || toString(locale).equalsIgnoreCase(trimmed))
+          .findFirst()
+          .orElseGet(() -> java.util.Locale.forLanguageTag(trimmed));
+    }
+  };
 
   @FXML
   private GridPane localesGrid;
@@ -64,20 +92,23 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
 
     List<Locale> locales = model.getLocales();
     for (int index = 0; index < locales.size(); index++) {
-      localesGrid.addRow(index + 1, createTextField(index), createActionsBox(index));
+      localesGrid.addRow(index + 1, createLocaleComboBox(index), createActionsBox(index));
     }
   }
 
-  private TextField createTextField(int index) {
+  private ComboBox<java.util.Locale> createLocaleComboBox(int index) {
     Locale locale = model.getLocales().get(index);
-    TextField textField = new TextField(locale.getCode());
-    textField.setId("locale-" + index);
-    textField.setMaxWidth(Double.MAX_VALUE);
-    textField.textProperty().addListener((observable, oldValue, newValue) -> {
-      locale.setCode(newValue);
-      debouncer.debounce(textField.getId(), this::commitLocalesChange, COMMIT_DEBOUNCE_MS, true);
+    ComboBox<java.util.Locale> comboBox = new ComboBox<>(FXCollections.observableArrayList(AVAILABLE_LOCALES));
+    comboBox.setId("locale-" + index);
+    comboBox.setEditable(true);
+    comboBox.setMaxWidth(Double.MAX_VALUE);
+    comboBox.setConverter(LOCALE_CONVERTER);
+    comboBox.setValue(LOCALE_CONVERTER.fromString(locale.getCode()));
+    comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+      locale.setCode(newValue == null ? null : newValue.toLanguageTag());
+      debouncer.debounce(comboBox.getId(), this::commitLocalesChange, COMMIT_DEBOUNCE_MS, true);
     });
-    return textField;
+    return comboBox;
   }
 
   private HBox createActionsBox(int index) {
