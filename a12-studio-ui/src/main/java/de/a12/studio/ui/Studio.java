@@ -31,6 +31,7 @@ public class Studio extends Application implements StudioEventListener {
 
   public static Stage stage;
   private static RootController rootController;
+  private static Project currentProject;
 
   @Override
   public void start(Stage stage) throws IOException {
@@ -85,10 +86,20 @@ public class Studio extends Application implements StudioEventListener {
     return rootController.getSelectedProjectItem();
   }
 
+  public static Project getCurrentProject() {
+    return currentProject;
+  }
+
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
-    Project project = event.getProject();
-    stage.setTitle("A12 Studio - " + project.getName());
-    rootController.setTitle("A12 Studio - " + project.getName() + " (" + project.getRoot().getPath() + ")");
+    // Set before anything else: Studio registers as a listener before the FXML (and its nested
+    // controllers, e.g. TabPaneController) is loaded, so this runs before TabPaneController restores
+    // previously-open tabs - those tabs load their document model editors immediately and need the
+    // project to already be available for cross-model settings validation (e.g. the settings button's
+    // error badge).
+    currentProject = event.getProject();
+
+    stage.setTitle("A12 Studio - " + currentProject.getName());
+    rootController.setTitle("A12 Studio - " + currentProject.getName() + " (" + currentProject.getRoot().getPath() + ")");
   }
 }

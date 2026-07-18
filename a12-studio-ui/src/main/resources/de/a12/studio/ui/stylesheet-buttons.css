@@ -104,10 +104,12 @@
  * Primary action button (e.g. "+ Add")
  */
 .primary-button {
+    -fx-border-style: solid solid solid solid;
+    -fx-border-color: -fx-accent-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
     -fx-background-color: -fx-accent-color;
-    -fx-background-radius: 7px;
-    -fx-border-radius: 7px;
-    -fx-border-width: 0;
     -fx-text-fill: -fx-text-color-inverse;
     -fx-font-weight: bold;
     -fx-pref-height: 32px;
@@ -117,7 +119,12 @@
 }
 
 .primary-button:hover {
-    -fx-background-color: derive(-fx-accent-color, -10%);
+    -fx-border-style: solid solid solid solid;
+    -fx-border-color: derive(-fx-accent-color, -15%);
+    -fx-border-width: 1;
+    -fx-background-color: derive(-fx-accent-color, -15%);
+    -fx-text-fill: -fx-text-color-inverse;
+    -fx-cursor: hand;
 }
 
 .primary-button .label {
@@ -132,10 +139,12 @@
  * Secondary action button (e.g. "Annotation Datasets")
  */
 .secondary-button {
-    -fx-background-color: derive(-fx-panel-color, -12%);
-    -fx-background-radius: 7px;
-    -fx-border-radius: 7px;
-    -fx-border-width: 0;
+    -fx-border-radius: 3px;
+    -fx-border-style: solid solid solid solid;
+    -fx-border-color: -fx-border-color-theme;
+    -fx-border-width: 1;
+    -fx-background-radius: 3px;
+    -fx-background-color: -fx-surface-color;
     -fx-text-fill: -fx-text-color;
     -fx-font-weight: bold;
     -fx-pref-height: 32px;
@@ -145,5 +154,10 @@
 }
 
 .secondary-button:hover {
-    -fx-background-color: derive(-fx-panel-color, -20%);
+    -fx-border-style: solid solid solid solid;
+    -fx-border-color: -fx-accent-color;
+    -fx-border-width: 1;
+    -fx-background-color: -fx-panel-color;
+    -fx-text-fill: -fx-text-color;
+    -fx-cursor: hand;
 }

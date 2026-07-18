@@ -18,3 +18,4 @@ config/*.properties
 /a12-studio-data-services/*.log
 /a12-studio-models/*.log
 /testing/basic/models/settings.json
+/a12-studio-ui/*log

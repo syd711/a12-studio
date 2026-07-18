@@ -26,6 +26,13 @@ import java.util.stream.Collectors;
 
 public class DMValidationService {
 
+  // The only two time zones a document model's settings can be configured with (see TimezonePanelController);
+  // every document model in a project must agree on one of them, mirroring SME's TimeZoneCheck rule.
+  private static final String EUROPE_BERLIN = "Europe/Berlin";
+
+  private static final String TIME_ZONE_MISMATCH_MESSAGE =
+      "There is a document model with time zone Europe/Berlin in this workspace. This model's time zone needs to be Europe/Berlin as well.";
+
   /**
    * UI-safe entry point: takes/returns only data-services model types and plain strings, so callers that
    * don't have the kernel jars on their classpath (e.g. a12-studio-ui) can still trigger validation.
@@ -53,6 +60,63 @@ public class DMValidationService {
     return validate(model, otherModels).stream()
         .map(error -> new ElementValidationError(error.getId(), error.getMessage(), error.getSeverity().name()))
         .toList();
+  }
+
+  /**
+   * UI-safe entry point: every human-readable settings problem for this model (locales, time zone, etc., as
+   * edited via the Model Settings dialog), whether kernel-reported (single model) or cross-model (e.g. a
+   * time zone that disagrees with the rest of the project, see {@link #getTimeZoneMismatchError}). Empty if
+   * there are none, e.g. for driving both a settings-button badge and its error tooltip. Exceptions from the
+   * kernel consistency check (e.g. on a model that's mid-edit and momentarily inconsistent) are treated as
+   * "no issues" rather than surfaced, matching {@link #validate} below.
+   */
+  public List<String> getSettingsIssueMessages(
+      de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
+      List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
+    List<String> messages = new ArrayList<>();
+    getTimeZoneMismatchError(documentModel, otherDocumentModels).ifPresent(messages::add);
+    getMissingLocaleError(documentModel).ifPresent(messages::add);
+    return messages;
+  }
+
+  /**
+   * UI-safe entry point for the Locales settings panel: the kernel's "at least one locale" consistency
+   * problem, reworded for end users (the kernel's own message embeds an internal error code).
+   */
+  public Optional<String> getMissingLocaleError(de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel) {
+    try {
+      DocumentModel model = DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(documentModel));
+      return DocumentModelSupport.getSettingsProblems(model).stream()
+          .filter(p -> p.getMessage().contains("MVK_SUPP_LANGUAGES_MISSING"))
+          .findFirst()
+          .map(p -> "Please add at least one locale.");
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+
+  /**
+   * UI-safe entry point for the Timezone settings panel: every document model in a project must use the
+   * same time zone. Mirrors SME's {@code TimeZoneCheck} custom validation rule, which is not part of the
+   * kernel's own single-model consistency check (see {@link DocumentModelSupport#getSettingsProblems}) since
+   * it depends on the other document models in the project.
+   */
+  public Optional<String> getTimeZoneMismatchError(
+      de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
+      List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
+    String timeZone = getTimeZone(documentModel);
+    if (EUROPE_BERLIN.equals(timeZone)) {
+      return Optional.empty();
+    }
+    boolean otherModelUsesEuropeBerlin = otherDocumentModels.stream()
+        .anyMatch(other -> EUROPE_BERLIN.equals(getTimeZone(other)));
+    return otherModelUsesEuropeBerlin ? Optional.of(TIME_ZONE_MISMATCH_MESSAGE) : Optional.empty();
+  }
+
+  private static String getTimeZone(de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel) {
+    de.a12.studio.dataservices.models.documentmodel.DocumentModelContent content = documentModel.getContent();
+    de.a12.studio.dataservices.models.documentmodel.ModelConfig modelConfig = content != null ? content.getModelConfig() : null;
+    return modelConfig != null ? modelConfig.getTimeZone() : null;
   }
 
   public List<DocumentModelErrors> validate(DocumentModel model, List<DocumentModel> otherModels) {

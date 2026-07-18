@@ -8,9 +8,11 @@ import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.GroupElement;
 import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.SystemUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +20,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.shape.Circle;
 import org.jspecify.annotations.NonNull;
 
 import java.io.File;
@@ -37,11 +41,21 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   private static final String FIELD_EDITOR_FXML = "document-model-field-editor.fxml";
   private static final String GROUP_EDITOR_FXML = "document-model-group-editor.fxml";
 
+  private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
+
+  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
+
   @FXML
   private SplitPane splitPane;
 
   @FXML
   private BorderPane editorContainer;
+
+  @FXML
+  private Circle settingsErrorBadge;
+
+  @FXML
+  private Tooltip settingsButtonTooltip;
 
   @FXML
   private DocumentModelElementsTreeController elementsTreeController;
@@ -61,6 +75,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   @FXML
   public void onSettings(ActionEvent e) {
     EditorDialogs.openSettings();
+    updateSettingsErrorBadge();
   }
 
   @FXML
@@ -70,6 +85,16 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   public void loadModel(@NonNull A12Model model) {
     load(((DocumentModel) model).getContent().getModelRoot());
+    updateSettingsErrorBadge();
+  }
+
+  private void updateSettingsErrorBadge() {
+    List<String> issues = projectItem.getModel() instanceof DocumentModel documentModel
+        ? VALIDATION_SERVICE.getSettingsIssueMessages(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+        : List.of();
+
+    settingsErrorBadge.setVisible(!issues.isEmpty());
+    settingsButtonTooltip.setText(issues.isEmpty() ? DEFAULT_SETTINGS_TOOLTIP : String.join("\n\n", issues));
   }
 
   private void load(@NonNull ModelRoot modelRoot) {

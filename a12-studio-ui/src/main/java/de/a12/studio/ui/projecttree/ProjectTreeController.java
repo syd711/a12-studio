@@ -20,11 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
@@ -75,6 +71,15 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         log.warn("Failed to validate '{}': {}", documentItems.get(i).getPath(), e.getMessage(), e);
         validationErrorsByPath.put(documentItems.get(i).getPath(),
             List.of(new ElementValidationError(null, "Failed to parse document: " + e.getMessage(), "ERROR")));
+      }
+
+      Set<Map.Entry<String, List<ElementValidationError>>> entries = validationErrorsByPath.entrySet();
+      for (Map.Entry<String, List<ElementValidationError>> entry : entries) {
+        String key = entry.getKey();
+        List<ElementValidationError> errors = entry.getValue();
+        for (ElementValidationError error : errors) {
+            log.error("[{}] {} Validation Issue: {}: {}", key, error.severity(), error.elementId(), error.message());
+        }
       }
     }
     return validationErrorsByPath;

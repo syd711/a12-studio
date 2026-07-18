@@ -115,6 +115,15 @@
 }
 
 /**
+ * Toolbar button error badge
+ */
+.toolbar-button-error-badge {
+    -fx-fill: -fx-error-bg;
+    -fx-stroke: -fx-background;
+    -fx-stroke-width: 1.5px;
+}
+
+/**
  * Preferences overlay
  */
  .preference-section {

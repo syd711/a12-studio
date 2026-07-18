@@ -21,6 +21,7 @@ import com.mgmtp.a12.kernel.md.model.api.visitor.DocumentModelWalker.VisitProces
 import com.mgmtp.a12.kernel.md.facade.DocumentModelServiceFactory;
 import com.mgmtp.a12.kernel.md.serializer.model.a12internal.services.DocumentModelSerializer;
 import com.mgmtp.a12.model.notification.RankedNotification;
+import com.mgmtp.a12.model.notification.Severity;
 import de.a12.studio.dataservices.services.support.additivemodel.AdditiveModelSupport;
 
 import org.apache.commons.io.IOUtils;
@@ -384,6 +385,21 @@ public final class DocumentModelSupport {
         .filter(p -> !p.getMessage().contains("MVK_ERROR_CALC_CYCLE"))
         .filter(p -> !(p.getMessage().startsWith("Missing rules [") && p.getMessage().contains("for attachment with group")))
         .filter(p -> p.getSource() instanceof Element)
+        .toList();
+  }
+
+  /**
+   * Consistency problems the kernel reports against the model's header/config as a whole (e.g. missing
+   * locales, an invalid time zone) rather than against a single {@link Element}, which {@link
+   * #getElementProblems} is restricted to. Used to flag the Model Settings dialog as invalid.
+   */
+  public static List<IProblem> getSettingsProblems(DocumentModel documentModel) {
+    List<IProblem> problems = new ArrayList<>();
+    new DocumentModelService().checkConsistency(documentModel, problems::add);
+
+    return problems.stream()
+        .filter(p -> !(p.getSource() instanceof Element))
+        .filter(p -> p.getSeverity() == Severity.ERROR)
         .toList();
   }
 

@@ -5,8 +5,11 @@ import de.a12.studio.commons.util.WidgetFactory;
 import de.a12.studio.commons.util.localsettings.LocalUISettings;
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.Locale;
+import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
@@ -36,11 +39,16 @@ public class LocalesPanelController implements Initializable {
 
   private static final int COMMIT_DEBOUNCE_MS = 150;
 
+  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
+
   @FXML
   private TitledPane root;
 
   @FXML
   private GridPane localesGrid;
+
+  @FXML
+  private ErrorContainerController errorContainerController;
 
   private final Debouncer debouncer = new Debouncer();
 
@@ -72,12 +80,14 @@ public class LocalesPanelController implements Initializable {
   public void setModel(@NonNull A12Model model) {
     this.model = model;
     rebuildRows();
+    updateValidation();
   }
 
   @FXML
   private void onAdd() {
     model.getLocales().add(new Locale());
     rebuildRows();
+    updateValidation();
   }
 
   private void rebuildRows() {
@@ -123,6 +133,17 @@ public class LocalesPanelController implements Initializable {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null) {
       saveMode.commit(projectItem);
+    }
+    updateValidation();
+  }
+
+  private void updateValidation() {
+    if (model instanceof DocumentModel documentModel) {
+      VALIDATION_SERVICE.getMissingLocaleError(documentModel)
+          .ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    }
+    else {
+      errorContainerController.hide();
     }
   }
 

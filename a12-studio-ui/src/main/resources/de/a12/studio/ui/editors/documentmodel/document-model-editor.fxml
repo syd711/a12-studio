@@ -6,20 +6,27 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
-                <Button mnemonicParsing="false" onAction="#onSettings" styleClass="default-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2c-cog" iconSize="18" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Model Settings" />
-                    </tooltip>
-                </Button>
+                <StackPane>
+                    <children>
+                        <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#onSettings" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2c-cog" iconSize="18" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip fx:id="settingsButtonTooltip" text="Model Settings" />
+                            </tooltip>
+                        </Button>
+                        <Circle fx:id="settingsErrorBadge" styleClass="toolbar-button-error-badge" radius="4" translateX="10" translateY="-10" mouseTransparent="true" visible="false" StackPane.alignment="CENTER" />
+                    </children>
+                </StackPane>
                 <Button layoutX="10.0" layoutY="10.0" onAction="#onTypeDefinitions" mnemonicParsing="false" styleClass="default-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2p-puzzle" iconSize="18" />

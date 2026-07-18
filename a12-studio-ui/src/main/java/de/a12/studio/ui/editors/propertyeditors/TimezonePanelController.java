@@ -5,8 +5,11 @@ import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModelContent;
 import de.a12.studio.dataservices.models.documentmodel.ModelConfig;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -26,11 +29,16 @@ public class TimezonePanelController implements Initializable {
 
   private static final List<String> TIMEZONES = List.of("UTC", "Europe/Berlin");
 
+  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
+
   @FXML
   private TitledPane root;
 
   @FXML
   private ComboBox<String> timezoneCombo;
+
+  @FXML
+  private ErrorContainerController errorContainerController;
 
   private DocumentModel model;
 
@@ -77,6 +85,7 @@ public class TimezonePanelController implements Initializable {
     } finally {
       updatingFromModel = false;
     }
+    updateValidation();
   }
 
   private void commitChange(String timeZone) {
@@ -94,6 +103,21 @@ public class TimezonePanelController implements Initializable {
     if (projectItem != null) {
       saveMode.commit(projectItem);
     }
+    updateValidation();
+  }
+
+  /**
+   * A model's time zone must agree with every other document model in its project, see {@link
+   * DMValidationService#getTimeZoneMismatchError}.
+   */
+  private void updateValidation() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (model == null || projectItem == null) {
+      errorContainerController.hide();
+      return;
+    }
+    VALIDATION_SERVICE.getTimeZoneMismatchError(model, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+        .ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
   }
 
   private static ModelConfig getModelConfig(DocumentModel model) {
