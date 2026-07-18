@@ -54,7 +54,8 @@
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
         <items>
-          <Button mnemonicParsing="false" styleClass="primary-button" text="Close" />
+            <Button fx:id="saveBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="primary-button" text="Save" />
+          <Button mnemonicParsing="false" styleClass="secondary-button" text="Cancel" />
         </items>
       </ToolBar>
    </bottom>

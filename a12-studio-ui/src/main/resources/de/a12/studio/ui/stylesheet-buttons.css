@@ -132,7 +132,7 @@
  * Secondary action button (e.g. "Annotation Datasets")
  */
 .secondary-button {
-    -fx-background-color: -fx-panel-color;
+    -fx-background-color: derive(-fx-panel-color, -12%);
     -fx-background-radius: 7px;
     -fx-border-radius: 7px;
     -fx-border-width: 0;
@@ -145,5 +145,5 @@
 }
 
 .secondary-button:hover {
-    -fx-background-color: derive(-fx-panel-color, -6%);
+    -fx-background-color: derive(-fx-panel-color, -20%);
 }
