@@ -5,9 +5,11 @@ import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.Locale;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
+import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -129,6 +131,11 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
   private void commitLocalesChange() {
     commitChange();
     updateValidation();
+
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem != null) {
+      StudioEventManager.getInstance().fireLocalesChangedEvent(projectItem);
+    }
   }
 
   private void updateValidation() {

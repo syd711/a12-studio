@@ -12,7 +12,7 @@
     <top>
         <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
             <items>
-                <Button mnemonicParsing="false" styleClass="primary-button" text="Add">
+                <Button mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add">
                     <graphic>
                         <FontIcon iconLiteral="mdi2p-plus-circle" iconSize="18" />
                     </graphic></Button>

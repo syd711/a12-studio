@@ -38,4 +38,8 @@ public interface StudioEventListener {
   default void settingsChanged(@NonNull SettingsChangedEvent event) {
 
   }
+
+  default void localesChanged(@NonNull LocalesChangedEvent event) {
+
+  }
 }

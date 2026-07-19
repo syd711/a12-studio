@@ -88,4 +88,11 @@ public class StudioEventManager {
       listener.settingsChanged(event);
     }
   }
+
+  public void fireLocalesChangedEvent(@NonNull ProjectItem projectItem) {
+    LocalesChangedEvent event = new LocalesChangedEvent(projectItem);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.localesChanged(event);
+    }
+  }
 }

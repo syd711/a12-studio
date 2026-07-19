@@ -13,6 +13,7 @@ import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -83,6 +84,15 @@ abstract public class AbstractPropertyEditor implements Initializable {
    */
   public ReadOnlyBooleanProperty errorProperty() {
     return errorContainerController.errorProperty();
+  }
+
+  /**
+   * Reflects the severity ("ERROR" or "WARNING") of whatever this panel's error container is currently (or
+   * was last) showing, so an owning dialog aggregating {@link #errorProperty()} across several panels can
+   * tell warnings apart from errors.
+   */
+  public ReadOnlyStringProperty severityProperty() {
+    return errorContainerController.severityProperty();
   }
 
   @Override

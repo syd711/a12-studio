@@ -54,6 +54,10 @@
     -fx-error-bg: #FF3333;
     -fx-error-text: -fx-text-color-inverse;
 
+    /* Warning / soft validation state */
+    -fx-warning-bg: #F5A623;
+    -fx-warning-text: -fx-text-color;
+
     /* Fixed-structure elements (children of attachment/multi-select groups) -
        soft, low-saturation tint distinguishing them from regular, freely editable elements. */
     -fx-fixed-child-bg: #FCF8FF;

@@ -1,17 +1,25 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.dataservices.models.documentmodel.BooleanFieldType;
+import de.a12.studio.dataservices.models.documentmodel.ConfirmFieldType;
+import de.a12.studio.dataservices.models.documentmodel.CustomFieldFieldType;
 import de.a12.studio.dataservices.models.documentmodel.DateFieldType;
+import de.a12.studio.dataservices.models.documentmodel.DateFragmentFieldType;
+import de.a12.studio.dataservices.models.documentmodel.DateRangeFieldType;
+import de.a12.studio.dataservices.models.documentmodel.DateTimeFieldType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.Element;
+import de.a12.studio.dataservices.models.documentmodel.EnumerationFieldType;
 import de.a12.studio.dataservices.models.documentmodel.FieldConfig;
 import de.a12.studio.dataservices.models.documentmodel.FieldElement;
 import de.a12.studio.dataservices.models.documentmodel.FieldType;
 import de.a12.studio.dataservices.models.documentmodel.NumberFieldType;
 import de.a12.studio.dataservices.models.documentmodel.RequirednessConfig;
 import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
+import de.a12.studio.dataservices.models.documentmodel.TimeFieldType;
 import de.a12.studio.dataservices.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.dataservices.models.documentmodel.TypeDefinition;
+import de.a12.studio.dataservices.models.documentmodel.UnspecifiedFieldType;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -35,10 +43,21 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
   private static final String TYPE_STRING = "String";
   private static final String TYPE_NUMBER = "Number";
-  private static final String TYPE_BOOLEAN = "Boolean";
   private static final String TYPE_DATE = "Date";
+  private static final String TYPE_DATE_TIME = "DateTime";
+  private static final String TYPE_TIME = "Time";
+  private static final String TYPE_DATE_FRAGMENT = "DateFragment";
+  private static final String TYPE_DATE_RANGE = "DateRange";
+  private static final String TYPE_CONFIRM = "Confirm";
+  private static final String TYPE_BOOLEAN = "Boolean";
+  private static final String TYPE_CUSTOM_FIELD = "CustomField";
+  private static final String TYPE_ENUMERATION = "Enumeration";
+  private static final String TYPE_UNSPECIFIED = "Unspecified";
 
-  private static final List<String> DATA_TYPES = List.of(TYPE_STRING, TYPE_NUMBER, TYPE_BOOLEAN, TYPE_DATE);
+  // Order mirrors the field-type dropdown in the SME reference implementation (DomainField.json).
+  private static final List<String> DATA_TYPES = List.of(
+      TYPE_STRING, TYPE_NUMBER, TYPE_DATE, TYPE_DATE_TIME, TYPE_TIME, TYPE_DATE_FRAGMENT, TYPE_DATE_RANGE,
+      TYPE_CONFIRM, TYPE_BOOLEAN, TYPE_CUSTOM_FIELD, TYPE_ENUMERATION, TYPE_UNSPECIFIED);
 
   @FXML
   private ComboBox<String> dataTypeCombo;
@@ -157,8 +176,16 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   private static FieldType createFieldType(String dataType) {
     return switch (dataType == null ? TYPE_STRING : dataType) {
       case TYPE_NUMBER -> new NumberFieldType();
-      case TYPE_BOOLEAN -> new BooleanFieldType();
       case TYPE_DATE -> new DateFieldType();
+      case TYPE_DATE_TIME -> new DateTimeFieldType();
+      case TYPE_TIME -> new TimeFieldType();
+      case TYPE_DATE_FRAGMENT -> new DateFragmentFieldType();
+      case TYPE_DATE_RANGE -> new DateRangeFieldType();
+      case TYPE_CONFIRM -> new ConfirmFieldType();
+      case TYPE_BOOLEAN -> new BooleanFieldType();
+      case TYPE_CUSTOM_FIELD -> new CustomFieldFieldType();
+      case TYPE_ENUMERATION -> new EnumerationFieldType();
+      case TYPE_UNSPECIFIED -> new UnspecifiedFieldType();
       default -> new StringFieldType();
     };
   }
@@ -166,10 +193,26 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   private static String getDataTypeName(FieldType fieldType) {
     if (fieldType instanceof NumberFieldType) {
       return TYPE_NUMBER;
-    } else if (fieldType instanceof BooleanFieldType) {
-      return TYPE_BOOLEAN;
+    } else if (fieldType instanceof DateTimeFieldType) {
+      return TYPE_DATE_TIME;
+    } else if (fieldType instanceof DateFragmentFieldType) {
+      return TYPE_DATE_FRAGMENT;
+    } else if (fieldType instanceof DateRangeFieldType) {
+      return TYPE_DATE_RANGE;
     } else if (fieldType instanceof DateFieldType) {
       return TYPE_DATE;
+    } else if (fieldType instanceof TimeFieldType) {
+      return TYPE_TIME;
+    } else if (fieldType instanceof ConfirmFieldType) {
+      return TYPE_CONFIRM;
+    } else if (fieldType instanceof BooleanFieldType) {
+      return TYPE_BOOLEAN;
+    } else if (fieldType instanceof CustomFieldFieldType) {
+      return TYPE_CUSTOM_FIELD;
+    } else if (fieldType instanceof EnumerationFieldType) {
+      return TYPE_ENUMERATION;
+    } else if (fieldType instanceof UnspecifiedFieldType) {
+      return TYPE_UNSPECIFIED;
     }
     return TYPE_STRING;
   }

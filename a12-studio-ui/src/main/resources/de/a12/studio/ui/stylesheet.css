@@ -120,6 +120,17 @@
     -fx-border-radius: 6px;
 }
 
+/* Warning severity variant, toggled via the "warning" pseudo-class in ErrorContainerController so it can
+   reuse the error container's box model while only swapping colors. */
+.error-container:warning {
+    -fx-background-color: -fx-warning-bg;
+}
+
+.error-container:warning .error-title,
+.error-container:warning .error-message {
+    -fx-text-fill: -fx-warning-text;
+}
+
 /**
  * Toolbar button error badge
  */

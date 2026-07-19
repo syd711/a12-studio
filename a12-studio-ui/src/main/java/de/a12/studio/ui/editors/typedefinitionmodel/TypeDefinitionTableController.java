@@ -3,23 +3,36 @@ package de.a12.studio.ui.editors.typedefinitionmodel;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.FieldType;
+import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
 import de.a12.studio.dataservices.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.dataservices.models.documentmodel.TypeDefinition;
+import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
+import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class TypeDefinitionTableController implements Initializable {
@@ -28,6 +41,9 @@ public class TypeDefinitionTableController implements Initializable {
 
   private static final String NAME_COLUMN_ID = "name";
   private static final String BASE_TYPE_COLUMN_ID = "baseType";
+
+  private static final String ID_PREFIX = "typedef_";
+  private static final String DEFAULT_NAME = "NewType";
 
   @FXML
   private SearchFieldController searchController;
@@ -76,6 +92,82 @@ public class TypeDefinitionTableController implements Initializable {
         saveColumnWidth(NAME_COLUMN_ID, newValue.doubleValue()));
     baseTypeColumn.widthProperty().addListener((observable, oldValue, newValue) ->
         saveColumnWidth(BASE_TYPE_COLUMN_ID, newValue.doubleValue()));
+
+    typeDefinitionsTable.setRowFactory(table -> new TableRow<>() {
+      @Override
+      protected void updateItem(TypeDefinition item, boolean empty) {
+        super.updateItem(item, empty);
+        setContextMenu(empty || item == null ? null : createContextMenu(item));
+      }
+    });
+  }
+
+  @FXML
+  private void onAdd() {
+    TypeDefinition typeDefinition = new TypeDefinition();
+    typeDefinition.setId(generateId());
+    typeDefinition.setName(uniqueName(DEFAULT_NAME));
+    typeDefinition.setFieldType(new StringFieldType());
+
+    typeDefinitions.add(typeDefinition);
+    searchController.clear();
+    applyFilter(searchController.getText());
+    selectTypeDefinition(typeDefinition);
+    save();
+  }
+
+  private ContextMenu createContextMenu(@NonNull TypeDefinition typeDefinition) {
+    MenuItem deleteItem = new MenuItem("Delete", WidgetFactory.createIcon(Icons.TRASH));
+    deleteItem.setOnAction(event -> onDelete(typeDefinition));
+
+    ContextMenu contextMenu = new ContextMenu();
+    contextMenu.getItems().add(deleteItem);
+    return contextMenu;
+  }
+
+  private void onDelete(@NonNull TypeDefinition typeDefinition) {
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this type definition?", null, null, "Delete");
+    if (result.isEmpty() || result.get() != ButtonType.OK) {
+      return;
+    }
+
+    typeDefinitions.remove(typeDefinition);
+    applyFilter(searchController.getText());
+    save();
+  }
+
+  private void selectTypeDefinition(@NonNull TypeDefinition typeDefinition) {
+    typeDefinitionsTable.getSelectionModel().select(typeDefinition);
+    int row = typeDefinitionsTable.getSelectionModel().getSelectedIndex();
+    if (row >= 0) {
+      typeDefinitionsTable.scrollTo(row);
+    }
+  }
+
+  private String uniqueName(@NonNull String baseName) {
+    Set<String> usedNames = new HashSet<>();
+    for (TypeDefinition typeDefinition : typeDefinitions) {
+      usedNames.add(typeDefinition.getName());
+    }
+    if (!usedNames.contains(baseName)) {
+      return baseName;
+    }
+    int suffix = 2;
+    while (usedNames.contains(baseName + "_" + suffix)) {
+      suffix++;
+    }
+    return baseName + "_" + suffix;
+  }
+
+  private String generateId() {
+    return ID_PREFIX + UUID.randomUUID();
+  }
+
+  private void save() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem != null) {
+      projectItem.save();
+    }
   }
 
   private void applyFilter(String filter) {

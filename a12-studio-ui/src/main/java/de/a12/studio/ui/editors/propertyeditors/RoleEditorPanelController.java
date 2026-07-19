@@ -5,6 +5,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.Annotation;
 import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
@@ -23,6 +24,7 @@ import javafx.scene.layout.HBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -40,6 +42,14 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
 
   private static final String ROLES_ANNOTATION_NAME = "roles";
   private static final int COMMIT_DEBOUNCE_MS = 150;
+
+  // Workspace-root singleton file that, if present, would let the SME resolve/validate role names against a
+  // known set (not yet ported, see docs/sme-reference-comparison.md); until then its mere presence/absence is
+  // still relevant for the warning below, mirroring SME's RolesModelNotPresent custom condition.
+  private static final String ROLES_FILE_NAME = "roles.yaml";
+
+  private static final String MISSING_ROLES_FILE_WARNING =
+      "The workspace should have a roles file if roles are specified in the model.";
 
   @FXML
   private GridPane rolesGrid;
@@ -61,6 +71,7 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
     roles.addAll(parseRoles(model));
     newRowIndices.clear();
     rebuildRows();
+    updateRolesFileWarning();
   }
 
   @FXML
@@ -181,6 +192,29 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
     }
 
     commitChange();
+    updateRolesFileWarning();
+  }
+
+  /**
+   * Mirrors SME's {@code shouldHaveRolesModelIfSpecifyingRoles} rule: roles typed on a model are free text
+   * unless the workspace has a roles file to validate them against, so warn (rather than block) when roles
+   * are specified but no such file exists.
+   */
+  private void updateRolesFileWarning() {
+    boolean rolesSpecified = roles.stream().anyMatch(role -> !role.isBlank());
+    if (rolesSpecified && !workspaceHasRolesFile()) {
+      showError("WARNING", MISSING_ROLES_FILE_WARNING);
+    } else {
+      hideError();
+    }
+  }
+
+  private static boolean workspaceHasRolesFile() {
+    Project project = Studio.getCurrentProject();
+    if (project == null) {
+      return true;
+    }
+    return new File(project.getFolder(), ROLES_FILE_NAME).isFile();
   }
 
   private static Annotation findRolesAnnotation(A12Model model) {

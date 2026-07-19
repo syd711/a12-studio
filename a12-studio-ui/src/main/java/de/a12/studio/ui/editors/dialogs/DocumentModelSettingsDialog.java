@@ -5,6 +5,7 @@ import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
@@ -13,7 +14,6 @@ import de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController
 import de.a12.studio.ui.editors.propertyeditors.RoleEditorPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SupportedCharactersPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TimezonePanelController;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
@@ -26,6 +26,9 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
 
   private static final String GENERIC_ERROR_MESSAGE =
       "One or more of the panels below contain an error. Please review them before saving.";
+
+  private static final String GENERIC_WARNING_MESSAGE =
+      "One or more of the panels below contain a warning. Please review them before saving.";
 
   @FXML
   private ModelSettingsNamePanelController modelSettingsNameController;
@@ -95,28 +98,38 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
 
   /**
    * Shows this dialog's own error container, with a generic title/message, whenever any of the property
-   * editor panels it embeds is showing a validation error in its own (panel-level) error container.
+   * editor panels it embeds is showing a validation error or warning in its own (panel-level) error
+   * container. An error in any panel takes precedence over a warning, so the dialog only shows "Warning"
+   * once every visible panel-level message is a warning.
    */
   private void bindErrorContainer() {
-    List<ReadOnlyBooleanProperty> panelErrorProperties = List.of(
-        modelSettingsNameController.errorProperty(),
-        supportedCharactersController.errorProperty(),
-        localesController.errorProperty(),
-        labelsController.errorProperty(),
-        rolesController.errorProperty(),
-        annotationsController.errorProperty(),
-        timezoneController.errorProperty());
+    List<AbstractPropertyEditor> panels = List.of(
+        modelSettingsNameController,
+        supportedCharactersController,
+        localesController,
+        labelsController,
+        rolesController,
+        annotationsController,
+        timezoneController);
 
     Runnable updateErrorContainer = () -> {
-      boolean anyPanelHasError = panelErrorProperties.stream().anyMatch(ReadOnlyBooleanProperty::get);
-      if (anyPanelHasError) {
+      boolean anyError = panels.stream()
+          .anyMatch(panel -> panel.errorProperty().get() && "ERROR".equalsIgnoreCase(panel.severityProperty().get()));
+      boolean anyWarning = panels.stream()
+          .anyMatch(panel -> panel.errorProperty().get() && "WARNING".equalsIgnoreCase(panel.severityProperty().get()));
+      if (anyError) {
         errorContainerController.show("ERROR", GENERIC_ERROR_MESSAGE);
+      } else if (anyWarning) {
+        errorContainerController.show("WARNING", GENERIC_WARNING_MESSAGE);
       } else {
         errorContainerController.hide();
       }
     };
 
-    panelErrorProperties.forEach(property -> property.addListener((observable, oldValue, newValue) -> updateErrorContainer.run()));
+    panels.forEach(panel -> {
+      panel.errorProperty().addListener((observable, oldValue, newValue) -> updateErrorContainer.run());
+      panel.severityProperty().addListener((observable, oldValue, newValue) -> updateErrorContainer.run());
+    });
     updateErrorContainer.run();
   }
 

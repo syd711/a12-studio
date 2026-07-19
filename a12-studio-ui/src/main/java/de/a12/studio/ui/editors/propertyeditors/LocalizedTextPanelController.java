@@ -9,15 +9,20 @@ import de.a12.studio.dataservices.models.documentmodel.StringTypeOptions;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.events.LocalesChangedEvent;
+import de.a12.studio.ui.events.StudioEventListener;
+import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.jspecify.annotations.NonNull;
 
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.function.Function;
 
 /**
@@ -29,12 +34,17 @@ import java.util.function.Function;
  * controller is loaded from FXML, before setElement/setModel; {@code element} and {@link #model} are mutually
  * exclusive.
  */
-public class LocalizedTextPanelController extends AbstractPropertyEditor {
+public class LocalizedTextPanelController extends AbstractPropertyEditor implements StudioEventListener {
 
   @FXML
   private GridPane localesGrid;
 
   private A12Model model;
+
+  // Captured whenever setElement/setModel is called, i.e. whenever this panel is (re)bound to whichever
+  // project item is currently selected. Used to tell apart a locales-changed event meant for this panel's own
+  // model from one fired for a different, unrelated model open in another tab.
+  private ProjectItem projectItem;
 
   private Function<Element, List<de.a12.studio.dataservices.models.Label>> elementTextsAccessor = Element::getExternalDescription;
 
@@ -88,8 +98,15 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   @Override
+  public void initialize(URL location, ResourceBundle resources) {
+    super.initialize(location, resources);
+    StudioEventManager.getInstance().addListener(this);
+  }
+
+  @Override
   public void setElement(@NonNull Element element) {
     this.model = null;
+    this.projectItem = Studio.getSelectedProjectItem();
     super.setElement(element);
     buildLocaleFields();
     populateLocaleFields();
@@ -98,8 +115,17 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   public void setModel(@NonNull A12Model model) {
     this.element = null;
     this.model = model;
+    this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
     populateLocaleFields();
+  }
+
+  @Override
+  public void localesChanged(@NonNull LocalesChangedEvent event) {
+    if (event.getItem().equals(projectItem)) {
+      buildLocaleFields();
+      populateLocaleFields();
+    }
   }
 
   private List<de.a12.studio.dataservices.models.Label> getTexts() {
@@ -201,7 +227,6 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   private List<Locale> getModelLocales() {
-    ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem == null || projectItem.getModel() == null) {
       return List.of();
     }
