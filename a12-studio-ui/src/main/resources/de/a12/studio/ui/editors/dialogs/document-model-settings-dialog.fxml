@@ -24,25 +24,25 @@
                           <padding>
                               <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                           </padding>
-      
+
                           <!-- Name / Version / Description -->
                           <fx:include fx:id="modelSettingsName" source="../propertyeditors/model-settings-name-panel.fxml" />
-      
+
                           <!-- Supported Characters -->
                           <fx:include fx:id="supportedCharacters" source="../propertyeditors/supported-characters-panel.fxml" />
-      
+
                           <!-- Locales -->
                           <fx:include fx:id="locales" source="../propertyeditors/locales-panel.fxml" />
-      
+
                           <!-- Labels -->
                           <fx:include fx:id="labels" source="../propertyeditors/localized-text-panel.fxml" />
-      
+
                           <!-- Roles -->
                           <fx:include fx:id="roles" source="../propertyeditors/roles-panel.fxml" />
-      
+
                           <!-- Annotations -->
                           <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
-      
+
                           <!-- Timezone -->
                           <fx:include fx:id="timezone" source="../propertyeditors/timezone-panel.fxml" />
                       </VBox>

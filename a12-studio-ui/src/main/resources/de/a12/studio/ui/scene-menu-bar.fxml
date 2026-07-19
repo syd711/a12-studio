@@ -14,9 +14,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
+<BorderPane styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
    <left>
-      <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_LEFT" prefHeight="42.0" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
             <MenuBar fx:id="menuBar" styleClass="base-component">
               <menus>
@@ -54,7 +54,7 @@
    <right>
       <HBox fx:id="menuBarRightPanel" alignment="CENTER_RIGHT" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="updateBtn" accessibleText="Update available" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button" visible="false" managed="false">
+            <Button fx:id="updateBtn" accessibleText="Update available" managed="false" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button" visible="false">
                 <graphic>
                     <FontIcon iconColor="#03A905" iconLiteral="mdi2a-arrow-down-bold" iconSize="18" />
                 </graphic>
@@ -100,6 +100,6 @@
       </HBox>
    </right>
    <center>
-      <HBox styleClass="dark-panel" BorderPane.alignment="CENTER" />
+      <HBox alignment="CENTER_RIGHT" prefHeight="42.0" styleClass="dark-panel" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

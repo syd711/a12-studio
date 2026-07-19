@@ -135,6 +135,10 @@
     -fx-background-color: -fx-text-color-inverse;
 }
 
+.primary-button FontIcon {
+    -fx-icon-color: -fx-text-color-inverse;
+}
+
 /**
  * Secondary action button (e.g. "Annotation Datasets")
  */

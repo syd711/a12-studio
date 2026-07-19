@@ -27,21 +27,13 @@
                         <Circle fx:id="settingsErrorBadge" styleClass="toolbar-button-error-badge" radius="4" translateX="10" translateY="-10" mouseTransparent="true" visible="false" StackPane.alignment="CENTER" />
                     </children>
                 </StackPane>
-                <Button layoutX="10.0" layoutY="10.0" onAction="#onTypeDefinitions" mnemonicParsing="false" styleClass="default-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2p-puzzle" iconSize="18" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Type Definitions" />
-                    </tooltip>
-                </Button>
                 <Separator prefHeight="0.0" prefWidth="0.0" />
                 <Button layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onAction="#onFileEdit" styleClass="default-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Type Definitions" />
+                        <Tooltip text="Edit File" />
                     </tooltip>
                 </Button>
                 <Button layoutX="10.0" layoutY="51.0" mnemonicParsing="false" onAction="#onFileOpen" styleClass="default-button">
@@ -49,7 +41,7 @@
                         <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="18" />
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Type Definitions" />
+                        <Tooltip text="Open Model Folder" />
                     </tooltip>
                 </Button>
             </items>
@@ -58,7 +50,7 @@
     <center>
         <BorderPane BorderPane.alignment="CENTER">
             <center>
-                <SplitPane fx:id="splitPane" dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                <SplitPane fx:id="splitPane" dividerPositions="0.4" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <items>
                         <fx:include fx:id="typeDefinitionsTable" source="typedefinition-table.fxml" />
                         <BorderPane fx:id="editorContainer" />

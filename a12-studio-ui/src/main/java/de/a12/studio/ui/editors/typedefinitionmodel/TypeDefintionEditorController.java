@@ -77,11 +77,6 @@ public class TypeDefintionEditorController extends AbstractEditorController impl
     updateSettingsErrorBadge();
   }
 
-  @FXML
-  public void onTypeDefinitions(ActionEvent e) {
-    DocumentModelDialogs.openTypeDefinitions();
-  }
-
   public void loadModel(@NonNull A12Model model) {
     load(((DocumentModel) model).getContent().getModelRoot());
     updateSettingsErrorBadge();

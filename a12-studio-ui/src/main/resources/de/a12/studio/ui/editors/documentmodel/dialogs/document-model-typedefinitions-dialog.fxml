@@ -16,37 +16,6 @@
         <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
     </top>
    <center>
-      <BorderPane styleClass="properties-panel" BorderPane.alignment="CENTER">
-         <top>
-            <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
-              <items>
-                <Button mnemonicParsing="false" styleClass="primary-button" text="Add">
-                     <graphic>
-                        <FontIcon fill="WHITE" iconColor="WHITE" iconLiteral="mdi2p-plus-circle" iconSize="18" />
-                     </graphic></Button>
-                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="default-button" text="Button" />
-              </items>
-            </ToolBar>
-         </top>
-         <center>
-            <SplitPane dividerPositions="0.5" BorderPane.alignment="CENTER">
-               <items>
-                  <TableView>
-                    <columns>
-                      <TableColumn prefWidth="75.0" text="NAME" />
-                      <TableColumn prefWidth="75.0" text="BASE TYPE" />
-                        <TableColumn prefWidth="75.0" text="SOURCE" />
-                    </columns>
-                  </TableView>
-                  <ScrollPane prefHeight="200.0" prefWidth="200.0">
-                     <content>
-                        <VBox prefHeight="200.0" prefWidth="100.0" />
-                     </content>
-                  </ScrollPane>
-               </items>
-            </SplitPane>
-         </center>
-      </BorderPane>
    </center>
    <bottom>
       <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="panel-toolbar" BorderPane.alignment="CENTER">

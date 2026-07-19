@@ -41,7 +41,7 @@
                         <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Type Definitions" />
+                        <Tooltip text="Edit File" />
                     </tooltip>
                 </Button>
                 <Button layoutX="10.0" layoutY="51.0" mnemonicParsing="false" onAction="#onFileOpen" styleClass="default-button">
@@ -49,7 +49,7 @@
                         <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="18" />
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Type Definitions" />
+                        <Tooltip text="Open Model Folder" />
                     </tooltip>
                 </Button>
             </items>
