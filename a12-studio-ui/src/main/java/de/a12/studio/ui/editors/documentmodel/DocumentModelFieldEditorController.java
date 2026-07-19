@@ -73,6 +73,10 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
   @Override
   public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
     generalInformationController.setAncestors(ancestors);
-    propertyEditors.forEach(propertyEditor -> propertyEditor.setElement(element));
+    boolean readOnly = isWithinAttachment(ancestors);
+    propertyEditors.forEach(propertyEditor -> {
+      propertyEditor.setElement(element);
+      propertyEditor.setEditorDisabled(readOnly);
+    });
   }
 }

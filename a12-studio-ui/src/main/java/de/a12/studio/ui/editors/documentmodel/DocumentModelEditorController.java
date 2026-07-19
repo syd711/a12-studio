@@ -118,7 +118,8 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
     Element selected = selectedElements.get(0);
     String editorFxml = selected instanceof GroupElement ? GROUP_EDITOR_FXML : FIELD_EDITOR_FXML;
-    editorContainer.setCenter(loadEditor(editorFxml, selected));
+    Node node = loadEditor(editorFxml, selected);
+    editorContainer.setCenter(node);
   }
 
   private Node loadEditor(@NonNull String fxml, @NonNull Element selected) {

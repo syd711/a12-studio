@@ -78,6 +78,15 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   /**
+   * Puts this panel into (or out of) read-only mode by disabling every control in its content area. JavaFX
+   * propagates the disabled state to all descendants, so this covers rows added dynamically later (e.g. by
+   * an "Add" button) as well. The TitledPane's own expand/collapse toggle is left usable.
+   */
+  public void setEditorDisabled(boolean disabled) {
+    root.getContent().setDisable(disabled);
+  }
+
+  /**
    * Reflects whether this panel is currently showing an error in its own error container, so an owning
    * dialog that embeds several panels can observe and aggregate their error state into its own, dialog-level
    * error container.
