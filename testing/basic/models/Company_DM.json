@@ -74,7 +74,8 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType"
+                          "type": "StringType",
+                          "StringType": {}
                         },
                         "label": [
                           {

@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
@@ -35,6 +36,13 @@ public class FieldInformationPanelController extends AbstractPropertyEditor impl
 
   public void setAncestors(@NonNull List<Element> ancestors) {
     this.ancestors = ancestors;
+  }
+
+  public void focusNameField() {
+    Platform.runLater(() -> {
+      nameField.requestFocus();
+      nameField.selectAll();
+    });
   }
 
   @Override

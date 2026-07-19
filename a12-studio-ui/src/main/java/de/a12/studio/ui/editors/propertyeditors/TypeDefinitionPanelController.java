@@ -28,6 +28,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
@@ -83,11 +84,15 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   @FXML
   private CheckBox requiredCheckBox;
 
+  @FXML
+  private GridPane customTypeGrid;
+
   private List<TypeDefinition> availableTypeDefinitions = List.of();
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
+    customTypeGrid.managedProperty().bindBidirectional(customTypeGrid.visibleProperty());
 
     dataTypeComboBox.getItems().addAll(DATA_TYPES);
 
@@ -141,6 +146,10 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
         field.setFieldType(createFieldType(value));
       }
     }));
+  }
+
+  public void setCustomTypeDisabled() {
+    customTypeGrid.setVisible(false);
   }
 
   @Override

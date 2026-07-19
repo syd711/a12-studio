@@ -4,14 +4,17 @@ import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.dataservices.projects.ProjectItem;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
@@ -25,6 +28,9 @@ public class NewModelDialogController implements DialogController {
 
   @FXML
   private TextField nameField;
+
+  @FXML
+  private Label pathLabel;
 
   @FXML
   private Button okButton;
@@ -66,11 +72,12 @@ public class NewModelDialogController implements DialogController {
     stage.close();
   }
 
-  public static Optional<NewModelInput> show(Stage owner) {
+  public static Optional<NewModelInput> show(Stage owner, @NonNull ProjectItem targetFolder) {
     FXMLLoader fxmlLoader = new FXMLLoader(NewModelDialogController.class.getResource("dialog-new-model.fxml"));
     Stage stage = WidgetFactory.createDialogStage("dialog-new-model", fxmlLoader, owner, "New Model");
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;
+    controller.pathLabel.setText(targetFolder.getPath());
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {

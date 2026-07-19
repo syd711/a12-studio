@@ -57,6 +57,8 @@ public class TypeDefintionEditorController extends AbstractEditorController impl
   @FXML
   private TypeDefinitionTableController typeDefinitionsTableController;
 
+  private TypeDefinitionModelFieldEditorController currentFieldEditorController;
+
   @FXML
   public void onFileOpen(ActionEvent e) {
     File file = projectItem.getFile();
@@ -100,15 +102,23 @@ public class TypeDefintionEditorController extends AbstractEditorController impl
     splitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) ->
         saveDividerPosition(newValue.doubleValue()));
     typeDefinitionsTableController.setSelectionListener(this::onTypeDefinitionSelectionChanged);
+    typeDefinitionsTableController.setOnItemAdded(this::focusNameField);
   }
 
   private void onTypeDefinitionSelectionChanged(TypeDefinition selected) {
     if (selected == null) {
       editorContainer.setCenter(null);
+      currentFieldEditorController = null;
       return;
     }
 
     editorContainer.setCenter(loadEditor(FIELD_EDITOR_FXML, selected));
+  }
+
+  private void focusNameField() {
+    if (currentFieldEditorController != null) {
+      currentFieldEditorController.focusNameField();
+    }
   }
 
   private Node loadEditor(@NonNull String fxml, @NonNull TypeDefinition selected) {
@@ -118,6 +128,9 @@ public class TypeDefintionEditorController extends AbstractEditorController impl
       if (loader.getController() instanceof ElementEditorController elementEditorController) {
         elementEditorController.setElement(new TypeDefinitionFieldElement(selected), List.of());
       }
+      currentFieldEditorController = loader.getController() instanceof TypeDefinitionModelFieldEditorController fieldEditorController
+          ? fieldEditorController
+          : null;
       return node;
     }
     catch (IOException e) {

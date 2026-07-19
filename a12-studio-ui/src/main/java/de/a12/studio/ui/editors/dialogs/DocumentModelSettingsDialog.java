@@ -14,6 +14,7 @@ import de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController
 import de.a12.studio.ui.editors.propertyeditors.RoleEditorPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SupportedCharactersPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TimezonePanelController;
+import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
@@ -136,6 +137,7 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
   @FXML
   private void onSave() {
     saveMode.flush();
+    StudioEventManager.getInstance().fireLocalesChangedEvent(Studio.getSelectedProjectItem());
     stage.close();
   }
 
@@ -150,5 +152,6 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
     if (snapshot != null) {
       snapshot.restore();
     }
+    StudioEventManager.getInstance().fireLocalesChangedEvent(Studio.getSelectedProjectItem());
   }
 }

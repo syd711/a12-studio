@@ -5,6 +5,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
@@ -14,10 +15,34 @@
             <items>
                 <Button mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add">
                     <graphic>
-                        <FontIcon iconLiteral="mdi2p-plus-circle" iconSize="18" />
-                    </graphic></Button>
-                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="secondary-button" text="Import" />
-                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="secondary-button" text="Delete Import" />
+                        <FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus-circle" iconSize="18" />
+                    </graphic>
+                </Button>
+                <Button layoutX="169.0" layoutY="11.0" mnemonicParsing="false" styleClass="delete-button" text="Delete">
+                    <tooltip>
+                        <Tooltip text="Delete the selected import" />
+                    </tooltip>
+                    <graphic>
+                        <FontIcon iconColor="#c0392b" iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
+                    </graphic>
+                </Button>
+                <Separator layoutX="412.0" layoutY="10.0" orientation="VERTICAL" />
+                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="secondary-button" text="Import">
+                    <tooltip>
+                        <Tooltip text="Import a new set of types." />
+                    </tooltip>
+               <graphic>
+                  <FontIcon iconLiteral="mdi2i-import" iconSize="18" />
+               </graphic>
+                </Button>
+                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="delete-button" text="Delete Import">
+                    <tooltip>
+                        <Tooltip text="Delete the selected import" />
+                    </tooltip>
+                    <graphic>
+                        <FontIcon iconColor="#c0392b" iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
+                    </graphic>
+                </Button>
                 <Separator layoutX="145.0" layoutY="10.0" orientation="VERTICAL" />
                 <fx:include fx:id="search" source="../../components/search-field.fxml" />
             </items>
@@ -31,6 +56,5 @@
                 <TableColumn prefWidth="90.0" text="SOURCE" />
             </columns>
         </TableView>
-
     </center>
 </BorderPane>

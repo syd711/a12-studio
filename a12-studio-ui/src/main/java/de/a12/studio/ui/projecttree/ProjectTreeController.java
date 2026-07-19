@@ -151,6 +151,22 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
   }
 
+  @FXML
+  private void onNewModel() {
+    if (project != null) {
+      menuFactory.onCreateNewModel(resolveTargetFolder());
+    }
+  }
+
+  private ProjectItem resolveTargetFolder() {
+    TreeItem<ProjectItemViewModel> selected = projectTree.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      return project.getRoot();
+    }
+    ProjectItem item = selected.getValue().getProjectItem();
+    return item.isFolder() ? item : item.getParent();
+  }
+
   private void setExpandedRecursive(TreeItem<ProjectItemViewModel> treeItem, boolean expanded) {
     if (treeItem == null) {
       return;

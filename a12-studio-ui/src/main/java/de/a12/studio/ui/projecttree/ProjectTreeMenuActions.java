@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -97,7 +98,7 @@ public class ProjectTreeMenuActions {
   }
 
   void onCreateNewModel(@NonNull ProjectItem parent) {
-    Optional<NewModelInput> input = NewModelDialogController.show(getStage());
+    Optional<NewModelInput> input = NewModelDialogController.show(getStage(), parent);
     if (input.isEmpty()) {
       return;
     }
@@ -105,8 +106,9 @@ public class ProjectTreeMenuActions {
     ModelType modelType = input.get().modelType();
     String name = input.get().name();
     try {
-      NewModelFactory.createModel(parent, modelType, name);
+      ProjectItem item = NewModelFactory.createModel(parent, modelType, name);
       onReload.run();
+      onOpen.accept(new ProjectItemViewModel(item, Map.of()));
     }
     catch (IOException e) {
       showError("Could not create '" + name + "'", e);

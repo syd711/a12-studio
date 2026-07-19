@@ -2,7 +2,7 @@
  * Table View
  */
 .table-view {
-    -fx-font-size: 13px;
+    -fx-font-size: 13.5px;
     -fx-background-color: -fx-input-bg;
     -fx-border-color: -fx-border-color-theme;
     -fx-border-width: 1px;
@@ -33,7 +33,7 @@
 
 .table-view .cell,
 .table-view .table-cell {
-    -fx-font-size: 13px;
+    -fx-font-size: 13.5px;
     -fx-text-fill: -fx-text-color;
 }
 
@@ -43,11 +43,16 @@
     -fx-table-cell-border-color: -fx-border-divider;
 }
 
-.table-view .table-row-cell:selected {
-    -fx-background-color: -fx-selection-bg;
+.table-view .table-row-cell:filled:selected,
+.table-view .table-row-cell:filled:selected:focused,
+.table-view .table-row-cell:filled:selected:hover {
+    -fx-background: -fx-accent-color;
+    -fx-background-color: -fx-accent-color;
 }
 
-.table-view .table-row-cell:selected .table-cell {
-    -fx-text-fill: -fx-selection-text;
+.table-view .table-row-cell:filled:selected .table-cell,
+.table-view .table-row-cell:filled:selected:focused .table-cell,
+.table-view .table-row-cell:filled:selected:hover .table-cell {
+    -fx-text-fill: -fx-text-color-inverse;
     -fx-font-weight: 600;
 }

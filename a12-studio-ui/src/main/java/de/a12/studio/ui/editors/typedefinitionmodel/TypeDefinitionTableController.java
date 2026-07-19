@@ -15,6 +15,7 @@ import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
@@ -25,6 +26,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.HashSet;
@@ -61,8 +63,14 @@ public class TypeDefinitionTableController implements Initializable {
 
   private Consumer<TypeDefinition> selectionListener;
 
+  private Runnable onItemAddedListener;
+
   public void setSelectionListener(@NonNull Consumer<TypeDefinition> selectionListener) {
     this.selectionListener = selectionListener;
+  }
+
+  public void setOnItemAdded(@NonNull Runnable onItemAddedListener) {
+    this.onItemAddedListener = onItemAddedListener;
   }
 
   public void load(@NonNull DocumentModel model) {
@@ -74,11 +82,13 @@ public class TypeDefinitionTableController implements Initializable {
   public void initialize(URL location, ResourceBundle resources) {
     searchController.setOnSearch(this::applyFilter);
 
-    typeDefinitionsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-    typeDefinitionsTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-      if (selectionListener != null) {
-        selectionListener.accept(newValue);
+    typeDefinitionsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    typeDefinitionsTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TypeDefinition>) change -> {
+      if (selectionListener == null) {
+        return;
       }
+      List<TypeDefinition> selectedItems = typeDefinitionsTable.getSelectionModel().getSelectedItems();
+      selectionListener.accept(selectedItems.size() == 1 ? selectedItems.get(0) : null);
     });
 
     nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getName()));
@@ -97,7 +107,7 @@ public class TypeDefinitionTableController implements Initializable {
       @Override
       protected void updateItem(TypeDefinition item, boolean empty) {
         super.updateItem(item, empty);
-        setContextMenu(empty || item == null ? null : createContextMenu(item));
+        setContextMenu(empty || item == null ? null : createContextMenu(this));
       }
     });
   }
@@ -113,33 +123,47 @@ public class TypeDefinitionTableController implements Initializable {
     searchController.clear();
     applyFilter(searchController.getText());
     selectTypeDefinition(typeDefinition);
+    if (onItemAddedListener != null) {
+      onItemAddedListener.run();
+    }
     save();
   }
 
-  private ContextMenu createContextMenu(@NonNull TypeDefinition typeDefinition) {
-    MenuItem deleteItem = new MenuItem("Delete", WidgetFactory.createIcon(Icons.TRASH));
-    deleteItem.setOnAction(event -> onDelete(typeDefinition));
+  private ContextMenu createContextMenu(@NonNull TableRow<TypeDefinition> row) {
+    FontIcon deleteIcon = WidgetFactory.createIcon(Icons.TRASH);
+    deleteIcon.getStyleClass().add("menu-icon");
+
+    MenuItem deleteItem = new MenuItem("Delete", deleteIcon);
+    deleteItem.setOnAction(event -> onDelete(row));
 
     ContextMenu contextMenu = new ContextMenu();
     contextMenu.getItems().add(deleteItem);
     return contextMenu;
   }
 
-  private void onDelete(@NonNull TypeDefinition typeDefinition) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this type definition?", null, null, "Delete");
+  private void onDelete(@NonNull TableRow<TypeDefinition> row) {
+    List<TypeDefinition> selectedItems = List.copyOf(typeDefinitionsTable.getSelectionModel().getSelectedItems());
+    List<TypeDefinition> itemsToDelete = selectedItems.size() > 1 && selectedItems.contains(row.getItem())
+        ? selectedItems
+        : List.of(row.getItem());
+
+    String message = itemsToDelete.size() > 1
+        ? "Delete " + itemsToDelete.size() + " type definitions?"
+        : "Delete this type definition?";
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, message, null, null, "Delete");
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }
 
-    typeDefinitions.remove(typeDefinition);
+    typeDefinitions.removeAll(itemsToDelete);
     applyFilter(searchController.getText());
     save();
   }
 
   private void selectTypeDefinition(@NonNull TypeDefinition typeDefinition) {
-    typeDefinitionsTable.getSelectionModel().select(typeDefinition);
-    int row = typeDefinitionsTable.getSelectionModel().getSelectedIndex();
+    int row = typeDefinitionsTable.getItems().indexOf(typeDefinition);
     if (row >= 0) {
+      typeDefinitionsTable.getSelectionModel().clearAndSelect(row);
       typeDefinitionsTable.scrollTo(row);
     }
   }

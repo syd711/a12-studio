@@ -32,6 +32,8 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    typeDefinitionController.setCustomTypeDisabled();
+
     propertyEditors = List.of(generalInformationController, typeDefinitionController, dataTypeConfigurationController,
         suggestionsController);
   }
@@ -40,5 +42,9 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
   public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
     generalInformationController.setAncestors(ancestors);
     propertyEditors.forEach(propertyEditor -> propertyEditor.setElement(element));
+  }
+
+  public void focusNameField() {
+    generalInformationController.focusNameField();
   }
 }
