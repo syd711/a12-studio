@@ -23,12 +23,12 @@
     ],
     "annotations": [
       {
-        "name": "roles",
-        "value": "tester,reviewer"
-      },
-      {
         "name": "application",
         "value": "dsfd"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
       }
     ],
     "modelReferences": []
@@ -74,8 +74,10 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType",
-                          "StringType": {}
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "abc"
+                          }
                         },
                         "label": [
                           {
@@ -646,6 +648,15 @@
           }
         }
       ]
-    }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_dab31221-c120-43e5-bd0f-c81fbede3285",
+        "name": "abc",
+        "fieldType": {
+          "type": "StringType"
+        }
+      }
+    ]
   }
 }

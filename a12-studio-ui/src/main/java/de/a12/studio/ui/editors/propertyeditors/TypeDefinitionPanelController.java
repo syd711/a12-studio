@@ -157,7 +157,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     super.setElement(element);
 
     availableTypeDefinitions = collectAvailableTypeDefinitions(element.getId());
-    dataTypeCombo.getItems().setAll(availableTypeDefinitions.stream().map(TypeDefinition::getId).toList());
+//    dataTypeCombo.getItems().setAll(availableTypeDefinitions.stream().map(TypeDefinition::getId).toList());
 
     Optional<FieldConfig> fieldConfig = getFieldConfig(element);
     FieldType fieldType = fieldConfig.map(FieldConfig::getFieldType).orElse(null);
