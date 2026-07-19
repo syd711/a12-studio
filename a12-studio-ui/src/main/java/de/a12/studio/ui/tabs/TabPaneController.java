@@ -1,7 +1,10 @@
 package de.a12.studio.ui.tabs;
 
+import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.EditorFactory;
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
@@ -88,9 +91,13 @@ public class TabPaneController implements Initializable, StudioEventListener {
     tab.setUserData(item);
     tab.setClosable(true);
 
-    FontIcon icon = WidgetFactory.createIcon(Icons.FILE_OUTLINE);
-    icon.setIconColor(Color.valueOf(WidgetFactory.DEFAULT_COLOR));
-    tab.setGraphic(icon);
+    A12Model model = item.getModel();
+    if (model instanceof TypeDefinitionModel) {
+      tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(ModelType.TYPEDEFINITION)));
+    }
+    else {
+      tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(model.getModelType())));
+    }
     tab.setContextMenu(createTabContextMenu(tab));
     tab.setOnClosed(closeEvent -> onTabClosed(tab));
     tabPane.getTabs().add(tab);

@@ -3,15 +3,11 @@ package de.a12.studio.ui.editors.typedefinitionmodel;
 import de.a12.studio.dataservices.models.A12Model;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.models.documentmodel.GroupElement;
-import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
+import de.a12.studio.dataservices.models.documentmodel.TypeDefinition;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
-import de.a12.studio.ui.editors.documentmodel.DocumentModelElementsTreeController;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
-import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -39,6 +35,8 @@ public class TypeDefintionEditorController extends AbstractEditorController impl
   private static final String TABLE_SETTINGS_ID = ModelType.TYPEDEFINITION.getValue();
 
   private static final String MAIN_DIVIDER_ID = "mainDivider";
+
+  private static final String FIELD_EDITOR_FXML = "typedefinition-model-field-editor.fxml";
 
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
@@ -78,7 +76,7 @@ public class TypeDefintionEditorController extends AbstractEditorController impl
   }
 
   public void loadModel(@NonNull A12Model model) {
-    load(((DocumentModel) model).getContent().getModelRoot());
+    load((DocumentModel) model);
     updateSettingsErrorBadge();
   }
 
@@ -91,8 +89,8 @@ public class TypeDefintionEditorController extends AbstractEditorController impl
     settingsButtonTooltip.setText(issues.isEmpty() ? DEFAULT_SETTINGS_TOOLTIP : String.join("\n\n", issues));
   }
 
-  private void load(@NonNull ModelRoot modelRoot) {
-//    elementsTreeController.load(projectItem, modelRoot);
+  private void load(@NonNull DocumentModel documentModel) {
+    typeDefinitionsTableController.load(documentModel);
   }
 
   @Override
@@ -101,26 +99,24 @@ public class TypeDefintionEditorController extends AbstractEditorController impl
     applyDividerPosition(tableSettings);
     splitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) ->
         saveDividerPosition(newValue.doubleValue()));
-//    elementsTreeController.setSelectionListener(this::onElementSelectionChanged);
+    typeDefinitionsTableController.setSelectionListener(this::onTypeDefinitionSelectionChanged);
   }
 
-  private void onElementSelectionChanged(@NonNull List<Element> selectedElements) {
-    if (selectedElements.size() != 1) {
+  private void onTypeDefinitionSelectionChanged(TypeDefinition selected) {
+    if (selected == null) {
       editorContainer.setCenter(null);
       return;
     }
 
-//    Element selected = selectedElements.get(0);
-//    String editorFxml = selected instanceof GroupElement ? GROUP_EDITOR_FXML : FIELD_EDITOR_FXML;
-//    editorContainer.setCenter(loadEditor(editorFxml, selected));
+    editorContainer.setCenter(loadEditor(FIELD_EDITOR_FXML, selected));
   }
 
-  private Node loadEditor(@NonNull String fxml, @NonNull Element selected) {
+  private Node loadEditor(@NonNull String fxml, @NonNull TypeDefinition selected) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
       Node node = loader.load();
       if (loader.getController() instanceof ElementEditorController elementEditorController) {
-//        elementEditorController.setElement(selected, elementsTreeController.getAncestors(selected));
+        elementEditorController.setElement(new TypeDefinitionFieldElement(selected), List.of());
       }
       return node;
     }

@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.dataservices.models.documentmodel.BooleanFieldType;
 import de.a12.studio.dataservices.models.documentmodel.DateFieldType;
+import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.Element;
 import de.a12.studio.dataservices.models.documentmodel.FieldConfig;
 import de.a12.studio.dataservices.models.documentmodel.FieldElement;
@@ -10,15 +11,21 @@ import de.a12.studio.dataservices.models.documentmodel.NumberFieldType;
 import de.a12.studio.dataservices.models.documentmodel.RequirednessConfig;
 import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
 import de.a12.studio.dataservices.models.documentmodel.TypeDefFieldType;
+import de.a12.studio.dataservices.models.documentmodel.TypeDefinition;
+import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
+import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -57,11 +64,29 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   @FXML
   private CheckBox requiredCheckBox;
 
+  private List<TypeDefinition> availableTypeDefinitions = List.of();
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
 
     dataTypeComboBox.getItems().addAll(DATA_TYPES);
+
+    dataTypeCombo.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(String id) {
+        return availableTypeDefinitions.stream()
+            .filter(typeDefinition -> typeDefinition.getId().equals(id))
+            .findFirst()
+            .map(TypeDefinition::getName)
+            .orElse(id);
+      }
+
+      @Override
+      public String fromString(String name) {
+        return name;
+      }
+    });
 
     dataTypeCombo.managedProperty().bind(dataTypeCombo.visibleProperty());
     dataTypeCombo.visibleProperty().bind(typeDefinitionCheckBox.selectedProperty());
@@ -102,6 +127,9 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   @Override
   public void setElement(@NonNull Element element) {
     super.setElement(element);
+
+    availableTypeDefinitions = collectAvailableTypeDefinitions(element.getId());
+    dataTypeCombo.getItems().setAll(availableTypeDefinitions.stream().map(TypeDefinition::getId).toList());
 
     Optional<FieldConfig> fieldConfig = getFieldConfig(element);
     FieldType fieldType = fieldConfig.map(FieldConfig::getFieldType).orElse(null);
@@ -155,5 +183,28 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
       return Optional.of(fieldElement.getField());
     }
     return Optional.empty();
+  }
+
+  /**
+   * Every type definition a field can point to via {@link TypeDefFieldType}: the current document model's
+   * own type definitions plus every other document model's in the same project (a type definition model is
+   * just a document model whose header carries the "tdonly" annotation, so it's included here too), minus
+   * {@code excludedId} itself so a type definition can't reference itself.
+   */
+  private static List<TypeDefinition> collectAvailableTypeDefinitions(@NonNull String excludedId) {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem == null) {
+      return List.of();
+    }
+
+    List<TypeDefinition> result = new ArrayList<>();
+    if (projectItem.getModel() instanceof DocumentModel documentModel) {
+      result.addAll(documentModel.getContent().getTypeDefinitions());
+    }
+    for (DocumentModel other : ProjectDocumentModels.getOtherDocumentModels(projectItem)) {
+      result.addAll(other.getContent().getTypeDefinitions());
+    }
+    result.removeIf(typeDefinition -> excludedId.equals(typeDefinition.getId()));
+    return result;
   }
 }

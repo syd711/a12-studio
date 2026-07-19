@@ -1,6 +1,8 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.dataservices.models.A12Model;
+import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.ui.util.Icons;
@@ -52,15 +54,11 @@ public class ProjectItemViewModel {
       return null;
     }
 
-    return switch (model.getModelType()) {
-      case DOCUMENT -> Icons.PNG_MODEL_DOCUMENT;
-      case FORM -> Icons.PNG_MODEL_FORM;
-      case OVERVIEW -> Icons.PNG_MODEL_OVERVIEW;
-      case RELATIONSHIP -> Icons.PNG_MODEL_RELATIONSHIP;
-      case APPLICATION -> Icons.PNG_MODEL_APPLICATION;
-      case CONTENT -> Icons.PNG_MODEL_CONTENT;
-      case TYPEDEFINITION -> Icons.PNG_MODEL_TYPE_DEFINITION;
-    };
+    if (model instanceof TypeDefinitionModel) {
+      return Icons.forModelType(ModelType.TYPEDEFINITION);
+    }
+
+    return Icons.forModelType(model.getModelType());
   }
 
   public List<ProjectItemViewModel> getChildren() {

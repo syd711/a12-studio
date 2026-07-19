@@ -21,6 +21,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -39,6 +41,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
@@ -169,6 +173,22 @@ public class WidgetFactory {
     label.setTooltip(createTooltip(tooltip));
     label.setGraphic(icon);
     return label;
+  }
+
+  private static final Map<String, Image> MODEL_ICON_CACHE = new HashMap<>();
+
+  public static ImageView createModelIcon(@NonNull String iconPath) {
+    ImageView imageView = new ImageView(loadModelIcon(iconPath));
+    imageView.getStyleClass().add("tree-icon");
+    imageView.setFitWidth(DEFAULT_ICON_SIZE);
+    imageView.setFitHeight(DEFAULT_ICON_SIZE);
+    imageView.setPreserveRatio(true);
+    return imageView;
+  }
+
+  private static Image loadModelIcon(@NonNull String iconPath) {
+    return MODEL_ICON_CACHE.computeIfAbsent(iconPath,
+        path -> new Image(WidgetFactory.class.getResourceAsStream(path), DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE, true, true));
   }
 
   public static String hexColor(Integer color) {

@@ -1,5 +1,7 @@
 package de.a12.studio.ui.util;
 
+import de.a12.studio.dataservices.models.ModelType;
+
 public interface Icons {
 
   String WINDOW_MINIMIZE = "mdi2w-window-minimize";
@@ -49,4 +51,20 @@ public interface Icons {
   String ELEMENT_REQUIRED = "mdi2a-asterisk-circle-outline";
 
   String ELEMENT_VALIDATION_RULE = "mdi2a-alpha-v-circle";
+
+  static String forModelType(ModelType modelType) {
+    if (modelType == null) {
+      return null;
+    }
+
+    return switch (modelType) {
+      case DOCUMENT -> PNG_MODEL_DOCUMENT;
+      case FORM -> PNG_MODEL_FORM;
+      case OVERVIEW -> PNG_MODEL_OVERVIEW;
+      case RELATIONSHIP -> PNG_MODEL_RELATIONSHIP;
+      case APPLICATION -> PNG_MODEL_APPLICATION;
+      case CONTENT -> PNG_MODEL_CONTENT;
+      case TYPEDEFINITION -> PNG_MODEL_TYPE_DEFINITION;
+    };
+  }
 }

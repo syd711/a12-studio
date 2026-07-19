@@ -14,7 +14,7 @@
             <items>
                 <Button mnemonicParsing="false" styleClass="primary-button" text="Add">
                     <graphic>
-                        <FontIcon iconColor="WHITE" iconLiteral="mdi2p-plus-circle" iconSize="18" />
+                        <FontIcon iconLiteral="mdi2p-plus-circle" iconSize="18" />
                     </graphic></Button>
                 <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="secondary-button" text="Import" />
                 <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="secondary-button" text="Delete Import" />
@@ -24,10 +24,10 @@
         </ToolBar>
     </top>
     <center>
-        <TableView>
+        <TableView fx:id="typeDefinitionsTable">
             <columns>
-                <TableColumn prefWidth="200.0" text="NAME" />
-                <TableColumn prefWidth="90.0" text="BASE TYPE" />
+                <TableColumn fx:id="nameColumn" prefWidth="200.0" text="NAME" />
+                <TableColumn fx:id="baseTypeColumn" prefWidth="90.0" text="BASE TYPE" />
                 <TableColumn prefWidth="90.0" text="SOURCE" />
             </columns>
         </TableView>

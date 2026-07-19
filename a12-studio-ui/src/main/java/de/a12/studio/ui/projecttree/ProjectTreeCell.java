@@ -6,7 +6,6 @@ import de.a12.studio.ui.util.Icons;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -17,16 +16,13 @@ import javafx.scene.input.TransferMode;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
 
-  private static final Map<String, Image> MODEL_ICON_CACHE = new HashMap<>();
   private static final DataFormat PROJECT_ITEM_PATH = new DataFormat("application/x-a12-project-item-path");
 
   private final Consumer<ProjectItemViewModel> onOpen;
@@ -34,7 +30,6 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
   private final AtomicReference<ProjectItemViewModel> dragSource;
 
   private final FontIcon icon = new FontIcon();
-  private final ImageView modelIcon = new ImageView();
 
   private final ChangeListener<Boolean> expandedListener = (observable, wasExpanded, expanded) ->
       icon.setIconLiteral(expanded ? Icons.FOLDER_OPEN_OUTLINE : Icons.FOLDER_OUTLINE);
@@ -47,10 +42,6 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     this.dragSource = dragSource;
 
     icon.getStyleClass().add("tree-icon");
-    modelIcon.getStyleClass().add("tree-icon");
-    modelIcon.setFitWidth(18);
-    modelIcon.setFitHeight(18);
-    modelIcon.setPreserveRatio(true);
     setOnMouseClicked(event -> {
       if (event.getClickCount() == 2 && !isEmpty() && getItem() != null) {
         onOpen.accept(getItem());
@@ -101,11 +92,6 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       return false;
     }
     return menuFactory.canMoveItem(source.getProjectItem(), getItem().getProjectItem());
-  }
-
-  private static Image loadModelIcon(@NonNull String iconPath) {
-    return MODEL_ICON_CACHE.computeIfAbsent(iconPath,
-        path -> new Image(ProjectTreeCell.class.getResourceAsStream(path), 18, 18, true, true));
   }
 
   @Override
@@ -162,7 +148,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     else {
       String iconPath = item.getIconPath();
       if (iconPath != null) {
-        modelIcon.setImage(loadModelIcon(iconPath));
+        ImageView modelIcon = WidgetFactory.createModelIcon(iconPath);
         setGraphic(modelIcon);
       }
       else {

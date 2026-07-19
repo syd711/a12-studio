@@ -137,6 +137,7 @@
 
 .primary-button FontIcon {
     -fx-icon-color: -fx-text-color-inverse;
+    -fx-fill: -fx-text-color-inverse !important;
 }
 
 /**
