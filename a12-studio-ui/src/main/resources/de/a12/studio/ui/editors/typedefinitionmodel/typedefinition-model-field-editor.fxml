@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionModelFieldEditorController">
+  <content>
+    <VBox spacing="12.0" styleClass="field-editor">
+      <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+      </padding>
+         <Label styleClass="editor-type-label" text="Type Definition Editor" />
+
+      <!-- General Information -->
+      <fx:include fx:id="generalInformation" source="../propertyeditors/field-information-panel.fxml" />
+
+      <!-- Data Def Configuration -->
+      <fx:include fx:id="typeDefinition" source="../propertyeditors/type-definition-panel.fxml" />
+
+      <!-- Data Type Configuration -->
+      <fx:include fx:id="dataTypeConfiguration" source="../propertyeditors/data-type-configuration-panel.fxml" />
+
+      <!-- Suggestions -->
+      <fx:include fx:id="suggestions" source="../propertyeditors/suggestions-panel.fxml" />
+    </VBox>
+  </content>
+</ScrollPane>
