@@ -14,6 +14,7 @@ public enum ModelType {
 
   DOCUMENT("document", "Document Model"),
   FORM("form", "Form Model"),
+  TYPEDEFINITION("typedefinition", "Type Definition Model"),
   OVERVIEW("overview", "Overview Model"),
   RELATIONSHIP("relationship", "Relationship Model"),
   APPLICATION("application", "Application Model"),

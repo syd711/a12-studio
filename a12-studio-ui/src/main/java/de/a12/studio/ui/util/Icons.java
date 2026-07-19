@@ -37,6 +37,7 @@ public interface Icons {
   String PNG_MODEL_RELATIONSHIP = "/de/a12/studio/ui/icons/Model-Relationship.png";
   String PNG_MODEL_APPLICATION = "/de/a12/studio/ui/icons/Model-App.png";
   String PNG_MODEL_CONTENT = "/de/a12/studio/ui/icons/Model-Content.png";
+  String PNG_MODEL_TYPE_DEFINITION = "/de/a12/studio/ui/icons/Model-Type-Definition.png";
 
   String ELEMENT_MULTI_SELECT = "mdi2c-checkbox-multiple-marked-outline";
   String ELEMENT_INCLUDE = "mdi2l-link";

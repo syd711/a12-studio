@@ -5,6 +5,7 @@ import de.a12.studio.dataservices.models.applicationmodel.ApplicationModel;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.formmodel.FormModel;
 import de.a12.studio.dataservices.models.overviewmodel.OverviewModel;
+import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -15,6 +16,10 @@ import java.nio.file.Path;
 
 @Slf4j
 public class ModelFactory {
+
+  // Type Definition Models don't have their own modelType; they are DocumentModels flagged with this
+  // header annotation, so a plain modelType lookup can't tell them apart from a regular DocumentModel.
+  private static final String TD_ONLY_ANNOTATION = "tdonly";
 
   @Nullable
   public static A12Model load(@NonNull ProjectItem projectItem) {
@@ -31,7 +36,10 @@ public class ModelFactory {
 
       ModelType modelType = ModelType.fromValue(modelTypeValue);
       return switch (modelType) {
-        case DOCUMENT -> JsonSettings.objectMapper.treeToValue(root, DocumentModel.class);
+        case DOCUMENT -> {
+          Class<? extends DocumentModel> targetClass = isTypeDefinitionOnly(root) ? TypeDefinitionModel.class : DocumentModel.class;
+          yield JsonSettings.objectMapper.treeToValue(root, targetClass);
+        }
         case OVERVIEW -> JsonSettings.objectMapper.treeToValue(root, OverviewModel.class);
         case APPLICATION -> JsonSettings.objectMapper.treeToValue(root, ApplicationModel.class);
         case FORM -> JsonSettings.objectMapper.treeToValue(root, FormModel.class);
@@ -45,5 +53,15 @@ public class ModelFactory {
       log.warn("Failed to load model from '{}': {}", projectItem.getPath(), e.getMessage(), e);
       return null;
     }
+  }
+
+  private static boolean isTypeDefinitionOnly(@NonNull JsonNode root) {
+    for (JsonNode annotation : root.path("header").path("annotations")) {
+      if (TD_ONLY_ANNOTATION.equals(annotation.path("name").asString(null))
+          && "true".equals(annotation.path("value").asString(null))) {
+        return true;
+      }
+    }
+    return false;
   }
 }

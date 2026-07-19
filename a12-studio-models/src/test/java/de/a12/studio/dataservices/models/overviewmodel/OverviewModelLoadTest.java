@@ -1,4 +1,4 @@
-package de.a12.studio.dataservices.models.typedefinitionmodel;
+package de.a12.studio.dataservices.models.overviewmodel;
 
 import de.a12.studio.dataservices.models.Label;
 import de.a12.studio.dataservices.models.ModelType;
@@ -24,7 +24,7 @@ class OverviewModelLoadTest {
 
   @Test
   void loadsCompanyOverviewModel() throws Exception {
-    OverviewModel model = load("/typedefinitionmodel/Company_OM.json");
+    OverviewModel model = load("/overviewmodel/Company_OM.json");
 
     assertEquals("Company_OM", model.getId());
     assertEquals(ModelType.OVERVIEW, model.getModelType());
@@ -73,7 +73,7 @@ class OverviewModelLoadTest {
 
   @Test
   void loadsInvoiceOverviewModelWithMultiSelectionAndExpressionColumn() throws Exception {
-    OverviewModel model = load("/typedefinitionmodel/Invoice_OM.json");
+    OverviewModel model = load("/overviewmodel/Invoice_OM.json");
 
     OverviewModelContent content = model.getContent();
     assertFalse(content.getConfiguration().getFilterConfiguration().getShowFilterButton() == null);
@@ -105,7 +105,7 @@ class OverviewModelLoadTest {
 
   @Test
   void loadsPersonOverviewModelAlignmentAndAttachmentColumn() throws Exception {
-    OverviewModel model = load("/typedefinitionmodel/Person_OM.json");
+    OverviewModel model = load("/overviewmodel/Person_OM.json");
 
     OverviewModelContent content = model.getContent();
     assertEquals(6, content.getConfiguration().getFilterConfiguration().getSectionData().size());

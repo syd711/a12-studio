@@ -1,0 +1,32 @@
+{
+  "header": {
+    "id": "Relationship_RM",
+    "modelType": "relationship",
+    "modelVersion": "3.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [],
+    "modelReferences": []
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "associationType": "SHARED",
+    "storage": "EXTERNAL",
+    "labels": [
+      {
+        "locale": "de"
+      },
+      {
+        "locale": "en"
+      }
+    ],
+    "entityCharacteristics": []
+  }
+}

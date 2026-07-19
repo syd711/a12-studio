@@ -1,0 +1,44 @@
+package de.a12.studio.ui;
+
+import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
+import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
+import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionEditorController;
+import de.a12.studio.ui.util.WidgetFactory;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+
+import java.io.IOException;
+
+@Slf4j
+public class EditorFactory {
+
+  public static Parent create(@NonNull ProjectItem item) {
+    try {
+      Parent content = null;
+
+      // TypeDefinitionModel extends DocumentModel, so this check must come first.
+      if (item.getModel() instanceof TypeDefinitionModel) {
+        FXMLLoader loader = new FXMLLoader(TypeDefintionEditorController.class.getResource("typedefinition-model-editor.fxml"));
+        content = loader.load();
+        TypeDefintionEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof DocumentModel) {
+        FXMLLoader loader = new FXMLLoader(DocumentModelEditorController.class.getResource("document-model-editor.fxml"));
+        content = loader.load();
+        DocumentModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      return content;
+    }
+    catch (IOException e) {
+      log.error("Failed to load editor: {}", e.getMessage(), e);
+      WidgetFactory.showAlert(Studio.stage, e.getMessage());
+    }
+    return null;
+  }
+}

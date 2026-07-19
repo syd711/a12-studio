@@ -59,6 +59,7 @@ public class ProjectItemViewModel {
       case RELATIONSHIP -> Icons.PNG_MODEL_RELATIONSHIP;
       case APPLICATION -> Icons.PNG_MODEL_APPLICATION;
       case CONTENT -> Icons.PNG_MODEL_CONTENT;
+      case TYPEDEFINITION -> Icons.PNG_MODEL_TYPE_DEFINITION;
     };
   }
 

@@ -1,0 +1,120 @@
+{
+  "header": {
+    "id": "CommonFieldDefinitions_TDM",
+    "modelType": "document",
+    "modelVersion": "28.3.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "tdonly",
+        "value": "true"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "CommonFieldDefinitions_TDM"
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_c2f0eead-9c32-485c-a804-5342e2663918",
+        "name": "Location",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "Munich",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Munich"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "München"
+                  }
+                ]
+              },
+              {
+                "value": "Hamburg",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Hamburg"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Hamburg"
+                  }
+                ]
+              }
+            ],
+            "alphabeticalSorting": true
+          }
+        }
+      },
+      {
+        "id": "typedef_68d921f4-b054-48a4-9147-52be50cd91f7",
+        "name": "PersonType",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "Freelancer",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Freelancer"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Freiberufler"
+                  }
+                ]
+              },
+              {
+                "value": "Employee",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Employee"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Mitarbeiter"
+                  }
+                ]
+              }
+            ],
+            "categories": []
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": []
+    }
+  }
+}

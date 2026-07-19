@@ -1,0 +1,32 @@
+{
+  "header": {
+    "id": "Document_DM",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Document_DM"
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    }
+  }
+}

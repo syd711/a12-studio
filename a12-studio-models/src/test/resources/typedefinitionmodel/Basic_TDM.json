@@ -1,0 +1,46 @@
+{
+  "header": {
+    "id": "Basic_TDM",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "tdonly",
+        "value": "true"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Basic_TDM"
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_24318feb-6861-457d-be4c-2ce3f56d79f6",
+        "name": "abc",
+        "fieldType": {
+          "type": "StringType"
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": []
+    }
+  }
+}

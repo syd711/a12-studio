@@ -1,5 +1,6 @@
 package de.a12.studio.ui.tabs;
 
+import de.a12.studio.ui.EditorFactory;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.Project;
@@ -78,31 +79,23 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   private void open(@NonNull ProjectItem item) {
-    try {
-      FXMLLoader loader = new FXMLLoader(DocumentModelEditorController.class.getResource("document-model-editor.fxml"));
-      Parent content = loader.load();
-
-      if (item.getModel() instanceof DocumentModel documentModel) {
-        DocumentModelEditorController controller = loader.getController();
-        controller.load(item);
-      }
-
-      Tab tab = new Tab(item.getName(), content);
-      tab.setUserData(item);
-      tab.setClosable(true);
-
-      FontIcon icon = WidgetFactory.createIcon(Icons.FILE_OUTLINE);
-      icon.setIconColor(Color.valueOf(WidgetFactory.DEFAULT_COLOR));
-      tab.setGraphic(icon);
-      tab.setContextMenu(createTabContextMenu(tab));
-      tab.setOnClosed(closeEvent -> onTabClosed(tab));
-      tabPane.getTabs().add(tab);
-      tabPane.getSelectionModel().select(tab);
-      installDoubleClickHandler(tab);
+    Parent content = EditorFactory.create(item);
+    if (content == null) {
+      return;
     }
-    catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+
+    Tab tab = new Tab(item.getName(), content);
+    tab.setUserData(item);
+    tab.setClosable(true);
+
+    FontIcon icon = WidgetFactory.createIcon(Icons.FILE_OUTLINE);
+    icon.setIconColor(Color.valueOf(WidgetFactory.DEFAULT_COLOR));
+    tab.setGraphic(icon);
+    tab.setContextMenu(createTabContextMenu(tab));
+    tab.setOnClosed(closeEvent -> onTabClosed(tab));
+    tabPane.getTabs().add(tab);
+    tabPane.getSelectionModel().select(tab);
+    installDoubleClickHandler(tab);
   }
 
   private void installDoubleClickHandler(@NonNull Tab tab) {

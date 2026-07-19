@@ -4,6 +4,7 @@ import de.a12.studio.dataservices.models.applicationmodel.ApplicationModel;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.formmodel.FormModel;
 import de.a12.studio.dataservices.models.overviewmodel.OverviewModel;
+import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.dataservices.projects.ProjectItem;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class ModelFactoryTest {
 
   @Test
   void loadsSupportedOverviewModel() {
-    File file = resource("/typedefinitionmodel/Company_OM.json");
+    File file = resource("/overviewmodel/Company_OM.json");
     A12Model model = ModelFactory.load(new ProjectItem(file));
 
     OverviewModel overviewModel = assertInstanceOf(OverviewModel.class, model);
@@ -49,6 +50,15 @@ class ModelFactoryTest {
 
     FormModel formModel = assertInstanceOf(FormModel.class, model);
     assertEquals("Company_FM", formModel.getId());
+  }
+
+  @Test
+  void loadsTdOnlyAnnotatedDocumentAsTypeDefinitionModel() {
+    File file = resource("/typedefinitionmodel/Basic_TDM.json");
+    A12Model model = ModelFactory.load(new ProjectItem(file));
+
+    TypeDefinitionModel typeDefinitionModel = assertInstanceOf(TypeDefinitionModel.class, model);
+    assertEquals("Basic_TDM", typeDefinitionModel.getId());
   }
 
   @Test
