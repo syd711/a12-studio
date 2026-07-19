@@ -50,6 +50,13 @@ public class StudioEventManager {
     }
   }
 
+  public void fireModelDeletedEvent(@NonNull ProjectItem projectItem) {
+    ModelDeletedEvent event = new ModelDeletedEvent(projectItem);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.modelDeleted(event);
+    }
+  }
+
   public void fireModelSaveEvent(@NonNull ProjectItem projectItem) {
     ModelSaveEvent event = new ModelSaveEvent(projectItem);
     for (StudioEventListener listener : listeners) {

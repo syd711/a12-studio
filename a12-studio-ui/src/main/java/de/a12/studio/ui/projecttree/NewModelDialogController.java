@@ -73,11 +73,18 @@ public class NewModelDialogController implements DialogController {
   }
 
   public static Optional<NewModelInput> show(Stage owner, @NonNull ProjectItem targetFolder) {
+    return show(owner, targetFolder, null);
+  }
+
+  public static Optional<NewModelInput> show(Stage owner, @NonNull ProjectItem targetFolder, ModelType preselectedType) {
     FXMLLoader fxmlLoader = new FXMLLoader(NewModelDialogController.class.getResource("dialog-new-model.fxml"));
     Stage stage = WidgetFactory.createDialogStage("dialog-new-model", fxmlLoader, owner, "New Model");
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;
     controller.pathLabel.setText(targetFolder.getPath());
+    if (preselectedType != null) {
+      controller.typeComboBox.getSelectionModel().select(preselectedType);
+    }
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {

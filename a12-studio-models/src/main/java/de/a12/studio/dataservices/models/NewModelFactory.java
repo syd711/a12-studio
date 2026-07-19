@@ -2,6 +2,7 @@ package de.a12.studio.dataservices.models;
 
 import de.a12.studio.dataservices.models.applicationmodel.ApplicationModel;
 import de.a12.studio.dataservices.models.applicationmodel.ApplicationModelContent;
+import de.a12.studio.dataservices.models.documentmodel.ConditionLanguage;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModelContent;
 import de.a12.studio.dataservices.models.documentmodel.ModelConfig;
@@ -16,8 +17,8 @@ import de.a12.studio.dataservices.projects.ProjectItem;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class NewModelFactory {
 
@@ -29,9 +30,12 @@ public class NewModelFactory {
     A12Model model = buildModel(modelType, name);
 
     ProjectItem item = parent.createChildModel(name);
-    model.setId(UUID.randomUUID().toString());
-    model.setModelType(model instanceof TypeDefinitionModel ? ModelType.DOCUMENT : modelType);
-    model.setModelVersion(modelType.getCurrentVersion());
+    // Type Definition Models are persisted with header modelType "document" (see TD_ONLY_ANNOTATION
+    // above), so the version must come from ModelType.DOCUMENT too, not from the typedefinition entry.
+    ModelType headerModelType = model instanceof TypeDefinitionModel ? ModelType.DOCUMENT : modelType;
+    model.setId(ProjectItem.idFromFileName(item.getName()));
+    model.setModelType(headerModelType);
+    model.setModelVersion(headerModelType.getCurrentVersion());
 
     item.setModel(model);
     item.save();
@@ -54,10 +58,31 @@ public class NewModelFactory {
     ModelInfo modelInfo = new ModelInfo();
     modelInfo.setName(name);
     content.setModelInfo(modelInfo);
-    content.setModelConfig(new ModelConfig());
+    content.setModelConfig(defaultModelConfig());
     content.setModelRoot(new ModelRoot());
     model.setContent(content);
+    model.setLocales(defaultLocales());
     return model;
+  }
+
+  // Kernel deserialization requires these fields to be present; values match the convention used
+  // across existing document models in this project (see e.g. Person_DM.json).
+  private static ModelConfig defaultModelConfig() {
+    ModelConfig modelConfig = new ModelConfig();
+    modelConfig.setTimeZone("UTC");
+    modelConfig.setDecimalSeparator(".");
+    ConditionLanguage conditionLanguage = new ConditionLanguage();
+    conditionLanguage.setCode("en_US");
+    modelConfig.setConditionLanguage(conditionLanguage);
+    return modelConfig;
+  }
+
+  private static List<Locale> defaultLocales() {
+    Locale en = new Locale();
+    en.setCode("en");
+    Locale de = new Locale();
+    de.setCode("de");
+    return new ArrayList<>(List.of(en, de));
   }
 
   private static TypeDefinitionModel buildTypeDefinitionModel(@NonNull String name) {
@@ -66,7 +91,7 @@ public class NewModelFactory {
     Annotation tdOnly = new Annotation();
     tdOnly.setName(TD_ONLY_ANNOTATION);
     tdOnly.setValue("true");
-    model.setAnnotations(List.of(tdOnly));
+    model.setAnnotations(new ArrayList<>(List.of(tdOnly)));
     return model;
   }
 

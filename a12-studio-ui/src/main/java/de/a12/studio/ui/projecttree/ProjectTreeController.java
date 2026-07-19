@@ -1,6 +1,7 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.ui.components.SearchFieldController;
+import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
 import de.a12.studio.dataservices.projects.Project;
 import de.a12.studio.dataservices.projects.ProjectItem;
@@ -10,14 +11,20 @@ import de.a12.studio.ui.events.ModelFocusRequestedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.*;
@@ -33,6 +40,9 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   @FXML
   private SearchFieldController searchController;
+
+  @FXML
+  private MenuButton newButton;
 
   private Project project;
   private ProjectItemViewModel rootViewModel;
@@ -151,10 +161,15 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
   }
 
-  @FXML
-  private void onNewModel() {
+  private void onNewModel(@NonNull ModelType modelType) {
     if (project != null) {
-      menuFactory.onCreateNewModel(resolveTargetFolder());
+      menuFactory.onCreateNewModel(resolveTargetFolder(), modelType);
+    }
+  }
+
+  private void onNewFolder() {
+    if (project != null) {
+      menuFactory.onCreateNewFolder(resolveTargetFolder());
     }
   }
 
@@ -246,6 +261,19 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem);
+    for (ModelType modelType : ModelType.values()) {
+      MenuItem modelItem = new MenuItem(modelType.getDisplayName());
+      modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+      modelItem.setOnAction(event -> onNewModel(modelType));
+      newButton.getItems().add(modelItem);
+    }
+    newButton.getItems().add(new SeparatorMenuItem());
+    MenuItem folderItem = new MenuItem("Folder");
+    FontIcon folderIcon = WidgetFactory.createIcon(Icons.FOLDER_OUTLINE);
+    folderIcon.getStyleClass().add("menu-icon");
+    folderItem.setGraphic(folderIcon);
+    folderItem.setOnAction(event -> onNewFolder());
+    newButton.getItems().add(folderItem);
     StudioEventManager.getInstance().addListener(this);
     searchController.setOnSearch(this::applyFilter);
     projectTree.setOnKeyPressed(event -> {

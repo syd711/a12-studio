@@ -6,6 +6,7 @@ import de.a12.studio.ui.util.zip.ZipUtil;
 import de.a12.studio.dataservices.models.ModelType;
 import de.a12.studio.dataservices.models.NewModelFactory;
 import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.projecttree.NewModelDialogController.NewModelInput;
 import de.a12.studio.ui.util.Icons;
 import javafx.scene.Node;
@@ -98,7 +99,11 @@ public class ProjectTreeMenuActions {
   }
 
   void onCreateNewModel(@NonNull ProjectItem parent) {
-    Optional<NewModelInput> input = NewModelDialogController.show(getStage(), parent);
+    onCreateNewModel(parent, null);
+  }
+
+  void onCreateNewModel(@NonNull ProjectItem parent, ModelType preselectedType) {
+    Optional<NewModelInput> input = NewModelDialogController.show(getStage(), parent, preselectedType);
     if (input.isEmpty()) {
       return;
     }
@@ -188,6 +193,7 @@ public class ProjectTreeMenuActions {
     if (result.isPresent() && result.get() == ButtonType.OK) {
       try {
         item.delete();
+        StudioEventManager.getInstance().fireModelDeletedEvent(item);
         onReload.run();
       }
       catch (IOException e) {

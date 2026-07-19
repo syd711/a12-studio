@@ -81,6 +81,21 @@ public class TabPaneController implements Initializable, StudioEventListener {
     open(event.getItem());
   }
 
+  @Override
+  public void modelDeleted(@NonNull ModelDeletedEvent event) {
+    String deletedPath = event.getItem().getPath();
+    for (Tab tab : new ArrayList<>(tabPane.getTabs())) {
+      ProjectItem tabItem = (ProjectItem) tab.getUserData();
+      if (tabItem != null && isSameOrDescendant(tabItem.getPath(), deletedPath)) {
+        closeTab(tab);
+      }
+    }
+  }
+
+  private boolean isSameOrDescendant(@NonNull String path, @NonNull String ancestorPath) {
+    return path.equals(ancestorPath) || path.startsWith(ancestorPath + File.separator);
+  }
+
   private void open(@NonNull ProjectItem item) {
     Parent content = EditorFactory.create(item);
     if (content == null) {

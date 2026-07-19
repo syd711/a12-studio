@@ -19,6 +19,10 @@ public interface StudioEventListener {
 
   }
 
+  default void modelDeleted(@NonNull ModelDeletedEvent event) {
+
+  }
+
   default void modelFocusRequested(@NonNull ModelFocusRequestedEvent event) {
 
   }

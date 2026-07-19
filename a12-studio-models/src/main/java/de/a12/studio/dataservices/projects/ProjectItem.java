@@ -129,6 +129,16 @@ public class ProjectItem {
 
     Files.move(file.toPath(), newFile.toPath());
     this.file = newFile;
+
+    if (!isFolder() && model != null) {
+      model.setId(idFromFileName(newFile.getName()));
+      save();
+    }
+  }
+
+  // Convention: a model's header/id always matches its filename without the ".json" suffix.
+  public static String idFromFileName(String fileName) {
+    return fileName.endsWith(".json") ? fileName.substring(0, fileName.length() - ".json".length()) : fileName;
   }
 
   public boolean isAncestorOf(ProjectItem other) {
@@ -171,6 +181,10 @@ public class ProjectItem {
     copy.parent = parent;
     if (parent != null && parent.children != null) {
       parent.children.add(copy);
+    }
+    if (!copy.isFolder() && copy.model != null) {
+      copy.model.setId(idFromFileName(copyFile.getName()));
+      copy.save();
     }
     return copy;
   }

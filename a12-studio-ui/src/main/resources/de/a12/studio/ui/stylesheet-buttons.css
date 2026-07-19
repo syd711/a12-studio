@@ -18,8 +18,17 @@
     -fx-cursor: hand;
 }
 
+/*
+ * !important is required here: ikonli's FontIcon reports its -fx-icon-color
+ * CssMetaData with a hardcoded StyleOrigin, and a plain type selector like
+ * "*|FontIcon" contributes nothing to JavaFX's specificity calculation (only
+ * id/style-class/pseudo-class counts are weighed - the element name is
+ * ignored). That makes this rule tie in specificity with the global
+ * ".ikonli-font-icon" / ".toolbar-icon" rules, with the winner decided by
+ * arbitrary stylesheet load order. !important removes that ambiguity.
+ */
 .default-button *|FontIcon {
-    -fx-icon-color: #000000;
+    -fx-icon-color: #000000 !important;
 }
 
 /**
@@ -136,8 +145,7 @@
 }
 
 .primary-button *|FontIcon {
-    -fx-icon-color: -fx-text-color-inverse;
-    -fx-fill: -fx-text-color-inverse !important;
+    -fx-icon-color: -fx-text-color-inverse !important;
 }
 
 /**
@@ -196,6 +204,5 @@
 }
 
 .delete-button *|FontIcon {
-    -fx-icon-color: #c0392b;
-    -fx-fill: #c0392b !important;
+    -fx-icon-color: #c0392b !important;
 }
