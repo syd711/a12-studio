@@ -7,6 +7,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.preview.PreviewServer;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -80,6 +81,11 @@ public class Studio extends Application implements StudioEventListener {
     stage.toFront();
     stage.requestFocus();
     stage.setAlwaysOnTop(false);
+  }
+
+  @Override
+  public void stop() {
+    PreviewServer.stopIfRunning();
   }
 
   public static ProjectItem getSelectedProjectItem() {
