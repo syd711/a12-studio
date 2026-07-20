@@ -102,11 +102,15 @@ public class LocalUISettings {
   }
 
   public static boolean getBoolean(@NonNull String key) {
+    return getBoolean(key, false);
+  }
+
+  public static boolean getBoolean(@NonNull String key, boolean defaultValue) {
     if (store.containsKey(key)) {
       String s = store.get(key);
       return Boolean.valueOf(s);
     }
-    return false;
+    return defaultValue;
   }
 
   public static String getString(@NonNull String key) {

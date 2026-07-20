@@ -46,4 +46,8 @@ public interface StudioEventListener {
   default void localesChanged(@NonNull LocalesChangedEvent event) {
 
   }
+
+  default void tabSelectionChanged(@NonNull TabSelectionChangedEvent event) {
+
+  }
 }

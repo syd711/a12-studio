@@ -102,4 +102,11 @@ public class StudioEventManager {
       listener.localesChanged(event);
     }
   }
+
+  public void fireTabSelectionChangedEvent(ProjectItem projectItem) {
+    TabSelectionChangedEvent event = new TabSelectionChangedEvent(projectItem);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.tabSelectionChanged(event);
+    }
+  }
 }

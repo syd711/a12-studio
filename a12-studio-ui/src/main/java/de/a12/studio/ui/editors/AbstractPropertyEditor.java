@@ -111,7 +111,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
       if (settingsKey != null) {
         boolean animated = root.isAnimated();
         root.setAnimated(false);
-        root.setExpanded(LocalUISettings.getBoolean(settingsKey));
+        root.setExpanded(LocalUISettings.getBoolean(settingsKey, true));
         root.setAnimated(animated);
         root.expandedProperty().addListener((observable, oldValue, newValue) ->
             LocalUISettings.saveProperty(settingsKey, String.valueOf(newValue)));

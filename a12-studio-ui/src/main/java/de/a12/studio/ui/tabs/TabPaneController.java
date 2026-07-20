@@ -178,10 +178,12 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   private void onSelectionChanged(Tab newTab) {
+    ProjectItem item = newTab == null ? null : (ProjectItem) newTab.getUserData();
+    StudioEventManager.getInstance().fireTabSelectionChangedEvent(item);
+
     if (restoringSelection || project == null) {
       return;
     }
-    ProjectItem item = newTab == null ? null : (ProjectItem) newTab.getUserData();
     project.getSettings().getUISettings().setSelectedFile(item == null ? null : item.getPath());
     project.getSettings().getUISettings().save();
   }

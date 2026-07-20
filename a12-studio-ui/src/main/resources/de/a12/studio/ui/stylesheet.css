@@ -216,3 +216,15 @@
 .ghost-button-default:hover {
     -fx-background-color: transparent;
 }
+
+/**
+ * Footer status bar
+ */
+.footer-file-info {
+    -fx-padding: 0 8px;
+}
+
+.footer-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-text-muted;
+}
