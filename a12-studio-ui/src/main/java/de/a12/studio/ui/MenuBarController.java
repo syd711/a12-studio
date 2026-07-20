@@ -36,7 +36,7 @@ import java.util.ResourceBundle;
 public class MenuBarController implements Initializable, StudioEventListener {
 
   // No published a12-release-line concept exists yet for the Java stack; update by hand until one does.
-  private static final String A12_RELEASE_VERSION = "2025.06";
+  private static final String A12_RELEASE_VERSION = "2026.06";
 
   @FXML
   private MenuBar menuBar;

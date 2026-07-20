@@ -1,23 +1,17 @@
 package de.a12.studio.dataservices.services.documentmodel.features.validation;
 
-import com.mgmtp.a12.kernel.md.model.a12internal.Computation;
-import com.mgmtp.a12.kernel.md.model.a12internal.DocumentModel;
-import com.mgmtp.a12.kernel.md.model.a12internal.Element;
-import com.mgmtp.a12.kernel.md.model.a12internal.Field;
-import com.mgmtp.a12.kernel.md.model.a12internal.Group;
-import com.mgmtp.a12.kernel.md.model.a12internal.fieldtypes.EnumerationType;
-import com.mgmtp.a12.kernel.md.model.a12internal.fieldtypes.TypeDefType;
-import com.mgmtp.a12.kernel.md.model.a12internal.services.DocumentModelReferenceResolver;
-import com.mgmtp.a12.kernel.md.model.a12internal.services.DocumentModelService;
-import com.mgmtp.a12.kernel.md.model.a12internal.visitor.DocumentModelVisitor;
-import com.mgmtp.a12.kernel.md.model.a12internal.visitor.DocumentModelWalker;
-import com.mgmtp.a12.kernel.md.model.api.visitor.DocumentModelWalker.VisitProcess;
-import com.mgmtp.a12.model.notification.Severity;
+import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.documentmodel.ComputationElement;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelContent;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.EnumerationFieldType;
+import de.a12.studio.models.documentmodel.EnumerationValue;
+import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.FieldType;
+import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelConfig;
-import de.a12.studio.models.util.JsonSettings;
-import de.a12.studio.dataservices.services.support.DocumentModelSupport;
-import de.a12.studio.dataservices.services.support.InMemoryDocumentModelReferenceResolver;
+import de.a12.studio.models.documentmodel.TypeDefFieldType;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -35,14 +29,13 @@ public class DMValidationService {
   private static final String TIME_ZONE_MISMATCH_MESSAGE =
       "There is a document model with time zone Europe/Berlin in this workspace. This model's time zone needs to be Europe/Berlin as well.";
 
+  private static final String INCLUDE_PURPOSE = "include";
+
   /**
-   * UI-safe entry point: takes/returns only data-services model types and plain strings, so callers that
-   * don't have the kernel jars on their classpath (e.g. a12-studio-ui) can still trigger validation.
+   * UI-safe entry point: takes/returns only data-services model types and plain strings.
    */
   public Optional<ElementValidationError> validateElement(
-      de.a12.studio.models.documentmodel.DocumentModel documentModel,
-      String elementId,
-      List<de.a12.studio.models.documentmodel.DocumentModel> otherDocumentModels) {
+      DocumentModel documentModel, String elementId, List<DocumentModel> otherDocumentModels) {
     return validateDocument(documentModel, otherDocumentModels).stream()
         .filter(error -> error.elementId().equals(elementId))
         .findFirst();
@@ -52,29 +45,20 @@ public class DMValidationService {
    * UI-safe entry point: validates every element of a document model, e.g. for whole-project validation
    * where there's no single element to check (see {@link #validateElement} for that narrower case).
    */
-  public List<ElementValidationError> validateDocument(
-      de.a12.studio.models.documentmodel.DocumentModel documentModel,
-      List<de.a12.studio.models.documentmodel.DocumentModel> otherDocumentModels) {
-    DocumentModel model = DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(documentModel));
-    List<DocumentModel> otherModels = otherDocumentModels.stream()
-        .map(other -> DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(other)))
-        .toList();
-    return validate(model, otherModels).stream()
-        .map(error -> new ElementValidationError(error.getId(), error.getMessage(), error.getSeverity().name()))
+  public List<ElementValidationError> validateDocument(DocumentModel documentModel, List<DocumentModel> otherDocumentModels) {
+    return validate(documentModel, otherDocumentModels).stream()
+        .filter(problem -> problem.elementId() != null)
+        .map(problem -> new ElementValidationError(problem.elementId(), problem.message(), problem.severity().name()))
         .toList();
   }
 
   /**
    * UI-safe entry point: every human-readable settings problem for this model (locales, time zone, etc., as
-   * edited via the Model Settings dialog), whether kernel-reported (single model) or cross-model (e.g. a
-   * time zone that disagrees with the rest of the project, see {@link #getTimeZoneMismatchError}). Empty if
-   * there are none, e.g. for driving both a settings-button badge and its error tooltip. Exceptions from the
-   * kernel consistency check (e.g. on a model that's mid-edit and momentarily inconsistent) are treated as
-   * "no issues" rather than surfaced, matching {@link #validate} below.
+   * edited via the Model Settings dialog), whether single-model (missing locale) or cross-model (e.g. a time
+   * zone that disagrees with the rest of the project, see {@link #getTimeZoneMismatchError}). Empty if there
+   * are none, e.g. for driving both a settings-button badge and its error tooltip.
    */
-  public List<String> getSettingsIssueMessages(
-      de.a12.studio.models.documentmodel.DocumentModel documentModel,
-      List<de.a12.studio.models.documentmodel.DocumentModel> otherDocumentModels) {
+  public List<String> getSettingsIssueMessages(DocumentModel documentModel, List<DocumentModel> otherDocumentModels) {
     List<String> messages = new ArrayList<>();
     getTimeZoneMismatchError(documentModel, otherDocumentModels).ifPresent(messages::add);
     getMissingLocaleError(documentModel).ifPresent(messages::add);
@@ -82,174 +66,189 @@ public class DMValidationService {
   }
 
   /**
-   * UI-safe entry point for the Locales settings panel: the kernel's "at least one locale" consistency
-   * problem, reworded for end users (the kernel's own message embeds an internal error code).
+   * UI-safe entry point for the Locales settings panel: at least one locale is required.
    */
-  public Optional<String> getMissingLocaleError(de.a12.studio.models.documentmodel.DocumentModel documentModel) {
-    try {
-      DocumentModel model = DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(documentModel));
-      return DocumentModelSupport.getSettingsProblems(model).stream()
-          .filter(p -> p.getMessage().contains("MVK_SUPP_LANGUAGES_MISSING"))
-          .findFirst()
-          .map(p -> "Please add at least one locale.");
-    } catch (Exception e) {
-      return Optional.empty();
-    }
+  public Optional<String> getMissingLocaleError(DocumentModel documentModel) {
+    boolean missing = documentModel.getLocales() == null || documentModel.getLocales().isEmpty();
+    return missing ? Optional.of("Please add at least one locale.") : Optional.empty();
   }
 
   /**
    * UI-safe entry point for the Timezone settings panel: every document model in a project must use the
-   * same time zone. Mirrors SME's {@code TimeZoneCheck} custom validation rule, which is not part of the
-   * kernel's own single-model consistency check (see {@link DocumentModelSupport#getSettingsProblems}) since
-   * it depends on the other document models in the project.
+   * same time zone. Mirrors SME's {@code TimeZoneCheck} custom validation rule.
    */
-  public Optional<String> getTimeZoneMismatchError(
-      de.a12.studio.models.documentmodel.DocumentModel documentModel,
-      List<de.a12.studio.models.documentmodel.DocumentModel> otherDocumentModels) {
+  public Optional<String> getTimeZoneMismatchError(DocumentModel documentModel, List<DocumentModel> otherDocumentModels) {
     String timeZone = getTimeZone(documentModel);
     if (EUROPE_BERLIN.equals(timeZone)) {
       return Optional.empty();
     }
-    boolean otherModelUsesEuropeBerlin = otherDocumentModels.stream()
-        .anyMatch(other -> EUROPE_BERLIN.equals(getTimeZone(other)));
+    boolean otherModelUsesEuropeBerlin = otherDocumentModels.stream().anyMatch(other -> EUROPE_BERLIN.equals(getTimeZone(other)));
     return otherModelUsesEuropeBerlin ? Optional.of(TIME_ZONE_MISMATCH_MESSAGE) : Optional.empty();
   }
 
-  private static String getTimeZone(de.a12.studio.models.documentmodel.DocumentModel documentModel) {
+  private static String getTimeZone(DocumentModel documentModel) {
     DocumentModelContent content = documentModel.getContent();
     ModelConfig modelConfig = content != null ? content.getModelConfig() : null;
     return modelConfig != null ? modelConfig.getTimeZone() : null;
   }
 
-  public List<DocumentModelErrors> validate(DocumentModel model, List<DocumentModel> otherModels) {
-    List<DocumentModelErrors> elementErrorsThatKernelDoesNotFind = checkMissingErrors(model, otherModels);
+  /**
+   * Combines this service's own structural checks (below) with a clean-room port of the a12 kernel's
+   * consistency rules ({@link DocumentModelConsistencyRules}). A single bad reference elsewhere in the model
+   * shouldn't hide every other problem, so a failure in the ported kernel rules falls back to just the
+   * structural checks rather than surfacing nothing.
+   */
+  List<ValidationProblem> validate(DocumentModel model, List<DocumentModel> otherModels) {
+    List<ValidationProblem> structuralProblems = checkMissingErrors(model, otherModels);
     try {
-      List<DocumentModelErrors> kernelElementErrors =
-          DocumentModelSupport.getElementProblems(model).stream()
-              .map(p -> new DocumentModelErrors(((Element) p.getSource()).getId(), p.getMessage(), p.getSeverity()))
-              .toList();
-      List<DocumentModelErrors> combined = new ArrayList<>(elementErrorsThatKernelDoesNotFind);
-      combined.addAll(kernelElementErrors);
+      List<ValidationProblem> combined = new ArrayList<>(structuralProblems);
+      combined.addAll(DocumentModelConsistencyRules.checkAll(model, new ElementIndex(model)));
       return combined;
     } catch (Exception e) {
-      return elementErrorsThatKernelDoesNotFind;
+      return structuralProblems;
     }
   }
 
   /**
-   * Checks for Errors that the Kernel validation does not find.
-   * We use simple generic Error Messages instead of the Document Model ValidationRule Error Messages so that changes in
-   * the Validation Error Messages do not need to be integrated into this code.
+   * Checks for errors the ported kernel rules don't cover: missing/unresolved references between elements.
+   * We use simple generic error messages instead of the kernel's own wording so that changes to that wording
+   * don't need to be integrated into this code.
    */
-  private static List<DocumentModelErrors> checkMissingErrors(DocumentModel model, List<DocumentModel> otherModels) {
-    DocumentModelService documentModelService = new DocumentModelService();
-    List<DocumentModelErrors> result = new ArrayList<>();
-    List<Element> unfixableElements = new ArrayList<>();
-    DocumentModelReferenceResolver resolver = new InMemoryDocumentModelReferenceResolver(otherModels);
-    DocumentModelVisitor visitor =
-        new DocumentModelVisitor() {
-          @Override
-          public VisitProcess visitGroup(Group group) {
-            String groupPath = documentModelService.getPath(group);
-            if (hasMissingIncludeReference(group, resolver)) {
-              result.add(
-                  new DocumentModelErrors(group.getId(), "Include with path '" + groupPath + "': Missing Include Reference", Severity.ERROR));
-              unfixableElements.add(group);
-            }
-            if (hasMissingIndexField(group)) {
-              String elementType = DocumentModelSupport.isInclude(group) ? "Include" : "Group";
-              result.add(
-                  new DocumentModelErrors(group.getId(), elementType + " with path '" + groupPath + "': Missing Index Field", Severity.ERROR));
-            }
-            Set<Element> duplicatedElements = getElementsWithDuplicatedNames(group);
-            for (Element element : duplicatedElements) {
-              String elementPath = documentModelService.getPath(group);
-              result.add(
-                  new DocumentModelErrors(
-                      element.getId(), "Element with path '" + elementPath + "': Multiple Elements with same path", Severity.ERROR));
-            }
-            return VisitProcess.CONTINUE_TRAVERSAL;
-          }
-
-          @Override
-          public VisitProcess visitComputation(Computation computation) {
-            if (hasMissingComputedField(computation)) {
-              String path = documentModelService.getPath(computation);
-              result.add(
-                  new DocumentModelErrors(computation.getId(), "Computation with path '" + path + "': Missing Computed Field", Severity.ERROR));
-              unfixableElements.add(computation);
-            }
-            return VisitProcess.CONTINUE_TRAVERSAL;
-          }
-
-          @Override
-          public VisitProcess visitField(Field field) {
-            String path = documentModelService.getPath(field);
-            if (hasTooFewEnumValues(field)) {
-              result.add(
-                  new DocumentModelErrors(
-                      field.getId(), "Field with path '" + path + "': Enumeration must have at least two values", Severity.ERROR));
-            }
-            if (hasMissingTypeDef(field)) {
-              result.add(new DocumentModelErrors(field.getId(), "Field with path '" + path + "': Missing Type Definition", Severity.ERROR));
-              unfixableElements.add(field);
-            }
-            return VisitProcess.CONTINUE_TRAVERSAL;
-          }
-        };
-
-    new DocumentModelWalker().acceptDocumentModel(model, visitor);
-    for (Element element : unfixableElements) {
-      element.getParent().removeElement(element);
+  private static List<ValidationProblem> checkMissingErrors(DocumentModel model, List<DocumentModel> otherModels) {
+    ElementIndex index = new ElementIndex(model);
+    List<ValidationProblem> result = new ArrayList<>();
+    for (Element element : index.allElements()) {
+      if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
+        String groupPath = index.getPath(groupElement);
+        if (hasMissingIncludeReference(groupElement, model, otherModels)) {
+          result.add(new ValidationProblem(
+              groupElement.getId(), "Include with path '" + groupPath + "': Missing Include Reference", Severity.ERROR));
+        }
+        if (hasMissingIndexField(groupElement, index)) {
+          String elementType = isInclude(groupElement, model) ? "Include" : "Group";
+          result.add(new ValidationProblem(
+              groupElement.getId(), elementType + " with path '" + groupPath + "': Missing Index Field", Severity.ERROR));
+        }
+        for (Element duplicate : getElementsWithDuplicatedNames(groupElement)) {
+          result.add(new ValidationProblem(
+              duplicate.getId(), "Element with path '" + groupPath + "': Multiple Elements with same path", Severity.ERROR));
+        }
+      } else if (element instanceof ComputationElement computation) {
+        if (hasMissingComputedField(computation, index)) {
+          String path = index.getPath(computation);
+          result.add(new ValidationProblem(computation.getId(), "Computation with path '" + path + "': Missing Computed Field", Severity.ERROR));
+        }
+      } else if (element instanceof FieldElement field) {
+        String path = index.getPath(field);
+        if (hasTooFewEnumValues(field, index)) {
+          result.add(new ValidationProblem(
+              field.getId(), "Field with path '" + path + "': Enumeration must have at least two values", Severity.ERROR));
+        }
+        if (hasMissingTypeDef(field, index)) {
+          result.add(new ValidationProblem(field.getId(), "Field with path '" + path + "': Missing Type Definition", Severity.ERROR));
+        }
+      }
     }
     return result;
   }
 
-  private static boolean hasMissingIncludeReference(Group group, DocumentModelReferenceResolver resolver) {
-    return DocumentModelSupport.isInclude(group)
-        && resolver.getDocumentModel(group.getIncludeDetails().get().getModelReference().getReference()) == null;
+  private static boolean isInclude(GroupElement groupElement, DocumentModel model) {
+    String alias = groupElement.getGroup().getModelAlias();
+    return alias != null && !alias.isBlank() && findIncludeReference(model, alias).isPresent();
   }
 
-  private static Set<Element> getElementsWithDuplicatedNames(Group group) {
-    Set<Element> result = new LinkedHashSet<>();
-    var nameMap = group.getElements().stream().collect(Collectors.groupingBy(Element::getName));
-    nameMap.values().stream().filter(v -> v.size() > 1).forEach(result::addAll);
-    return result;
-  }
-
-  private static boolean hasMissingIndexField(Group group) {
-    boolean indexFieldUndefined = group.getIndexField().isPresent() && group.getIndexField().get().getDocumentModelObject().isEmpty();
-    if (indexFieldUndefined) {
-      group.setIndexField(null);
+  private static Optional<ModelReference> findIncludeReference(DocumentModel model, String alias) {
+    if (model.getModelReferences() == null) {
+      return Optional.empty();
     }
-    return indexFieldUndefined;
+    return model.getModelReferences().stream()
+        .filter(r -> INCLUDE_PURPOSE.equals(r.getPurpose()) && alias.equals(r.getAlias()))
+        .findFirst();
   }
 
-  private static boolean hasMissingComputedField(Computation computation) {
-    return computation.getComputedField().getDocumentModelObject().isEmpty();
-  }
-
-  private static boolean hasMissingTypeDef(Field field) {
-    return field.getFieldType() instanceof TypeDefType typeDefType && typeDefType.getTypeDefinition().isEmpty();
-  }
-
-  private static boolean hasTooFewEnumValues(Field field) {
-    if ("multi-select".equals(field.getParent().getUsageType().orElse(null))) {
-      var enumValues = getEnumValues(field);
-      return enumValues != null && enumValues.size() < 2;
+  private static boolean hasMissingIncludeReference(GroupElement groupElement, DocumentModel model, List<DocumentModel> otherModels) {
+    String alias = groupElement.getGroup().getModelAlias();
+    if (alias == null || alias.isBlank()) {
+      return false;
     }
-    return false;
+    Optional<ModelReference> reference = findIncludeReference(model, alias);
+    return reference.isEmpty() || resolveOtherModel(reference.get().getReference(), otherModels) == null;
   }
 
-  private static List<EnumerationType.EnumValue> getEnumValues(Field field) {
-    if (field.getFieldType() instanceof EnumerationType enumerationType) {
-      return enumerationType.getValues();
-    } else if (field.getFieldType() instanceof TypeDefType typeDefType
-        && typeDefType.getTypeDefinition().isPresent()
-        && typeDefType.getTypeDefinition().get().getFieldType() instanceof EnumerationType referencedEnumType) {
-      return referencedEnumType.getValues();
-    } else {
+  /** Mirrors the strip-path-and-.json-suffix resolution the a12 kernel's reference resolver used. */
+  private static DocumentModel resolveOtherModel(String reference, List<DocumentModel> otherModels) {
+    if (reference == null) {
       return null;
     }
+    String id = reference;
+    int lastSlash = id.lastIndexOf('/');
+    if (lastSlash >= 0) {
+      id = id.substring(lastSlash + 1);
+    }
+    int jsonSuffix = id.lastIndexOf(".json");
+    if (jsonSuffix >= 0) {
+      id = id.substring(0, jsonSuffix);
+    }
+    String finalId = id;
+    return otherModels.stream().filter(dm -> finalId.equals(dm.getId())).findFirst().orElse(null);
+  }
+
+  private static boolean hasMissingIndexField(GroupElement groupElement, ElementIndex index) {
+    String indexFieldName = groupElement.getGroup().getIndexFieldName();
+    if (indexFieldName == null || indexFieldName.isBlank()) {
+      return false;
+    }
+    return index.resolveRelativePath(groupElement, indexFieldName).filter(ElementIndex::isField).isEmpty();
+  }
+
+  private static Set<Element> getElementsWithDuplicatedNames(GroupElement groupElement) {
+    List<Element> elements = groupElement.getGroup().getElements();
+    if (elements == null) {
+      return Set.of();
+    }
+    Set<Element> result = new LinkedHashSet<>();
+    elements.stream().collect(Collectors.groupingBy(Element::getName)).values().stream()
+        .filter(group -> group.size() > 1)
+        .forEach(result::addAll);
+    return result;
+  }
+
+  private static boolean hasMissingComputedField(ComputationElement computation, ElementIndex index) {
+    String relPath = computation.getComputation() == null ? null : computation.getComputation().getComputedFieldRelPath();
+    if (relPath == null || relPath.isBlank()) {
+      return true;
+    }
+    return index.resolveRelativePath(computation, relPath).filter(ElementIndex::isField).isEmpty();
+  }
+
+  private static boolean hasTooFewEnumValues(FieldElement field, ElementIndex index) {
+    GroupElement parent = index.parentOf(field);
+    if (parent == null || parent.getGroup() == null || !"multi-select".equals(parent.getGroup().getUsageType())) {
+      return false;
+    }
+    List<EnumerationValue> enumValues = getEnumValues(field, index);
+    return enumValues != null && enumValues.size() < 2;
+  }
+
+  private static List<EnumerationValue> getEnumValues(FieldElement field, ElementIndex index) {
+    if (field.getField() == null) {
+      return null;
+    }
+    FieldType effectiveType = index.effectiveFieldType(field.getField().getFieldType());
+    if (effectiveType instanceof EnumerationFieldType enumType && enumType.getEnumerationType() != null) {
+      return enumType.getEnumerationType().getValues();
+    }
+    return null;
+  }
+
+  private static boolean hasMissingTypeDef(FieldElement field, ElementIndex index) {
+    if (field.getField() == null || !(field.getField().getFieldType() instanceof TypeDefFieldType typeDefFieldType)) {
+      return false;
+    }
+    String typeDefId = typeDefFieldType.getTypeDefType() == null ? null : typeDefFieldType.getTypeDefType().getTypeDefinitionId();
+    if (typeDefId == null || typeDefId.isBlank()) {
+      return true;
+    }
+    return index.effectiveFieldType(typeDefFieldType) == null;
   }
 }
