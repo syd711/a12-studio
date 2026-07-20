@@ -2,10 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-<BorderPane fx:id="footer" maxHeight="20.0" minHeight="20.0" styleClass="panel-toolbar" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.FooterController">
+<BorderPane fx:id="footer" maxHeight="20.0" minHeight="20.0" styleClass="footer-bar" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.FooterController">
 
     <padding>
         <Insets bottom="4.0" top="2.0" />
@@ -15,16 +16,18 @@
         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="footer-file-info" BorderPane.alignment="CENTER_LEFT">
             <children>
                 <Label fx:id="filePathLabel" styleClass="footer-label" />
+            <Separator layoutX="76.0" layoutY="10.0" orientation="VERTICAL" prefHeight="200.0" />
                 <Label fx:id="fileSizeLabel" styleClass="footer-label" />
+            <Separator layoutX="28.0" layoutY="10.0" orientation="VERTICAL" prefHeight="200.0" />
                 <Label fx:id="fileModifiedLabel" styleClass="footer-label" />
+            <Separator orientation="VERTICAL" prefHeight="200.0" />
+                <Label fx:id="fileEncodingLabel" styleClass="footer-label" />
+            <Separator layoutX="49.0" layoutY="10.0" orientation="VERTICAL" prefHeight="200.0" />
             </children>
         </HBox>
     </left>
    <right>
       <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
-         <children>
-                <Label fx:id="fileEncodingLabel" styleClass="footer-label" />
-         </children>
          <padding>
             <Insets right="6.0" />
          </padding>

@@ -220,6 +220,14 @@
 /**
  * Footer status bar
  */
+.footer-bar {
+    -fx-background-color: -fx-border-color-theme;
+    -fx-border-color: -fx-border-subtle transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
 .footer-file-info {
     -fx-padding: 0 8px;
 }
