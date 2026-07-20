@@ -30,7 +30,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class TypeDefintionEditorController extends AbstractEditorController implements Initializable {
+public class TypeDefintionModelEditorController extends AbstractEditorController implements Initializable {
 
   private static final String TABLE_SETTINGS_ID = ModelType.TYPEDEFINITION.getValue();
 

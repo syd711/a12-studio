@@ -1,10 +1,12 @@
 package de.a12.studio.ui;
 
+import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.ui.editors.applicationmodel.ApplicationModelEditorController;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
-import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionEditorController;
+import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,15 +24,21 @@ public class EditorFactory {
 
       // TypeDefinitionModel extends DocumentModel, so this check must come first.
       if (item.getModel() instanceof TypeDefinitionModel) {
-        FXMLLoader loader = new FXMLLoader(TypeDefintionEditorController.class.getResource("typedefinition-model-editor.fxml"));
+        FXMLLoader loader = new FXMLLoader(TypeDefintionModelEditorController.class.getResource("typedefinition-model-editor.fxml"));
         content = loader.load();
-        TypeDefintionEditorController controller = loader.getController();
+        TypeDefintionModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof DocumentModel) {
         FXMLLoader loader = new FXMLLoader(DocumentModelEditorController.class.getResource("document-model-editor.fxml"));
         content = loader.load();
         DocumentModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof ApplicationModel) {
+        FXMLLoader loader = new FXMLLoader(ApplicationModelEditorController.class.getResource("application-model-editor.fxml"));
+        content = loader.load();
+        ApplicationModelEditorController controller = loader.getController();
         controller.load(item);
       }
       return content;

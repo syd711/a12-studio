@@ -1,0 +1,189 @@
+package de.a12.studio.ui.editors.propertyeditors;
+
+import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.applicationmodel.ApplicationModelContent;
+import de.a12.studio.models.applicationmodel.InitialActivity;
+import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.WidgetFactory;
+import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+/**
+ * Edits {@link InitialActivity#getDescriptor()}. Same row-based Name/Value layout as {@link
+ * AnnotationsPanelController}, except the name column offers a fixed set of descriptor keys instead of
+ * suggestions sourced from a registry. Not bound to a single Element (the descriptor lives on the model's
+ * {@link ApplicationModelContent}), so it follows the model-header pattern used by e.g. {@link
+ * TimezonePanelController}.
+ */
+public class ActivityPanelController extends AbstractPropertyEditor {
+
+  private static final List<String> DESCRIPTOR_KEYS = List.of("instance", "model", "module", "engine", "menuEnty");
+
+  @FXML
+  private GridPane descriptorGrid;
+
+  private ApplicationModel model;
+
+  private final List<DescriptorEntry> entries = new ArrayList<>();
+
+  public void setModel(@NonNull ApplicationModel model) {
+    this.model = model;
+    rebuildRows();
+  }
+
+  @FXML
+  private void onAdd() {
+    entries.add(new DescriptorEntry("", ""));
+    syncDescriptorToModel();
+    rebuildRows();
+    commitChange();
+  }
+
+  private void rebuildRows() {
+    descriptorGrid.getChildren().removeIf(node -> {
+      Integer rowIndex = GridPane.getRowIndex(node);
+      return rowIndex != null && rowIndex > 0;
+    });
+
+    entries.clear();
+    Map<String, String> descriptor = getDescriptor();
+    if (descriptor != null) {
+      descriptor.forEach((key, value) -> entries.add(new DescriptorEntry(key, value)));
+    }
+
+    for (int index = 0; index < entries.size(); index++) {
+      addRow(entries.get(index), index, entries.size());
+    }
+  }
+
+  private void addRow(DescriptorEntry entry, int index, int rowCount) {
+    ComboBox<String> nameField = new ComboBox<>();
+    nameField.setId("activityName-" + index);
+    nameField.setEditable(true);
+    nameField.setMaxWidth(Double.MAX_VALUE);
+    nameField.getItems().setAll(DESCRIPTOR_KEYS);
+    setFieldValue(nameField, entry.key);
+
+    TextField valueField = new TextField();
+    valueField.setId("activityValue-" + index);
+    valueField.setMaxWidth(Double.MAX_VALUE);
+    setFieldValue(valueField, entry.value);
+
+    bindTextField(valueField, (el, value) -> {
+      entry.value = value;
+      syncDescriptorToModel();
+    });
+    bindComboBox(nameField, (el, value) -> {
+      entry.key = value;
+      syncDescriptorToModel();
+    });
+
+    descriptorGrid.addRow(index + 1, nameField, valueField, createActionsBox(entry, index, rowCount));
+  }
+
+  private HBox createActionsBox(DescriptorEntry entry, int index, int rowCount) {
+    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
+    moveUpButton.setDisable(index == 0);
+
+    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
+    moveDownButton.setDisable(index == rowCount - 1);
+
+    Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
+      entries.add(entries.indexOf(entry) + 1, new DescriptorEntry(entry.key, entry.value));
+      syncDescriptorToModel();
+      rebuildRows();
+      commitChange();
+    });
+
+    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this entry?", null, null, "Delete");
+      if (result.isPresent() && result.get() == ButtonType.OK) {
+        entries.remove(entry);
+        syncDescriptorToModel();
+        rebuildRows();
+        commitChange();
+      }
+    });
+
+    HBox actionsBox = new HBox(4.0, moveUpButton, moveDownButton, copyButton, deleteButton);
+    actionsBox.setAlignment(Pos.CENTER_LEFT);
+    return actionsBox;
+  }
+
+  private void moveRow(int fromIndex, int toIndex) {
+    Collections.swap(entries, fromIndex, toIndex);
+    syncDescriptorToModel();
+    rebuildRows();
+    commitChange();
+  }
+
+  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
+    FontIcon icon = new FontIcon(iconLiteral);
+    icon.setIconSize(16);
+    icon.getStyleClass().add("toolbar-icon");
+
+    Button button = new Button();
+    button.getStyleClass().add("default-button");
+    button.setGraphic(icon);
+    button.setTooltip(new Tooltip(tooltip));
+    button.setOnAction(event -> action.run());
+    return button;
+  }
+
+  private Map<String, String> getDescriptor() {
+    if (model == null || model.getContent() == null || model.getContent().getInitialActivity() == null) {
+      return null;
+    }
+    return model.getContent().getInitialActivity().getDescriptor();
+  }
+
+  private void syncDescriptorToModel() {
+    if (model == null) {
+      return;
+    }
+    ApplicationModelContent content = model.getContent();
+    if (content == null) {
+      content = new ApplicationModelContent();
+      model.setContent(content);
+    }
+    InitialActivity initialActivity = content.getInitialActivity();
+    if (initialActivity == null) {
+      initialActivity = new InitialActivity();
+      content.setInitialActivity(initialActivity);
+    }
+
+    Map<String, String> descriptor = initialActivity.getDescriptor();
+    descriptor.clear();
+    for (DescriptorEntry entry : entries) {
+      descriptor.put(entry.key, entry.value);
+    }
+  }
+
+  private static final class DescriptorEntry {
+
+    private String key;
+    private String value;
+
+    private DescriptorEntry(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
+  }
+}
