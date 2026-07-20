@@ -2,7 +2,7 @@
   "header": {
     "id": "PersonCompany_Person____generated",
     "modelType": "document",
-    "modelVersion": "28.4.0",
+    "modelVersion": "29.4.0",
     "locales": [
       {
         "code": "en"
@@ -24,7 +24,6 @@
     ],
     "modelReferences": [
       {
-        "alias": "Person_DM",
         "modelType": "document",
         "purpose": "include",
         "reference": "Person_DM"
@@ -57,7 +56,9 @@
                 "name": "People",
                 "Group": {
                   "repeatability": 1,
-                  "modelAlias": "Person_DM"
+                  "includeConfig": {
+                    "reference": "Person_DM"
+                  }
                 }
               }
             ]

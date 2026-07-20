@@ -1,8 +1,14 @@
 {
-  "document": "28.4.0",
-  "typedefinition": "28.4.0",
-  "form": "37.3.0",
-  "overview": "38.2.0",
+  "app": "6.0.0",
+  "document": "29.4.0",
+  "composeddocument": "29.4.0",
+  "typedefinition": "29.4.0",
+  "form": "39.0.0",
+  "overview": "39.0.0",
+  "tree": "11.0.0",
+  "print": "4.0.0",
+  "printtypesettings": "3.2.0",
+  "masterdetailmodule": "1.0.0",
   "relationship": "3.0.0",
   "application": "6.0.0",
   "content": "0.8.0"

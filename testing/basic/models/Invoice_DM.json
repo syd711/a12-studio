@@ -2,7 +2,7 @@
   "header": {
     "id": "Invoice_DM",
     "modelType": "document",
-    "modelVersion": "28.4.0",
+    "modelVersion": "29.4.0",
     "locales": [
       {
         "code": "en"
@@ -33,19 +33,16 @@
     ],
     "modelReferences": [
       {
-        "alias": "Addresses_DM",
         "modelType": "document",
         "purpose": "include",
         "reference": "Addresses_DM"
       },
       {
-        "alias": "Order_DM",
         "modelType": "document",
         "purpose": "include",
         "reference": "Order_DM"
       },
       {
-        "alias": "PaymentInfo_DM",
         "modelType": "document",
         "purpose": "include",
         "reference": "PaymentInfo_DM"
@@ -90,7 +87,9 @@
                 "name": "Addresses",
                 "Group": {
                   "repeatability": 1,
-                  "modelAlias": "Addresses_DM"
+                  "includeConfig": {
+                    "reference": "Addresses_DM"
+                  }
                 }
               },
               {
@@ -99,7 +98,9 @@
                 "name": "Order",
                 "Group": {
                   "repeatability": 1,
-                  "modelAlias": "Order_DM"
+                  "includeConfig": {
+                    "reference": "Order_DM"
+                  }
                 }
               },
               {
@@ -108,7 +109,9 @@
                 "name": "PaymentInfo",
                 "Group": {
                   "repeatability": 1,
-                  "modelAlias": "PaymentInfo_DM"
+                  "includeConfig": {
+                    "reference": "PaymentInfo_DM"
+                  }
                 }
               },
               {

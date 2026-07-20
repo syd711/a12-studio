@@ -2,7 +2,7 @@
   "header": {
     "id": "Company_DM",
     "modelType": "document",
-    "modelVersion": "28.4.0",
+    "modelVersion": "29.4.0",
     "locales": [
       {
         "code": "en"
@@ -23,10 +23,6 @@
     ],
     "annotations": [
       {
-        "name": "application",
-        "value": "dsfd"
-      },
-      {
         "name": "roles",
         "value": "tester,reviewer"
       }
@@ -43,8 +39,7 @@
       "decimalSeparator": ".",
       "conditionLanguage": {
         "code": "en_US"
-      },
-      "supportedCharacters": []
+      }
     },
     "modelRoot": {
       "rootGroups": [
@@ -270,8 +265,8 @@
                             "name": "description",
                             "annotations": [
                               {
-                                "name": null,
-                                "value": null
+                                "name": "enable_approximate_match_search",
+                                "value": "true"
                               }
                             ],
                             "Field": {

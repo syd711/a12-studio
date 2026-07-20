@@ -1,7 +1,6 @@
-package de.a12.studio.dataservices.models.formmodel;
+package de.a12.studio.models.formmodel;
 
 import de.a12.studio.models.ModelType;
-import de.a12.studio.models.formmodel.*;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;

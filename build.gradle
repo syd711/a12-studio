@@ -2,7 +2,7 @@ subprojects {
     apply plugin: 'java'
 
     group = 'de.a12.studio'
-    version = '2506.06-ext0-001'
+    version = '2606.06-ext0-001'
 
     tasks.withType(JavaCompile).configureEach {
         options.release = 21

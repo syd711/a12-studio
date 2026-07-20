@@ -1,6 +1,5 @@
-package de.a12.studio.dataservices.models.documentmodel;
+package de.a12.studio.models.documentmodel;
 
-import de.a12.studio.models.documentmodel.*;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;

@@ -1,4 +1,4 @@
-package de.a12.studio.dataservices.models.typedefinitionmodel;
+package de.a12.studio.models.typedefinitionmodel;
 
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
@@ -6,7 +6,6 @@ import de.a12.studio.models.documentmodel.EnumerationFieldType;
 import de.a12.studio.models.documentmodel.EnumerationValue;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.TypeDefinition;
-import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;

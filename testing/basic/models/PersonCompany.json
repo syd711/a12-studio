@@ -2,7 +2,7 @@
   "header": {
     "id": "PersonCompany",
     "modelType": "relationship",
-    "modelVersion": "3.0.0",
+    "modelVersion": "4.0.0",
     "locales": [
       {
         "code": "de"
@@ -40,10 +40,7 @@
   },
   "content": {
     "duplicatesAllowed": false,
-    "associationType": "SHARED",
-    "storage": "EXTERNAL",
     "linkDocumentModel": null,
-    "embeddedGroupPath": null,
     "labels": [
       {
         "locale": "de"
@@ -58,15 +55,6 @@
         "role": "Person",
         "documentModel": "Person_DM",
         "ordered": false,
-        "navigable": true,
-        "linkConstraints": {
-          "multiplicity": {
-            "lowerLimit": 0,
-            "unbounded": true,
-            "upperLimit": null
-          }
-        },
-        "candidateConstraints": null,
         "labels": [
           {
             "locale": "de",
@@ -76,21 +64,18 @@
             "locale": "en",
             "text": "Employees"
           }
-        ]
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
       },
       {
         "role": "Company",
         "documentModel": "Company_DM",
         "ordered": false,
-        "navigable": true,
-        "linkConstraints": {
-          "multiplicity": {
-            "lowerLimit": 0,
-            "unbounded": false,
-            "upperLimit": 1
-          }
-        },
-        "candidateConstraints": null,
         "labels": [
           {
             "locale": "de",
@@ -100,7 +85,13 @@
             "locale": "en",
             "text": "Employed by"
           }
-        ]
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        }
       }
     ]
   }

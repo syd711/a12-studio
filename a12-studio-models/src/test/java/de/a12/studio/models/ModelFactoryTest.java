@@ -1,7 +1,5 @@
-package de.a12.studio.dataservices.models;
+package de.a12.studio.models;
 
-import de.a12.studio.models.A12Model;
-import de.a12.studio.models.ModelFactory;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;

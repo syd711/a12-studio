@@ -2,7 +2,7 @@
   "header": {
     "id": "Company_OM",
     "modelType": "overview",
-    "modelVersion": "38.3.0",
+    "modelVersion": "39.0.0",
     "locales": [
       {
         "code": "en"
@@ -37,6 +37,106 @@
     ]
   },
   "content": {
+    "columns": [
+      {
+        "id": "column-08f11",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Logo"
+          },
+          {
+            "locale": "de",
+            "text": "Logo"
+          }
+        ],
+        "width": 1,
+        "elementRef": "group_8e00a",
+        "sortable": false
+      },
+      {
+        "id": "column-4949b",
+        "width": 1,
+        "elementRef": "field_67684",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-9d296",
+        "width": 1,
+        "elementRef": "field_16af2",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "event_delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "button",
+          "label": [
+            {
+              "locale": "en",
+              "text": "New"
+            },
+            {
+              "locale": "de",
+              "text": "Neu"
+            }
+          ],
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
     "configuration": {
       "enableFilter": true,
       "showFullTextSearch": true,
@@ -126,106 +226,6 @@
           }
         ]
       }
-    },
-    "subHeaderBox": {
-      "majorElements": [
-        {
-          "type": "search"
-        },
-        {
-          "type": "filter"
-        }
-      ],
-      "minorElements": [
-        {
-          "type": "button",
-          "label": [
-            {
-              "locale": "en",
-              "text": "New"
-            },
-            {
-              "locale": "de",
-              "text": "Neu"
-            }
-          ],
-          "event": "add",
-          "icon": {
-            "name": "add"
-          },
-          "destructive": false,
-          "primary": false
-        }
-      ]
-    },
-    "footerBox": {
-      "majorElements": [],
-      "minorElements": []
-    },
-    "columns": [
-      {
-        "id": "column-08f11",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Logo"
-          },
-          {
-            "locale": "de",
-            "text": "Logo"
-          }
-        ],
-        "width": 1,
-        "elementRef": "group_8e00a",
-        "sortable": false
-      },
-      {
-        "id": "column-4949b",
-        "width": 1,
-        "elementRef": "field_67684",
-        "sortable": true,
-        "preferredSorting": "ASC"
-      },
-      {
-        "id": "column-9d296",
-        "width": 1,
-        "elementRef": "field_16af2",
-        "sortable": false
-      }
-    ],
-    "rowActionGroup": {
-      "actions": [
-        {
-          "event": "event_delete",
-          "confirmation": {
-            "title": [
-              {
-                "locale": "en",
-                "text": "Warning"
-              },
-              {
-                "locale": "de",
-                "text": "Warnung"
-              }
-            ],
-            "message": [
-              {
-                "locale": "en",
-                "text": "Do you really want to delete this entry?"
-              },
-              {
-                "locale": "de",
-                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
-              }
-            ]
-          },
-          "icon": {
-            "name": "delete"
-          },
-          "destructive": false,
-          "primary": false
-        }
-      ]
     }
   }
 }

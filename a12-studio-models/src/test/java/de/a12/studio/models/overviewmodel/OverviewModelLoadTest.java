@@ -1,8 +1,7 @@
-package de.a12.studio.dataservices.models.overviewmodel;
+package de.a12.studio.models.overviewmodel;
 
 import de.a12.studio.models.Label;
 import de.a12.studio.models.ModelType;
-import de.a12.studio.models.overviewmodel.*;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;

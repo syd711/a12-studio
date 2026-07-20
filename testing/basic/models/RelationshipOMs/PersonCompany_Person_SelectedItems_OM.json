@@ -2,7 +2,7 @@
   "header": {
     "id": "PersonCompany_Person_SelectedItems_OM",
     "modelType": "overview",
-    "modelVersion": "38.3.0",
+    "modelVersion": "39.0.0",
     "locales": [
       {
         "code": "en"
@@ -37,19 +37,6 @@
     ]
   },
   "content": {
-    "configuration": {
-      "enableFilter": false,
-      "showFullTextSearch": false,
-      "pagingSize": 10
-    },
-    "subHeaderBox": {
-      "majorElements": [],
-      "minorElements": []
-    },
-    "footerBox": {
-      "majorElements": [],
-      "minorElements": []
-    },
     "columns": [
       {
         "id": "column-10d42",
@@ -66,6 +53,19 @@
     ],
     "rowActionGroup": {
       "actions": []
+    },
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 10
     }
   }
 }

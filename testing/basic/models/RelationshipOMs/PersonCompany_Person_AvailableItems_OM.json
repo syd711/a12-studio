@@ -2,7 +2,7 @@
   "header": {
     "id": "PersonCompany_Person_AvailableItems_OM",
     "modelType": "overview",
-    "modelVersion": "38.3.0",
+    "modelVersion": "39.0.0",
     "locales": [
       {
         "code": "en"
@@ -37,31 +37,6 @@
     ]
   },
   "content": {
-    "configuration": {
-      "enableFilter": true,
-      "showFullTextSearch": true,
-      "pagingSize": 10,
-      "filterConfiguration": {
-        "showFilterButton": true,
-        "showFilterBar": true,
-        "filterMode": "all"
-      }
-    },
-    "subHeaderBox": {
-      "majorElements": [
-        {
-          "type": "search"
-        },
-        {
-          "type": "filter"
-        }
-      ],
-      "minorElements": []
-    },
-    "footerBox": {
-      "majorElements": [],
-      "minorElements": []
-    },
     "columns": [
       {
         "id": "column-469a4",
@@ -78,6 +53,31 @@
     ],
     "rowActionGroup": {
       "actions": []
+    },
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all"
+      }
     }
   }
 }
