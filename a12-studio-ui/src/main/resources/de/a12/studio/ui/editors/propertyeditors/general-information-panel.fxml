@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="GENERAL INFORMATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.FieldInformationPanelController">
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController">
    <BorderPane>
       <center>
         <GridPane hgap="10.0" vgap="8.0">

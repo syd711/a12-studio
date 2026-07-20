@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class FieldInformationPanelController extends AbstractPropertyEditor implements Initializable {
+public class GeneralInformationPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final List<String> DATA_TYPES = List.of("String", "Number", "Boolean", "Date", "Object");
 

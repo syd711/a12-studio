@@ -15,7 +15,7 @@ import java.util.ResourceBundle;
 public class TypeDefinitionModelFieldEditorController implements ElementEditorController, Initializable {
 
   @FXML
-  private FieldInformationPanelController generalInformationController;
+  private GeneralInformationPanelController generalInformationController;
 
   @FXML
   private TypeDefinitionPanelController typeDefinitionController;

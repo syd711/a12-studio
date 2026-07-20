@@ -15,7 +15,7 @@
             <Label styleClass="editor-type-label" text="Group Editor"/>
 
             <!-- General Information -->
-            <fx:include fx:id="generalInformation" source="../propertyeditors/field-information-panel.fxml"/>
+            <fx:include fx:id="generalInformation" source="../propertyeditors/general-information-panel.fxml"/>
 
             <!-- Label -->
             <fx:include fx:id="label" source="../propertyeditors/localized-text-panel.fxml"/>

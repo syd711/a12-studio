@@ -3,7 +3,7 @@ package de.a12.studio.ui.editors.documentmodel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
-import de.a12.studio.ui.editors.propertyeditors.FieldInformationPanelController;
+import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 public class DocumentModelGroupEditorController implements ElementEditorController, Initializable {
 
   @FXML
-  private FieldInformationPanelController generalInformationController;
+  private GeneralInformationPanelController generalInformationController;
 
   @FXML
   private LocalizedTextPanelController labelController;
