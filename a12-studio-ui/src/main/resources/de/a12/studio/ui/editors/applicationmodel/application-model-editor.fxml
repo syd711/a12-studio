@@ -31,6 +31,14 @@
                     </children>
                 </StackPane>
                 <Separator prefHeight="0.0" prefWidth="0.0" />
+                <Button mnemonicParsing="false" onAction="#onPreview" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2e-eye-outline" iconSize="18" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Preview" />
+                    </tooltip>
+                </Button>
                 <Button layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onAction="#onFileEdit" styleClass="default-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />

@@ -1,6 +1,7 @@
 package de.a12.studio.ui.util;
 
 
+import de.a12.studio.models.projects.settings.PreviewSettings;
 import de.a12.studio.ui.Studio;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -9,6 +10,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 import static de.a12.studio.ui.util.OSUtil.isLinux;
 import static de.a12.studio.ui.util.OSUtil.isMac;
@@ -213,6 +215,63 @@ public class SystemUtil {
     catch (IOException e) {
       log.error("Failed to open URL: " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * Opens the given URL in the browser selected by {@code browserType}, falling back to {@link
+   * #openUrl(String)}'s system-default behavior for {@code SYSTEM_DEFAULT} or if the requested browser's
+   * executable can't be launched (e.g. not installed).
+   *
+   * @param url The URL to open.
+   * @param browserType Which browser to launch the URL in.
+   */
+  public static void openUrl(String url, PreviewSettings.BrowserType browserType) {
+    if (browserType == PreviewSettings.BrowserType.SYSTEM_DEFAULT) {
+      openUrl(url);
+      return;
+    }
+
+    try {
+      new ProcessBuilder(browserCommand(browserType, url)).start();
+    }
+    catch (IOException e) {
+      log.warn("Failed to launch {}, falling back to the system default browser: {}", browserType, e.getMessage());
+      openUrl(url);
+    }
+  }
+
+  /**
+   * Windows resolves common browser names ("chrome", "firefox", "msedge") through the registry's App Paths
+   * entries when routed through {@code cmd /c start}, same as the plain {@code start "" <url>} call in {@link
+   * #openUrl(String)} - a bare {@link ProcessBuilder} call wouldn't find them without their install directory
+   * on PATH, which isn't the default for these otherwise.
+   */
+  private static List<String> browserCommand(PreviewSettings.BrowserType browserType, String url) {
+    if (isWindows()) {
+      String executable = switch (browserType) {
+        case CHROME -> "chrome";
+        case FIREFOX -> "firefox";
+        case EDGE -> "msedge";
+        case SYSTEM_DEFAULT -> throw new IllegalStateException("handled by the caller");
+      };
+      return List.of("cmd.exe", "/c", "start", "", executable, url);
+    }
+    if (isMac()) {
+      String appName = switch (browserType) {
+        case CHROME -> "Google Chrome";
+        case FIREFOX -> "Firefox";
+        case EDGE -> "Microsoft Edge";
+        case SYSTEM_DEFAULT -> throw new IllegalStateException("handled by the caller");
+      };
+      return List.of("open", "-a", appName, url);
+    }
+    String executable = switch (browserType) {
+      case CHROME -> "google-chrome";
+      case FIREFOX -> "firefox";
+      case EDGE -> "microsoft-edge";
+      case SYSTEM_DEFAULT -> throw new IllegalStateException("handled by the caller");
+    };
+    return List.of(executable, url);
   }
 
   /**

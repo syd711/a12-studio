@@ -9,6 +9,7 @@ import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.propertyeditors.ActivityPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModulesPanelController;
+import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -61,6 +62,11 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   public void onSettings(ActionEvent e) {
     EditorDialogs.openSettings();
     updateSettingsErrorBadge();
+  }
+
+  @FXML
+  public void onPreview(ActionEvent e) {
+    PreviewLauncher.openPreview(projectItem);
   }
 
   public void loadModel(@NonNull A12Model model) {
