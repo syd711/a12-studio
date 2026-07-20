@@ -114,7 +114,8 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
     dataTypeCombo.managedProperty().bind(dataTypeCombo.visibleProperty());
     dataTypeCombo.visibleProperty().bind(typeDefinitionCheckBox.selectedProperty());
-    dataTypeComboBox.disableProperty().bind(typeDefinitionCheckBox.selectedProperty());
+    dataTypeComboBox.managedProperty().bind(dataTypeComboBox.visibleProperty());
+    dataTypeComboBox.visibleProperty().bind(typeDefinitionCheckBox.selectedProperty().not());
 
     requiredParentBox.managedProperty().bind(requiredParentBox.visibleProperty());
     requiredParentBox.visibleProperty().bind(requiredCheckBox.selectedProperty());
@@ -134,18 +135,28 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
       }
     }));
 
-    bindCheckBox(typeDefinitionCheckBox, (element, value) -> withFieldConfig(element, field ->
-        field.setFieldType(value ? new TypeDefFieldType() : createFieldType(dataTypeComboBox.getValue()))));
+    bindCheckBox(typeDefinitionCheckBox, (element, value) -> {
+      if (value && dataTypeComboBox.getValue() == null) {
+        setFieldValue(dataTypeComboBox, DATA_TYPES.get(0));
+      }
+      withFieldConfig(element, field ->
+          field.setFieldType(value ? new TypeDefFieldType() : createFieldType(dataTypeComboBox.getValue())));
+    });
     bindComboBox(dataTypeCombo, (element, value) -> withFieldConfig(element, field -> {
       if (field.getFieldType() instanceof TypeDefFieldType typeDefFieldType) {
         typeDefFieldType.getTypeDefType().setTypeDefinitionId(value);
       }
     }));
-    bindComboBox(dataTypeComboBox, (element, value) -> withFieldConfig(element, field -> {
-      if (!(field.getFieldType() instanceof TypeDefFieldType)) {
-        field.setFieldType(createFieldType(value));
+    bindComboBox(dataTypeComboBox, (element, value) -> {
+      if (value == null) {
+        return;
       }
-    }));
+      withFieldConfig(element, field -> {
+        if (!(field.getFieldType() instanceof TypeDefFieldType)) {
+          field.setFieldType(createFieldType(value));
+        }
+      });
+    });
   }
 
   public void setCustomTypeDisabled() {
