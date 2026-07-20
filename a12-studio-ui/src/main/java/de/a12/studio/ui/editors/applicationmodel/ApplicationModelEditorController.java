@@ -8,6 +8,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.propertyeditors.ActivityPanelController;
+import de.a12.studio.ui.editors.propertyeditors.ModulesPanelController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -42,6 +43,9 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   private ActivityPanelController activityController;
 
   @FXML
+  private ModulesPanelController modulesController;
+
+  @FXML
   public void onFileOpen(ActionEvent e) {
     File file = projectItem.getFile();
     SystemUtil.openFile(file);
@@ -65,6 +69,7 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   }
 
   private void load(@NonNull ApplicationModel documentModel) {
+    modulesController.setModel(documentModel);
     activityController.setModel(documentModel);
   }
 

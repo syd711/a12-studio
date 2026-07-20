@@ -58,6 +58,7 @@
                   <Label styleClass="editor-type-label" text="Application Model" />
                   <fx:include fx:id="region" source="../propertyeditors/region-panel.fxml" />
                   <fx:include fx:id="layout" source="../propertyeditors/layout-panel.fxml" />
+                  <fx:include fx:id="modules" source="../propertyeditors/modules-panel.fxml" />
                   <fx:include fx:id="activity" source="../propertyeditors/activity-panel.fxml" />
                </children>
                <padding>
