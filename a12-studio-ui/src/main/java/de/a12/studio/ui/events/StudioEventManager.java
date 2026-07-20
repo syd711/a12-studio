@@ -1,8 +1,8 @@
 package de.a12.studio.ui.events;
 
-import de.a12.studio.dataservices.projects.Project;
-import de.a12.studio.dataservices.projects.ProjectItem;
-import de.a12.studio.dataservices.projects.settings.JsonSettings;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.JsonSettings;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import org.jspecify.annotations.NonNull;
 

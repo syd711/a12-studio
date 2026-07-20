@@ -1,11 +1,12 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.models.Locale;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.Locale;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Edits {@link A12Model#getLocales()}. Not bound to a single {@link de.a12.studio.dataservices.models.documentmodel.Element}
+ * Edits {@link A12Model#getLocales()}. Not bound to a single {@link Element}
  * (locales live on the model header), so {@link #setElement} is never called and only {@link #setModel} is used;
  * validation is therefore driven manually via {@link #updateValidation} rather than the element-based
  * validation in {@link AbstractPropertyEditor#commitChange(javafx.scene.Node)}.

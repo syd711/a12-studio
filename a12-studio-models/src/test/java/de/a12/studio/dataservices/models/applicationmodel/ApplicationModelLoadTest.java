@@ -1,6 +1,8 @@
 package de.a12.studio.dataservices.models.applicationmodel;
 
-import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.applicationmodel.*;
+import de.a12.studio.models.applicationmodel.Module;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.json.JsonMapper;

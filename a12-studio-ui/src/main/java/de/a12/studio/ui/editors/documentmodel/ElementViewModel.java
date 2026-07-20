@@ -1,11 +1,11 @@
 package de.a12.studio.ui.editors.documentmodel;
 
-import de.a12.studio.dataservices.models.documentmodel.ComputationElement;
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.models.documentmodel.FieldElement;
-import de.a12.studio.dataservices.models.documentmodel.GroupConfig;
-import de.a12.studio.dataservices.models.documentmodel.GroupElement;
-import de.a12.studio.dataservices.models.documentmodel.RuleElement;
+import de.a12.studio.models.documentmodel.ComputationElement;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.GroupConfig;
+import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
 

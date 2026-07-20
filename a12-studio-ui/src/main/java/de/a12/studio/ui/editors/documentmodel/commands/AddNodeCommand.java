@@ -1,6 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel.commands;
 
-import de.a12.studio.dataservices.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.util.commandstack.Command;
 import org.jspecify.annotations.NonNull;
 

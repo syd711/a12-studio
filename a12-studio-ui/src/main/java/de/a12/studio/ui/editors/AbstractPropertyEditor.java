@@ -2,10 +2,10 @@ package de.a12.studio.ui.editors;
 
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.ui.Studio;

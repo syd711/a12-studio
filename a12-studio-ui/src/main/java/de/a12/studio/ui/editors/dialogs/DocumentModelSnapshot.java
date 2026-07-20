@@ -1,11 +1,11 @@
 package de.a12.studio.ui.editors.dialogs;
 
-import de.a12.studio.dataservices.models.Annotation;
-import de.a12.studio.dataservices.models.Label;
-import de.a12.studio.dataservices.models.Locale;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModelContent;
-import de.a12.studio.dataservices.models.documentmodel.ModelConfig;
+import de.a12.studio.models.Annotation;
+import de.a12.studio.models.Label;
+import de.a12.studio.models.Locale;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.DocumentModelContent;
+import de.a12.studio.models.documentmodel.ModelConfig;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;

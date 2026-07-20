@@ -1,12 +1,13 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.models.Locale;
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.models.documentmodel.FieldElement;
-import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
-import de.a12.studio.dataservices.models.documentmodel.StringTypeOptions;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.Locale;
+import de.a12.studio.models.Label;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.models.documentmodel.StringTypeOptions;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.LocalesChangedEvent;
@@ -26,7 +27,7 @@ import java.util.ResourceBundle;
 import java.util.function.Function;
 
 /**
- * Edits a per-locale text (a list of {@link de.a12.studio.dataservices.models.Label}). Reused for the label,
+ * Edits a per-locale text (a list of {@link Label}). Reused for the label,
  * internal description, external description and helper text of a single {@link Element} (via {@link
  * #setElement}, distinguished via {@link #configureLabel} / {@link #configureInternal} / {@link
  * #configureExternal} / {@link #configureHelperText}), as well as for a model's own header labels (via {@link
@@ -46,11 +47,11 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   // model from one fired for a different, unrelated model open in another tab.
   private ProjectItem projectItem;
 
-  private Function<Element, List<de.a12.studio.dataservices.models.Label>> elementTextsAccessor = Element::getExternalDescription;
+  private Function<Element, List<Label>> elementTextsAccessor = Element::getExternalDescription;
 
-  private Function<Element, List<de.a12.studio.dataservices.models.Label>> elementTextsWriteAccessor = elementTextsAccessor;
+  private Function<Element, List<Label>> elementTextsWriteAccessor = elementTextsAccessor;
 
-  private Function<A12Model, List<de.a12.studio.dataservices.models.Label>> modelTextsAccessor = A12Model::getLabels;
+  private Function<A12Model, List<Label>> modelTextsAccessor = A12Model::getLabels;
 
   private String fieldKey = "external";
 
@@ -84,12 +85,12 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
     setSettingsKeySuffix("." + fieldKey);
   }
 
-  private void configure(Function<Element, List<de.a12.studio.dataservices.models.Label>> textsAccessor, String fieldKey, String title) {
+  private void configure(Function<Element, List<Label>> textsAccessor, String fieldKey, String title) {
     configure(textsAccessor, textsAccessor, fieldKey, title);
   }
 
-  private void configure(Function<Element, List<de.a12.studio.dataservices.models.Label>> readAccessor,
-      Function<Element, List<de.a12.studio.dataservices.models.Label>> writeAccessor, String fieldKey, String title) {
+  private void configure(Function<Element, List<Label>> readAccessor,
+                         Function<Element, List<Label>> writeAccessor, String fieldKey, String title) {
     this.elementTextsAccessor = readAccessor;
     this.elementTextsWriteAccessor = writeAccessor;
     this.fieldKey = fieldKey;
@@ -128,7 +129,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
     }
   }
 
-  private List<de.a12.studio.dataservices.models.Label> getTexts() {
+  private List<Label> getTexts() {
     return model != null ? modelTextsAccessor.apply(model) : elementTextsAccessor.apply(element);
   }
 
@@ -154,56 +155,56 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   }
 
   private void populateLocaleFields() {
-    List<de.a12.studio.dataservices.models.Label> texts = getTexts();
+    List<Label> texts = getTexts();
     textFieldsByLocale.forEach((localeCode, textField) -> {
       String text = texts.stream()
           .filter(label -> localeCode.equals(label.getLocale()))
           .findFirst()
-          .map(de.a12.studio.dataservices.models.Label::getText)
+          .map(Label::getText)
           .orElse("");
       setFieldValue(textField, text);
     });
   }
 
-  private List<de.a12.studio.dataservices.models.Label> getWriteTexts() {
+  private List<Label> getWriteTexts() {
     return model != null ? modelTextsAccessor.apply(model) : elementTextsWriteAccessor.apply(element);
   }
 
   private void setLocaleText(String localeCode, String value) {
-    List<de.a12.studio.dataservices.models.Label> texts = getWriteTexts();
-    Optional<de.a12.studio.dataservices.models.Label> existing = texts.stream()
+    List<Label> texts = getWriteTexts();
+    Optional<Label> existing = texts.stream()
         .filter(label -> localeCode.equals(label.getLocale()))
         .findFirst();
     if (existing.isPresent()) {
       existing.get().setText(value);
     } else {
-      de.a12.studio.dataservices.models.Label label = new de.a12.studio.dataservices.models.Label();
+      Label label = new Label();
       label.setLocale(localeCode);
       label.setText(value);
       texts.add(label);
     }
   }
 
-  private static List<de.a12.studio.dataservices.models.Label> getHelperText(Element element) {
+  private static List<Label> getHelperText(Element element) {
     if (element instanceof FieldElement fieldElement && fieldElement.getField() != null) {
       return fieldElement.getField().getHelperText();
     }
     return List.of();
   }
 
-  private static List<de.a12.studio.dataservices.models.Label> getLabel(Element element) {
+  private static List<Label> getLabel(Element element) {
     if (element instanceof FieldElement fieldElement && fieldElement.getField() != null) {
       return fieldElement.getField().getLabel();
     }
     return List.of();
   }
 
-  private static List<de.a12.studio.dataservices.models.Label> getErrorMessages(Element element) {
+  private static List<Label> getErrorMessages(Element element) {
     StringTypeOptions options = getStringTypeOptions(element).orElse(null);
     return options != null ? options.getErrorMessage() : List.of();
   }
 
-  private static List<de.a12.studio.dataservices.models.Label> getOrCreateErrorMessages(Element element) {
+  private static List<Label> getOrCreateErrorMessages(Element element) {
     if (element instanceof FieldElement fieldElement
         && fieldElement.getField() != null
         && fieldElement.getField().getFieldType() instanceof StringFieldType stringFieldType) {

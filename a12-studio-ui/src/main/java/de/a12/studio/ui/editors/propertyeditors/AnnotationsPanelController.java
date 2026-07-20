@@ -1,11 +1,11 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.models.Annotation;
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.Annotation;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.AnnotationFieldRegistry;

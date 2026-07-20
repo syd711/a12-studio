@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,7 +14,7 @@ import java.util.ResourceBundle;
 
 /**
  * Edits the model's name ({@link DocumentModel#getId()}) and internal description, and shows the model
- * version read-only. Not bound to a single {@link de.a12.studio.dataservices.models.documentmodel.Element}
+ * version read-only. Not bound to a single {@link Element}
  * (these fields live on the model itself), so {@link #setElement} is never called and only {@link #setModel}
  * is used.
  */

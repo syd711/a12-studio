@@ -1,12 +1,11 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
-import de.a12.studio.dataservices.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
 import de.a12.studio.ui.editors.propertyeditors.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TitledPane;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;

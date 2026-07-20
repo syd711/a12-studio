@@ -1,9 +1,9 @@
 package de.a12.studio.ui.projecttree;
 
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;

@@ -1,9 +1,9 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.documentmodel.TypeDefinition;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;

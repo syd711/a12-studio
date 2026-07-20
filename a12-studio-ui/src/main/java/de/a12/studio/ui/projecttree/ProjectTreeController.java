@@ -1,10 +1,10 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.ui.components.SearchFieldController;
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.projects.Project;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.ui.events.ModelFocusRequestedEvent;

@@ -1,6 +1,6 @@
 package de.a12.studio.ui.events;
 
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.projects.ProjectItem;
 import org.jspecify.annotations.NonNull;
 
 public class ModelSaveEvent {

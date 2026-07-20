@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors;
 
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;

@@ -1,8 +1,8 @@
 package de.a12.studio.ui;
 
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionEditorController;
 import de.a12.studio.ui.util.WidgetFactory;

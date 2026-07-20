@@ -1,19 +1,16 @@
 package de.a12.studio.ui.tabs;
 
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.EditorFactory;
 import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.projects.Project;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.*;
-import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -21,13 +18,9 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.paint.Color;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;

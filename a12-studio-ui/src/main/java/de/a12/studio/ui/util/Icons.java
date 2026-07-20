@@ -1,6 +1,6 @@
 package de.a12.studio.ui.util;
 
-import de.a12.studio.dataservices.models.ModelType;
+import de.a12.studio.models.ModelType;
 
 public interface Icons {
 

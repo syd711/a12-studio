@@ -13,7 +13,9 @@ import com.mgmtp.a12.kernel.md.model.a12internal.visitor.DocumentModelVisitor;
 import com.mgmtp.a12.kernel.md.model.a12internal.visitor.DocumentModelWalker;
 import com.mgmtp.a12.kernel.md.model.api.visitor.DocumentModelWalker.VisitProcess;
 import com.mgmtp.a12.model.notification.Severity;
-import de.a12.studio.dataservices.util.JsonSettings;
+import de.a12.studio.models.documentmodel.DocumentModelContent;
+import de.a12.studio.models.documentmodel.ModelConfig;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.dataservices.services.support.DocumentModelSupport;
 import de.a12.studio.dataservices.services.support.InMemoryDocumentModelReferenceResolver;
 
@@ -38,9 +40,9 @@ public class DMValidationService {
    * don't have the kernel jars on their classpath (e.g. a12-studio-ui) can still trigger validation.
    */
   public Optional<ElementValidationError> validateElement(
-      de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
+      de.a12.studio.models.documentmodel.DocumentModel documentModel,
       String elementId,
-      List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
+      List<de.a12.studio.models.documentmodel.DocumentModel> otherDocumentModels) {
     return validateDocument(documentModel, otherDocumentModels).stream()
         .filter(error -> error.elementId().equals(elementId))
         .findFirst();
@@ -51,8 +53,8 @@ public class DMValidationService {
    * where there's no single element to check (see {@link #validateElement} for that narrower case).
    */
   public List<ElementValidationError> validateDocument(
-      de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
-      List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
+      de.a12.studio.models.documentmodel.DocumentModel documentModel,
+      List<de.a12.studio.models.documentmodel.DocumentModel> otherDocumentModels) {
     DocumentModel model = DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(documentModel));
     List<DocumentModel> otherModels = otherDocumentModels.stream()
         .map(other -> DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(other)))
@@ -71,8 +73,8 @@ public class DMValidationService {
    * "no issues" rather than surfaced, matching {@link #validate} below.
    */
   public List<String> getSettingsIssueMessages(
-      de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
-      List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
+      de.a12.studio.models.documentmodel.DocumentModel documentModel,
+      List<de.a12.studio.models.documentmodel.DocumentModel> otherDocumentModels) {
     List<String> messages = new ArrayList<>();
     getTimeZoneMismatchError(documentModel, otherDocumentModels).ifPresent(messages::add);
     getMissingLocaleError(documentModel).ifPresent(messages::add);
@@ -83,7 +85,7 @@ public class DMValidationService {
    * UI-safe entry point for the Locales settings panel: the kernel's "at least one locale" consistency
    * problem, reworded for end users (the kernel's own message embeds an internal error code).
    */
-  public Optional<String> getMissingLocaleError(de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel) {
+  public Optional<String> getMissingLocaleError(de.a12.studio.models.documentmodel.DocumentModel documentModel) {
     try {
       DocumentModel model = DocumentModelSupport.deserialize(JsonSettings.objectMapper.writeValueAsString(documentModel));
       return DocumentModelSupport.getSettingsProblems(model).stream()
@@ -102,8 +104,8 @@ public class DMValidationService {
    * it depends on the other document models in the project.
    */
   public Optional<String> getTimeZoneMismatchError(
-      de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel,
-      List<de.a12.studio.dataservices.models.documentmodel.DocumentModel> otherDocumentModels) {
+      de.a12.studio.models.documentmodel.DocumentModel documentModel,
+      List<de.a12.studio.models.documentmodel.DocumentModel> otherDocumentModels) {
     String timeZone = getTimeZone(documentModel);
     if (EUROPE_BERLIN.equals(timeZone)) {
       return Optional.empty();
@@ -113,9 +115,9 @@ public class DMValidationService {
     return otherModelUsesEuropeBerlin ? Optional.of(TIME_ZONE_MISMATCH_MESSAGE) : Optional.empty();
   }
 
-  private static String getTimeZone(de.a12.studio.dataservices.models.documentmodel.DocumentModel documentModel) {
-    de.a12.studio.dataservices.models.documentmodel.DocumentModelContent content = documentModel.getContent();
-    de.a12.studio.dataservices.models.documentmodel.ModelConfig modelConfig = content != null ? content.getModelConfig() : null;
+  private static String getTimeZone(de.a12.studio.models.documentmodel.DocumentModel documentModel) {
+    DocumentModelContent content = documentModel.getContent();
+    ModelConfig modelConfig = content != null ? content.getModelConfig() : null;
     return modelConfig != null ? modelConfig.getTimeZone() : null;
   }
 

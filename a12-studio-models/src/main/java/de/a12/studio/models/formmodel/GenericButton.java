@@ -1,0 +1,24 @@
+package de.a12.studio.models.formmodel;
+
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class GenericButton extends Button {
+
+  private final Map<String, Object> config = new LinkedHashMap<>();
+
+  public GenericButton() {
+    setType(ButtonType.OTHER);
+  }
+
+  @JsonAnySetter
+  public void setConfig(String name, Object value) {
+    config.put(name, value);
+  }
+
+  public Map<String, Object> getConfig() {
+    return config;
+  }
+}

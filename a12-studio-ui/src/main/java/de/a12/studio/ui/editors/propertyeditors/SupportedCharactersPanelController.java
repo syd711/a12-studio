@@ -1,10 +1,11 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.util.Debouncer;
-import de.a12.studio.dataservices.util.JsonSettings;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModelContent;
-import de.a12.studio.dataservices.models.documentmodel.ModelConfig;
+import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.DocumentModelContent;
+import de.a12.studio.models.documentmodel.ModelConfig;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,7 +19,7 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
- * Edits {@link ModelConfig#getSupportedCharacters()}. Not bound to a single {@link de.a12.studio.dataservices.models.documentmodel.Element}
+ * Edits {@link ModelConfig#getSupportedCharacters()}. Not bound to a single {@link Element}
  * (supported characters live on the model's {@link ModelConfig}), so {@link #setElement} is never called and
  * only {@link #setModel} is used.
  */

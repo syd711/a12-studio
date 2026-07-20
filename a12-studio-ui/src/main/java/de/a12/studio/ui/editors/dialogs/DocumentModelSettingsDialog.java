@@ -1,8 +1,8 @@
 package de.a12.studio.ui.editors.dialogs;
 
 import de.a12.studio.ui.components.DialogController;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;

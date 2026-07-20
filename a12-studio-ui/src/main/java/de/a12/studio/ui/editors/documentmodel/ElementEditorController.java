@@ -1,8 +1,8 @@
 package de.a12.studio.ui.editors.documentmodel;
 
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.models.documentmodel.GroupConfig;
-import de.a12.studio.dataservices.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.GroupConfig;
+import de.a12.studio.models.documentmodel.GroupElement;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;

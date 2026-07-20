@@ -1,11 +1,12 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.models.Annotation;
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.projects.Project;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.Annotation;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 
 /**
  * Edits the comma-separated {@code roles} header annotation (see {@code /header/annotations} in a model's
- * json), e.g. {@code "tester,reviewer"}. Not bound to a single {@link de.a12.studio.dataservices.models.documentmodel.Element}
+ * json), e.g. {@code "tester,reviewer"}. Not bound to a single {@link Element}
  * (roles live on the model header), so {@link #setElement} is never called and only {@link #setModel} is used.
  */
 public class RoleEditorPanelController extends AbstractPropertyEditor implements Initializable {

@@ -1,6 +1,6 @@
 package de.a12.studio.ui.preferences;
 
-import de.a12.studio.dataservices.projects.settings.JsonSettings;
+import de.a12.studio.models.projects.settings.JsonSettings;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

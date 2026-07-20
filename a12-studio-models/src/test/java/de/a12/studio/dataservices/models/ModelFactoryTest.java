@@ -1,11 +1,13 @@
 package de.a12.studio.dataservices.models;
 
-import de.a12.studio.dataservices.models.applicationmodel.ApplicationModel;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.formmodel.FormModel;
-import de.a12.studio.dataservices.models.overviewmodel.OverviewModel;
-import de.a12.studio.dataservices.models.typedefinitionmodel.TypeDefinitionModel;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelFactory;
+import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.models.projects.ProjectItem;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

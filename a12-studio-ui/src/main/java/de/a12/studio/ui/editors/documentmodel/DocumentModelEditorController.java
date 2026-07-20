@@ -2,12 +2,12 @@ package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
-import de.a12.studio.dataservices.models.A12Model;
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.models.documentmodel.GroupElement;
-import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;

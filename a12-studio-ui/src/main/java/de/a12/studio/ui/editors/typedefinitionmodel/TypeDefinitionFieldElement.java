@@ -1,9 +1,9 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
-import de.a12.studio.dataservices.models.documentmodel.FieldConfig;
-import de.a12.studio.dataservices.models.documentmodel.FieldElement;
-import de.a12.studio.dataservices.models.documentmodel.FieldType;
-import de.a12.studio.dataservices.models.documentmodel.TypeDefinition;
+import de.a12.studio.models.documentmodel.FieldConfig;
+import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.FieldType;
+import de.a12.studio.models.documentmodel.TypeDefinition;
 import org.jspecify.annotations.NonNull;
 
 /**

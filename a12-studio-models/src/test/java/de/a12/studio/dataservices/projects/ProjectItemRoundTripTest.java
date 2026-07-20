@@ -1,5 +1,6 @@
 package de.a12.studio.dataservices.projects;
 
+import de.a12.studio.models.projects.ProjectItem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

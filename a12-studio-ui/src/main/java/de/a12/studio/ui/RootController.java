@@ -1,7 +1,7 @@
 package de.a12.studio.ui;
 
-import de.a12.studio.dataservices.projects.Project;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.AnnotationFieldRegistry;
 import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;

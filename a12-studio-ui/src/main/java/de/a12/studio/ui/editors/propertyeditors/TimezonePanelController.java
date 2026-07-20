@@ -1,9 +1,10 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModelContent;
-import de.a12.studio.dataservices.models.documentmodel.ModelConfig;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.DocumentModelContent;
+import de.a12.studio.models.documentmodel.ModelConfig;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Edits {@link ModelConfig#getTimeZone()}. Not bound to a single {@link de.a12.studio.dataservices.models.documentmodel.Element}
+ * Edits {@link ModelConfig#getTimeZone()}. Not bound to a single {@link Element}
  * (the time zone lives on the model's {@link ModelConfig}), so {@link #setElement} is never called and only
  * {@link #setModel} is used; validation is therefore driven manually via {@link #updateValidation} rather than
  * the element-based validation in {@link AbstractPropertyEditor#commitChange(javafx.scene.Node)}.

@@ -1,6 +1,6 @@
 package de.a12.studio.ui;
 
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.updater.Dialogs;
 import de.a12.studio.ui.util.StudioVersion;

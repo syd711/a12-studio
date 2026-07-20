@@ -1,8 +1,8 @@
 package de.a12.studio.ui.util;
 
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.projects.Project;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import org.jspecify.annotations.NonNull;
 

@@ -2,8 +2,8 @@ package de.a12.studio.ui;
 
 import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
-import de.a12.studio.dataservices.projects.Project;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;

@@ -1,28 +1,29 @@
 package de.a12.studio.ui.editors.documentmodel;
 
-import de.a12.studio.dataservices.models.ModelType;
-import de.a12.studio.dataservices.models.documentmodel.ComputationConfig;
-import de.a12.studio.dataservices.models.documentmodel.ComputationElement;
-import de.a12.studio.dataservices.models.documentmodel.DocumentModel;
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.models.documentmodel.EnumerationFieldType;
-import de.a12.studio.dataservices.models.documentmodel.EnumerationTypeOptions;
-import de.a12.studio.dataservices.models.documentmodel.EnumerationValue;
-import de.a12.studio.dataservices.models.documentmodel.FieldConfig;
-import de.a12.studio.dataservices.models.documentmodel.FieldElement;
-import de.a12.studio.dataservices.models.documentmodel.GroupConfig;
-import de.a12.studio.dataservices.models.documentmodel.GroupElement;
-import de.a12.studio.dataservices.models.documentmodel.ModelRoot;
-import de.a12.studio.dataservices.models.documentmodel.NumberFieldType;
-import de.a12.studio.dataservices.models.documentmodel.RequirednessConfig;
-import de.a12.studio.dataservices.models.documentmodel.RuleConfig;
-import de.a12.studio.dataservices.models.documentmodel.RuleElement;
-import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.Label;
+import de.a12.studio.models.documentmodel.ComputationConfig;
+import de.a12.studio.models.documentmodel.ComputationElement;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.EnumerationFieldType;
+import de.a12.studio.models.documentmodel.EnumerationTypeOptions;
+import de.a12.studio.models.documentmodel.EnumerationValue;
+import de.a12.studio.models.documentmodel.FieldConfig;
+import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.GroupConfig;
+import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.ModelRoot;
+import de.a12.studio.models.documentmodel.NumberFieldType;
+import de.a12.studio.models.documentmodel.RequirednessConfig;
+import de.a12.studio.models.documentmodel.RuleConfig;
+import de.a12.studio.models.documentmodel.RuleElement;
+import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
-import de.a12.studio.dataservices.projects.ProjectItem;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
 import de.a12.studio.ui.util.commandstack.Command;
@@ -671,8 +672,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return config;
   }
 
-  private de.a12.studio.dataservices.models.Label newLabel(@NonNull String locale, @NonNull String text) {
-    de.a12.studio.dataservices.models.Label label = new de.a12.studio.dataservices.models.Label();
+  private Label newLabel(@NonNull String locale, @NonNull String text) {
+    Label label = new Label();
     label.setLocale(locale);
     label.setText(text);
     return label;

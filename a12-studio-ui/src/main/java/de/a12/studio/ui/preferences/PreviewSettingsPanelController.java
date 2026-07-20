@@ -1,6 +1,6 @@
 package de.a12.studio.ui.preferences;
 
-import de.a12.studio.dataservices.projects.settings.PreviewSettings;
+import de.a12.studio.models.projects.settings.PreviewSettings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;

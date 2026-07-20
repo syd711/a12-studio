@@ -1,10 +1,10 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.dataservices.models.documentmodel.Element;
-import de.a12.studio.dataservices.models.documentmodel.FieldElement;
-import de.a12.studio.dataservices.models.documentmodel.StringFieldType;
-import de.a12.studio.dataservices.models.documentmodel.StringTypeOptions;
+import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.models.documentmodel.StringTypeOptions;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
