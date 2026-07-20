@@ -86,6 +86,7 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
       snapshot = new DocumentModelSnapshot(documentModel);
 
       modelSettingsNameController.setModel(documentModel);
+      modelSettingsNameController.focusNameField();
       supportedCharactersController.setModel(documentModel);
       localesController.setModel(documentModel);
       labelsController.setModel(documentModel);

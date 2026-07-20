@@ -2,17 +2,16 @@ package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import org.jspecify.annotations.NonNull;
 
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
 
-public class GeneralInformationPanelController extends AbstractPropertyEditor implements Initializable {
+public class GeneralInformationPanelController extends AbstractPropertyEditor {
 
   private static final List<String> DATA_TYPES = List.of("String", "Number", "Boolean", "Date", "Object");
 
@@ -27,11 +26,11 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor im
 
   private List<Element> ancestors = List.of();
 
-  @Override
-  public void initialize(URL url, ResourceBundle resourceBundle) {
-    super.initialize(url, resourceBundle);
-    bindTextField(nameField, Element::setName);
-    nameField.textProperty().addListener((observable, oldValue, newValue) -> updatePathField(newValue));
+  @FXML
+  private void onEditName(ActionEvent event) {
+    EditorDialogs.openSettings();
+    setFieldValue(nameField, element.getName());
+    updatePathField(element.getName());
   }
 
   public void setAncestors(@NonNull List<Element> ancestors) {

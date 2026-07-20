@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.propertyeditors;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
@@ -44,5 +45,12 @@ public class ModelSettingsNamePanelController extends AbstractPropertyEditor imp
     setFieldValue(nameField, model.getId());
     versionField.setText(model.getModelVersion());
     setFieldValue(descriptionArea, model.getDescription());
+  }
+
+  public void focusNameField() {
+    Platform.runLater(() -> {
+      nameField.requestFocus();
+      nameField.selectAll();
+    });
   }
 }

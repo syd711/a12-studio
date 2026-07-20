@@ -2,7 +2,7 @@
   "header": {
     "id": "TypeDefinition",
     "modelType": "document",
-    "modelVersion": "28.4.0",
+    "modelVersion": "29.4.0",
     "locales": [
       {
         "code": "de"
@@ -33,9 +33,6 @@
       },
       "supportedCharacters": []
     },
-    "modelRoot": {
-      "rootGroups": []
-    },
     "typeDefinitions": [
       {
         "id": "typedef_f15fa74e-efe6-4289-b80f-c59e39719040",
@@ -47,6 +44,9 @@
           }
         }
       }
-    ]
+    ],
+    "modelRoot": {
+      "rootGroups": []
+    }
   }
 }
