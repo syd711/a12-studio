@@ -74,8 +74,8 @@
 
 .properties-panel {
     -fx-background-color: -fx-chrome-bg;
-    -fx-border-color: transparent transparent transparent -fx-border-subtle;
-    -fx-border-width: 0 0 0 1px;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px 1px 0 1px;
     -fx-background-radius: 6px;
 }
 
@@ -84,7 +84,41 @@
 }
 
 .field-editor {
-    -fx-background-color: transparent;
+    -fx-background-color: #fbfcfd;
+}
+
+/**
+ * Modules panel rows: a white draggable card per module, reorderable via the drag handle (see
+ * .module-drag-handle) in addition to the existing move up/down buttons.
+ */
+.module-row {
+    -fx-background-color: -fx-surface-color;
+    -fx-background-radius: 8px;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: 8px 12px;
+    -fx-effect: dropshadow(gaussian, rgba(17, 17, 17, 0.06), 4, 0, 0, 1);
+}
+
+.module-drag-handle {
+    -fx-icon-color: -fx-text-faint;
+}
+
+/* Accent line on the row's top/bottom edge, shown while another row is dragged over it, marking exactly
+   where the dragged module will land - above or below this row. */
+.module-row-drop-above {
+    -fx-border-color: -fx-accent-color -fx-border-subtle -fx-border-subtle -fx-border-subtle;
+    -fx-border-width: 3px 1px 1px 1px;
+}
+
+.module-row-drop-below {
+    -fx-border-color: -fx-border-subtle -fx-border-subtle -fx-accent-color -fx-border-subtle;
+    -fx-border-width: 1px 1px 3px 1px;
+}
+
+.module-row-dragging {
+    -fx-opacity: 0.5;
 }
 
 /**

@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -99,11 +100,7 @@ public class ActivityPanelController extends AbstractPropertyEditor {
   }
 
   private HBox createActionsBox(DescriptorEntry entry, int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
-    moveUpButton.setDisable(index == 0);
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
+    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
 
     Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
       entries.add(entries.indexOf(entry) + 1, new DescriptorEntry(entry.key, entry.value));
@@ -122,9 +119,23 @@ public class ActivityPanelController extends AbstractPropertyEditor {
       }
     });
 
-    HBox actionsBox = new HBox(4.0, moveUpButton, moveDownButton, copyButton, deleteButton);
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, copyButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
+  }
+
+  // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
+  // "move-button" style class), so the pair together takes up the same width/height as a single normal button.
+  private VBox createMoveButtonsBox(int index, int rowCount) {
+    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
+    moveUpButton.setDisable(index == 0);
+    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
+
+    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
+    moveDownButton.setDisable(index == rowCount - 1);
+    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
+
+    return new VBox(1, moveUpButton, moveDownButton);
   }
 
   private void moveRow(int fromIndex, int toIndex) {

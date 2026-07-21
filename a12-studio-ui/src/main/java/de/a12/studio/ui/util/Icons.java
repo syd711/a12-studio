@@ -20,6 +20,7 @@ public interface Icons {
   String ARROW_COLLAPSE_ALL = "mdi2a-arrow-collapse-vertical";
   String ARROW_UP = "mdi2a-arrow-up";
   String ARROW_DOWN = "mdi2a-arrow-down";
+  String DRAG_HANDLE = "mdi2d-drag-vertical";
 
   String RELOAD = "mdi2r-refresh";
   String CLOSE = "mdi2c-close";

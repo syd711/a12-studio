@@ -52,6 +52,31 @@
 }
 
 /**
+ * Half-height variant of .default-button, for stacking two buttons (e.g. move up/down) in a VBox so their
+ * combined height matches a single normal button.
+ */
+.move-button {
+    -fx-pref-height: 17px;
+    -fx-min-height: 17px;
+    -fx-max-height: 17px;
+}
+
+/*
+ * Squares off the shared edge between the stacked move up/down buttons, so the pair reads as one rounded
+ * button rather than two: the top button keeps rounded top corners but has square bottom corners, and vice
+ * versa for the bottom button.
+ */
+.move-button-top {
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-radius: 8px 8px 0 0;
+}
+
+.move-button-bottom {
+    -fx-background-radius: 0 0 8px 8px;
+    -fx-border-radius: 0 0 8px 8px;
+}
+
+/**
  * Toolbar icon buttons on dark surfaces (e.g. the menu bar's right panel) -
  * white icon/text on a dark background, mirroring .default-button.
  */
