@@ -30,7 +30,7 @@ public class ProjectItem {
   private boolean root = false;
   @Getter
   @Setter
-  private A12Model model;
+  private A12Model<?> model;
   private boolean loaded = false;
 
   public ProjectItem(File listFile) {

@@ -77,7 +77,7 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
     updateSettingsErrorBadge();
   }
 
-  public void loadModel(@NonNull A12Model model) {
+  public void loadModel(@NonNull A12Model<?> model) {
     load((DocumentModel) model);
     updateSettingsErrorBadge();
   }

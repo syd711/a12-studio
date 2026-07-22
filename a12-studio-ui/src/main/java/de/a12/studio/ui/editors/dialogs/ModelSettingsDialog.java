@@ -1,7 +1,8 @@
 package de.a12.studio.ui.editors.dialogs;
 
-import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
@@ -23,7 +24,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class DocumentModelSettingsDialog implements Initializable, DialogController {
+public class ModelSettingsDialog implements Initializable, DialogController {
 
   private static final String GENERIC_ERROR_MESSAGE =
       "One or more of the panels below contain an error. Please review them before saving.";
@@ -61,7 +62,7 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
 
   // Captured in initialize() before any panel can touch the model, so onCancel can undo whatever they
   // already applied to it in place. Null if there was no model to edit in the first place.
-  private DocumentModelSnapshot snapshot;
+  private ModelSnapshot snapshot;
 
   private Stage stage;
 
@@ -82,17 +83,20 @@ public class DocumentModelSettingsDialog implements Initializable, DialogControl
     timezoneController.setSaveMode(saveMode);
 
     ProjectItem projectItem = Studio.getSelectedProjectItem();
-    if (projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel) {
-      snapshot = new DocumentModelSnapshot(documentModel);
+    if (projectItem != null && projectItem.getModel() != null) {
+      A12Model<?> model = projectItem.getModel();
+      snapshot = new ModelSnapshot(model);
 
-      modelSettingsNameController.setModel(documentModel);
+      modelSettingsNameController.setModel(model);
       modelSettingsNameController.focusNameField();
-      supportedCharactersController.setModel(documentModel);
-      localesController.setModel(documentModel);
-      labelsController.setModel(documentModel);
-      rolesController.setModel(documentModel);
-      annotationsController.setModel(documentModel);
-      timezoneController.setModel(documentModel);
+      supportedCharactersController.setModel(model);
+      localesController.setModel(model);
+      labelsController.setModel(model);
+      rolesController.setModel(model);
+      annotationsController.setModel(model);
+      if (model instanceof DocumentModel documentModel) {
+        timezoneController.setModel(documentModel);
+      }
     }
 
     bindErrorContainer();

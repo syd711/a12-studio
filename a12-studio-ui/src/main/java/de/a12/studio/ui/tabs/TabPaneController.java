@@ -99,7 +99,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
     tab.setUserData(item);
     tab.setClosable(true);
 
-    A12Model model = item.getModel();
+    A12Model<?> model = item.getModel();
     if (model instanceof TypeDefinitionModel) {
       tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(ModelType.TYPEDEFINITION)));
     }
@@ -169,6 +169,13 @@ public class TabPaneController implements Initializable, StudioEventListener {
   public ProjectItem getSelectedProjectItem() {
     Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
     return selectedTab == null ? null : (ProjectItem) selectedTab.getUserData();
+  }
+
+  public void closeSelectedTab() {
+    Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+    if (selectedTab != null) {
+      closeTab(selectedTab);
+    }
   }
 
   @Override

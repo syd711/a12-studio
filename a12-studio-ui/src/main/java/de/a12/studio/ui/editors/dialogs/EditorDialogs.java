@@ -9,9 +9,9 @@ import javafx.stage.Stage;
 public class EditorDialogs {
 
   public static void openSettings() {
-    FXMLLoader fxmlLoader = new FXMLLoader(DocumentModelSettingsDialog.class.getResource("/de/a12/studio/ui/editors/dialogs/document-model-settings-dialog.fxml"));
+    FXMLLoader fxmlLoader = new FXMLLoader(ModelSettingsDialog.class.getResource("/de/a12/studio/ui/editors/dialogs/document-model-settings-dialog.fxml"));
     Stage stage = WidgetFactory.createDialogStage("document-mode-settings", fxmlLoader, Studio.stage, "Model Settings");
-    DocumentModelSettingsDialog controller = (DocumentModelSettingsDialog) stage.getUserData();
+    ModelSettingsDialog controller = (ModelSettingsDialog) stage.getUserData();
     controller.setStage(stage);
 
     FXResizeHelper.install(stage, 30, 6);

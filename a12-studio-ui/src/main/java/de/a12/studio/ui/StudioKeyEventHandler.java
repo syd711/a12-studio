@@ -42,6 +42,10 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       }
       ke.consume();
     }
+    else if (ke.getCode() == KeyCode.W && ke.isControlDown()) {
+      Studio.closeSelectedTab();
+      ke.consume();
+    }
   }
 
   private void resize(double width, double height) {

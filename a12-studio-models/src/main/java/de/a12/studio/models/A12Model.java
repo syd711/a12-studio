@@ -4,16 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// "header" is a synthetic getter/setter property on this class while "content" is a real field on the
+// generic parameter, so without an explicit order Jackson does not reliably put header first.
+@JsonPropertyOrder({"header", "content"})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-abstract public class A12Model {
+abstract public class A12Model<C> {
 
   @JsonIgnore
   private String id;
@@ -38,6 +42,9 @@ abstract public class A12Model {
 
   @JsonIgnore
   private List<ModelReference> modelReferences = new ArrayList<>();
+
+  @JsonProperty("content")
+  private C content;
 
   // The json wraps these fields in a "header" object, but callers use them directly on the model, so
   // they are bridged through a private DTO instead of being kept as a nested field.

@@ -89,6 +89,10 @@ public class RootController implements Initializable, StudioEventListener {
     return tabPaneController.getSelectedProjectItem();
   }
 
+  public void closeSelectedTab() {
+    tabPaneController.closeSelectedTab();
+  }
+
   @Override
   public void preferencesOpenRequested(@NonNull PreferencesOpenRequestedEvent event) {
     try {

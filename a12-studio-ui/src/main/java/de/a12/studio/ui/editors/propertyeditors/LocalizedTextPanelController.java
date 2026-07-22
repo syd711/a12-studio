@@ -40,7 +40,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   @FXML
   private GridPane localesGrid;
 
-  private A12Model model;
+  private A12Model<?> model;
 
   // Captured whenever setElement/setModel is called, i.e. whenever this panel is (re)bound to whichever
   // project item is currently selected. Used to tell apart a locales-changed event meant for this panel's own
@@ -51,7 +51,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
 
   private Function<Element, List<Label>> elementTextsWriteAccessor = elementTextsAccessor;
 
-  private Function<A12Model, List<Label>> modelTextsAccessor = A12Model::getLabels;
+  private Function<A12Model<?>, List<Label>> modelTextsAccessor = A12Model::getLabels;
 
   private String fieldKey = "external";
 
@@ -113,7 +113,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
     populateLocaleFields();
   }
 
-  public void setModel(@NonNull A12Model model) {
+  public void setModel(@NonNull A12Model<?> model) {
     this.element = null;
     this.model = model;
     this.projectItem = Studio.getSelectedProjectItem();

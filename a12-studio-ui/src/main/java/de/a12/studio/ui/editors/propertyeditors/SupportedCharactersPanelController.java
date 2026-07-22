@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.models.util.JsonSettings;
@@ -34,7 +35,7 @@ public class SupportedCharactersPanelController extends AbstractPropertyEditor i
   @FXML
   private TextField supportedCharactersField;
 
-  private DocumentModel model;
+  private A12Model<?> model;
 
   // Set while setModel() is repopulating the field from the model, so the valueProperty listener below
   // does not mistake that programmatic change for a user edit and write it straight back.
@@ -51,7 +52,7 @@ public class SupportedCharactersPanelController extends AbstractPropertyEditor i
     });
   }
 
-  public void setModel(@NonNull DocumentModel model) {
+  public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
     ModelConfig modelConfig = getModelConfig(model);
     updatingFromModel = true;
@@ -110,10 +111,5 @@ public class SupportedCharactersPanelController extends AbstractPropertyEditor i
     } catch (RuntimeException e) {
       return null;
     }
-  }
-
-  private static ModelConfig getModelConfig(DocumentModel model) {
-    DocumentModelContent content = model.getContent();
-    return content != null ? content.getModelConfig() : null;
   }
 }

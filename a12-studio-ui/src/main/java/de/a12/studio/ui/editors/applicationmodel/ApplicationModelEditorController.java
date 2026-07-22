@@ -77,7 +77,7 @@ public class ApplicationModelEditorController extends AbstractEditorController i
     PreviewLauncher.openPreview(projectItem);
   }
 
-  public void loadModel(@NonNull A12Model model) {
+  public void loadModel(@NonNull A12Model<?> model) {
     load((ApplicationModel) model);
     updateSettingsErrorBadge();
   }

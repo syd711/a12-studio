@@ -22,7 +22,7 @@ public class ModelFactory {
   private static final String TD_ONLY_ANNOTATION = "tdonly";
 
   @Nullable
-  public static A12Model load(@NonNull ProjectItem projectItem) {
+  public static A12Model<?> load(@NonNull ProjectItem projectItem) {
     if (projectItem.isFolder() || !projectItem.getName().toLowerCase().endsWith(".json")) {
       return null;
     }

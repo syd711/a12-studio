@@ -27,7 +27,7 @@ public class NewModelFactory {
   private static final String TD_ONLY_ANNOTATION = "tdonly";
 
   public static ProjectItem createModel(@NonNull ProjectItem parent, @NonNull ModelType modelType, @NonNull String name) throws IOException {
-    A12Model model = buildModel(modelType, name);
+    A12Model<?> model = buildModel(modelType, name);
 
     ProjectItem item = parent.createChildModel(name);
     // Type Definition Models are persisted with header modelType "document" (see TD_ONLY_ANNOTATION
@@ -42,7 +42,7 @@ public class NewModelFactory {
     return item;
   }
 
-  private static A12Model buildModel(ModelType modelType, String name) throws IOException {
+  private static A12Model<?> buildModel(ModelType modelType, String name) throws IOException {
     return switch (modelType) {
       case DOCUMENT -> buildDocumentModel(new DocumentModel(), name);
       case TYPEDEFINITION -> buildTypeDefinitionModel(name);

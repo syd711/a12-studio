@@ -83,7 +83,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
     DocumentModelDialogs.openTypeDefinitions();
   }
 
-  public void loadModel(@NonNull A12Model model) {
+  public void loadModel(@NonNull A12Model<?> model) {
     load(((DocumentModel) model).getContent().getModelRoot());
     updateSettingsErrorBadge();
   }

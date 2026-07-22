@@ -29,5 +29,5 @@ abstract public class AbstractEditorController implements StudioEventListener {
     this.save();
   }
 
-  abstract public void loadModel(@NonNull A12Model model);
+  abstract public void loadModel(@NonNull A12Model<?> model);
 }

@@ -72,9 +72,9 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
 
   private final Debouncer debouncer = new Debouncer();
 
-  private A12Model model;
+  private A12Model<?> model;
 
-  public void setModel(@NonNull A12Model model) {
+  public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
     rebuildRows();
     updateValidation();

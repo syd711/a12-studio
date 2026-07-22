@@ -92,6 +92,10 @@ public class Studio extends Application implements StudioEventListener {
     return rootController.getSelectedProjectItem();
   }
 
+  public static void closeSelectedTab() {
+    rootController.closeSelectedTab();
+  }
+
   public static Project getCurrentProject() {
     return currentProject;
   }

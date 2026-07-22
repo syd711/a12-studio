@@ -47,7 +47,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   @FXML
   private GridPane annotationsGrid;
 
-  private A12Model model;
+  private A12Model<?> model;
 
   // The model type / field type of the element currently being edited, i.e. the key under which suggested
   // names are looked up in and reported to the AnnotationFieldRegistry (or just the model type, for
@@ -66,7 +66,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     rebuildRows();
   }
 
-  public void setModel(@NonNull A12Model model) {
+  public void setModel(@NonNull A12Model<?> model) {
     this.element = null;
     this.model = model;
     rebuildRows();

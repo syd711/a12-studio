@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.dialogs;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.Label;
 import de.a12.studio.models.Locale;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Captures the subset of a {@link DocumentModel} that {@link DocumentModelSettingsDialog}'s property editors
+ * Captures the subset of a {@link DocumentModel} that {@link ModelSettingsDialog}'s property editors
  * can change (the header fields, plus {@link ModelConfig#getSupportedCharacters()} and {@link
  * ModelConfig#getTimeZone()}), so {@link #restore()} can undo whatever they already applied to the live model
  * object while the dialog was open. Deliberately narrower than a whole-model snapshot: it never touches {@link
@@ -20,9 +21,9 @@ import java.util.List;
  * non-modal parts of the UI may already hold live {@code Element} references into - replacing it wholesale
  * (e.g. via a JSON round-trip of the whole model) would silently detach those references.
  */
-class DocumentModelSnapshot {
+class ModelSnapshot {
 
-  private final DocumentModel model;
+  private final A12Model<?> model;
 
   private final String id;
   private final String description;
@@ -32,7 +33,7 @@ class DocumentModelSnapshot {
   private final String timeZone;
   private final List<String> supportedCharacters;
 
-  DocumentModelSnapshot(@NonNull DocumentModel model) {
+  ModelSnapshot(@NonNull A12Model<?> model) {
     this.model = model;
     this.id = model.getId();
     this.description = model.getDescription();
@@ -40,7 +41,7 @@ class DocumentModelSnapshot {
     copyLabels(model.getLabels(), labels);
     copyAnnotations(model.getAnnotations(), annotations);
 
-    ModelConfig modelConfig = getModelConfig(model);
+    ModelConfig modelConfig = model instanceof DocumentModel documentModel ? getModelConfig(documentModel) : null;
     this.timeZone = modelConfig != null ? modelConfig.getTimeZone() : null;
     this.supportedCharacters = modelConfig != null ? new ArrayList<>(modelConfig.getSupportedCharacters()) : new ArrayList<>();
   }
@@ -57,7 +58,7 @@ class DocumentModelSnapshot {
     replaceContents(model.getLabels(), labels);
     replaceContents(model.getAnnotations(), annotations);
 
-    ModelConfig modelConfig = getModelConfig(model);
+    ModelConfig modelConfig = model instanceof DocumentModel documentModel ? getModelConfig(documentModel) : null;
     if (modelConfig != null) {
       modelConfig.setTimeZone(timeZone);
       replaceContents(modelConfig.getSupportedCharacters(), supportedCharacters);

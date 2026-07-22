@@ -49,7 +49,7 @@ public class ProjectItemViewModel {
   }
 
   public String getIconPath() {
-    A12Model model = projectItem.getModel();
+    A12Model<?> model = projectItem.getModel();
     if (model == null) {
       return null;
     }

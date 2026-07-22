@@ -1,5 +1,8 @@
 package de.a12.studio.ui.editors;
 
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.documentmodel.DocumentModelContent;
+import de.a12.studio.models.documentmodel.ModelConfig;
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.ModelType;
@@ -332,5 +335,13 @@ abstract public class AbstractPropertyEditor implements Initializable {
     }
 
     return modelType.getValue() + "." + getClass().getSimpleName() + settingsKeySuffix + ".expanded";
+  }
+
+  protected ModelConfig getModelConfig(A12Model<?> model) {
+    if (!(model instanceof DocumentModel documentModel)) {
+      return null;
+    }
+    DocumentModelContent content = documentModel.getContent();
+    return content != null ? content.getModelConfig() : null;
   }
 }

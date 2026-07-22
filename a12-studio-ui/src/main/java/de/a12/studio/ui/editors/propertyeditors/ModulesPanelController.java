@@ -73,6 +73,13 @@ public class ModulesPanelController extends AbstractPropertyEditor {
     modulesList.getChildren().clear();
 
     List<Module> modules = getModules();
+    if (modules.isEmpty()) {
+      Label emptyLabel = new Label("No modules found.");
+      emptyLabel.getStyleClass().add("placeholder-label");
+      modulesList.getChildren().add(emptyLabel);
+      return;
+    }
+
     for (int index = 0; index < modules.size(); index++) {
       modulesList.getChildren().add(createRow(modules.get(index), index, modules.size()));
     }

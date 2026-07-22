@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -14,7 +15,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Edits the model's name ({@link DocumentModel#getId()}) and internal description, and shows the model
+ * Edits the model's name ({@link A12Model#getId()}) and internal description, and shows the model
  * version read-only. Not bound to a single {@link Element}
  * (these fields live on the model itself), so {@link #setElement} is never called and only {@link #setModel}
  * is used.
@@ -30,7 +31,7 @@ public class ModelSettingsNamePanelController extends AbstractPropertyEditor imp
   @FXML
   private TextArea descriptionArea;
 
-  private DocumentModel model;
+  private A12Model<?> model;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -40,7 +41,7 @@ public class ModelSettingsNamePanelController extends AbstractPropertyEditor imp
     bindTextArea(descriptionArea, (element, value) -> model.setDescription(value));
   }
 
-  public void setModel(@NonNull DocumentModel model) {
+  public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
     setFieldValue(nameField, model.getId());
     versionField.setText(model.getModelVersion());

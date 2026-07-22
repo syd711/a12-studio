@@ -57,7 +57,7 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
 
   private final Debouncer debouncer = new Debouncer();
 
-  private A12Model model;
+  private A12Model<?> model;
   private ModelType currentModelType;
   private final List<String> roles = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
   // combobox until the panel is reloaded from the model (setModel), at which point they become regular rows.
   private final Set<Integer> newRowIndices = new HashSet<>();
 
-  public void setModel(@NonNull A12Model model) {
+  public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
     this.currentModelType = model.getModelType();
     roles.clear();
@@ -218,7 +218,7 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
     return new File(project.getFolder(), ROLES_FILE_NAME).isFile();
   }
 
-  private static Annotation findRolesAnnotation(A12Model model) {
+  private static Annotation findRolesAnnotation(A12Model<?> model) {
     for (Annotation annotation : model.getAnnotations()) {
       if (ROLES_ANNOTATION_NAME.equals(annotation.getName())) {
         return annotation;
@@ -227,7 +227,7 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
     return null;
   }
 
-  private static List<String> parseRoles(A12Model model) {
+  private static List<String> parseRoles(A12Model<?> model) {
     Annotation rolesAnnotation = findRolesAnnotation(model);
     if (rolesAnnotation == null || rolesAnnotation.getValue() == null || rolesAnnotation.getValue().isBlank()) {
       return List.of();
