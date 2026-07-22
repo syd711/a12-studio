@@ -1,14 +1,24 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.applicationmodel.ApplicationModelContent;
+import de.a12.studio.models.applicationmodel.Region;
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Edits {@link ApplicationModelContent#getRegion()}'s name, the application model's top-level region. Not bound
+ * to a single {@link Element} (the region lives on the model's content), so it follows the model-header pattern
+ * used by e.g. {@link LayoutPanelController}.
+ */
 public class RegionPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final List<String> REGIONS = List.of("APP", "CONTENT", "SIDEBAR", "MODAL");
@@ -16,9 +26,38 @@ public class RegionPanelController extends AbstractPropertyEditor implements Ini
   @FXML
   private ComboBox<String> regionCombo;
 
+  private ApplicationModel model;
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
     regionCombo.getItems().addAll(REGIONS);
+
+    bindComboBox(regionCombo, (element, value) -> getOrCreateRegion().setName(value));
+  }
+
+  public void setModel(@NonNull ApplicationModel model) {
+    this.model = model;
+    Region region = getRegion();
+    setFieldValue(regionCombo, region != null ? region.getName() : null);
+    hideError();
+  }
+
+  private Region getRegion() {
+    return model == null || model.getContent() == null ? null : model.getContent().getRegion();
+  }
+
+  private Region getOrCreateRegion() {
+    ApplicationModelContent content = model.getContent();
+    if (content == null) {
+      content = new ApplicationModelContent();
+      model.setContent(content);
+    }
+    Region region = content.getRegion();
+    if (region == null) {
+      region = new Region();
+      content.setRegion(region);
+    }
+    return region;
   }
 }

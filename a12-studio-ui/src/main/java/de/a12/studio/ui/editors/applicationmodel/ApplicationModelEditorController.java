@@ -8,7 +8,9 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.propertyeditors.ActivityPanelController;
+import de.a12.studio.ui.editors.propertyeditors.LayoutPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModulesPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RegionPanelController;
 import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.SystemUtil;
@@ -47,6 +49,12 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   private ModulesPanelController modulesController;
 
   @FXML
+  private LayoutPanelController layoutController;
+
+  @FXML
+  private RegionPanelController regionController;
+
+  @FXML
   public void onFileOpen(ActionEvent e) {
     File file = projectItem.getFile();
     SystemUtil.openFile(file);
@@ -77,6 +85,8 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   private void load(@NonNull ApplicationModel documentModel) {
     modulesController.setModel(documentModel);
     activityController.setModel(documentModel);
+    layoutController.setModel(documentModel);
+    regionController.setModel(documentModel);
   }
 
   private void updateSettingsErrorBadge() {

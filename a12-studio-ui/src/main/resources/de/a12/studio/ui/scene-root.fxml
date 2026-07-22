@@ -19,12 +19,12 @@
                <center>
                   <StackPane fx:id="main" BorderPane.alignment="CENTER">
                      <children>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                        <BorderPane>
                            <center>
                               <Label text="Open project from the menu" BorderPane.alignment="CENTER" />
                            </center>
                         </BorderPane>
-                        <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" prefHeight="200.0" prefWidth="200.0">
+                        <SplitPane fx:id="mainSplitPane" dividerPositions="0.3">
                            <items>
                               <fx:include fx:id="projectTree" source="projecttree/scene-project-tree.fxml" />
                               <fx:include fx:id="tabPane" source="tabs/scene-tab-pane.fxml" />

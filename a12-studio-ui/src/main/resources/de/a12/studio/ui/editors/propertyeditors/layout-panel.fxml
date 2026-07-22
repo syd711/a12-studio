@@ -14,7 +14,7 @@
   <VBox>
     <children>
       <Label styleClass="field-label" text="Name*" />
-      <ComboBox fx:id="layoutCombo" editable="true" prefWidth="200.0" />
+      <ComboBox fx:id="layoutCombo" editable="true" prefWidth="250.0" />
       <Label styleClass="field-label" text="Settings" />
       <TextArea fx:id="settingsArea" prefRowCount="4" wrapText="true" VBox.vgrow="ALWAYS" />
     </children>
