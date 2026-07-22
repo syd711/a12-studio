@@ -9,11 +9,7 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -39,6 +35,9 @@ public class ActivityPanelController extends AbstractPropertyEditor {
 
   @FXML
   private GridPane descriptorGrid;
+
+  @FXML
+  private CheckBox skipDataLoadingCheckbox;
 
   private ApplicationModel model;
 

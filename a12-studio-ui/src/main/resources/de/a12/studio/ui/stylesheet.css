@@ -205,6 +205,8 @@
 
 .preferences-overlay {
     -fx-background-color: -fx-panel-color;
+    -fx-border-radius: 0 0 6px 6px;
+    -fx-background-radius: 6px;
 }
 
 .preferences-nav {
@@ -218,7 +220,8 @@
 .preferences-content {
     -fx-background-color: -fx-surface-color;
     -fx-background-radius: 12px 12px 0 0;
-    -fx-border-radius: 6px 6px 0 0;
+    -fx-border-radius: 6px 6px 6px 6px;
+    -fx-background-radius: 6px;
 }
 
 .preference-button {
