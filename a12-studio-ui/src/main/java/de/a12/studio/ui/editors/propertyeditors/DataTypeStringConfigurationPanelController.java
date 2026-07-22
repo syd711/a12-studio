@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-public class DataTypeConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
+public class DataTypeStringConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
 
   @FXML
   private TextField minLengthField;

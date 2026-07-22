@@ -21,7 +21,7 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
   private TypeDefinitionPanelController typeDefinitionController;
 
   @FXML
-  private DataTypeConfigurationPanelController dataTypeConfigurationController;
+  private DataTypeStringConfigurationPanelController dataTypeConfigurationController;
 
   @FXML
   private SuggestionsPanelController suggestionsController;
