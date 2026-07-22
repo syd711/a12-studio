@@ -30,8 +30,7 @@
       "decimalSeparator": ".",
       "conditionLanguage": {
         "code": "en_US"
-      },
-      "supportedCharacters": []
+      }
     },
     "modelRoot": {
       "rootGroups": [
@@ -242,7 +241,6 @@
                         "fieldType": {
                           "type": "StringType",
                           "StringType": {
-                            "pattern": "[0-9]+([A-Ja-j]?)",
                             "errorMessage": [
                               {
                                 "locale": "en",
@@ -252,7 +250,8 @@
                                 "locale": "de",
                                 "text": "Bitte geben eine Hausnummer ein. Adresszusätze a-j sind zulässig."
                               }
-                            ]
+                            ],
+                            "pattern": "[0-9]+([A-Ja-j]?)"
                           }
                         },
                         "label": [
@@ -281,7 +280,6 @@
                         "fieldType": {
                           "type": "StringType",
                           "StringType": {
-                            "pattern": "[0-9]{5}",
                             "errorMessage": [
                               {
                                 "locale": "en",
@@ -291,7 +289,8 @@
                                 "locale": "de",
                                 "text": "Bitte geben Sie eine fünf-stellige Postleitzahl an."
                               }
-                            ]
+                            ],
+                            "pattern": "[0-9]{5}"
                           }
                         },
                         "label": [
@@ -782,7 +781,6 @@
                         "fieldType": {
                           "type": "StringType",
                           "StringType": {
-                            "pattern": "[0-9]+([A-Ja-j]?)",
                             "errorMessage": [
                               {
                                 "locale": "en",
@@ -792,7 +790,8 @@
                                 "locale": "de",
                                 "text": "Bitte geben eine Hausnummer ein. Adresszusätze a-j sind zulässig."
                               }
-                            ]
+                            ],
+                            "pattern": "[0-9]+([A-Ja-j]?)"
                           }
                         },
                         "label": [
@@ -821,7 +820,6 @@
                         "fieldType": {
                           "type": "StringType",
                           "StringType": {
-                            "pattern": "[0-9]{5}",
                             "errorMessage": [
                               {
                                 "locale": "en",
@@ -831,7 +829,8 @@
                                 "locale": "de",
                                 "text": "Bitte geben Sie eine fünf-stellige Postleitzahl an."
                               }
-                            ]
+                            ],
+                            "pattern": "[0-9]{5}"
                           }
                         },
                         "label": [

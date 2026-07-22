@@ -35,7 +35,7 @@
       "immutable": false
     },
     "modelConfig": {
-      "timeZone": "Europe/Berlin",
+      "timeZone": "UTC",
       "decimalSeparator": ".",
       "conditionLanguage": {
         "code": "en_US"
@@ -69,10 +69,7 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "TypeDefType",
-                          "TypeDefType": {
-                            "typeDefinitionId": "abc"
-                          }
+                          "type": "StringType"
                         },
                         "label": [
                           {
@@ -643,15 +640,6 @@
           }
         }
       ]
-    },
-    "typeDefinitions": [
-      {
-        "id": "typedef_dab31221-c120-43e5-bd0f-c81fbede3285",
-        "name": "abc",
-        "fieldType": {
-          "type": "StringType"
-        }
-      }
-    ]
+    }
   }
 }
