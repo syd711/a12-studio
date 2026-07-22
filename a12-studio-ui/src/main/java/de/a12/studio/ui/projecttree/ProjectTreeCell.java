@@ -31,8 +31,14 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
 
   private final FontIcon icon = new FontIcon();
 
-  private final ChangeListener<Boolean> expandedListener = (observable, wasExpanded, expanded) ->
+  private final ChangeListener<Boolean> expandedListener = (observable, wasExpanded, expanded) -> {
+    if (isLockedFolder(getItem())) {
+      icon.setIconLiteral(Icons.FOLDER_LOCK_OUTLINE);
+    }
+    else {
       icon.setIconLiteral(expanded ? Icons.FOLDER_OPEN_OUTLINE : Icons.FOLDER_OUTLINE);
+    }
+  };
   private TreeItem<ProjectItemViewModel> boundTreeItem;
 
   ProjectTreeCell(@NonNull Consumer<ProjectItemViewModel> onOpen, @NonNull ProjectTreeMenuActions menuFactory,
@@ -115,9 +121,10 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     }
 
     setText(item.getDisplayName());
+    boolean locked = isLockedFolder(item);
     boolean missingModel = !item.isFolder() && !item.hasModel();
     setContextMenu(missingModel ? null : menuFactory.createTreeItemContextMenu(item));
-    if (missingModel) {
+    if (missingModel || locked) {
       if (!getStyleClass().contains("model-missing")) {
         getStyleClass().add("model-missing");
       }
@@ -140,7 +147,12 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     }
     if (item.isFolder()) {
       boundTreeItem = getTreeItem();
-      icon.setIconLiteral(boundTreeItem.isExpanded() ? Icons.FOLDER_OPEN : Icons.FOLDER);
+      if (locked) {
+        icon.setIconLiteral(Icons.FOLDER_LOCK_OUTLINE);
+      }
+      else {
+        icon.setIconLiteral(boundTreeItem.isExpanded() ? Icons.FOLDER_OPEN : Icons.FOLDER);
+      }
       icon.setIconSize(18);
       boundTreeItem.expandedProperty().addListener(expandedListener);
       setGraphic(icon);
@@ -157,5 +169,13 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
         setGraphic(icon);
       }
     }
+  }
+
+  private static boolean isLockedFolder(ProjectItemViewModel item) {
+    if (item == null || !item.isFolder()) {
+      return false;
+    }
+    String name = item.getName();
+    return "data".equalsIgnoreCase(name) || "resources".equalsIgnoreCase(name);
   }
 }

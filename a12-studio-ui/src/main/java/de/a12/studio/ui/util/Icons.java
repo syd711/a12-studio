@@ -13,6 +13,7 @@ public interface Icons {
   String FOLDER_OPEN = "mdi2f-folder-open";
   String FOLDER_OUTLINE = "mdi2f-folder-outline";
   String FOLDER_OPEN_OUTLINE = "mdi2f-folder-open-outline";
+  String FOLDER_LOCK_OUTLINE = "mdi2f-folder-lock-outline";
   String FILE_OUTLINE = "mdi2f-file-outline";
   String FILE_TABLE_OUTLINE = "mdi2f-file-table-outline";
 

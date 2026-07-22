@@ -1,10 +1,11 @@
-package de.a12.studio.ui.editors.applicationmodel;
+package de.a12.studio.ui.editors.overviewmodel;
 
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.propertyeditors.*;
@@ -25,9 +26,9 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class ApplicationModelEditorController extends AbstractEditorController implements Initializable {
+public class OverviewModelEditorController extends AbstractEditorController implements Initializable {
 
-  private static final String TABLE_SETTINGS_ID = ModelType.APPLICATION.getValue();
+  private static final String TABLE_SETTINGS_ID = ModelType.OVERVIEW.getValue();
 
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
@@ -38,21 +39,6 @@ public class ApplicationModelEditorController extends AbstractEditorController i
 
   @FXML
   private Circle settingsErrorBadge;
-
-  @FXML
-  private ActivityPanelController activityController;
-
-  @FXML
-  private ModulesPanelController modulesController;
-
-  @FXML
-  private LayoutPanelController layoutController;
-
-  @FXML
-  private RegionPanelController regionController;
-
-  @FXML
-  private SubregionsPanelController subregionsController;
 
   @FXML
   public void onFileOpen(ActionEvent e) {
@@ -72,21 +58,13 @@ public class ApplicationModelEditorController extends AbstractEditorController i
     updateSettingsErrorBadge();
   }
 
-  @FXML
-  public void onPreview(ActionEvent e) {
-    PreviewLauncher.openPreview(projectItem);
-  }
-
   public void loadModel(@NonNull A12Model<?> model) {
-    load((ApplicationModel) model);
+    load((OverviewModel) model);
     updateSettingsErrorBadge();
   }
 
-  private void load(@NonNull ApplicationModel documentModel) {
-    modulesController.setModel(documentModel);
-    activityController.setModel(documentModel);
-    layoutController.setModel(documentModel);
-    regionController.setModel(documentModel);
+  private void load(@NonNull OverviewModel documentModel) {
+
   }
 
   private void updateSettingsErrorBadge() {

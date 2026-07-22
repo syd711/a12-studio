@@ -24,7 +24,7 @@
       <rowConstraints>
         <RowConstraints />
       </rowConstraints>
-      <Label styleClass="field-label" text="Name*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="Key*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
       <Label styleClass="field-label" text="Value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
     </GridPane>
     <HBox spacing="8.0">
