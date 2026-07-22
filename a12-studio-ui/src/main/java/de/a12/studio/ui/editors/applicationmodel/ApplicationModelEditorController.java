@@ -27,8 +27,6 @@ import java.util.ResourceBundle;
 
 public class ApplicationModelEditorController extends AbstractEditorController implements Initializable {
 
-  private static final String TABLE_SETTINGS_ID = ModelType.APPLICATION.getValue();
-
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
   private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
@@ -100,6 +98,11 @@ public class ApplicationModelEditorController extends AbstractEditorController i
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
+    BaseTableSettings tableSettings = getBaseTableSettings();
+  }
+
+  @Override
+  public @NonNull ModelType getModelType() {
+    return ModelType.APPLICATION;
   }
 }

@@ -33,9 +33,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class DocumentModelEditorController extends AbstractEditorController implements Initializable {
-
-  private static final String TABLE_SETTINGS_ID = ModelType.DOCUMENT.getValue();
-
   private static final String MAIN_DIVIDER_ID = "mainDivider";
 
   private static final String FIELD_EDITOR_FXML = "document-model-field-editor.fxml";
@@ -103,7 +100,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
+    BaseTableSettings tableSettings = getBaseTableSettings();
     applyDividerPosition(tableSettings);
     splitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) ->
         saveDividerPosition(newValue.doubleValue()));
@@ -147,11 +144,16 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   }
 
   private void saveDividerPosition(double position) {
-    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
+    BaseTableSettings tableSettings = getBaseTableSettings();
     if (tableSettings == null) {
       return;
     }
     tableSettings.getDividerPositions().put(MAIN_DIVIDER_ID, position);
     tableSettings.save();
+  }
+
+  @Override
+  public @NonNull ModelType getModelType() {
+    return ModelType.DOCUMENT;
   }
 }

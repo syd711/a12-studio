@@ -1,17 +1,16 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
+import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.TypeDefinition;
-import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
-import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,8 +30,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class TypeDefintionModelEditorController extends AbstractEditorController implements Initializable {
-
-  private static final String TABLE_SETTINGS_ID = ModelType.TYPEDEFINITION.getValue();
 
   private static final String MAIN_DIVIDER_ID = "mainDivider";
 
@@ -97,7 +94,7 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
+    BaseTableSettings tableSettings = getBaseTableSettings();
     applyDividerPosition(tableSettings);
     splitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) ->
         saveDividerPosition(newValue.doubleValue()));
@@ -149,11 +146,16 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
   }
 
   private void saveDividerPosition(double position) {
-    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
+    BaseTableSettings tableSettings = getBaseTableSettings();
     if (tableSettings == null) {
       return;
     }
     tableSettings.getDividerPositions().put(MAIN_DIVIDER_ID, position);
     tableSettings.save();
+  }
+
+  @Override
+  public @NonNull ModelType getModelType() {
+    return ModelType.TYPEDEFINITION;
   }
 }

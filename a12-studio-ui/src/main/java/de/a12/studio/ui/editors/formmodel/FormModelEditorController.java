@@ -1,15 +1,12 @@
-package de.a12.studio.ui.editors.overviewmodel;
+package de.a12.studio.ui.editors.formmodel;
 
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
-import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
-import de.a12.studio.ui.editors.propertyeditors.*;
-import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -26,7 +23,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class OverviewModelEditorController extends AbstractEditorController implements Initializable {
+public class FormModelEditorController extends AbstractEditorController implements Initializable {
+
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
   private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
@@ -79,6 +77,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
   @Override
   public @NonNull ModelType getModelType() {
-    return ModelType.OVERVIEW;
+    return ModelType.FORM;
   }
 }
