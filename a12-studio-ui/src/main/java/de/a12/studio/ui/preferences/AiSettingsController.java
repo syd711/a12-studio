@@ -14,7 +14,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AiSettingsPanelController implements Initializable {
+public class AiSettingsController implements Initializable {
 
   @FXML
   private CheckBox claudeConsoleButtonCheckBox;

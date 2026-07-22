@@ -50,7 +50,7 @@ public class PreferencesController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    showPage(aiSettingsBtn, "ai-settings-panel.fxml");
+    showPage(aiSettingsBtn, "ai-settings.fxml");
   }
 
   public void showSection(PreferencesOpenRequestedEvent.@NonNull Section section) {
@@ -64,17 +64,17 @@ public class PreferencesController implements Initializable {
 
   @FXML
   private void onAiSettings() {
-    showPage(aiSettingsBtn, "ai-settings-panel.fxml");
+    showPage(aiSettingsBtn, "ai-settings.fxml");
   }
 
   @FXML
   private void onAnnotationSets() {
-    showPage(annotationSetsBtn, "annotation-sets-panel.fxml");
+    showPage(annotationSetsBtn, "annotation-sets.fxml");
   }
 
   @FXML
   private void onPreviewSettings() {
-    showPage(previewSettingsBtn, "preview-settings-panel.fxml");
+    showPage(previewSettingsBtn, "preview-settings.fxml");
   }
 
   private void showPage(Button button, String fxml) {
