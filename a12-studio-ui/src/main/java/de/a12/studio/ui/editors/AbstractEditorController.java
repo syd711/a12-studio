@@ -8,6 +8,7 @@ import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
+import javafx.fxml.FXML;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
@@ -17,6 +18,13 @@ abstract public class AbstractEditorController implements StudioEventListener {
   protected ProjectItem projectItem;
   private BaseTableSettings baseTableSettings;
 
+  /**
+   * Injected via {@code fx:include} in every editor FXML. After {@link #load} is called
+   * the component is wired to the current {@code projectItem}.
+   */
+  @FXML
+  protected EditorFileToolbarButtons fileToolbarButtons;
+
   public void save() {
     projectItem.save();
   }
@@ -24,6 +32,10 @@ abstract public class AbstractEditorController implements StudioEventListener {
   public void load(@NonNull ProjectItem projectItem) {
     this.projectItem = projectItem;
     this.loadModel(projectItem.getModel());
+
+    if (fileToolbarButtons != null) {
+      fileToolbarButtons.setFileSupplier(() -> projectItem.getFile());
+    }
 
     StudioEventManager.getInstance().addListener(this);
   }

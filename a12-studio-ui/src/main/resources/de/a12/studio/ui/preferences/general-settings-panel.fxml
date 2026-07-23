@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.preferences.GeneralSettingsPanelController">
+    <top>
+        <VBox BorderPane.alignment="CENTER_LEFT">
+            <children>
+                <Label styleClass="preference-title" text="PROJECT SETTINGS" />
+                <Label styleClass="preference-subtitle" text="General" />
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="12.0" left="12.0" top="12.0" />
+            </BorderPane.margin>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="12.0" BorderPane.alignment="TOP_LEFT">
+            <children>
+                <Label styleClass="field-label" text="Relationship Engine Mode" />
+                <ComboBox fx:id="relationshipEngineModeCombo" prefWidth="220.0" />
+
+                <CheckBox fx:id="showMetaDataCheckBox" text="Show metadata in UI models">
+                    <VBox.margin>
+                        <Insets top="8.0" />
+                    </VBox.margin>
+                </CheckBox>
+
+                <VBox>
+                    <VBox.margin>
+                        <Insets top="16.0" />
+                    </VBox.margin>
+                    <fx:include fx:id="locales" source="../editors/propertyeditors/locales-panel.fxml" />
+                </VBox>
+            </children>
+            <padding>
+                <Insets left="12.0" right="12.0" top="8.0" />
+            </padding>
+        </VBox>
+    </center>
+</BorderPane>

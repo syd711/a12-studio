@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import de.a12.studio.ui.editors.EditorFileToolbarButtons?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController">
     <right>
@@ -32,23 +33,7 @@
                         <Circle fx:id="settingsErrorBadge" mouseTransparent="true" radius="4" styleClass="toolbar-button-error-badge" translateX="10" translateY="-10" visible="false" StackPane.alignment="CENTER" />
                     </children>
                 </StackPane>
-                <Separator prefHeight="0.0" prefWidth="0.0" />
-                <Button layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onAction="#onFileEdit" styleClass="default-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Edit File" />
-                    </tooltip>
-                </Button>
-                <Button layoutX="10.0" layoutY="51.0" mnemonicParsing="false" onAction="#onFileOpen" styleClass="default-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="18" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Open Model Folder" />
-                    </tooltip>
-                </Button>
+                <EditorFileToolbarButtons fx:id="fileToolbarButtons" />
             </items>
          <BorderPane.margin>
             <Insets />

@@ -6,7 +6,8 @@ public class PreferencesOpenRequestedEvent {
 
   public enum Section {
     AI_SETTINGS,
-    ANNOTATION_SETS
+    ANNOTATION_SETS,
+    GENERAL_SETTINGS
   }
 
   @NonNull

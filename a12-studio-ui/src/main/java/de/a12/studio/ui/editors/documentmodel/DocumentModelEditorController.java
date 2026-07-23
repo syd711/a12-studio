@@ -13,7 +13,6 @@ import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;
 import de.a12.studio.ui.util.ProjectDocumentModels;
-import de.a12.studio.ui.util.SystemUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +24,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.shape.Circle;
 import org.jspecify.annotations.NonNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
@@ -57,17 +55,6 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   @FXML
   private DocumentModelElementsTreeController elementsTreeController;
 
-  @FXML
-  public void onFileOpen(ActionEvent e) {
-    File file = projectItem.getFile();
-    SystemUtil.openFile(file);
-  }
-
-  @FXML
-  public void onFileEdit(ActionEvent e) {
-    File file = projectItem.getFile();
-    SystemUtil.editFile(file);
-  }
 
   @FXML
   public void onSettings(ActionEvent e) {

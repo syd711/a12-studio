@@ -19,6 +19,9 @@ import java.util.ResourceBundle;
 public class PreferencesController implements Initializable {
 
   @FXML
+  private Button generalSettingsBtn;
+
+  @FXML
   private Button aiSettingsBtn;
 
   @FXML
@@ -54,12 +57,16 @@ public class PreferencesController implements Initializable {
   }
 
   public void showSection(PreferencesOpenRequestedEvent.@NonNull Section section) {
-    if (section == PreferencesOpenRequestedEvent.Section.ANNOTATION_SETS) {
-      onAnnotationSets();
+    switch (section) {
+      case ANNOTATION_SETS -> onAnnotationSets();
+      case GENERAL_SETTINGS -> onGeneralSettings();
+      default -> onAiSettings();
     }
-    else {
-      onAiSettings();
-    }
+  }
+
+  @FXML
+  private void onGeneralSettings() {
+    showPage(generalSettingsBtn, "general-settings-panel.fxml");
   }
 
   @FXML
