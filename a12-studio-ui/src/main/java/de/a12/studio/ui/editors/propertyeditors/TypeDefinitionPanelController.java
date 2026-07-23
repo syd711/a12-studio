@@ -87,6 +87,9 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   @FXML
   private GridPane customTypeGrid;
 
+  @FXML
+  private GridPane checkboxesGrid;
+
   private List<TypeDefinition> availableTypeDefinitions = List.of();
 
   @Override

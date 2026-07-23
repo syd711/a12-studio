@@ -12,8 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="DATA TYPE CONFIGURATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeStringConfigurationPanelController">
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="DATA TYPE CONFIGURATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeStringConfigurationPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
@@ -50,13 +49,16 @@
         </rowConstraints>
     </GridPane>
 
-    <TitledPane fx:id="suggestionsPane" expanded="false" text="SUGGESTIONS" maxWidth="Infinity">
+    <TitledPane fx:id="suggestionsPane" maxWidth="Infinity" text="SUGGESTIONS">
       <VBox>
         <padding>
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </padding>
         <Label styleClass="placeholder-label" text="No suggestions available yet." />
       </VBox>
+               <VBox.margin>
+                  <Insets left="-8.0" />
+               </VBox.margin>
     </TitledPane>
   </VBox>
  </center>

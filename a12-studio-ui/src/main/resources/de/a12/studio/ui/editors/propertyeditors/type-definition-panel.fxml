@@ -58,15 +58,25 @@
                                 <ComboBox fx:id="dataTypeComboBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" />
                             </children>
                         </VBox>
-
-                        <HBox spacing="16.0" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="1">
+                        <rowConstraints>
+                            <RowConstraints />
+                        </rowConstraints>
+                    </GridPane>
+                    <GridPane fx:id="checkboxesGrid" hgap="10.0" vgap="8.0">
+                        <columnConstraints>
+                            <ColumnConstraints />
+                            <ColumnConstraints hgrow="ALWAYS" />
+                            <ColumnConstraints minWidth="90.0" prefWidth="90.0" />
+                            <ColumnConstraints hgrow="ALWAYS" />
+                        </columnConstraints>
+                        <HBox spacing="16.0" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="0">
                             <CheckBox fx:id="globalCheckBox" prefWidth="100.0" text="Global" />
                             <CheckBox fx:id="transientCheckBox" text="Transient" />
                             <GridPane.margin>
                                 <Insets top="6.0" />
                             </GridPane.margin>
                         </HBox>
-                        <HBox layoutX="10.0" layoutY="152.0" spacing="16.0" GridPane.columnSpan="4" GridPane.rowIndex="2">
+                        <HBox layoutX="10.0" layoutY="152.0" spacing="16.0" GridPane.columnSpan="4" GridPane.rowIndex="1">
                             <children>
                                 <CheckBox fx:id="requiredCheckBox" prefWidth="100.0" text="Required" />
                                 <HBox fx:id="requiredParentBox" alignment="CENTER_LEFT" spacing="6.0">
@@ -88,7 +98,6 @@
                             </children>
                         </HBox>
                         <rowConstraints>
-                            <RowConstraints />
                             <RowConstraints />
                             <RowConstraints minHeight="10.0" />
                         </rowConstraints>
