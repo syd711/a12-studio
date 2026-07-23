@@ -176,6 +176,6 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       return false;
     }
     String name = item.getName();
-    return "data".equalsIgnoreCase(name) || "resources".equalsIgnoreCase(name);
+    return "data".equalsIgnoreCase(name) || "auth".equalsIgnoreCase(name) || "resources".equalsIgnoreCase(name);
   }
 }

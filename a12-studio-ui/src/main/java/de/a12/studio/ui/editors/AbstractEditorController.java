@@ -6,11 +6,16 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXML;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+
+import java.io.File;
 
 @Slf4j
 abstract public class AbstractEditorController implements StudioEventListener {
@@ -27,6 +32,18 @@ abstract public class AbstractEditorController implements StudioEventListener {
 
   public void save() {
     projectItem.save();
+  }
+
+  @FXML
+  public void onFileOpen(ActionEvent e) {
+    File file = projectItem.getFile();
+    SystemUtil.openFile(file);
+  }
+
+  @FXML
+  public void onFileEdit(ActionEvent e) {
+    File file = projectItem.getFile();
+    SystemUtil.editFile(file);
   }
 
   public void load(@NonNull ProjectItem projectItem) {

@@ -45,6 +45,9 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
   private static final DataFormat SUBREGION_INDEX = new DataFormat("application/x-a12-subregion-index");
 
   @FXML
+  private HBox columnHeaders;
+
+  @FXML
   private VBox subregionsList;
 
   private Region region;
@@ -73,8 +76,10 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     subregionsList.getChildren().clear();
 
     List<Region> subregions = getSubRegions();
+    columnHeaders.setVisible(!subregions.isEmpty());
+    columnHeaders.setManaged(!subregions.isEmpty());
     if (subregions.isEmpty()) {
-      Label emptyLabel = new Label("No subregions found.");
+      Label emptyLabel = new Label("No subregions configured.");
       emptyLabel.getStyleClass().add("placeholder-label");
       subregionsList.getChildren().add(emptyLabel);
       return;

@@ -16,11 +16,13 @@ import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 /**
  * Edits {@link InitialActivity#getDescriptor()}. Same row-based Name/Value layout as {@link
@@ -43,9 +45,20 @@ public class ActivityPanelController extends AbstractPropertyEditor {
 
   private final List<DescriptorEntry> entries = new ArrayList<>();
 
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
+    super.initialize(location, resources);
+    bindCheckBox(skipDataLoadingCheckbox, (el, value) -> {
+      if (model != null) {
+        getOrCreateInitialActivity().setWithoutData(value ? true : null);
+      }
+    });
+  }
+
   public void setModel(@NonNull ApplicationModel model) {
     this.model = model;
     rebuildRows();
+    setFieldValue(skipDataLoadingCheckbox, isWithoutData());
   }
 
   @FXML
@@ -164,10 +177,25 @@ public class ActivityPanelController extends AbstractPropertyEditor {
     return model.getContent().getInitialActivity().getDescriptor();
   }
 
+  private boolean isWithoutData() {
+    if (model == null || model.getContent() == null || model.getContent().getInitialActivity() == null) {
+      return false;
+    }
+    return Boolean.TRUE.equals(model.getContent().getInitialActivity().getWithoutData());
+  }
+
   private void syncDescriptorToModel() {
     if (model == null) {
       return;
     }
+    Map<String, String> descriptor = getOrCreateInitialActivity().getDescriptor();
+    descriptor.clear();
+    for (DescriptorEntry entry : entries) {
+      descriptor.put(entry.key, entry.value);
+    }
+  }
+
+  private InitialActivity getOrCreateInitialActivity() {
     ApplicationModelContent content = model.getContent();
     if (content == null) {
       content = new ApplicationModelContent();
@@ -178,12 +206,7 @@ public class ActivityPanelController extends AbstractPropertyEditor {
       initialActivity = new InitialActivity();
       content.setInitialActivity(initialActivity);
     }
-
-    Map<String, String> descriptor = initialActivity.getDescriptor();
-    descriptor.clear();
-    for (DescriptorEntry entry : entries) {
-      descriptor.put(entry.key, entry.value);
-    }
+    return initialActivity;
   }
 
   private static final class DescriptorEntry {
