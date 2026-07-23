@@ -83,8 +83,12 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
     super.modelSaved(event);
-    if (projectItem != null && projectItem.getPath().equals(event.getItem().getPath())) {
-      typeDefinitionsTableController.refresh();
+    if (projectItem == null || !projectItem.getPath().equals(event.getItem().getPath())) {
+      return;
+    }
+    projectItem.reload();
+    if (projectItem.getModel() != null) {
+      loadModel(projectItem.getModel());
     }
   }
 

@@ -39,7 +39,8 @@
       "decimalSeparator": ".",
       "conditionLanguage": {
         "code": "en_US"
-      }
+      },
+      "supportedCharacters": []
     },
     "modelRoot": {
       "rootGroups": [

@@ -26,9 +26,6 @@
         <!-- Description (Internal) -->
         <fx:include fx:id="errorMessages" source="../propertyeditors/localized-text-panel.fxml" />
 
-      <!-- Suggestions -->
-      <fx:include fx:id="suggestions" source="../propertyeditors/suggestions-panel.fxml" />
-
       <!-- Label -->
       <fx:include fx:id="label" source="../propertyeditors/localized-text-panel.fxml" />
 

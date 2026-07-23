@@ -16,6 +16,14 @@
       {
         "name": "tdonly",
         "value": "true"
+      },
+      {
+        "name": "aaa",
+        "value": null
+      },
+      {
+        "name": "bbbb",
+        "value": null
       }
     ],
     "modelReferences": []
@@ -33,10 +41,13 @@
       },
       "supportedCharacters": []
     },
+    "modelRoot": {
+      "rootGroups": []
+    },
     "typeDefinitions": [
       {
         "id": "typedef_f15fa74e-efe6-4289-b80f-c59e39719040",
-        "name": "NewType",
+        "name": "abc",
         "fieldType": {
           "type": "StringType",
           "StringType": {
@@ -44,9 +55,6 @@
           }
         }
       }
-    ],
-    "modelRoot": {
-      "rootGroups": []
-    }
+    ]
   }
 }

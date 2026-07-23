@@ -23,18 +23,13 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
   @FXML
   private DataTypeStringConfigurationPanelController dataTypeConfigurationController;
 
-  @FXML
-  private SuggestionsPanelController suggestionsController;
-
-
   private List<AbstractPropertyEditor> propertyEditors;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     typeDefinitionController.setCustomTypeDisabled();
 
-    propertyEditors = List.of(generalInformationController, typeDefinitionController, dataTypeConfigurationController,
-        suggestionsController);
+    propertyEditors = List.of(generalInformationController, typeDefinitionController, dataTypeConfigurationController);
   }
 
   @Override

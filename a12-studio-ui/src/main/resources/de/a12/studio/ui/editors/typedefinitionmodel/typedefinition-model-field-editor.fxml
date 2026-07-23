@@ -22,9 +22,6 @@
 
       <!-- Data Type Configuration -->
       <fx:include fx:id="dataTypeConfiguration" source="../propertyeditors/data-type-string-configuration-panel.fxml" />
-
-      <!-- Suggestions -->
-      <fx:include fx:id="suggestions" source="../propertyeditors/suggestions-panel.fxml" />
     </VBox>
   </content>
 </ScrollPane>

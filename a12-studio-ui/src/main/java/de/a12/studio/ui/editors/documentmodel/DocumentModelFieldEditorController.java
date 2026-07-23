@@ -6,7 +6,6 @@ import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DataTypeStringConfigurationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
-import de.a12.studio.ui.editors.propertyeditors.SuggestionsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TypeDefinitionPanelController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,9 +32,6 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
 
   @FXML
   private LocalizedTextPanelController errorMessagesController;
-
-  @FXML
-  private SuggestionsPanelController suggestionsController;
 
   @FXML
   private LocalizedTextPanelController labelController;
@@ -66,7 +62,7 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
     errorMessages.visibleProperty().bind(dataTypeConfigurationController.patternProperty().isNotEmpty());
 
     propertyEditors = List.of(generalInformationController, typeDefinitionController, dataTypeConfigurationController, errorMessagesController,
-        suggestionsController, labelController, descriptionInternalController, descriptionExternalController,
+        labelController, descriptionInternalController, descriptionExternalController,
         helperTextController, annotationsController);
   }
 

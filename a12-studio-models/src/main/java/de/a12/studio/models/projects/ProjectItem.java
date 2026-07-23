@@ -57,6 +57,12 @@ public class ProjectItem {
     }
   }
 
+  public void reload() {
+    if (!isFolder()) {
+      this.model = ModelFactory.load(this);
+    }
+  }
+
   public boolean isFolder() {
     return file.isDirectory();
   }

@@ -12,41 +12,53 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="DATA TYPE CONFIGURATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeStringConfigurationPanelController">
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="DATA TYPE CONFIGURATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeStringConfigurationPanelController">
  <BorderPane>
  <center>
-  <GridPane hgap="10.0" vgap="8.0">
-    <columnConstraints>
-      <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
-      <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
-      <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
-    </columnConstraints>
+  <VBox spacing="10.0">
+    <GridPane hgap="10.0" vgap="8.0">
+      <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+      </columnConstraints>
 
-    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
-      <Label styleClass="field-label" text="Min. Length" />
-      <TextField fx:id="minLengthField" />
-    </VBox>
-    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
-      <Label styleClass="field-label" text="Max. Length" />
-      <TextField fx:id="maxLengthField" />
-    </VBox>
-    <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
-      <Label styleClass="field-label" text="Pattern" />
-      <TextField fx:id="patternField" />
-    </VBox>
+      <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <Label styleClass="field-label" text="Min. Length" />
+        <TextField fx:id="minLengthField" />
+      </VBox>
+      <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+        <Label styleClass="field-label" text="Max. Length" />
+        <TextField fx:id="maxLengthField" />
+      </VBox>
+      <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
+        <Label styleClass="field-label" text="Pattern" />
+        <TextField fx:id="patternField" />
+      </VBox>
 
-    <HBox spacing="16.0" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1">
-      <CheckBox fx:id="lineBreaksCheckBox" text="Line Breaks Permitted" />
-      <CheckBox fx:id="alphabeticalSortingCheckBox" text="Alphabetical Sorting" />
-         <GridPane.margin>
-            <Insets top="6.0" />
-         </GridPane.margin>
-    </HBox>
-      <rowConstraints>
-         <RowConstraints />
-         <RowConstraints />
-      </rowConstraints>
-  </GridPane>
+      <HBox spacing="16.0" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1">
+        <CheckBox fx:id="lineBreaksCheckBox" text="Line Breaks Permitted" />
+        <CheckBox fx:id="alphabeticalSortingCheckBox" text="Alphabetical Sorting" />
+           <GridPane.margin>
+              <Insets top="6.0" />
+           </GridPane.margin>
+      </HBox>
+        <rowConstraints>
+           <RowConstraints />
+           <RowConstraints />
+        </rowConstraints>
+    </GridPane>
+
+    <TitledPane fx:id="suggestionsPane" expanded="false" text="SUGGESTIONS" maxWidth="Infinity">
+      <VBox>
+        <padding>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+        </padding>
+        <Label styleClass="placeholder-label" text="No suggestions available yet." />
+      </VBox>
+    </TitledPane>
+  </VBox>
  </center>
  <top>
     <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />

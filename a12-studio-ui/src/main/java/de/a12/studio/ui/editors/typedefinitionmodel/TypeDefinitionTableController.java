@@ -74,12 +74,24 @@ public class TypeDefinitionTableController implements Initializable {
   }
 
   public void load(@NonNull DocumentModel model) {
+    String selectedId = getSelectedId();
     this.typeDefinitions = model.getContent().getTypeDefinitions();
     applyFilter(searchController.getText());
+    if (selectedId != null) {
+      selectById(selectedId);
+    }
   }
 
-  public void refresh() {
-    applyFilter(searchController.getText());
+  private String getSelectedId() {
+    List<TypeDefinition> selectedItems = typeDefinitionsTable.getSelectionModel().getSelectedItems();
+    return selectedItems.size() == 1 ? selectedItems.get(0).getId() : null;
+  }
+
+  private void selectById(@NonNull String id) {
+    typeDefinitionsTable.getItems().stream()
+        .filter(typeDefinition -> id.equals(typeDefinition.getId()))
+        .findFirst()
+        .ifPresent(this::selectTypeDefinition);
   }
 
   @Override
