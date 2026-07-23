@@ -53,7 +53,7 @@ public class PreferencesController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    showPage(aiSettingsBtn, "ai-settings.fxml");
+    showPage(aiSettingsBtn, "general-settings.fxml");
   }
 
   public void showSection(PreferencesOpenRequestedEvent.@NonNull Section section) {
@@ -66,7 +66,7 @@ public class PreferencesController implements Initializable {
 
   @FXML
   private void onGeneralSettings() {
-    showPage(generalSettingsBtn, "general-settings-panel.fxml");
+    showPage(generalSettingsBtn, "general-settings.fxml");
   }
 
   @FXML
