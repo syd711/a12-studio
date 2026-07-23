@@ -11,24 +11,35 @@ import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.updater.Dialogs;
 import de.a12.studio.ui.updater.UpdaterService;
+import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioVersion;
 import de.a12.studio.ui.util.SystemUtil;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -53,6 +64,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private Menu recentProjectsMenu;
+
   private Project project;
 
   private final UpdaterService updaterService = new UpdaterService();
@@ -70,15 +82,6 @@ public class MenuBarController implements Initializable, StudioEventListener {
     chooser.setTitle("Choose Project Workspace");
 
     File file = chooser.showOpenDialog(Studio.stage);
-    if (file != null) {
-      openProject(file);
-    }
-  }
-
-  @FXML
-  private void onProjectOpen(javafx.event.ActionEvent event) {
-    MenuItem menuItem = (MenuItem) event.getSource();
-    File file = (File) menuItem.getUserData();
     if (file != null) {
       openProject(file);
     }
@@ -105,13 +108,97 @@ public class MenuBarController implements Initializable, StudioEventListener {
       return;
     }
 
+    double rowWidth = calculateRecentProjectRowWidth(recentProjects);
     for (String path : recentProjects) {
-      File file = new File(path);
-      MenuItem menuItem = new MenuItem(file.getAbsolutePath());
-      menuItem.setUserData(file);
-      menuItem.setOnAction(this::onProjectOpen);
-      recentProjectsMenu.getItems().add(menuItem);
+      recentProjectsMenu.getItems().add(createRecentProjectMenuItem(new File(path), rowWidth));
     }
+
+    recentProjectsMenu.getItems().add(new SeparatorMenuItem());
+    MenuItem clearItem = new MenuItem("Clear Recent Projects");
+    clearItem.setOnAction(event -> onClearRecentProjects());
+    recentProjectsMenu.getItems().add(clearItem);
+  }
+
+  private void onClearRecentProjects() {
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(
+        Studio.stage, "Clear all recent projects?", null, null, "Clear");
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      LocalUISettings.clearRecentProjects();
+      refreshRecentProjectsMenu();
+    }
+  }
+
+  private static final Font RECENT_PROJECT_FONT = Font.font(14);
+  // Space reserved for the remove button, its padding and the row's own spacing/padding,
+  // on top of the measured text width.
+  private static final double RECENT_PROJECT_ROW_CHROME_WIDTH = 60;
+  private static final double RECENT_PROJECT_ROW_MIN_WIDTH = 240;
+  private static final double RECENT_PROJECT_ROW_MAX_WIDTH = 720;
+
+  private double calculateRecentProjectRowWidth(List<String> paths) {
+    Text measurer = new Text();
+    measurer.setFont(RECENT_PROJECT_FONT);
+
+    double maxTextWidth = 0;
+    for (String path : paths) {
+      measurer.setText(new File(path).getAbsolutePath());
+      maxTextWidth = Math.max(maxTextWidth, measurer.getLayoutBounds().getWidth());
+    }
+
+    double rowWidth = maxTextWidth + RECENT_PROJECT_ROW_CHROME_WIDTH;
+    return Math.min(Math.max(rowWidth, RECENT_PROJECT_ROW_MIN_WIDTH), RECENT_PROJECT_ROW_MAX_WIDTH);
+  }
+
+  private CustomMenuItem createRecentProjectMenuItem(File file, double rowWidth) {
+    String path = file.getAbsolutePath();
+
+    Label label = new Label(path);
+    label.setMaxWidth(Double.MAX_VALUE);
+    // Truncates from the front so the project folder name (the useful part) stays visible;
+    // only kicks in for paths longer than RECENT_PROJECT_ROW_MAX_WIDTH allows.
+    label.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);
+    label.setTooltip(WidgetFactory.createTooltip(path));
+    HBox.setHgrow(label, Priority.ALWAYS);
+    label.setOnMouseClicked(event -> {
+      closeMenuBarChain();
+      openProject(file);
+    });
+
+    FontIcon removeIcon = WidgetFactory.createIcon(Icons.TRASH);
+    // Reuses the existing ".menu-item:hover .menu-icon" rule so the icon turns white
+    // on the same blue selection highlight as every other menu icon.
+    removeIcon.getStyleClass().add("menu-icon");
+    Button removeBtn = new Button();
+    removeBtn.setGraphic(removeIcon);
+    removeBtn.getStyleClass().add("recent-project-remove-btn");
+    removeBtn.setTooltip(WidgetFactory.createTooltip("Remove from Recent Projects"));
+    removeBtn.setOnAction(event -> {
+      event.consume();
+      LocalUISettings.removeRecentProject(path);
+      refreshRecentProjectsMenu();
+    });
+
+    HBox row = new HBox(8, label, removeBtn);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("recent-project-item");
+    // CustomMenuItem content isn't stretched to the menu's width by default, so without
+    // an explicit width the hgrow above has nothing to grow into and the button ends up
+    // right after the text instead of pinned to the row's right edge.
+    row.setPrefWidth(rowWidth);
+    row.setMinWidth(rowWidth);
+    row.setMaxWidth(rowWidth);
+
+    // hideOnClick=false so removing an entry doesn't collapse the whole menu; the
+    // label click handler above closes it explicitly when a project is opened instead.
+    return new CustomMenuItem(row, false);
+  }
+
+  private void closeMenuBarChain() {
+    Menu topMenu = recentProjectsMenu;
+    while (topMenu.getParentMenu() != null) {
+      topMenu = topMenu.getParentMenu();
+    }
+    topMenu.hide();
   }
 
   @FXML

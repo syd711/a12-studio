@@ -155,6 +155,16 @@ public class LocalUISettings {
     return recentProjects;
   }
 
+  public static void removeRecentProject(@NonNull String path) {
+    List<String> recentProjects = getRecentProjects();
+    recentProjects.remove(path);
+    saveJsonProperty(RECENT_PROJECTS, recentProjects);
+  }
+
+  public static void clearRecentProjects() {
+    saveJsonProperty(RECENT_PROJECTS, new ArrayList<>());
+  }
+
   public static void saveLocation(int x, int y, int width, int height) {
     if (y >= 0) {
       store.set("x", x);

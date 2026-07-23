@@ -238,6 +238,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   private TreeItem<ProjectItemViewModel> toTreeItem(@NonNull ProjectItemViewModel viewModel) {
     TreeItem<ProjectItemViewModel> treeItem = new TreeItem<>(viewModel);
+    treeItem.setExpanded(true);
     for (ProjectItemViewModel child : viewModel.getChildren()) {
       treeItem.getChildren().add(toTreeItem(child));
     }

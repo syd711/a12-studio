@@ -79,3 +79,21 @@
 .dark-panel {
     -fx-background-color: -fx-menu-bar-color;
 }
+
+/**
+ * Recent Projects submenu rows (recentProjectsMenu in MenuBarController) - each
+ * row is a CustomMenuItem with a path label and a right-aligned remove button.
+ */
+.recent-project-item {
+    -fx-padding: 0 8px 0 0;
+}
+
+.recent-project-remove-btn {
+    -fx-background-color: transparent;
+    -fx-padding: 4px;
+    -fx-cursor: hand;
+}
+
+.recent-project-remove-btn:hover {
+    -fx-background-color: black;
+}

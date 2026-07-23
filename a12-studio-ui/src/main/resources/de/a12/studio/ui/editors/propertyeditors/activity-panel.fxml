@@ -14,8 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="INITIAL ACTIVITY" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.ActivityPanelController">
+<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="INITIAL ACTIVITY" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.ActivityPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
@@ -48,7 +47,7 @@
                      <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
                   </graphic>
                   <tooltip>
-                     <Tooltip prefWidth="300.0" text="The initial activity specified by the descriptor loads data by default. If this is not required or wanted, set this option. Ignored if no activity descriptor is set." />
+                     <Tooltip prefWidth="300.0" text="The initial activity specified by the descriptor loads data by default. If this is not required or wanted, set this option. Ignored if no activity descriptor is set." wrapText="true" />
                   </tooltip>
                </Label>
             </children>
