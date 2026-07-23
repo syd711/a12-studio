@@ -24,7 +24,8 @@ public abstract class JsonSettings {
     AI,
     UI,
     ANNOTATION,
-    PREVIEW
+    PREVIEW,
+    PROJECT_ROOT
   }
 
   public final static ObjectMapper objectMapper;
