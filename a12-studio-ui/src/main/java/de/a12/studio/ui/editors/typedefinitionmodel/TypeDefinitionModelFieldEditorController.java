@@ -21,13 +21,14 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
   private TypeDefinitionPanelController typeDefinitionController;
 
   @FXML
-  private DataTypeStringConfigurationPanelController dataTypeConfigurationController;
+  private DataTypeConfigurationPanelController dataTypeConfigurationController;
 
   private List<AbstractPropertyEditor> propertyEditors;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     typeDefinitionController.setCustomTypeDisabled();
+    typeDefinitionController.hideCheckboxesGrid();
 
     propertyEditors = List.of(generalInformationController, typeDefinitionController, dataTypeConfigurationController);
   }

@@ -15,8 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TYPE DEFINITION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.TypeDefinitionPanelController">
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TYPE DEFINITION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.TypeDefinitionPanelController">
     <BorderPane>
         <center>
             <VBox spacing="8.0">
@@ -97,9 +96,15 @@
                                 </HBox>
                             </children>
                         </HBox>
+                  <HBox fx:id="defaultErrorMessagesBox" alignment="CENTER_LEFT" spacing="6.0" GridPane.columnSpan="4" GridPane.rowIndex="2">
+                     <children>
+                        <CheckBox fx:id="defaultErrorMessagesCheckbox" text="Use default error messages" />
+                     </children>
+                  </HBox>
                         <rowConstraints>
                             <RowConstraints />
-                            <RowConstraints minHeight="10.0" />
+                            <RowConstraints />
+                     <RowConstraints minHeight="10.0" />
                         </rowConstraints>
                     </GridPane>
                 </children>

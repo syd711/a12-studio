@@ -3,7 +3,7 @@ package de.a12.studio.ui.editors.documentmodel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
-import de.a12.studio.ui.editors.propertyeditors.DataTypeStringConfigurationPanelController;
+import de.a12.studio.ui.editors.propertyeditors.DataTypeConfigurationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TypeDefinitionPanelController;
@@ -25,7 +25,7 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
   private TypeDefinitionPanelController typeDefinitionController;
 
   @FXML
-  private DataTypeStringConfigurationPanelController dataTypeConfigurationController;
+  private DataTypeConfigurationPanelController dataTypeConfigurationController;
 
   @FXML
   private TitledPane errorMessages;

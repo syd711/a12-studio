@@ -21,7 +21,7 @@
       <fx:include fx:id="typeDefinition" source="../propertyeditors/type-definition-panel.fxml" />
 
       <!-- Data Type Configuration -->
-      <fx:include fx:id="dataTypeConfiguration" source="../propertyeditors/data-type-string-configuration-panel.fxml" />
+      <fx:include fx:id="dataTypeConfiguration" source="../propertyeditors/data-type-configuration-panel.fxml" />
     </VBox>
   </content>
 </ScrollPane>

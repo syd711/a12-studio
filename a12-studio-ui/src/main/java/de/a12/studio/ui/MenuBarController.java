@@ -1,6 +1,7 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.ui.components.StudioFolderChooser;
+import de.a12.studio.ui.newproject.NewProjectDialogController;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
@@ -59,6 +60,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private void onNew() {
+    NewProjectDialogController.show(Studio.stage).ifPresent(this::openProject);
   }
 
   @FXML

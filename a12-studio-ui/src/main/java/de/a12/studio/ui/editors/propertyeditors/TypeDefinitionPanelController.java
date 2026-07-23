@@ -70,6 +70,12 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   private CheckBox requiredParentCheckBox;
 
   @FXML
+  private CheckBox defaultErrorMessagesCheckbox;
+
+  @FXML
+  private HBox defaultErrorMessagesBox;
+
+  @FXML
   private HBox requiredParentBox;
 
   @FXML
@@ -96,6 +102,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
     customTypeGrid.managedProperty().bindBidirectional(customTypeGrid.visibleProperty());
+    checkboxesGrid.managedProperty().bindBidirectional(checkboxesGrid.visibleProperty());
 
     dataTypeComboBox.getItems().addAll(DATA_TYPES);
 
@@ -123,6 +130,9 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     requiredParentBox.managedProperty().bind(requiredParentBox.visibleProperty());
     requiredParentBox.visibleProperty().bind(requiredCheckBox.selectedProperty());
 
+    defaultErrorMessagesBox.managedProperty().bind(defaultErrorMessagesBox.visibleProperty());
+    defaultErrorMessagesBox.visibleProperty().bind(requiredCheckBox.selectedProperty());
+
     bindCheckBox(globalCheckBox, (element, value) ->
         withFieldConfig(element, field -> field.setGlobal(value ? true : null)));
     bindCheckBox(transientCheckBox, (element, value) ->
@@ -135,6 +145,11 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
         field.getRequirednessConfig().setMode(value
             ? RequirednessConfig.MODE_REQUIRED_IF_PARENT_FILLED
             : RequirednessConfig.MODE_REQUIRED);
+      }
+    }));
+    bindCheckBox(defaultErrorMessagesCheckbox, (element, value) -> withFieldConfig(element, field -> {
+      if (field.getRequirednessConfig() != null && value) {
+        field.getRequirednessConfig().getErrorMessage().clear();
       }
     }));
 
@@ -166,6 +181,14 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     customTypeGrid.setVisible(false);
   }
 
+  /**
+   * Global/transient/required have no equivalent on a {@link TypeDefinition} (see {@code
+   * TypeDefinitionFieldElement}), so the type definition editor hides this section entirely.
+   */
+  public void hideCheckboxesGrid() {
+    checkboxesGrid.setVisible(false);
+  }
+
   @Override
   public void setElement(@NonNull Element element) {
     super.setElement(element);
@@ -188,6 +211,8 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     setFieldValue(requiredCheckBox, requirednessConfig != null);
     setFieldValue(requiredParentCheckBox,
         requirednessConfig != null && RequirednessConfig.MODE_REQUIRED_IF_PARENT_FILLED.equals(requirednessConfig.getMode()));
+    setFieldValue(defaultErrorMessagesCheckbox,
+        requirednessConfig == null || requirednessConfig.getErrorMessage().isEmpty());
   }
 
   private static RequirednessConfig newRequirednessConfig(boolean onlyIfParentFilled) {
