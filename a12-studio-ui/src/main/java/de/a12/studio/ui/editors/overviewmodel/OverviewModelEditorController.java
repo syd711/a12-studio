@@ -11,7 +11,6 @@ import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.propertyeditors.*;
 import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.ProjectDocumentModels;
-import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.event.ActionEvent;
@@ -21,7 +20,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Circle;
 import org.jspecify.annotations.NonNull;
 
-import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -37,17 +35,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   @FXML
   private Circle settingsErrorBadge;
 
-  @FXML
-  public void onFileOpen(ActionEvent e) {
-    File file = projectItem.getFile();
-    SystemUtil.openFile(file);
-  }
-
-  @FXML
-  public void onFileEdit(ActionEvent e) {
-    File file = projectItem.getFile();
-    SystemUtil.editFile(file);
-  }
 
   @FXML
   public void onSettings(ActionEvent e) {
