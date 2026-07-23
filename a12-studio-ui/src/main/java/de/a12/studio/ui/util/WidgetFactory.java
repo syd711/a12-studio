@@ -340,8 +340,10 @@ public class WidgetFactory {
       }
     });
 
-    restoreStagePosition(stateId, stage);
-    installStatePersistence(stateId, stage, controller);
+    if(stateId != null) {
+      restoreStagePosition(stateId, stage);
+      installStatePersistence(stateId, stage, controller);
+    }
 
     return stage;
   }
