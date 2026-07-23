@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
  * json), e.g. {@code "tester,reviewer"}. Not bound to a single {@link Element}
  * (roles live on the model header), so {@link #setElement} is never called and only {@link #setModel} is used.
  */
-public class RoleEditorPanelController extends AbstractPropertyEditor implements Initializable {
+public class RolesEditorPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final String ROLES_ANNOTATION_NAME = "roles";
   private static final int COMMIT_DEBOUNCE_MS = 150;
@@ -52,8 +53,13 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
   private static final String MISSING_ROLES_FILE_WARNING =
       "The workspace should have a roles file if roles are specified in the model.";
 
+  private static final String NO_ROLES_CONFIGURED_MESSAGE = "No roles configured.";
+
   @FXML
   private GridPane rolesGrid;
+
+  @FXML
+  private Label roleHeaderLabel;
 
   private final Debouncer debouncer = new Debouncer();
 
@@ -87,6 +93,15 @@ public class RoleEditorPanelController extends AbstractPropertyEditor implements
       Integer rowIndex = GridPane.getRowIndex(node);
       return rowIndex != null && rowIndex > 0;
     });
+
+    roleHeaderLabel.setVisible(!roles.isEmpty());
+    roleHeaderLabel.setManaged(!roles.isEmpty());
+    if (roles.isEmpty()) {
+      Label emptyLabel = new Label(NO_ROLES_CONFIGURED_MESSAGE);
+      emptyLabel.getStyleClass().add("placeholder-label");
+      rolesGrid.addRow(1, emptyLabel);
+      return;
+    }
 
     for (int index = 0; index < roles.size(); index++) {
       Node roleField = newRowIndices.contains(index) ? createTextField(index) : createComboBox(index);

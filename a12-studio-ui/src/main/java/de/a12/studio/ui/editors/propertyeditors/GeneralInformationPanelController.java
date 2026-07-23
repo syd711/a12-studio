@@ -1,19 +1,25 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
-import de.a12.studio.ui.editors.dialogs.EditorDialogs;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class GeneralInformationPanelController extends AbstractPropertyEditor {
 
-  private static final List<String> DATA_TYPES = List.of("String", "Number", "Boolean", "Date", "Object");
+  // Disallows whitespace and characters that are illegal in filenames on Windows/macOS/Linux, since the
+  // element name is used as-is as a filename/path segment elsewhere.
+  private static final Pattern VALID_NAME = Pattern.compile("^[^\\s\\\\/:*?\"<>|]+$");
 
   @FXML
   private TextField nameField;
@@ -28,9 +34,27 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onEditName(ActionEvent event) {
-    EditorDialogs.openSettings();
-    setFieldValue(nameField, element.getName());
-    updatePathField(element.getName());
+    String newName = WidgetFactory.showInputDialog(Studio.stage, "Rename", "Name", null, null, element.getName());
+    if (newName == null || newName.equals(element.getName())) {
+      return;
+    }
+
+    if (!VALID_NAME.matcher(newName).matches()) {
+      WidgetFactory.showAlert(Studio.stage, "Invalid name", "The name must be a valid filename and must not contain whitespace.");
+      return;
+    }
+
+    element.setName(newName);
+    setFieldValue(nameField, newName);
+    updatePathField(newName);
+    commitChange();
+  }
+
+  @FXML
+  private void onCopyPath(ActionEvent event) {
+    ClipboardContent content = new ClipboardContent();
+    content.putString(pathField.getText());
+    Clipboard.getSystemClipboard().setContent(content);
   }
 
   public void setAncestors(@NonNull List<Element> ancestors) {

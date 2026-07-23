@@ -12,7 +12,7 @@ import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController;
-import de.a12.studio.ui.editors.propertyeditors.RoleEditorPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SupportedCharactersPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TimezonePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -45,7 +45,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   private LocalizedTextPanelController labelsController;
 
   @FXML
-  private RoleEditorPanelController rolesController;
+  private RolesEditorPanelController rolesController;
 
   @FXML
   private AnnotationsPanelController annotationsController;

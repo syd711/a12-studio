@@ -78,6 +78,10 @@ public class TypeDefinitionTableController implements Initializable {
     applyFilter(searchController.getText());
   }
 
+  public void refresh() {
+    applyFilter(searchController.getText());
+  }
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     searchController.setOnSearch(this::applyFilter);

@@ -36,7 +36,7 @@
                     <VBox.margin>
                         <Insets top="16.0" />
                     </VBox.margin>
-                    <fx:include fx:id="locales" source="../editors/propertyeditors/locales-panel.fxml" />
+                    <fx:include fx:id="locales" source="general-locales-panel.fxml" />
                 </VBox>
             </children>
             <padding>

@@ -8,6 +8,7 @@ import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
+import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import javafx.event.ActionEvent;
@@ -77,6 +78,14 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
 
   private void load(@NonNull DocumentModel documentModel) {
     typeDefinitionsTableController.load(documentModel);
+  }
+
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    super.modelSaved(event);
+    if (projectItem != null && projectItem.getPath().equals(event.getItem().getPath())) {
+      typeDefinitionsTableController.refresh();
+    }
   }
 
   @Override

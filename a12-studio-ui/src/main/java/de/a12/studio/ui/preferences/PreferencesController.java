@@ -60,7 +60,7 @@ public class PreferencesController implements Initializable {
     switch (section) {
       case ANNOTATION_SETS -> onAnnotationSets();
       case GENERAL_SETTINGS -> onGeneralSettings();
-      default -> onAiSettings();
+      default -> onGeneralSettings();
     }
   }
 

@@ -277,6 +277,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
     Optional<ElementValidationError> error = validateElement(projectItem);
     showValidationError(error.orElse(null));
     StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
+    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 
   private Optional<ElementValidationError> validateElement(@NonNull ProjectItem projectItem) {

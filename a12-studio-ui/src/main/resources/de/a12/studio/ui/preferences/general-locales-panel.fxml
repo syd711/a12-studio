@@ -10,20 +10,19 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="ROLES" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController">
+<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@../stylesheet.css" text="LOCALES" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.GeneralLocalesPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
-    <GridPane fx:id="rolesGrid" hgap="10.0" vgap="6.0">
+    <GridPane fx:id="localesGrid" hgap="10.0" vgap="6.0">
       <columnConstraints>
-        <ColumnConstraints hgrow="ALWAYS" percentWidth="74.0" />
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="30.0" />
         <ColumnConstraints hgrow="NEVER" minWidth="150.0" prefWidth="150.0" />
       </columnConstraints>
       <rowConstraints>
         <RowConstraints />
       </rowConstraints>
-      <Label fx:id="roleHeaderLabel" styleClass="field-label" text="Role*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <Label fx:id="codeHeaderLabel" styleClass="field-label" text="Code*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
     </GridPane>
     <HBox spacing="8.0">
       <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" />
@@ -31,7 +30,7 @@
   </VBox>
  </center>
  <top>
-    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+    <fx:include fx:id="errorContainer" source="../components/error-container.fxml" BorderPane.alignment="CENTER" />
  </top>
  </BorderPane>
 </TitledPane>
