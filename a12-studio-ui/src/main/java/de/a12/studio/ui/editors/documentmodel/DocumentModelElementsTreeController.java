@@ -2,6 +2,8 @@ package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.Label;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
+import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
 import de.a12.studio.models.documentmodel.ComputationConfig;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -33,6 +35,7 @@ import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -44,6 +47,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -59,7 +63,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Slf4j
 public class DocumentModelElementsTreeController implements Initializable, StudioEventListener {
+
+  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   private static final String TABLE_SETTINGS_ID = ModelType.DOCUMENT.getValue();
 
@@ -214,7 +221,50 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       }
     }
     elementsTreeTable.setRoot(root);
+    applyValidationState(root);
     expandAll(root);
+  }
+
+  /**
+   * Re-validates the whole document and marks each errored element's tree row, so structural changes made
+   * elsewhere in the tree (e.g. deleting a field another group uses as its index field, undo/redo, initial
+   * load of a document that was already invalid on disk) are reflected immediately. This rebuilds every
+   * {@link ElementViewModel} in the tree (see {@link #toTreeItem}), which would otherwise always start out
+   * with {@code hasError == false} until the next individual field edit re-triggers {@link #elementValidated}.
+   */
+  private void applyValidationState(@NonNull TreeItem<ElementViewModel> root) {
+    Set<String> erroredElementIds = erroredElementIds();
+    markErrors(root, erroredElementIds);
+  }
+
+  private Set<String> erroredElementIds() {
+    if (!(projectItem.getModel() instanceof DocumentModel documentModel)) {
+      return Set.of();
+    }
+    try {
+      List<ElementValidationError> errors =
+          VALIDATION_SERVICE.validateDocument(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
+      Set<String> ids = new HashSet<>();
+      for (ElementValidationError error : errors) {
+        if (error.elementId() != null) {
+          ids.add(error.elementId());
+        }
+      }
+      return ids;
+    }
+    catch (Exception e) {
+      log.warn("Failed to validate document '{}': {}", projectItem.getPath(), e.getMessage(), e);
+      return Set.of();
+    }
+  }
+
+  private void markErrors(@NonNull TreeItem<ElementViewModel> treeItem, @NonNull Set<String> erroredElementIds) {
+    if (treeItem.getValue() != null) {
+      treeItem.getValue().setHasError(erroredElementIds.contains(treeItem.getValue().getElement().getId()));
+    }
+    for (TreeItem<ElementViewModel> child : treeItem.getChildren()) {
+      markErrors(child, erroredElementIds);
+    }
   }
 
   private void expandAll(@NonNull TreeItem<ElementViewModel> treeItem) {

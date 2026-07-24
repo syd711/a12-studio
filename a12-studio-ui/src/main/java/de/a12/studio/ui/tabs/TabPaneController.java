@@ -178,6 +178,24 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
   }
 
+  public void selectNextTab() {
+    int size = tabPane.getTabs().size();
+    if (size < 2) {
+      return;
+    }
+    int current = tabPane.getSelectionModel().getSelectedIndex();
+    tabPane.getSelectionModel().select((current + 1) % size);
+  }
+
+  public void selectPreviousTab() {
+    int size = tabPane.getTabs().size();
+    if (size < 2) {
+      return;
+    }
+    int current = tabPane.getSelectionModel().getSelectedIndex();
+    tabPane.getSelectionModel().select((current - 1 + size) % size);
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);

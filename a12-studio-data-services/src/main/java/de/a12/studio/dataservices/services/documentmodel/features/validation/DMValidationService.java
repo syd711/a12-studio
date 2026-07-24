@@ -31,6 +31,13 @@ public class DMValidationService {
 
   private static final String INCLUDE_PURPOSE = "include";
 
+  // Verbatim text of SME's DomainGroup meta-model rule "A12_INDEX_FIELD_INVALID_REFERENCE" (see
+  // client/resources/models/documentModel/DomainGroup.json in the SME repo), which fires the moment a group's
+  // configured index field no longer resolves to a field in the group (e.g. that field was deleted). Kept
+  // verbatim, unlike the other generic messages below, so the Group properties panel can show users the exact
+  // wording they already know from SME.
+  public static final String INDEX_FIELD_INVALID_MESSAGE = "The index field is not a valid field.";
+
   /**
    * UI-safe entry point: takes/returns only data-services model types and plain strings.
    */
@@ -112,7 +119,8 @@ public class DMValidationService {
   /**
    * Checks for errors the ported kernel rules don't cover: missing/unresolved references between elements.
    * We use simple generic error messages instead of the kernel's own wording so that changes to that wording
-   * don't need to be integrated into this code.
+   * don't need to be integrated into this code — except {@link #INDEX_FIELD_INVALID_MESSAGE}, which is shown
+   * directly in the Group properties panel and is kept verbatim on purpose.
    */
   private static List<ValidationProblem> checkMissingErrors(DocumentModel model, List<DocumentModel> otherModels) {
     ElementIndex index = new ElementIndex(model);
@@ -125,9 +133,7 @@ public class DMValidationService {
               groupElement.getId(), "Include with path '" + groupPath + "': Missing Include Reference", Severity.ERROR));
         }
         if (hasMissingIndexField(groupElement, index)) {
-          String elementType = isInclude(groupElement, model) ? "Include" : "Group";
-          result.add(new ValidationProblem(
-              groupElement.getId(), elementType + " with path '" + groupPath + "': Missing Index Field", Severity.ERROR));
+          result.add(new ValidationProblem(groupElement.getId(), INDEX_FIELD_INVALID_MESSAGE, Severity.ERROR));
         }
         for (Element duplicate : getElementsWithDuplicatedNames(groupElement)) {
           result.add(new ValidationProblem(
@@ -150,11 +156,6 @@ public class DMValidationService {
       }
     }
     return result;
-  }
-
-  private static boolean isInclude(GroupElement groupElement, DocumentModel model) {
-    String alias = groupElement.getGroup().getModelAlias();
-    return alias != null && !alias.isBlank() && findIncludeReference(model, alias).isPresent();
   }
 
   private static Optional<ModelReference> findIncludeReference(DocumentModel model, String alias) {

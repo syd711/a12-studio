@@ -31,6 +31,7 @@
                                     <VBox spacing="3.0">
                                        <children>
                                                 <Button fx:id="previewSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPreviewSettings" styleClass="preference-button" text="Preview Settings" />
+                                                <Button fx:id="shortcutsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onShortcuts" styleClass="preference-button" text="Shortcuts" />
                                        </children>
                                     </VBox>
                                  </children>

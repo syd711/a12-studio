@@ -11,26 +11,29 @@ import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.dialogs.CategoryDialogController;
 import de.a12.studio.ui.events.LocalesChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -43,12 +46,12 @@ import java.util.function.Consumer;
 
 /**
  * Edits an {@link EnumerationFieldType}'s {@link EnumerationTypeOptions}: the list of {@link Category
- * categories}, the list of {@link EnumerationValue enumeration values} (with a per-locale text and a checkbox
- * per category to mark membership), and the alphabetical-sorting flag. Row/column structure (categories,
- * locales, values) is rebuilt from scratch on every structural change; individual text/checkbox edits are
- * committed via the usual {@link AbstractPropertyEditor#bindTextField}/{@link
- * AbstractPropertyEditor#bindCheckBox} debounced save. Pagination of the enumeration values list is
- * intentionally not implemented.
+ * categories} (each edited via a modal dialog for its name/description), the list of {@link EnumerationValue
+ * enumeration values} (with a per-locale text and, for every category, an editable combobox holding that
+ * value's category value), and the alphabetical-sorting flag. Row/column structure (categories, locales,
+ * values) is rebuilt from scratch on every structural change; individual text/combobox edits are committed via
+ * the usual {@link AbstractPropertyEditor#bindTextField}/{@link AbstractPropertyEditor#bindComboBox} debounced
+ * save. Pagination of the enumeration values list is intentionally not implemented.
  */
 public class DataTypeEnumerationConfigurationPanelController extends AbstractPropertyEditor implements Initializable, StudioEventListener {
 
@@ -62,7 +65,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
   private javafx.scene.control.Label enumerationValuesEmptyLabel;
 
   @FXML
-  private Button clearValuesButton;
+  private HBox buttonPanel;
 
   @FXML
   private CheckBox alphabeticalSortingCheckBox;
@@ -98,10 +101,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
 
   @FXML
   private void onAddCategory() {
-    withEnumerationTypeOptions(element, options -> options.getCategories().add(new Category()));
-    rebuildCategoryRows();
-    rebuildEnumerationValuesGrid();
-    commitChange();
+    openCategoryDialog(null);
   }
 
   private List<Category> getCategories() {
@@ -124,7 +124,12 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     nameLabel.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
-    HBox row = new HBox(10.0, nameLabel, createCategoryActionsBox(category, index, rowCount));
+    javafx.scene.control.Label descriptionLabel = new javafx.scene.control.Label(category.getDescription() == null ? "" : category.getDescription());
+    descriptionLabel.setId("category-description-" + index);
+    descriptionLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(descriptionLabel, Priority.ALWAYS);
+
+    HBox row = new HBox(10.0, nameLabel, descriptionLabel, createCategoryActionsBox(category, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
     return row;
@@ -144,17 +149,42 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
   }
 
   private void onEditCategory(Category category) {
-    TextInputDialog dialog = new TextInputDialog(category.getName() == null ? "" : category.getName());
-    dialog.initOwner(Studio.stage);
-    dialog.setTitle("Edit Category");
-    dialog.setHeaderText(null);
-    dialog.setContentText("Name:");
-    dialog.showAndWait().ifPresent(name -> {
-      category.setName(name.isEmpty() ? null : name);
-      rebuildCategoryRows();
-      rebuildEnumerationValuesGrid();
-      commitChange();
-    });
+    openCategoryDialog(category);
+  }
+
+  /**
+   * Opens the Add/Edit Category modal. {@code existing} is {@code null} when adding a new category, otherwise
+   * the category being edited in place.
+   */
+  private void openCategoryDialog(Category existing) {
+    String title = existing == null ? "Add Category" : "Edit Category";
+    FXMLLoader fxmlLoader = new FXMLLoader(CategoryDialogController.class.getResource("category-dialog.fxml"));
+    Stage stage = WidgetFactory.createDialogStage("category-dialog", fxmlLoader, Studio.stage, title);
+    CategoryDialogController controller = (CategoryDialogController) stage.getUserData();
+    controller.initDialog(stage, existing == null ? null : existing.getName(), existing == null ? null : existing.getDescription());
+    stage.showAndWait();
+
+    if (controller.getResult().isEmpty() || controller.getResult().get() != ButtonType.OK) {
+      return;
+    }
+    String name = controller.getName();
+    if (name == null || name.isBlank()) {
+      return;
+    }
+    String description = controller.getDescription();
+
+    if (existing == null) {
+      Category category = new Category();
+      category.setName(name);
+      category.setDescription(description == null || description.isEmpty() ? null : description);
+      withEnumerationTypeOptions(element, options -> options.getCategories().add(category));
+    } else {
+      existing.setName(name);
+      existing.setDescription(description == null || description.isEmpty() ? null : description);
+    }
+    rebuildCategoryRows();
+    rebuildEnumerationValuesGrid();
+    commitChange();
   }
 
   private void onDeleteCategory(Category category) {
@@ -201,21 +231,22 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     commitChange();
   }
 
-  @FXML
-  private void onClearValues() {
-    for (EnumerationValue value : getEnumerationValues()) {
-      value.getLabel().clear();
-    }
-    rebuildEnumerationValuesGrid();
-    commitChange();
-  }
-
   private void onDeleteValue(EnumerationValue value) {
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this enumeration value?", null, null, "Delete");
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }
+    int index = getEnumerationValues().indexOf(value);
     getEnumerationValues().remove(value);
+    if (index >= 0) {
+      // category values are aligned by index with the enumeration values list, so the removed value's slot
+      // has to be removed from every category as well to keep the remaining entries aligned.
+      for (Category category : getCategories()) {
+        if (index < category.getValues().size()) {
+          category.getValues().remove(index);
+        }
+      }
+    }
     rebuildEnumerationValuesGrid();
     commitChange();
   }
@@ -238,7 +269,8 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     enumerationValuesGrid.setManaged(!empty);
     enumerationValuesEmptyLabel.setVisible(empty);
     enumerationValuesEmptyLabel.setManaged(empty);
-    clearValuesButton.setDisable(empty);
+    buttonPanel.setVisible(!empty);
+    buttonPanel.setManaged(!empty);
 
     if (empty) {
       return;
@@ -257,10 +289,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
 
     for (Category category : categories) {
       addGridHeader(column, category.getName() == null ? "" : category.getName());
-      ColumnConstraints constraints = new ColumnConstraints();
-      constraints.setHalignment(HPos.CENTER);
-      constraints.setPrefWidth(90.0);
-      enumerationValuesGrid.getColumnConstraints().add(constraints);
+      addGrowingColumnConstraint();
       column++;
     }
 
@@ -272,6 +301,8 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
       EnumerationValue value = values.get(rowIndex);
       int gridRow = rowIndex + 1;
       int currentColumn = 0;
+      // captured by the combobox listeners below, since the loop variable itself isn't effectively final
+      final int valueIndex = rowIndex;
 
       TextField valueField = new TextField(value.getValue() == null ? "" : value.getValue());
       valueField.setId("enumvalue-" + rowIndex);
@@ -290,12 +321,14 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
       }
 
       for (Category category : categories) {
-        CheckBox checkBox = new CheckBox();
-        checkBox.setId("enumcategory-" + rowIndex + "-" + currentColumn);
-        setFieldValue(checkBox, value.getValue() != null && category.getValues().contains(value.getValue()));
-        bindCheckBox(checkBox, (element, checked) -> toggleCategoryMembership(category, value, checked));
-        GridPane.setHalignment(checkBox, HPos.CENTER);
-        enumerationValuesGrid.add(checkBox, currentColumn, gridRow);
+        ComboBox<String> categoryValueCombo = new ComboBox<>();
+        categoryValueCombo.setId("enumcategory-" + rowIndex + "-" + currentColumn);
+        categoryValueCombo.setEditable(true);
+        categoryValueCombo.setMaxWidth(Double.MAX_VALUE);
+        setComboBoxItems(categoryValueCombo, getDistinctCategoryValues(category));
+        setFieldValue(categoryValueCombo, getCategoryValue(category, valueIndex));
+        bindComboBox(categoryValueCombo, (element, newValue) -> setCategoryValue(category, valueIndex, newValue));
+        enumerationValuesGrid.add(categoryValueCombo, currentColumn, gridRow);
         currentColumn++;
       }
 
@@ -317,18 +350,35 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     enumerationValuesGrid.getColumnConstraints().add(constraints);
   }
 
-  private static void toggleCategoryMembership(Category category, EnumerationValue value, boolean checked) {
-    String code = value.getValue();
-    if (code == null || code.isEmpty()) {
-      return;
+  /**
+   * A category's {@code values} are aligned by index with the enumeration values list (i.e. entry {@code i}
+   * is the category value assigned to the {@code i}-th enumeration value), matching the SME reference
+   * implementation. Reads out of bounds (e.g. a value row added after the category) as an empty string.
+   */
+  private static String getCategoryValue(Category category, int valueIndex) {
+    List<String> values = category.getValues();
+    return valueIndex < values.size() ? values.get(valueIndex) : "";
+  }
+
+  private static void setCategoryValue(Category category, int valueIndex, String newValue) {
+    List<String> values = category.getValues();
+    while (values.size() <= valueIndex) {
+      values.add("");
     }
-    if (checked) {
-      if (!category.getValues().contains(code)) {
-        category.getValues().add(code);
-      }
-    } else {
-      category.getValues().remove(code);
-    }
+    values.set(valueIndex, newValue == null ? "" : newValue);
+  }
+
+  /**
+   * Items offered by a category value combobox: every distinct, non-blank value already entered for that
+   * category, matching the SME reference implementation's "Drop-Down Selection ... contains all already
+   * inserted enumeration values for this category".
+   */
+  private static List<String> getDistinctCategoryValues(Category category) {
+    return category.getValues().stream()
+        .filter(value -> value != null && !value.isEmpty())
+        .distinct()
+        .sorted()
+        .toList();
   }
 
   private static String getLabelText(EnumerationValue value, String localeCode) {

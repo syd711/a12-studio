@@ -14,7 +14,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
+<BorderPane styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.MenuBarController">
    <left>
       <HBox alignment="CENTER_LEFT" prefHeight="42.0" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
@@ -60,6 +61,14 @@
                 </graphic>
                 <tooltip>
                     <Tooltip text="Update available" />
+                </tooltip>
+            </Button>
+            <Button fx:id="searchBtn" accessibleText="Search Files" mnemonicParsing="false" onAction="#onSearch" styleClass="menu-bar-button">
+                <graphic>
+                    <FontIcon iconLiteral="mdi2m-magnify" iconSize="20" styleClass="toolbar-icon" />
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Search Files" />
                 </tooltip>
             </Button>
             <Button fx:id="claudeConsoleBtn" accessibleText="Claude Console" mnemonicParsing="false" onAction="#onOpenClaudeConsole" styleClass="menu-bar-button">

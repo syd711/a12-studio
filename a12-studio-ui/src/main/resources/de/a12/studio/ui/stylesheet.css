@@ -13,6 +13,7 @@
 @import "stylesheet-table-view.css";
 @import "stylesheet-titled-pane.css";
 @import "stylesheet-toolbar.css";
+@import "stylesheet-search-dialog.css";
 
 /**
  * Tooltips
@@ -253,6 +254,28 @@
 
 .ghost-button-default:hover {
     -fx-background-color: transparent;
+}
+
+.shortcuts-scroll,
+.shortcuts-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.shortcut-key {
+    -fx-font-family: monospace;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+    -fx-background-color: -fx-panel-color;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 3 8 3 8;
+}
+
+.shortcut-description {
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size: 14px;
 }
 
 /**

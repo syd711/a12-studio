@@ -1,0 +1,53 @@
+/**
+ * File Search Dialog (headerless "go to file" palette)
+ */
+.search-dialog-header {
+    -fx-background-color: -fx-surface-color;
+    -fx-background-radius: 6px 6px 0 0;
+    -fx-border-color: transparent transparent -fx-border-subtle transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.search-dialog-icon {
+    -fx-icon-color: -fx-text-faint;
+}
+
+.search-dialog-field,
+.search-dialog-field:focused {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+    -fx-font-size: 16px;
+    -fx-pref-height: 30px;
+}
+
+.search-dialog-results {
+    -fx-background-color: -fx-content-bg;
+    -fx-border-width: 0;
+}
+
+.search-dialog-results .list-cell {
+    -fx-padding: 6px 14px;
+    -fx-background-color: -fx-content-bg;
+}
+
+.search-dialog-results .list-cell:filled:selected,
+.search-dialog-results .list-cell:filled:selected:focused,
+.search-dialog-results .list-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+}
+
+.search-result-name {
+    -fx-text-fill: -fx-text-color;
+    -fx-font-size: 13.5px;
+}
+
+.search-result-path {
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size: 12px;
+}
+
+.search-dialog-results .list-cell:filled:selected .search-result-name,
+.search-dialog-results .list-cell:filled:selected .search-result-path {
+    -fx-text-fill: -fx-text-color-inverse;
+}

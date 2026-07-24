@@ -50,6 +50,10 @@ public class GroupPropertiesPanelController extends AbstractPropertyEditor imple
     setComboBoxItems(indexFieldComboBox, fieldNamesInGroup(config));
     setFieldValue(repetitionsField, config != null && config.getRepeatability() != null ? String.valueOf(config.getRepeatability()) : "");
     setFieldValue(indexFieldComboBox, config != null ? config.getIndexFieldName() : null);
+
+    // Reflects an index field that was deleted elsewhere in the tree (so this panel never ran its own
+    // commit/validate cycle for that change) as soon as this group is selected.
+    refreshValidationState();
   }
 
   private static List<String> fieldNamesInGroup(GroupConfig config) {

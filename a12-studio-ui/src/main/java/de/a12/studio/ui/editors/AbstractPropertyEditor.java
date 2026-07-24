@@ -337,6 +337,22 @@ abstract public class AbstractPropertyEditor implements Initializable {
     StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 
+  /**
+   * Re-validates the currently bound element against the model's current state and reflects the result in
+   * this panel's error container, without saving. Unlike {@link #commitChange}, this isn't triggered by an
+   * edit in one of this panel's own fields, so it's the right hook for subclasses that need to reflect
+   * validation problems caused by changes made elsewhere in the model (e.g. a field this element references
+   * having been deleted) as soon as the element is (re)selected — such changes don't otherwise run this
+   * panel's own commit/validate cycle. Call from {@link #setElement} after repopulating this panel's fields.
+   */
+  protected void refreshValidationState() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (element == null || projectItem == null) {
+      return;
+    }
+    showValidationError(validateElement(projectItem).orElse(null));
+  }
+
   private Optional<ElementValidationError> validateElement(@NonNull ProjectItem projectItem) {
     if (element == null || !(projectItem.getModel() instanceof DocumentModel documentModel)) {
       return Optional.empty();

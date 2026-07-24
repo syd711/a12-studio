@@ -1,5 +1,6 @@
 package de.a12.studio.ui;
 
+import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.newproject.NewProjectDialogController;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
@@ -214,6 +215,13 @@ public class MenuBarController implements Initializable, StudioEventListener {
   @FXML
   private void onPreferences() {
     StudioEventManager.getInstance().firePreferencesOpenRequestedEvent();
+  }
+
+  @FXML
+  private void onSearch() {
+    if (project != null) {
+      FileSearchDialogController.show(Studio.stage, project);
+    }
   }
 
   @FXML

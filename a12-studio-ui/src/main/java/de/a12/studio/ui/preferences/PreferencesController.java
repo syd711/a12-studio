@@ -31,6 +31,9 @@ public class PreferencesController implements Initializable {
   private Button previewSettingsBtn;
 
   @FXML
+  private Button shortcutsBtn;
+
+  @FXML
   private StackPane contentStack;
 
   @FXML
@@ -82,6 +85,11 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onPreviewSettings() {
     showPage(previewSettingsBtn, "preview-settings.fxml");
+  }
+
+  @FXML
+  private void onShortcuts() {
+    showPage(shortcutsBtn, "shortcuts-settings.fxml");
   }
 
   private void showPage(Button button, String fxml) {

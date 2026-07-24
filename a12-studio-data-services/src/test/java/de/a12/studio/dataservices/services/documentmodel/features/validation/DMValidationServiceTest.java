@@ -72,6 +72,18 @@ class DMValidationServiceTest {
   }
 
   @Test
+  void detectsIndexFieldDeleted() {
+    GroupElement group = newGroup("g1", "root");
+    group.getGroup().setIndexFieldName("name");
+    DocumentModel model = newModel(group);
+
+    List<ElementValidationError> errors = service.validateDocument(model, List.of());
+
+    assertTrue(errors.stream().anyMatch(
+        e -> "g1".equals(e.elementId()) && DMValidationService.INDEX_FIELD_INVALID_MESSAGE.equals(e.message())));
+  }
+
+  @Test
   void reportsMissingLocale() {
     DocumentModel model = newModel(newGroup("g1", "root", newField("f1", "name", null)));
     model.setLocales(List.of());

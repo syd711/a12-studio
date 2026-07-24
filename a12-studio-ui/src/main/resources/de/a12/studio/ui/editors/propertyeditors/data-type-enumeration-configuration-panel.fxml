@@ -10,15 +10,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="ENUMERATION TYPE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="CATEGORY" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeEnumerationConfigurationPanelController">
  <BorderPane>
  <center>
   <VBox spacing="14.0">
     <VBox spacing="8.0">
-      <Label styleClass="field-label" text="Category" />
       <HBox fx:id="categoryColumnHeaders" spacing="10.0">
         <Label styleClass="field-label" text="Name" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+        <Label styleClass="field-label" text="Description" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
       </HBox>
       <VBox fx:id="categoryRows" spacing="8.0" />
       <HBox spacing="8.0">
@@ -26,14 +26,13 @@
       </HBox>
     </VBox>
 
-    <TitledPane fx:id="enumerationValuesPane" maxWidth="Infinity" text="Enumeration Values">
+    <TitledPane fx:id="enumerationValuesPane" maxWidth="Infinity" text="ENUMERATION VALUES">
       <VBox spacing="10.0">
         <padding>
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </padding>
-        <HBox spacing="8.0">
+        <HBox spacing="8.0" fx:id="buttonPanel">
           <Button fx:id="fillEmptyTextsButton" mnemonicParsing="false" onAction="#onFillEmptyTexts" styleClass="secondary-button" text="Fill Empty Texts" />
-          <Button fx:id="clearValuesButton" mnemonicParsing="false" onAction="#onClearValues" styleClass="secondary-button" text="Clear Values" />
         </HBox>
         <GridPane fx:id="enumerationValuesGrid" hgap="10.0" vgap="6.0" />
         <Label fx:id="enumerationValuesEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />

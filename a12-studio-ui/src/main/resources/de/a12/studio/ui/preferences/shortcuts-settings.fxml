@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.ShortcutsSettingsController">
+    <top>
+        <VBox BorderPane.alignment="CENTER_LEFT">
+            <children>
+                <Label styleClass="preference-title" text="A12 STUDIO SETTINGS" />
+                <Label styleClass="preference-subtitle" text="Shortcuts" />
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="12.0" left="12.0" top="12.0" />
+            </BorderPane.margin>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="shortcuts-scroll" BorderPane.alignment="TOP_LEFT">
+            <content>
+                <GridPane fx:id="shortcutsGrid" hgap="16.0" vgap="10.0">
+                    <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="8.0" />
+                    </padding>
+                </GridPane>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
