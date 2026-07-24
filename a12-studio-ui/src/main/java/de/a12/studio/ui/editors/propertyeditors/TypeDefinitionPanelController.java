@@ -61,7 +61,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   // Order mirrors the field-type dropdown in the SME reference implementation (DomainField.json).
   private static final List<String> DATA_TYPES = List.of(
       TYPE_STRING, TYPE_NUMBER, TYPE_DATE, TYPE_DATE_TIME, TYPE_TIME, TYPE_DATE_FRAGMENT, TYPE_DATE_RANGE,
-      TYPE_CONFIRM, TYPE_BOOLEAN, TYPE_CUSTOM_FIELD, TYPE_ENUMERATION);
+      TYPE_CONFIRM, TYPE_BOOLEAN, TYPE_ENUMERATION);
 
   @FXML
   private ComboBox<String> dataTypeCombo;

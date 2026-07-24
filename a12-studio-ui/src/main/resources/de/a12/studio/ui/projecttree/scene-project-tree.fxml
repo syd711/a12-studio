@@ -54,8 +54,6 @@
                               <Tooltip text="Collapse all" />
                           </tooltip>
                       </Button>
-                      <Separator orientation="VERTICAL" />
-                      <fx:include fx:id="search" source="../components/search-field.fxml" />
                   </items>
               </ToolBar>
          </children>

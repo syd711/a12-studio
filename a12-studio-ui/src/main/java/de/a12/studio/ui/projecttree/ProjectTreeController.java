@@ -1,6 +1,5 @@
 package de.a12.studio.ui.projecttree;
 
-import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
@@ -39,20 +38,28 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private TreeView<ProjectItemViewModel> projectTree;
 
   @FXML
-  private SearchFieldController searchController;
-
-  @FXML
   private MenuButton newButton;
 
   private Project project;
   private ProjectItemViewModel rootViewModel;
   private ProjectTreeMenuActions menuFactory;
 
-  public void load(@NonNull Project project) {
-    this.project = project;
-    Map<String, List<ElementValidationError>> validationErrorsByPath = validateAllDocuments(project);
-    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
-    applyFilter(searchController.getText());
+  @FXML
+  private void onExpandAll() {
+    setExpandedRecursive(projectTree.getRoot(), true);
+  }
+
+  @FXML
+  private void onCollapseAll() {
+    setExpandedRecursive(projectTree.getRoot(), false);
+  }
+
+  @FXML
+  private void onReload() {
+    if (project != null) {
+      project.reload();
+      load(project);
+    }
   }
 
   /**
@@ -88,11 +95,20 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         String key = entry.getKey();
         List<ElementValidationError> errors = entry.getValue();
         for (ElementValidationError error : errors) {
-            log.error("[{}] {} Validation Issue: {}: {}", key, error.severity(), error.elementId(), error.message());
+          log.error("[{}] {} Validation Issue: {}: {}", key, error.severity(), error.elementId(), error.message());
         }
       }
     }
     return validationErrorsByPath;
+  }
+
+  public void load(@NonNull Project project) {
+    this.project = project;
+    Map<String, List<ElementValidationError>> validationErrorsByPath = validateAllDocuments(project);
+    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
+    TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
+    rootTreeItem.setExpanded(true);
+    projectTree.setRoot(rootTreeItem);
   }
 
   private void collectDocumentItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
@@ -103,61 +119,6 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
     else if (item.getModel() instanceof DocumentModel) {
       result.add(item);
-    }
-  }
-
-  private void applyFilter(String filter) {
-    if (rootViewModel == null) {
-      return;
-    }
-
-    String term = filter == null ? "" : filter.trim().toLowerCase();
-    TreeItem<ProjectItemViewModel> rootTreeItem = term.isEmpty()
-        ? toTreeItem(rootViewModel)
-        : toFilteredTreeItem(rootViewModel, term);
-
-    if (rootTreeItem == null) {
-      rootTreeItem = new TreeItem<>(rootViewModel);
-    }
-    rootTreeItem.setExpanded(true);
-    projectTree.setRoot(rootTreeItem);
-  }
-
-  private TreeItem<ProjectItemViewModel> toFilteredTreeItem(@NonNull ProjectItemViewModel viewModel, @NonNull String term) {
-    List<TreeItem<ProjectItemViewModel>> matchingChildren = new ArrayList<>();
-    for (ProjectItemViewModel child : viewModel.getChildren()) {
-      TreeItem<ProjectItemViewModel> filteredChild = toFilteredTreeItem(child, term);
-      if (filteredChild != null) {
-        matchingChildren.add(filteredChild);
-      }
-    }
-
-    boolean selfMatches = viewModel.getName().toLowerCase().contains(term);
-    if (!selfMatches && matchingChildren.isEmpty()) {
-      return null;
-    }
-
-    TreeItem<ProjectItemViewModel> treeItem = new TreeItem<>(viewModel);
-    treeItem.getChildren().addAll(matchingChildren);
-    treeItem.setExpanded(!matchingChildren.isEmpty());
-    return treeItem;
-  }
-
-  @FXML
-  private void onExpandAll() {
-    setExpandedRecursive(projectTree.getRoot(), true);
-  }
-
-  @FXML
-  private void onCollapseAll() {
-    setExpandedRecursive(projectTree.getRoot(), false);
-  }
-
-  @FXML
-  private void onReload() {
-    if (project != null) {
-      project.reload();
-      load(project);
     }
   }
 
@@ -203,10 +164,6 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   }
 
   private void revealItem(@NonNull ProjectItem item) {
-    if (!searchController.getText().isEmpty()) {
-      searchController.clear();
-    }
-
     TreeItem<ProjectItemViewModel> treeItem = findTreeItem(projectTree.getRoot(), item);
     if (treeItem == null) {
       return;
@@ -276,7 +233,6 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     folderItem.setOnAction(event -> onNewFolder());
     newButton.getItems().add(folderItem);
     StudioEventManager.getInstance().addListener(this);
-    searchController.setOnSearch(this::applyFilter);
     projectTree.setOnKeyPressed(event -> {
       TreeItem<ProjectItemViewModel> selected = projectTree.getSelectionModel().getSelectedItem();
       if (event.getCode() == KeyCode.ENTER) {

@@ -10,8 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelElementsTreeController">
+<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelElementsTreeController">
     <top>
         <ToolBar fx:id="modelTreeToolbarBar" styleClass="panel-toolbar" BorderPane.alignment="CENTER">
             <items>
@@ -32,7 +31,18 @@
                     </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL" />
-                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="primary-button" text="Add" />
+                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="secondary-button">
+               <graphic>
+                  <FontIcon iconLiteral="mdi2p-plus-circle-outline" iconSize="18" />
+               </graphic></MenuButton>
+                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteButton" styleClass="delete-button" text="Delete">
+                    <tooltip>
+                        <Tooltip text="Delete the selected element(s)" />
+                    </tooltip>
+                    <graphic>
+                        <FontIcon iconColor="#c0392b" iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
+                    </graphic>
+                </Button>
             <Separator layoutX="145.0" layoutY="10.0" orientation="VERTICAL" />
                 <fx:include fx:id="search" source="../../components/search-field.fxml" />
             </items>

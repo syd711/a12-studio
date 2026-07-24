@@ -1,26 +1,12 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.models.ModelType;
-import de.a12.studio.models.Label;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.ElementValidationError;
-import de.a12.studio.models.documentmodel.ComputationConfig;
-import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
-import de.a12.studio.models.documentmodel.EnumerationFieldType;
-import de.a12.studio.models.documentmodel.EnumerationTypeOptions;
-import de.a12.studio.models.documentmodel.EnumerationValue;
-import de.a12.studio.models.documentmodel.FieldConfig;
-import de.a12.studio.models.documentmodel.FieldElement;
-import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
-import de.a12.studio.models.documentmodel.NumberFieldType;
-import de.a12.studio.models.documentmodel.RequirednessConfig;
-import de.a12.studio.models.documentmodel.RuleConfig;
-import de.a12.studio.models.documentmodel.RuleElement;
-import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -34,6 +20,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -52,12 +39,10 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -74,17 +59,6 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private static final String TYPE_COLUMN_ID = "type";
 
-  private static final String ID_PREFIX_GROUP = "group";
-  private static final String ID_PREFIX_FIELD = "field";
-  private static final String ID_PREFIX_RULE = "rule";
-  private static final String ID_PREFIX_COMPUTATION = "computation";
-  private static final String ID_PREFIX_ATTACHMENT = "attachment";
-  private static final String ID_PREFIX_MULTI_SELECT = "multi-select";
-  private static final String ID_PREFIX_MULTI_SELECT_CHILD = "multiSelectChild";
-  private static final String ID_PREFIX_INCLUDE = "include";
-
-  private static final Random ID_RANDOM = new SecureRandom();
-
   @FXML
   private ToolBar modelTreeToolbarBar;
 
@@ -96,6 +70,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   @FXML
   private MenuButton modelTreeAddButton;
+
+  @FXML
+  private Button deleteButton;
 
   @FXML
   private SearchFieldController searchController;
@@ -303,70 +280,6 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return treeItem;
   }
 
-  @Override
-  public void initialize(URL url, ResourceBundle resourceBundle) {
-    modelTreeAddButton.setDisable(true);
-    updateUndoRedoState();
-    searchController.setOnSearch(this::applyFilter);
-
-    elementsTreeTable.setShowRoot(false);
-    elementsTreeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    elementsTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ElementViewModel>>() {
-      @Override
-      public void changed(ObservableValue<? extends TreeItem<ElementViewModel>> observable, TreeItem<ElementViewModel> oldValue, TreeItem<ElementViewModel> newValue) {
-        modelTreeAddButton.setDisable(newValue == null || isWithinFixedChildrenGroup(newValue.getValue().getElement()));
-      }
-    });
-    elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());
-    elementsTreeTable.setOnKeyPressed(event -> {
-      if (event.getCode() == KeyCode.DELETE) {
-        onDeleteKeyPressed();
-      }
-    });
-    elementsTreeTable.setRowFactory(treeTable -> new TreeTableRow<>() {
-      @Override
-      protected void updateItem(ElementViewModel item, boolean empty) {
-        super.updateItem(item, empty);
-        setContextMenu(empty || item == null || isWithinFixedChildrenGroup(item.getElement()) ? null : createContextMenu());
-        boolean fixedChildLeaf = !empty && item != null && hasFixedChildrenAncestor(item.getElement());
-        if (fixedChildLeaf) {
-          if (!getStyleClass().contains("fixed-child-row")) {
-            getStyleClass().add("fixed-child-row");
-          }
-        }
-        else {
-          getStyleClass().remove("fixed-child-row");
-        }
-      }
-    });
-    nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
-    nameColumn.setCellFactory(column -> new ElementNameTreeCell());
-
-
-    typeColumn.setCellValueFactory(param -> {
-      String type = param.getValue().getValue().getType();
-      if (type != null) {
-        type = type.replaceAll("Type", "");
-        if (type.equalsIgnoreCase("Rule")) {
-          type = "Validation Rule";
-        }
-      }
-
-      return new ReadOnlyStringWrapper(type);
-    });
-
-    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
-    applyColumnWidth(nameColumn, tableSettings, NAME_COLUMN_ID);
-    applyColumnWidth(typeColumn, tableSettings, TYPE_COLUMN_ID);
-
-    nameColumn.widthProperty().addListener((observable, oldValue, newValue) ->
-        saveColumnWidth(NAME_COLUMN_ID, newValue.doubleValue()));
-    typeColumn.widthProperty().addListener((observable, oldValue, newValue) ->
-        saveColumnWidth(TYPE_COLUMN_ID, newValue.doubleValue()));
-
-    modelTreeAddButton.getItems().addAll(createAddMenuItems());
-  }
-
   private ContextMenu createContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
     contextMenu.getItems().addAll(createElementMenuItems());
@@ -403,12 +316,25 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     items.add(createMenuItem("_Paste", Icons.PASTE));
     items.add(new SeparatorMenuItem());
     MenuItem deleteItem = createMenuItem("_Delete", Icons.TRASH);
-    deleteItem.setOnAction(event -> onDeleteModelItem());
+    deleteItem.setOnAction(event -> confirmAndDeleteSelection());
     items.add(deleteItem);
     return items;
   }
 
   private void onDeleteKeyPressed() {
+    confirmAndDeleteSelection();
+  }
+
+  @FXML
+  private void onDeleteButton() {
+    confirmAndDeleteSelection();
+  }
+
+  /**
+   * Always confirms before deleting, regardless of the entry point (toolbar button, context menu,
+   * Delete key), warning separately when child elements would be removed along with the selection.
+   */
+  private void confirmAndDeleteSelection() {
     List<TreeItem<ElementViewModel>> selection =
         new ArrayList<>(elementsTreeTable.getSelectionModel().getSelectedItems());
     if (selection.isEmpty()) {
@@ -416,12 +342,11 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     }
 
     boolean hasChildren = topLevelSelection(selection).stream().anyMatch(treeItem -> !treeItem.getChildren().isEmpty());
-    if (hasChildren) {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
-          "Delete the selected element(s)?", "Child elements will be deleted as well.", null, "Delete");
-      if (result.isEmpty() || result.get() != ButtonType.OK) {
-        return;
-      }
+    String help = hasChildren ? "Child elements will be deleted as well." : null;
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
+        "Delete the selected element(s)?", help, null, "Delete");
+    if (result.isEmpty() || result.get() != ButtonType.OK) {
+      return;
     }
 
     onDeleteModelItem();
@@ -480,13 +405,20 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private List<MenuItem> createAddMenuItems() {
     List<MenuItem> items = new ArrayList<>();
-    items.add(createAddMenuItem(createMenuItem("_Group", createGroupIcon()), this::newGroupElement));
-    items.add(createAddMenuItem(createMenuItem("_Field", Icons.ELEMENT_FIELD), this::newFieldElement));
-    items.add(createAddMenuItem(createMenuItem("_Validation Rule", Icons.ELEMENT_VALIDATION_RULE), this::newRuleElement));
-    items.add(createAddMenuItem(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION), this::newComputationElement));
-    items.add(createAddMenuItem(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT), this::newAttachmentElement));
-    items.add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT), this::newMultiSelectElement));
-    items.add(createAddMenuItem(createMenuItem("_Include", Icons.ELEMENT_INCLUDE), this::newIncludeElement));
+    items.add(createAddMenuItem(createMenuItem("_Group", createGroupIcon()),
+        siblings -> DocumentModelElementFactory.newGroupElement(siblings, modelRoot)));
+    items.add(createAddMenuItem(createMenuItem("_Field", Icons.ELEMENT_FIELD),
+        siblings -> DocumentModelElementFactory.newFieldElement(siblings, modelRoot)));
+    items.add(createAddMenuItem(createMenuItem("_Validation Rule", Icons.ELEMENT_VALIDATION_RULE),
+        siblings -> DocumentModelElementFactory.newRuleElement(siblings, modelRoot)));
+    items.add(createAddMenuItem(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION),
+        siblings -> DocumentModelElementFactory.newComputationElement(siblings, modelRoot)));
+    items.add(createAddMenuItem(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT),
+        siblings -> DocumentModelElementFactory.newAttachmentElement(siblings, modelRoot)));
+    items.add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT),
+        siblings -> DocumentModelElementFactory.newMultiSelectElement(siblings, modelRoot)));
+    items.add(createAddMenuItem(createMenuItem("_Include", Icons.ELEMENT_INCLUDE),
+        siblings -> DocumentModelElementFactory.newIncludeElement(siblings, modelRoot)));
     return items;
   }
 
@@ -507,6 +439,12 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     }
 
     Element newElement = elementFactory.apply(insertionPoint.siblings());
+    String name = promptElementName(newElement.getName());
+    if (name == null) {
+      return;
+    }
+    newElement.setName(name);
+
     commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), newElement, insertionPoint.index()));
 
     updateUndoRedoState();
@@ -516,12 +454,31 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   }
 
   /**
+   * Asks for the new element's name, pre-filled with the factory's auto-generated name, looping
+   * until the entered name is a valid whitespace-free filename or the user cancels.
+   */
+  private String promptElementName(@NonNull String defaultName) {
+    String name = defaultName;
+    while (true) {
+      name = WidgetFactory.showInputDialog(Studio.stage, "New Element", "Name", null, null, name);
+      if (name == null) {
+        return null;
+      }
+      name = name.trim();
+      if (FileUtils.isValidWindowsFilename(name)) {
+        return name;
+      }
+      WidgetFactory.showAlert(Studio.stage, "Please enter a valid name without whitespace.");
+    }
+  }
+
+  /**
    * Where a new element should land: as the last child of the selected group, or as a sibling
    * directly after the selected element if a non-group (leaf) element is selected.
    */
   private record InsertionPoint(List<Element> siblings, int index) {
-  }
 
+  }
   private InsertionPoint resolveInsertionPoint(@NonNull TreeItem<ElementViewModel> selectedItem) {
     Element selected = selectedItem.getValue().getElement();
     if (selected instanceof GroupElement groupElement && groupElement.getGroup() != null) {
@@ -554,224 +511,6 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     }
   }
 
-  private Element newGroupElement(@NonNull List<Element> siblings) {
-    GroupElement group = new GroupElement();
-    group.setId(generateId(ID_PREFIX_GROUP));
-    group.setName(uniqueName("Group", siblings));
-    GroupConfig config = new GroupConfig();
-    config.setRepeatability(1);
-    group.setGroup(config);
-    return group;
-  }
-
-  private Element newFieldElement(@NonNull List<Element> siblings) {
-    FieldElement field = new FieldElement();
-    field.setId(generateId(ID_PREFIX_FIELD));
-    field.setName(uniqueName("Field", siblings));
-    field.setField(newStringFieldConfig());
-    return field;
-  }
-
-  private Element newRuleElement(@NonNull List<Element> siblings) {
-    RuleElement rule = new RuleElement();
-    String id = generateId(ID_PREFIX_RULE);
-    rule.setId(id);
-    rule.setName(uniqueName("ValidationRule", siblings));
-    RuleConfig config = new RuleConfig();
-    config.setErrorCode("Error " + id);
-    rule.setRule(config);
-    return rule;
-  }
-
-  private Element newComputationElement(@NonNull List<Element> siblings) {
-    ComputationElement computation = new ComputationElement();
-    computation.setId(generateId(ID_PREFIX_COMPUTATION));
-    computation.setName(uniqueName("ComputationRule", siblings));
-    computation.setComputation(new ComputationConfig());
-    return computation;
-  }
-
-  /**
-   * A group with a fixed set of children (attachment). Field/rule names, error conditions and
-   * messages mirror what the kernel expects for the "attachment" usage type.
-   */
-  private Element newAttachmentElement(@NonNull List<Element> siblings) {
-    GroupElement attachment = new GroupElement();
-    attachment.setId(generateId(ID_PREFIX_ATTACHMENT));
-    attachment.setName(uniqueName("Attachment", siblings));
-    GroupConfig config = new GroupConfig();
-    config.setRepeatability(1);
-    config.setUsageType(GroupConfig.USAGE_TYPE_ATTACHMENT);
-    config.getElements().addAll(createAttachmentFixedChildren());
-    attachment.setGroup(config);
-    return attachment;
-  }
-
-  private List<Element> createAttachmentFixedChildren() {
-    List<Element> children = new ArrayList<>();
-    children.add(newFixedField("original_filename", newStringFieldConfig()));
-    children.add(newFixedField("internal_filename", newStringFieldConfig()));
-    children.add(newFixedField("content", newStringFieldConfig()));
-    children.add(newFixedField("attachment_id", newStringFieldConfig()));
-    children.add(newFixedField("size", newNumberFieldConfig()));
-    children.add(newFixedField("mime_type", newStringFieldConfig()));
-    children.add(newFixedField("category", newStringFieldConfig()));
-    children.add(newFixedField("description", newStringFieldConfig()));
-    children.add(newAttachmentRule("AttachmentInternalFilenameRequired", "../internal_filename",
-        "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
-        "Internal Error: Field $internal_filename$ of customType attachment is not filled."));
-    children.add(newAttachmentRule("AttachmentMimeTypeRequired", "../mime_type",
-        "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
-        "Internal Error: Field $mime_type$ of customType attachment is not filled."));
-    children.add(newAttachmentRule("AttachmentIdOrContentFilled", "../content",
-        "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
-        "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."));
-    children.add(newAttachmentRule("SizeOfContentFilled", "../content",
-        "FieldFilled(content) and FieldNotFilled(size)",
-        "Internal Error: If the content is filled, the size must be also filled."));
-    return children;
-  }
-
-  private RuleElement newAttachmentRule(@NonNull String name, @NonNull String errorEntityRelPath,
-                                         @NonNull String errorCondition, @NonNull String errorMessageText) {
-    RuleElement rule = new RuleElement();
-    String id = generateId(ID_PREFIX_RULE);
-    rule.setId(id);
-    rule.setName(name);
-    RuleConfig config = new RuleConfig();
-    config.setErrorEntityRelPath(errorEntityRelPath);
-    config.setErrorCode("Error " + id);
-    config.setErrorCondition(errorCondition);
-    config.setSeverity("ERROR");
-    config.getErrorMessage().add(newLabel("en", errorMessageText));
-    config.getErrorMessage().add(newLabel("de", errorMessageText));
-    rule.setRule(config);
-    return rule;
-  }
-
-  /**
-   * A group with a fixed single "value" enumeration child, forced to the maximum repeatability
-   * (999999) that the kernel treats as "unbounded" for the "multi-select" usage type.
-   */
-  private Element newMultiSelectElement(@NonNull List<Element> siblings) {
-    GroupElement multiSelect = new GroupElement();
-    multiSelect.setId(generateId(ID_PREFIX_MULTI_SELECT));
-    multiSelect.setName(uniqueName("New Multi-Select", siblings));
-    GroupConfig config = new GroupConfig();
-    config.setRepeatability(999_999);
-    config.setUsageType(GroupConfig.USAGE_TYPE_MULTI_SELECT);
-    config.getElements().add(newMultiSelectFixedChild());
-    multiSelect.setGroup(config);
-    return multiSelect;
-  }
-
-  private FieldElement newMultiSelectFixedChild() {
-    FieldElement field = new FieldElement();
-    field.setId(generateId(ID_PREFIX_MULTI_SELECT_CHILD));
-    field.setName("value");
-    FieldConfig config = new FieldConfig();
-    RequirednessConfig requirednessConfig = new RequirednessConfig();
-    requirednessConfig.setMode(RequirednessConfig.MODE_REQUIRED);
-    config.setRequirednessConfig(requirednessConfig);
-    EnumerationTypeOptions options = new EnumerationTypeOptions();
-    options.getValues().add(newEnumerationValue("key1"));
-    options.getValues().add(newEnumerationValue("key2"));
-    EnumerationFieldType fieldType = new EnumerationFieldType();
-    fieldType.setEnumerationType(options);
-    config.setFieldType(fieldType);
-    field.setField(config);
-    return field;
-  }
-
-  private EnumerationValue newEnumerationValue(@NonNull String value) {
-    EnumerationValue enumerationValue = new EnumerationValue();
-    enumerationValue.setValue(value);
-    return enumerationValue;
-  }
-
-  /**
-   * A group referencing another Document Model. The reference itself ({@code modelAlias}) has no
-   * picker in the UI yet, so it's left unset here, same as a plain group, until that reference can
-   * be assigned (surfaces as a "Missing Include Reference" validation error until then).
-   */
-  private Element newIncludeElement(@NonNull List<Element> siblings) {
-    GroupElement include = new GroupElement();
-    include.setId(generateId(ID_PREFIX_INCLUDE));
-    include.setName(uniqueName("New Include", siblings));
-    GroupConfig config = new GroupConfig();
-    config.setRepeatability(1);
-    include.setGroup(config);
-    return include;
-  }
-
-  private FieldElement newFixedField(@NonNull String name, @NonNull FieldConfig config) {
-    FieldElement field = new FieldElement();
-    field.setId(generateId(ID_PREFIX_FIELD));
-    field.setName(name);
-    field.setField(config);
-    return field;
-  }
-
-  private FieldConfig newStringFieldConfig() {
-    FieldConfig config = new FieldConfig();
-    config.setFieldType(new StringFieldType());
-    return config;
-  }
-
-  private FieldConfig newNumberFieldConfig() {
-    FieldConfig config = new FieldConfig();
-    config.setFieldType(new NumberFieldType());
-    return config;
-  }
-
-  private Label newLabel(@NonNull String locale, @NonNull String text) {
-    Label label = new Label();
-    label.setLocale(locale);
-    label.setText(text);
-    return label;
-  }
-
-  private String uniqueName(@NonNull String baseName, @NonNull List<Element> siblings) {
-    Set<String> usedNames = new HashSet<>();
-    for (Element sibling : siblings) {
-      usedNames.add(sibling.getName());
-    }
-    if (!usedNames.contains(baseName)) {
-      return baseName;
-    }
-    int suffix = 2;
-    while (usedNames.contains(baseName + "_" + suffix)) {
-      suffix++;
-    }
-    return baseName + "_" + suffix;
-  }
-
-  private String generateId(@NonNull String prefix) {
-    Set<String> usedIds = collectIds();
-    String id;
-    do {
-      id = prefix + "_" + String.format("%05x", ID_RANDOM.nextInt(0x100000));
-    } while (usedIds.contains(id));
-    return id;
-  }
-
-  private Set<String> collectIds() {
-    Set<String> ids = new HashSet<>();
-    for (GroupElement rootGroup : modelRoot.getRootGroups()) {
-      collectIds(rootGroup, ids);
-    }
-    return ids;
-  }
-
-  private void collectIds(@NonNull Element element, @NonNull Set<String> ids) {
-    ids.add(element.getId());
-    if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
-      for (Element child : groupElement.getGroup().getElements()) {
-        collectIds(child, ids);
-      }
-    }
-  }
-
   private MenuItem createMenuItem(@NonNull String text, @NonNull String icon) {
     MenuItem menuItem = new MenuItem(text);
     FontIcon fontIcon = WidgetFactory.createIcon(icon);
@@ -789,12 +528,6 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private Node createGroupIcon() {
     return WidgetFactory.createIcon(Icons.ELEMENT_GROUP);
-  }
-
-  private Node createPngIcon(@NonNull String path) {
-    Image image = new Image(getClass().getResourceAsStream(path),
-        WidgetFactory.DEFAULT_ICON_SIZE, WidgetFactory.DEFAULT_ICON_SIZE, true, true);
-    return new ImageView(image);
   }
 
   private void applyColumnWidth(@NonNull TreeTableColumn<ElementViewModel, String> column,
@@ -815,5 +548,71 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     }
     tableSettings.getColumnWith().put(columnId, width);
     tableSettings.save();
+  }
+
+  @Override
+  public void initialize(URL url, ResourceBundle resourceBundle) {
+    modelTreeAddButton.setDisable(true);
+    deleteButton.setDisable(true);
+    updateUndoRedoState();
+    searchController.setOnSearch(this::applyFilter);
+
+    elementsTreeTable.setShowRoot(false);
+    elementsTreeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    elementsTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ElementViewModel>>() {
+      @Override
+      public void changed(ObservableValue<? extends TreeItem<ElementViewModel>> observable, TreeItem<ElementViewModel> oldValue, TreeItem<ElementViewModel> newValue) {
+        modelTreeAddButton.setDisable(newValue == null || isWithinFixedChildrenGroup(newValue.getValue().getElement()));
+        deleteButton.setDisable(newValue == null);
+      }
+    });
+    elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());
+    elementsTreeTable.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.DELETE) {
+        onDeleteKeyPressed();
+      }
+    });
+    elementsTreeTable.setRowFactory(treeTable -> new TreeTableRow<>() {
+      @Override
+      protected void updateItem(ElementViewModel item, boolean empty) {
+        super.updateItem(item, empty);
+        setContextMenu(empty || item == null || isWithinFixedChildrenGroup(item.getElement()) ? null : createContextMenu());
+        boolean fixedChildLeaf = !empty && item != null && hasFixedChildrenAncestor(item.getElement());
+        if (fixedChildLeaf) {
+          if (!getStyleClass().contains("fixed-child-row")) {
+            getStyleClass().add("fixed-child-row");
+          }
+        }
+        else {
+          getStyleClass().remove("fixed-child-row");
+        }
+      }
+    });
+    nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
+    nameColumn.setCellFactory(column -> new ElementNameTreeCell());
+
+
+    typeColumn.setCellValueFactory(param -> {
+      String type = param.getValue().getValue().getType();
+      if (type != null) {
+        type = type.replaceAll("Type", "");
+        if (type.equalsIgnoreCase("Rule")) {
+          type = "Validation Rule";
+        }
+      }
+
+      return new ReadOnlyStringWrapper(type);
+    });
+
+    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
+    applyColumnWidth(nameColumn, tableSettings, NAME_COLUMN_ID);
+    applyColumnWidth(typeColumn, tableSettings, TYPE_COLUMN_ID);
+
+    nameColumn.widthProperty().addListener((observable, oldValue, newValue) ->
+        saveColumnWidth(NAME_COLUMN_ID, newValue.doubleValue()));
+    typeColumn.widthProperty().addListener((observable, oldValue, newValue) ->
+        saveColumnWidth(TYPE_COLUMN_ID, newValue.doubleValue()));
+
+    modelTreeAddButton.getItems().addAll(createAddMenuItems());
   }
 }
