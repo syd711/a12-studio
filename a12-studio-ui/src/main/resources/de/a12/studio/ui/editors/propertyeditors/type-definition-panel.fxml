@@ -29,7 +29,6 @@
                         </columnConstraints>
                         <VBox GridPane.columnSpan="4">
                             <children>
-                                <Label styleClass="field-label" text="Type Definition" />
                                 <HBox alignment="CENTER_LEFT" prefHeight="42.0" spacing="12.0">
                                     <children>
 

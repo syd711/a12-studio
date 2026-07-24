@@ -1,24 +1,45 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.models.Locale;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.HintList;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.StringTypeOptions;
+import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.dialogs.SuggestionsDialogController;
+import de.a12.studio.ui.events.LocalesChangedEvent;
+import de.a12.studio.ui.events.StudioEventListener;
+import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.Icons;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-public class DataTypeStringConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
+public class DataTypeStringConfigurationPanelController extends AbstractPropertyEditor implements Initializable, StudioEventListener {
 
   @FXML
   private TextField minLengthField;
@@ -35,9 +56,21 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
   @FXML
   private CheckBox alphabeticalSortingCheckBox;
 
+  @FXML
+  private HBox suggestionsColumnHeaders;
+
+  @FXML
+  private VBox suggestionsRows;
+
+  @FXML
+  private Label suggestionsEmptyLabel;
+
+  private ProjectItem projectItem;
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
+    StudioEventManager.getInstance().addListener(this);
 
     WidgetFactory.restrictToNumericInput(minLengthField);
     WidgetFactory.restrictToNumericInput(maxLengthField);
@@ -56,6 +89,7 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
   @Override
   public void setElement(@NonNull Element element) {
     super.setElement(element);
+    this.projectItem = Studio.getSelectedProjectItem();
 
     StringTypeOptions options = getStringFieldType(element).map(StringFieldType::getStringType).orElse(null);
     setFieldValue(minLengthField, options != null && options.getMinLength() != null ? String.valueOf(options.getMinLength()) : "");
@@ -63,6 +97,119 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     setFieldValue(patternField, options != null && options.getPattern() != null ? options.getPattern() : "");
     setFieldValue(lineBreaksCheckBox, options != null && Boolean.TRUE.equals(options.getLineBreaksPermitted()));
     setFieldValue(alphabeticalSortingCheckBox, options != null && Boolean.TRUE.equals(options.getAlphabeticalSorting()));
+    rebuildSuggestionsRows();
+  }
+
+  @Override
+  public void localesChanged(@NonNull LocalesChangedEvent event) {
+    if (event.getItem().equals(projectItem)) {
+      rebuildSuggestionsRows();
+    }
+  }
+
+  // ----- Suggestions -----
+
+  private void rebuildSuggestionsRows() {
+    suggestionsRows.getChildren().clear();
+
+    List<Locale> locales = getModelLocales();
+    boolean empty = locales.isEmpty();
+    suggestionsColumnHeaders.setVisible(!empty);
+    suggestionsColumnHeaders.setManaged(!empty);
+    suggestionsRows.setVisible(!empty);
+    suggestionsRows.setManaged(!empty);
+    suggestionsEmptyLabel.setVisible(empty);
+    suggestionsEmptyLabel.setManaged(empty);
+
+    for (Locale locale : locales) {
+      suggestionsRows.getChildren().add(createSuggestionsRow(locale));
+    }
+  }
+
+  private HBox createSuggestionsRow(Locale locale) {
+    Label localeLabel = new Label(locale.getCode());
+    localeLabel.setPrefWidth(80.0);
+
+    List<String> values = getSuggestionValues(locale.getCode());
+    Label valuesLabel = new Label(values.isEmpty() ? "" : String.join(", ", values));
+    valuesLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(valuesLabel, Priority.ALWAYS);
+
+    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> openSuggestionsDialog(locale));
+
+    HBox row = new HBox(10.0, localeLabel, valuesLabel, editButton);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("module-row");
+    row.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 2) {
+        openSuggestionsDialog(locale);
+      }
+    });
+    return row;
+  }
+
+  private void openSuggestionsDialog(Locale locale) {
+    FXMLLoader fxmlLoader = new FXMLLoader(SuggestionsDialogController.class.getResource("suggestions-dialog.fxml"));
+    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, Studio.stage, "Suggestions for Locale " + locale.getCode());
+    SuggestionsDialogController controller = (SuggestionsDialogController) stage.getUserData();
+    controller.initDialog(stage, getSuggestionValues(locale.getCode()));
+    stage.showAndWait();
+
+    if (controller.getResult().isEmpty() || controller.getResult().get() != ButtonType.OK) {
+      return;
+    }
+    List<String> newValues = controller.getValues();
+    withStringTypeOptions(element, options -> setSuggestionValues(options, locale.getCode(), newValues));
+    rebuildSuggestionsRows();
+    commitChange();
+  }
+
+  private List<String> getSuggestionValues(String localeCode) {
+    StringTypeOptions options = getStringFieldType(element).map(StringFieldType::getStringType).orElse(null);
+    if (options == null) {
+      return List.of();
+    }
+    return options.getHintList().stream()
+        .filter(hintList -> localeCode.equals(hintList.getLocale()))
+        .findFirst()
+        .map(HintList::getValues)
+        .orElse(List.of());
+  }
+
+  private static void setSuggestionValues(StringTypeOptions options, String localeCode, List<String> values) {
+    Optional<HintList> existing = options.getHintList().stream()
+        .filter(hintList -> localeCode.equals(hintList.getLocale()))
+        .findFirst();
+    if (values.isEmpty()) {
+      existing.ifPresent(options.getHintList()::remove);
+    } else if (existing.isPresent()) {
+      existing.get().setValues(values);
+    } else {
+      HintList hintList = new HintList();
+      hintList.setLocale(localeCode);
+      hintList.setValues(values);
+      options.getHintList().add(hintList);
+    }
+  }
+
+  private List<Locale> getModelLocales() {
+    if (projectItem == null || projectItem.getModel() == null) {
+      return List.of();
+    }
+    return projectItem.getModel().getLocales();
+  }
+
+  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
+    FontIcon icon = new FontIcon(iconLiteral);
+    icon.setIconSize(16);
+    icon.getStyleClass().add("toolbar-icon");
+
+    Button button = new Button();
+    button.getStyleClass().add("default-button");
+    button.setGraphic(icon);
+    button.setTooltip(new Tooltip(tooltip));
+    button.setOnAction(event -> action.run());
+    return button;
   }
 
   private static void withStringTypeOptions(Element element, Consumer<StringTypeOptions> mutator) {

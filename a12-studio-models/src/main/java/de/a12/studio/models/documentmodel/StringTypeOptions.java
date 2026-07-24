@@ -23,4 +23,6 @@ public class StringTypeOptions {
   private Boolean alphabeticalSorting;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> errorMessage = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<HintList> hintList = new ArrayList<>();
 }

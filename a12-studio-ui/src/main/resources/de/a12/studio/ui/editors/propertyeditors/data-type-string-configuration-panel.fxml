@@ -51,11 +51,16 @@
     </GridPane>
 
     <TitledPane fx:id="suggestionsPane" maxWidth="Infinity" text="SUGGESTIONS">
-      <VBox>
+      <VBox spacing="8.0">
         <padding>
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </padding>
-        <Label styleClass="placeholder-label" text="No suggestions available yet." />
+        <HBox fx:id="suggestionsColumnHeaders" spacing="10.0">
+          <Label styleClass="field-label" text="Locale" prefWidth="80.0" />
+          <Label styleClass="field-label" text="Suggestions" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+        </HBox>
+        <VBox fx:id="suggestionsRows" spacing="8.0" />
+        <Label fx:id="suggestionsEmptyLabel" styleClass="placeholder-label" text="No suggestions available yet." />
       </VBox>
                <VBox.margin>
                   <Insets left="-8.0" />

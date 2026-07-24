@@ -31,11 +31,11 @@
                     </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL" />
-                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="secondary-button">
+                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="secondary-button" text="Add">
                <graphic>
-                  <FontIcon iconLiteral="mdi2p-plus-circle-outline" iconSize="18" />
+                  <FontIcon iconLiteral="mdi2p-plus-circle-outline" iconSize="18" text="󰐙" />
                </graphic></MenuButton>
-                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteButton" styleClass="delete-button" text="Delete">
+                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteButton" styleClass="delete-button">
                     <tooltip>
                         <Tooltip text="Delete the selected element(s)" />
                     </tooltip>
