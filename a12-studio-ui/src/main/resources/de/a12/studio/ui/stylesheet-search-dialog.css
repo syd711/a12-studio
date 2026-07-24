@@ -1,9 +1,27 @@
 /**
  * File Search Dialog (headerless "go to file" palette)
  */
-.search-dialog-header {
+.search-dialog-tabs {
     -fx-background-color: -fx-surface-color;
     -fx-background-radius: 6px 6px 0 0;
+}
+
+.search-dialog-tab {
+    -fx-padding: 6px 10px;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -fx-text-muted;
+    -fx-border-color: transparent transparent transparent transparent;
+    -fx-border-width: 0 0 2px 0;
+    -fx-cursor: hand;
+}
+
+.search-dialog-tab:selected {
+    -fx-text-fill: -fx-text-color;
+    -fx-border-color: transparent transparent -fx-primary-color transparent;
+}
+
+.search-dialog-header {
+    -fx-background-color: -fx-surface-color;
     -fx-border-color: transparent transparent -fx-border-subtle transparent;
     -fx-border-width: 0 0 1px 0;
 }

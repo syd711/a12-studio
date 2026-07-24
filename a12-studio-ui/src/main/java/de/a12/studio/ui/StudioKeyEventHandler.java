@@ -30,7 +30,8 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut("Ctrl+Tab", "Select the next tab"),
       new Shortcut("Ctrl+Shift+Tab", "Select the previous tab"),
       new Shortcut("Ctrl+Alt+P", "Open Preferences"),
-      new Shortcut("Ctrl+Alt+N", "Search files"),
+      new Shortcut("Ctrl+Shift+N", "Search files"),
+      new Shortcut("Ctrl+Shift+F", "Find in files"),
       new Shortcut("Ctrl+Alt+U", "Show update info"),
       new Shortcut("Ctrl+Alt+H", "Resize window to 1920x1080"),
       new Shortcut("Ctrl+Alt+W", "Resize window to 2560x1440")
@@ -79,8 +80,12 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       StudioEventManager.getInstance().firePreferencesOpenRequestedEvent();
       ke.consume();
     }
-    else if (ke.getCode() == KeyCode.N && ke.isAltDown() && ke.isControlDown()) {
+    else if (ke.getCode() == KeyCode.N && ke.isShiftDown() && ke.isControlDown()) {
       FileSearchDialogController.show(stage, Studio.getCurrentProject());
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.F && ke.isShiftDown() && ke.isControlDown()) {
+      FileSearchDialogController.show(stage, Studio.getCurrentProject(), FileSearchDialogController.SearchMode.FIND_IN_FILES);
       ke.consume();
     }
   }

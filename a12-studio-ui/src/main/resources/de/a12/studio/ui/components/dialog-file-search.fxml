@@ -6,19 +6,33 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="640.0" prefHeight="440.0" prefWidth="640.0" styleClass="navigation-panel, search-dialog" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.FileSearchDialogController">
    <top>
-      <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="search-dialog-header" BorderPane.alignment="CENTER">
-         <padding>
-            <Insets bottom="10.0" left="14.0" right="14.0" top="12.0" />
-         </padding>
+      <VBox BorderPane.alignment="CENTER">
          <children>
-            <FontIcon iconLiteral="mdi2m-magnify" iconSize="20" styleClass="search-dialog-icon" />
-            <TextField fx:id="searchField" promptText="Search files..." styleClass="search-dialog-field" HBox.hgrow="ALWAYS" />
+            <HBox spacing="4.0" styleClass="search-dialog-tabs">
+               <padding>
+                  <Insets bottom="0.0" left="14.0" right="14.0" top="10.0" />
+               </padding>
+               <children>
+                  <Label fx:id="findFilesTab" styleClass="search-dialog-tab" text="Find Files" />
+                  <Label fx:id="findInFilesTab" styleClass="search-dialog-tab" text="Find in Files" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="search-dialog-header">
+               <padding>
+                  <Insets bottom="10.0" left="14.0" right="14.0" top="8.0" />
+               </padding>
+               <children>
+                  <FontIcon iconLiteral="mdi2m-magnify" iconSize="20" styleClass="search-dialog-icon" />
+                  <TextField fx:id="searchField" promptText="Search files..." styleClass="search-dialog-field" HBox.hgrow="ALWAYS" />
+               </children>
+            </HBox>
          </children>
-      </HBox>
+      </VBox>
    </top>
    <center>
       <ListView fx:id="resultsList" styleClass="search-dialog-results" BorderPane.alignment="CENTER" />
