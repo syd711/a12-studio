@@ -10,19 +10,18 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="PROPERTIES" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.GroupPropertiesPanelController">
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="PROPERTIES" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.GroupPropertiesPanelController">
  <BorderPane>
  <center>
   <GridPane hgap="10.0" vgap="8.0">
     <columnConstraints>
-      <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-      <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+      <ColumnConstraints hgrow="ALWAYS" percentWidth="30.0" />
+      <ColumnConstraints hgrow="ALWAYS" percentWidth="60.0" />
     </columnConstraints>
 
     <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
       <Label styleClass="field-label" text="Repetitions" />
-      <TextField fx:id="repetitionsField" />
+      <Spinner fx:id="repetitionsField" editable="true" maxWidth="Infinity" />
     </VBox>
     <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
       <Label styleClass="field-label" text="Index Field" />

@@ -47,7 +47,7 @@ public class GroupPropertiesPanelController extends AbstractPropertyEditor imple
     super.setElement(element);
 
     GroupConfig config = getGroupConfig(element).orElse(null);
-    indexFieldComboBox.getItems().setAll(fieldNamesInGroup(config));
+    setComboBoxItems(indexFieldComboBox, fieldNamesInGroup(config));
     setFieldValue(repetitionsField, config != null && config.getRepeatability() != null ? String.valueOf(config.getRepeatability()) : "");
     setFieldValue(indexFieldComboBox, config != null ? config.getIndexFieldName() : null);
   }

@@ -264,6 +264,24 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   /**
+   * Replaces a combo box's items without triggering the save/validation cycle registered by {@link
+   * #bindComboBox}. Property editors whose item list depends on the current element (instead of being fixed
+   * at panel construction) must use this (instead of {@code comboBox.getItems().setAll(...)}) whenever they
+   * repopulate it from the model, e.g. in {@link #setElement}: JavaFX resets a ComboBox's value to {@code null}
+   * when the backing items list is replaced and the previously selected item isn't found in the new content,
+   * and without this guard that spurious reset is indistinguishable from a user clearing the field, wiping out
+   * the model's actual value.
+   */
+  protected void setComboBoxItems(@NonNull ComboBox<String> comboBox, @NonNull List<String> items) {
+    updatingFromModel = true;
+    try {
+      comboBox.getItems().setAll(items);
+    } finally {
+      updatingFromModel = false;
+    }
+  }
+
+  /**
    * Same as {@link #bindTextField} but for a combo box's value.
    */
   protected void bindComboBox(@NonNull ComboBox<String> comboBox, @NonNull BiConsumer<Element, String> setter) {
