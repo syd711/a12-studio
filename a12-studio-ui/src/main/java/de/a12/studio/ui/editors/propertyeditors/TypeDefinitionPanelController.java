@@ -24,6 +24,9 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
@@ -98,6 +101,15 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
   private List<TypeDefinition> availableTypeDefinitions = List.of();
 
+  // Reflects the element's current FieldType, re-set whenever this panel changes it (i.e. via
+  // typeDefinitionCheckBox or dataTypeComboBox) so sibling panels (e.g. DataTypeConfigurationPanelController)
+  // can react and swap their own content without waiting for the next setElement() call.
+  private final ObjectProperty<FieldType> currentFieldType = new SimpleObjectProperty<>();
+
+  public ReadOnlyObjectProperty<FieldType> fieldTypeProperty() {
+    return currentFieldType;
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
@@ -157,8 +169,9 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
       if (value && dataTypeComboBox.getValue() == null) {
         setFieldValue(dataTypeComboBox, DATA_TYPES.get(0));
       }
-      withFieldConfig(element, field ->
-          field.setFieldType(value ? new TypeDefFieldType() : createFieldType(dataTypeComboBox.getValue())));
+      FieldType newFieldType = value ? new TypeDefFieldType() : createFieldType(dataTypeComboBox.getValue());
+      withFieldConfig(element, field -> field.setFieldType(newFieldType));
+      currentFieldType.set(newFieldType);
     });
     bindComboBox(dataTypeCombo, (element, value) -> withFieldConfig(element, field -> {
       if (field.getFieldType() instanceof TypeDefFieldType typeDefFieldType) {
@@ -171,7 +184,9 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
       }
       withFieldConfig(element, field -> {
         if (!(field.getFieldType() instanceof TypeDefFieldType)) {
-          field.setFieldType(createFieldType(value));
+          FieldType newFieldType = createFieldType(value);
+          field.setFieldType(newFieldType);
+          currentFieldType.set(newFieldType);
         }
       });
     });

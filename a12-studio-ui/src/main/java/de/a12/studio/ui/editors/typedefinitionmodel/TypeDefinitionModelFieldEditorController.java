@@ -25,16 +25,25 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
 
   private List<AbstractPropertyEditor> propertyEditors;
 
+  private Element element;
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     typeDefinitionController.setCustomTypeDisabled();
     typeDefinitionController.hideCheckboxesGrid();
+
+    typeDefinitionController.fieldTypeProperty().addListener((observable, oldValue, newValue) -> {
+      if (element != null) {
+        dataTypeConfigurationController.setElement(element);
+      }
+    });
 
     propertyEditors = List.of(generalInformationController, typeDefinitionController, dataTypeConfigurationController);
   }
 
   @Override
   public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
+    this.element = element;
     generalInformationController.setAncestors(ancestors);
     propertyEditors.forEach(propertyEditor -> propertyEditor.setElement(element));
   }

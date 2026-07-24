@@ -10,4 +10,8 @@ public class DateRangeFieldType extends FieldType {
 
   @JsonProperty("DateRangeType")
   private DateRangeTypeOptions dateRangeType = new DateRangeTypeOptions();
+
+  public DateRangeFieldType() {
+    setType("DateRangeType");
+  }
 }

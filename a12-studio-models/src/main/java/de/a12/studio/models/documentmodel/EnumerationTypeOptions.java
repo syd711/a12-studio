@@ -16,4 +16,6 @@ public class EnumerationTypeOptions {
   private List<EnumerationValue> values = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Category> categories = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean alphabeticalSorting;
 }

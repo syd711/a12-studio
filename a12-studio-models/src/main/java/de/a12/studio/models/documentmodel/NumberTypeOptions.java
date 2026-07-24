@@ -17,4 +17,7 @@ public class NumberTypeOptions {
   private Double maxValue;
   private String trait;
   private Boolean zeroNotAllowed;
+  private Boolean positivesOnly;
+  private Boolean leadingZerosAllowed;
+  private Integer maxIntegerDigits;
 }

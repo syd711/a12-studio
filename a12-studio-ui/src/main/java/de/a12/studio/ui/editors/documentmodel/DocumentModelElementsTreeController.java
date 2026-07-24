@@ -295,9 +295,11 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
     typeColumn.setCellValueFactory(param -> {
       String type = param.getValue().getValue().getType();
-      type = type.replaceAll("Type", "");
-      if (type.equalsIgnoreCase("Rule")) {
-        type = "Validation Rule";
+      if (type != null) {
+        type = type.replaceAll("Type", "");
+        if (type.equalsIgnoreCase("Rule")) {
+          type = "Validation Rule";
+        }
       }
 
       return new ReadOnlyStringWrapper(type);

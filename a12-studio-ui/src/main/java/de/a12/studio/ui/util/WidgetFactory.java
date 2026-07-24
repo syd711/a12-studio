@@ -277,6 +277,18 @@ public class WidgetFactory {
     textField.setTextFormatter(new TextFormatter<>(filter));
   }
 
+  /**
+   * Restricts a text field to decimal input, rejecting any keystroke that would result in a value other than
+   * an optionally negative, optionally fractional number (e.g. while it is being typed: "-", "-1", "1.").
+   */
+  public static void restrictToDecimalInput(TextField textField) {
+    UnaryOperator<TextFormatter.Change> filter = change -> {
+      String newText = change.getControlNewText();
+      return (newText.isEmpty() || newText.matches("-?\\d*\\.?\\d*")) ? change : null;
+    };
+    textField.setTextFormatter(new TextFormatter<>(filter));
+  }
+
   //---------------------------------------------
   // Stage / dialog infrastructure
 

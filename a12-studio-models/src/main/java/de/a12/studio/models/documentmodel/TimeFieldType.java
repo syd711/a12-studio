@@ -10,4 +10,8 @@ public class TimeFieldType extends FieldType {
 
   @JsonProperty("TimeType")
   private TimeTypeOptions timeType = new TimeTypeOptions();
+
+  public TimeFieldType() {
+    setType("TimeType");
+  }
 }

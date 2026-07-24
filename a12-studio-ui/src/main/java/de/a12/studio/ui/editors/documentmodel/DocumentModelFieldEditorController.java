@@ -50,6 +50,8 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
 
   private List<AbstractPropertyEditor> propertyEditors;
 
+  private Element element;
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     labelController.configureLabel();
@@ -61,6 +63,12 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
     errorMessages.managedProperty().bind(errorMessages.visibleProperty());
     errorMessages.visibleProperty().bind(dataTypeConfigurationController.patternProperty().isNotEmpty());
 
+    typeDefinitionController.fieldTypeProperty().addListener((observable, oldValue, newValue) -> {
+      if (element != null) {
+        dataTypeConfigurationController.setElement(element);
+      }
+    });
+
     propertyEditors = List.of(generalInformationController, typeDefinitionController, dataTypeConfigurationController, errorMessagesController,
         labelController, descriptionInternalController, descriptionExternalController,
         helperTextController, annotationsController);
@@ -68,6 +76,7 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
 
   @Override
   public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
+    this.element = element;
     generalInformationController.setAncestors(ancestors);
     boolean readOnly = isWithinAttachment(ancestors);
     propertyEditors.forEach(propertyEditor -> {

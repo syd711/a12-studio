@@ -12,4 +12,8 @@ public class UnspecifiedFieldType extends FieldType {
   @JsonProperty("UnspecifiedType")
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private UnspecifiedTypeOptions unspecifiedType;
+
+  public UnspecifiedFieldType() {
+    setType("UnspecifiedType");
+  }
 }

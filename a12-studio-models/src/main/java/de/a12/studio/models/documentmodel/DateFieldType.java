@@ -10,4 +10,8 @@ public class DateFieldType extends FieldType {
 
   @JsonProperty("DateType")
   private DateTypeOptions dateType = new DateTypeOptions();
+
+  public DateFieldType() {
+    setType("DateType");
+  }
 }

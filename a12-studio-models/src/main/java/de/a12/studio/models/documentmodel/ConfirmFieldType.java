@@ -12,4 +12,8 @@ public class ConfirmFieldType extends FieldType {
   @JsonProperty("ConfirmType")
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private ConfirmTypeOptions confirmType;
+
+  public ConfirmFieldType() {
+    setType("ConfirmType");
+  }
 }

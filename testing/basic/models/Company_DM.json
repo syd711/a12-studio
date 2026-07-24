@@ -70,7 +70,7 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType"
+                          "type": "BooleanType"
                         },
                         "label": [
                           {

@@ -10,4 +10,8 @@ public class TypeDefFieldType extends FieldType {
 
   @JsonProperty("TypeDefType")
   private TypeDefTypeOptions typeDefType = new TypeDefTypeOptions();
+
+  public TypeDefFieldType() {
+    setType("TypeDefType");
+  }
 }

@@ -10,4 +10,8 @@ public class EnumerationFieldType extends FieldType {
 
   @JsonProperty("EnumerationType")
   private EnumerationTypeOptions enumerationType;
+
+  public EnumerationFieldType() {
+    setType("EnumerationType");
+  }
 }

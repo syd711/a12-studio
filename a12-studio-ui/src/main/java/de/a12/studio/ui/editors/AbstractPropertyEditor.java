@@ -90,6 +90,16 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   /**
+   * Shows or hides this panel's whole {@link TitledPane}, e.g. for panels that only make sense for some
+   * field types and would otherwise render as an empty, title-only pane. {@code setManaged} is toggled
+   * alongside {@code setVisible} so the hidden pane doesn't still reserve layout space.
+   */
+  protected void setEditorVisible(boolean visible) {
+    root.setVisible(visible);
+    root.setManaged(visible);
+  }
+
+  /**
    * Reflects whether this panel is currently showing an error in its own error container, so an owning
    * dialog that embeds several panels can observe and aggregate their error state into its own, dialog-level
    * error container.

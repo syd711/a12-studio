@@ -12,4 +12,8 @@ public class NumberFieldType extends FieldType {
   @JsonProperty("NumberType")
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private NumberTypeOptions numberType;
+
+  public NumberFieldType() {
+    setType("NumberType");
+  }
 }

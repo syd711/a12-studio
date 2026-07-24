@@ -12,4 +12,8 @@ public class StringFieldType extends FieldType {
   @JsonProperty("StringType")
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private StringTypeOptions stringType;
+
+  public StringFieldType() {
+    setType("StringType");
+  }
 }

@@ -10,4 +10,8 @@ public class CustomFieldFieldType extends FieldType {
 
   @JsonProperty("CustomFieldType")
   private CustomFieldTypeOptions customFieldType = new CustomFieldTypeOptions();
+
+  public CustomFieldFieldType() {
+    setType("CustomFieldType");
+  }
 }

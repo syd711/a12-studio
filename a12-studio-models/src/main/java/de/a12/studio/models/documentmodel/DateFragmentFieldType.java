@@ -10,4 +10,8 @@ public class DateFragmentFieldType extends FieldType {
 
   @JsonProperty("DateFragmentType")
   private DateFragmentTypeOptions dateFragmentType = new DateFragmentTypeOptions();
+
+  public DateFragmentFieldType() {
+    setType("DateFragmentType");
+  }
 }
