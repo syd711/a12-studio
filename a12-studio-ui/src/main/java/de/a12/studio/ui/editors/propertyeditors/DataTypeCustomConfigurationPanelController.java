@@ -9,6 +9,7 @@ import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -30,9 +31,14 @@ public class DataTypeCustomConfigurationPanelController extends AbstractProperty
   @FXML
   private TextField maxLengthField;
 
+  @FXML
+  private GridPane lengthGrid;
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
+
+    lengthGrid.managedProperty().bindBidirectional(lengthGrid.visibleProperty());
 
     WidgetFactory.restrictToNumericInput(minLengthField);
     WidgetFactory.restrictToNumericInput(maxLengthField);
@@ -41,6 +47,15 @@ public class DataTypeCustomConfigurationPanelController extends AbstractProperty
     bindTextField(displayNameField, (element, value) -> withCustomFieldTypeOptions(element, options -> options.setDisplayName(value.isEmpty() ? null : value)));
     bindTextField(minLengthField, (element, value) -> withCustomFieldTypeOptions(element, options -> options.setMinLength(parseInteger(value))));
     bindTextField(maxLengthField, (element, value) -> withCustomFieldTypeOptions(element, options -> options.setMaxLength(parseInteger(value))));
+  }
+
+  /**
+   * Min./Max. Length constrain the runtime value entered for the custom field, which has no equivalent when
+   * this panel configures a {@link de.a12.studio.models.documentmodel.TypeDefinition} itself, so the type
+   * definition editor hides this section entirely.
+   */
+  public void hideLengthGrid() {
+    lengthGrid.setVisible(false);
   }
 
   @Override

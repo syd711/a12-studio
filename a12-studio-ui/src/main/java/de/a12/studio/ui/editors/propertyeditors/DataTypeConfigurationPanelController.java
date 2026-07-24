@@ -121,6 +121,10 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     return stringConfigurationController.patternProperty();
   }
 
+  public void hideCustomLengthGrid() {
+    customConfigurationController.hideLengthGrid();
+  }
+
   @Override
   public void setElement(@NonNull Element element) {
     super.setElement(element);

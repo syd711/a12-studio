@@ -31,6 +31,7 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
   public void initialize(URL url, ResourceBundle resourceBundle) {
     typeDefinitionController.setCustomTypeDisabled();
     typeDefinitionController.hideCheckboxesGrid();
+    dataTypeConfigurationController.hideCustomLengthGrid();
 
     typeDefinitionController.fieldTypeProperty().addListener((observable, oldValue, newValue) -> {
       if (element != null) {
