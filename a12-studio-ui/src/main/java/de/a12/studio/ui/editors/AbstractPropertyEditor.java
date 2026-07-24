@@ -374,11 +374,21 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   private void showValidationError(ElementValidationError error) {
-    if (error == null) {
+    if (error == null || suppressErrorContainer()) {
       errorContainerController.hide();
     } else {
       errorContainerController.show(error.severity(), error.message());
     }
+  }
+
+  /**
+   * Lets a subclass keep its own error container permanently hidden, even when a validation error is found
+   * for the bound element. Useful for panels (e.g. the annotations one) whose fields aren't themselves the
+   * source of the element-level errors surfaced by {@link #commitChange}, so showing them here would be
+   * misleading. Field-level error styling (the "error" pseudo-class) is unaffected.
+   */
+  protected boolean suppressErrorContainer() {
+    return false;
   }
 
   /**

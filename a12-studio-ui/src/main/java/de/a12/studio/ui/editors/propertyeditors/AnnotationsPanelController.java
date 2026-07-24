@@ -59,6 +59,13 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   // the rows) can still refresh every row's suggestions once the registry changes.
   private final List<ComboBox<String>> nameFields = new ArrayList<>();
 
+  // Editing an annotation revalidates the whole element, so any error surfaced here would typically be
+  // about some unrelated field rather than the annotation itself; showing it in this panel is misleading.
+  @Override
+  protected boolean suppressErrorContainer() {
+    return true;
+  }
+
   @Override
   public void setElement(@NonNull Element element) {
     this.model = null;
