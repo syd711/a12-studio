@@ -8,6 +8,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
+import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
@@ -35,6 +36,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   private static final String FIELD_EDITOR_FXML = "document-model-field-editor.fxml";
   private static final String GROUP_EDITOR_FXML = "document-model-group-editor.fxml";
+  private static final String VALIDATION_RULE_EDITOR_FXML = "document-model-validation-rule-editor.fxml";
 
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
@@ -101,7 +103,16 @@ public class DocumentModelEditorController extends AbstractEditorController impl
     }
 
     Element selected = selectedElements.get(0);
-    String editorFxml = selected instanceof GroupElement ? GROUP_EDITOR_FXML : FIELD_EDITOR_FXML;
+    String editorFxml;
+    if (selected instanceof GroupElement) {
+      editorFxml = GROUP_EDITOR_FXML;
+    }
+    else if (selected instanceof RuleElement) {
+      editorFxml = VALIDATION_RULE_EDITOR_FXML;
+    }
+    else {
+      editorFxml = FIELD_EDITOR_FXML;
+    }
     Node node = loadEditor(editorFxml, selected);
     editorContainer.setCenter(node);
   }

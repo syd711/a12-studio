@@ -28,11 +28,11 @@ public class DataTypeDateRangeConfigurationPanelController extends AbstractPrope
 
   private static final Map<String, String> FORMAT_LABELS = new LinkedHashMap<>();
   static {
-    FORMAT_LABELS.put(FORMAT_YEAR, "Only Year (" + FORMAT_YEAR + ")");
-    FORMAT_LABELS.put(FORMAT_MONTH, "Only Month (" + FORMAT_MONTH + ")");
-    FORMAT_LABELS.put(FORMAT_DAY_MONTH_YEAR, "Day, Month and Year (" + FORMAT_DAY_MONTH_YEAR + ")");
-    FORMAT_LABELS.put(FORMAT_MONTH_YEAR, "Only Month and Year (" + FORMAT_MONTH_YEAR + ")");
-    FORMAT_LABELS.put(FORMAT_DAY_MONTH, "Only Day and Month (" + FORMAT_DAY_MONTH + ")");
+    FORMAT_LABELS.put(FORMAT_YEAR, "Only Year (" + FORMAT_YEAR + "/" + FORMAT_YEAR + ")");
+    FORMAT_LABELS.put(FORMAT_MONTH, "Only Month (" + FORMAT_MONTH + "/" + FORMAT_MONTH + ")");
+    FORMAT_LABELS.put(FORMAT_DAY_MONTH_YEAR, "Day, Month and Year (" + FORMAT_DAY_MONTH_YEAR + "/" + FORMAT_DAY_MONTH_YEAR + ")");
+    FORMAT_LABELS.put(FORMAT_MONTH_YEAR, "Only Month and Year (" + FORMAT_MONTH_YEAR + "/" + FORMAT_MONTH_YEAR + ")");
+    FORMAT_LABELS.put(FORMAT_DAY_MONTH, "Only Day and Month (" + FORMAT_DAY_MONTH + "/" + FORMAT_DAY_MONTH + ")");
   }
 
   @FXML
