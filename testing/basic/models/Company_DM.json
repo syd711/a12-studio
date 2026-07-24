@@ -84,7 +84,8 @@
                         ],
                         "requirednessConfig": {
                           "mode": "absoluteOrRelativeToNextRepAncestor"
-                        }
+                        },
+                        "global": true
                       }
                     },
                     {
@@ -358,6 +359,25 @@
                             }
                           }
                         ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_a5e1d",
+                      "name": "Field",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_7a6b8",
+                      "name": "Group",
+                      "Group": {
+                        "repeatability": 1,
+                        "elements": []
                       }
                     }
                   ]

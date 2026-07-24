@@ -280,9 +280,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return treeItem;
   }
 
-  private ContextMenu createContextMenu() {
+  private ContextMenu createContextMenu(@NonNull Element element) {
     ContextMenu contextMenu = new ContextMenu();
-    contextMenu.getItems().addAll(createElementMenuItems());
+    contextMenu.getItems().addAll(createElementMenuItems(element));
     return contextMenu;
   }
 
@@ -307,10 +307,12 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return false;
   }
 
-  private List<MenuItem> createElementMenuItems() {
+  private List<MenuItem> createElementMenuItems(@NonNull Element element) {
     List<MenuItem> items = new ArrayList<>();
-    items.addAll(createAddMenuItems());
-    items.add(new SeparatorMenuItem());
+    if (!new ElementViewModel(element).hasFixedChildren()) {
+      items.addAll(createAddMenuItems());
+      items.add(new SeparatorMenuItem());
+    }
     items.add(createMenuItem("_Cut", Icons.CUT));
     items.add(createMenuItem("Cop_y", Icons.COPY));
     items.add(createMenuItem("_Paste", Icons.PASTE));
@@ -576,7 +578,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       @Override
       protected void updateItem(ElementViewModel item, boolean empty) {
         super.updateItem(item, empty);
-        setContextMenu(empty || item == null || isWithinFixedChildrenGroup(item.getElement()) ? null : createContextMenu());
+        setContextMenu(empty || item == null || hasFixedChildrenAncestor(item.getElement())
+            ? null : createContextMenu(item.getElement()));
         boolean fixedChildLeaf = !empty && item != null && hasFixedChildrenAncestor(item.getElement());
         if (fixedChildLeaf) {
           if (!getStyleClass().contains("fixed-child-row")) {

@@ -124,14 +124,17 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     nameLabel.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
-    javafx.scene.control.Label descriptionLabel = new javafx.scene.control.Label(category.getDescription() == null ? "" : category.getDescription());
-    descriptionLabel.setId("category-description-" + index);
-    descriptionLabel.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(descriptionLabel, Priority.ALWAYS);
-
-    HBox row = new HBox(10.0, nameLabel, descriptionLabel, createCategoryActionsBox(category, index, rowCount));
+    HBox row = new HBox(10.0, nameLabel, createCategoryActionsBox(category, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
+    if (category.getDescription() != null && !category.getDescription().isEmpty()) {
+      Tooltip.install(row, new Tooltip(category.getDescription()));
+    }
+    nameLabel.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 2) {
+        onEditCategory(category);
+      }
+    });
     return row;
   }
 
