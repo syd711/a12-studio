@@ -15,35 +15,25 @@ split into `core`, `modules` [one per model type], `app`, `a12Extension`, `packa
 desktop app.
 
 **Key insight:** SME's backend is not a distinct architectural layer conceptually — it's a thin REST wrapper around
-proprietary A12 kernel libraries (`com.mgmtp.a12.kernel:*`, `com.mgmtp.a12.tdg:*`, `com.mgmtp.a12.print:*`). It has
+the A12 kernel libraries (`com.mgmtp.a12.kernel:*`, `com.mgmtp.a12.tdg:*`, `com.mgmtp.a12.print:*`). It has
 no database, no file persistence, no session state; every endpoint takes model JSON in and returns a computed
 result. File load/save is purely a frontend/Electron filesystem concern.
 
-a12-studio, being a single JVM desktop app (JavaFX-based UI, no Electron/Node split), pulls in **the same kernel
-libraries directly** as dependencies of `a12-studio-data-services` rather than going through a REST hop. This was
-confirmed by comparing `ValidationRuleService.java` (a12-studio) against SME's `ValidationRuleController.kt` — both
-call the identical kernel API (`DocumentModelService().hasValidConditionText(...)`). **The correct porting strategy
-is therefore "call the same kernel APIs SME's backend calls, in-process" — not "reimplement SME's REST endpoints."**
-
-Current kernel/print dependencies in `a12-studio-data-services/build.gradle`:
-
-```
-com.mgmtp.a12.kernel:kernel-md-facade:30.8.1
-com.mgmtp.a12.base:base-model-consistency:29.3.0
-com.mgmtp.a12.kernel:kernel-md-join:30.8.1                    (additive document model)
-com.mgmtp.a12.kernel:kernel-md-combination-model:30.8.1
-com.mgmtp.a12.kernel:kernel-md-structuralmapping-tool:30.8.1
-com.mgmtp.a12.kernel:kernel-md-datatransfer-codegen:30.8.1
-com.mgmtp.a12.kernel:kernel-md-model-migration:30.8.1
-com.mgmtp.a12.base:base-model-migration-api:29.3.0
-com.mgmtp.a12.dataservices:dataservices-core-metadata:38.4.2
-com.mgmtp.a12.print:print-engine-api:3.2.3
-com.mgmtp.a12.print:print-engine-runtime:3.2.3
-com.mgmtp.a12.print:print-typesetting:3.2.3
-```
-
-**Notably absent:** `com.mgmtp.a12.tdg` (the constraint-solver library behind SME's "rule contradiction" check —
-see below) and any form-model kernel library.
+**a12-studio does not depend on the kernel.** `a12-studio-data-services/build.gradle` has no kernel/print/base
+dependencies today — only `project(':a12-studio-models')` plus test libraries. An earlier version of this doc
+claimed a12-studio "pulls in the same kernel libraries directly" and listed specific coordinates as already present;
+that was never actually true (no such `build.gradle` entries exist in git history, and there is no
+`ValidationRuleService.java` in this repo). The kernel's Community-edition artifacts (e.g. `kernel-md-facade`,
+`kernel-md-model`) are in fact anonymously downloadable from `artifacts.geta12.com` — dual-licensed EUPL-1.2/commercial,
+same as this repo's own `LICENSE` — so an in-process kernel dependency is a legally and technically viable path, not
+a blocked one. But taking it is a real architectural decision (large transitive dependency footprint; turns
+a12-studio from an independent reimplementation into a kernel wrapper for whatever slice uses it), so it hasn't been
+taken. The strategy actually in use is a **clean-room, data-driven port**: read the same JSON rule definitions the
+kernel/SME ship (e.g. `client/resources/models/documentModel/Domain*.json`) and evaluate them with a
+purpose-built interpreter in `a12-studio-data-services`, rather than either reimplementing SME's REST endpoints or
+depending on the real kernel jars. See `DocumentModelConsistencyRules.java` for the (currently hand-ported, not yet
+data-driven) document-model-level rules, and the planned meta-model validation rule engine (below) for the much
+larger family of field/group/rule/computation config-validation rules SME's `Domain*.json` files define.
 
 ---
 

@@ -66,8 +66,20 @@ public class DataTypeDateRangeConfigurationPanelController extends AbstractPrope
   public void setElement(@NonNull Element element) {
     super.setElement(element);
 
-    DateRangeTypeOptions options = getDateRangeFieldType(element).map(DateRangeFieldType::getDateRangeType).orElse(null);
-    setFieldValue(formatComboBox, options != null ? options.getFormat() : null);
+    Optional<DateRangeFieldType> dateRangeFieldType = getDateRangeFieldType(element);
+    DateRangeTypeOptions options = dateRangeFieldType.map(DateRangeFieldType::getDateRangeType).orElse(null);
+    String format = options != null ? options.getFormat() : null;
+
+    // A date range without a format is invalid, so default to the first format option as soon as the
+    // field is selected instead of leaving the combo box blank until the user manually picks one.
+    if (dateRangeFieldType.isPresent() && (format == null || format.isEmpty())) {
+      format = FORMAT_LABELS.keySet().iterator().next();
+      String defaultFormat = format;
+      withDateRangeTypeOptions(element, o -> o.setFormat(defaultFormat));
+      commitChange();
+    }
+
+    setFieldValue(formatComboBox, format);
   }
 
   private static void withDateRangeTypeOptions(Element element, Consumer<DateRangeTypeOptions> mutator) {

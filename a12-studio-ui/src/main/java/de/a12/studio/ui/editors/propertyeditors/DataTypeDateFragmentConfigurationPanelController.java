@@ -64,8 +64,20 @@ public class DataTypeDateFragmentConfigurationPanelController extends AbstractPr
   public void setElement(@NonNull Element element) {
     super.setElement(element);
 
-    DateFragmentTypeOptions options = getDateFragmentFieldType(element).map(DateFragmentFieldType::getDateFragmentType).orElse(null);
-    setFieldValue(formatComboBox, options != null ? options.getFormatOfFragment() : null);
+    Optional<DateFragmentFieldType> dateFragmentFieldType = getDateFragmentFieldType(element);
+    DateFragmentTypeOptions options = dateFragmentFieldType.map(DateFragmentFieldType::getDateFragmentType).orElse(null);
+    String format = options != null ? options.getFormatOfFragment() : null;
+
+    // A date fragment without a format is invalid, so default to the first format option as soon as the
+    // field is selected instead of leaving the combo box blank until the user manually picks one.
+    if (dateFragmentFieldType.isPresent() && (format == null || format.isEmpty())) {
+      format = FORMAT_LABELS.keySet().iterator().next();
+      String defaultFormat = format;
+      withDateFragmentTypeOptions(element, o -> o.setFormatOfFragment(defaultFormat));
+      commitChange();
+    }
+
+    setFieldValue(formatComboBox, format);
   }
 
   private static void withDateFragmentTypeOptions(Element element, Consumer<DateFragmentTypeOptions> mutator) {

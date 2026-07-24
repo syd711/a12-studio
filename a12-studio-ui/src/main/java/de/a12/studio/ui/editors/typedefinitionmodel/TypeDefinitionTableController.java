@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
+import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -130,9 +131,20 @@ public class TypeDefinitionTableController implements Initializable {
 
   @FXML
   private void onAdd() {
+    String name = WidgetFactory.showInputDialog(Studio.stage, "New Type", "Name", null, null, uniqueName(DEFAULT_NAME));
+    if (name == null) {
+      return;
+    }
+
+    name = name.trim();
+    if (!FileUtils.isValidWindowsFilename(name)) {
+      WidgetFactory.showAlert(Studio.stage, "Invalid name", "The name must be a valid filename and must not contain whitespace.");
+      return;
+    }
+
     TypeDefinition typeDefinition = new TypeDefinition();
     typeDefinition.setId(generateId());
-    typeDefinition.setName(uniqueName(DEFAULT_NAME));
+    typeDefinition.setName(name);
     typeDefinition.setFieldType(new StringFieldType());
 
     typeDefinitions.add(typeDefinition);
@@ -162,7 +174,19 @@ public class TypeDefinitionTableController implements Initializable {
     List<TypeDefinition> itemsToDelete = selectedItems.size() > 1 && selectedItems.contains(row.getItem())
         ? selectedItems
         : List.of(row.getItem());
+    deleteTypeDefinitions(itemsToDelete);
+  }
 
+  @FXML
+  private void onDelete() {
+    List<TypeDefinition> selectedItems = List.copyOf(typeDefinitionsTable.getSelectionModel().getSelectedItems());
+    if (selectedItems.isEmpty()) {
+      return;
+    }
+    deleteTypeDefinitions(selectedItems);
+  }
+
+  private void deleteTypeDefinitions(@NonNull List<TypeDefinition> itemsToDelete) {
     String message = itemsToDelete.size() > 1
         ? "Delete " + itemsToDelete.size() + " type definitions?"
         : "Delete this type definition?";

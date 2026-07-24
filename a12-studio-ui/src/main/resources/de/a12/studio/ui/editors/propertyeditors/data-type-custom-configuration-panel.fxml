@@ -9,8 +9,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="CUSTOM TYPE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeCustomConfigurationPanelController">
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="CUSTOM TYPE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeCustomConfigurationPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
@@ -29,17 +28,27 @@
         <TextField fx:id="displayNameField" />
       </VBox>
 
-      <VBox GridPane.columnIndex="0" GridPane.rowIndex="1">
+      <rowConstraints>
+         <RowConstraints />
+      </rowConstraints>
+    </GridPane>
+
+    <GridPane fx:id="lengthGrid" hgap="10.0" vgap="8.0">
+      <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+      </columnConstraints>
+
+      <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
         <Label styleClass="field-label" text="Min. Length" />
         <TextField fx:id="minLengthField" />
       </VBox>
-      <VBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+      <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
         <Label styleClass="field-label" text="Max. Length" />
         <TextField fx:id="maxLengthField" />
       </VBox>
 
       <rowConstraints>
-         <RowConstraints />
          <RowConstraints />
       </rowConstraints>
     </GridPane>

@@ -9,7 +9,8 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionTableController">
+<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionTableController">
     <top>
         <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
             <items>
@@ -18,9 +19,9 @@
                         <FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus-circle-outline" iconSize="18" />
                     </graphic>
                 </Button>
-                <Button layoutX="169.0" layoutY="11.0" mnemonicParsing="false" styleClass="delete-button">
+                <Button layoutX="169.0" layoutY="11.0" mnemonicParsing="false" onAction="#onDelete" styleClass="delete-button">
                     <tooltip>
-                        <Tooltip text="Delete the selected import" />
+                        <Tooltip text="Delete the selected type definition" />
                     </tooltip>
                     <graphic>
                         <FontIcon iconColor="#c0392b" iconLiteral="mdi2t-trash-can-outline" iconSize="18" />

@@ -31,7 +31,7 @@ public class StudioEventManager {
 
   public void fireProjectClosedEvent(@NonNull Project project) {
     ProjectClosedEvent event = new ProjectClosedEvent(project);
-    for (StudioEventListener listener : listeners) {
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.projectClosed(event);
     }
   }
@@ -45,7 +45,7 @@ public class StudioEventManager {
 
   public void fireModelClosedEvent(@NonNull ProjectItem projectItem) {
     ModelClosedEvent event = new ModelClosedEvent(projectItem);
-    for (StudioEventListener listener : listeners) {
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.modelClosed(event);
     }
   }
@@ -59,7 +59,7 @@ public class StudioEventManager {
 
   public void fireModelSaveEvent(@NonNull ProjectItem projectItem) {
     ModelSaveEvent event = new ModelSaveEvent(projectItem);
-    for (StudioEventListener listener : listeners) {
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.modelSaved(event);
     }
   }
@@ -73,7 +73,7 @@ public class StudioEventManager {
 
   public void fireModelFocusRequestedEvent(@NonNull ProjectItem projectItem) {
     ModelFocusRequestedEvent event = new ModelFocusRequestedEvent(projectItem);
-    for (StudioEventListener listener : listeners) {
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.modelFocusRequested(event);
     }
   }

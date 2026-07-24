@@ -49,10 +49,15 @@
         "id": "typedef_f15fa74e-efe6-4289-b80f-c59e39719040",
         "name": "abc",
         "fieldType": {
-          "type": "StringType",
-          "StringType": {
-            "pattern": "dss"
-          }
+          "type": "StringType"
+        }
+      },
+      {
+        "id": "typedef_a9a0cc3a-8b7a-445b-9e4f-4b9a39ae6f3b",
+        "name": "NewType_2",
+        "fieldType": {
+          "type": "CustomFieldType",
+          "CustomFieldType": {}
         }
       }
     ]

@@ -62,10 +62,10 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor {
   }
 
   public void focusNameField() {
-    Platform.runLater(() -> {
-      nameField.requestFocus();
-      nameField.selectAll();
-    });
+//    Platform.runLater(() -> {
+//      nameField.requestFocus();
+//      nameField.selectAll();
+//    });
   }
 
   @Override

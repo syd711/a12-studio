@@ -54,14 +54,14 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   private static final String TYPE_DATE_RANGE = "DateRange";
   private static final String TYPE_CONFIRM = "Confirm";
   private static final String TYPE_BOOLEAN = "Boolean";
-  private static final String TYPE_CUSTOM_FIELD = "CustomField";
+  private static final String TYPE_CUSTOM = "Custom";
   private static final String TYPE_ENUMERATION = "Enumeration";
   private static final String TYPE_UNSPECIFIED = "Unspecified";
 
   // Order mirrors the field-type dropdown in the SME reference implementation (DomainField.json).
   private static final List<String> DATA_TYPES = List.of(
       TYPE_STRING, TYPE_NUMBER, TYPE_DATE, TYPE_DATE_TIME, TYPE_TIME, TYPE_DATE_FRAGMENT, TYPE_DATE_RANGE,
-      TYPE_CONFIRM, TYPE_BOOLEAN, TYPE_ENUMERATION);
+      TYPE_CONFIRM, TYPE_BOOLEAN, TYPE_CUSTOM, TYPE_ENUMERATION);
 
   @FXML
   private ComboBox<String> dataTypeCombo;
@@ -246,7 +246,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
       case TYPE_DATE_RANGE -> new DateRangeFieldType();
       case TYPE_CONFIRM -> new ConfirmFieldType();
       case TYPE_BOOLEAN -> new BooleanFieldType();
-      case TYPE_CUSTOM_FIELD -> new CustomFieldFieldType();
+      case TYPE_CUSTOM -> new CustomFieldFieldType();
       case TYPE_ENUMERATION -> new EnumerationFieldType();
       case TYPE_UNSPECIFIED -> new UnspecifiedFieldType();
       default -> new StringFieldType();
@@ -271,7 +271,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     } else if (fieldType instanceof BooleanFieldType) {
       return TYPE_BOOLEAN;
     } else if (fieldType instanceof CustomFieldFieldType) {
-      return TYPE_CUSTOM_FIELD;
+      return TYPE_CUSTOM;
     } else if (fieldType instanceof EnumerationFieldType) {
       return TYPE_ENUMERATION;
     } else if (fieldType instanceof UnspecifiedFieldType) {
