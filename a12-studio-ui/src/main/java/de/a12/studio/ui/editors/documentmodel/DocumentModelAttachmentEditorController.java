@@ -4,7 +4,6 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController;
-import de.a12.studio.ui.editors.propertyeditors.GroupPropertiesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,13 +13,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class DocumentModelGroupEditorController implements ElementEditorController, Initializable {
+public class DocumentModelAttachmentEditorController implements ElementEditorController, Initializable {
 
   @FXML
   private GeneralInformationPanelController generalInformationController;
-
-  @FXML
-  private GroupPropertiesPanelController propertiesController;
 
   @FXML
   private LocalizedTextPanelController labelController;
@@ -42,7 +38,7 @@ public class DocumentModelGroupEditorController implements ElementEditorControll
     descriptionInternalController.configureInternal();
     descriptionExternalController.configureExternal();
 
-    propertyEditors = List.of(generalInformationController, propertiesController, labelController, descriptionInternalController,
+    propertyEditors = List.of(generalInformationController, labelController, descriptionInternalController,
         descriptionExternalController, annotationsController);
   }
 

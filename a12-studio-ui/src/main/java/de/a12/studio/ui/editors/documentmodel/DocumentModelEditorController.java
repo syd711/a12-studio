@@ -4,8 +4,10 @@ import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.documentmodel.RuleElement;
@@ -36,7 +38,9 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   private static final String FIELD_EDITOR_FXML = "document-model-field-editor.fxml";
   private static final String GROUP_EDITOR_FXML = "document-model-group-editor.fxml";
+  private static final String ATTACHMENT_EDITOR_FXML = "document-model-attachment-editor.fxml";
   private static final String VALIDATION_RULE_EDITOR_FXML = "document-model-validation-rule-editor.fxml";
+  private static final String COMPUTATION_RULE_EDITOR_FXML = "document-model-computation-rule-editor.fxml";
 
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
@@ -104,11 +108,17 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
     Element selected = selectedElements.get(0);
     String editorFxml;
-    if (selected instanceof GroupElement) {
-      editorFxml = GROUP_EDITOR_FXML;
+    if (selected instanceof GroupElement groupElement) {
+      editorFxml = groupElement.getGroup() != null
+          && GroupConfig.USAGE_TYPE_ATTACHMENT.equals(groupElement.getGroup().getUsageType())
+          ? ATTACHMENT_EDITOR_FXML
+          : GROUP_EDITOR_FXML;
     }
     else if (selected instanceof RuleElement) {
       editorFxml = VALIDATION_RULE_EDITOR_FXML;
+    }
+    else if (selected instanceof ComputationElement) {
+      editorFxml = COMPUTATION_RULE_EDITOR_FXML;
     }
     else {
       editorFxml = FIELD_EDITOR_FXML;

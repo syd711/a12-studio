@@ -23,6 +23,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -206,6 +207,20 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   /**
+   * Sets a spinner's editor text without triggering the save/validation cycle registered by {@link
+   * #bindSpinner}. Property editors should use this (instead of {@code spinner.getEditor().setText(...)})
+   * whenever they repopulate a field from the model, e.g. in {@link #setElement}.
+   */
+  protected void setFieldValue(@NonNull Spinner<Integer> spinner, String value) {
+    updatingFromModel = true;
+    try {
+      spinner.getEditor().setText(value);
+    } finally {
+      updatingFromModel = false;
+    }
+  }
+
+  /**
    * Reusable pattern for property editor fields: whenever the text field's value changes, applies it to the
    * element via {@code setter}, saves the owning model's json file, and re-validates the element via the
    * data service api, reflecting the result on the field's styling and in the error container. The
@@ -258,6 +273,20 @@ abstract public class AbstractPropertyEditor implements Initializable {
       }
       setter.accept(element, newValue);
       debouncer.debounce(comboBox.getId(), () -> commitChange(comboBox), COMMIT_DEBOUNCE_MS, true);
+    });
+  }
+
+  /**
+   * Same as {@link #bindTextField} but for a spinner's editor text, so both typing and the increment/decrement
+   * arrows (which JavaFX reflects into the editor's text) go through the same debounced commit path.
+   */
+  protected void bindSpinner(@NonNull Spinner<Integer> spinner, @NonNull BiConsumer<Element, String> setter) {
+    spinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      setter.accept(element, newValue);
+      debouncer.debounce(spinner.getId(), () -> commitChange(spinner), COMMIT_DEBOUNCE_MS, true);
     });
   }
 
