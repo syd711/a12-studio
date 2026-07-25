@@ -1,6 +1,8 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DataTypeConfigurationPanelController;
@@ -61,11 +63,13 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
     helperTextController.configureHelperText();
 
     errorMessages.managedProperty().bind(errorMessages.visibleProperty());
-    errorMessages.visibleProperty().bind(dataTypeConfigurationController.patternProperty().isNotEmpty());
+    dataTypeConfigurationController.patternProperty().addListener((observable, oldValue, newValue) -> updateErrorMessagesVisibility());
+    typeDefinitionController.defaultErrorMessagesProperty().addListener((observable, oldValue, newValue) -> updateErrorMessagesVisibility());
 
     typeDefinitionController.fieldTypeProperty().addListener((observable, oldValue, newValue) -> {
       if (element != null) {
         dataTypeConfigurationController.setElement(element);
+        updateErrorMessagesVisibility();
       }
     });
 
@@ -79,15 +83,35 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
     this.element = element;
     generalInformationController.setAncestors(ancestors);
     typeDefinitionController.setAncestors(ancestors);
+    dataTypeConfigurationController.setAncestors(ancestors);
     boolean readOnly = isWithinAttachment(ancestors);
     propertyEditors.forEach(propertyEditor -> {
       propertyEditor.setElement(element);
       propertyEditor.setEditorDisabled(readOnly);
     });
+    updateErrorMessagesVisibility();
   }
 
   @Override
   public void destroy() {
     propertyEditors.forEach(AbstractPropertyEditor::destroy);
+  }
+
+  /**
+   * A multi-select group's String choices hide the whole "Data Type Configuration" section (including the
+   * pattern field that normally drives this panel's visibility), so there the "use default error messages"
+   * checkbox decides instead: unchecked means the user wants a custom message, so the editor is shown.
+   */
+  private void updateErrorMessagesVisibility() {
+    boolean hidden = isStringFieldType() && typeDefinitionController.isMultiSelectParent()
+        ? !typeDefinitionController.defaultErrorMessagesProperty().get()
+        : !dataTypeConfigurationController.patternProperty().get().isEmpty();
+    errorMessages.setVisible(!hidden);
+  }
+
+  private boolean isStringFieldType() {
+    return element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() instanceof StringFieldType;
   }
 }

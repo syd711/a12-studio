@@ -6,6 +6,8 @@ import de.a12.studio.models.documentmodel.DateRangeFieldType;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.EnumerationFieldType;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.GroupConfig;
+import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.NumberFieldType;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -57,6 +59,12 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
   private Node enumerationConfigurationNode;
 
   private DataTypeEnumerationConfigurationPanelController enumerationConfigurationController;
+
+  private List<Element> ancestors = List.of();
+
+  public void setAncestors(@NonNull List<Element> ancestors) {
+    this.ancestors = ancestors;
+  }
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -135,7 +143,10 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     dateRangeConfigurationController.setElement(element);
     customConfigurationController.setElement(element);
     enumerationConfigurationController.setElement(element);
-    if (isStringFieldType(element)) {
+    if (isStringFieldType(element) && isMultiSelectParent()) {
+      // A multi-select group's String choices have no configurable properties of their own.
+      content.getChildren().setAll(List.of());
+    } else if (isStringFieldType(element)) {
       content.getChildren().setAll(List.of(stringConfigurationNode));
     } else if (isNumberFieldType(element)) {
       content.getChildren().setAll(List.of(numberConfigurationNode));
@@ -187,5 +198,12 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     return element instanceof FieldElement fieldElement
         && fieldElement.getField() != null
         && fieldElement.getField().getFieldType() instanceof EnumerationFieldType;
+  }
+
+  private boolean isMultiSelectParent() {
+    Element parent = ancestors.isEmpty() ? null : ancestors.get(ancestors.size() - 1);
+    return parent instanceof GroupElement groupElement
+        && groupElement.getGroup() != null
+        && GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType());
   }
 }

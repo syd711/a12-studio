@@ -27,6 +27,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -118,6 +119,10 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
   public ReadOnlyObjectProperty<FieldType> fieldTypeProperty() {
     return currentFieldType;
+  }
+
+  public ReadOnlyBooleanProperty defaultErrorMessagesProperty() {
+    return defaultErrorMessagesCheckbox.selectedProperty();
   }
 
   public void setAncestors(@NonNull List<Element> ancestors) {
@@ -319,7 +324,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
    * Global/transient/required are meaningless for a multi-select group's field-choice children, so the
    * checkboxesGrid is hidden there too.
    */
-  private boolean isMultiSelectParent() {
+  public boolean isMultiSelectParent() {
     Element parent = ancestors.isEmpty() ? null : ancestors.get(ancestors.size() - 1);
     return parent instanceof GroupElement groupElement
         && groupElement.getGroup() != null
