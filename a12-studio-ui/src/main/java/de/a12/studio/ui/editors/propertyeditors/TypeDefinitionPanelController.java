@@ -109,6 +109,8 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
   private List<Element> ancestors = List.of();
 
+  private boolean checkboxesGridDisabled = false;
+
   // Reflects the element's current FieldType, re-set whenever this panel changes it (i.e. via
   // typeDefinitionCheckBox or dataTypeComboBox) so sibling panels (e.g. DataTypeConfigurationPanelController)
   // can react and swap their own content without waiting for the next setElement() call.
@@ -211,6 +213,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
    * TypeDefinitionFieldElement}), so the type definition editor hides this section entirely.
    */
   public void hideCheckboxesGrid() {
+    checkboxesGridDisabled = true;
     checkboxesGrid.setVisible(false);
   }
 
@@ -222,6 +225,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 //    dataTypeCombo.getItems().setAll(availableTypeDefinitions.stream().map(TypeDefinition::getId).toList());
 
     dataTypeComboBox.getItems().setAll(availableDataTypes());
+    checkboxesGrid.setVisible(!checkboxesGridDisabled && !isMultiSelectParent());
 
     Optional<FieldConfig> fieldConfig = getFieldConfig(element);
     FieldType fieldType = fieldConfig.map(FieldConfig::getFieldType).orElse(null);
@@ -308,13 +312,18 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
    * valid data types there; every other parent allows the full {@link #DATA_TYPES} list.
    */
   private List<String> availableDataTypes() {
+    return isMultiSelectParent() ? MULTI_SELECT_DATA_TYPES : DATA_TYPES;
+  }
+
+  /**
+   * Global/transient/required are meaningless for a multi-select group's field-choice children, so the
+   * checkboxesGrid is hidden there too.
+   */
+  private boolean isMultiSelectParent() {
     Element parent = ancestors.isEmpty() ? null : ancestors.get(ancestors.size() - 1);
-    if (parent instanceof GroupElement groupElement
+    return parent instanceof GroupElement groupElement
         && groupElement.getGroup() != null
-        && GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType())) {
-      return MULTI_SELECT_DATA_TYPES;
-    }
-    return DATA_TYPES;
+        && GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType());
   }
 
   /**

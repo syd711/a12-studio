@@ -151,7 +151,7 @@ public class DocumentModelElementFactory {
   public static Element newMultiSelectElement(@NonNull List<Element> siblings, @NonNull ModelRoot modelRoot) {
     GroupElement multiSelect = new GroupElement();
     multiSelect.setId(generateId(ID_PREFIX_MULTI_SELECT, modelRoot));
-    multiSelect.setName(uniqueName("Multi-Select", siblings));
+    multiSelect.setName(uniqueName("MultiSelect", siblings));
     GroupConfig config = new GroupConfig();
     config.setRepeatability(999_999);
     config.setUsageType(GroupConfig.USAGE_TYPE_MULTI_SELECT);

@@ -104,9 +104,7 @@
                       "Field": {
                         "fieldType": {
                           "type": "StringType",
-                          "StringType": {
-                            "pattern": "ff"
-                          }
+                          "StringType": {}
                         },
                         "label": [
                           {
@@ -388,7 +386,32 @@
                           "excludeRules": true,
                           "excludeComputations": true
                         },
-                        "elements": []
+                        "elements": [
+                          {
+                            "type": "Group",
+                            "id": "multi-select_6c89b",
+                            "name": "Multi-Select",
+                            "Group": {
+                              "repeatability": 999999,
+                              "usageType": "multi-select",
+                              "elements": [
+                                {
+                                  "type": "Field",
+                                  "id": "multiSelectChild_2b43a",
+                                  "name": "value",
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType"
+                                    },
+                                    "requirednessConfig": {
+                                      "mode": "absoluteOrRelativeToNextRepAncestor"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
