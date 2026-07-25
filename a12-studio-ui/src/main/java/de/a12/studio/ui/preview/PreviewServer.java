@@ -142,11 +142,11 @@ public class PreviewServer {
     String moduleName = query.get("module");
     String sceneName = query.get("scene");
 
-    PreviewApplicationDto application = previewService.buildPreview(model);
+    PreviewApplicationDto application = previewService.buildPreview(projectItem);
     PreviewSceneDto scene = null;
     if (moduleName != null && sceneName != null) {
       try {
-        scene = previewService.resolveScene(model, moduleName, sceneName);
+        scene = previewService.resolveScene(projectItem, moduleName, sceneName);
       }
       catch (IllegalArgumentException e) {
         log.debug("Ignoring unresolved module/scene '{}/{}': {}", moduleName, sceneName, e.getMessage());

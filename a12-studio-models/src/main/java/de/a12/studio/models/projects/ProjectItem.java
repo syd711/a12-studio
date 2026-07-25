@@ -147,6 +147,33 @@ public class ProjectItem {
     return fileName.endsWith(".json") ? fileName.substring(0, fileName.length() - ".json".length()) : fileName;
   }
 
+  /**
+   * Searches the whole project tree (from the root, regardless of where {@code this} sits in it) for the
+   * model whose id matches {@code modelId}, per the filename/id convention documented on {@link
+   * #idFromFileName}. Used by the preview feature to resolve a model reference (e.g. an Overview Model's
+   * bound Document Model) into its loaded content.
+   */
+  public ProjectItem findByModelId(String modelId) {
+    ProjectItem root = this;
+    while (root.parent != null) {
+      root = root.parent;
+    }
+    return root.findDescendantByModelId(modelId);
+  }
+
+  private ProjectItem findDescendantByModelId(String modelId) {
+    if (!isFolder()) {
+      return model != null && modelId.equals(model.getId()) ? this : null;
+    }
+    for (ProjectItem child : getChildren()) {
+      ProjectItem found = child.findDescendantByModelId(modelId);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
+
   public boolean isAncestorOf(ProjectItem other) {
     for (ProjectItem current = other.parent; current != null; current = current.parent) {
       if (current.equals(this)) {

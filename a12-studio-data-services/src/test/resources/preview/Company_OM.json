@@ -1,0 +1,204 @@
+{
+  "header": {
+    "id": "Company_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Companies"
+      },
+      {
+        "locale": "de",
+        "text": "Firmen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "DM",
+        "modelType": "document",
+        "purpose": "document-model-for-overview",
+        "reference": "Company_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "showRowCount": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "custom_list",
+        "fields": [
+          {
+            "fieldId": "field_67684"
+          },
+          {
+            "fieldId": "field_16af2"
+          },
+          {
+            "fieldId": "field_94860"
+          },
+          {
+            "fieldId": "field_3fcb8"
+          },
+          {
+            "fieldId": "field_2f4c1"
+          }
+        ],
+        "sectionData": [
+          {
+            "id": "section-e83d1",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Name"
+              },
+              {
+                "locale": "de",
+                "text": "Name"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "field_67684"
+              },
+              {
+                "fieldId": "field_16af2"
+              }
+            ]
+          },
+          {
+            "id": "section-c4b02",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Address Type"
+              },
+              {
+                "locale": "de",
+                "text": "Addresstyp"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "field_94860"
+              }
+            ]
+          },
+          {
+            "id": "section-bbfef",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Location"
+              },
+              {
+                "locale": "de",
+                "text": "Ort"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "field_3fcb8"
+              },
+              {
+                "fieldId": "field_2f4c1"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "subHeaderBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "columns": [
+      {
+        "id": "column-08f11",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Logo"
+          },
+          {
+            "locale": "de",
+            "text": "Logo"
+          }
+        ],
+        "width": 1.0,
+        "elementRef": "group_8e00a",
+        "sortable": false
+      },
+      {
+        "id": "column-4949b",
+        "width": 1.0,
+        "elementRef": "field_67684",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-9d296",
+        "width": 1.0,
+        "elementRef": "field_16af2",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "event_delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    }
+  }
+}

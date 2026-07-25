@@ -68,6 +68,33 @@
     margin: 4px 0;
     font-size: 13px;
   }
+  .view-header {
+    font-weight: bold;
+  }
+  .view-model {
+    font-weight: normal;
+    opacity: 0.6;
+  }
+  .view-fields {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    font-size: 12px;
+  }
+  .view-fields th, .view-fields td {
+    text-align: left;
+    padding: 3px 6px;
+    border-bottom: 1px solid #8884;
+  }
+  .view-fields th {
+    opacity: 0.6;
+    font-weight: normal;
+  }
+  .field-type {
+    opacity: 0.6;
+    font-family: monospace;
+    font-size: 11px;
+  }
   .empty {
     opacity: 0.5;
     font-style: italic;
@@ -129,6 +156,41 @@
         : "Initial Activity: " + entries.map(([key, value]) => key + "=" + value).join(", ");
   }
 
+  function renderView(view) {
+    const el = document.createElement("div");
+    el.className = "view";
+
+    const header = document.createElement("div");
+    header.className = "view-header";
+    header.textContent = view.name + " ";
+    if (view.modelName) {
+      const model = document.createElement("span");
+      model.className = "view-model";
+      model.textContent = "(" + view.modelName + ")";
+      header.appendChild(model);
+    }
+    el.appendChild(header);
+
+    if (view.fields && view.fields.length > 0) {
+      const table = document.createElement("table");
+      table.className = "view-fields";
+      view.fields.forEach(field => {
+        const row = document.createElement("tr");
+        const labelCell = document.createElement("td");
+        labelCell.textContent = field.label;
+        row.appendChild(labelCell);
+        const typeCell = document.createElement("td");
+        typeCell.className = "field-type";
+        typeCell.textContent = field.fieldType || "";
+        row.appendChild(typeCell);
+        table.appendChild(row);
+      });
+      el.appendChild(table);
+    }
+
+    return el;
+  }
+
   function renderRegion(region) {
     const el = document.createElement("div");
     el.className = "region";
@@ -149,12 +211,7 @@
       el.appendChild(empty);
     }
     else {
-      region.views.forEach(view => {
-        const viewEl = document.createElement("div");
-        viewEl.className = "view";
-        viewEl.textContent = view;
-        el.appendChild(viewEl);
-      });
+      region.views.forEach(view => el.appendChild(renderView(view)));
     }
 
     region.subRegions.forEach(subRegion => el.appendChild(renderRegion(subRegion)));
