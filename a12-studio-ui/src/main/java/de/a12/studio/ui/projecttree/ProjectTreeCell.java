@@ -71,7 +71,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
   }
 
   private void onDragDetected(MouseEvent event) {
-    if (isEmpty() || getItem() == null || getItem().getProjectItem().isRoot()) {
+    if (isEmpty() || getItem() == null || getItem().getProjectItem().isRoot() || getItem().isSettings()) {
       return;
     }
 
@@ -122,7 +122,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
 
     setText(item.getDisplayName());
     boolean locked = isLockedFolder(item);
-    boolean missingModel = !item.isFolder() && !item.hasModel();
+    boolean missingModel = !item.isFolder() && !item.hasModel() && !item.isSettings();
     setContextMenu(missingModel ? null : menuFactory.createTreeItemContextMenu(item));
     if (missingModel || locked) {
       if (!getStyleClass().contains("model-missing")) {
@@ -155,6 +155,11 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       }
       icon.setIconSize(18);
       boundTreeItem.expandedProperty().addListener(expandedListener);
+      setGraphic(icon);
+    }
+    else if (item.isSettings()) {
+      icon.setIconSize(18);
+      icon.setIconLiteral(Icons.COG_OUTLINE);
       setGraphic(icon);
     }
     else {

@@ -10,6 +10,6 @@ public class ProjectFileFilter implements FileFilter {
     if(pathname.isDirectory() && name.startsWith(".")) {
       return false;
     }
-    return name.endsWith(".json") || pathname.isDirectory();
+    return name.equals("settings.json") || name.endsWith(".json") || pathname.isDirectory();
   }
 }

@@ -44,11 +44,21 @@ public class ProjectItemViewModel {
     return projectItem.getModel() != null;
   }
 
+  public boolean isSettings() {
+    return !projectItem.isFolder()
+        && "settings.json".equals(projectItem.getName())
+        && projectItem.getParent() != null
+        && projectItem.getParent().isRoot();
+  }
+
   public ProjectItem getProjectItem() {
     return projectItem;
   }
 
   public String getIconPath() {
+    if (isSettings()) {
+      return null; // handled separately in cell (FontIcon, not ImageView)
+    }
     A12Model<?> model = projectItem.getModel();
     if (model == null) {
       return null;

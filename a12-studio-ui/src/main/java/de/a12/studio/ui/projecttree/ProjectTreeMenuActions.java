@@ -57,12 +57,12 @@ public class ProjectTreeMenuActions {
     open.setOnAction(event -> onOpen.accept(viewModel));
 
     MenuItem rename = new MenuItem("_Rename");
-    rename.setDisable(projectItem.isRoot());
+    rename.setDisable(projectItem.isRoot() || viewModel.isSettings());
     rename.setOnAction(event -> onRenameItem(projectItem));
 
     MenuItem createCopy = new MenuItem("_Create Copy");
     createCopy.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.COPY)));
-    createCopy.setDisable(projectItem.isRoot());
+    createCopy.setDisable(projectItem.isRoot() || viewModel.isSettings());
     createCopy.setOnAction(event -> onCreateCopy(projectItem));
 
     MenuItem zipFolder = new MenuItem("_Zip Folder");
@@ -72,7 +72,7 @@ public class ProjectTreeMenuActions {
 
     MenuItem delete = new MenuItem("_Delete");
     delete.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.TRASH)));
-    delete.setDisable(projectItem.isRoot());
+    delete.setDisable(projectItem.isRoot() || viewModel.isSettings());
     delete.setOnAction(event -> onDeleteItem(projectItem));
 
     return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);

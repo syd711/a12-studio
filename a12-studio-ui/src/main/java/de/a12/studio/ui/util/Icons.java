@@ -27,6 +27,7 @@ public interface Icons {
   String CLOSE = "mdi2c-close";
   String TRASH = "mdi2t-trash-can-outline";
   String COPY = "mdi2c-content-copy";
+  String COG_OUTLINE = "mdi2c-cog-outline";
   String PENCIL = "mdi2p-pencil-outline";
   String ZIP = "mdi2f-folder-zip-outline";
   String CUT = "mdi2c-content-cut";
