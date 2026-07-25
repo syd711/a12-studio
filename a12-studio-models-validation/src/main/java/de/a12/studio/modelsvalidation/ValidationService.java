@@ -24,9 +24,6 @@ import java.util.Optional;
  */
 public class ValidationService {
 
-  private static final MissingLocaleValidator MISSING_LOCALE_VALIDATOR = new MissingLocaleValidator();
-  private static final TimeZoneValidator TIME_ZONE_VALIDATOR = new TimeZoneValidator();
-
   private final Project project;
   private final DocumentModelValidationService documentModelValidationService = new DocumentModelValidationService();
   private final OverviewModelValidationService overviewModelValidationService = new OverviewModelValidationService();
@@ -61,24 +58,25 @@ public class ValidationService {
    * and its error tooltip.
    */
   public List<String> getSettingsIssueMessages(A12Model<?> model) {
+    List<ModelValidationError> errors = validate(model);
     List<String> messages = new ArrayList<>();
-    getTimeZoneMismatchError(model).ifPresent(messages::add);
-    getMissingLocaleError(model).ifPresent(messages::add);
+    findMessage(errors, TimeZoneValidator.ELEMENT_ID).ifPresent(messages::add);
+    findMessage(errors, MissingLocaleValidator.ELEMENT_ID).ifPresent(messages::add);
     return messages;
   }
 
   /** For the Locales settings panel: at least one locale is required. */
   public Optional<String> getMissingLocaleError(A12Model<?> model) {
-    return MISSING_LOCALE_VALIDATOR.validate(model, buildContext(model)).stream()
-        .map(ModelValidationError::message)
-        .findFirst();
+    return findMessage(validate(model), MissingLocaleValidator.ELEMENT_ID);
   }
 
   /** For the Timezone settings panel: every document model in a project must use the same time zone. */
   public Optional<String> getTimeZoneMismatchError(A12Model<?> model) {
-    return TIME_ZONE_VALIDATOR.validate(model, buildContext(model)).stream()
-        .map(ModelValidationError::message)
-        .findFirst();
+    return findMessage(validate(model), TimeZoneValidator.ELEMENT_ID);
+  }
+
+  private static Optional<String> findMessage(List<ModelValidationError> errors, String elementId) {
+    return errors.stream().filter(error -> elementId.equals(error.elementId())).map(ModelValidationError::message).findFirst();
   }
 
   private ValidationContext buildContext(A12Model<?> model) {
