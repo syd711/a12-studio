@@ -1,4 +1,4 @@
-package de.a12.studio.modelsvalidation;
+package de.a12.studio.modelsvalidation.validators;
 
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;

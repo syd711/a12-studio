@@ -11,7 +11,6 @@ import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.TypeDefFieldType;
-import de.a12.studio.modelsvalidation.ElementIndex;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -24,7 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Checks for errors the ported kernel rules ({@link DocumentModelConsistencyValidator}) don't cover:
+ * Checks for errors the ported kernel rules ({@link BasicConsistencyValidator} and siblings) don't cover:
  * missing/unresolved references between elements. We use simple generic error messages instead of the
  * kernel's own wording so that changes to that wording don't need to be integrated into this code — except
  * {@link #INDEX_FIELD_INVALID_MESSAGE}, which is shown directly in the Group properties panel and is kept

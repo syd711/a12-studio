@@ -31,8 +31,10 @@ a12-studio from an independent reimplementation into a kernel wrapper for whatev
 taken. The strategy actually in use is a **clean-room, data-driven port**: read the same JSON rule definitions the
 kernel/SME ship (e.g. `client/resources/models/documentModel/Domain*.json`) and evaluate them with a
 purpose-built interpreter in `a12-studio-data-services`, rather than either reimplementing SME's REST endpoints or
-depending on the real kernel jars. See `DocumentModelConsistencyRules.java` for the (currently hand-ported, not yet
-data-driven) document-model-level rules, and the planned meta-model validation rule engine (below) for the much
+depending on the real kernel jars. See the `SchemaVersionValidator`, `DuplicateIdValidator`,
+`NumberFieldValueLimitValidator`, `MultiSelectGroupValidator`, `AttachmentGroupValidator`, and
+`BasicConsistencyValidator` classes for the (currently hand-ported, not yet data-driven) document-model-level
+rules, and the planned meta-model validation rule engine (below) for the much
 larger family of field/group/rule/computation config-validation rules SME's `Domain*.json` files define.
 
 ---
