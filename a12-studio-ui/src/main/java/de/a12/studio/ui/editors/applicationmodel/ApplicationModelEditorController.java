@@ -1,15 +1,13 @@
 package de.a12.studio.ui.editors.applicationmodel;
 
-import de.a12.studio.modelsvalidation.DMValidationService;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
-import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.propertyeditors.*;
 import de.a12.studio.ui.preview.PreviewLauncher;
-import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,8 +23,6 @@ import java.util.ResourceBundle;
 public class ApplicationModelEditorController extends AbstractEditorController implements Initializable {
 
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
-
-  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   @FXML
   private Tooltip settingsButtonTooltip;
@@ -74,8 +70,8 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   }
 
   private void updateSettingsErrorBadge() {
-    List<String> issues = projectItem.getModel() instanceof DocumentModel documentModel
-        ? VALIDATION_SERVICE.getSettingsIssueMessages(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+    List<String> issues = projectItem.getModel() != null
+        ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
         : List.of();
 
     settingsErrorBadge.setVisible(!issues.isEmpty());

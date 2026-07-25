@@ -1,15 +1,14 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
-import de.a12.studio.modelsvalidation.DMValidationService;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.TypeDefinition;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
 import de.a12.studio.ui.events.ModelSaveEvent;
-import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,8 +34,6 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
   private static final String FIELD_EDITOR_FXML = "typedefinition-model-field-editor.fxml";
 
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
-
-  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   @FXML
   private SplitPane splitPane;
@@ -68,8 +65,8 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
   }
 
   private void updateSettingsErrorBadge() {
-    List<String> issues = projectItem.getModel() instanceof DocumentModel documentModel
-        ? VALIDATION_SERVICE.getSettingsIssueMessages(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+    List<String> issues = projectItem.getModel() != null
+        ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
         : List.of();
 
     settingsErrorBadge.setVisible(!issues.isEmpty());

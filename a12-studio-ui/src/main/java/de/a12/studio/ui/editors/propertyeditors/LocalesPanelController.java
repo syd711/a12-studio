@@ -5,9 +5,7 @@ import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Locale;
-import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.modelsvalidation.DMValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -40,8 +38,6 @@ import java.util.Optional;
 public class LocalesPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final int COMMIT_DEBOUNCE_MS = 150;
-
-  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   private static final List<java.util.Locale> AVAILABLE_LOCALES = Arrays.stream(java.util.Locale.getAvailableLocales())
       .filter(locale -> !locale.toLanguageTag().isEmpty() && !locale.toLanguageTag().equals("und"))
@@ -140,12 +136,8 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
   }
 
   private void updateValidation() {
-    if (model instanceof DocumentModel documentModel) {
-      VALIDATION_SERVICE.getMissingLocaleError(documentModel)
-          .ifPresentOrElse(message -> showError("ERROR", message), this::hideError);
-    } else {
-      hideError();
-    }
+    Studio.getValidationService().getMissingLocaleError(model)
+        .ifPresentOrElse(message -> showError("ERROR", message), this::hideError);
   }
 
   private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {

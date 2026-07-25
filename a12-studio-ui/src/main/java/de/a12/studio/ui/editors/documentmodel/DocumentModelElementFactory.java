@@ -191,7 +191,7 @@ public class DocumentModelElementFactory {
   public static Element newIncludeElement(@NonNull List<Element> siblings, @NonNull ModelRoot modelRoot) {
     GroupElement include = new GroupElement();
     include.setId(generateId(ID_PREFIX_INCLUDE, modelRoot));
-    include.setName(uniqueName("New Include", siblings));
+    include.setName(uniqueName("Include", siblings));
     GroupConfig config = new GroupConfig();
     config.setRepeatability(1);
     include.setGroup(config);

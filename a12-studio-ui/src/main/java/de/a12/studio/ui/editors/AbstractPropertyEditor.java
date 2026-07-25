@@ -9,8 +9,7 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.modelsvalidation.DMValidationService;
-import de.a12.studio.modelsvalidation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -42,8 +41,6 @@ abstract public class AbstractPropertyEditor implements Initializable {
   private static final int COMMIT_DEBOUNCE_MS = 150;
 
   private static final PseudoClass ERROR_PSEUDO_CLASS = PseudoClass.getPseudoClass("error");
-
-  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   private final Debouncer debouncer = new Debouncer();
 
@@ -331,7 +328,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
     if (element == null) {
       return;
     }
-    Optional<ElementValidationError> error = validateElement(projectItem);
+    Optional<ModelValidationError> error = validateElement(projectItem);
     showValidationError(error.orElse(null));
     StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
     StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
@@ -353,19 +350,20 @@ abstract public class AbstractPropertyEditor implements Initializable {
     showValidationError(validateElement(projectItem).orElse(null));
   }
 
-  private Optional<ElementValidationError> validateElement(@NonNull ProjectItem projectItem) {
-    if (element == null || !(projectItem.getModel() instanceof DocumentModel documentModel)) {
+  private Optional<ModelValidationError> validateElement(@NonNull ProjectItem projectItem) {
+    A12Model<?> model = projectItem.getModel();
+    if (element == null || model == null) {
       return Optional.empty();
     }
     try {
-      return VALIDATION_SERVICE.validateElement(documentModel, element.getId(), List.of());
+      return Studio.getValidationService().validateElement(model, element.getId());
     } catch (Exception e) {
       log.warn("Failed to validate element '{}': {}", element.getId(), e.getMessage(), e);
       return Optional.empty();
     }
   }
 
-  private void applyValidationResult(@NonNull Node field, @NonNull Optional<ElementValidationError> error) {
+  private void applyValidationResult(@NonNull Node field, @NonNull Optional<ModelValidationError> error) {
     field.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, error.isPresent());
     showValidationError(error.orElse(null));
     if (element != null) {
@@ -373,7 +371,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
     }
   }
 
-  private void showValidationError(ElementValidationError error) {
+  private void showValidationError(ModelValidationError error) {
     if (error == null || suppressErrorContainer()) {
       errorContainerController.hide();
     } else {
@@ -392,7 +390,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
   }
 
   /**
-   * For subclasses whose validation isn't expressed as an {@link ElementValidationError} (e.g. a model-header
+   * For subclasses whose validation isn't expressed as a {@link ModelValidationError} (e.g. a model-header
    * panel that isn't bound to a single {@link Element}, so {@link #commitChange()}'s element-based validation
    * never runs): shows this panel's own error container directly.
    */

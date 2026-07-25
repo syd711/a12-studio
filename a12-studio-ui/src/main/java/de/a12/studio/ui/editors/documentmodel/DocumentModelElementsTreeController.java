@@ -1,7 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel;
 
-import de.a12.studio.modelsvalidation.DMValidationService;
-import de.a12.studio.modelsvalidation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -17,7 +16,6 @@ import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.Icons;
-import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.Command;
 import de.a12.studio.ui.util.commandstack.CommandStack;
@@ -43,8 +41,6 @@ import java.util.function.Function;
 
 @Slf4j
 public class DocumentModelElementsTreeController implements Initializable, StudioEventListener {
-
-  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   private static final String TABLE_SETTINGS_ID = ModelType.DOCUMENT.getValue();
 
@@ -212,10 +208,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       return Set.of();
     }
     try {
-      List<ElementValidationError> errors =
-          VALIDATION_SERVICE.validateDocument(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
+      List<ModelValidationError> errors = Studio.getValidationService().validate(documentModel);
       Set<String> ids = new HashSet<>();
-      for (ElementValidationError error : errors) {
+      for (ModelValidationError error : errors) {
         if (error.elementId() != null) {
           ids.add(error.elementId());
         }

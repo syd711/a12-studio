@@ -1,7 +1,7 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.modelsvalidation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.util.Icons;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TreeCell;
@@ -133,7 +133,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       getStyleClass().remove("model-missing");
     }
 
-    List<ElementValidationError> validationErrors = item.getValidationErrors();
+    List<ModelValidationError> validationErrors = item.getValidationErrors();
     if (validationErrors.isEmpty()) {
       getStyleClass().remove("validation-error");
       setTooltip(WidgetFactory.createTooltip(item.getDisplayName()));
@@ -142,7 +142,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       if (!getStyleClass().contains("validation-error")) {
         getStyleClass().add("validation-error");
       }
-      String messages = validationErrors.stream().map(ElementValidationError::message).collect(Collectors.joining("\n"));
+      String messages = validationErrors.stream().map(ModelValidationError::message).collect(Collectors.joining("\n"));
       setTooltip(WidgetFactory.createTooltip(item.getDisplayName() + "\n" + messages));
     }
     if (item.isFolder()) {

@@ -23,5 +23,9 @@ public class GroupConfig {
   private String modelAlias;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String indexFieldName;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean excludeRules;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean excludeComputations;
   private List<Element> elements = new ArrayList<>();
 }

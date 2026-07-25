@@ -1,11 +1,11 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.models.ModelType;
-import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.modelsvalidation.DMValidationService;
-import de.a12.studio.modelsvalidation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.ValidationService;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.ModelFocusRequestedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
@@ -31,8 +31,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class ProjectTreeController implements Initializable, StudioEventListener {
-
-  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   @FXML
   private TreeView<ProjectItemViewModel> projectTree;
@@ -63,38 +61,33 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   }
 
   /**
-   * Validates every document in the project, including cross-document include references, so the tree can
-   * flag documents with problems as soon as the project is opened.
+   * Validates every model in the project, including cross-document include references, so the tree can flag
+   * items with problems as soon as the project is opened.
    */
-  private Map<String, List<ElementValidationError>> validateAllDocuments(@NonNull Project project) {
-    List<ProjectItem> documentItems = new ArrayList<>();
-    collectDocumentItems(project.getRoot(), documentItems);
+  private Map<String, List<ModelValidationError>> validateAllModels(@NonNull Project project) {
+    List<ProjectItem> modelItems = new ArrayList<>();
+    collectModelItems(project.getRoot(), modelItems);
 
-    List<DocumentModel> allModels = documentItems.stream()
-        .map(item -> (DocumentModel) item.getModel())
-        .toList();
-
-    Map<String, List<ElementValidationError>> validationErrorsByPath = new HashMap<>();
-    for (int i = 0; i < documentItems.size(); i++) {
-      List<DocumentModel> otherModels = new ArrayList<>(allModels);
-      otherModels.remove(i);
+    ValidationService validationService = Studio.getValidationService();
+    Map<String, List<ModelValidationError>> validationErrorsByPath = new HashMap<>();
+    for (ProjectItem item : modelItems) {
       try {
-        List<ElementValidationError> errors = VALIDATION_SERVICE.validateDocument(allModels.get(i), otherModels);
+        List<ModelValidationError> errors = validationService.validate(item.getModel());
         if (!errors.isEmpty()) {
-          validationErrorsByPath.put(documentItems.get(i).getPath(), errors);
+          validationErrorsByPath.put(item.getPath(), errors);
         }
       }
       catch (Exception e) {
-        log.warn("Failed to validate '{}': {}", documentItems.get(i).getPath(), e.getMessage(), e);
-        validationErrorsByPath.put(documentItems.get(i).getPath(),
-            List.of(new ElementValidationError(null, "Failed to parse document: " + e.getMessage(), "ERROR")));
+        log.warn("Failed to validate '{}': {}", item.getPath(), e.getMessage(), e);
+        validationErrorsByPath.put(item.getPath(),
+            List.of(new ModelValidationError(item.getModel(), null, "Failed to parse document: " + e.getMessage(), "ERROR")));
       }
 
-      Set<Map.Entry<String, List<ElementValidationError>>> entries = validationErrorsByPath.entrySet();
-      for (Map.Entry<String, List<ElementValidationError>> entry : entries) {
+      Set<Map.Entry<String, List<ModelValidationError>>> entries = validationErrorsByPath.entrySet();
+      for (Map.Entry<String, List<ModelValidationError>> entry : entries) {
         String key = entry.getKey();
-        List<ElementValidationError> errors = entry.getValue();
-        for (ElementValidationError error : errors) {
+        List<ModelValidationError> errors = entry.getValue();
+        for (ModelValidationError error : errors) {
           log.error("[{}] {} Validation Issue: {}: {}", key, error.severity(), error.elementId(), error.message());
         }
       }
@@ -104,20 +97,20 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   public void load(@NonNull Project project) {
     this.project = project;
-    Map<String, List<ElementValidationError>> validationErrorsByPath = validateAllDocuments(project);
+    Map<String, List<ModelValidationError>> validationErrorsByPath = validateAllModels(project);
     this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
     rootTreeItem.setExpanded(true);
     projectTree.setRoot(rootTreeItem);
   }
 
-  private void collectDocumentItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
+  private void collectModelItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
     if (item.isFolder()) {
       for (ProjectItem child : item.getChildren()) {
-        collectDocumentItems(child, result);
+        collectModelItems(child, result);
       }
     }
-    else if (item.getModel() instanceof DocumentModel) {
+    else if (item.getModel() != null) {
       result.add(item);
     }
   }

@@ -3,7 +3,7 @@ package de.a12.studio.ui.events;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.JsonSettings;
-import de.a12.studio.modelsvalidation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class StudioEventManager {
     }
   }
 
-  public void fireElementValidatedEvent(@NonNull String elementId, ElementValidationError error) {
+  public void fireElementValidatedEvent(@NonNull String elementId, ModelValidationError error) {
     ElementValidatedEvent event = new ElementValidatedEvent(elementId, error);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {
       listener.elementValidated(event);

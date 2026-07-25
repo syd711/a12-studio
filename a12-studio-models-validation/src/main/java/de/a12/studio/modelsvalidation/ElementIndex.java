@@ -23,14 +23,14 @@ import java.util.Optional;
  * tree, replacing the live object graph the a12 kernel used to build during deserialization. Built once per
  * validation call.
  */
-class ElementIndex {
+public class ElementIndex {
 
   private final DocumentModel model;
   private final Map<String, Element> byId = new HashMap<>();
   private final Map<Element, GroupElement> parentOf = new HashMap<>();
   private final List<Element> all = new ArrayList<>();
 
-  ElementIndex(DocumentModel model) {
+  public ElementIndex(DocumentModel model) {
     this.model = model;
     List<GroupElement> rootGroups = model.getContent().getModelRoot().getRootGroups();
     if (rootGroups != null) {
@@ -54,7 +54,7 @@ class ElementIndex {
   }
 
   /** Every element in the model, in document order. */
-  List<Element> allElements() {
+  public List<Element> allElements() {
     return all;
   }
 
@@ -62,12 +62,12 @@ class ElementIndex {
     return Optional.ofNullable(id == null ? null : byId.get(id));
   }
 
-  GroupElement parentOf(Element element) {
+  public GroupElement parentOf(Element element) {
     return parentOf.get(element);
   }
 
   /** "/"-separated path of element names from the model root, mirroring the kernel's ElementUtils.getPath. */
-  String getPath(Element element) {
+  public String getPath(Element element) {
     return "/" + String.join("/", ancestorNamesIncludingSelf(element));
   }
 
@@ -88,7 +88,7 @@ class ElementIndex {
    * pops back up to the parent (so a Computation/Rule, which has no children, reaches sibling fields via
    * "../fieldName"). Mirrors the kernel's ElementPathUtils.absPath(getPath(element), relativePath).
    */
-  Optional<Element> resolveRelativePath(Element referencingElement, String relativePath) {
+  public Optional<Element> resolveRelativePath(Element referencingElement, String relativePath) {
     if (relativePath == null || relativePath.isBlank()) {
       return Optional.empty();
     }
@@ -131,7 +131,7 @@ class ElementIndex {
     return null;
   }
 
-  static boolean isField(Element element) {
+  public static boolean isField(Element element) {
     return element instanceof FieldElement;
   }
 
@@ -148,7 +148,7 @@ class ElementIndex {
   }
 
   /** Resolves a TypeDefType field to the field type it points to, mirroring the kernel's Field.getEffectiveType(). */
-  FieldType effectiveFieldType(FieldType fieldType) {
+  public FieldType effectiveFieldType(FieldType fieldType) {
     if (fieldType instanceof TypeDefFieldType typeDefFieldType
         && typeDefFieldType.getTypeDefType() != null
         && typeDefFieldType.getTypeDefType().getTypeDefinitionId() != null) {

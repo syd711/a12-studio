@@ -5,10 +5,8 @@ import de.a12.studio.models.documentmodel.DocumentModelContent;
 import de.a12.studio.models.documentmodel.ModelConfig;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.modelsvalidation.DMValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
-import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -27,8 +25,6 @@ import java.util.ResourceBundle;
 public class TimezonePanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final List<String> TIMEZONES = List.of("UTC", "Europe/Berlin");
-
-  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   @FXML
   private ComboBox<String> timezoneCombo;
@@ -80,7 +76,7 @@ public class TimezonePanelController extends AbstractPropertyEditor implements I
 
   /**
    * A model's time zone must agree with every other document model in its project, see {@link
-   * DMValidationService#getTimeZoneMismatchError}.
+   * de.a12.studio.modelsvalidation.ValidationService#getTimeZoneMismatchError}.
    */
   private void updateValidation() {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
@@ -88,7 +84,7 @@ public class TimezonePanelController extends AbstractPropertyEditor implements I
       hideError();
       return;
     }
-    VALIDATION_SERVICE.getTimeZoneMismatchError(model, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+    Studio.getValidationService().getTimeZoneMismatchError(model)
         .ifPresentOrElse(message -> showError("ERROR", message), this::hideError);
   }
 

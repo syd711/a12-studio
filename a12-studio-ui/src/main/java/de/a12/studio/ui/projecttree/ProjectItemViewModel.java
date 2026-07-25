@@ -4,7 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.modelsvalidation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
 
@@ -15,9 +15,9 @@ import java.util.Map;
 public class ProjectItemViewModel {
 
   private final ProjectItem projectItem;
-  private final Map<String, List<ElementValidationError>> validationErrorsByPath;
+  private final Map<String, List<ModelValidationError>> validationErrorsByPath;
 
-  public ProjectItemViewModel(@NonNull ProjectItem projectItem, @NonNull Map<String, List<ElementValidationError>> validationErrorsByPath) {
+  public ProjectItemViewModel(@NonNull ProjectItem projectItem, @NonNull Map<String, List<ModelValidationError>> validationErrorsByPath) {
     this.projectItem = projectItem;
     this.validationErrorsByPath = validationErrorsByPath;
   }
@@ -69,7 +69,7 @@ public class ProjectItemViewModel {
     return children;
   }
 
-  public List<ElementValidationError> getValidationErrors() {
+  public List<ModelValidationError> getValidationErrors() {
     return validationErrorsByPath.getOrDefault(projectItem.getPath(), List.of());
   }
 

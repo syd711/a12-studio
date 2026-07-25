@@ -10,11 +10,10 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.documentmodel.RuleElement;
-import de.a12.studio.modelsvalidation.DMValidationService;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;
-import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -42,8 +41,6 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   private static final String COMPUTATION_RULE_EDITOR_FXML = "document-model-computation-rule-editor.fxml";
 
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
-
-  private static final DMValidationService VALIDATION_SERVICE = new DMValidationService();
 
   @FXML
   private SplitPane splitPane;
@@ -78,8 +75,8 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   }
 
   private void updateSettingsErrorBadge() {
-    List<String> issues = projectItem.getModel() instanceof DocumentModel documentModel
-        ? VALIDATION_SERVICE.getSettingsIssueMessages(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+    List<String> issues = projectItem.getModel() != null
+        ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
         : List.of();
 
     settingsErrorBadge.setVisible(!issues.isEmpty());

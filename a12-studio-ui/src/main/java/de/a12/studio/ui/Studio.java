@@ -4,6 +4,7 @@ import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -33,6 +34,7 @@ public class Studio extends Application implements StudioEventListener {
   public static Stage stage;
   private static RootController rootController;
   private static Project currentProject;
+  private static ValidationService validationService;
 
   @Override
   public void start(Stage stage) throws IOException {
@@ -108,6 +110,10 @@ public class Studio extends Application implements StudioEventListener {
     return currentProject;
   }
 
+  public static ValidationService getValidationService() {
+    return validationService;
+  }
+
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
     // Set before anything else: Studio registers as a listener before the FXML (and its nested
@@ -116,6 +122,7 @@ public class Studio extends Application implements StudioEventListener {
     // project to already be available for cross-model settings validation (e.g. the settings button's
     // error badge).
     currentProject = event.getProject();
+    validationService = new ValidationService(currentProject);
 
     stage.setTitle("A12 Studio - " + currentProject.getName());
     rootController.setTitle("A12 Studio - " + currentProject.getName() + " (" + currentProject.getRoot().getPath() + ")");

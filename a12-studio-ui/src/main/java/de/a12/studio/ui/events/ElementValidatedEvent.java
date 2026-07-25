@@ -1,6 +1,6 @@
 package de.a12.studio.ui.events;
 
-import de.a12.studio.modelsvalidation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
@@ -9,9 +9,9 @@ public class ElementValidatedEvent {
   @NonNull
   private final String elementId;
 
-  private final ElementValidationError error;
+  private final ModelValidationError error;
 
-  public ElementValidatedEvent(@NonNull String elementId, ElementValidationError error) {
+  public ElementValidatedEvent(@NonNull String elementId, ModelValidationError error) {
     this.elementId = elementId;
     this.error = error;
   }
@@ -20,7 +20,7 @@ public class ElementValidatedEvent {
     return elementId;
   }
 
-  public Optional<ElementValidationError> getError() {
+  public Optional<ModelValidationError> getError() {
     return Optional.ofNullable(error);
   }
 }

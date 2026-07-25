@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class ModelReference {
 
+  public static final String PURPOSE_INCLUDE = "include";
+
   private String alias;
   private ModelType modelType;
   private String purpose;

@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  * kernel's condition-language compiler (catching expression syntax errors, undefined field references, and
  * calc cycles) and is not reproducible without reimplementing that compiler, so it is intentionally omitted.
  */
-final class DocumentModelConsistencyRules {
+public final class DocumentModelConsistencyRules {
 
   private static final int MAX_DIGITS = 15;
   private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+\\.\\d+)");
@@ -54,7 +54,7 @@ final class DocumentModelConsistencyRules {
   private DocumentModelConsistencyRules() {
   }
 
-  static List<ValidationProblem> checkAll(DocumentModel model, ElementIndex index) {
+  public static List<ValidationProblem> checkAll(DocumentModel model, ElementIndex index) {
     List<ValidationProblem> problems = new ArrayList<>();
     problems.addAll(checkSchemaVersion(model));
     problems.addAll(checkIdUnique(index));
@@ -251,8 +251,8 @@ final class DocumentModelConsistencyRules {
   }
 
   // --- DocumentSchemaVersionRule / DocumentSchemaVersionPatternRule ---
-  // Model-sourced (elementId == null): DMValidationService drops these, mirroring how the kernel's
-  // getElementProblems only ever surfaced element-sourced problems to the UI. Kept for completeness.
+  // Model-sourced (elementId == null): DocumentModelValidationService drops these, mirroring how the
+  // kernel's getElementProblems only ever surfaced element-sourced problems to the UI. Kept for completeness.
 
   private static List<ValidationProblem> checkSchemaVersion(DocumentModel model) {
     List<ValidationProblem> problems = new ArrayList<>();
