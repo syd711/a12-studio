@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.applicationmodel.ModuleEditorController">
+<ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.applicationmodel.ModuleEditorController">
     <content>
         <VBox spacing="12.0" styleClass="field-editor">
             <padding>
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
             </padding>
-            <Label styleClass="editor-type-label" text="Module Editor" />
+         <BorderPane>
+            <left>
+                  <Label styleClass="editor-type-label" text="Module Editor" BorderPane.alignment="CENTER" />
+            </left>
+            <right>
+               <Button mnemonicParsing="false" onAction="#onClose" styleClass="ghost-button-default" BorderPane.alignment="CENTER">
+                  <graphic>
+                     <FontIcon iconColor="#272828" iconLiteral="mdi2c-close-circle-outline" iconSize="32" />
+                  </graphic>
+               </Button>
+            </right>
+         </BorderPane>
 
             <!-- Name -->
             <VBox>
@@ -21,6 +39,35 @@
                     <TextField fx:id="nameField" promptText="Enter the module name here..." />
                 </children>
             </VBox>
+
+            <!-- Menu -->
+            <TitledPane fx:id="menuPane" maxWidth="Infinity" text="Menu">
+                <VBox spacing="12.0">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label styleClass="field-label" text="Name" />
+                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                    <children>
+                                        <TextField fx:id="menuNameField" maxWidth="Infinity" promptText="Enter the menu name here..." HBox.hgrow="ALWAYS" />
+                                        <Label>
+                                            <graphic>
+                                                <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                                            </graphic>
+                                            <tooltip>
+                                                <Tooltip prefWidth="300.0" text="Leave empty, if the module should not have a menu entry. Additional menu data like activityDescriptor, permission and children is not saved in that case." wrapText="true" />
+                                            </tooltip>
+                                        </Label>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <!-- Activity Descriptor -->
+                        <fx:include fx:id="activity" source="../propertyeditors/activity-panel.fxml" />
+                    </children>
+                </VBox>
+            </TitledPane>
 
             <!-- Label -->
             <fx:include fx:id="label" source="../propertyeditors/localized-text-panel.fxml" />

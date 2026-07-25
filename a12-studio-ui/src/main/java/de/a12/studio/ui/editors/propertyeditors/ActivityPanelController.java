@@ -3,6 +3,8 @@ package de.a12.studio.ui.editors.propertyeditors;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.InitialActivity;
+import de.a12.studio.models.applicationmodel.Menu;
+import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.Icons;
@@ -27,9 +29,10 @@ import java.util.ResourceBundle;
 /**
  * Edits {@link InitialActivity#getDescriptor()}. Same row-based Name/Value layout as {@link
  * AnnotationsPanelController}, except the name column offers a fixed set of descriptor keys instead of
- * suggestions sourced from a registry. Not bound to a single Element (the descriptor lives on the model's
- * {@link ApplicationModelContent}), so it follows the model-header pattern used by e.g. {@link
- * TimezonePanelController}.
+ * suggestions sourced from a registry. Not bound to a single Element (the descriptor lives on either the
+ * model's {@link ApplicationModelContent} via {@link #setModel}, or a {@link Module}'s {@link Menu} via
+ * {@link #setModule}; the two are mutually exclusive), so it follows the model-header pattern used by e.g.
+ * {@link TimezonePanelController}.
  */
 public class ActivityPanelController extends AbstractPropertyEditor {
 
@@ -43,20 +46,30 @@ public class ActivityPanelController extends AbstractPropertyEditor {
 
   private ApplicationModel model;
 
+  private Module module;
+
   private final List<DescriptorEntry> entries = new ArrayList<>();
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
     bindCheckBox(skipDataLoadingCheckbox, (el, value) -> {
-      if (model != null) {
+      if (model != null || module != null) {
         getOrCreateInitialActivity().setWithoutData(value ? true : null);
       }
     });
   }
 
   public void setModel(@NonNull ApplicationModel model) {
+    this.module = null;
     this.model = model;
+    rebuildRows();
+    setFieldValue(skipDataLoadingCheckbox, isWithoutData());
+  }
+
+  public void setModule(@NonNull Module module) {
+    this.model = null;
+    this.module = module;
     rebuildRows();
     setFieldValue(skipDataLoadingCheckbox, isWithoutData());
   }
@@ -171,21 +184,28 @@ public class ActivityPanelController extends AbstractPropertyEditor {
   }
 
   private Map<String, String> getDescriptor() {
-    if (model == null || model.getContent() == null || model.getContent().getInitialActivity() == null) {
-      return null;
-    }
-    return model.getContent().getInitialActivity().getDescriptor();
+    InitialActivity initialActivity = getInitialActivity();
+    return initialActivity != null ? initialActivity.getDescriptor() : null;
   }
 
   private boolean isWithoutData() {
-    if (model == null || model.getContent() == null || model.getContent().getInitialActivity() == null) {
-      return false;
+    InitialActivity initialActivity = getInitialActivity();
+    return initialActivity != null && Boolean.TRUE.equals(initialActivity.getWithoutData());
+  }
+
+  private InitialActivity getInitialActivity() {
+    if (module != null) {
+      Menu menu = module.getMenu();
+      return menu != null ? menu.getInitialActivity() : null;
     }
-    return Boolean.TRUE.equals(model.getContent().getInitialActivity().getWithoutData());
+    if (model == null || model.getContent() == null) {
+      return null;
+    }
+    return model.getContent().getInitialActivity();
   }
 
   private void syncDescriptorToModel() {
-    if (model == null) {
+    if (model == null && module == null) {
       return;
     }
     Map<String, String> descriptor = getOrCreateInitialActivity().getDescriptor();
@@ -196,11 +216,28 @@ public class ActivityPanelController extends AbstractPropertyEditor {
   }
 
   private InitialActivity getOrCreateInitialActivity() {
+    if (module != null) {
+      return getOrCreateInitialActivity(module.getOrCreateMenu());
+    }
+
     ApplicationModelContent content = model.getContent();
     if (content == null) {
       content = new ApplicationModelContent();
       model.setContent(content);
     }
+    return getOrCreateInitialActivity(content);
+  }
+
+  private static InitialActivity getOrCreateInitialActivity(Menu menu) {
+    InitialActivity initialActivity = menu.getInitialActivity();
+    if (initialActivity == null) {
+      initialActivity = new InitialActivity();
+      menu.setInitialActivity(initialActivity);
+    }
+    return initialActivity;
+  }
+
+  private static InitialActivity getOrCreateInitialActivity(ApplicationModelContent content) {
     InitialActivity initialActivity = content.getInitialActivity();
     if (initialActivity == null) {
       initialActivity = new InitialActivity();

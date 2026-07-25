@@ -85,13 +85,11 @@ public class ApplicationModelEditorController extends AbstractEditorController i
     activityController.setModel(documentModel);
     layoutController.setModel(documentModel);
     regionController.setModel(documentModel);
+    subregionsController.setModel(documentModel);
   }
 
   private void openModuleEditor(@NonNull Module module) {
-    if (currentModuleEditorController != null) {
-      currentModuleEditorController.destroy();
-      currentModuleEditorController = null;
-    }
+    closeModuleEditor();
 
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(MODULE_EDITOR_FXML));
@@ -99,6 +97,7 @@ public class ApplicationModelEditorController extends AbstractEditorController i
       VBox.setVgrow(node, Priority.ALWAYS);
       currentModuleEditorController = loader.getController();
       currentModuleEditorController.setModule(module);
+      currentModuleEditorController.setOnCloseRequested(this::closeModuleEditor);
       editorContainer.getChildren().setAll(node);
       if (!splitPane.getItems().contains(editorContainer)) {
         splitPane.getItems().add(editorContainer);
@@ -108,6 +107,15 @@ public class ApplicationModelEditorController extends AbstractEditorController i
     catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  private void closeModuleEditor() {
+    if (currentModuleEditorController != null) {
+      currentModuleEditorController.destroy();
+      currentModuleEditorController = null;
+    }
+    editorContainer.getChildren().clear();
+    splitPane.getItems().remove(editorContainer);
   }
 
   private void updateSettingsErrorBadge() {

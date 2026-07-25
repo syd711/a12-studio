@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.Layout;
 import de.a12.studio.models.applicationmodel.Region;
 import de.a12.studio.ui.Studio;
@@ -34,10 +36,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Edits {@link Region#getSubRegions()}: a list of subregions, each reorderable (move up/down), editable and
- * copyable via {@link SubregionDialogController}, and deletable. Same row-based layout as {@link
- * ModulesPanelController}, with an additional read-only "Layout" column showing each subregion's {@link
- * Layout#getName()}.
+ * Edits {@link ApplicationModelContent#getRegion()}'s {@link Region#getSubRegions()}: a list of subregions, each
+ * reorderable (move up/down), editable and copyable via {@link SubregionDialogController}, and deletable. Same
+ * row-based layout as {@link ModulesPanelController}, with an additional read-only "Layout" column showing each
+ * subregion's {@link Layout#getName()}. Not bound to a single {@link de.a12.studio.models.documentmodel.Element}
+ * (the region lives on the model's content), so it follows the model-header pattern used by e.g. {@link
+ * RegionPanelController}.
  */
 public class SubregionsPanelController extends AbstractPropertyEditor {
 
@@ -50,10 +54,10 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
   @FXML
   private VBox subregionsList;
 
-  private Region region;
+  private ApplicationModel model;
 
-  public void setRegion(@NonNull Region region) {
-    this.region = region;
+  public void setModel(@NonNull ApplicationModel model) {
+    this.model = model;
     rebuildRows();
   }
 
@@ -62,13 +66,32 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     SubregionDialogController.showForAdd(Studio.stage).ifPresent(name -> {
       Region subregion = new Region();
       subregion.setName(name);
-      getSubRegions().add(subregion);
+      getOrCreateSubRegions().add(subregion);
       rebuildRows();
       commitChange();
     });
   }
 
+  private Region getRegion() {
+    return model == null || model.getContent() == null ? null : model.getContent().getRegion();
+  }
+
   private List<Region> getSubRegions() {
+    Region region = getRegion();
+    return region != null ? region.getSubRegions() : List.of();
+  }
+
+  private List<Region> getOrCreateSubRegions() {
+    ApplicationModelContent content = model.getContent();
+    if (content == null) {
+      content = new ApplicationModelContent();
+      model.setContent(content);
+    }
+    Region region = content.getRegion();
+    if (region == null) {
+      region = new Region();
+      content.setRegion(region);
+    }
     return region.getSubRegions();
   }
 
@@ -178,7 +201,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     if (insertIndex == fromIndex) {
       return;
     }
-    List<Region> subregions = getSubRegions();
+    List<Region> subregions = getOrCreateSubRegions();
     Region moved = subregions.remove(fromIndex);
     subregions.add(insertIndex, moved);
     rebuildRows();
@@ -200,7 +223,8 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
       copy.setName(subregion.getName());
       copy.setLayout(subregion.getLayout());
       copy.setSubRegions(new ArrayList<>(subregion.getSubRegions()));
-      getSubRegions().add(getSubRegions().indexOf(subregion) + 1, copy);
+      List<Region> subregions = getOrCreateSubRegions();
+      subregions.add(subregions.indexOf(subregion) + 1, copy);
       rebuildRows();
       commitChange();
     });
@@ -208,7 +232,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this subregion?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
-        getSubRegions().remove(subregion);
+        getOrCreateSubRegions().remove(subregion);
         rebuildRows();
         commitChange();
       }
@@ -234,7 +258,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
   }
 
   private void moveRow(int fromIndex, int toIndex) {
-    Collections.swap(getSubRegions(), fromIndex, toIndex);
+    Collections.swap(getOrCreateSubRegions(), fromIndex, toIndex);
     rebuildRows();
     commitChange();
   }
