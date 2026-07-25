@@ -5,13 +5,17 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.IncludeConfig;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import org.jspecify.annotations.NonNull;
@@ -26,6 +30,9 @@ public class IncludePropertiesPanelController extends AbstractPropertyEditor imp
 
   @FXML
   private ComboBox<String> referenceComboBox;
+
+  @FXML
+  private Button editReferenceButton;
 
   @FXML
   private CheckBox excludeValidationRulesCheckBox;
@@ -43,6 +50,29 @@ public class IncludePropertiesPanelController extends AbstractPropertyEditor imp
         getGroupConfig(element).ifPresent(config -> includeConfig(config).setExcludeRules(value ? true : null)));
     bindCheckBox(excludeComputationRulesCheckBox, (element, value) ->
         getGroupConfig(element).ifPresent(config -> includeConfig(config).setExcludeComputations(value ? true : null)));
+
+    editReferenceButton.disableProperty().bind(referenceComboBox.valueProperty().isNull());
+  }
+
+  /**
+   * Opens the Document Model referenced by the combo box in an editor tab, selecting its tab instead if it's
+   * already open (see {@code TabPaneController#modelOpened}).
+   */
+  @FXML
+  private void onEditReference(ActionEvent event) {
+    String reference = referenceComboBox.getValue();
+    if (reference == null) {
+      return;
+    }
+
+    ProjectDocumentModels.findProjectItemByModelId(reference).ifPresent(item -> {
+      Project project = Studio.getCurrentProject();
+      if (project != null) {
+        project.getSettings().getUISettings().addOpenedFile(item.getPath());
+        project.getSettings().getUISettings().save();
+      }
+      StudioEventManager.getInstance().fireModelOpenEvent(item);
+    });
   }
 
   @Override

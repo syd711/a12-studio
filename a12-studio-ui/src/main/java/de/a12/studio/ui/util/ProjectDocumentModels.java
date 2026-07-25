@@ -8,6 +8,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Looks up sibling {@link DocumentModel}s in the same project, needed for cross-model settings validation
@@ -45,5 +46,34 @@ public final class ProjectDocumentModels {
     else if (!item.getPath().equals(excludedPath) && item.getModel() instanceof DocumentModel documentModel) {
       result.add(documentModel);
     }
+  }
+
+  /**
+   * The {@link ProjectItem} backing the {@link DocumentModel} with the given id, searched from the project's
+   * canonical root (see {@link #getOtherDocumentModels} for why). Used to open a referenced model (e.g. an
+   * Include's target) in an editor tab, which needs the {@link ProjectItem} rather than just the model.
+   */
+  public static Optional<ProjectItem> findProjectItemByModelId(@NonNull String modelId) {
+    Project project = Studio.getCurrentProject();
+    if (project == null) {
+      return Optional.empty();
+    }
+    return findByModelId(project.getRoot(), modelId);
+  }
+
+  private static Optional<ProjectItem> findByModelId(@NonNull ProjectItem item, @NonNull String modelId) {
+    if (item.isFolder()) {
+      for (ProjectItem child : item.getChildren()) {
+        Optional<ProjectItem> found = findByModelId(child, modelId);
+        if (found.isPresent()) {
+          return found;
+        }
+      }
+      return Optional.empty();
+    }
+    if (item.getModel() instanceof DocumentModel documentModel && modelId.equals(documentModel.getId())) {
+      return Optional.of(item);
+    }
+    return Optional.empty();
   }
 }
