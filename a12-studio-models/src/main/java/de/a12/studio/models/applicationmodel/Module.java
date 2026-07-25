@@ -18,4 +18,14 @@ public class Module {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Menu menu;
   private List<Flow> flows = new ArrayList<>();
+
+  // Menu.name has no default and is normally kept in sync with the module's own name (see real app models),
+  // so a freshly created menu is seeded with it rather than left null.
+  public Menu getOrCreateMenu() {
+    if (menu == null) {
+      menu = new Menu();
+      menu.setName(name);
+    }
+    return menu;
+  }
 }

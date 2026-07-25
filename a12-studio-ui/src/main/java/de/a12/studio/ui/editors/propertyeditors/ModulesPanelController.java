@@ -33,11 +33,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Edits {@link ApplicationModelContent#getModules()}: a list of module names, each reorderable (move up/down),
- * editable and copyable via {@link ModuleDialogController}, and deletable. Not bound to a single Element (modules
- * live on the model's content), so it follows the model-header pattern used by e.g. {@link ActivityPanelController}.
+ * copyable and deletable, with a full editor (name, menu label, roles) opened inline via {@link #onEditModule}
+ * (see {@link #setOnEditModule}) when a row's "Edit" button is pressed or a row is double-clicked. Not bound to
+ * a single Element (modules live on the model's content), so it follows the model-header pattern used by e.g.
+ * {@link ActivityPanelController}.
  */
 public class ModulesPanelController extends AbstractPropertyEditor {
 
@@ -49,9 +52,17 @@ public class ModulesPanelController extends AbstractPropertyEditor {
 
   private ApplicationModel model;
 
+  // Notified with the module to open in the inline editor, e.g. by ApplicationModelEditorController to show
+  // it in its editorContainer. Set via setOnEditModule once this panel is loaded from FXML.
+  private Consumer<Module> onEditModule;
+
   public void setModel(@NonNull ApplicationModel model) {
     this.model = model;
     rebuildRows();
+  }
+
+  public void setOnEditModule(@NonNull Consumer<Module> onEditModule) {
+    this.onEditModule = onEditModule;
   }
 
   @FXML
@@ -99,6 +110,11 @@ public class ModulesPanelController extends AbstractPropertyEditor {
     HBox row = new HBox(10.0, dragHandle, nameLabel, createActionsBox(module, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
+    row.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 2) {
+        onEditModule.accept(module);
+      }
+    });
     setupDragAndDrop(row, dragHandle, index);
     return row;
   }
@@ -179,12 +195,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(Module module, int index, int rowCount) {
     VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () ->
-        ModuleDialogController.showForEdit(Studio.stage, module.getName()).ifPresent(name -> {
-          module.setName(name);
-          rebuildRows();
-          commitChange();
-        }));
+    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> onEditModule.accept(module));
 
     Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
       Module copy = new Module();

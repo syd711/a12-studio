@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.propertyeditors;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Locale;
 import de.a12.studio.models.Label;
+import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
@@ -30,10 +31,11 @@ import java.util.function.Function;
  * Edits a per-locale text (a list of {@link Label}). Reused for the label,
  * internal description, external description and helper text of a single {@link Element} (via {@link
  * #setElement}, distinguished via {@link #configureLabel} / {@link #configureInternal} / {@link
- * #configureExternal} / {@link #configureHelperText}), as well as for a model's own header labels (via {@link
- * #setModel} after {@link #configureModelLabels}). Exactly one configure method must be called once after this
- * controller is loaded from FXML, before setElement/setModel; {@code element} and {@link #model} are mutually
- * exclusive.
+ * #configureExternal} / {@link #configureHelperText}), for a model's own header labels (via {@link
+ * #setModel} after {@link #configureModelLabels}), and for an application model {@link Module}'s menu label
+ * (via {@link #setModule} after {@link #configureModuleMenuLabel}). Exactly one configure method must be
+ * called once after this controller is loaded from FXML, before setElement/setModel/setModule; {@code
+ * element}, {@link #model} and {@link #module} are mutually exclusive.
  */
 public class LocalizedTextPanelController extends AbstractPropertyEditor implements StudioEventListener {
 
@@ -41,6 +43,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   private GridPane localesGrid;
 
   private A12Model<?> model;
+
+  private Module module;
 
   // Captured whenever setElement/setModel is called, i.e. whenever this panel is (re)bound to whichever
   // project item is currently selected. Used to tell apart a locales-changed event meant for this panel's own
@@ -52,6 +56,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   private Function<Element, List<Label>> elementTextsWriteAccessor = elementTextsAccessor;
 
   private Function<A12Model<?>, List<Label>> modelTextsAccessor = A12Model::getLabels;
+
+  private Function<Module, List<Label>> moduleTextsAccessor = module -> module.getOrCreateMenu().getLabel();
 
   private String fieldKey = "external";
 
@@ -85,6 +91,12 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
     setSettingsKeySuffix("." + fieldKey);
   }
 
+  public void configureModuleMenuLabel() {
+    this.fieldKey = "label";
+    setTitle("LABEL");
+    setSettingsKeySuffix("." + fieldKey);
+  }
+
   private void configure(Function<Element, List<Label>> textsAccessor, String fieldKey, String title) {
     configure(textsAccessor, textsAccessor, fieldKey, title);
   }
@@ -107,6 +119,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   @Override
   public void setElement(@NonNull Element element) {
     this.model = null;
+    this.module = null;
     this.projectItem = Studio.getSelectedProjectItem();
     super.setElement(element);
     buildLocaleFields();
@@ -115,7 +128,17 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
 
   public void setModel(@NonNull A12Model<?> model) {
     this.element = null;
+    this.module = null;
     this.model = model;
+    this.projectItem = Studio.getSelectedProjectItem();
+    buildLocaleFields();
+    populateLocaleFields();
+  }
+
+  public void setModule(@NonNull Module module) {
+    this.element = null;
+    this.model = null;
+    this.module = module;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
     populateLocaleFields();
@@ -135,6 +158,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   }
 
   private List<Label> getTexts() {
+    if (module != null) {
+      return moduleTextsAccessor.apply(module);
+    }
     return model != null ? modelTextsAccessor.apply(model) : elementTextsAccessor.apply(element);
   }
 
@@ -172,6 +198,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   }
 
   private List<Label> getWriteTexts() {
+    if (module != null) {
+      return moduleTextsAccessor.apply(module);
+    }
     return model != null ? modelTextsAccessor.apply(model) : elementTextsWriteAccessor.apply(element);
   }
 

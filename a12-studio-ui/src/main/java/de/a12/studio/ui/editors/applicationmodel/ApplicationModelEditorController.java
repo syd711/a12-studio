@@ -3,19 +3,28 @@ package de.a12.studio.ui.editors.applicationmodel;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.propertyeditors.*;
+import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -23,6 +32,8 @@ import java.util.ResourceBundle;
 public class ApplicationModelEditorController extends AbstractEditorController implements Initializable {
 
   private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
+
+  private static final String MODULE_EDITOR_FXML = "module-editor.fxml";
 
   @FXML
   private Tooltip settingsButtonTooltip;
@@ -45,6 +56,13 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   @FXML
   private SubregionsPanelController subregionsController;
 
+  @FXML
+  private SplitPane splitPane;
+
+  @FXML
+  private VBox editorContainer;
+
+  private ModuleEditorController currentModuleEditorController;
 
   @FXML
   public void onSettings(ActionEvent e) {
@@ -69,6 +87,29 @@ public class ApplicationModelEditorController extends AbstractEditorController i
     regionController.setModel(documentModel);
   }
 
+  private void openModuleEditor(@NonNull Module module) {
+    if (currentModuleEditorController != null) {
+      currentModuleEditorController.destroy();
+      currentModuleEditorController = null;
+    }
+
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource(MODULE_EDITOR_FXML));
+      Node node = loader.load();
+      VBox.setVgrow(node, Priority.ALWAYS);
+      currentModuleEditorController = loader.getController();
+      currentModuleEditorController.setModule(module);
+      editorContainer.getChildren().setAll(node);
+      if (!splitPane.getItems().contains(editorContainer)) {
+        splitPane.getItems().add(editorContainer);
+        splitPane.setDividerPositions(0.5);
+      }
+    }
+    catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
   private void updateSettingsErrorBadge() {
     List<String> issues = projectItem.getModel() != null
         ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
@@ -81,10 +122,25 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     BaseTableSettings tableSettings = getBaseTableSettings();
+    modulesController.setOnEditModule(this::openModuleEditor);
   }
 
   @Override
   public @NonNull ModelType getModelType() {
     return ModelType.APPLICATION;
+  }
+
+  /**
+   * In addition to unregistering this editor itself (see {@link AbstractEditorController#modelClosed}), tears
+   * down whichever module editor panel is currently displayed in {@code editorContainer}, since it isn't
+   * otherwise reached once the tab is gone.
+   */
+  @Override
+  public void modelClosed(@NonNull ModelClosedEvent event) {
+    super.modelClosed(event);
+    if (currentModuleEditorController != null && event.getItem().equals(projectItem)) {
+      currentModuleEditorController.destroy();
+      currentModuleEditorController = null;
+    }
   }
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.applicationmodel.ModuleEditorController">
+    <content>
+        <VBox spacing="12.0" styleClass="field-editor">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <Label styleClass="editor-type-label" text="Module Editor" />
+
+            <!-- Name -->
+            <VBox>
+                <children>
+                    <Label styleClass="field-label" text="Name*" />
+                    <TextField fx:id="nameField" promptText="Enter the module name here..." />
+                </children>
+            </VBox>
+
+            <!-- Label -->
+            <fx:include fx:id="label" source="../propertyeditors/localized-text-panel.fxml" />
+
+            <!-- Roles -->
+            <fx:include fx:id="roles" source="../propertyeditors/module-roles-panel.fxml" />
+        </VBox>
+    </content>
+</ScrollPane>

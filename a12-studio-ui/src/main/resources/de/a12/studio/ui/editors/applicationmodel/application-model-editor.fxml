@@ -2,9 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
@@ -12,9 +12,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+
 <?import de.a12.studio.ui.editors.EditorFileToolbarButtons?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.applicationmodel.ApplicationModelEditorController">
+    <fx:define>
+        <VBox fx:id="editorContainer" prefWidth="100.0" />
+    </fx:define>
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
@@ -48,21 +52,25 @@
         </ToolBar>
     </right>
    <center>
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
-         <content>
-            <VBox spacing="12.0" styleClass="field-editor">
-               <children>
-                  <fx:include fx:id="region" source="../propertyeditors/region-panel.fxml" />
-                  <fx:include fx:id="subregions" source="../propertyeditors/subregions-panel.fxml" />
-                  <fx:include fx:id="layout" source="../propertyeditors/layout-panel.fxml" />
-                  <fx:include fx:id="modules" source="../propertyeditors/modules-panel.fxml" />
-                  <fx:include fx:id="activity" source="../propertyeditors/activity-panel.fxml" />
-               </children>
-               <padding>
-                  <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-               </padding>
-            </VBox>
-         </content>
-      </ScrollPane>
+      <SplitPane fx:id="splitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
+         <items>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+               <content>
+                  <VBox spacing="12.0" styleClass="field-editor">
+                     <children>
+                        <fx:include fx:id="region" source="../propertyeditors/region-panel.fxml" />
+                        <fx:include fx:id="subregions" source="../propertyeditors/subregions-panel.fxml" />
+                        <fx:include fx:id="layout" source="../propertyeditors/layout-panel.fxml" />
+                        <fx:include fx:id="modules" source="../propertyeditors/modules-panel.fxml" />
+                        <fx:include fx:id="activity" source="../propertyeditors/activity-panel.fxml" />
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </ScrollPane>
+         </items>
+      </SplitPane>
    </center>
 </BorderPane>
