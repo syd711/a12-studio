@@ -290,8 +290,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   }
 
   /**
-   * Whether {@code element} is a group with fixed children (attachment, multi-select), or a descendant
-   * of one. Such groups have a fixed set of children, so nothing may be added inside them.
+   * Whether {@code element} is a group with fixed children (attachment, multi-select, include), or a
+   * descendant of one. Such groups have a fixed set of children, so nothing may be added inside them.
    */
   private boolean isWithinFixedChildrenGroup(@NonNull Element element) {
     return new ElementViewModel(element).hasFixedChildren() || hasFixedChildrenAncestor(element);
@@ -299,7 +299,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   /**
    * Whether any ancestor of {@code element} (not {@code element} itself) is a group with fixed
-   * children (attachment, multi-select).
+   * children (attachment, multi-select, include).
    */
   private boolean hasFixedChildrenAncestor(@NonNull Element element) {
     for (Element ancestor : getAncestors(element)) {

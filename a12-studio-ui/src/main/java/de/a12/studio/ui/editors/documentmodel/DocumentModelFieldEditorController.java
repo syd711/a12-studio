@@ -103,10 +103,10 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
    * checkbox decides instead: unchecked means the user wants a custom message, so the editor is shown.
    */
   private void updateErrorMessagesVisibility() {
-    boolean hidden = isStringFieldType() && typeDefinitionController.isMultiSelectParent()
+    boolean visible = !isStringFieldType() && typeDefinitionController.isMultiSelectParent()
         ? !typeDefinitionController.defaultErrorMessagesProperty().get()
         : !dataTypeConfigurationController.patternProperty().get().isEmpty();
-    errorMessages.setVisible(!hidden);
+    errorMessages.setVisible(visible);
   }
 
   private boolean isStringFieldType() {

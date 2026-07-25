@@ -106,12 +106,13 @@ public class ElementViewModel {
   }
 
   /**
-   * Whether this element is a group whose children are fixed by its usage type (attachment, multi-select),
-   * so no elements may be added to or removed from it.
+   * Whether this element is a group whose children are fixed (attachment, multi-select) or externally
+   * determined by a referenced document model (include), so no elements may be added to or removed from it.
    */
   public boolean hasFixedChildren() {
     return element instanceof GroupElement groupElement
-        && (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)
+        && (isInclude(groupElement)
+            || hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)
             || hasUsageType(groupElement, GroupConfig.USAGE_TYPE_MULTI_SELECT));
   }
 

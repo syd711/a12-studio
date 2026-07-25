@@ -26,6 +26,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -160,7 +161,8 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     requiredParentBox.visibleProperty().bind(requiredCheckBox.selectedProperty());
 
     defaultErrorMessagesBox.managedProperty().bind(defaultErrorMessagesBox.visibleProperty());
-    defaultErrorMessagesBox.visibleProperty().bind(requiredCheckBox.selectedProperty());
+    defaultErrorMessagesBox.visibleProperty().bind(requiredCheckBox.selectedProperty()
+        .and(Bindings.createBooleanBinding(() -> !isMultiSelectStringDataType(), dataTypeComboBox.valueProperty())));
 
     bindCheckBox(globalCheckBox, (element, value) ->
         withFieldConfig(element, field -> field.setGlobal(value ? true : null)));
@@ -329,6 +331,14 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     return parent instanceof GroupElement groupElement
         && groupElement.getGroup() != null
         && GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType());
+  }
+
+  /**
+   * A multi-select group's String choices have no error-message-relevant validation of their own, so the
+   * "Use default error messages" checkbox is meaningless there and stays hidden.
+   */
+  private boolean isMultiSelectStringDataType() {
+    return isMultiSelectParent() && TYPE_STRING.equals(dataTypeComboBox.getValue());
   }
 
   /**

@@ -380,13 +380,38 @@
                       "id": "include_e823c",
                       "name": "People",
                       "Group": {
-                        "repeatability": 1,
+                        "repeatability": 22,
                         "includeConfig": {
-                          "reference": "Addresses_DM",
+                          "reference": "Invoice_DM",
                           "excludeRules": true,
                           "excludeComputations": true
                         },
                         "elements": []
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "multi-select_e50ab",
+                      "name": "MultiSelect",
+                      "Group": {
+                        "repeatability": 999999,
+                        "usageType": "multi-select",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "multiSelectChild_39463",
+                            "name": "value",
+                            "Field": {
+                              "fieldType": {
+                                "type": "EnumerationType",
+                                "EnumerationType": null
+                              },
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
