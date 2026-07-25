@@ -100,6 +100,18 @@
 }
 
 /*
+ * The element name is rendered via a Label set as the cell's graphic (see
+ * ElementNameTreeCell), not as the cell's own text, so -fx-text-fill on
+ * .tree-table-cell.validation-error above never reaches it. This is the actual
+ * rule that turns an errored element's name red; the selected-state override
+ * further down (search "tree-cell-name-label") restores white text on top of it.
+ */
+.tree-cell-name-label.validation-error {
+    -fx-text-fill: -fx-error-bg;
+    -fx-font-weight: bold;
+}
+
+/*
  * ID-scoped overrides for the document model elements TreeTableView
  * (fx:id="elementsTreeTable"). An id selector always outranks Modena's
  * built-in class/pseudo-class selectors, so this is used as a guaranteed
