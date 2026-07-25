@@ -74,6 +74,9 @@
 
             <!-- Roles -->
             <fx:include fx:id="roles" source="../propertyeditors/module-roles-panel.fxml" />
+
+            <!-- Child Menu -->
+            <fx:include fx:id="childMenu" source="../propertyeditors/child-menu-panel.fxml" />
         </VBox>
     </content>
 </ScrollPane>

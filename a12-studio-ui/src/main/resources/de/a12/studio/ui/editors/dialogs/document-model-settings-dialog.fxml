@@ -43,6 +43,9 @@
                           <!-- Annotations -->
                           <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
 
+                          <!-- Model References -->
+                          <fx:include fx:id="modelReferences" source="../propertyeditors/model-references-panel.fxml" />
+
                           <!-- Timezone -->
                           <fx:include fx:id="timezone" source="../propertyeditors/timezone-panel.fxml" />
                       </VBox>

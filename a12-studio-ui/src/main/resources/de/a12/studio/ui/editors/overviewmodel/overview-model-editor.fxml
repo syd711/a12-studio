@@ -43,7 +43,7 @@
    <center>
        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
            <tabs>
-               <Tab text="Untitled Tab 1">
+               <Tab text="Overview">
                    <content>
                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
                            <content>
@@ -58,7 +58,7 @@
                        </ScrollPane>
                    </content>
                </Tab>
-               <Tab text="Untitled Tab 2">
+               <Tab text="Custom Actions">
                    <content>
                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                    </content>

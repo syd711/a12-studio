@@ -1,0 +1,185 @@
+package de.a12.studio.ui.editors.propertyeditors;
+
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.WidgetFactory;
+import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Edits an {@link A12Model}'s header {@link A12Model#getModelReferences()}: a list of {@link ModelReference}s,
+ * each naming an alias/purpose and pointing at another model of a chosen {@link ModelType}. Same row-based
+ * layout as {@link AnnotationsPanelController}'s model-header mode, with two dependent combo boxes instead of
+ * a single name/value pair: picking a Model Type repopulates the Reference combo box with every other model
+ * of that type in the project (see {@link ProjectDocumentModels#getOtherModelsOfType}), and resets the
+ * previously chosen reference since it no longer necessarily matches the new type.
+ */
+public class ModelReferencesPanelController extends AbstractPropertyEditor {
+
+  @FXML
+  private GridPane referencesGrid;
+
+  private A12Model<?> model;
+
+  public void setModel(@NonNull A12Model<?> model) {
+    this.model = model;
+    rebuildRows();
+  }
+
+  @FXML
+  private void onAdd() {
+    getModelReferences().add(new ModelReference());
+    rebuildRows();
+    commitChange();
+  }
+
+  private List<ModelReference> getModelReferences() {
+    return model.getModelReferences();
+  }
+
+  private void rebuildRows() {
+    referencesGrid.getChildren().removeIf(node -> {
+      Integer rowIndex = GridPane.getRowIndex(node);
+      return rowIndex != null && rowIndex > 0;
+    });
+
+    List<ModelReference> references = getModelReferences();
+    for (int index = 0; index < references.size(); index++) {
+      addRow(references.get(index), index, references.size());
+    }
+  }
+
+  private void addRow(ModelReference reference, int index, int rowCount) {
+    TextField aliasField = new TextField();
+    aliasField.setId("modelReferenceAlias-" + index);
+    aliasField.setMaxWidth(Double.MAX_VALUE);
+    setFieldValue(aliasField, reference.getAlias());
+    bindTextField(aliasField, (el, value) -> reference.setAlias(value));
+
+    TextField purposeField = new TextField();
+    purposeField.setId("modelReferencePurpose-" + index);
+    purposeField.setMaxWidth(Double.MAX_VALUE);
+    setFieldValue(purposeField, reference.getPurpose());
+    bindTextField(purposeField, (el, value) -> reference.setPurpose(value));
+
+    ComboBox<String> referenceField = new ComboBox<>();
+    referenceField.setId("modelReferenceReference-" + index);
+    referenceField.setMaxWidth(Double.MAX_VALUE);
+    referenceField.getItems().setAll(referenceOptionsFor(reference.getModelType()));
+    setFieldValue(referenceField, reference.getReference());
+    bindComboBox(referenceField, (el, value) -> reference.setReference(value));
+
+    ComboBox<String> modelTypeField = new ComboBox<>();
+    modelTypeField.setId("modelReferenceModelType-" + index);
+    modelTypeField.setMaxWidth(Double.MAX_VALUE);
+    modelTypeField.getItems().setAll(Arrays.stream(ModelType.values()).map(ModelType::getValue).toList());
+    setFieldValue(modelTypeField, reference.getModelType() != null ? reference.getModelType().getValue() : null);
+    bindComboBox(modelTypeField, (el, value) -> {
+      reference.setModelType(value != null ? ModelType.fromValue(value) : null);
+      reference.setReference(null);
+      setComboBoxItems(referenceField, referenceOptionsFor(reference.getModelType()));
+      setFieldValue(referenceField, null);
+    });
+
+    referencesGrid.addRow(index + 1, aliasField, purposeField, modelTypeField, referenceField, createActionsBox(reference, index, rowCount));
+  }
+
+  /**
+   * Every other model of {@code modelType} in the current project, by id, sorted for a stable dropdown order.
+   * Empty (rather than every model) until a Model Type is chosen, since a reference is only meaningful once
+   * its type narrows down which models are valid targets.
+   */
+  private List<String> referenceOptionsFor(ModelType modelType) {
+    if (modelType == null) {
+      return List.of();
+    }
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem == null) {
+      return List.of();
+    }
+    return ProjectDocumentModels.getOtherModelsOfType(projectItem, modelType).stream()
+        .map(A12Model::getId)
+        .sorted(Comparator.naturalOrder())
+        .toList();
+  }
+
+  private HBox createActionsBox(ModelReference reference, int index, int rowCount) {
+    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+
+    Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
+      ModelReference copy = new ModelReference();
+      copy.setAlias(reference.getAlias());
+      copy.setPurpose(reference.getPurpose());
+      copy.setModelType(reference.getModelType());
+      copy.setReference(reference.getReference());
+      List<ModelReference> references = getModelReferences();
+      references.add(references.indexOf(reference) + 1, copy);
+      rebuildRows();
+      commitChange();
+    });
+
+    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this model reference?", null, null, "Delete");
+      if (result.isPresent() && result.get() == ButtonType.OK) {
+        getModelReferences().remove(reference);
+        rebuildRows();
+        commitChange();
+      }
+    });
+
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, copyButton, deleteButton);
+    actionsBox.setAlignment(Pos.CENTER_LEFT);
+    return actionsBox;
+  }
+
+  // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
+  // "move-button" style class), so the pair together takes up the same width/height as a single normal button.
+  private VBox createMoveButtonsBox(int index, int rowCount) {
+    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
+    moveUpButton.setDisable(index == 0);
+    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
+
+    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
+    moveDownButton.setDisable(index == rowCount - 1);
+    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
+
+    return new VBox(1, moveUpButton, moveDownButton);
+  }
+
+  private void moveRow(int fromIndex, int toIndex) {
+    Collections.swap(getModelReferences(), fromIndex, toIndex);
+    rebuildRows();
+    commitChange();
+  }
+
+  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
+    FontIcon icon = new FontIcon(iconLiteral);
+    icon.setIconSize(16);
+    icon.getStyleClass().add("toolbar-icon");
+
+    Button button = new Button();
+    button.getStyleClass().add("default-button");
+    button.setGraphic(icon);
+    button.setTooltip(new Tooltip(tooltip));
+    button.setOnAction(event -> action.run());
+    return button;
+  }
+}

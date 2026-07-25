@@ -11,6 +11,7 @@ import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.ModelReferencesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SupportedCharactersPanelController;
@@ -51,6 +52,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   private AnnotationsPanelController annotationsController;
 
   @FXML
+  private ModelReferencesPanelController modelReferencesController;
+
+  @FXML
   private ErrorContainerController errorContainerController;
 
   @FXML
@@ -80,6 +84,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     labelsController.setSaveMode(saveMode);
     rolesController.setSaveMode(saveMode);
     annotationsController.setSaveMode(saveMode);
+    modelReferencesController.setSaveMode(saveMode);
     timezoneController.setSaveMode(saveMode);
 
     ProjectItem projectItem = Studio.getSelectedProjectItem();
@@ -94,6 +99,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       labelsController.setModel(model);
       rolesController.setModel(model);
       annotationsController.setModel(model);
+      modelReferencesController.setModel(model);
       if (model instanceof DocumentModel documentModel) {
         timezoneController.setModel(documentModel);
       }
@@ -116,6 +122,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         labelsController,
         rolesController,
         annotationsController,
+        modelReferencesController,
         timezoneController);
 
     Runnable updateErrorContainer = () -> {

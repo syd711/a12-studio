@@ -1,5 +1,7 @@
 package de.a12.studio.ui.util;
 
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
@@ -45,6 +47,35 @@ public final class ProjectDocumentModels {
     }
     else if (!item.getPath().equals(excludedPath) && item.getModel() instanceof DocumentModel documentModel) {
       result.add(documentModel);
+    }
+  }
+
+  /**
+   * Every model of the given {@link ModelType} in {@code projectItem}'s project, excluding {@code
+   * projectItem} itself, sorted by id. Unlike {@link #getOtherDocumentModels}, not limited to {@link
+   * DocumentModel}: used by {@link de.a12.studio.ui.editors.propertyeditors.ModelReferencesPanelController}
+   * to offer every model a header {@code ModelReference} could point at, whatever its type.
+   */
+  public static List<A12Model<?>> getOtherModelsOfType(@NonNull ProjectItem projectItem, ModelType modelType) {
+    Project project = Studio.getCurrentProject();
+    if (project == null || modelType == null) {
+      return List.of();
+    }
+
+    List<A12Model<?>> result = new ArrayList<>();
+    collectModelsOfType(project.getRoot(), projectItem.getPath(), modelType, result);
+    result.sort((a, b) -> a.getId().compareTo(b.getId()));
+    return result;
+  }
+
+  private static void collectModelsOfType(@NonNull ProjectItem item, @NonNull String excludedPath, @NonNull ModelType modelType, @NonNull List<A12Model<?>> result) {
+    if (item.isFolder()) {
+      for (ProjectItem child : item.getChildren()) {
+        collectModelsOfType(child, excludedPath, modelType, result);
+      }
+    }
+    else if (!item.getPath().equals(excludedPath) && item.getModel() != null && item.getModel().getModelType() == modelType) {
+      result.add(item.getModel());
     }
   }
 

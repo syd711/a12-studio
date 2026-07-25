@@ -96,27 +96,7 @@
               }
             ]
           }
-        ],
-        "orCreateMenu": {
-          "name": "welcome",
-          "label": [
-            {
-              "locale": "en",
-              "text": "Welcome"
-            },
-            {
-              "locale": "de",
-              "text": "Willkommen"
-            }
-          ],
-          "initialActivity": {
-            "descriptor": {
-              "engine": "content",
-              "name": "WelcomePage"
-            },
-            "withoutData": true
-          }
-        }
+        ]
       },
       {
         "name": "CompanyModule",
@@ -223,26 +203,7 @@
               }
             ]
           }
-        ],
-        "orCreateMenu": {
-          "name": "CompanyModule",
-          "label": [
-            {
-              "locale": "en",
-              "text": "Companies"
-            },
-            {
-              "locale": "de",
-              "text": "Firmen"
-            }
-          ],
-          "initialActivity": {
-            "descriptor": {
-              "module": "CompanyModule",
-              "engine": "overview"
-            }
-          }
-        }
+        ]
       },
       {
         "name": "InvoiceModule",
@@ -350,26 +311,7 @@
               }
             ]
           }
-        ],
-        "orCreateMenu": {
-          "name": "InvoiceModule",
-          "label": [
-            {
-              "locale": "en",
-              "text": "Invoices"
-            },
-            {
-              "locale": "de",
-              "text": "Rechnungen"
-            }
-          ],
-          "initialActivity": {
-            "descriptor": {
-              "module": "InvoiceModule",
-              "engine": "overview"
-            }
-          }
-        }
+        ]
       },
       {
         "name": "PersonModule",
@@ -476,30 +418,11 @@
               }
             ]
           }
-        ],
-        "orCreateMenu": {
-          "name": "PersonModule",
-          "label": [
-            {
-              "locale": "en",
-              "text": "Persons"
-            },
-            {
-              "locale": "de",
-              "text": "Personen"
-            }
-          ],
-          "initialActivity": {
-            "descriptor": {
-              "module": "PersonModule",
-              "engine": "overview"
-            }
-          }
-        }
+        ]
       }
     ],
     "region": {
-      "name": "CONTENT",
+      "name": "APP",
       "layout": {
         "name": "ApplicationFrame"
       },
