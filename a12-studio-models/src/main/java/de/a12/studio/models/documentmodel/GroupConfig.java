@@ -27,5 +27,7 @@ public class GroupConfig {
   private Boolean excludeRules;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean excludeComputations;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private IncludeConfig includeConfig;
   private List<Element> elements = new ArrayList<>();
 }

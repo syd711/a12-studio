@@ -11,6 +11,7 @@ import de.a12.studio.models.documentmodel.FieldConfig;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.documentmodel.NumberFieldType;
 import de.a12.studio.models.documentmodel.RequirednessConfig;
@@ -184,9 +185,10 @@ public class DocumentModelElementFactory {
   }
 
   /**
-   * A group referencing another Document Model. The reference itself ({@code modelAlias}) has no
-   * picker in the UI yet, so it's left unset here, same as a plain group, until that reference can
-   * be assigned (surfaces as a "Missing Include Reference" validation error until then).
+   * A group referencing another Document Model, identified by the presence of {@code includeConfig} on its
+   * {@link GroupConfig}. The reference itself ({@code includeConfig.reference}) has no picker in the UI yet, so
+   * it's left unset here until that reference can be assigned (surfaces as a "Missing Include Reference"
+   * validation error until then).
    */
   public static Element newIncludeElement(@NonNull List<Element> siblings, @NonNull ModelRoot modelRoot) {
     GroupElement include = new GroupElement();
@@ -194,6 +196,7 @@ public class DocumentModelElementFactory {
     include.setName(uniqueName("Include", siblings));
     GroupConfig config = new GroupConfig();
     config.setRepeatability(1);
+    config.setIncludeConfig(new IncludeConfig());
     include.setGroup(config);
     return include;
   }

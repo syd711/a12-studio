@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="INCLUDE PROPERTIES" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.IncludePropertiesPanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="8.0">
+    <children>
+      <VBox>
+        <children>
+          <Label styleClass="field-label" text="Document Model" />
+          <ComboBox fx:id="referenceComboBox" editable="false" maxWidth="Infinity" />
+        </children>
+      </VBox>
+      <HBox spacing="16.0">
+        <children>
+          <CheckBox fx:id="excludeValidationRulesCheckBox" text="Exclude Validation Rules" />
+          <CheckBox fx:id="excludeComputationRulesCheckBox" text="Exclude Computation Rules" />
+        </children>
+        <VBox.margin>
+          <Insets top="6.0" />
+        </VBox.margin>
+      </HBox>
+    </children>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

@@ -1,5 +1,6 @@
 package de.a12.studio.ui.projecttree;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
@@ -58,6 +59,88 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
   }
 
+  public void load(@NonNull Project project) {
+    this.project = project;
+    this.validationErrorsByPath = validateAllModels(project);
+    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
+    TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
+    rootTreeItem.setExpanded(true);
+    projectTree.setRoot(rootTreeItem);
+  }
+
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    if (project == null) {
+      return;
+    }
+    refreshNode(event.getItem().getModel());
+  }
+
+  @Override
+  public void modelDeleted(@NonNull ModelDeletedEvent event) {
+    if (project == null) {
+      return;
+    }
+    refreshNode(event.getItem().getModel());
+  }
+
+  /**
+   * Revalidates and redraws the tree node for {@code model} only, leaving every other node untouched. Use
+   * this instead of {@link #modelSaved}/{@link #modelDeleted}'s full-project revalidation + {@link
+   * TreeView#refresh()} when a change is known to be local to a single model (e.g. it can't affect any other
+   * document's cross-reference validation), since {@code refresh()} rebuilds every visible cell.
+   */
+  public void refreshNode(@NonNull A12Model<?> model) {
+    if (project == null) {
+      return;
+    }
+
+    TreeItem<ProjectItemViewModel> treeItem = findTreeItem(projectTree.getRoot(), model);
+    if (treeItem == null) {
+      return;
+    }
+
+    ProjectItem projectItem = treeItem.getValue().getProjectItem();
+    List<ModelValidationError> errors;
+    try {
+      errors = Studio.getValidationService().validate(model);
+    }
+    catch (Exception e) {
+      log.warn("Failed to validate '{}': {}", projectItem.getPath(), e.getMessage(), e);
+      errors = List.of(new ModelValidationError(model, null, "Failed to parse document: " + e.getMessage(), "ERROR"));
+    }
+
+    if (errors.isEmpty()) {
+      validationErrorsByPath.remove(projectItem.getPath());
+    }
+    else {
+      validationErrorsByPath.put(projectItem.getPath(), errors);
+    }
+
+    // TreeView has no API to redraw a single row. TreeItem.setValue() only notifies the cell when the new
+    // value is a different object (it's a plain reference-equality check), so re-setting the same
+    // ProjectItemViewModel would silently no-op - a fresh wrapper around the same ProjectItem/map is required
+    // to trigger the row's updateItem().
+    treeItem.setValue(new ProjectItemViewModel(projectItem, validationErrorsByPath));
+  }
+
+  private void collectModelItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
+    if (item.isFolder()) {
+      for (ProjectItem child : item.getChildren()) {
+        collectModelItems(child, result);
+      }
+    }
+    else if (item.getModel() != null) {
+      result.add(item);
+    }
+  }
+
+  private void onNewModel(@NonNull ModelType modelType) {
+    if (project != null) {
+      menuFactory.onCreateNewModel(resolveTargetFolder(), modelType);
+    }
+  }
+
   /**
    * Validates every model in the project, including cross-document include references, so the tree can flag
    * items with problems as soon as the project is opened.
@@ -91,52 +174,6 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       }
     }
     return validationErrorsByPath;
-  }
-
-  public void load(@NonNull Project project) {
-    this.project = project;
-    this.validationErrorsByPath = validateAllModels(project);
-    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
-    TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
-    rootTreeItem.setExpanded(true);
-    projectTree.setRoot(rootTreeItem);
-  }
-
-  @Override
-  public void modelSaved(@NonNull ModelSaveEvent event) {
-    if (project == null) {
-      return;
-    }
-    validationErrorsByPath.clear();
-    validationErrorsByPath.putAll(validateAllModels(project));
-    projectTree.refresh();
-  }
-
-  @Override
-  public void modelDeleted(@NonNull ModelDeletedEvent event) {
-    if (project == null) {
-      return;
-    }
-    validationErrorsByPath.clear();
-    validationErrorsByPath.putAll(validateAllModels(project));
-    projectTree.refresh();
-  }
-
-  private void collectModelItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
-    if (item.isFolder()) {
-      for (ProjectItem child : item.getChildren()) {
-        collectModelItems(child, result);
-      }
-    }
-    else if (item.getModel() != null) {
-      result.add(item);
-    }
-  }
-
-  private void onNewModel(@NonNull ModelType modelType) {
-    if (project != null) {
-      menuFactory.onCreateNewModel(resolveTargetFolder(), modelType);
-    }
   }
 
   private void onNewFolder() {
@@ -197,6 +234,22 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
     for (TreeItem<ProjectItemViewModel> child : treeItem.getChildren()) {
       TreeItem<ProjectItemViewModel> found = findTreeItem(child, target);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
+
+  private TreeItem<ProjectItemViewModel> findTreeItem(TreeItem<ProjectItemViewModel> treeItem, @NonNull A12Model<?> model) {
+    if (treeItem == null) {
+      return null;
+    }
+    if (treeItem.getValue().getProjectItem().getModel() == model) {
+      return treeItem;
+    }
+    for (TreeItem<ProjectItemViewModel> child : treeItem.getChildren()) {
+      TreeItem<ProjectItemViewModel> found = findTreeItem(child, model);
       if (found != null) {
         return found;
       }

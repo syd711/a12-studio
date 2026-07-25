@@ -6,11 +6,13 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController;
 import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
@@ -420,8 +422,11 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         siblings -> DocumentModelElementFactory.newAttachmentElement(siblings, modelRoot)));
     items.add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT),
         siblings -> DocumentModelElementFactory.newMultiSelectElement(siblings, modelRoot)));
-    items.add(createAddMenuItem(createMenuItem("_Include", Icons.ELEMENT_INCLUDE),
-        siblings -> DocumentModelElementFactory.newIncludeElement(siblings, modelRoot)));
+
+    MenuItem includeItem = createMenuItem("_Include", Icons.ELEMENT_INCLUDE);
+    includeItem.setOnAction(event -> onAddInclude());
+    items.add(includeItem);
+
     return items;
   }
 
@@ -447,6 +452,45 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       return;
     }
     newElement.setName(name);
+
+    commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), newElement, insertionPoint.index()));
+
+    updateUndoRedoState();
+    applyFilter(searchController.getText());
+    selectElement(newElement);
+    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+  }
+
+  /**
+   * Unlike every other element type (added via {@link #onAddElement}, then optionally renamed), a new
+   * Include must have its referenced {@link de.a12.studio.models.documentmodel.DocumentModel} picked up
+   * front: the {@link IncludeDialogController} dialog requires both a valid name and a reference selection
+   * before it can be submitted, so the Include this creates is never left in the "Missing Include Reference"
+   * state that an unset reference would otherwise cause (see {@link
+   * de.a12.studio.modelsvalidation.validators.MissingReferenceValidator}).
+   */
+  private void onAddInclude() {
+    TreeItem<ElementViewModel> selectedItem = elementsTreeTable.getSelectionModel().getSelectedItem();
+    if (selectedItem == null || selectedItem.getValue() == null) {
+      return;
+    }
+
+    InsertionPoint insertionPoint = resolveInsertionPoint(selectedItem);
+    if (insertionPoint == null) {
+      return;
+    }
+
+    Element newElement = DocumentModelElementFactory.newIncludeElement(insertionPoint.siblings(), modelRoot);
+
+    Project project = Studio.getCurrentProject();
+    Optional<IncludeDialogController.IncludeInput> input = IncludeDialogController.show(
+        Studio.stage, project, (DocumentModel) projectItem.getModel(), newElement.getName());
+    if (input.isEmpty()) {
+      return;
+    }
+
+    newElement.setName(input.get().name());
+    ((GroupElement) newElement).getGroup().getIncludeConfig().setReference(input.get().reference());
 
     commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), newElement, insertionPoint.index()));
 

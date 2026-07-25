@@ -1,7 +1,6 @@
 package de.a12.studio.modelsvalidation.validators;
 
 import de.a12.studio.models.A12Model;
-import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -10,6 +9,7 @@ import de.a12.studio.models.documentmodel.EnumerationValue;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
@@ -18,7 +18,6 @@ import de.a12.studio.modelsvalidation.ValidationContext;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,7 +48,7 @@ public final class MissingReferenceValidator implements ModelValidator {
     for (Element element : index.allElements()) {
       if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
         String groupPath = index.getPath(groupElement);
-        if (hasMissingIncludeReference(groupElement, documentModel, context.otherDocumentModels())) {
+        if (hasMissingIncludeReference(groupElement, context.otherDocumentModels())) {
           result.add(error(model, groupElement.getId(), "Include with path '" + groupPath + "': Missing Include Reference"));
         }
         if (hasMissingIndexField(groupElement, index)) {
@@ -80,22 +79,18 @@ public final class MissingReferenceValidator implements ModelValidator {
     return new ModelValidationError(model, elementId, message, Severity.ERROR.name());
   }
 
-  private static Optional<ModelReference> findIncludeReference(DocumentModel model, String alias) {
-    if (model.getModelReferences() == null) {
-      return Optional.empty();
-    }
-    return model.getModelReferences().stream()
-        .filter(r -> ModelReference.PURPOSE_INCLUDE.equals(r.getPurpose()) && alias.equals(r.getAlias()))
-        .findFirst();
-  }
-
-  private static boolean hasMissingIncludeReference(GroupElement groupElement, DocumentModel model, List<DocumentModel> otherModels) {
-    String alias = groupElement.getGroup().getModelAlias();
-    if (alias == null || alias.isBlank()) {
+  /**
+   * A group is an Include if its {@link de.a12.studio.models.documentmodel.GroupConfig} carries an {@code
+   * includeConfig}. A blank {@code reference} counts as missing: the UI leaves it unset when an Include is
+   * first created, until the user assigns one, and this should keep surfacing the error until then.
+   */
+  private static boolean hasMissingIncludeReference(GroupElement groupElement, List<DocumentModel> otherModels) {
+    IncludeConfig includeConfig = groupElement.getGroup().getIncludeConfig();
+    if (includeConfig == null) {
       return false;
     }
-    Optional<ModelReference> reference = findIncludeReference(model, alias);
-    return reference.isEmpty() || resolveOtherModel(reference.get().getReference(), otherModels) == null;
+    String reference = includeConfig.getReference();
+    return reference == null || reference.isBlank() || resolveOtherModel(reference, otherModels) == null;
   }
 
   /** Mirrors the strip-path-and-.json-suffix resolution the a12 kernel's reference resolver used. */

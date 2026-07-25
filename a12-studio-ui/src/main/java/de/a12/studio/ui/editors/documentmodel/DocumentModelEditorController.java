@@ -37,6 +37,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   private static final String FIELD_EDITOR_FXML = "document-model-field-editor.fxml";
   private static final String GROUP_EDITOR_FXML = "document-model-group-editor.fxml";
+  private static final String INCLUDE_EDITOR_FXML = "document-model-include-editor.fxml";
   private static final String ATTACHMENT_EDITOR_FXML = "document-model-attachment-editor.fxml";
   private static final String VALIDATION_RULE_EDITOR_FXML = "document-model-validation-rule-editor.fxml";
   private static final String COMPUTATION_RULE_EDITOR_FXML = "document-model-computation-rule-editor.fxml";
@@ -112,10 +113,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
     Element selected = selectedElements.get(0);
     String editorFxml;
     if (selected instanceof GroupElement groupElement) {
-      editorFxml = groupElement.getGroup() != null
-          && GroupConfig.USAGE_TYPE_ATTACHMENT.equals(groupElement.getGroup().getUsageType())
-          ? ATTACHMENT_EDITOR_FXML
-          : GROUP_EDITOR_FXML;
+      editorFxml = groupEditorFxml(groupElement);
     }
     else if (selected instanceof RuleElement) {
       editorFxml = VALIDATION_RULE_EDITOR_FXML;
@@ -128,6 +126,25 @@ public class DocumentModelEditorController extends AbstractEditorController impl
     }
     Node node = loadEditor(editorFxml, selected);
     editorContainer.setCenter(node);
+  }
+
+  /**
+   * A group is an Include (a reference to another Document Model) if its {@link GroupConfig} carries an
+   * {@code includeConfig}, distinct from the "attachment" {@code usageType} groups and from plain groups,
+   * which have neither.
+   */
+  private String groupEditorFxml(@NonNull GroupElement groupElement) {
+    GroupConfig config = groupElement.getGroup();
+    if (config == null) {
+      return GROUP_EDITOR_FXML;
+    }
+    if (config.getIncludeConfig() != null) {
+      return INCLUDE_EDITOR_FXML;
+    }
+    if (GroupConfig.USAGE_TYPE_ATTACHMENT.equals(config.getUsageType())) {
+      return ATTACHMENT_EDITOR_FXML;
+    }
+    return GROUP_EDITOR_FXML;
   }
 
   private Node loadEditor(@NonNull String fxml, @NonNull Element selected) {

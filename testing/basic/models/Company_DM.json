@@ -27,7 +27,13 @@
         "value": "tester,reviewer"
       }
     ],
-    "modelReferences": []
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Person_DM"
+      }
+    ]
   },
   "content": {
     "modelInfo": {
@@ -56,18 +62,13 @@
                 "id": "group_1b51c",
                 "name": "CompanyDetails",
                 "Group": {
-                  "repeatability": 1,
+                  "repeatability": 5,
+                  "indexFieldName": "CompanyName",
                   "elements": [
                     {
                       "type": "Field",
                       "id": "field_67684",
                       "name": "CompanyName",
-                      "annotations": [
-                        {
-                          "name": "enable_approximate_match_search",
-                          "value": "true"
-                        }
-                      ],
                       "Field": {
                         "fieldType": {
                           "type": "NumberType"
@@ -82,10 +83,11 @@
                             "text": "Firmenname"
                           }
                         ],
+                        "global": true,
+                        "transient": true,
                         "requirednessConfig": {
-                          "mode": "absoluteOrRelativeToNextRepAncestor"
-                        },
-                        "global": true
+                          "mode": "relativeToParent"
+                        }
                       }
                     },
                     {
@@ -100,7 +102,10 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType"
+                          "type": "StringType",
+                          "StringType": {
+                            "pattern": "jj"
+                          }
                         },
                         "label": [
                           {
@@ -126,7 +131,7 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType"
+                          "type": "BooleanType"
                         },
                         "label": [
                           {
@@ -373,11 +378,15 @@
                     },
                     {
                       "type": "Group",
-                      "id": "group_7a6b8",
-                      "name": "Group",
+                      "id": "include_e823c",
+                      "name": "People",
                       "Group": {
                         "repeatability": 1,
-                        "elements": []
+                        "includeConfig": {
+                          "reference": "Person_DM",
+                          "excludeRules": true,
+                          "excludeComputations": true
+                        }
                       }
                     }
                   ]

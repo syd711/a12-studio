@@ -45,6 +45,9 @@ public class ElementViewModel {
       return fieldElement.getField().getFieldType().getType();
     }
     if (element instanceof GroupElement groupElement) {
+      if (isInclude(groupElement)) {
+        return "Include";
+      }
       if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)) {
         return "Attachment";
       }
@@ -71,6 +74,9 @@ public class ElementViewModel {
 
   public String getIcon() {
     if (element instanceof GroupElement groupElement) {
+      if (isInclude(groupElement)) {
+        return Icons.ELEMENT_INCLUDE;
+      }
       if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)) {
         return Icons.ELEMENT_ATTACHMENT;
       }
@@ -103,6 +109,15 @@ public class ElementViewModel {
 
   private static boolean hasUsageType(GroupElement groupElement, String usageType) {
     return groupElement.getGroup() != null && usageType.equals(groupElement.getGroup().getUsageType());
+  }
+
+  /**
+   * A group is an Include (a reference to another Document Model) if its {@link GroupConfig} carries an
+   * {@code includeConfig}, distinct from the "attachment"/"multi-select" {@code usageType} groups and from
+   * plain groups, which have neither. Mirrors {@code DocumentModelEditorController#groupEditorFxml}.
+   */
+  private static boolean isInclude(GroupElement groupElement) {
+    return groupElement.getGroup() != null && groupElement.getGroup().getIncludeConfig() != null;
   }
 
   public List<ElementViewModel> getChildren() {
