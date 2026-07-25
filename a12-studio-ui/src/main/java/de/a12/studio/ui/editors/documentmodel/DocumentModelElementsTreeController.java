@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors.documentmodel;
 
-import de.a12.studio.dataservices.validation.DMValidationService;
-import de.a12.studio.dataservices.validation.ElementValidationError;
+import de.a12.studio.modelsvalidation.DMValidationService;
+import de.a12.studio.modelsvalidation.ElementValidationError;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;

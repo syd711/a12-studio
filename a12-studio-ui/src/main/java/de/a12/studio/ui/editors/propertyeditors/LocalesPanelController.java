@@ -7,7 +7,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Locale;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.dataservices.validation.DMValidationService;
+import de.a12.studio.modelsvalidation.DMValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.StudioEventManager;

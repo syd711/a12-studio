@@ -10,7 +10,7 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.documentmodel.RuleElement;
-import de.a12.studio.dataservices.validation.DMValidationService;
+import de.a12.studio.modelsvalidation.DMValidationService;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;

@@ -4,7 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.dataservices.validation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ElementValidationError;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
 

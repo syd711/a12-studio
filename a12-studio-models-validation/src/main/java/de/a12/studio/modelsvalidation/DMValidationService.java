@@ -1,4 +1,4 @@
-package de.a12.studio.dataservices.validation;
+package de.a12.studio.modelsvalidation;
 
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.documentmodel.ComputationElement;

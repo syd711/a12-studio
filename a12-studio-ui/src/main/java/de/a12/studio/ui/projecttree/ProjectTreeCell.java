@@ -1,7 +1,7 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.dataservices.validation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ElementValidationError;
 import de.a12.studio.ui.util.Icons;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TreeCell;

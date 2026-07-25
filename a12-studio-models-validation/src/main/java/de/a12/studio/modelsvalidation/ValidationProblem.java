@@ -1,4 +1,4 @@
-package de.a12.studio.dataservices.validation;
+package de.a12.studio.modelsvalidation;
 
 /**
  * elementId is null for problems reported against the document model itself (e.g. schema version) rather

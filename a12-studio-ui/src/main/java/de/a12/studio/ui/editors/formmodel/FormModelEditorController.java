@@ -1,6 +1,6 @@
 package de.a12.studio.ui.editors.formmodel;
 
-import de.a12.studio.dataservices.validation.DMValidationService;
+import de.a12.studio.modelsvalidation.DMValidationService;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;

@@ -1,6 +1,6 @@
 package de.a12.studio.ui.events;
 
-import de.a12.studio.dataservices.validation.ElementValidationError;
+import de.a12.studio.modelsvalidation.ElementValidationError;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
