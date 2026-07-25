@@ -5,7 +5,7 @@ import de.a12.studio.models.documentmodel.DocumentModelContent;
 import de.a12.studio.models.documentmodel.ModelConfig;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
+import de.a12.studio.dataservices.validation.DMValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.ProjectDocumentModels;

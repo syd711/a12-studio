@@ -1,6 +1,6 @@
 package de.a12.studio.ui.editors.relationship;
 
-import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
+import de.a12.studio.dataservices.validation.DMValidationService;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -8,8 +8,6 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.util.ProjectDocumentModels;
-import de.a12.studio.ui.util.localsettings.BaseTableSettings;
-import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

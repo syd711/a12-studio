@@ -1,4 +1,4 @@
-package de.a12.studio.dataservices.services.applicationmodel.preview;
+package de.a12.studio.dataservices.preview;
 
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;

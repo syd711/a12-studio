@@ -1,7 +1,7 @@
 package de.a12.studio.ui.preview;
 
-import de.a12.studio.dataservices.services.applicationmodel.preview.PreviewApplicationDto;
-import de.a12.studio.dataservices.services.applicationmodel.preview.PreviewSceneDto;
+import de.a12.studio.dataservices.preview.PreviewApplicationDto;
+import de.a12.studio.dataservices.preview.PreviewSceneDto;
 import org.jspecify.annotations.Nullable;
 
 /**

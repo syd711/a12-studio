@@ -1,7 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
-import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.ComputationElement;
@@ -11,7 +10,7 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.documentmodel.RuleElement;
-import de.a12.studio.dataservices.services.documentmodel.features.validation.DMValidationService;
+import de.a12.studio.dataservices.validation.DMValidationService;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;

@@ -13,6 +13,8 @@ import de.a12.studio.models.documentmodel.EnumerationFieldType;
 import de.a12.studio.models.documentmodel.FieldConfig;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
+import de.a12.studio.models.documentmodel.GroupConfig;
+import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.NumberFieldType;
 import de.a12.studio.models.documentmodel.RequirednessConfig;
 import de.a12.studio.models.documentmodel.StringFieldType;
@@ -63,6 +65,10 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
       TYPE_STRING, TYPE_NUMBER, TYPE_DATE, TYPE_DATE_TIME, TYPE_TIME, TYPE_DATE_FRAGMENT, TYPE_DATE_RANGE,
       TYPE_CONFIRM, TYPE_BOOLEAN, TYPE_CUSTOM, TYPE_ENUMERATION);
 
+  // A multi-select group's options are field-choices, so only String and Enumeration make sense as its
+  // children's data type.
+  private static final List<String> MULTI_SELECT_DATA_TYPES = List.of(TYPE_STRING, TYPE_ENUMERATION);
+
   @FXML
   private ComboBox<String> dataTypeCombo;
 
@@ -101,6 +107,8 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
   private List<TypeDefinition> availableTypeDefinitions = List.of();
 
+  private List<Element> ancestors = List.of();
+
   // Reflects the element's current FieldType, re-set whenever this panel changes it (i.e. via
   // typeDefinitionCheckBox or dataTypeComboBox) so sibling panels (e.g. DataTypeConfigurationPanelController)
   // can react and swap their own content without waiting for the next setElement() call.
@@ -110,13 +118,15 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     return currentFieldType;
   }
 
+  public void setAncestors(@NonNull List<Element> ancestors) {
+    this.ancestors = ancestors;
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
     customTypeGrid.managedProperty().bindBidirectional(customTypeGrid.visibleProperty());
     checkboxesGrid.managedProperty().bindBidirectional(checkboxesGrid.visibleProperty());
-
-    dataTypeComboBox.getItems().addAll(DATA_TYPES);
 
     dataTypeCombo.setConverter(new StringConverter<>() {
       @Override
@@ -211,6 +221,8 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     availableTypeDefinitions = collectAvailableTypeDefinitions(element.getId());
 //    dataTypeCombo.getItems().setAll(availableTypeDefinitions.stream().map(TypeDefinition::getId).toList());
 
+    dataTypeComboBox.getItems().setAll(availableDataTypes());
+
     Optional<FieldConfig> fieldConfig = getFieldConfig(element);
     FieldType fieldType = fieldConfig.map(FieldConfig::getFieldType).orElse(null);
     boolean isTypeDefinition = fieldType instanceof TypeDefFieldType;
@@ -289,6 +301,20 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
       return Optional.of(fieldElement.getField());
     }
     return Optional.empty();
+  }
+
+  /**
+   * A multi-select group's children are the field-choices it offers, so only String and Enumeration are
+   * valid data types there; every other parent allows the full {@link #DATA_TYPES} list.
+   */
+  private List<String> availableDataTypes() {
+    Element parent = ancestors.isEmpty() ? null : ancestors.get(ancestors.size() - 1);
+    if (parent instanceof GroupElement groupElement
+        && groupElement.getGroup() != null
+        && GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType())) {
+      return MULTI_SELECT_DATA_TYPES;
+    }
+    return DATA_TYPES;
   }
 
   /**

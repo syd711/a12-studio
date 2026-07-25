@@ -2,9 +2,9 @@ package de.a12.studio.ui.preview;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import de.a12.studio.dataservices.services.applicationmodel.preview.ApplicationModelPreviewService;
-import de.a12.studio.dataservices.services.applicationmodel.preview.PreviewApplicationDto;
-import de.a12.studio.dataservices.services.applicationmodel.preview.PreviewSceneDto;
+import de.a12.studio.dataservices.preview.ApplicationModelPreviewService;
+import de.a12.studio.dataservices.preview.PreviewApplicationDto;
+import de.a12.studio.dataservices.preview.PreviewSceneDto;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.PreviewSettings;

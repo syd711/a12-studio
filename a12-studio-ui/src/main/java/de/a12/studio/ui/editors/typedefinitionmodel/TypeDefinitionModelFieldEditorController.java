@@ -46,6 +46,7 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
   public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
     this.element = element;
     generalInformationController.setAncestors(ancestors);
+    typeDefinitionController.setAncestors(ancestors);
     propertyEditors.forEach(propertyEditor -> propertyEditor.setElement(element));
   }
 

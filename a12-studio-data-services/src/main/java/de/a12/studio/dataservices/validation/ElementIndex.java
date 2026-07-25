@@ -1,4 +1,4 @@
-package de.a12.studio.dataservices.services.documentmodel.features.validation;
+package de.a12.studio.dataservices.validation;
 
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
