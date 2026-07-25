@@ -47,4 +47,9 @@ public class DocumentModelComputationRuleEditorController implements ElementEdit
       propertyEditor.setEditorDisabled(readOnly);
     });
   }
+
+  @Override
+  public void destroy() {
+    propertyEditors.forEach(AbstractPropertyEditor::destroy);
+  }
 }

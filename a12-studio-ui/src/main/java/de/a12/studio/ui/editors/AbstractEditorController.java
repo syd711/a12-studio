@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -67,6 +68,19 @@ abstract public class AbstractEditorController implements StudioEventListener {
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
     this.save();
+  }
+
+  /**
+   * Unregisters this editor once its tab is closed, so a closed editor stops receiving (and reacting to,
+   * e.g. via {@link #modelSaved}) events fired for other tabs still open. {@code event.getItem()} is compared
+   * by path (see {@link ProjectItem#equals}) rather than reference, since {@link #load} is always called with
+   * whatever {@link ProjectItem} instance the caller happens to hold.
+   */
+  @Override
+  public void modelClosed(@NonNull ModelClosedEvent event) {
+    if (event.getItem().equals(projectItem)) {
+      StudioEventManager.getInstance().removeListener(this);
+    }
   }
 
   @NonNull

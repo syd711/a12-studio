@@ -107,6 +107,11 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     }
   }
 
+  @Override
+  public void destroy() {
+    StudioEventManager.getInstance().removeListener(this);
+  }
+
   // ----- Suggestions -----
 
   private void rebuildSuggestionsRows() {

@@ -6,10 +6,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.Studio;
-import de.a12.studio.ui.events.ModelFocusRequestedEvent;
-import de.a12.studio.ui.events.ProjectOpenedEvent;
-import de.a12.studio.ui.events.StudioEventListener;
-import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
@@ -41,6 +38,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private Project project;
   private ProjectItemViewModel rootViewModel;
   private ProjectTreeMenuActions menuFactory;
+  private Map<String, List<ModelValidationError>> validationErrorsByPath = new HashMap<>();
 
   @FXML
   private void onExpandAll() {
@@ -97,11 +95,31 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   public void load(@NonNull Project project) {
     this.project = project;
-    Map<String, List<ModelValidationError>> validationErrorsByPath = validateAllModels(project);
+    this.validationErrorsByPath = validateAllModels(project);
     this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
     rootTreeItem.setExpanded(true);
     projectTree.setRoot(rootTreeItem);
+  }
+
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    if (project == null) {
+      return;
+    }
+    validationErrorsByPath.clear();
+    validationErrorsByPath.putAll(validateAllModels(project));
+    projectTree.refresh();
+  }
+
+  @Override
+  public void modelDeleted(@NonNull ModelDeletedEvent event) {
+    if (project == null) {
+      return;
+    }
+    validationErrorsByPath.clear();
+    validationErrorsByPath.putAll(validateAllModels(project));
+    projectTree.refresh();
   }
 
   private void collectModelItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {

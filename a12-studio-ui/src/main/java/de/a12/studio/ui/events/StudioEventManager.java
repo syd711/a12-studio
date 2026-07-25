@@ -22,6 +22,13 @@ public class StudioEventManager {
     listeners.add(listener);
   }
 
+  public void removeListener(@NonNull StudioEventListener listener) {
+    if (listeners.contains(listener)) {
+      listeners.remove(listener);
+    }
+  }
+
+
   public void fireProjectOpenEvent(@NonNull Project project) {
     ProjectOpenedEvent event = new ProjectOpenedEvent(project);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {

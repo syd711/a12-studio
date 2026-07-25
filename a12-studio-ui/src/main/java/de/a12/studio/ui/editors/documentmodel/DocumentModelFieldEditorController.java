@@ -85,4 +85,9 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
       propertyEditor.setEditorDisabled(readOnly);
     });
   }
+
+  @Override
+  public void destroy() {
+    propertyEditors.forEach(AbstractPropertyEditor::destroy);
+  }
 }

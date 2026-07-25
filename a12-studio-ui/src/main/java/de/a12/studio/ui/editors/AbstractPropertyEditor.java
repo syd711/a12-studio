@@ -73,6 +73,14 @@ abstract public class AbstractPropertyEditor implements Initializable {
     this.saveMode = saveMode;
   }
 
+  /**
+   * Releases resources held by this panel once it (and the editor/dialog that embeds it) is torn down.
+   * Subclasses that register themselves with {@link StudioEventManager} (to react to events like
+   * {@code localesChanged}) must override this to unregister, since nothing else does so on their behalf.
+   */
+  public void destroy() {
+  }
+
   public void setElement(@NonNull Element element) {
     this.element = element;
     showValidationError(null);
@@ -312,6 +320,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
     }
     saveMode.commit(projectItem);
     applyValidationResult(field, validateElement(projectItem));
+    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 
   /**

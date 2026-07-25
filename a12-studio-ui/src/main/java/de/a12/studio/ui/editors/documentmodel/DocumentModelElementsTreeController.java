@@ -12,6 +12,7 @@ import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
 import de.a12.studio.ui.events.ElementValidatedEvent;
+import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.FileUtils;
@@ -95,6 +96,18 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     this.modelRoot = modelRoot;
     applyFilter(searchController.getText());
     StudioEventManager.getInstance().addListener(this);
+  }
+
+  /**
+   * Unregisters this tree controller once its owning tab is closed, mirroring {@link
+   * de.a12.studio.ui.editors.AbstractEditorController#modelClosed}. This controller registers itself directly
+   * (rather than inheriting from {@code AbstractEditorController}) since it isn't a top-level tab editor.
+   */
+  @Override
+  public void modelClosed(@NonNull ModelClosedEvent event) {
+    if (event.getItem().equals(projectItem)) {
+      StudioEventManager.getInstance().removeListener(this);
+    }
   }
 
   @Override

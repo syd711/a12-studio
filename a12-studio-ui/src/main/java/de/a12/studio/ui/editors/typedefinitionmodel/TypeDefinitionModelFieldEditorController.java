@@ -53,4 +53,9 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
   public void focusNameField() {
     generalInformationController.focusNameField();
   }
+
+  @Override
+  public void destroy() {
+    propertyEditors.forEach(AbstractPropertyEditor::destroy);
+  }
 }

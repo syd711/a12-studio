@@ -17,6 +17,7 @@ public class EditorDialogs {
     FXResizeHelper.install(stage, 30, 6);
     stage.setMinWidth(800);
     stage.setMinHeight(600);
+    stage.setOnHidden(event -> controller.destroy());
 
     stage.showAndWait();
   }

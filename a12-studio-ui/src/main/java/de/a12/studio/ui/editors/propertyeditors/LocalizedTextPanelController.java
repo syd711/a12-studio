@@ -129,6 +129,11 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
     }
   }
 
+  @Override
+  public void destroy() {
+    StudioEventManager.getInstance().removeListener(this);
+  }
+
   private List<Label> getTexts() {
     return model != null ? modelTextsAccessor.apply(model) : elementTextsAccessor.apply(element);
   }

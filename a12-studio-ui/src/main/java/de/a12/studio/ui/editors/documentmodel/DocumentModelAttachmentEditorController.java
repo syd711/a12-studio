@@ -51,4 +51,9 @@ public class DocumentModelAttachmentEditorController implements ElementEditorCon
       propertyEditor.setEditorDisabled(readOnly);
     });
   }
+
+  @Override
+  public void destroy() {
+    propertyEditors.forEach(AbstractPropertyEditor::destroy);
+  }
 }

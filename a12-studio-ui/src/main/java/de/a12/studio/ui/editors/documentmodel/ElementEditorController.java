@@ -12,6 +12,16 @@ public interface ElementEditorController {
   void setElement(@NonNull Element element, @NonNull List<Element> ancestors);
 
   /**
+   * Releases resources held by this controller and its embedded property editor panels once it's replaced by
+   * another element's editor or the owning tab is closed. Implementations that embed panels registered with
+   * {@link de.a12.studio.ui.events.StudioEventManager} (e.g. via {@link
+   * de.a12.studio.ui.editors.AbstractPropertyEditor#destroy}) must override this to unregister them, since
+   * nothing else does so on their behalf once this controller's {@link javafx.scene.Node} is discarded.
+   */
+  default void destroy() {
+  }
+
+  /**
    * Whether the selected element is nested inside an attachment group, whose fixed children (filename,
    * content, ...) are managed by the kernel and shouldn't be hand-edited in the property editors.
    */

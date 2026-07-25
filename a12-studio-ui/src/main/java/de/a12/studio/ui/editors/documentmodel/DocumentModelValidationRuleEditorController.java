@@ -47,4 +47,9 @@ public class DocumentModelValidationRuleEditorController implements ElementEdito
       propertyEditor.setEditorDisabled(readOnly);
     });
   }
+
+  @Override
+  public void destroy() {
+    propertyEditors.forEach(AbstractPropertyEditor::destroy);
+  }
 }

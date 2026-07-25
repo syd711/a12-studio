@@ -8,6 +8,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
+import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import javafx.event.ActionEvent;
@@ -100,9 +101,13 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
   }
 
   private void onTypeDefinitionSelectionChanged(TypeDefinition selected) {
+    if (currentFieldEditorController != null) {
+      currentFieldEditorController.destroy();
+      currentFieldEditorController = null;
+    }
+
     if (selected == null) {
       editorContainer.setCenter(null);
-      currentFieldEditorController = null;
       return;
     }
 
@@ -154,5 +159,19 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
   @Override
   public @NonNull ModelType getModelType() {
     return ModelType.TYPEDEFINITION;
+  }
+
+  /**
+   * In addition to unregistering this editor itself (see {@link AbstractEditorController#modelClosed}), tears
+   * down whichever field editor panel is currently displayed in {@code editorContainer}, since it isn't
+   * otherwise reached by {@link #onTypeDefinitionSelectionChanged} once the tab is gone.
+   */
+  @Override
+  public void modelClosed(@NonNull ModelClosedEvent event) {
+    super.modelClosed(event);
+    if (currentFieldEditorController != null && event.getItem().equals(projectItem)) {
+      currentFieldEditorController.destroy();
+      currentFieldEditorController = null;
+    }
   }
 }

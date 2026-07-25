@@ -97,6 +97,11 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     }
   }
 
+  @Override
+  public void destroy() {
+    StudioEventManager.getInstance().removeListener(this);
+  }
+
   // ----- Category -----
 
   @FXML

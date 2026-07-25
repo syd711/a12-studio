@@ -14,6 +14,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.dialogs.EditorDialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;
+import de.a12.studio.ui.events.ModelClosedEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -57,6 +58,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   @FXML
   private DocumentModelElementsTreeController elementsTreeController;
 
+  private ElementEditorController currentElementEditorController;
 
   @FXML
   public void onSettings(ActionEvent e) {
@@ -97,6 +99,11 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   }
 
   private void onElementSelectionChanged(@NonNull List<Element> selectedElements) {
+    if (currentElementEditorController != null) {
+      currentElementEditorController.destroy();
+      currentElementEditorController = null;
+    }
+
     if (selectedElements.size() != 1) {
       editorContainer.setCenter(null);
       return;
@@ -129,6 +136,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
       Node node = loader.load();
       if (loader.getController() instanceof ElementEditorController elementEditorController) {
         elementEditorController.setElement(selected, elementsTreeController.getAncestors(selected));
+        currentElementEditorController = elementEditorController;
       }
       return node;
     }
@@ -159,5 +167,19 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   @Override
   public @NonNull ModelType getModelType() {
     return ModelType.DOCUMENT;
+  }
+
+  /**
+   * In addition to unregistering this editor itself (see {@link AbstractEditorController#modelClosed}), tears
+   * down whichever element editor panel is currently displayed in {@code editorContainer}, since it isn't
+   * otherwise reached by {@link #onElementSelectionChanged} once the tab is gone.
+   */
+  @Override
+  public void modelClosed(@NonNull ModelClosedEvent event) {
+    super.modelClosed(event);
+    if (currentElementEditorController != null && event.getItem().equals(projectItem)) {
+      currentElementEditorController.destroy();
+      currentElementEditorController = null;
+    }
   }
 }
