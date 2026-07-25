@@ -56,7 +56,13 @@ import java.util.function.Consumer;
 public class DataTypeEnumerationConfigurationPanelController extends AbstractPropertyEditor implements Initializable, StudioEventListener {
 
   @FXML
+  private HBox categoryColumnHeaders;
+
+  @FXML
   private VBox categoryRows;
+
+  @FXML
+  private javafx.scene.control.Label categoryRowsEmptyLabel;
 
   @FXML
   private GridPane enumerationValuesGrid;
@@ -118,6 +124,12 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     categoryRows.getChildren().clear();
 
     List<Category> categories = getCategories();
+    boolean empty = categories.isEmpty();
+    categoryColumnHeaders.setVisible(!empty);
+    categoryColumnHeaders.setManaged(!empty);
+    categoryRowsEmptyLabel.setVisible(empty);
+    categoryRowsEmptyLabel.setManaged(empty);
+
     for (int index = 0; index < categories.size(); index++) {
       categoryRows.getChildren().add(createCategoryRow(categories.get(index), index, categories.size()));
     }

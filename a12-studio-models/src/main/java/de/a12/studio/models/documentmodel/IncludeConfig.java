@@ -12,4 +12,8 @@ public class IncludeConfig {
 
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String reference;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean excludeRules;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean excludeComputations;
 }

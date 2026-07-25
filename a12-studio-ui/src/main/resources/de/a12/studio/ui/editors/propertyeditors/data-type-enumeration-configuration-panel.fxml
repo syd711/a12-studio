@@ -21,6 +21,7 @@
         <Label styleClass="field-label" text="Description" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
       </HBox>
       <VBox fx:id="categoryRows" spacing="8.0" />
+      <Label fx:id="categoryRowsEmptyLabel" styleClass="placeholder-label" text="No categories configured." />
       <HBox spacing="8.0">
         <Button fx:id="addCategoryButton" mnemonicParsing="false" onAction="#onAddCategory" styleClass="primary-button" text="Add" />
       </HBox>

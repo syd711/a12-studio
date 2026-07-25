@@ -35,7 +35,14 @@ public class ElementViewModel {
   }
 
   public String getName() {
-    return element.getName();
+    String name = element.getName();
+    if (element instanceof GroupElement groupElement && groupElement.getGroup() != null && showsRepetitions(groupElement)) {
+      Integer repeatability = groupElement.getGroup().getRepeatability();
+      if (repeatability != null) {
+        return name + " [" + repeatability + "]";
+      }
+    }
+    return name;
   }
 
   public String getType() {
@@ -46,7 +53,8 @@ public class ElementViewModel {
     }
     if (element instanceof GroupElement groupElement) {
       if (isInclude(groupElement)) {
-        return "Include";
+        String reference = groupElement.getGroup().getIncludeConfig().getReference();
+        return reference == null || reference.isBlank() ? "Include" : "Include [" + reference + "]";
       }
       if (hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)) {
         return "Attachment";
@@ -109,6 +117,16 @@ public class ElementViewModel {
 
   private static boolean hasUsageType(GroupElement groupElement, String usageType) {
     return groupElement.getGroup() != null && usageType.equals(groupElement.getGroup().getUsageType());
+  }
+
+  /**
+   * Plain Groups and Includes show their repetition count in the tree (e.g. "Group [5]"); attachment and
+   * multi-select groups have a fixed/derived repeatability (see {@link #hasFixedChildren}) that isn't
+   * meaningful to surface the same way.
+   */
+  private static boolean showsRepetitions(GroupElement groupElement) {
+    return !hasUsageType(groupElement, GroupConfig.USAGE_TYPE_ATTACHMENT)
+        && !hasUsageType(groupElement, GroupConfig.USAGE_TYPE_MULTI_SELECT);
   }
 
   /**

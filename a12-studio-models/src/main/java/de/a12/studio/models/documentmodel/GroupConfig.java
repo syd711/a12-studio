@@ -24,10 +24,6 @@ public class GroupConfig {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String indexFieldName;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Boolean excludeRules;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Boolean excludeComputations;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private IncludeConfig includeConfig;
   private List<Element> elements = new ArrayList<>();
 }

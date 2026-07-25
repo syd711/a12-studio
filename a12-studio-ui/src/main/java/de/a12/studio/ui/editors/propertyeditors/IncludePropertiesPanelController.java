@@ -40,9 +40,9 @@ public class IncludePropertiesPanelController extends AbstractPropertyEditor imp
     bindComboBox(referenceComboBox, (element, value) ->
         getGroupConfig(element).ifPresent(config -> includeConfig(config).setReference(value)));
     bindCheckBox(excludeValidationRulesCheckBox, (element, value) ->
-        getGroupConfig(element).ifPresent(config -> config.setExcludeRules(value ? true : null)));
+        getGroupConfig(element).ifPresent(config -> includeConfig(config).setExcludeRules(value ? true : null)));
     bindCheckBox(excludeComputationRulesCheckBox, (element, value) ->
-        getGroupConfig(element).ifPresent(config -> config.setExcludeComputations(value ? true : null)));
+        getGroupConfig(element).ifPresent(config -> includeConfig(config).setExcludeComputations(value ? true : null)));
   }
 
   @Override
@@ -54,8 +54,8 @@ public class IncludePropertiesPanelController extends AbstractPropertyEditor imp
 
     setComboBoxItems(referenceComboBox, includableModelIds());
     setFieldValue(referenceComboBox, includeConfig != null ? includeConfig.getReference() : null);
-    setFieldValue(excludeValidationRulesCheckBox, config != null && Boolean.TRUE.equals(config.getExcludeRules()));
-    setFieldValue(excludeComputationRulesCheckBox, config != null && Boolean.TRUE.equals(config.getExcludeComputations()));
+    setFieldValue(excludeValidationRulesCheckBox, includeConfig != null && Boolean.TRUE.equals(includeConfig.getExcludeRules()));
+    setFieldValue(excludeComputationRulesCheckBox, includeConfig != null && Boolean.TRUE.equals(includeConfig.getExcludeComputations()));
 
     // Reflects a reference that became invalid elsewhere (e.g. the referenced model was deleted) as soon as
     // this Include is selected.
