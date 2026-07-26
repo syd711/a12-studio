@@ -47,6 +47,9 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   @FXML
   private GridPane annotationsGrid;
 
+  @FXML
+  private Button annotationDatasetsButton;
+
   private A12Model<?> model;
 
   // The model type / field type of the element currently being edited, i.e. the key under which suggested
@@ -89,6 +92,13 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   @FXML
   private void onAnnotationDatasets() {
     StudioEventManager.getInstance().firePreferencesOpenRequestedEvent(PreferencesOpenRequestedEvent.Section.ANNOTATION_SETS);
+  }
+
+  // Used when this panel is embedded in a modal dialog (e.g. ModelSettingsDialog), where opening the
+  // Preferences window on top of it would be confusing.
+  public void hideAnnotationDatasetsButton() {
+    annotationDatasetsButton.setVisible(false);
+    annotationDatasetsButton.setManaged(false);
   }
 
   private List<Annotation> getBackingAnnotations() {

@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.dialogs;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.models.projects.ProjectItem;
@@ -77,6 +78,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     labelsController.configureModelLabels();
+    annotationsController.hideAnnotationDatasetsButton();
 
     modelSettingsNameController.setSaveMode(saveMode);
     supportedCharactersController.setSaveMode(saveMode);
@@ -102,7 +104,11 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       modelReferencesController.setModel(model);
       if (model instanceof DocumentModel documentModel) {
         timezoneController.setModel(documentModel);
+        timezoneController.setVisible(true);
+      } else {
+        timezoneController.setVisible(false);
       }
+      supportedCharactersController.setVisible(!(model instanceof ApplicationModel));
     }
 
     bindErrorContainer();

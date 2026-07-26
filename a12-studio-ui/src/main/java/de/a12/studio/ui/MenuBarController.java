@@ -275,9 +275,12 @@ public class MenuBarController implements Initializable, StudioEventListener {
     refreshClaudeConsoleButton(JsonSettings.load());
 
     Platform.runLater(() -> {
-      File lastFolderSelection = LocalUISettings.getLastFolderSelection();
-      if (lastFolderSelection != null) {
-        openProject(lastFolderSelection);
+      List<String> recentProjects = LocalUISettings.getRecentProjects();
+      if (!recentProjects.isEmpty()) {
+        File file = new File(recentProjects.get(0));
+        if (file.exists()) {
+          openProject(file);
+        }
       }
     });
   }

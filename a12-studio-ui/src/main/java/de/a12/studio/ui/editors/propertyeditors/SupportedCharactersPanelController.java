@@ -52,6 +52,14 @@ public class SupportedCharactersPanelController extends AbstractPropertyEditor i
     });
   }
 
+  /**
+   * Hides this panel entirely for model types that have no supported-characters concept, e.g. an
+   * {@code ApplicationModel} (only {@link ModelConfig#getSupportedCharacters()} backs this panel).
+   */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
   public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
     ModelConfig modelConfig = getModelConfig(model);

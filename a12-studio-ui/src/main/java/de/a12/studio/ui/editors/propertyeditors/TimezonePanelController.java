@@ -47,6 +47,14 @@ public class TimezonePanelController extends AbstractPropertyEditor implements I
     });
   }
 
+  /**
+   * Hides this panel entirely for model types that have no time zone concept, e.g. an {@code ApplicationModel}
+   * (only a {@link DocumentModel} is ever passed to {@link #setModel}).
+   */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
   public void setModel(@NonNull DocumentModel model) {
     this.model = model;
     ModelConfig modelConfig = getModelConfig(model);
