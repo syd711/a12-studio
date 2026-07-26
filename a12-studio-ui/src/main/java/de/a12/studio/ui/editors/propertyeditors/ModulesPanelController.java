@@ -105,7 +105,13 @@ public class ModulesPanelController extends AbstractPropertyEditor {
     Label nameLabel = new Label(module.getName());
     nameLabel.setId("module-" + index);
     nameLabel.setMaxWidth(Double.MAX_VALUE);
+    nameLabel.setCursor(Cursor.HAND);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
+    nameLabel.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        onEditModule.accept(module);
+      }
+    });
 
     HBox row = new HBox(10.0, dragHandle, nameLabel, createActionsBox(module, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);

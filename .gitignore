@@ -18,3 +18,5 @@ config/*.properties
 /a12-studio-data-services/*.log
 /a12-studio-models/*.log
 /a12-studio-ui/*log
+/testing/basic/logs/previewapp-server.log
+/testing/basic/bundled/seed.tar.gz

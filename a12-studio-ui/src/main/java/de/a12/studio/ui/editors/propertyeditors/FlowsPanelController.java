@@ -122,13 +122,24 @@ public class FlowsPanelController extends AbstractPropertyEditor {
   }
 
   private TreeTableRow<Object> createRow() {
-    return new TreeTableRow<>() {
+    TreeTableRow<Object> row = new TreeTableRow<>() {
       @Override
       protected void updateItem(Object item, boolean empty) {
         super.updateItem(item, empty);
         setContextMenu(empty || item == null ? null : createRowContextMenu(item));
       }
     };
+    row.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 2 && !row.isEmpty()) {
+        Object item = row.getItem();
+        if (item instanceof Flow flow) {
+          editFlow(flow);
+        } else if (item instanceof Scene scene) {
+          editScene(findParentFlow(scene), scene);
+        }
+      }
+    });
+    return row;
   }
 
   private ContextMenu createEmptyAreaContextMenu() {
@@ -151,7 +162,7 @@ public class FlowsPanelController extends AbstractPropertyEditor {
       contextMenu.getItems().addAll(
           createMenuItem("Add Scene", Icons.PLUS, () -> addScene(parentFlow)),
           new SeparatorMenuItem(),
-          createMenuItem("Edit Scene", Icons.PENCIL, () -> editScene(scene)),
+          createMenuItem("Edit Scene", Icons.PENCIL, () -> editScene(parentFlow, scene)),
           createMenuItem("Delete Scene", Icons.TRASH, () -> deleteScene(parentFlow, scene)));
     }
     return contextMenu;
@@ -168,7 +179,7 @@ public class FlowsPanelController extends AbstractPropertyEditor {
     if (selected instanceof Flow flow) {
       editFlow(flow);
     } else if (selected instanceof Scene scene) {
-      editScene(scene);
+      editScene(findParentFlow(scene), scene);
     }
   }
 
@@ -198,7 +209,7 @@ public class FlowsPanelController extends AbstractPropertyEditor {
     if (flow == null) {
       return;
     }
-    Dialogs.showSceneForAdd(Studio.stage).ifPresent(scene -> {
+    Dialogs.showSceneForAdd(Studio.stage, flow).ifPresent(scene -> {
       flow.getScenes().add(scene);
       rebuildTree();
       commitChange();
@@ -212,8 +223,11 @@ public class FlowsPanelController extends AbstractPropertyEditor {
     }
   }
 
-  private void editScene(@NonNull Scene scene) {
-    if (Dialogs.showSceneForEdit(Studio.stage, scene)) {
+  private void editScene(Flow parentFlow, @NonNull Scene scene) {
+    if (parentFlow == null) {
+      return;
+    }
+    if (Dialogs.showSceneForEdit(Studio.stage, parentFlow, scene)) {
       rebuildTree();
       commitChange();
     }

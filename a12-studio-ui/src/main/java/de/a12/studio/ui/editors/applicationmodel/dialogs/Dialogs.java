@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.applicationmodel.dialogs;
 
+import de.a12.studio.models.applicationmodel.Case;
+import de.a12.studio.models.applicationmodel.Directive;
 import de.a12.studio.models.applicationmodel.Flow;
 import de.a12.studio.models.applicationmodel.Menu;
 import de.a12.studio.models.applicationmodel.Scene;
@@ -91,22 +93,74 @@ public class Dialogs {
     return true;
   }
 
-  public static Optional<Scene> showSceneForAdd(Stage owner) {
+  public static Optional<Scene> showSceneForAdd(Stage owner, Flow flow) {
     Scene scene = new Scene();
     scene.setName("New Scene");
-    return showScene(owner, "Add Scene") ? Optional.of(scene) : Optional.empty();
+    return showScene(owner, "Add Scene", flow, scene, null) ? Optional.of(scene) : Optional.empty();
   }
 
-  public static boolean showSceneForEdit(Stage owner, Scene scene) {
-    return showScene(owner, "Edit Scene");
+  public static boolean showSceneForEdit(Stage owner, Flow flow, Scene scene) {
+    return showScene(owner, "Edit Scene", flow, scene, new SceneSnapshot(scene));
   }
 
-  private static boolean showScene(Stage owner, String title) {
+  private static boolean showScene(Stage owner, String title, Flow flow, Scene scene, SceneSnapshot snapshot) {
     FXMLLoader fxmlLoader = new FXMLLoader(SceneDialogController.class.getResource("scene-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("dialog-scene", fxmlLoader, owner, title);
+    Stage stage = WidgetFactory.createDialogStage("dialogscene", fxmlLoader, owner, title);
     SceneDialogController controller = (SceneDialogController) stage.getUserData();
-    controller.init(stage);
+    controller.init(stage, flow, scene, snapshot);
+
+    FXResizeHelper.install(stage, 30, 6);
+    stage.setMinWidth(800);
+    stage.setMinHeight(600);
+
     stage.showAndWait();
     return controller.isConfirmed();
+  }
+
+  public static Optional<Case> showCaseForAdd(Stage owner) {
+    Case caseObj = new Case();
+    caseObj.setName("New Case");
+    return showCase(owner, "Add Case", caseObj, null) ? Optional.of(caseObj) : Optional.empty();
+  }
+
+  public static boolean showCaseForEdit(Stage owner, Case caseObj) {
+    return showCase(owner, "Edit Case", caseObj, new CaseSnapshot(caseObj));
+  }
+
+  private static boolean showCase(Stage owner, String title, Case caseObj, CaseSnapshot snapshot) {
+    FXMLLoader fxmlLoader = new FXMLLoader(CaseDialogController.class.getResource("case-dialog.fxml"));
+    Stage stage = WidgetFactory.createDialogStage("dialog-case", fxmlLoader, owner, title);
+    CaseDialogController controller = (CaseDialogController) stage.getUserData();
+    controller.init(stage, caseObj, snapshot);
+
+    FXResizeHelper.install(stage, 30, 6);
+    stage.setMinWidth(800);
+    stage.setMinHeight(600);
+
+    stage.setOnHidden(event -> controller.destroy());
+    stage.showAndWait();
+    return controller.isConfirmed();
+  }
+
+  public static Optional<Directive> showDirectiveForAdd(Stage owner) {
+    return showDirective(owner, "Add Directive", null);
+  }
+
+  public static Optional<Directive> showDirectiveForEdit(Stage owner, Directive directive) {
+    return showDirective(owner, "Edit Directive", directive);
+  }
+
+  private static Optional<Directive> showDirective(Stage owner, String title, Directive existing) {
+    FXMLLoader fxmlLoader = new FXMLLoader(DirectiveDialogController.class.getResource("directive-dialog.fxml"));
+    Stage stage = WidgetFactory.createDialogStage("dialog-directive", fxmlLoader, owner, title);
+    DirectiveDialogController controller = (DirectiveDialogController) stage.getUserData();
+    controller.init(stage, existing);
+
+    FXResizeHelper.install(stage, 30, 6);
+    stage.setMinWidth(800);
+    stage.setMinHeight(600);
+
+    stage.showAndWait();
+    return controller.getResult();
   }
 }

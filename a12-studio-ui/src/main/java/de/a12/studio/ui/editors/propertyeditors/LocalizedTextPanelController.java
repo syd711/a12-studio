@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.propertyeditors;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Locale;
 import de.a12.studio.models.Label;
+import de.a12.studio.models.applicationmodel.Case;
 import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
@@ -32,10 +33,11 @@ import java.util.function.Function;
  * internal description, external description and helper text of a single {@link Element} (via {@link
  * #setElement}, distinguished via {@link #configureLabel} / {@link #configureInternal} / {@link
  * #configureExternal} / {@link #configureHelperText}), for a model's own header labels (via {@link
- * #setModel} after {@link #configureModelLabels}), and for an application model {@link Module}'s menu label
- * (via {@link #setModule} after {@link #configureModuleMenuLabel}). Exactly one configure method must be
- * called once after this controller is loaded from FXML, before setElement/setModel/setModule; {@code
- * element}, {@link #model} and {@link #module} are mutually exclusive.
+ * #setModel} after {@link #configureModelLabels}), for an application model {@link Module}'s menu label
+ * (via {@link #setModule} after {@link #configureModuleMenuLabel}), and for a {@link Case}'s label (via
+ * {@link #setCase} after {@link #configureCaseLabel}). Exactly one configure method must be called once
+ * after this controller is loaded from FXML, before setElement/setModel/setModule/setCase; {@code element},
+ * {@link #model}, {@link #module} and {@link #sceneCase} are mutually exclusive.
  */
 public class LocalizedTextPanelController extends AbstractPropertyEditor implements StudioEventListener {
 
@@ -45,6 +47,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   private A12Model<?> model;
 
   private Module module;
+
+  private Case sceneCase;
 
   // Captured whenever setElement/setModel is called, i.e. whenever this panel is (re)bound to whichever
   // project item is currently selected. Used to tell apart a locales-changed event meant for this panel's own
@@ -97,6 +101,12 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
     setSettingsKeySuffix("." + fieldKey);
   }
 
+  public void configureCaseLabel() {
+    this.fieldKey = "label";
+    setTitle("LABEL");
+    setSettingsKeySuffix("." + fieldKey);
+  }
+
   private void configure(Function<Element, List<Label>> textsAccessor, String fieldKey, String title) {
     configure(textsAccessor, textsAccessor, fieldKey, title);
   }
@@ -120,6 +130,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   public void setElement(@NonNull Element element) {
     this.model = null;
     this.module = null;
+    this.sceneCase = null;
     this.projectItem = Studio.getSelectedProjectItem();
     super.setElement(element);
     buildLocaleFields();
@@ -129,6 +140,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   public void setModel(@NonNull A12Model<?> model) {
     this.element = null;
     this.module = null;
+    this.sceneCase = null;
     this.model = model;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -138,7 +150,18 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   public void setModule(@NonNull Module module) {
     this.element = null;
     this.model = null;
+    this.sceneCase = null;
     this.module = module;
+    this.projectItem = Studio.getSelectedProjectItem();
+    buildLocaleFields();
+    populateLocaleFields();
+  }
+
+  public void setCase(@NonNull Case sceneCase) {
+    this.element = null;
+    this.model = null;
+    this.module = null;
+    this.sceneCase = sceneCase;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
     populateLocaleFields();
@@ -158,6 +181,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   }
 
   private List<Label> getTexts() {
+    if (sceneCase != null) {
+      return sceneCase.getLabel();
+    }
     if (module != null) {
       return moduleTextsAccessor.apply(module);
     }
@@ -198,6 +224,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   }
 
   private List<Label> getWriteTexts() {
+    if (sceneCase != null) {
+      return sceneCase.getLabel();
+    }
     if (module != null) {
       return moduleTextsAccessor.apply(module);
     }

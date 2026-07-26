@@ -96,7 +96,32 @@
               }
             ]
           }
-        ]
+        ],
+        "orCreateMenu": {
+          "name": "welcome",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Welcome"
+            },
+            {
+              "locale": "de",
+              "text": "Willkommen"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "engine": "content",
+              "name": "WelcomePage"
+            },
+            "withoutData": true
+          },
+          "children": [
+            {
+              "name": "sdffwe"
+            }
+          ]
+        }
       },
       {
         "name": "CompanyModule",

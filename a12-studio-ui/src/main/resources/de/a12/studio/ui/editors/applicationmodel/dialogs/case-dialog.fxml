@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
@@ -10,8 +9,8 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="650.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.applicationmodel.dialogs.SceneDialogController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="550.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.applicationmodel.dialogs.CaseDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
    </top>
@@ -27,42 +26,15 @@
                <VBox>
                   <children>
                      <Label styleClass="field-label" text="Name*" />
-                     <TextField fx:id="nameField" promptText="Enter the scene name here..." />
+                     <TextField fx:id="nameField" promptText="Enter the case name here..." />
                   </children>
                </VBox>
 
-               <!-- Description -->
-               <VBox>
-                  <children>
-                     <Label styleClass="field-label" text="Description" />
-                     <TextField fx:id="descriptionField" promptText="Enter a description here..." />
-                  </children>
-               </VBox>
+               <!-- Label -->
+               <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
 
-               <!-- Prior Scene -->
-               <VBox>
-                  <children>
-                     <Label styleClass="field-label" text="Prior Scene" />
-                     <ComboBox fx:id="priorSceneCombo" maxWidth="Infinity" />
-                  </children>
-               </VBox>
-
-               <!-- Default Case -->
-               <VBox>
-                  <children>
-                     <Label styleClass="field-label" text="Default Case" />
-                     <ComboBox fx:id="defaultCaseCombo" maxWidth="Infinity" />
-                  </children>
-               </VBox>
-
-               <!-- Match Conditions -->
-               <fx:include fx:id="matchConditions" source="../../propertyeditors/match-conditions-panel.fxml" />
-
-               <!-- Scene Change -->
+               <!-- Scene Change (onEnter only) -->
                <fx:include fx:id="sceneChange" source="../../propertyeditors/scene-change-panel.fxml" />
-
-               <!-- Cases -->
-               <fx:include fx:id="cases" source="../../propertyeditors/cases-panel.fxml" />
             </VBox>
          </content>
          <padding>
