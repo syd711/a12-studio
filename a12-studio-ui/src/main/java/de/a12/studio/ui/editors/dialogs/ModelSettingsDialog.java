@@ -170,7 +170,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   /**
    * Unregisters {@code labelsController} (the only embedded panel that self-registers with {@link
    * StudioEventManager}) once this dialog is closed, regardless of how it was closed (Save, Cancel, or the
-   * window's own close button) — see {@link EditorDialogs#openSettings}, which calls this from the stage's
+   * window's own close button) — see {@link Dialogs#openSettings}, which calls this from the stage's
    * {@code onHidden} handler.
    */
   public void destroy() {

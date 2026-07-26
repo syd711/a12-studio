@@ -5,7 +5,7 @@ import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
-import de.a12.studio.ui.editors.applicationmodel.dialogs.ModuleDialogController;
+import de.a12.studio.ui.editors.applicationmodel.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
@@ -67,7 +67,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    ModuleDialogController.showForAdd(Studio.stage).ifPresent(name -> {
+    Dialogs.showModuleForAdd(Studio.stage).ifPresent(name -> {
       Module module = new Module();
       module.setName(name);
       getModules().add(module);

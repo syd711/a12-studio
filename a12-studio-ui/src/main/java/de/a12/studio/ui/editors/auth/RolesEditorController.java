@@ -4,7 +4,7 @@ import de.a12.studio.models.auth.AuthDocument;
 import de.a12.studio.models.auth.Role;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.ui.Studio;
-import de.a12.studio.ui.editors.auth.dialogs.RoleDialogController;
+import de.a12.studio.ui.editors.auth.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -106,7 +106,7 @@ public class RolesEditorController extends AbstractAuthFileEditorController impl
 
   @FXML
   private void onAddRole() {
-    RoleDialogController.showForAdd(Studio.stage).ifPresent(role -> {
+    Dialogs.showRoleForAdd(Studio.stage).ifPresent(role -> {
       // Mutate through the table's own (list-backed) ObservableList, not document.getRoles()
       // directly, so the TableView actually receives a change notification and redraws.
       rolesTable.getItems().add(role);
@@ -126,7 +126,7 @@ public class RolesEditorController extends AbstractAuthFileEditorController impl
   }
 
   private void openEditRoleDialog(@NonNull Role role) {
-    if (RoleDialogController.showForEdit(Studio.stage, role)) {
+    if (Dialogs.showRoleForEdit(Studio.stage, role)) {
       rolesTable.refresh();
       save();
     }

@@ -6,10 +6,8 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.util.FileUtils;
-import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -82,18 +80,16 @@ public class IncludeDialogController implements DialogController {
     stage.close();
   }
 
-  public static Optional<IncludeInput> show(Stage owner, @NonNull Project project, DocumentModel excludedModel, String defaultName) {
-    FXMLLoader fxmlLoader = new FXMLLoader(IncludeDialogController.class.getResource("include-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("include-dialog", fxmlLoader, owner, "New Include");
-    IncludeDialogController controller = (IncludeDialogController) stage.getUserData();
-    controller.stage = stage;
-    controller.nameField.setText(defaultName == null ? "" : defaultName);
-    controller.referenceComboBox.getItems().setAll(includableModels(project, excludedModel));
-    stage.showAndWait();
+  void init(Stage stage, @NonNull Project project, DocumentModel excludedModel, String defaultName) {
+    this.stage = stage;
+    nameField.setText(defaultName == null ? "" : defaultName);
+    referenceComboBox.getItems().setAll(includableModels(project, excludedModel));
+  }
 
-    if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
-      DocumentModel reference = controller.referenceComboBox.getValue();
-      String name = controller.nameField.getText();
+  Optional<IncludeInput> getResult() {
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      DocumentModel reference = referenceComboBox.getValue();
+      String name = nameField.getText();
       if (reference != null && name != null && !name.isBlank()) {
         return Optional.of(new IncludeInput(name.trim(), reference.getId()));
       }

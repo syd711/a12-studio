@@ -2,9 +2,7 @@ package de.a12.studio.ui.editors.auth.dialogs;
 
 import de.a12.studio.models.auth.Role;
 import de.a12.studio.ui.components.DialogController;
-import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
@@ -51,29 +49,16 @@ public class RoleDialogController implements DialogController {
     stage.close();
   }
 
-  public static Optional<Role> showForAdd(Stage owner) {
-    Role role = new Role();
-    return show(owner, "Add Role", role) ? Optional.of(role) : Optional.empty();
+  void init(Stage stage, Role role) {
+    this.stage = stage;
+    nameField.setText(role.getName());
+    descriptionField.setText(role.getDescription());
   }
 
-  public static boolean showForEdit(Stage owner, Role role) {
-    return show(owner, "Edit Role", role);
-  }
-
-  private static boolean show(Stage owner, String title, Role role) {
-    FXMLLoader fxmlLoader = new FXMLLoader(RoleDialogController.class.getResource("role-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("dialog-role", fxmlLoader, owner, title);
-    RoleDialogController controller = (RoleDialogController) stage.getUserData();
-    controller.stage = stage;
-
-    controller.nameField.setText(role.getName());
-    controller.descriptionField.setText(role.getDescription());
-
-    stage.showAndWait();
-
-    if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
-      role.setName(controller.nameField.getText().trim());
-      String description = controller.descriptionField.getText();
+  boolean applyResultTo(Role role) {
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      role.setName(nameField.getText().trim());
+      String description = descriptionField.getText();
       role.setDescription(description == null || description.isBlank() ? null : description.trim());
       return true;
     }

@@ -1,9 +1,7 @@
 package de.a12.studio.ui.editors.applicationmodel.dialogs;
 
 import de.a12.studio.ui.components.DialogController;
-import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
@@ -48,24 +46,14 @@ public class ModuleDialogController implements DialogController {
     stage.close();
   }
 
-  public static Optional<String> showForAdd(Stage owner) {
-    return show(owner, "Add Module", "");
+  void init(Stage stage, String initialName) {
+    this.stage = stage;
+    nameField.setText(initialName);
   }
 
-  public static Optional<String> showForEdit(Stage owner, String currentName) {
-    return show(owner, "Edit Module", currentName);
-  }
-
-  private static Optional<String> show(Stage owner, String title, String initialName) {
-    FXMLLoader fxmlLoader = new FXMLLoader(ModuleDialogController.class.getResource("module-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("dialog-module", fxmlLoader, owner, title);
-    ModuleDialogController controller = (ModuleDialogController) stage.getUserData();
-    controller.stage = stage;
-    controller.nameField.setText(initialName);
-    stage.showAndWait();
-
-    if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
-      String name = controller.nameField.getText();
+  Optional<String> getResult() {
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      String name = nameField.getText();
       if (name != null && !name.isBlank()) {
         return Optional.of(name.trim());
       }

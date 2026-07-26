@@ -6,7 +6,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.dialogs.EditorDialogs;
+import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
@@ -56,7 +56,7 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
 
   @FXML
   public void onSettings(ActionEvent e) {
-    EditorDialogs.openSettings();
+    Dialogs.openSettings();
     updateSettingsErrorBadge();
   }
 

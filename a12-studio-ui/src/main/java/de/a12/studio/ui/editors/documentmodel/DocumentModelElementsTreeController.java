@@ -12,6 +12,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController;
 import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.ModelClosedEvent;
@@ -483,7 +484,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     Element newElement = DocumentModelElementFactory.newIncludeElement(insertionPoint.siblings(), modelRoot);
 
     Project project = Studio.getCurrentProject();
-    Optional<IncludeDialogController.IncludeInput> input = IncludeDialogController.show(
+    Optional<IncludeDialogController.IncludeInput> input = Dialogs.showInclude(
         Studio.stage, project, (DocumentModel) projectItem.getModel(), newElement.getName());
     if (input.isEmpty()) {
       return;

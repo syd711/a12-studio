@@ -11,6 +11,7 @@ import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -68,8 +69,28 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
     });
 
     List<ModelReference> references = getModelReferences();
+    setHeaderRowVisible(!references.isEmpty());
+    if (references.isEmpty()) {
+      Label emptyLabel = new Label("No model references found.");
+      emptyLabel.getStyleClass().add("placeholder-label");
+      referencesGrid.add(emptyLabel, 0, 1, 5, 1);
+      return;
+    }
+
     for (int index = 0; index < references.size(); index++) {
       addRow(references.get(index), index, references.size());
+    }
+  }
+
+  // The column title Labels (Alias/Purpose/Model Type/Reference) live in row 0 of referencesGrid, defined in
+  // FXML rather than built here, so they're found by row index instead of by fx:id.
+  private void setHeaderRowVisible(boolean visible) {
+    for (Node node : referencesGrid.getChildren()) {
+      Integer rowIndex = GridPane.getRowIndex(node);
+      if (rowIndex == null || rowIndex == 0) {
+        node.setVisible(visible);
+        node.setManaged(visible);
+      }
     }
   }
 

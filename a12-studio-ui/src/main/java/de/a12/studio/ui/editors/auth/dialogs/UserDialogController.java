@@ -2,9 +2,7 @@ package de.a12.studio.ui.editors.auth.dialogs;
 
 import de.a12.studio.models.auth.User;
 import de.a12.studio.ui.components.DialogController;
-import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
@@ -66,37 +64,24 @@ public class UserDialogController implements DialogController {
     stage.close();
   }
 
-  public static Optional<User> showForAdd(Stage owner) {
-    User user = new User();
-    return show(owner, "Add User", user) ? Optional.of(user) : Optional.empty();
+  void init(Stage stage, User user) {
+    this.stage = stage;
+    usernameField.setText(user.getUsername());
+    passwordField.setText(user.getPassword());
+    authoritiesField.setText(joinAuthorities(user));
+    emailField.setText(user.getEmail());
+    firstnameField.setText(user.getFirstname());
+    lastnameField.setText(user.getLastname());
   }
 
-  public static boolean showForEdit(Stage owner, User user) {
-    return show(owner, "Edit User", user);
-  }
-
-  private static boolean show(Stage owner, String title, User user) {
-    FXMLLoader fxmlLoader = new FXMLLoader(UserDialogController.class.getResource("user-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("dialog-user", fxmlLoader, owner, title);
-    UserDialogController controller = (UserDialogController) stage.getUserData();
-    controller.stage = stage;
-
-    controller.usernameField.setText(user.getUsername());
-    controller.passwordField.setText(user.getPassword());
-    controller.authoritiesField.setText(joinAuthorities(user));
-    controller.emailField.setText(user.getEmail());
-    controller.firstnameField.setText(user.getFirstname());
-    controller.lastnameField.setText(user.getLastname());
-
-    stage.showAndWait();
-
-    if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
-      user.setUsername(controller.usernameField.getText().trim());
-      user.setPassword(emptyToNull(controller.passwordField.getText()));
-      user.setAuthorities(splitAuthorities(controller.authoritiesField.getText()));
-      user.setEmail(emptyToNull(controller.emailField.getText()));
-      user.setFirstname(emptyToNull(controller.firstnameField.getText()));
-      user.setLastname(emptyToNull(controller.lastnameField.getText()));
+  boolean applyResultTo(User user) {
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      user.setUsername(usernameField.getText().trim());
+      user.setPassword(emptyToNull(passwordField.getText()));
+      user.setAuthorities(splitAuthorities(authoritiesField.getText()));
+      user.setEmail(emptyToNull(emailField.getText()));
+      user.setFirstname(emptyToNull(firstnameField.getText()));
+      user.setLastname(emptyToNull(lastnameField.getText()));
       return true;
     }
     return false;

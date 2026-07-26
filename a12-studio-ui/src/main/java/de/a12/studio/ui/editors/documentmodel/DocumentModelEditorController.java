@@ -12,8 +12,7 @@ import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.dialogs.EditorDialogs;
-import de.a12.studio.ui.editors.documentmodel.dialogs.DocumentModelDialogs;
+import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -63,13 +62,13 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   @FXML
   public void onSettings(ActionEvent e) {
-    EditorDialogs.openSettings();
+    Dialogs.openSettings();
     updateSettingsErrorBadge();
   }
 
   @FXML
   public void onTypeDefinitions(ActionEvent e) {
-    DocumentModelDialogs.openTypeDefinitions();
+    de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs.openTypeDefinitions();
   }
 
   public void loadModel(@NonNull A12Model<?> model) {

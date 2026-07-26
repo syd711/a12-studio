@@ -10,9 +10,7 @@ import de.a12.studio.ui.editors.propertyeditors.ActivityPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModuleRolesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
-import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
@@ -31,7 +29,7 @@ import java.util.Optional;
  * the real, already-attached {@link Menu} live (so a {@link MenuSnapshot} taken before showing the dialog can
  * undo it on Cancel); for an add, they mutate a new, not-yet-attached {@link Menu} that the caller only
  * attaches to the parent's children list once this dialog resolves with {@link ButtonType#OK} (see {@link
- * #showForAdd}), so Cancel needs no undo there.
+ * Dialogs#showForAdd}), so Cancel needs no undo there.
  */
 public class ChildMenuDialogController implements DialogController {
 
@@ -89,10 +87,10 @@ public class ChildMenuDialogController implements DialogController {
   /**
    * Unregisters {@code labelController} (the only embedded panel that self-registers with {@link
    * StudioEventManager}) once this dialog is closed, regardless of how it was closed (OK, Cancel, or the
-   * window's own close button) — see {@link #show}, which calls this from the stage's {@code onHidden}
+   * window's own close button) — see {@link Dialogs#show}, which calls this from the stage's {@code onHidden}
    * handler.
    */
-  private void destroy() {
+  void destroy() {
     labelController.destroy();
   }
 
@@ -112,33 +110,21 @@ public class ChildMenuDialogController implements DialogController {
     stage.close();
   }
 
-  public static Optional<Menu> showForAdd(Stage owner) {
-    Menu menu = new Menu();
-    return show(owner, "Add Child Menu Entry", menu, null) ? Optional.of(menu) : Optional.empty();
-  }
-
-  public static boolean showForEdit(Stage owner, Menu menu) {
-    return show(owner, "Edit Child Menu Entry", menu, new MenuSnapshot(menu));
-  }
-
-  private static boolean show(Stage owner, String title, Menu menu, MenuSnapshot snapshot) {
-    FXMLLoader fxmlLoader = new FXMLLoader(ChildMenuDialogController.class.getResource("child-menu-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("dialog-child-menu", fxmlLoader, owner, title);
-    ChildMenuDialogController controller = (ChildMenuDialogController) stage.getUserData();
-    controller.stage = stage;
-    controller.snapshot = snapshot;
+  void init(Stage stage, Menu menu, MenuSnapshot snapshot) {
+    this.stage = stage;
+    this.snapshot = snapshot;
 
     Module workingModule = new Module();
     workingModule.setMenu(menu);
-    controller.workingModule = workingModule;
+    this.workingModule = workingModule;
 
-    controller.nameField.setText(menu.getName());
-    controller.activityController.setModule(workingModule);
-    controller.labelController.setModule(workingModule);
-    controller.rolesController.setModule(workingModule);
+    nameField.setText(menu.getName());
+    activityController.setModule(workingModule);
+    labelController.setModule(workingModule);
+    rolesController.setModule(workingModule);
+  }
 
-    stage.setOnHidden(event -> controller.destroy());
-    stage.showAndWait();
-    return controller.result.isPresent() && controller.result.get() == ButtonType.OK;
+  boolean isConfirmed() {
+    return result.isPresent() && result.get() == ButtonType.OK;
   }
 }

@@ -4,7 +4,7 @@ import de.a12.studio.models.auth.AuthDocument;
 import de.a12.studio.models.auth.User;
 import de.a12.studio.models.auth.UsersDocument;
 import de.a12.studio.ui.Studio;
-import de.a12.studio.ui.editors.auth.dialogs.UserDialogController;
+import de.a12.studio.ui.editors.auth.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -91,7 +91,7 @@ public class UsersEditorController extends AbstractAuthFileEditorController impl
 
   @FXML
   private void onAddUser() {
-    UserDialogController.showForAdd(Studio.stage).ifPresent(user -> {
+    Dialogs.showUserForAdd(Studio.stage).ifPresent(user -> {
       usersTable.getItems().add(user);
       usersTable.getSelectionModel().select(user);
       usersTable.scrollTo(user);
@@ -109,7 +109,7 @@ public class UsersEditorController extends AbstractAuthFileEditorController impl
   }
 
   private void openEditUserDialog(@NonNull User user) {
-    if (UserDialogController.showForEdit(Studio.stage, user)) {
+    if (Dialogs.showUserForEdit(Studio.stage, user)) {
       usersTable.refresh();
       save();
     }

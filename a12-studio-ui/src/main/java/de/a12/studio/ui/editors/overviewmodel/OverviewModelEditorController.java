@@ -5,7 +5,7 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.dialogs.EditorDialogs;
+import de.a12.studio.ui.editors.dialogs.Dialogs;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,7 +29,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
   @FXML
   public void onSettings(ActionEvent e) {
-    EditorDialogs.openSettings();
+    Dialogs.openSettings();
     updateSettingsErrorBadge();
   }
 

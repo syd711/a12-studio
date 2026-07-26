@@ -10,18 +10,16 @@ import de.a12.studio.models.documentmodel.StringTypeOptions;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
-import de.a12.studio.ui.editors.propertyeditors.dialogs.SuggestionsDialogController;
+import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.events.LocalesChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -29,7 +27,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -154,19 +151,12 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
   }
 
   private void openSuggestionsDialog(Locale locale) {
-    FXMLLoader fxmlLoader = new FXMLLoader(SuggestionsDialogController.class.getResource("suggestions-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, Studio.stage, "Suggestions for Locale " + locale.getCode());
-    SuggestionsDialogController controller = (SuggestionsDialogController) stage.getUserData();
-    controller.initDialog(stage, getSuggestionValues(locale.getCode()));
-    stage.showAndWait();
-
-    if (controller.getResult().isEmpty() || controller.getResult().get() != ButtonType.OK) {
-      return;
-    }
-    List<String> newValues = controller.getValues();
-    withStringTypeOptions(element, options -> setSuggestionValues(options, locale.getCode(), newValues));
-    rebuildSuggestionsRows();
-    commitChange();
+    Dialogs.showSuggestions(Studio.stage, "Suggestions for Locale " + locale.getCode(), getSuggestionValues(locale.getCode()))
+        .ifPresent(newValues -> {
+          withStringTypeOptions(element, options -> setSuggestionValues(options, locale.getCode(), newValues));
+          rebuildSuggestionsRows();
+          commitChange();
+        });
   }
 
   private List<String> getSuggestionValues(String localeCode) {

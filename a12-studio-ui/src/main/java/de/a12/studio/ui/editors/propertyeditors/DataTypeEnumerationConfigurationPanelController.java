@@ -11,14 +11,13 @@ import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
-import de.a12.studio.ui.editors.propertyeditors.dialogs.CategoryDialogController;
+import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.events.LocalesChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -33,7 +32,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -178,33 +176,21 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
    */
   private void openCategoryDialog(Category existing) {
     String title = existing == null ? "Add Category" : "Edit Category";
-    FXMLLoader fxmlLoader = new FXMLLoader(CategoryDialogController.class.getResource("category-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("category-dialog", fxmlLoader, Studio.stage, title);
-    CategoryDialogController controller = (CategoryDialogController) stage.getUserData();
-    controller.initDialog(stage, existing == null ? null : existing.getName(), existing == null ? null : existing.getDescription());
-    stage.showAndWait();
-
-    if (controller.getResult().isEmpty() || controller.getResult().get() != ButtonType.OK) {
-      return;
-    }
-    String name = controller.getName();
-    if (name == null || name.isBlank()) {
-      return;
-    }
-    String description = controller.getDescription();
-
-    if (existing == null) {
-      Category category = new Category();
-      category.setName(name);
-      category.setDescription(description == null || description.isEmpty() ? null : description);
-      withEnumerationTypeOptions(element, options -> options.getCategories().add(category));
-    } else {
-      existing.setName(name);
-      existing.setDescription(description == null || description.isEmpty() ? null : description);
-    }
-    rebuildCategoryRows();
-    rebuildEnumerationValuesGrid();
-    commitChange();
+    Dialogs.showCategory(Studio.stage, title, existing == null ? null : existing.getName(), existing == null ? null : existing.getDescription())
+        .ifPresent(input -> {
+          if (existing == null) {
+            Category category = new Category();
+            category.setName(input.name());
+            category.setDescription(input.description() == null || input.description().isEmpty() ? null : input.description());
+            withEnumerationTypeOptions(element, options -> options.getCategories().add(category));
+          } else {
+            existing.setName(input.name());
+            existing.setDescription(input.description() == null || input.description().isEmpty() ? null : input.description());
+          }
+          rebuildCategoryRows();
+          rebuildEnumerationValuesGrid();
+          commitChange();
+        });
   }
 
   private void onDeleteCategory(Category category) {

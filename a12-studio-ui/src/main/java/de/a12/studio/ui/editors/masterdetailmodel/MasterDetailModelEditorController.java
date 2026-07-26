@@ -7,7 +7,7 @@ import de.a12.studio.models.masterdetailmodel.FormMapping;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.dialogs.EditorDialogs;
+import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -87,7 +87,7 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
 
   @FXML
   public void onSettings(ActionEvent e) {
-    EditorDialogs.openSettings();
+    Dialogs.openSettings();
     updateSettingsErrorBadge();
   }
 

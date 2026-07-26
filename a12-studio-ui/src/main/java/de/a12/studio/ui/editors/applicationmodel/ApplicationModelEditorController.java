@@ -6,7 +6,7 @@ import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.dialogs.EditorDialogs;
+import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.editors.propertyeditors.*;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.preview.PreviewLauncher;
@@ -66,7 +66,7 @@ public class ApplicationModelEditorController extends AbstractEditorController i
 
   @FXML
   public void onSettings(ActionEvent e) {
-    EditorDialogs.openSettings();
+    Dialogs.openSettings();
     updateSettingsErrorBadge();
   }
 

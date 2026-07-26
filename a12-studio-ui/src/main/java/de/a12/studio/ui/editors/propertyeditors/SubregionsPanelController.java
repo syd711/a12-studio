@@ -6,6 +6,7 @@ import de.a12.studio.models.applicationmodel.Layout;
 import de.a12.studio.models.applicationmodel.Region;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.applicationmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.applicationmodel.dialogs.SubregionDialogController;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -63,7 +64,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    SubregionDialogController.showForAdd(Studio.stage).ifPresent(name -> {
+    Dialogs.showSubregionForAdd(Studio.stage).ifPresent(name -> {
       Region subregion = new Region();
       subregion.setName(name);
       getOrCreateSubRegions().add(subregion);
@@ -212,7 +213,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
 
     Button editButton = createActionButton(Icons.PENCIL, "Edit", () ->
-        SubregionDialogController.showForEdit(Studio.stage, subregion.getName()).ifPresent(name -> {
+        Dialogs.showSubregionForEdit(Studio.stage, subregion.getName()).ifPresent(name -> {
           subregion.setName(name);
           rebuildRows();
           commitChange();
