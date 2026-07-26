@@ -36,6 +36,12 @@ abstract public class AbstractAuthFileEditorController implements StudioEventLis
     StudioEventManager.getInstance().addListener(this);
   }
 
+  @FXML
+  private void onReload() {
+    projectItem.reload();
+    this.loadDocument(projectItem.getAuthDocument());
+  }
+
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
     this.save();
