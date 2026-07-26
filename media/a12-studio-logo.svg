@@ -1,0 +1,20 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="lightSq2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f8c9b4"></stop>
+        <stop offset="55%" stop-color="#f2a583"></stop>
+        <stop offset="100%" stop-color="#ed7341"></stop>
+      </linearGradient>
+      <linearGradient id="darkSq2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#3a3a3a"></stop>
+        <stop offset="60%" stop-color="#141414"></stop>
+        <stop offset="100%" stop-color="#000000"></stop>
+      </linearGradient>
+    </defs>
+    <path d="M 0 96 L 320 96 L 320 416 L 416 416 L 416 512 L 60 512 Q 0 512 0 452 Z" fill="url(#darkSq2)"></path>
+    <path d="M 96 0 L 452 0 Q 512 0 512 60 L 512 416 L 416 416 L 416 96 L 96 96 Z" fill="url(#lightSq2)"></path>
+    <rect x="96" y="96" width="320" height="320" fill="#000000"></rect>
+    <text x="200" y="270" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="900" font-size="120" fill="#ffffff" letter-spacing="-2">A12</text>
+    <line x1="130" y1="300" x2="270" y2="300" stroke="#ffffff" stroke-width="3" opacity="0.6"></line>
+    <text x="200" y="382" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="78" fill="#ffffff" letter-spacing="0">STUDIO</text>
+  </svg>

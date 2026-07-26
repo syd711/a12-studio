@@ -247,7 +247,10 @@ public class FXResizeHelper {
 
   private void launch() {
 
-    SCENE.setOnMousePressed(event -> {
+    // Registered as capturing-phase filters (not bubble-phase handlers) so the resize/drag
+    // gesture is captured before a descendant control - e.g. a ToolBar, which is known to
+    // swallow MOUSE_PRESSED/MOUSE_DRAGGED even over its empty background - can consume it first.
+    SCENE.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
       mPresSceneX = event.getSceneX();
       mPresSceneY = event.getSceneY();
 
@@ -256,6 +259,13 @@ public class FXResizeHelper {
 
       mPresStageW = STAGE.getWidth();
       mPresStageH = STAGE.getHeight();
+    });
+
+    SCENE.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
+      EventHandler<MouseEvent> handler = LISTENER.get(SCENE.getCursor());
+      if (handler != null) {
+        handler.handle(event);
+      }
     });
 
     SCENE.setOnMouseMoved(event -> {
@@ -311,8 +321,6 @@ public class FXResizeHelper {
 
   private void fireAction(Cursor c) {
     SCENE.setCursor(c);
-    if (c != Cursor.DEFAULT) SCENE.setOnMouseDragged(LISTENER.get(c));
-    else SCENE.setOnMouseDragged(null);
   }
 
   public void setVerticalOnly() {
