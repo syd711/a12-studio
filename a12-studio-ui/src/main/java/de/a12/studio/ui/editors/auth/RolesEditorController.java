@@ -11,6 +11,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -43,6 +44,12 @@ public class RolesEditorController extends AbstractAuthFileEditorController impl
 
   @FXML
   private ListView<String> accessRightsList;
+
+  @FXML
+  private Button addAccessRightButton;
+
+  @FXML
+  private Button removeAccessRightButton;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -90,6 +97,10 @@ public class RolesEditorController extends AbstractAuthFileEditorController impl
     accessRightsLabel.setManaged(hasSelection);
     accessRightsList.setVisible(hasSelection);
     accessRightsList.setManaged(hasSelection);
+    addAccessRightButton.setVisible(hasSelection);
+    addAccessRightButton.setManaged(hasSelection);
+    removeAccessRightButton.setVisible(hasSelection);
+    removeAccessRightButton.setManaged(hasSelection);
     accessRightsList.setItems(hasSelection ? FXCollections.observableList(role.getAccessRights()) : FXCollections.observableArrayList());
   }
 
