@@ -137,6 +137,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     javafx.scene.control.Label nameLabel = new javafx.scene.control.Label(category.getName() == null ? "" : category.getName());
     nameLabel.setId("category-" + index);
     nameLabel.setMaxWidth(Double.MAX_VALUE);
+    nameLabel.setCursor(javafx.scene.Cursor.HAND);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
     HBox row = new HBox(10.0, nameLabel, createCategoryActionsBox(category, index, rowCount));
@@ -146,7 +147,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
       Tooltip.install(row, new Tooltip(category.getDescription()));
     }
     nameLabel.setOnMouseClicked(event -> {
-      if (event.getClickCount() == 2) {
+      if (event.getClickCount() == 1) {
         onEditCategory(category);
       }
     });

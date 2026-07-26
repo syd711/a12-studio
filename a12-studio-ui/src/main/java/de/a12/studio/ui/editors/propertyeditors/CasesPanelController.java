@@ -9,6 +9,7 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -82,13 +83,14 @@ public class CasesPanelController {
     Label nameLabel = new Label(caseObj.getName() == null ? "" : caseObj.getName());
     nameLabel.setId("case-" + index);
     nameLabel.setMaxWidth(Double.MAX_VALUE);
+    nameLabel.setCursor(Cursor.HAND);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
     HBox row = new HBox(10.0, nameLabel, createActionsBox(caseObj, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
     nameLabel.setOnMouseClicked(event -> {
-      if (event.getClickCount() == 2) {
+      if (event.getClickCount() == 1) {
         onEditCase(caseObj);
       }
     });

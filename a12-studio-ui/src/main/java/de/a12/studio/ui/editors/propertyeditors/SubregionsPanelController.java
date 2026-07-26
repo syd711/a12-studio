@@ -123,7 +123,13 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     Label nameLabel = new Label(subregion.getName());
     nameLabel.setId("subregion-" + index);
     nameLabel.setMaxWidth(Double.MAX_VALUE);
+    nameLabel.setCursor(Cursor.HAND);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
+    nameLabel.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        editSubregion(subregion);
+      }
+    });
 
     Label layoutLabel = new Label(subregion.getLayout() != null ? subregion.getLayout().getName() : "");
     layoutLabel.setId("subregion-layout-" + index);
@@ -209,15 +215,18 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     commitChange();
   }
 
+  private void editSubregion(Region subregion) {
+    Dialogs.showSubregionForEdit(Studio.stage, subregion.getName()).ifPresent(name -> {
+      subregion.setName(name);
+      rebuildRows();
+      commitChange();
+    });
+  }
+
   private HBox createActionsBox(Region subregion, int index, int rowCount) {
     VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () ->
-        Dialogs.showSubregionForEdit(Studio.stage, subregion.getName()).ifPresent(name -> {
-          subregion.setName(name);
-          rebuildRows();
-          commitChange();
-        }));
+    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> editSubregion(subregion));
 
     Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
       Region copy = new Region();

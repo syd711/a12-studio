@@ -166,7 +166,13 @@ public class SceneChangePanelController {
 
     Label nameLabel = new Label(directive instanceof ViewAddDirective viewAdd && viewAdd.getName() != null ? viewAdd.getName() : "");
     nameLabel.setMaxWidth(Double.MAX_VALUE);
+    nameLabel.setCursor(Cursor.HAND);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
+    nameLabel.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        editDirective(directives, directive);
+      }
+    });
 
     HBox row = new HBox(10.0, dragHandle, typeLabel, regionLabel, nameLabel, createActionsBox(directives, directive, index));
     row.setAlignment(Pos.CENTER_LEFT);
@@ -246,14 +252,17 @@ public class SceneChangePanelController {
     rebuildAll();
   }
 
+  private void editDirective(List<Directive> directives, Directive directive) {
+    Dialogs.showDirectiveForEdit(Studio.stage, directive).ifPresent(updated -> {
+      directives.set(directives.indexOf(directive), updated);
+      rebuildAll();
+    });
+  }
+
   private HBox createActionsBox(List<Directive> directives, Directive directive, int index) {
     VBox moveButtonsBox = createMoveButtonsBox(directives, index);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () ->
-        Dialogs.showDirectiveForEdit(Studio.stage, directive).ifPresent(updated -> {
-          directives.set(directives.indexOf(directive), updated);
-          rebuildAll();
-        }));
+    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> editDirective(directives, directive));
 
     Button copyButton = createActionButton(Icons.COPY, "Duplicate", () -> {
       directives.add(index + 1, cloneDirective(directive));
