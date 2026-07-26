@@ -71,7 +71,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
-    if (project == null) {
+    if (project == null || event.getItem().getModel() == null) {
       return;
     }
     refreshNode(event.getItem().getModel());
@@ -79,7 +79,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   @Override
   public void modelDeleted(@NonNull ModelDeletedEvent event) {
-    if (project == null) {
+    if (project == null || event.getItem().getModel() == null) {
       return;
     }
     refreshNode(event.getItem().getModel());
@@ -273,7 +273,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
           PreferencesOpenRequestedEvent.Section.GENERAL_SETTINGS);
       return;
     }
-    if (!viewModel.isFolder() && viewModel.hasModel()) {
+    if (!viewModel.isFolder() && (viewModel.hasModel() || viewModel.hasAuthFile())) {
       if (project != null) {
         project.getSettings().getUISettings().addOpenedFile(viewModel.getProjectItem().getPath());
         project.getSettings().getUISettings().save();
@@ -312,13 +312,13 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       }
       else if (event.getCode() == KeyCode.DELETE) {
         if (selected != null && !selected.getValue().getProjectItem().isRoot()
-            && !selected.getValue().isSettings()) {
+            && !selected.getValue().isSettings() && !selected.getValue().isAuthFile()) {
           menuFactory.onDeleteItem(selected.getValue().getProjectItem());
         }
       }
       else if (event.getCode() == KeyCode.F2) {
         if (selected != null && !selected.getValue().getProjectItem().isRoot()
-            && !selected.getValue().isSettings()) {
+            && !selected.getValue().isSettings() && !selected.getValue().isAuthFile()) {
           menuFactory.onRenameItem(selected.getValue().getProjectItem());
         }
       }

@@ -1,8 +1,11 @@
 package de.a12.studio.models.projects;
 
 import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.models.util.YamlSettings;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelFactory;
+import de.a12.studio.models.auth.AuthDocument;
+import de.a12.studio.models.auth.AuthFileFactory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +34,9 @@ public class ProjectItem {
   @Getter
   @Setter
   private A12Model<?> model;
+  @Getter
+  @Setter
+  private AuthDocument authDocument;
   private boolean loaded = false;
 
   public ProjectItem(File listFile) {
@@ -40,7 +46,12 @@ public class ProjectItem {
 
   public void save() {
     try {
-      JsonSettings.objectMapper.writeValue(new File(getPath()), getModel());
+      if (model != null) {
+        JsonSettings.objectMapper.writeValue(new File(getPath()), model);
+      }
+      else if (authDocument != null) {
+        YamlSettings.objectMapper.writeValue(new File(getPath()), authDocument);
+      }
       log.info("Saved {}", getPath());
     }
     catch (Exception e) {
@@ -53,6 +64,9 @@ public class ProjectItem {
       this.loaded = true;
       if (!this.isFolder()) {
         this.model = ModelFactory.load(this);
+        if (this.model == null) {
+          this.authDocument = AuthFileFactory.load(this);
+        }
       }
     }
   }
@@ -60,6 +74,7 @@ public class ProjectItem {
   public void reload() {
     if (!isFolder()) {
       this.model = ModelFactory.load(this);
+      this.authDocument = this.model == null ? AuthFileFactory.load(this) : null;
     }
   }
 

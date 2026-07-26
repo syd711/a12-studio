@@ -1,12 +1,16 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.auth.RolesDocument;
+import de.a12.studio.models.auth.UsersDocument;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.applicationmodel.ApplicationModelEditorController;
+import de.a12.studio.ui.editors.auth.RolesEditorController;
+import de.a12.studio.ui.editors.auth.UsersEditorController;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.editors.masterdetailmodel.MasterDetailModelEditorController;
 import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
@@ -55,6 +59,18 @@ public class EditorFactory {
         FXMLLoader loader = new FXMLLoader(MasterDetailModelEditorController.class.getResource("master-detail-model-editor.fxml"));
         content = loader.load();
         MasterDetailModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getAuthDocument() instanceof RolesDocument) {
+        FXMLLoader loader = new FXMLLoader(RolesEditorController.class.getResource("roles-editor.fxml"));
+        content = loader.load();
+        RolesEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getAuthDocument() instanceof UsersDocument) {
+        FXMLLoader loader = new FXMLLoader(UsersEditorController.class.getResource("users-editor.fxml"));
+        content = loader.load();
+        UsersEditorController controller = loader.getController();
         controller.load(item);
       }
       return content;

@@ -1,6 +1,7 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.util.Icons;
 import javafx.beans.value.ChangeListener;
@@ -71,7 +72,8 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
   }
 
   private void onDragDetected(MouseEvent event) {
-    if (isEmpty() || getItem() == null || getItem().getProjectItem().isRoot() || getItem().isSettings()) {
+    if (isEmpty() || getItem() == null || getItem().getProjectItem().isRoot() || getItem().isSettings()
+        || getItem().isAuthFile()) {
       return;
     }
 
@@ -122,7 +124,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
 
     setText(item.getDisplayName());
     boolean locked = isLockedFolder(item);
-    boolean missingModel = !item.isFolder() && !item.hasModel() && !item.isSettings();
+    boolean missingModel = !item.isFolder() && !item.hasModel() && !item.isSettings() && !item.isAuthFile();
     setContextMenu(missingModel ? null : menuFactory.createTreeItemContextMenu(item));
     if (missingModel || locked) {
       if (!getStyleClass().contains("model-missing")) {
@@ -160,6 +162,12 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     else if (item.isSettings()) {
       icon.setIconSize(18);
       icon.setIconLiteral(Icons.COG_OUTLINE);
+      setGraphic(icon);
+    }
+    else if (item.isAuthFile()) {
+      icon.setIconSize(18);
+      icon.setIconLiteral(item.getProjectItem().getAuthDocument() instanceof RolesDocument
+          ? Icons.ACCOUNT_KEY_OUTLINE : Icons.ACCOUNT_MULTIPLE_OUTLINE);
       setGraphic(icon);
     }
     else {

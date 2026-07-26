@@ -1,6 +1,7 @@
 dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.17'
     implementation 'tools.jackson.core:jackson-databind:3.1.4'
+    implementation 'tools.jackson.dataformat:jackson-dataformat-yaml:3.1.4'
 
     testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

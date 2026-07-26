@@ -28,6 +28,8 @@ public interface Icons {
   String TRASH = "mdi2t-trash-can-outline";
   String COPY = "mdi2c-content-copy";
   String COG_OUTLINE = "mdi2c-cog-outline";
+  String ACCOUNT_KEY_OUTLINE = "mdi2a-account-key-outline";
+  String ACCOUNT_MULTIPLE_OUTLINE = "mdi2a-account-multiple-outline";
   String PENCIL = "mdi2p-pencil-outline";
   String ZIP = "mdi2f-folder-zip-outline";
   String CUT = "mdi2c-content-cut";

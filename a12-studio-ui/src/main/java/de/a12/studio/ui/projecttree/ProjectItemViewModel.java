@@ -51,12 +51,20 @@ public class ProjectItemViewModel {
         && projectItem.getParent().isRoot();
   }
 
+  public boolean hasAuthFile() {
+    return projectItem.getAuthDocument() != null;
+  }
+
+  public boolean isAuthFile() {
+    return !projectItem.isFolder() && hasAuthFile();
+  }
+
   public ProjectItem getProjectItem() {
     return projectItem;
   }
 
   public String getIconPath() {
-    if (isSettings()) {
+    if (isSettings() || isAuthFile()) {
       return null; // handled separately in cell (FontIcon, not ImageView)
     }
     A12Model<?> model = projectItem.getModel();

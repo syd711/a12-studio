@@ -1,6 +1,7 @@
 package de.a12.studio.ui.tabs;
 
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.EditorFactory;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -19,6 +20,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.net.URL;
@@ -103,8 +105,14 @@ public class TabPaneController implements Initializable, StudioEventListener {
     if (model instanceof TypeDefinitionModel) {
       tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(ModelType.TYPEDEFINITION)));
     }
-    else {
+    else if (model != null) {
       tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(model.getModelType())));
+    }
+    else if (item.getAuthDocument() != null) {
+      FontIcon icon = new FontIcon(item.getAuthDocument() instanceof RolesDocument
+          ? Icons.ACCOUNT_KEY_OUTLINE : Icons.ACCOUNT_MULTIPLE_OUTLINE);
+      icon.setIconSize(18);
+      tab.setGraphic(icon);
     }
     tab.setContextMenu(createTabContextMenu(tab));
     tab.setOnClosed(closeEvent -> onTabClosed(tab));

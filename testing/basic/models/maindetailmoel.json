@@ -1,0 +1,26 @@
+{
+  "header": {
+    "id": "maindetailmoel",
+    "modelType": "module-masterdetail",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "type": "overview"
+  }
+}
