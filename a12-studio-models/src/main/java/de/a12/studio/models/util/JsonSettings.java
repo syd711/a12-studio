@@ -25,7 +25,8 @@ public abstract class JsonSettings {
     UI,
     ANNOTATION,
     PREVIEW,
-    PROJECT_ROOT
+    PROJECT_ROOT,
+    A12_INSTALLATION
   }
 
   public final static ObjectMapper objectMapper;

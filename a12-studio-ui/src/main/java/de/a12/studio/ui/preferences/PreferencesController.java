@@ -28,6 +28,9 @@ public class PreferencesController implements Initializable {
   private Button annotationSetsBtn;
 
   @FXML
+  private Button a12InstallationBtn;
+
+  @FXML
   private Button previewSettingsBtn;
 
   @FXML
@@ -80,6 +83,11 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onAnnotationSets() {
     showPage(annotationSetsBtn, "annotation-sets.fxml");
+  }
+
+  @FXML
+  private void onA12Installation() {
+    showPage(a12InstallationBtn, "a12-installation-settings.fxml");
   }
 
   @FXML

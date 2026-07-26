@@ -59,7 +59,7 @@ public class Studio extends Application implements StudioEventListener {
     Scene scene = new Scene(root, width, height, Color.TRANSPARENT);
     scene.addEventHandler(KeyEvent.KEY_PRESSED, new StudioKeyEventHandler(stage));
     stage.setTitle("A12 Studio");
-    stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-48.png")));
+    stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-180.png")));
     stage.setScene(scene);
     stage.setMinWidth(1480);
     stage.setMinHeight(900);

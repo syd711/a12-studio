@@ -10,6 +10,7 @@ import de.a12.studio.ui.editors.propertyeditors.ActivityPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModuleRolesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.FileUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -72,7 +73,7 @@ public class ChildMenuDialogController implements DialogController {
     activityController.setSaveMode(saveMode);
     labelController.setSaveMode(saveMode);
     rolesController.setSaveMode(saveMode);
-    okButton.disableProperty().bind(nameField.textProperty().map(name -> name == null || name.isBlank()));
+    okButton.disableProperty().bind(nameField.textProperty().map(name -> !FileUtils.isValidWindowsFilename(name)));
     nameField.requestFocus();
   }
 
