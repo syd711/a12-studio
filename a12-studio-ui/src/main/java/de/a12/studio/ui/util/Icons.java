@@ -37,6 +37,10 @@ public interface Icons {
   String PASTE = "mdi2c-content-paste";
   String UNDO = "mdi2u-undo";
   String REDO = "mdi2r-redo";
+  String PLAY = "mdi2p-play";
+  String STOP = "mdi2s-stop";
+  String CONSOLE = "mdi2c-console";
+  String SCENE = "mdi2m-movie-open";
 
   String ELEMENT_GROUP = "mdi2f-folder-outline";
   // PNG assets (in de/a12/studio/ui/icons), not Ikonli glyph literals like the constants above.

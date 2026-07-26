@@ -12,6 +12,8 @@ import java.util.Optional;
 
 public class Dialogs {
 
+  private static final String FLOW_NAME_TOOLTIP = "The name of the flow which acts as an identifier and must be unique among siblings.";
+
   public static Optional<Menu> showChildMenuForAdd(Stage owner) {
     Menu menu = new Menu();
     return showChildMenu(owner, "Add Child Menu Entry", menu, null) ? Optional.of(menu) : Optional.empty();
@@ -71,22 +73,22 @@ public class Dialogs {
   }
 
   public static Optional<Flow> showFlowForAdd(Stage owner) {
+    String name = WidgetFactory.showInputDialog(owner, "Add Flow", "Name", null, null, "New Flow", FLOW_NAME_TOOLTIP);
+    if (name == null) {
+      return Optional.empty();
+    }
     Flow flow = new Flow();
-    flow.setName("New Flow");
-    return showFlow(owner, "Add Flow") ? Optional.of(flow) : Optional.empty();
+    flow.setName(name);
+    return Optional.of(flow);
   }
 
   public static boolean showFlowForEdit(Stage owner, Flow flow) {
-    return showFlow(owner, "Edit Flow");
-  }
-
-  private static boolean showFlow(Stage owner, String title) {
-    FXMLLoader fxmlLoader = new FXMLLoader(FlowDialogController.class.getResource("flow-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("dialog-flow", fxmlLoader, owner, title);
-    FlowDialogController controller = (FlowDialogController) stage.getUserData();
-    controller.init(stage);
-    stage.showAndWait();
-    return controller.isConfirmed();
+    String name = WidgetFactory.showInputDialog(owner, "Edit Flow", "Name", null, null, flow.getName(), FLOW_NAME_TOOLTIP);
+    if (name == null) {
+      return false;
+    }
+    flow.setName(name);
+    return true;
   }
 
   public static Optional<Scene> showSceneForAdd(Stage owner) {

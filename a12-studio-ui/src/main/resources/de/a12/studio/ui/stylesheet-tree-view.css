@@ -176,6 +176,24 @@
 }
 
 /*
+ * The scene name is rendered via a Label set as the cell's graphic (see
+ * FlowsPanelController#createNameCell), not as the cell's own text, so -fx-text-fill
+ * above never reaches it - same situation as #elementsTreeTable's .tree-cell-name-label
+ * override above, and needs the same explicit restatement here.
+ */
+#flowsTree .tree-table-row-cell:filled:selected .tree-table-cell .tree-cell-name-label,
+#flowsTree .tree-table-row-cell:filled:selected:focused .tree-table-cell .tree-cell-name-label,
+#flowsTree .tree-table-row-cell:filled:selected:hover .tree-table-cell .tree-cell-name-label {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+#flowsTree .tree-table-row-cell:filled:selected .tree-table-cell .tree-icon,
+#flowsTree .tree-table-row-cell:filled:selected:focused .tree-table-cell .tree-icon,
+#flowsTree .tree-table-row-cell:filled:selected:hover .tree-table-cell .tree-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}
+
+/*
  * Leaf elements (fields/rules) inside attachment/multi-select groups have a fixed
  * structure - they can't be added to or removed independently. A soft tint marks
  * them as behaving differently from regular, freely editable elements.

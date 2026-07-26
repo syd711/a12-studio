@@ -28,11 +28,16 @@
                <VBox.margin>
                   <Insets top="12.0" />
                </VBox.margin></Label>
-            <TextField fx:id="textField">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+               <children>
+                  <TextField fx:id="textField" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+                  <Label fx:id="infoIcon" managed="false" visible="false" />
+               </children>
+            </HBox>
             <HBox alignment="CENTER_RIGHT">
                <VBox.margin>
                   <Insets top="12.0" />

@@ -10,16 +10,21 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.layout.HBox;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.Optional;
@@ -32,8 +37,9 @@ import java.util.ResourceBundle;
  * Delete are offered as a per-row context menu (a Flow row offers "Add Flow"/"Add Scene", a Scene row only
  * "Add Scene"; Edit/Delete open a Flow- or Scene-specific dialog depending on the selected node), plus a
  * tree-level context menu for the empty area below the rows offering "Add Flow". The toolbar's Edit/Delete
- * buttons delegate to the same logic. The dialogs themselves ({@link Dialogs#showFlowForAdd} & co.) are
- * currently empty stubs, to be filled in later.
+ * buttons delegate to the same logic. Flow add/edit ({@link Dialogs#showFlowForAdd} & co.) reuses the generic
+ * {@link de.a12.studio.ui.util.WidgetFactory#showInputDialog} since a Flow only carries a name; Scene add/edit
+ * has its own dialog.
  */
 public class FlowsPanelController extends AbstractPropertyEditor {
 
@@ -64,6 +70,7 @@ public class FlowsPanelController extends AbstractPropertyEditor {
     super.initialize(location, resources);
     flowsTree.setShowRoot(false);
     nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(nameOf(param.getValue().getValue())));
+    nameColumn.setCellFactory(column -> createNameCell());
     descriptionColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(descriptionOf(param.getValue().getValue())));
     flowsTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> updateToolbarState());
     flowsTree.setRowFactory(treeTable -> createRow());
@@ -85,6 +92,33 @@ public class FlowsPanelController extends AbstractPropertyEditor {
     boolean hasSelection = flowsTree.getSelectionModel().getSelectedItem() != null;
     editButton.setDisable(!hasSelection);
     deleteButton.setDisable(!hasSelection);
+  }
+
+  private TreeTableCell<Object, String> createNameCell() {
+    return new TreeTableCell<>() {
+      @Override
+      protected void updateItem(String name, boolean empty) {
+        super.updateItem(name, empty);
+        if (empty || name == null) {
+          setText(null);
+          setGraphic(null);
+          return;
+        }
+        if (getTreeTableRow().getItem() instanceof Scene) {
+          Label nameLabel = new Label(name);
+          nameLabel.getStyleClass().add("tree-cell-name-label");
+          FontIcon icon = WidgetFactory.createIcon(Icons.SCENE);
+          icon.getStyleClass().add("tree-icon");
+          HBox graphic = new HBox(4, icon, nameLabel);
+          graphic.setAlignment(Pos.CENTER_LEFT);
+          setText(null);
+          setGraphic(graphic);
+        } else {
+          setText(name);
+          setGraphic(null);
+        }
+      }
+    };
   }
 
   private TreeTableRow<Object> createRow() {

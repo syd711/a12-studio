@@ -4,6 +4,7 @@ import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.StudioFolderChooser;
+import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -58,6 +59,7 @@ public class A12InstallationSettingsController implements Initializable {
 
   private void persist() {
     settings.save();
+    StudioEventManager.getInstance().fireSettingsChangedEvent(settings);
     updateValidation();
   }
 

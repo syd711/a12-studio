@@ -2,7 +2,7 @@ package de.a12.studio.ui.events;
 
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.models.projects.settings.JsonSettings;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import org.jspecify.annotations.NonNull;
 

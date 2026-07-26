@@ -1,5 +1,6 @@
 package de.a12.studio.ui.components;
 
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -19,6 +20,9 @@ public class InputDialogController implements DialogController {
 
   @FXML
   private Label helpLabel;
+
+  @FXML
+  private Label infoIcon;
 
   @FXML
   private Button cancelButton;
@@ -43,6 +47,10 @@ public class InputDialogController implements DialogController {
   }
 
   public void initDialog(Stage stage, String innerTitle, String description, String helpText, String defaultValue) {
+    initDialog(stage, innerTitle, description, helpText, defaultValue, null);
+  }
+
+  public void initDialog(Stage stage, String innerTitle, String description, String helpText, String defaultValue, String fieldTooltip) {
     this.stage = stage;
     this.textLabel.setText(innerTitle);
     textField.requestFocus();
@@ -66,6 +74,12 @@ public class InputDialogController implements DialogController {
       this.textField.selectAll();
       this.inputText = defaultValue;
     }
+
+    if (fieldTooltip != null) {
+      WidgetFactory.createHelpIcon(infoIcon, fieldTooltip);
+    }
+    infoIcon.setVisible(fieldTooltip != null);
+    infoIcon.setManaged(fieldTooltip != null);
 
     textField.textProperty().addListener((observable, oldValue, newValue) -> inputText = newValue);
   }

@@ -3,9 +3,12 @@ package de.a12.studio.ui;
 import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.newproject.NewProjectDialogController;
+import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
+import de.a12.studio.ui.previewapp.PreviewAppProcess;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.models.projects.settings.JsonSettings;
 import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
@@ -62,6 +65,15 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private Button claudeConsoleBtn;
+
+  @FXML
+  private Button launchPreviewAppBtn;
+
+  @FXML
+  private Button stopPreviewAppBtn;
+
+  @FXML
+  private Button previewAppLogBtn;
 
   @FXML
   private Menu recentProjectsMenu;
@@ -204,11 +216,13 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private void onCloseProject() {
+    PreviewAppProcess.getInstance().stop();
     StudioEventManager.getInstance().fireProjectClosedEvent(project);
   }
 
   @FXML
   private void onExit() {
+    PreviewAppProcess.getInstance().stop();
     System.exit(0);
   }
 
@@ -241,10 +255,48 @@ public class MenuBarController implements Initializable, StudioEventListener {
     return "claude";
   }
 
+  @FXML
+  private void onLaunchPreviewApp() {
+    if (project != null) {
+      PreviewAppProcess.getInstance().start(project);
+    }
+  }
+
+  @FXML
+  private void onStopPreviewApp() {
+    PreviewAppProcess.getInstance().stop();
+  }
+
+  @FXML
+  private void onOpenPreviewAppLog() {
+    PreviewAppLogWindow.show(Studio.stage);
+  }
+
+  private void refreshPreviewAppButtonsVisibility() {
+    String installationPath = A12Settings.load().getInstallationPath();
+    boolean visible = installationPath != null && A12Settings.isValidInstallationFolder(new File(installationPath));
+    launchPreviewAppBtn.setVisible(visible);
+    launchPreviewAppBtn.setManaged(visible);
+    stopPreviewAppBtn.setVisible(visible);
+    stopPreviewAppBtn.setManaged(visible);
+    previewAppLogBtn.setVisible(visible);
+    previewAppLogBtn.setManaged(visible);
+  }
+
+  private void refreshPreviewAppButtonsState(PreviewAppProcess.State state) {
+    boolean running = state == PreviewAppProcess.State.RUNNING;
+    boolean busy = state == PreviewAppProcess.State.STARTING || state == PreviewAppProcess.State.STOPPING;
+    launchPreviewAppBtn.setDisable(running || busy);
+    stopPreviewAppBtn.setDisable(!running && !busy);
+  }
+
   @Override
   public void settingsChanged(@NonNull SettingsChangedEvent event) {
     if (event.getSettings().getSettingsType().equals(JsonSettings.SettingsType.AI)) {
-      refreshClaudeConsoleButton(event.getSettings());
+      refreshClaudeConsoleButton((JsonSettings) event.getSettings());
+    }
+    if (event.getSettings().getSettingsType().equals(JsonSettings.SettingsType.A12_INSTALLATION)) {
+      refreshPreviewAppButtonsVisibility();
     }
   }
 
@@ -273,6 +325,11 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
     StudioEventManager.getInstance().addListener(this);
     refreshClaudeConsoleButton(JsonSettings.load());
+
+    refreshPreviewAppButtonsVisibility();
+    refreshPreviewAppButtonsState(PreviewAppProcess.getInstance().getState());
+    PreviewAppProcess.getInstance().stateProperty().addListener(
+        (observable, oldState, newState) -> refreshPreviewAppButtonsState(newState));
 
     Platform.runLater(() -> {
       List<String> recentProjects = LocalUISettings.getRecentProjects();

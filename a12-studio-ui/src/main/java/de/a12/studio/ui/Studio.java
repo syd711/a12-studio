@@ -9,6 +9,7 @@ import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preview.PreviewServer;
+import de.a12.studio.ui.previewapp.PreviewAppProcess;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -88,6 +89,7 @@ public class Studio extends Application implements StudioEventListener {
   @Override
   public void stop() {
     PreviewServer.stopIfRunning();
+    PreviewAppProcess.getInstance().stop();
   }
 
   public static ProjectItem getSelectedProjectItem() {

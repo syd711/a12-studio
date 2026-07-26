@@ -526,9 +526,13 @@ public class WidgetFactory {
   }
 
   public static String showInputDialog(Stage owner, String dialogTitle, String innerTitle, String description, String helpText, String defaultValue) {
+    return showInputDialog(owner, dialogTitle, innerTitle, description, helpText, defaultValue, null);
+  }
+
+  public static String showInputDialog(Stage owner, String dialogTitle, String innerTitle, String description, String helpText, String defaultValue, String fieldTooltip) {
     Stage stage = createDialogStage("dialog-input", InputDialogController.class, owner, dialogTitle, "dialog-input.fxml");
     InputDialogController controller = (InputDialogController) stage.getUserData();
-    controller.initDialog(stage, innerTitle, description, helpText, defaultValue);
+    controller.initDialog(stage, innerTitle, description, helpText, defaultValue, fieldTooltip);
     stage.showAndWait();
     Optional<ButtonType> result = controller.getResult();
     if (result.get().equals(ButtonType.OK)) {
