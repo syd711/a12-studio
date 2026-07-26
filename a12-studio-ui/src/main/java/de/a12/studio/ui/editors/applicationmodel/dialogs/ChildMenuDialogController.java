@@ -29,7 +29,7 @@ import java.util.Optional;
  * the real, already-attached {@link Menu} live (so a {@link MenuSnapshot} taken before showing the dialog can
  * undo it on Cancel); for an add, they mutate a new, not-yet-attached {@link Menu} that the caller only
  * attaches to the parent's children list once this dialog resolves with {@link ButtonType#OK} (see {@link
- * Dialogs#showForAdd}), so Cancel needs no undo there.
+ * Dialogs#showChildMenuForAdd}), so Cancel needs no undo there.
  */
 public class ChildMenuDialogController implements DialogController {
 

@@ -44,7 +44,7 @@ public class ChildMenuPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    Dialogs.showForAdd(Studio.stage).ifPresent(menu -> {
+    Dialogs.showChildMenuForAdd(Studio.stage).ifPresent(menu -> {
       getChildMenus().add(menu);
       rebuildRows();
       commitChange();
@@ -89,7 +89,7 @@ public class ChildMenuPanelController extends AbstractPropertyEditor {
   }
 
   private void editMenu(Menu menu) {
-    if (Dialogs.showForEdit(Studio.stage, menu)) {
+    if (Dialogs.showChildMenuForEdit(Studio.stage, menu)) {
       rebuildRows();
     }
   }

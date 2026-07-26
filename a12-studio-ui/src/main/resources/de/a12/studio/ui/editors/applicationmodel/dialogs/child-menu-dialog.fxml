@@ -51,6 +51,9 @@
             <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="OK" />
             <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel" />
          </items>
+         <padding>
+            <Insets bottom="8.0" right="8.0" />
+         </padding>
       </ToolBar>
    </bottom>
 </BorderPane>

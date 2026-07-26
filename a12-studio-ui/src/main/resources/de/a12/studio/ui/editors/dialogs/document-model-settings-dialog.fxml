@@ -67,6 +67,9 @@
             <Button fx:id="saveBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onSave" styleClass="primary-button" text="Save" />
           <Button fx:id="cancelBtn" mnemonicParsing="false" onAction="#onCancel" styleClass="secondary-button" text="Cancel" />
         </items>
+        <padding>
+           <Insets bottom="8.0" right="8.0" />
+        </padding>
       </ToolBar>
    </bottom>
 </BorderPane>
