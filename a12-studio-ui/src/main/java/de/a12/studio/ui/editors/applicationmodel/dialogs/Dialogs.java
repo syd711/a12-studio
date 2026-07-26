@@ -1,6 +1,8 @@
 package de.a12.studio.ui.editors.applicationmodel.dialogs;
 
+import de.a12.studio.models.applicationmodel.Flow;
 import de.a12.studio.models.applicationmodel.Menu;
+import de.a12.studio.models.applicationmodel.Scene;
 import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -66,5 +68,43 @@ public class Dialogs {
     controller.init(stage, initialName);
     stage.showAndWait();
     return controller.getResult();
+  }
+
+  public static Optional<Flow> showFlowForAdd(Stage owner) {
+    Flow flow = new Flow();
+    flow.setName("New Flow");
+    return showFlow(owner, "Add Flow") ? Optional.of(flow) : Optional.empty();
+  }
+
+  public static boolean showFlowForEdit(Stage owner, Flow flow) {
+    return showFlow(owner, "Edit Flow");
+  }
+
+  private static boolean showFlow(Stage owner, String title) {
+    FXMLLoader fxmlLoader = new FXMLLoader(FlowDialogController.class.getResource("flow-dialog.fxml"));
+    Stage stage = WidgetFactory.createDialogStage("dialog-flow", fxmlLoader, owner, title);
+    FlowDialogController controller = (FlowDialogController) stage.getUserData();
+    controller.init(stage);
+    stage.showAndWait();
+    return controller.isConfirmed();
+  }
+
+  public static Optional<Scene> showSceneForAdd(Stage owner) {
+    Scene scene = new Scene();
+    scene.setName("New Scene");
+    return showScene(owner, "Add Scene") ? Optional.of(scene) : Optional.empty();
+  }
+
+  public static boolean showSceneForEdit(Stage owner, Scene scene) {
+    return showScene(owner, "Edit Scene");
+  }
+
+  private static boolean showScene(Stage owner, String title) {
+    FXMLLoader fxmlLoader = new FXMLLoader(SceneDialogController.class.getResource("scene-dialog.fxml"));
+    Stage stage = WidgetFactory.createDialogStage("dialog-scene", fxmlLoader, owner, title);
+    SceneDialogController controller = (SceneDialogController) stage.getUserData();
+    controller.init(stage);
+    stage.showAndWait();
+    return controller.isConfirmed();
   }
 }

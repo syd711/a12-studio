@@ -23,6 +23,7 @@ public interface Icons {
   String ARROW_DOWN = "mdi2a-arrow-down";
   String DRAG_HANDLE = "mdi2d-drag-vertical";
 
+  String PLUS = "mdi2p-plus";
   String RELOAD = "mdi2r-refresh";
   String CLOSE = "mdi2c-close";
   String TRASH = "mdi2t-trash-can-outline";

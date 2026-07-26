@@ -156,6 +156,26 @@
 }
 
 /*
+ * ID-scoped overrides for the flows TreeTableView (fx:id="flowsTree"), mirroring
+ * #elementsTreeTable above - an id selector always outranks Modena's built-in
+ * class/pseudo-class selectors, so this is used as a guaranteed override for row
+ * selection background/text regardless of focus state.
+ */
+#flowsTree .tree-table-row-cell:filled:selected,
+#flowsTree .tree-table-row-cell:filled:selected:focused,
+#flowsTree .tree-table-row-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+}
+
+#flowsTree .tree-table-row-cell:filled:selected .tree-table-cell,
+#flowsTree .tree-table-row-cell:filled:selected:focused .tree-table-cell,
+#flowsTree .tree-table-row-cell:filled:selected:hover .tree-table-cell {
+    -fx-text-fill: -fx-text-color-inverse;
+    -fx-font-weight: 600;
+}
+
+/*
  * Leaf elements (fields/rules) inside attachment/multi-select groups have a fixed
  * structure - they can't be added to or removed independently. A soft tint marks
  * them as behaving differently from regular, freely editable elements.

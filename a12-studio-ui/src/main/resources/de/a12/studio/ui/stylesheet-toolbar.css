@@ -38,6 +38,11 @@
     -fx-background-color: -fx-panel-color;
 }
 
+.tool-bar.floating-toolbar {
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+}
+
 .tool-bar.footer-toolbar {
     -fx-background-color: -fx-panel-color;
     -fx-background-radius: 0 0 6px 6px;

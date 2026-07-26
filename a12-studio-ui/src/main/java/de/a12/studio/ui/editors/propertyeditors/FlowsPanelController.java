@@ -1,0 +1,247 @@
+package de.a12.studio.ui.editors.propertyeditors;
+
+import de.a12.studio.models.applicationmodel.Flow;
+import de.a12.studio.models.applicationmodel.Module;
+import de.a12.studio.models.applicationmodel.Scene;
+import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.applicationmodel.dialogs.Dialogs;
+import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.WidgetFactory;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableRow;
+import javafx.scene.control.TreeTableView;
+import org.jspecify.annotations.NonNull;
+
+import java.net.URL;
+import java.util.Optional;
+import java.util.ResourceBundle;
+
+/**
+ * Displays {@link Module#getFlows()} as a tree grid, each {@link Flow} expandable to its {@link Scene}s, with
+ * NAME and DESCRIPTION columns (only Scenes carry a description). Not bound to a single Element (flows live on
+ * the module), so it follows the model-header pattern used by e.g. {@link ChildMenuPanelController}. Add/Edit/
+ * Delete are offered as a per-row context menu (a Flow row offers "Add Flow"/"Add Scene", a Scene row only
+ * "Add Scene"; Edit/Delete open a Flow- or Scene-specific dialog depending on the selected node), plus a
+ * tree-level context menu for the empty area below the rows offering "Add Flow". The toolbar's Edit/Delete
+ * buttons delegate to the same logic. The dialogs themselves ({@link Dialogs#showFlowForAdd} & co.) are
+ * currently empty stubs, to be filled in later.
+ */
+public class FlowsPanelController extends AbstractPropertyEditor {
+
+  @FXML
+  private TreeTableView<Object> flowsTree;
+
+  @FXML
+  private TreeTableColumn<Object, String> nameColumn;
+
+  @FXML
+  private TreeTableColumn<Object, String> descriptionColumn;
+
+  @FXML
+  private Button editButton;
+
+  @FXML
+  private Button deleteButton;
+
+  private Module module;
+
+  public void setModule(@NonNull Module module) {
+    this.module = module;
+    rebuildTree();
+  }
+
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
+    super.initialize(location, resources);
+    flowsTree.setShowRoot(false);
+    nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(nameOf(param.getValue().getValue())));
+    descriptionColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(descriptionOf(param.getValue().getValue())));
+    flowsTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> updateToolbarState());
+    flowsTree.setRowFactory(treeTable -> createRow());
+    flowsTree.setContextMenu(createEmptyAreaContextMenu());
+    updateToolbarState();
+  }
+
+  @FXML
+  private void onEdit() {
+    editSelected();
+  }
+
+  @FXML
+  private void onDelete() {
+    deleteSelected();
+  }
+
+  private void updateToolbarState() {
+    boolean hasSelection = flowsTree.getSelectionModel().getSelectedItem() != null;
+    editButton.setDisable(!hasSelection);
+    deleteButton.setDisable(!hasSelection);
+  }
+
+  private TreeTableRow<Object> createRow() {
+    return new TreeTableRow<>() {
+      @Override
+      protected void updateItem(Object item, boolean empty) {
+        super.updateItem(item, empty);
+        setContextMenu(empty || item == null ? null : createRowContextMenu(item));
+      }
+    };
+  }
+
+  private ContextMenu createEmptyAreaContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+    contextMenu.getItems().add(createMenuItem("Add Flow", Icons.PLUS, this::addFlow));
+    return contextMenu;
+  }
+
+  private ContextMenu createRowContextMenu(@NonNull Object item) {
+    ContextMenu contextMenu = new ContextMenu();
+    if (item instanceof Flow flow) {
+      contextMenu.getItems().addAll(
+          createMenuItem("Add Flow", Icons.PLUS, this::addFlow),
+          createMenuItem("Add Scene", Icons.PLUS, () -> addScene(flow)),
+          new SeparatorMenuItem(),
+          createMenuItem("Edit Flow", Icons.PENCIL, () -> editFlow(flow)),
+          createMenuItem("Delete Flow", Icons.TRASH, () -> deleteFlow(flow)));
+    } else if (item instanceof Scene scene) {
+      Flow parentFlow = findParentFlow(scene);
+      contextMenu.getItems().addAll(
+          createMenuItem("Add Scene", Icons.PLUS, () -> addScene(parentFlow)),
+          new SeparatorMenuItem(),
+          createMenuItem("Edit Scene", Icons.PENCIL, () -> editScene(scene)),
+          createMenuItem("Delete Scene", Icons.TRASH, () -> deleteScene(parentFlow, scene)));
+    }
+    return contextMenu;
+  }
+
+  private static MenuItem createMenuItem(@NonNull String text, @NonNull String iconLiteral, @NonNull Runnable action) {
+    MenuItem menuItem = new MenuItem(text, WidgetFactory.createIcon(iconLiteral));
+    menuItem.setOnAction(event -> action.run());
+    return menuItem;
+  }
+
+  private void editSelected() {
+    Object selected = selectedValue();
+    if (selected instanceof Flow flow) {
+      editFlow(flow);
+    } else if (selected instanceof Scene scene) {
+      editScene(scene);
+    }
+  }
+
+  private void deleteSelected() {
+    Object selected = selectedValue();
+    if (selected instanceof Flow flow) {
+      deleteFlow(flow);
+    } else if (selected instanceof Scene scene) {
+      deleteScene(findParentFlow(scene), scene);
+    }
+  }
+
+  private Object selectedValue() {
+    TreeItem<Object> selectedItem = flowsTree.getSelectionModel().getSelectedItem();
+    return selectedItem == null ? null : selectedItem.getValue();
+  }
+
+  private void addFlow() {
+    Dialogs.showFlowForAdd(Studio.stage).ifPresent(flow -> {
+      module.getFlows().add(flow);
+      rebuildTree();
+      commitChange();
+    });
+  }
+
+  private void addScene(Flow flow) {
+    if (flow == null) {
+      return;
+    }
+    Dialogs.showSceneForAdd(Studio.stage).ifPresent(scene -> {
+      flow.getScenes().add(scene);
+      rebuildTree();
+      commitChange();
+    });
+  }
+
+  private void editFlow(@NonNull Flow flow) {
+    if (Dialogs.showFlowForEdit(Studio.stage, flow)) {
+      rebuildTree();
+      commitChange();
+    }
+  }
+
+  private void editScene(@NonNull Scene scene) {
+    if (Dialogs.showSceneForEdit(Studio.stage, scene)) {
+      rebuildTree();
+      commitChange();
+    }
+  }
+
+  private void deleteFlow(@NonNull Flow flow) {
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this flow?", null, null, "Delete");
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      module.getFlows().remove(flow);
+      rebuildTree();
+      commitChange();
+    }
+  }
+
+  private void deleteScene(Flow parentFlow, @NonNull Scene scene) {
+    if (parentFlow == null) {
+      return;
+    }
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this scene?", null, null, "Delete");
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      parentFlow.getScenes().remove(scene);
+      rebuildTree();
+      commitChange();
+    }
+  }
+
+  private Flow findParentFlow(@NonNull Scene scene) {
+    for (Flow flow : module.getFlows()) {
+      if (flow.getScenes().contains(scene)) {
+        return flow;
+      }
+    }
+    return null;
+  }
+
+  private void rebuildTree() {
+    TreeItem<Object> root = new TreeItem<>();
+    for (Flow flow : module.getFlows()) {
+      TreeItem<Object> flowItem = new TreeItem<>(flow);
+      for (Scene scene : flow.getScenes()) {
+        flowItem.getChildren().add(new TreeItem<>(scene));
+      }
+      flowItem.setExpanded(true);
+      root.getChildren().add(flowItem);
+    }
+    flowsTree.setRoot(root);
+  }
+
+  private static String nameOf(@NonNull Object item) {
+    if (item instanceof Flow flow) {
+      return flow.getName();
+    }
+    if (item instanceof Scene scene) {
+      return scene.getName();
+    }
+    return null;
+  }
+
+  private static String descriptionOf(@NonNull Object item) {
+    if (item instanceof Scene scene) {
+      return scene.getDescription();
+    }
+    return null;
+  }
+}

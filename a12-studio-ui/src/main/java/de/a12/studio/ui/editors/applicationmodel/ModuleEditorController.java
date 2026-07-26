@@ -6,6 +6,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.propertyeditors.ActivityPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ChildMenuPanelController;
+import de.a12.studio.ui.editors.propertyeditors.FlowsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModuleRolesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -20,9 +21,8 @@ import java.util.ResourceBundle;
 
 /**
  * Inline editor for a single {@link Module}, meant to be displayed in an editor container (e.g. the
- * application model editor's {@code editorContainer}) once a module is selected. Currently edits the module's
- * required name plus its menu's name, label, activity descriptor, roles and child menus; further module
- * details (flows) are expected to be added to this editor later.
+ * application model editor's {@code editorContainer}) once a module is selected. Edits the module's required
+ * name plus its menu's name, label, activity descriptor, roles, child menus and flows.
  */
 public class ModuleEditorController implements Initializable {
 
@@ -45,6 +45,9 @@ public class ModuleEditorController implements Initializable {
 
   @FXML
   private ChildMenuPanelController childMenuController;
+
+  @FXML
+  private FlowsPanelController flowsController;
 
   private final Debouncer debouncer = new Debouncer();
 
@@ -102,6 +105,7 @@ public class ModuleEditorController implements Initializable {
     activityController.setModule(module);
     rolesController.setModule(module);
     childMenuController.setModule(module);
+    flowsController.setModule(module);
   }
 
   public void destroy() {
