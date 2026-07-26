@@ -8,6 +8,7 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.*;
+import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
@@ -267,6 +268,11 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   }
 
   private void openItem(@NonNull ProjectItemViewModel viewModel) {
+    if (viewModel.isSettings()) {
+      StudioEventManager.getInstance().firePreferencesOpenRequestedEvent(
+          PreferencesOpenRequestedEvent.Section.GENERAL_SETTINGS);
+      return;
+    }
     if (!viewModel.isFolder() && viewModel.hasModel()) {
       if (project != null) {
         project.getSettings().getUISettings().addOpenedFile(viewModel.getProjectItem().getPath());
@@ -305,12 +311,14 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         }
       }
       else if (event.getCode() == KeyCode.DELETE) {
-        if (selected != null && !selected.getValue().getProjectItem().isRoot()) {
+        if (selected != null && !selected.getValue().getProjectItem().isRoot()
+            && !selected.getValue().isSettings()) {
           menuFactory.onDeleteItem(selected.getValue().getProjectItem());
         }
       }
       else if (event.getCode() == KeyCode.F2) {
-        if (selected != null && !selected.getValue().getProjectItem().isRoot()) {
+        if (selected != null && !selected.getValue().getProjectItem().isRoot()
+            && !selected.getValue().isSettings()) {
           menuFactory.onRenameItem(selected.getValue().getProjectItem());
         }
       }
