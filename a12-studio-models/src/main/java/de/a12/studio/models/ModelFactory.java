@@ -4,6 +4,7 @@ import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
@@ -43,6 +44,7 @@ public class ModelFactory {
         case OVERVIEW -> JsonSettings.objectMapper.treeToValue(root, OverviewModel.class);
         case APPLICATION -> JsonSettings.objectMapper.treeToValue(root, ApplicationModel.class);
         case FORM -> JsonSettings.objectMapper.treeToValue(root, FormModel.class);
+        case MASTERDETAIL -> JsonSettings.objectMapper.treeToValue(root, MasterDetailModel.class);
         default -> {
           log.warn("Model type '{}' of '{}' is not supported yet", modelType, projectItem.getPath());
           yield null;

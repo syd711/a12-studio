@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import de.a12.studio.ui.editors.EditorFileToolbarButtons?>
+
+<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.masterdetailmodel.MasterDetailModelEditorController">
+    <right>
+        <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
+            <items>
+                <StackPane>
+                    <children>
+                        <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#onSettings" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2c-cog" iconSize="18" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip fx:id="settingsButtonTooltip" text="Model Settings" />
+                            </tooltip>
+                        </Button>
+                        <Circle fx:id="settingsErrorBadge" mouseTransparent="true" radius="4" styleClass="toolbar-button-error-badge" translateX="10" translateY="-10" visible="false" StackPane.alignment="CENTER" />
+                    </children>
+                </StackPane>
+                <EditorFileToolbarButtons fx:id="fileToolbarButtons" />
+            </items>
+        </ToolBar>
+    </right>
+    <center>
+        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="Overview">
+                    <content>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+                            <content>
+                                <VBox spacing="16.0" styleClass="field-editor">
+                                    <children>
+                                        <VBox spacing="4.0">
+                                            <children>
+                                                <Label styleClass="field-label" text="Overview Model*" />
+                                                <ComboBox fx:id="overviewModelField" editable="false" maxWidth="Infinity" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0">
+                                            <children>
+                                                <Label styleClass="field-label" text="Form Width" />
+                                                <Spinner fx:id="formWidthField" editable="true" />
+                                            </children>
+                                        </VBox>
+                                        <Separator />
+                                        <VBox spacing="8.0">
+                                            <children>
+                                                <Label styleClass="field-label" text="Form Mapping" />
+                                                <GridPane fx:id="formMappingGrid" hgap="10.0" vgap="6.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints />
+                                                    </rowConstraints>
+                                                    <Label styleClass="field-label" text="Document Model" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                                    <Label styleClass="field-label" text="Form Model*" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                                </GridPane>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

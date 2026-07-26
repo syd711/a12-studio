@@ -68,6 +68,8 @@ public interface Icons {
       case APPLICATION -> PNG_MODEL_APPLICATION;
       case CONTENT -> PNG_MODEL_CONTENT;
       case TYPEDEFINITION -> PNG_MODEL_TYPE_DEFINITION;
+      // No dedicated asset yet; reuse the Overview icon since Master-Detail Models are overview-backed.
+      case MASTERDETAIL -> PNG_MODEL_OVERVIEW;
     };
   }
 }

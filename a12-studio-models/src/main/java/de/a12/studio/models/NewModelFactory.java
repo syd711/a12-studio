@@ -10,6 +10,8 @@ import de.a12.studio.models.documentmodel.ModelInfo;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
+import de.a12.studio.models.masterdetailmodel.MasterDetailModelContent;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.overviewmodel.OverviewModelContent;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
@@ -49,6 +51,7 @@ public class NewModelFactory {
       case FORM -> buildFormModel();
       case OVERVIEW -> buildOverviewModel();
       case APPLICATION -> buildApplicationModel();
+      case MASTERDETAIL -> buildMasterDetailModel();
       default -> throw new IOException("Model type '" + modelType.getDisplayName() + "' is not supported yet");
     };
   }
@@ -110,6 +113,14 @@ public class NewModelFactory {
   private static ApplicationModel buildApplicationModel() {
     ApplicationModel model = new ApplicationModel();
     model.setContent(new ApplicationModelContent());
+    return model;
+  }
+
+  private static MasterDetailModel buildMasterDetailModel() {
+    MasterDetailModel model = new MasterDetailModel();
+    MasterDetailModelContent content = new MasterDetailModelContent();
+    content.setType("overview");
+    model.setContent(content);
     return model;
   }
 }

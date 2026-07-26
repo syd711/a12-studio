@@ -2,11 +2,13 @@ package de.a12.studio.ui;
 
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.applicationmodel.ApplicationModelEditorController;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
+import de.a12.studio.ui.editors.masterdetailmodel.MasterDetailModelEditorController;
 import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -47,6 +49,12 @@ public class EditorFactory {
         FXMLLoader loader = new FXMLLoader(OverviewModelEditorController.class.getResource("overview-model-editor.fxml"));
         content = loader.load();
         OverviewModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof MasterDetailModel) {
+        FXMLLoader loader = new FXMLLoader(MasterDetailModelEditorController.class.getResource("master-detail-model-editor.fxml"));
+        content = loader.load();
+        MasterDetailModelEditorController controller = loader.getController();
         controller.load(item);
       }
       return content;

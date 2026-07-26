@@ -39,8 +39,14 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
 
   private A12Model<?> model;
 
+  // Application Models reference Master-Detail Models exclusively (see modelTypeOptions), and don't use
+  // alias/purpose for that (mirrors SME, which locks these columns read-only in the Application Model's
+  // Model References panel).
+  private boolean applicationModel;
+
   public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
+    this.applicationModel = model.getModelType() == ModelType.APPLICATION;
     rebuildRows();
   }
 
@@ -71,12 +77,14 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
     TextField aliasField = new TextField();
     aliasField.setId("modelReferenceAlias-" + index);
     aliasField.setMaxWidth(Double.MAX_VALUE);
+    aliasField.setEditable(!applicationModel);
     setFieldValue(aliasField, reference.getAlias());
     bindTextField(aliasField, (el, value) -> reference.setAlias(value));
 
     TextField purposeField = new TextField();
     purposeField.setId("modelReferencePurpose-" + index);
     purposeField.setMaxWidth(Double.MAX_VALUE);
+    purposeField.setEditable(!applicationModel);
     setFieldValue(purposeField, reference.getPurpose());
     bindTextField(purposeField, (el, value) -> reference.setPurpose(value));
 
@@ -90,7 +98,7 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
     ComboBox<String> modelTypeField = new ComboBox<>();
     modelTypeField.setId("modelReferenceModelType-" + index);
     modelTypeField.setMaxWidth(Double.MAX_VALUE);
-    modelTypeField.getItems().setAll(Arrays.stream(ModelType.values()).map(ModelType::getValue).toList());
+    modelTypeField.getItems().setAll(modelTypeOptions());
     setFieldValue(modelTypeField, reference.getModelType() != null ? reference.getModelType().getValue() : null);
     bindComboBox(modelTypeField, (el, value) -> {
       reference.setModelType(value != null ? ModelType.fromValue(value) : null);
@@ -100,6 +108,19 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
     });
 
     referencesGrid.addRow(index + 1, aliasField, purposeField, modelTypeField, referenceField, createActionsBox(reference, index, rowCount));
+  }
+
+  /**
+   * The Model Type values selectable in this panel's dropdown. An Application Model's header references
+   * exist to point at Master-Detail Models (which get synthesized into the app's modules), so it's the only
+   * type offered there; conversely, referencing a Master-Detail Model only makes sense from an Application
+   * Model, so every other model type's panel excludes it.
+   */
+  private List<String> modelTypeOptions() {
+    return Arrays.stream(ModelType.values())
+        .filter(type -> applicationModel ? type == ModelType.MASTERDETAIL : type != ModelType.MASTERDETAIL)
+        .map(ModelType::getValue)
+        .toList();
   }
 
   /**
