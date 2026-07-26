@@ -4,6 +4,7 @@ import de.a12.studio.models.auth.AuthDocument;
 import de.a12.studio.models.auth.User;
 import de.a12.studio.models.auth.UsersDocument;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.auth.dialogs.UserDialogController;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -16,19 +17,13 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.TextFieldTableCell;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class UsersEditorController extends AbstractAuthFileEditorController implements Initializable {
 
@@ -55,25 +50,28 @@ public class UsersEditorController extends AbstractAuthFileEditorController impl
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    bindTextColumn(usernameColumn, User::getUsername, User::setUsername);
-    bindTextColumn(passwordColumn, User::getPassword, User::setPassword);
-    bindTextColumn(emailColumn, User::getEmail, User::setEmail);
-    bindTextColumn(firstnameColumn, User::getFirstname, User::setFirstname);
-    bindTextColumn(lastnameColumn, User::getLastname, User::setLastname);
+    bindTextColumn(usernameColumn, User::getUsername);
+    bindTextColumn(passwordColumn, User::getPassword);
+    bindTextColumn(emailColumn, User::getEmail);
+    bindTextColumn(firstnameColumn, User::getFirstname);
+    bindTextColumn(lastnameColumn, User::getLastname);
 
     authoritiesColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(joinAuthorities(data.getValue())));
-    authoritiesColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-    authoritiesColumn.setOnEditCommit(event -> {
-      event.getRowValue().setAuthorities(splitAuthorities(event.getNewValue()));
-      save();
-    });
 
-    usersTable.setRowFactory(table -> new TableRow<>() {
-      @Override
-      protected void updateItem(User item, boolean empty) {
-        super.updateItem(item, empty);
-        setContextMenu(empty || item == null ? null : createRowContextMenu(this));
-      }
+    usersTable.setRowFactory(table -> {
+      TableRow<User> row = new TableRow<>() {
+        @Override
+        protected void updateItem(User item, boolean empty) {
+          super.updateItem(item, empty);
+          setContextMenu(empty || item == null ? null : createRowContextMenu(this));
+        }
+      };
+      row.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 2 && !row.isEmpty()) {
+          openEditUserDialog(row.getItem());
+        }
+      });
+      return row;
     });
   }
 
@@ -83,39 +81,46 @@ public class UsersEditorController extends AbstractAuthFileEditorController impl
     usersTable.setItems(FXCollections.observableList(usersDocument.getUsers()));
   }
 
-  private void bindTextColumn(@NonNull TableColumn<User, String> column, @NonNull Function<User, String> getter,
-                               @NonNull BiConsumer<User, String> setter) {
+  private void bindTextColumn(@NonNull TableColumn<User, String> column, @NonNull Function<User, String> getter) {
     column.setCellValueFactory(data -> new ReadOnlyStringWrapper(getter.apply(data.getValue())));
-    column.setCellFactory(TextFieldTableCell.forTableColumn());
-    column.setOnEditCommit(event -> {
-      setter.accept(event.getRowValue(), event.getNewValue());
-      save();
-    });
   }
 
   private static String joinAuthorities(@NonNull User user) {
     return String.join(", ", user.getAuthorities());
   }
 
-  private static List<String> splitAuthorities(String value) {
-    if (value == null || value.isBlank()) {
-      return new ArrayList<>();
-    }
-    return Arrays.stream(value.split(","))
-        .map(String::trim)
-        .filter(entry -> !entry.isEmpty())
-        .collect(Collectors.toCollection(ArrayList::new));
+  @FXML
+  private void onAddUser() {
+    UserDialogController.showForAdd(Studio.stage).ifPresent(user -> {
+      usersTable.getItems().add(user);
+      usersTable.getSelectionModel().select(user);
+      usersTable.scrollTo(user);
+      save();
+    });
   }
 
   @FXML
-  private void onAddUser() {
-    User user = new User();
-    user.setUsername("newuser");
-    user.setAuthorities(new ArrayList<>());
-    usersTable.getItems().add(user);
-    usersTable.getSelectionModel().select(user);
-    usersTable.scrollTo(user);
-    save();
+  private void onEditUser() {
+    User selected = usersTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      return;
+    }
+    openEditUserDialog(selected);
+  }
+
+  private void openEditUserDialog(@NonNull User user) {
+    if (UserDialogController.showForEdit(Studio.stage, user)) {
+      usersTable.refresh();
+      save();
+    }
+  }
+
+  @FXML
+  private void onDeleteUser() {
+    User selected = usersTable.getSelectionModel().getSelectedItem();
+    if (selected != null) {
+      onDeleteUser(selected);
+    }
   }
 
   private ContextMenu createRowContextMenu(@NonNull TableRow<User> row) {

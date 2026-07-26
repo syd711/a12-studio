@@ -2,7 +2,7 @@ package de.a12.studio.ui.editors.auth;
 
 import de.a12.studio.models.auth.AuthDocument;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.ui.editors.EditorFileToolbarButtons;
+import de.a12.studio.ui.editors.EditorFileToolbarButtonsController;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
@@ -19,7 +19,7 @@ abstract public class AbstractAuthFileEditorController implements StudioEventLis
   protected ProjectItem projectItem;
 
   @FXML
-  protected EditorFileToolbarButtons fileToolbarButtons;
+  protected EditorFileToolbarButtonsController fileToolbarButtonsController;
 
   public void save() {
     projectItem.save();
@@ -29,8 +29,8 @@ abstract public class AbstractAuthFileEditorController implements StudioEventLis
     this.projectItem = projectItem;
     this.loadDocument(projectItem.getAuthDocument());
 
-    if (fileToolbarButtons != null) {
-      fileToolbarButtons.setFileSupplier(() -> projectItem.getFile());
+    if (fileToolbarButtonsController != null) {
+      fileToolbarButtonsController.setFileSupplier(() -> projectItem.getFile());
     }
 
     StudioEventManager.getInstance().addListener(this);

@@ -14,7 +14,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-<?import de.a12.studio.ui.editors.EditorFileToolbarButtons?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController">
     <right>
@@ -33,7 +32,8 @@
                         <Circle fx:id="settingsErrorBadge" mouseTransparent="true" radius="4" styleClass="toolbar-button-error-badge" translateX="10" translateY="-10" visible="false" StackPane.alignment="CENTER" />
                     </children>
                 </StackPane>
-                <EditorFileToolbarButtons fx:id="fileToolbarButtons" />
+                <Separator prefHeight="0.0" prefWidth="0.0" />
+                <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
             </items>
          <BorderPane.margin>
             <Insets />

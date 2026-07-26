@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<fx:root spacing="6.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
-    <Separator prefHeight="0.0" prefWidth="0.0" />
+<VBox fx:id="root" spacing="6.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.EditorFileToolbarButtonsController">
     <Button mnemonicParsing="false" onAction="#onFileEdit" styleClass="default-button">
         <graphic>
             <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
@@ -24,4 +22,4 @@
             <Tooltip text="Open Model Folder" />
         </tooltip>
     </Button>
-</fx:root>
+</VBox>

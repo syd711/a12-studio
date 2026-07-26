@@ -7,11 +7,10 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
-<?import de.a12.studio.ui.editors.EditorFileToolbarButtons?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.auth.UsersEditorController">
-    <right>
-        <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
+    <top>
+        <ToolBar BorderPane.alignment="CENTER">
             <items>
                 <Button mnemonicParsing="false" onAction="#onAddUser" styleClass="default-button">
                     <graphic>
@@ -21,19 +20,41 @@
                         <Tooltip text="Add User" />
                     </tooltip>
                 </Button>
-                <EditorFileToolbarButtons fx:id="fileToolbarButtons" />
+                <Button mnemonicParsing="false" onAction="#onEditUser" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="18" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Edit User" />
+                    </tooltip>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#onDeleteUser" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Delete User" />
+                    </tooltip>
+                </Button>
+            </items>
+        </ToolBar>
+    </top>
+    <right>
+        <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
+            <items>
+                <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
             </items>
         </ToolBar>
     </right>
     <center>
-        <TableView fx:id="usersTable" editable="true" BorderPane.alignment="CENTER">
+        <TableView fx:id="usersTable" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="140.0" editable="true" />
-                <TableColumn fx:id="passwordColumn" text="Password" prefWidth="140.0" editable="true" />
-                <TableColumn fx:id="authoritiesColumn" text="Authorities" prefWidth="200.0" editable="true" />
-                <TableColumn fx:id="emailColumn" text="Email" prefWidth="180.0" editable="true" />
-                <TableColumn fx:id="firstnameColumn" text="First Name" prefWidth="140.0" editable="true" />
-                <TableColumn fx:id="lastnameColumn" text="Last Name" prefWidth="140.0" editable="true" />
+                <TableColumn fx:id="usernameColumn" text="Username" prefWidth="140.0" />
+                <TableColumn fx:id="passwordColumn" text="Password" prefWidth="140.0" />
+                <TableColumn fx:id="authoritiesColumn" text="Authorities" prefWidth="200.0" />
+                <TableColumn fx:id="emailColumn" text="Email" prefWidth="180.0" />
+                <TableColumn fx:id="firstnameColumn" text="First Name" prefWidth="140.0" />
+                <TableColumn fx:id="lastnameColumn" text="Last Name" prefWidth="140.0" />
             </columns>
         </TableView>
     </center>

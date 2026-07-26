@@ -29,7 +29,7 @@ abstract public class AbstractEditorController implements StudioEventListener {
    * the component is wired to the current {@code projectItem}.
    */
   @FXML
-  protected EditorFileToolbarButtons fileToolbarButtons;
+  protected EditorFileToolbarButtonsController fileToolbarButtonsController;
 
   public void save() {
     projectItem.save();
@@ -51,8 +51,8 @@ abstract public class AbstractEditorController implements StudioEventListener {
     this.projectItem = projectItem;
     this.loadModel(projectItem.getModel());
 
-    if (fileToolbarButtons != null) {
-      fileToolbarButtons.setFileSupplier(() -> projectItem.getFile());
+    if (fileToolbarButtonsController != null) {
+      fileToolbarButtonsController.setFileSupplier(() -> projectItem.getFile());
     }
 
     StudioEventManager.getInstance().addListener(this);

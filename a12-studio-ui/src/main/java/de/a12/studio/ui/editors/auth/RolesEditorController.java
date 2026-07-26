@@ -4,6 +4,7 @@ import de.a12.studio.models.auth.AuthDocument;
 import de.a12.studio.models.auth.Role;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.auth.dialogs.RoleDialogController;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -19,12 +20,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.control.cell.TextFieldTableCell;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -48,25 +47,22 @@ public class RolesEditorController extends AbstractAuthFileEditorController impl
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     nameColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getName()));
-    nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-    nameColumn.setOnEditCommit(event -> {
-      event.getRowValue().setName(event.getNewValue());
-      save();
-    });
-
     descriptionColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getDescription()));
-    descriptionColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-    descriptionColumn.setOnEditCommit(event -> {
-      event.getRowValue().setDescription(event.getNewValue());
-      save();
-    });
 
-    rolesTable.setRowFactory(table -> new TableRow<>() {
-      @Override
-      protected void updateItem(Role item, boolean empty) {
-        super.updateItem(item, empty);
-        setContextMenu(empty || item == null ? null : createRowContextMenu(this));
-      }
+    rolesTable.setRowFactory(table -> {
+      TableRow<Role> row = new TableRow<>() {
+        @Override
+        protected void updateItem(Role item, boolean empty) {
+          super.updateItem(item, empty);
+          setContextMenu(empty || item == null ? null : createRowContextMenu(this));
+        }
+      };
+      row.setOnMouseClicked(event -> {
+        if (event.getClickCount() == 2 && !row.isEmpty()) {
+          openEditRoleDialog(row.getItem());
+        }
+      });
+      return row;
     });
 
     rolesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showAccessRights(newValue));
@@ -99,15 +95,38 @@ public class RolesEditorController extends AbstractAuthFileEditorController impl
 
   @FXML
   private void onAddRole() {
-    Role role = new Role();
-    role.setName("New Role");
-    role.setAccessRights(new ArrayList<>());
-    // Mutate through the table's own (list-backed) ObservableList, not document.getRoles()
-    // directly, so the TableView actually receives a change notification and redraws.
-    rolesTable.getItems().add(role);
-    rolesTable.getSelectionModel().select(role);
-    rolesTable.scrollTo(role);
-    save();
+    RoleDialogController.showForAdd(Studio.stage).ifPresent(role -> {
+      // Mutate through the table's own (list-backed) ObservableList, not document.getRoles()
+      // directly, so the TableView actually receives a change notification and redraws.
+      rolesTable.getItems().add(role);
+      rolesTable.getSelectionModel().select(role);
+      rolesTable.scrollTo(role);
+      save();
+    });
+  }
+
+  @FXML
+  private void onEditRole() {
+    Role selected = rolesTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      return;
+    }
+    openEditRoleDialog(selected);
+  }
+
+  private void openEditRoleDialog(@NonNull Role role) {
+    if (RoleDialogController.showForEdit(Studio.stage, role)) {
+      rolesTable.refresh();
+      save();
+    }
+  }
+
+  @FXML
+  private void onDeleteRole() {
+    Role selected = rolesTable.getSelectionModel().getSelectedItem();
+    if (selected != null) {
+      onDeleteRole(selected);
+    }
   }
 
   @FXML
