@@ -108,6 +108,49 @@
 }
 
 /**
+ * Preview App controls (launch/stop/log) - 2px smaller than the
+ * standard .menu-bar-button sizing.
+ */
+.preview-app-button {
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+}
+
+/**
+ * Launch Preview App button - green background with white icon to
+ * highlight the primary "start" action in the menu bar.
+ */
+.launch-preview-app-button {
+    -fx-background-color: #03A905;
+}
+
+.launch-preview-app-button:hover {
+    -fx-background-color: derive(#03A905, 30%);
+}
+
+.launch-preview-app-button .toolbar-icon {
+    -fx-icon-color: white;
+}
+
+/**
+ * Stop Preview App button - red background with white icon to
+ * highlight the destructive "stop" action in the menu bar.
+ */
+.stop-preview-app-button {
+    -fx-background-color: #D32F2F;
+}
+
+.stop-preview-app-button:hover {
+    -fx-background-color: derive(#D32F2F, 30%);
+}
+
+.stop-preview-app-button .toolbar-icon {
+    -fx-icon-color: white;
+}
+
+/**
  * Version menu button (right panel) - text variant of .menu-bar-button,
  * sized to fit its version label instead of being icon-only square.
  */

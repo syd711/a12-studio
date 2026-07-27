@@ -41,6 +41,7 @@ public interface Icons {
   String STOP = "mdi2s-stop";
   String CONSOLE = "mdi2c-console";
   String SCENE = "mdi2m-movie-open";
+  String SERVER = "mdi2s-server";
 
   String ELEMENT_GROUP = "mdi2f-folder-outline";
   // PNG assets (in de/a12/studio/ui/icons), not Ikonli glyph literals like the constants above.

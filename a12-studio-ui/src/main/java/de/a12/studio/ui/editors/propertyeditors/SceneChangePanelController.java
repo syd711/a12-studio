@@ -162,7 +162,13 @@ public class SceneChangePanelController {
 
     Label regionLabel = new Label(String.join(", ", directive.getRegion()));
     regionLabel.setMaxWidth(Double.MAX_VALUE);
+    regionLabel.setCursor(Cursor.HAND);
     HBox.setHgrow(regionLabel, Priority.ALWAYS);
+    regionLabel.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        editDirective(directives, directive);
+      }
+    });
 
     Label nameLabel = new Label(directive instanceof ViewAddDirective viewAdd && viewAdd.getName() != null ? viewAdd.getName() : "");
     nameLabel.setMaxWidth(Double.MAX_VALUE);

@@ -5,6 +5,9 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.shape.Circle?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane fx:id="footer" maxHeight="20.0" minHeight="20.0" styleClass="footer-bar" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.FooterController">
 
@@ -27,10 +30,19 @@
         </HBox>
     </left>
    <right>
-      <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+      <HBox fx:id="previewAppStatus" alignment="CENTER_RIGHT" spacing="6.0" BorderPane.alignment="CENTER">
          <padding>
             <Insets right="6.0" />
          </padding>
+         <children>
+            <Label fx:id="previewAppStatusLabel" styleClass="footer-label" />
+            <StackPane>
+               <children>
+                  <FontIcon iconLiteral="mdi2s-server" iconSize="14" styleClass="footer-preview-app-icon" />
+                  <Circle fx:id="previewAppStatusBubble" mouseTransparent="true" radius="4" styleClass="preview-app-status-bubble" translateX="7" translateY="7" StackPane.alignment="CENTER" />
+               </children>
+            </StackPane>
+         </children>
       </HBox>
    </right>
 </BorderPane>

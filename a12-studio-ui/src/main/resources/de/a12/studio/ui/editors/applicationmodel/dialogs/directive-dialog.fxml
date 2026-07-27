@@ -8,14 +8,16 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="500.0" minWidth="600.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.applicationmodel.dialogs.DirectiveDialogController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="500.0" minWidth="600.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.applicationmodel.dialogs.DirectiveDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
    </top>
@@ -43,8 +45,7 @@
                   </children>
                </VBox>
 
-               <Label fx:id="genericNoticeLabel" managed="false" styleClass="placeholder-label" visible="false" wrapText="true"
-                      text="This directive type isn't fully supported by the editor yet; only its region can be edited here." />
+               <Label fx:id="genericNoticeLabel" managed="false" styleClass="placeholder-label" text="This directive type isn't fully supported by the editor yet; only its region can be edited here." visible="false" wrapText="true" />
 
                <!-- REGION_CLEAR: Layout -->
                <VBox fx:id="regionClearSection" spacing="12.0">
@@ -86,7 +87,19 @@
                            <RowConstraints />
                         </rowConstraints>
                         <Label styleClass="field-label" text="Type" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <Label styleClass="field-label" text="Preferred Width" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                           <children>
+                              <Label styleClass="field-label" text="Preferred Width" />
+                              <Label>
+                                 <tooltip>
+                                    <Tooltip prefWidth="300.0" text="This is for defining the preferred display width of an added view in the master detail layout. This can be a number from 1 to 11. If left empty, the available space is equally shared between the master and detail view." wrapText="true" />
+                                 </tooltip>
+                                 <graphic>
+                                    <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                                 </graphic>
+                              </Label>
+                           </children>
+                        </HBox>
                         <ComboBox fx:id="constraintsTypeCombo" editable="true" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                         <TextField fx:id="preferredWidthField" promptText="1-11" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                      </GridPane>
@@ -107,7 +120,7 @@
                         <Label styleClass="field-label" text="Document Model" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                      </GridPane>
                      <Label fx:id="modelsEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-                     <Button mnemonicParsing="false" onAction="#onAddModel" styleClass="default-button" text="Add Model" />
+                     <Button mnemonicParsing="false" onAction="#onAddModel" styleClass="primary-button" text="Add" />
 
                      <VBox>
                         <children>

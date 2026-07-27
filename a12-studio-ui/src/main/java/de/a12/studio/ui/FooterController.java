@@ -1,14 +1,21 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.A12Settings;
+import de.a12.studio.models.projects.settings.JsonSettings;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
+import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.events.TabSelectionChangedEvent;
+import de.a12.studio.ui.previewapp.PreviewAppProcess;
+import de.a12.studio.ui.previewapp.PreviewAppStatusMonitor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 import org.apache.commons.io.FileUtils;
 import org.jspecify.annotations.NonNull;
 
@@ -34,6 +41,10 @@ public class FooterController implements Initializable, StudioEventListener {
   // Only sampled to keep detection cheap on large files; a wrong encoding is rare in this many bytes.
   private static final int ENCODING_SAMPLE_SIZE = 64 * 1024;
 
+  private static final String STATUS_BUBBLE_RUNNING = "status-running";
+  private static final String STATUS_BUBBLE_STARTING = "status-starting";
+  private static final String STATUS_BUBBLE_STOPPED = "status-stopped";
+
   @FXML
   private Label filePathLabel;
 
@@ -46,12 +57,60 @@ public class FooterController implements Initializable, StudioEventListener {
   @FXML
   private Label fileEncodingLabel;
 
+  @FXML
+  private HBox previewAppStatus;
+
+  @FXML
+  private Label previewAppStatusLabel;
+
+  @FXML
+  private Circle previewAppStatusBubble;
+
   private ProjectItem currentItem;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
     showItem(null);
+
+    refreshPreviewAppStatusVisibility();
+    PreviewAppStatusMonitor monitor = PreviewAppStatusMonitor.getInstance();
+    monitor.start();
+    updatePreviewAppStatus(monitor.getStatus());
+    monitor.statusProperty().addListener((observable, oldStatus, newStatus) -> updatePreviewAppStatus(newStatus));
+  }
+
+  @Override
+  public void settingsChanged(@NonNull SettingsChangedEvent event) {
+    if (event.getSettings().getSettingsType().equals(JsonSettings.SettingsType.A12_INSTALLATION)) {
+      refreshPreviewAppStatusVisibility();
+    }
+  }
+
+  private void refreshPreviewAppStatusVisibility() {
+    String installationPath = A12Settings.load().getInstallationPath();
+    boolean visible = installationPath != null && A12Settings.isValidInstallationFolder(new File(installationPath));
+    previewAppStatus.setVisible(visible);
+    previewAppStatus.setManaged(visible);
+  }
+
+  private void updatePreviewAppStatus(PreviewAppStatusMonitor.Status status) {
+    previewAppStatusBubble.getStyleClass().removeAll(STATUS_BUBBLE_RUNNING, STATUS_BUBBLE_STARTING, STATUS_BUBBLE_STOPPED);
+
+    switch (status) {
+      case RUNNING -> {
+        previewAppStatusBubble.getStyleClass().add(STATUS_BUBBLE_RUNNING);
+        previewAppStatusLabel.setText("Preview App running on port " + PreviewAppProcess.getInstance().getPort());
+      }
+      case STARTING -> {
+        previewAppStatusBubble.getStyleClass().add(STATUS_BUBBLE_STARTING);
+        previewAppStatusLabel.setText("Preview App starting…");
+      }
+      case STOPPED -> {
+        previewAppStatusBubble.getStyleClass().add(STATUS_BUBBLE_STOPPED);
+        previewAppStatusLabel.setText("Preview App stopped");
+      }
+    }
   }
 
   @Override

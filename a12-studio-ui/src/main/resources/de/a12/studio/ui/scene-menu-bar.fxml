@@ -14,8 +14,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.MenuBarController">
+<BorderPane styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
    <left>
       <HBox alignment="CENTER_LEFT" prefHeight="42.0" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
@@ -55,38 +54,47 @@
    <right>
       <HBox fx:id="menuBarRightPanel" alignment="CENTER_RIGHT" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="updateBtn" accessibleText="Update available" managed="false" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button" visible="false">
-                <graphic>
-                    <FontIcon iconColor="#03A905" iconLiteral="mdi2a-arrow-down-bold" iconSize="18" />
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Update available" />
-                </tooltip>
-            </Button>
-            <Button fx:id="launchPreviewAppBtn" accessibleText="Launch Preview App" managed="false" mnemonicParsing="false" onAction="#onLaunchPreviewApp" styleClass="menu-bar-button" visible="false">
-                <graphic>
-                    <FontIcon iconLiteral="mdi2p-play" iconSize="20" styleClass="toolbar-icon" />
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Launch Preview App" />
-                </tooltip>
-            </Button>
-            <Button fx:id="stopPreviewAppBtn" accessibleText="Stop Preview App" disable="true" managed="false" mnemonicParsing="false" onAction="#onStopPreviewApp" styleClass="menu-bar-button" visible="false">
-                <graphic>
-                    <FontIcon iconLiteral="mdi2s-stop" iconSize="20" styleClass="toolbar-icon" />
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Stop Preview App" />
-                </tooltip>
-            </Button>
-            <Button fx:id="previewAppLogBtn" accessibleText="Preview App Log" managed="false" mnemonicParsing="false" onAction="#onOpenPreviewAppLog" styleClass="menu-bar-button" visible="false">
-                <graphic>
-                    <FontIcon iconLiteral="mdi2c-console" iconSize="20" styleClass="toolbar-icon" />
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Preview App Log" />
-                </tooltip>
-            </Button>
+            <HBox alignment="CENTER_LEFT" spacing="3.0">
+               <children>
+                  <Button fx:id="launchPreviewAppBtn" accessibleText="Launch Preview App" managed="false" mnemonicParsing="false" onAction="#onLaunchPreviewApp" styleClass="menu-bar-button, launch-preview-app-button, preview-app-button" visible="false">
+                      <graphic>
+                          <FontIcon iconLiteral="mdi2p-play" iconSize="20" styleClass="toolbar-icon" />
+                      </graphic>
+                      <tooltip>
+                          <Tooltip text="Launch Preview App" />
+                      </tooltip>
+                  </Button>
+                  <Button fx:id="stopPreviewAppBtn" accessibleText="Stop Preview App" disable="true" managed="false" mnemonicParsing="false" onAction="#onStopPreviewApp" styleClass="menu-bar-button, stop-preview-app-button, preview-app-button" visible="false">
+                      <graphic>
+                          <FontIcon iconLiteral="mdi2s-stop" iconSize="20" styleClass="toolbar-icon" />
+                      </graphic>
+                      <tooltip>
+                          <Tooltip text="Stop Preview App" />
+                      </tooltip>
+                  </Button>
+                  <Button fx:id="previewAppLogBtn" accessibleText="Preview App Log" managed="false" mnemonicParsing="false" onAction="#onOpenPreviewAppLog" styleClass="menu-bar-button, preview-app-button" visible="false">
+                      <graphic>
+                          <FontIcon iconLiteral="mdi2c-console" iconSize="20" styleClass="toolbar-icon" />
+                      </graphic>
+                      <tooltip>
+                          <Tooltip text="Preview App Log" />
+                      </tooltip>
+                  </Button>
+               </children>
+               <HBox.margin>
+                  <Insets right="6.0" />
+               </HBox.margin>
+            </HBox>
+
+             <Button fx:id="updateBtn" accessibleText="Update available" managed="false" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button" visible="false">
+                 <graphic>
+                     <FontIcon iconColor="#03A905" iconLiteral="mdi2a-arrow-down-bold" iconSize="18" />
+                 </graphic>
+                 <tooltip>
+                     <Tooltip text="Update available" />
+                 </tooltip>
+             </Button>
+
             <Button fx:id="searchBtn" accessibleText="Search Files" mnemonicParsing="false" onAction="#onSearch" styleClass="menu-bar-button">
                 <graphic>
                     <FontIcon iconLiteral="mdi2m-magnify" iconSize="20" styleClass="toolbar-icon" />

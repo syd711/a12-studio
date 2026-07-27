@@ -13,6 +13,12 @@
     -fx-text-fill: -fx-text-muted;
     -fx-padding: 3px 0 3px 1px;
 }
+.section-header {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+    -fx-padding: 3px 0 3px 1px;
+}
 
 .placeholder-label {
     -fx-text-fill: -fx-text-faint;

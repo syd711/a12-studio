@@ -297,3 +297,25 @@
     -fx-font-size: 11px;
     -fx-text-fill: -fx-text-muted;
 }
+
+.footer-preview-app-icon {
+    -fx-icon-color: -fx-icon-color-theme;
+}
+
+.preview-app-status-bubble {
+    -fx-stroke: -fx-background;
+    -fx-stroke-width: 1px;
+    -fx-fill: -fx-error-bg;
+}
+
+.preview-app-status-bubble.status-running {
+    -fx-fill: -fx-success-bg;
+}
+
+.preview-app-status-bubble.status-starting {
+    -fx-fill: -fx-warning-bg;
+}
+
+.preview-app-status-bubble.status-stopped {
+    -fx-fill: -fx-error-bg;
+}
