@@ -1,0 +1,28 @@
+{
+  "header": {
+    "id": "TimeZoneValidator_other",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "TimeZoneValidator_other",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "Europe/Berlin",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "header": {
+    "id": "FormLayoutColumnSumValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Ref_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "id": "screen_1",
+        "name": "MainScreen",
+        "screenElements": [
+          {
+            "type": "MultiColumnSection",
+            "id": "section_1",
+            "name": "TooWide",
+            "layout": {
+              "lg": "6-6-6",
+              "md": "6-6"
+            },
+            "screenElements": []
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

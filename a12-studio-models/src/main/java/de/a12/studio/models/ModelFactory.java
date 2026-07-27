@@ -2,10 +2,14 @@ package de.a12.studio.models;
 
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.printmodel.PrintModel;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +49,10 @@ public class ModelFactory {
         case APPLICATION -> JsonSettings.objectMapper.treeToValue(root, ApplicationModel.class);
         case FORM -> JsonSettings.objectMapper.treeToValue(root, FormModel.class);
         case MASTERDETAIL -> JsonSettings.objectMapper.treeToValue(root, MasterDetailModel.class);
+        case RELATIONSHIP -> JsonSettings.objectMapper.treeToValue(root, RelationshipModel.class);
+        case CONTENT -> JsonSettings.objectMapper.treeToValue(root, ContentModel.class);
+        case PRINT -> JsonSettings.objectMapper.treeToValue(root, PrintModel.class);
+        case TREE -> JsonSettings.objectMapper.treeToValue(root, TreeModel.class);
         default -> {
           log.warn("Model type '{}' of '{}' is not supported yet", modelType, projectItem.getPath());
           yield null;

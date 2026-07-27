@@ -1,0 +1,39 @@
+{
+  "header": {
+    "id": "ContentElementIdUniqueValidator_invalid",
+    "modelType": "content",
+    "modelVersion": "0.8.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "namespaceVersions": {
+        "com.mgmtp.a12.contentengine": "0.9.0"
+      }
+    },
+    "root": {
+      "id": "root_1",
+      "type": "Box",
+      "namespace": "com.mgmtp.a12.contentengine",
+      "props": {},
+      "children": [
+        {
+          "id": "child_1",
+          "type": "Paragraph",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "props": {}
+        },
+        {
+          "id": "child_1",
+          "type": "Paragraph",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "props": {}
+        }
+      ]
+    }
+  }
+}

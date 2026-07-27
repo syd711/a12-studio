@@ -1,0 +1,56 @@
+{
+  "header": {
+    "id": "MissingReferenceValidator_invalid",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "MissingReferenceValidator_invalid",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_root",
+          "name": "Root",
+          "Group": {
+            "repeatability": 2,
+            "indexFieldName": "DoesNotExist",
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_1",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

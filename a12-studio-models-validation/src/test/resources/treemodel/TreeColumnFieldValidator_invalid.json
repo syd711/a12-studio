@@ -1,0 +1,59 @@
+{
+  "header": {
+    "id": "TreeColumnFieldValidator_invalid",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "expansionStrategy": {
+        "type": "level_by_level"
+      }
+    },
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "nodes": [
+      {
+        "configuration": {
+          "dnd": false,
+          "inherit": {}
+        },
+        "id": "node_1",
+        "actions": [],
+        "documentModelRef": "Ref_DM",
+        "columns": [
+          {
+            "columnRef": "column_unknown",
+            "elementRef": "field_missing"
+          },
+          {
+            "columnRef": "column_1",
+            "elementRef": "field_2"
+          }
+        ],
+        "childRelationshipConfigurations": []
+      }
+    ],
+    "columns": [
+      {
+        "width": 1,
+        "styles": {},
+        "id": "column_1",
+        "label": [],
+        "name": "Name",
+        "fixedWidth": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "header": {
+    "id": "FormSiblingNameUniquenessValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Ref_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "id": "screen_1",
+        "name": "SameScreen",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_1",
+            "name": "SameSection",
+            "screenElements": []
+          },
+          {
+            "type": "Section",
+            "id": "section_2",
+            "name": "SameSection",
+            "screenElements": []
+          }
+        ]
+      },
+      {
+        "id": "screen_2",
+        "name": "SameScreen",
+        "screenElements": []
+      }
+    ],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

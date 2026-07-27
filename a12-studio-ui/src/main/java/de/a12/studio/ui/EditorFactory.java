@@ -3,17 +3,27 @@ package de.a12.studio.ui;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.models.auth.UsersDocument;
+import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.printmodel.PrintModel;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.applicationmodel.ApplicationModelEditorController;
 import de.a12.studio.ui.editors.auth.RolesEditorController;
 import de.a12.studio.ui.editors.auth.UsersEditorController;
+import de.a12.studio.ui.editors.contentmodel.ContentModelEditorController;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
+import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
 import de.a12.studio.ui.editors.masterdetailmodel.MasterDetailModelEditorController;
 import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
+import de.a12.studio.ui.editors.printmodel.PrintModelEditorController;
+import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController;
+import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -59,6 +69,36 @@ public class EditorFactory {
         FXMLLoader loader = new FXMLLoader(MasterDetailModelEditorController.class.getResource("master-detail-model-editor.fxml"));
         content = loader.load();
         MasterDetailModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof FormModel) {
+        FXMLLoader loader = new FXMLLoader(FormModelEditorController.class.getResource("form-model-editor.fxml"));
+        content = loader.load();
+        FormModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof RelationshipModel) {
+        FXMLLoader loader = new FXMLLoader(RelationshipModelEditorController.class.getResource("relationship-model-editor.fxml"));
+        content = loader.load();
+        RelationshipModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof ContentModel) {
+        FXMLLoader loader = new FXMLLoader(ContentModelEditorController.class.getResource("content-model-editor.fxml"));
+        content = loader.load();
+        ContentModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof TreeModel) {
+        FXMLLoader loader = new FXMLLoader(TreeModelEditorController.class.getResource("tree-model-editor.fxml"));
+        content = loader.load();
+        TreeModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof PrintModel) {
+        FXMLLoader loader = new FXMLLoader(PrintModelEditorController.class.getResource("print-model-editor.fxml"));
+        content = loader.load();
+        PrintModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getAuthDocument() instanceof RolesDocument) {

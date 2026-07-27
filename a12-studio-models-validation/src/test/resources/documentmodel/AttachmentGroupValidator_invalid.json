@@ -1,0 +1,49 @@
+{
+  "header": {
+    "id": "AttachmentGroupValidator_invalid",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "AttachmentGroupValidator_invalid",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_root",
+          "name": "Root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_attach",
+                "name": "Attachments",
+                "Group": {
+                  "repeatability": 5,
+                  "usageType": "attachment",
+                  "elements": []
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

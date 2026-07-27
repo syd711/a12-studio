@@ -1,0 +1,98 @@
+{
+  "header": {
+    "id": "PersonCompany",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "PersonCompany"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Person",
+        "reference": "Person_DM"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Company",
+        "reference": "Company_DM"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "linkDocumentModel": null,
+    "labels": [
+      {
+        "locale": "de"
+      },
+      {
+        "locale": "en",
+        "text": "PersonCompany"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "role": "Person",
+        "documentModel": "Person_DM",
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "de",
+            "text": "Mitarbeiter"
+          },
+          {
+            "locale": "en",
+            "text": "Employees"
+          }
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
+      },
+      {
+        "role": "Company",
+        "documentModel": "Company_DM",
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "de",
+            "text": "Beschäftigt von"
+          },
+          {
+            "locale": "en",
+            "text": "Employed by"
+          }
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "header": {
+    "id": "MasterDetailTypeConsistencyValidator_invalid",
+    "modelType": "module-masterdetail",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "type": "overview",
+    "formMapping": []
+  }
+}

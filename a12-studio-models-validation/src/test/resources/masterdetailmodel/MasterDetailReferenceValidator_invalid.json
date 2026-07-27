@@ -1,0 +1,22 @@
+{
+  "header": {
+    "id": "MasterDetailReferenceValidator_invalid",
+    "modelType": "module-masterdetail",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "type": "overview",
+    "overviewModel": "Missing_OM",
+    "formMapping": [
+      {
+        "documentModel": "Missing_DM",
+        "formModel": "Missing_FM"
+      }
+    ]
+  }
+}

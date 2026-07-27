@@ -1,0 +1,17 @@
+{
+  "header": {
+    "id": "SomeOtherName",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": []
+  }
+}

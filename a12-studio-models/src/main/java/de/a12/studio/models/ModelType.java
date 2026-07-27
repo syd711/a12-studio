@@ -19,7 +19,9 @@ public enum ModelType {
   RELATIONSHIP("relationship", "Relationship Model"),
   APPLICATION("application", "Application Model"),
   CONTENT("content", "Content Model"),
-  MASTERDETAIL("module-masterdetail", "Master-Detail Model");
+  MASTERDETAIL("module-masterdetail", "Master-Detail Model"),
+  PRINT("print", "Print Model"),
+  TREE("tree", "Tree Model");
 
   private static final String VERSIONS_RESOURCE = "model-versions.json";
   private static final Map<String, String> CURRENT_VERSIONS = loadCurrentVersions();

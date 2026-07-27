@@ -1,0 +1,22 @@
+{
+  "header": {
+    "id": "FormDocumentModelReferenceValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "screens": [],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

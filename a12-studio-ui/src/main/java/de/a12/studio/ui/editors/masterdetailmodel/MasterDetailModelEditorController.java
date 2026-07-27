@@ -5,9 +5,7 @@ import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.masterdetailmodel.FormMapping;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
-import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -18,9 +16,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
-import javafx.scene.shape.Circle;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -37,15 +33,8 @@ import java.util.ResourceBundle;
  */
 public class MasterDetailModelEditorController extends AbstractEditorController implements Initializable {
 
-  private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
   private static final int DEFAULT_FORM_WIDTH = 6;
   private static final int MAX_FORM_WIDTH = 11;
-
-  @FXML
-  private Tooltip settingsButtonTooltip;
-
-  @FXML
-  private Circle settingsErrorBadge;
 
   @FXML
   private ComboBox<String> overviewModelField;
@@ -83,12 +72,6 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
       model.getContent().setFormWidth(newValue);
       commitChange();
     });
-  }
-
-  @FXML
-  public void onSettings(ActionEvent e) {
-    Dialogs.openSettings();
-    updateSettingsErrorBadge();
   }
 
   @Override
@@ -202,15 +185,6 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
   private void commitChange() {
     projectItem.save();
     StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
-  }
-
-  private void updateSettingsErrorBadge() {
-    List<String> issues = projectItem.getModel() != null
-        ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
-        : List.of();
-
-    settingsErrorBadge.setVisible(!issues.isEmpty());
-    settingsButtonTooltip.setText(issues.isEmpty() ? DEFAULT_SETTINGS_TOOLTIP : String.join("\n\n", issues));
   }
 
   @Override

@@ -4,9 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.Module;
-import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.editors.propertyeditors.*;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.preview.PreviewLauncher;
@@ -17,10 +15,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Circle;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -31,15 +27,7 @@ import java.util.ResourceBundle;
 
 public class ApplicationModelEditorController extends AbstractEditorController implements Initializable {
 
-  private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
-
   private static final String MODULE_EDITOR_FXML = "module-editor.fxml";
-
-  @FXML
-  private Tooltip settingsButtonTooltip;
-
-  @FXML
-  private Circle settingsErrorBadge;
 
   @FXML
   private ActivityPanelController activityController;
@@ -63,12 +51,6 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   private VBox editorContainer;
 
   private ModuleEditorController currentModuleEditorController;
-
-  @FXML
-  public void onSettings(ActionEvent e) {
-    Dialogs.openSettings();
-    updateSettingsErrorBadge();
-  }
 
   @FXML
   public void onPreview(ActionEvent e) {
@@ -116,15 +98,6 @@ public class ApplicationModelEditorController extends AbstractEditorController i
     }
     editorContainer.getChildren().clear();
     splitPane.getItems().remove(editorContainer);
-  }
-
-  private void updateSettingsErrorBadge() {
-    List<String> issues = projectItem.getModel() != null
-        ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
-        : List.of();
-
-    settingsErrorBadge.setVisible(!issues.isEmpty());
-    settingsButtonTooltip.setText(issues.isEmpty() ? DEFAULT_SETTINGS_TOOLTIP : String.join("\n\n", issues));
   }
 
   @Override

@@ -1,0 +1,13 @@
+{
+  "header": {
+    "id": "MissingLocaleValidator_invalid",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": []
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": []
+  }
+}

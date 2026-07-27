@@ -1,0 +1,41 @@
+{
+  "header": {
+    "id": "TreeColumnsNotEmptyValidator_invalid",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "expansionStrategy": {
+        "type": "level_by_level"
+      }
+    },
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "nodes": [
+      {
+        "configuration": {
+          "dnd": false,
+          "inherit": {}
+        },
+        "id": "node_1",
+        "actions": [],
+        "documentModelRef": "Ref_DM",
+        "columns": [],
+        "childRelationshipConfigurations": []
+      }
+    ],
+    "columns": []
+  }
+}

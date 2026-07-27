@@ -1,0 +1,25 @@
+{
+  "header": {
+    "id": "HeaderModelReferenceValidator_invalid",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Missing",
+        "reference": "Missing_DM"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": []
+  }
+}

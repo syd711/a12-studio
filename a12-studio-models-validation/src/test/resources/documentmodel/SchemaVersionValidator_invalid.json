@@ -1,0 +1,28 @@
+{
+  "header": {
+    "id": "SchemaVersionValidator_invalid",
+    "modelType": "document",
+    "modelVersion": "not-a-version",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "SchemaVersionValidator_invalid",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "header": {
+    "id": "RelationshipLinkDocumentModelValidator_invalid",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": true,
+    "linkDocumentModel": "SomeLink_DM",
+    "labels": [],
+    "entityCharacteristics": [
+      {
+        "role": "First",
+        "documentModel": "First_DM",
+        "ordered": false,
+        "labels": [],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        }
+      },
+      {
+        "role": "Second",
+        "documentModel": "Second_DM",
+        "ordered": false,
+        "labels": [],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
+      }
+    ]
+  }
+}

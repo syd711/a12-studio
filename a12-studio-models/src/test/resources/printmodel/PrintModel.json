@@ -1,0 +1,59 @@
+{
+  "header": {
+    "id": "PrintModel",
+    "modelType": "print",
+    "modelVersion": "4.0.0",
+    "description": "Description",
+    "locales": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester"
+      }
+    ]
+  },
+  "content": {
+    "id": "PRINT_MODEL_CONTENT",
+    "general": {
+      "id": "PRINT_MODEL_CONTENT_GENERAL",
+      "metadata": {
+        "id": "9BN8asVnrw-ydfzz6RElp",
+        "titleComputation": [
+          {
+            "id": "q_Emnhk5wkxPBlTh_Hjk4",
+            "operation": "\"PrintModel\""
+          }
+        ],
+        "descriptionComputation": [
+          {
+            "id": "_jCFr4aOzb_A8pOOiwmEA",
+            "operation": "\"Description\""
+          }
+        ],
+        "languageComputation": [
+          {
+            "id": "WWu9f1BcjaldYyZMmDn_2",
+            "operation": "\"DE\""
+          }
+        ],
+        "authorComputation": [
+          {
+            "id": "O3kZlKAybtJE4Qzg6aBEr",
+            "operation": "\"Print Model Editor\""
+          }
+        ]
+      },
+      "structure": [],
+      "segmentDefaults": {
+        "id": "SBKZqy-DxIE_pJ5X-bglg",
+        "fontSize": 12
+      }
+    },
+    "segments": {
+      "id": "RpkDZTKWBqHt6iZSS9yO7",
+      "definitions": [],
+      "references": []
+    },
+    "elementDefinitions": []
+  }
+}

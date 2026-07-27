@@ -2,14 +2,24 @@ package de.a12.studio.modelsvalidation;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.services.ApplicationModelValidationService;
+import de.a12.studio.modelsvalidation.services.ContentModelValidationService;
 import de.a12.studio.modelsvalidation.services.DocumentModelValidationService;
 import de.a12.studio.modelsvalidation.services.FormModelValidationService;
+import de.a12.studio.modelsvalidation.services.MasterDetailModelValidationService;
 import de.a12.studio.modelsvalidation.services.OverviewModelValidationService;
+import de.a12.studio.modelsvalidation.services.PrintModelValidationService;
+import de.a12.studio.modelsvalidation.services.RelationshipModelValidationService;
+import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
 
@@ -29,6 +39,11 @@ public class ValidationService {
   private final OverviewModelValidationService overviewModelValidationService = new OverviewModelValidationService();
   private final FormModelValidationService formModelValidationService = new FormModelValidationService();
   private final ApplicationModelValidationService applicationModelValidationService = new ApplicationModelValidationService();
+  private final RelationshipModelValidationService relationshipModelValidationService = new RelationshipModelValidationService();
+  private final TreeModelValidationService treeModelValidationService = new TreeModelValidationService();
+  private final PrintModelValidationService printModelValidationService = new PrintModelValidationService();
+  private final ContentModelValidationService contentModelValidationService = new ContentModelValidationService();
+  private final MasterDetailModelValidationService masterDetailModelValidationService = new MasterDetailModelValidationService();
 
   public ValidationService(Project project) {
     this.project = project;
@@ -42,6 +57,11 @@ public class ValidationService {
       case OverviewModel overviewModel -> overviewModelValidationService.validate(overviewModel, context);
       case FormModel formModel -> formModelValidationService.validate(formModel, context);
       case ApplicationModel applicationModel -> applicationModelValidationService.validate(applicationModel, context);
+      case RelationshipModel relationshipModel -> relationshipModelValidationService.validate(relationshipModel, context);
+      case TreeModel treeModel -> treeModelValidationService.validate(treeModel, context);
+      case PrintModel printModel -> printModelValidationService.validate(printModel, context);
+      case ContentModel contentModel -> contentModelValidationService.validate(contentModel, context);
+      case MasterDetailModel masterDetailModel -> masterDetailModelValidationService.validate(masterDetailModel, context);
       default -> List.of();
     };
   }
@@ -80,6 +100,7 @@ public class ValidationService {
   }
 
   private ValidationContext buildContext(A12Model<?> model) {
-    return new ValidationContext(project, ProjectModels.getOtherDocumentModels(project, model));
+    return new ValidationContext(project, ProjectModels.findItem(project, model),
+        ProjectModels.getOtherDocumentModels(project, model), ProjectModels.getOtherModels(project, model));
   }
 }

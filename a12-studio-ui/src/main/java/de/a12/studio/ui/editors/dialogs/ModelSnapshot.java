@@ -43,7 +43,10 @@ class ModelSnapshot {
 
     ModelConfig modelConfig = model instanceof DocumentModel documentModel ? getModelConfig(documentModel) : null;
     this.timeZone = modelConfig != null ? modelConfig.getTimeZone() : null;
-    this.supportedCharacters = modelConfig != null ? new ArrayList<>(modelConfig.getSupportedCharacters()) : new ArrayList<>();
+    // null = the model had no supportedCharacters key at all; restore() must put that state back as-is.
+    this.supportedCharacters = modelConfig != null && modelConfig.getSupportedCharacters() != null
+        ? new ArrayList<>(modelConfig.getSupportedCharacters())
+        : null;
   }
 
   /**

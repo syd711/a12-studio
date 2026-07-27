@@ -1,0 +1,42 @@
+{
+  "header": {
+    "id": "PrintImageValidator_invalid",
+    "modelType": "print",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "id": "PRINT_MODEL_CONTENT",
+    "general": {
+      "id": "GENERAL",
+      "metadata": {
+        "id": "META",
+        "titleComputation": [],
+        "descriptionComputation": [],
+        "languageComputation": [],
+        "authorComputation": []
+      },
+      "structure": [],
+      "segmentDefaults": {
+        "id": "DEFAULTS",
+        "fontSize": 12
+      }
+    },
+    "segments": {
+      "id": "SEGMENTS",
+      "definitions": [],
+      "references": []
+    },
+    "elementDefinitions": [
+      {
+        "id": "image_element_1",
+        "type": "Image",
+        "url": "images/logo.png"
+      }
+    ]
+  }
+}

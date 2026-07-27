@@ -1,0 +1,51 @@
+{
+  "header": {
+    "id": "TreeHierarchicalColumnRefValidator_invalid",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "hierarchicalColumnRef": "column_unknown",
+      "expansionStrategy": {
+        "type": "level_by_level"
+      }
+    },
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "nodes": [
+      {
+        "configuration": {
+          "dnd": false,
+          "inherit": {}
+        },
+        "id": "node_1",
+        "actions": [],
+        "documentModelRef": "Ref_DM",
+        "columns": [],
+        "childRelationshipConfigurations": []
+      }
+    ],
+    "columns": [
+      {
+        "width": 1,
+        "styles": {},
+        "id": "column_1",
+        "label": [],
+        "name": "Name",
+        "fixedWidth": false
+      }
+    ]
+  }
+}

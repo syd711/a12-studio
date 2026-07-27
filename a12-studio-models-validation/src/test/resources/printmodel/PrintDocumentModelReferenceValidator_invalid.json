@@ -1,0 +1,43 @@
+{
+  "header": {
+    "id": "PrintDocumentModelReferenceValidator_invalid",
+    "modelType": "print",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "reference": "Bad.Name_DM",
+        "purpose": "data binding"
+      }
+    ]
+  },
+  "content": {
+    "id": "PRINT_MODEL_CONTENT",
+    "general": {
+      "id": "GENERAL",
+      "metadata": {
+        "id": "META",
+        "titleComputation": [],
+        "descriptionComputation": [],
+        "languageComputation": [],
+        "authorComputation": []
+      },
+      "structure": [],
+      "segmentDefaults": {
+        "id": "DEFAULTS",
+        "fontSize": 12
+      }
+    },
+    "segments": {
+      "id": "SEGMENTS",
+      "definitions": [],
+      "references": []
+    },
+    "elementDefinitions": []
+  }
+}

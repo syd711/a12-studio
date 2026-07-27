@@ -1,0 +1,84 @@
+{
+  "header": {
+    "id": "PrintElementReferenceIntegrityValidator_invalid",
+    "modelType": "print",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "id": "PRINT_MODEL_CONTENT",
+    "general": {
+      "id": "GENERAL",
+      "metadata": {
+        "id": "META",
+        "titleComputation": [],
+        "descriptionComputation": [],
+        "languageComputation": [],
+        "authorComputation": []
+      },
+      "structure": [
+        {
+          "id": "segment_missing"
+        }
+      ],
+      "segmentDefaults": {
+        "id": "DEFAULTS",
+        "fontSize": 12
+      }
+    },
+    "segments": {
+      "id": "SEGMENTS",
+      "definitions": [
+        {
+          "id": "segment_1",
+          "title": "First Segment",
+          "type": "Default",
+          "defaultSegment": {
+            "id": "seg_default_1",
+            "pageOrientation": "Portrait"
+          },
+          "elementReferences": [
+            {
+              "id": "ref_1",
+              "refId": "definition_missing",
+              "position": {
+                "id": "pos_1",
+                "x": {
+                  "id": "x_1",
+                  "value": 10,
+                  "unit": "Millimeter"
+                },
+                "y": {
+                  "id": "y_1",
+                  "value": 10,
+                  "unit": "Millimeter"
+                }
+              },
+              "dimensions": {
+                "id": "dim_1",
+                "minHeight": {
+                  "id": "h_1",
+                  "value": 6,
+                  "unit": "Millimeter"
+                },
+                "minWidth": {
+                  "id": "w_1",
+                  "value": 40,
+                  "unit": "Millimeter"
+                }
+              },
+              "hideConditions": []
+            }
+          ],
+          "dataContexts": []
+        }
+      ],
+      "references": []
+    },
+    "elementDefinitions": []
+  }
+}

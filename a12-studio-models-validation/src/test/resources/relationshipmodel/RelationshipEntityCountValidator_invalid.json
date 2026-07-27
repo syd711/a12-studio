@@ -1,0 +1,30 @@
+{
+  "header": {
+    "id": "RelationshipEntityCountValidator_invalid",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": [
+      {
+        "role": "OnlyOne",
+        "documentModel": "Some_DM",
+        "ordered": false,
+        "labels": [],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
+      }
+    ]
+  }
+}

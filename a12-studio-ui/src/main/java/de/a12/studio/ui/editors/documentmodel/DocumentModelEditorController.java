@@ -10,9 +10,7 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.documentmodel.RuleElement;
-import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,9 +18,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.shape.Circle;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -41,8 +37,6 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   private static final String VALIDATION_RULE_EDITOR_FXML = "document-model-validation-rule-editor.fxml";
   private static final String COMPUTATION_RULE_EDITOR_FXML = "document-model-computation-rule-editor.fxml";
 
-  private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
-
   @FXML
   private SplitPane splitPane;
 
@@ -50,21 +44,9 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   private BorderPane editorContainer;
 
   @FXML
-  private Circle settingsErrorBadge;
-
-  @FXML
-  private Tooltip settingsButtonTooltip;
-
-  @FXML
   private DocumentModelElementsTreeController elementsTreeController;
 
   private ElementEditorController currentElementEditorController;
-
-  @FXML
-  public void onSettings(ActionEvent e) {
-    Dialogs.openSettings();
-    updateSettingsErrorBadge();
-  }
 
   @FXML
   public void onTypeDefinitions(ActionEvent e) {
@@ -74,15 +56,6 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   public void loadModel(@NonNull A12Model<?> model) {
     load(((DocumentModel) model).getContent().getModelRoot());
     updateSettingsErrorBadge();
-  }
-
-  private void updateSettingsErrorBadge() {
-    List<String> issues = projectItem.getModel() != null
-        ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
-        : List.of();
-
-    settingsErrorBadge.setVisible(!issues.isEmpty());
-    settingsButtonTooltip.setText(issues.isEmpty() ? DEFAULT_SETTINGS_TOOLTIP : String.join("\n\n", issues));
   }
 
   private void load(@NonNull ModelRoot modelRoot) {

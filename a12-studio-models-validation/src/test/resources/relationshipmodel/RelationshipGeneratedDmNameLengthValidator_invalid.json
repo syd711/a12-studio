@@ -1,0 +1,42 @@
+{
+  "header": {
+    "id": "RelationshipWithAVeryLongModelNameThatTogetherWithTheRoleExceedsTheLimit_0123456789",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": [
+      {
+        "role": "AnotherRatherLongRoleName",
+        "documentModel": "First_DM",
+        "ordered": false,
+        "labels": [],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
+      },
+      {
+        "role": "B",
+        "documentModel": "Second_DM",
+        "ordered": false,
+        "labels": [],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
+      }
+    ]
+  }
+}

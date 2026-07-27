@@ -7,14 +7,18 @@ import de.a12.studio.modelsvalidation.ValidatorRunner;
 import de.a12.studio.modelsvalidation.validators.AttachmentGroupValidator;
 import de.a12.studio.modelsvalidation.validators.BasicConsistencyValidator;
 import de.a12.studio.modelsvalidation.validators.DuplicateIdValidator;
+import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.MissingReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.MultiSelectGroupValidator;
+import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.NumberFieldValueLimitValidator;
 import de.a12.studio.modelsvalidation.validators.SchemaVersionValidator;
 import de.a12.studio.modelsvalidation.validators.StringPatternErrorMessageValidator;
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
+import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 
 import java.util.List;
 
@@ -31,6 +35,10 @@ public final class DocumentModelValidationService {
       new AttachmentGroupValidator(),
       new BasicConsistencyValidator(),
       new MissingLocaleValidator(),
+      new LocaleCodeValidator(),
+      new ModelIdFilenameValidator(),
+      new UniqueModelIdValidator(),
+      new NameConventionValidator(),
       new TimeZoneValidator(),
       new StringPatternErrorMessageValidator());
 

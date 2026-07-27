@@ -1,0 +1,51 @@
+{
+  "header": {
+    "id": "PrintTableColumnWidthValidator_invalid",
+    "modelType": "print",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "id": "PRINT_MODEL_CONTENT",
+    "general": {
+      "id": "GENERAL",
+      "metadata": {
+        "id": "META",
+        "titleComputation": [],
+        "descriptionComputation": [],
+        "languageComputation": [],
+        "authorComputation": []
+      },
+      "structure": [],
+      "segmentDefaults": {
+        "id": "DEFAULTS",
+        "fontSize": 12
+      }
+    },
+    "segments": {
+      "id": "SEGMENTS",
+      "definitions": [],
+      "references": []
+    },
+    "elementDefinitions": [
+      {
+        "id": "table_element_1",
+        "type": "Table",
+        "columns": [
+          {
+            "id": "table_column_1",
+            "width": 60
+          },
+          {
+            "id": "table_column_2",
+            "width": 60
+          }
+        ]
+      }
+    ]
+  }
+}

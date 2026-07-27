@@ -1,9 +1,13 @@
 package de.a12.studio.models;
 
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.printmodel.PrintModel;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
 import org.junit.jupiter.api.Test;
@@ -59,6 +63,42 @@ class ModelFactoryTest {
 
     TypeDefinitionModel typeDefinitionModel = assertInstanceOf(TypeDefinitionModel.class, model);
     assertEquals("Basic_TDM", typeDefinitionModel.getId());
+  }
+
+  @Test
+  void loadsSupportedRelationshipModel() {
+    File file = resource("/relationshipmodel/PersonCompany.json");
+    A12Model<?> model = ModelFactory.load(new ProjectItem(file));
+
+    RelationshipModel relationshipModel = assertInstanceOf(RelationshipModel.class, model);
+    assertEquals("PersonCompany", relationshipModel.getId());
+  }
+
+  @Test
+  void loadsSupportedContentModel() {
+    File file = resource("/contentmodel/WelcomePage_CM.json");
+    A12Model<?> model = ModelFactory.load(new ProjectItem(file));
+
+    ContentModel contentModel = assertInstanceOf(ContentModel.class, model);
+    assertEquals("WelcomePage_CM", contentModel.getId());
+  }
+
+  @Test
+  void loadsSupportedPrintModel() {
+    File file = resource("/printmodel/PrintModel.json");
+    A12Model<?> model = ModelFactory.load(new ProjectItem(file));
+
+    PrintModel printModel = assertInstanceOf(PrintModel.class, model);
+    assertEquals("PrintModel", printModel.getId());
+  }
+
+  @Test
+  void loadsSupportedTreeModel() {
+    File file = resource("/treemodel/TreeModel.json");
+    A12Model<?> model = ModelFactory.load(new ProjectItem(file));
+
+    TreeModel treeModel = assertInstanceOf(TreeModel.class, model);
+    assertEquals("TreeModel", treeModel.getId());
   }
 
   @Test

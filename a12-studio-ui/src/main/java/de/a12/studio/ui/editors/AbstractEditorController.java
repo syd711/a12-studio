@@ -3,6 +3,8 @@ package de.a12.studio.ui.editors;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
@@ -12,14 +14,18 @@ import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.scene.control.Tooltip;
+import javafx.scene.shape.Circle;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
 import java.io.File;
+import java.util.List;
 
 @Slf4j
 abstract public class AbstractEditorController implements StudioEventListener {
+
+  private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
   protected ProjectItem projectItem;
   private BaseTableSettings baseTableSettings;
@@ -30,6 +36,34 @@ abstract public class AbstractEditorController implements StudioEventListener {
    */
   @FXML
   protected EditorFileToolbarButtonsController fileToolbarButtonsController;
+
+  /**
+   * Settings toolbar button badge, injected in every editor FXML that shows the settings button.
+   * Both may be null for editors without a settings button.
+   */
+  @FXML
+  protected Tooltip settingsButtonTooltip;
+
+  @FXML
+  protected Circle settingsErrorBadge;
+
+  @FXML
+  public void onSettings(ActionEvent e) {
+    Dialogs.openSettings();
+    updateSettingsErrorBadge();
+  }
+
+  protected void updateSettingsErrorBadge() {
+    if (settingsErrorBadge == null || settingsButtonTooltip == null) {
+      return;
+    }
+    List<String> issues = projectItem != null && projectItem.getModel() != null
+        ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
+        : List.of();
+
+    settingsErrorBadge.setVisible(!issues.isEmpty());
+    settingsButtonTooltip.setText(issues.isEmpty() ? DEFAULT_SETTINGS_TOOLTIP : String.join("\n\n", issues));
+  }
 
   public void save() {
     projectItem.save();
