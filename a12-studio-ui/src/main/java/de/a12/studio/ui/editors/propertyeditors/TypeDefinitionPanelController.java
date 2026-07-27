@@ -23,6 +23,7 @@ import de.a12.studio.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.models.documentmodel.UnspecifiedFieldType;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -251,6 +252,11 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
         requirednessConfig != null && RequirednessConfig.MODE_REQUIRED_IF_PARENT_FILLED.equals(requirednessConfig.getMode()));
     setFieldValue(defaultErrorMessagesCheckbox,
         requirednessConfig == null || requirednessConfig.getErrorMessage().isEmpty());
+  }
+
+  @Override
+  protected String validationProperty() {
+    return ElementProperty.TYPE;
   }
 
   private static RequirednessConfig newRequirednessConfig(boolean onlyIfParentFilled) {

@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DateFragmentFieldType;
 import de.a12.studio.models.documentmodel.DateFragmentTypeOptions;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -78,6 +79,11 @@ public class DataTypeDateFragmentConfigurationPanelController extends AbstractPr
     }
 
     setFieldValue(formatComboBox, format);
+  }
+
+  @Override
+  protected String validationProperty() {
+    return ElementProperty.DATA_TYPE;
   }
 
   private static void withDateFragmentTypeOptions(Element element, Consumer<DateFragmentTypeOptions> mutator) {

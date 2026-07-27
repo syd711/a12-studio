@@ -8,6 +8,7 @@ import de.a12.studio.models.documentmodel.HintList;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.StringTypeOptions;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
@@ -95,6 +96,11 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     setFieldValue(lineBreaksCheckBox, options != null && Boolean.TRUE.equals(options.getLineBreaksPermitted()));
     setFieldValue(alphabeticalSortingCheckBox, options != null && Boolean.TRUE.equals(options.getAlphabeticalSorting()));
     rebuildSuggestionsRows();
+  }
+
+  @Override
+  protected String validationProperty() {
+    return ElementProperty.DATA_TYPE;
   }
 
   @Override

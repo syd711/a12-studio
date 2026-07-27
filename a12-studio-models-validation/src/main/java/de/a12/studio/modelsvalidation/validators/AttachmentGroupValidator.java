@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -67,13 +68,13 @@ public final class AttachmentGroupValidator implements ModelValidator {
       List<String> missingFields = new ArrayList<>(List.of(ATTACHMENT_REQUIRED_FIELDS));
       missingFields.removeAll(fieldNames);
       if (!missingFields.isEmpty()) {
-        errors.add(error(model, groupElement.getId(),
+        errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL,
             "Missing fields [" + String.join(", ", missingFields) + "] for attachment with group [" + groupElement.getName() + "]."));
       }
       List<String> missingRules = new ArrayList<>(requiredRules);
       missingRules.removeAll(rulesPresent);
       if (!missingRules.isEmpty()) {
-        errors.add(error(model, groupElement.getId(),
+        errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL,
             "Missing rules [" + String.join(", ", missingRules) + "] for attachment with group [" + groupElement.getName() + "]."));
       }
 
@@ -89,7 +90,7 @@ public final class AttachmentGroupValidator implements ModelValidator {
                 boolean noValueValidation = Boolean.TRUE.equals(options.getNoValueValidation());
                 boolean lineBreaksPermitted = Boolean.TRUE.equals(options.getLineBreaksPermitted());
                 if (!noValueValidation || !lineBreaksPermitted) {
-                  errors.add(error(model, groupElement.getId(), "Field [content] in group [" + groupElement.getName()
+                  errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL, "Field [content] in group [" + groupElement.getName()
                       + "] must specify both \"noValueValidation\" and \"linebreaksPermitted\"."));
                 }
               }
@@ -99,7 +100,7 @@ public final class AttachmentGroupValidator implements ModelValidator {
     return errors;
   }
 
-  private static ModelValidationError error(A12Model<?> model, String elementId, String message) {
-    return new ModelValidationError(model, elementId, message, Severity.ERROR.name());
+  private static ModelValidationError error(A12Model<?> model, String elementId, String property, String message) {
+    return new ModelValidationError(model, elementId, property, message, Severity.ERROR.name());
   }
 }

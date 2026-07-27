@@ -7,6 +7,7 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -42,7 +43,7 @@ public final class StringPatternErrorMessageValidator implements ModelValidator 
       if (pattern == null || pattern.isEmpty() || hasErrorMessage(stringType.getErrorMessage())) {
         continue;
       }
-      errors.add(new ModelValidationError(model, field.getId(),
+      errors.add(new ModelValidationError(model, field.getId(), ElementProperty.ERROR_MESSAGE,
           "The pattern '" + pattern + "' is specified, but the corresponding error text is not.", Severity.ERROR.name()));
     }
     return errors;

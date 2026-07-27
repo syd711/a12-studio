@@ -1,8 +1,12 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.applicationmodel.Flow;
 import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.models.applicationmodel.Scene;
+import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.validators.application.ApplicationUniqueNamesValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.applicationmodel.dialogs.Dialogs;
@@ -27,6 +31,8 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -274,6 +280,31 @@ public class FlowsPanelController extends AbstractPropertyEditor {
       root.getChildren().add(flowItem);
     }
     flowsTree.setRoot(root);
+    refreshNameUniquenessError();
+  }
+
+  /**
+   * Not bound to an {@link de.a12.studio.models.documentmodel.Element}, so the base class's element-keyed
+   * validation plumbing never runs for this panel; queries {@link ApplicationUniqueNamesValidator}'s
+   * dedicated flow- and scene-name element ids (both scoped to {@link #module}, since this panel shows that
+   * whole module's flow/scene tree at once) directly instead. Called from {@link #rebuildTree} (itself called
+   * by every mutation here, plus {@link #setModule}), so this always reflects the tree as currently shown.
+   */
+  private void refreshNameUniquenessError() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    A12Model<?> model = projectItem == null ? null : projectItem.getModel();
+    if (model == null) {
+      hideError();
+      return;
+    }
+    List<ModelValidationError> errors = new ArrayList<>();
+    errors.addAll(Studio.getValidationService().validateElement(model, ApplicationUniqueNamesValidator.flowsElementId(module.getName())));
+    errors.addAll(Studio.getValidationService().validateElement(model, ApplicationUniqueNamesValidator.scenesElementId(module.getName())));
+    if (errors.isEmpty()) {
+      hideError();
+    } else {
+      showError(errors.get(0).severity(), errors.get(0).message());
+    }
   }
 
   private static String nameOf(@NonNull Object item) {

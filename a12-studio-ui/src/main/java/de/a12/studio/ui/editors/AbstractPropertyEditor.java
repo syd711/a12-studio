@@ -9,6 +9,7 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
@@ -83,7 +84,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
 
   public void setElement(@NonNull Element element) {
     this.element = element;
-    showValidationError(null);
+    refreshValidationState();
   }
 
   /**
@@ -337,46 +338,79 @@ abstract public class AbstractPropertyEditor implements Initializable {
     if (element == null) {
       return;
     }
-    Optional<ModelValidationError> error = validateElement(projectItem);
-    showValidationError(error.orElse(null));
-    StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
+    List<ModelValidationError> errors = validateElement(projectItem);
+    showValidationError(ownError(errors).orElse(null));
+    StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), errors.isEmpty() ? null : errors.get(0));
     StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
   }
 
   /**
    * Re-validates the currently bound element against the model's current state and reflects the result in
    * this panel's error container, without saving. Unlike {@link #commitChange}, this isn't triggered by an
-   * edit in one of this panel's own fields, so it's the right hook for subclasses that need to reflect
-   * validation problems caused by changes made elsewhere in the model (e.g. a field this element references
-   * having been deleted) as soon as the element is (re)selected — such changes don't otherwise run this
-   * panel's own commit/validate cycle. Call from {@link #setElement} after repopulating this panel's fields.
+   * edit in one of this panel's own fields, so it's what makes validation problems caused by changes made
+   * elsewhere in the model (e.g. a field this element references having been deleted, or an error already
+   * present when the project was opened) show up in this panel's own error container as soon as the element
+   * is (re)selected — such changes don't otherwise run this panel's own commit/validate cycle. Called
+   * automatically by {@link #setElement}, since every element-bound panel belongs to exactly one element and
+   * should surface that element's error regardless of which field caused it; subclasses only need to call this
+   * again themselves if they must re-check after something that happens later in their own {@code setElement}
+   * override.
    */
   protected void refreshValidationState() {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (element == null || projectItem == null) {
       return;
     }
-    showValidationError(validateElement(projectItem).orElse(null));
+    showValidationError(ownError(validateElement(projectItem)).orElse(null));
   }
 
-  private Optional<ModelValidationError> validateElement(@NonNull ProjectItem projectItem) {
+  /**
+   * The {@link ElementProperty} tag (see that class for the available constants) this panel is the intended
+   * home for, or {@code null} (the default) if it doesn't own any. Several sibling panels are routinely bound
+   * to the exact same {@link Element} at once (e.g. a document model field's General Information, Type
+   * Definition and Data Type Configuration panels each get their own {@link #setElement}), and {@link
+   * ModelValidationError#elementId()} alone can't tell them apart — only {@link ModelValidationError#property()}
+   * can. {@link #ownError} uses this to pick, out of every error found for the bound element, the one (if any)
+   * that is actually this panel's concern, so unrelated errors don't show up in the wrong container. Leaving
+   * this at the default means the panel never shows anything automatically, which is correct for panels with
+   * no corresponding validator (e.g. the annotations one).
+   */
+  protected String validationProperty() {
+    return null;
+  }
+
+  /**
+   * Out of every validation problem currently found for the bound element, the one (if any) that matches
+   * this panel's {@link #validationProperty()}. See that method for why a plain element-id match isn't
+   * enough.
+   */
+  private Optional<ModelValidationError> ownError(@NonNull List<ModelValidationError> errors) {
+    String property = validationProperty();
+    if (property == null) {
+      return Optional.empty();
+    }
+    return errors.stream().filter(error -> property.equals(error.property())).findFirst();
+  }
+
+  private List<ModelValidationError> validateElement(@NonNull ProjectItem projectItem) {
     A12Model<?> model = projectItem.getModel();
     if (element == null || model == null) {
-      return Optional.empty();
+      return List.of();
     }
     try {
       return Studio.getValidationService().validateElement(model, element.getId());
     } catch (Exception e) {
       log.warn("Failed to validate element '{}': {}", element.getId(), e.getMessage(), e);
-      return Optional.empty();
+      return List.of();
     }
   }
 
-  private void applyValidationResult(@NonNull Node field, @NonNull Optional<ModelValidationError> error) {
-    field.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, error.isPresent());
-    showValidationError(error.orElse(null));
+  private void applyValidationResult(@NonNull Node field, @NonNull List<ModelValidationError> errors) {
+    Optional<ModelValidationError> ownError = ownError(errors);
+    field.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, ownError.isPresent());
+    showValidationError(ownError.orElse(null));
     if (element != null) {
-      StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), error.orElse(null));
+      StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), errors.isEmpty() ? null : errors.get(0));
     }
   }
 

@@ -3,6 +3,8 @@ package de.a12.studio.ui.editors.propertyeditors;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.Module;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.validators.application.ApplicationUniqueNamesValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.applicationmodel.dialogs.Dialogs;
@@ -81,6 +83,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
   }
 
   private void rebuildRows() {
+    refreshNameUniquenessError();
     modulesList.getChildren().clear();
 
     List<Module> modules = getModules();
@@ -93,6 +96,22 @@ public class ModulesPanelController extends AbstractPropertyEditor {
 
     for (int index = 0; index < modules.size(); index++) {
       modulesList.getChildren().add(createRow(modules.get(index), index, modules.size()));
+    }
+  }
+
+  /**
+   * Not bound to an {@link de.a12.studio.models.documentmodel.Element}, so the base class's element-keyed
+   * validation plumbing never runs for this panel; queries {@link ApplicationUniqueNamesValidator}'s
+   * dedicated module-name element id directly instead. Called from {@link #rebuildRows} (itself called by
+   * every mutation here, plus {@link #setModel}), so this always reflects the list as currently shown.
+   */
+  private void refreshNameUniquenessError() {
+    List<ModelValidationError> errors =
+        Studio.getValidationService().validateElement(model, ApplicationUniqueNamesValidator.MODULES_ELEMENT_ID);
+    if (errors.isEmpty()) {
+      hideError();
+    } else {
+      showError(errors.get(0).severity(), errors.get(0).message());
     }
   }
 

@@ -20,5 +20,8 @@
     <Button mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" />
   </VBox>
  </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
  </BorderPane>
 </TitledPane>

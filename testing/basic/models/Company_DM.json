@@ -104,7 +104,9 @@
                       "Field": {
                         "fieldType": {
                           "type": "StringType",
-                          "StringType": {}
+                          "StringType": {
+                            "pattern": "dfs"
+                          }
                         },
                         "label": [
                           {

@@ -5,6 +5,7 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.NumberFieldType;
 import de.a12.studio.models.documentmodel.NumberTypeOptions;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -131,6 +132,11 @@ public class DataTypeNumberConfigurationPanelController extends AbstractProperty
     setFieldValue(maxValueField, options != null && options.getMaxValue() != null ? String.valueOf(options.getMaxValue()) : "");
     setFieldValue(maxIntegerDigitsField, options != null && options.getMaxIntegerDigits() != null ? String.valueOf(options.getMaxIntegerDigits()) : "");
     setFieldValue(unitComboBox, options != null ? options.getTrait() : null);
+  }
+
+  @Override
+  protected String validationProperty() {
+    return ElementProperty.DATA_TYPE;
   }
 
   private static void withNumberTypeOptions(Element element, Consumer<NumberTypeOptions> mutator) {

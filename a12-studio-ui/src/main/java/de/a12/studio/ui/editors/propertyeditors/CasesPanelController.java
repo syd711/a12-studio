@@ -1,9 +1,14 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.applicationmodel.Case;
 import de.a12.studio.models.applicationmodel.Scene;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.validators.application.ApplicationUniqueNamesValidator;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.applicationmodel.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -29,7 +34,9 @@ import java.util.Optional;
  * modal dialog), matching the SME reference's "Cases" table. Follows the same row-list pattern as {@link
  * SceneChangePanelController}'s onEnter/onExit tables. Isn't wired through {@link
  * de.a12.studio.ui.editors.AbstractPropertyEditor} for the same reason as {@link
- * MatchConditionsPanelController}.
+ * MatchConditionsPanelController}, but still gets its own {@code errorContainer} (queried directly via {@link
+ * de.a12.studio.modelsvalidation.ValidationService#validateElement}) to surface {@link
+ * ApplicationUniqueNamesValidator}'s case-name-uniqueness check, scoped to this panel's {@link #scene}.
  */
 public class CasesPanelController {
 
@@ -38,6 +45,9 @@ public class CasesPanelController {
 
   @FXML
   private Label emptyLabel;
+
+  @FXML
+  private ErrorContainerController errorContainerController;
 
   private Scene scene;
 
@@ -67,6 +77,7 @@ public class CasesPanelController {
   }
 
   private void rebuildRows() {
+    refreshNameUniquenessError();
     rows.getChildren().clear();
 
     List<Case> cases = scene.getCases();
@@ -76,6 +87,29 @@ public class CasesPanelController {
 
     for (int index = 0; index < cases.size(); index++) {
       rows.getChildren().add(createRow(cases.get(index), index, cases.size()));
+    }
+  }
+
+  /**
+   * Queries {@link ApplicationUniqueNamesValidator}'s dedicated case-name element id, scoped to this panel's
+   * {@link #scene}, directly against the current project's model, since this panel isn't an {@link
+   * de.a12.studio.ui.editors.AbstractPropertyEditor} and so has no access to its element-keyed validation
+   * plumbing. Called from {@link #rebuildRows} (itself called by every mutation here, plus {@link #setScene}).
+   */
+  private void refreshNameUniquenessError() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    A12Model<?> model = projectItem == null ? null : projectItem.getModel();
+    if (model == null) {
+      errorContainerController.hide();
+      return;
+    }
+    List<ModelValidationError> errors =
+        Studio.getValidationService().validateElement(model, ApplicationUniqueNamesValidator.casesElementId(scene.getName()));
+    if (errors.isEmpty()) {
+      errorContainerController.hide();
+    } else {
+      ModelValidationError error = errors.get(0);
+      errorContainerController.show(error.severity(), error.message());
     }
   }
 

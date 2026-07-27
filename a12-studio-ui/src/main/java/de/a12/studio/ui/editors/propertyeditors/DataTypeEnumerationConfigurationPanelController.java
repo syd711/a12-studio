@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.EnumerationTypeOptions;
 import de.a12.studio.models.documentmodel.EnumerationValue;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
@@ -92,6 +93,11 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     setFieldValue(alphabeticalSortingCheckBox, options != null && Boolean.TRUE.equals(options.getAlphabeticalSorting()));
     rebuildCategoryRows();
     rebuildEnumerationValuesGrid();
+  }
+
+  @Override
+  protected String validationProperty() {
+    return ElementProperty.DATA_TYPE;
   }
 
   @Override

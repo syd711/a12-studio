@@ -11,6 +11,7 @@ import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.documentmodel.TypeDefFieldType;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -49,34 +50,36 @@ public final class MissingReferenceValidator implements ModelValidator {
       if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
         String groupPath = index.getPath(groupElement);
         if (hasMissingIncludeReference(groupElement, context.otherDocumentModels())) {
-          result.add(error(model, groupElement.getId(), "Include with path '" + groupPath + "': Missing Include Reference"));
+          result.add(error(model, groupElement.getId(), ElementProperty.INCLUDE_REFERENCE,
+              "Include with path '" + groupPath + "': Missing Include Reference"));
         }
         if (hasMissingIndexField(groupElement, index)) {
-          result.add(error(model, groupElement.getId(), INDEX_FIELD_INVALID_MESSAGE));
+          result.add(error(model, groupElement.getId(), ElementProperty.GROUP_PROPERTIES, INDEX_FIELD_INVALID_MESSAGE));
         }
         for (Element duplicate : getElementsWithDuplicatedNames(groupElement)) {
-          result.add(error(model, duplicate.getId(), "Element with path '" + groupPath + "': Multiple Elements with same path"));
+          result.add(error(model, duplicate.getId(), ElementProperty.GENERAL,
+              "Element with path '" + groupPath + "': Multiple Elements with same path"));
         }
       } else if (element instanceof ComputationElement computation) {
         if (hasMissingComputedField(computation, index)) {
           String path = index.getPath(computation);
-          result.add(error(model, computation.getId(), "Computation with path '" + path + "': Missing Computed Field"));
+          result.add(error(model, computation.getId(), ElementProperty.GENERAL, "Computation with path '" + path + "': Missing Computed Field"));
         }
       } else if (element instanceof FieldElement field) {
         String path = index.getPath(field);
         if (hasTooFewEnumValues(field, index)) {
-          result.add(error(model, field.getId(), "Field with path '" + path + "': Enumeration must have at least two values"));
+          result.add(error(model, field.getId(), ElementProperty.DATA_TYPE, "Field with path '" + path + "': Enumeration must have at least two values"));
         }
         if (hasMissingTypeDef(field, index)) {
-          result.add(error(model, field.getId(), "Field with path '" + path + "': Missing Type Definition"));
+          result.add(error(model, field.getId(), ElementProperty.TYPE, "Field with path '" + path + "': Missing Type Definition"));
         }
       }
     }
     return result;
   }
 
-  private static ModelValidationError error(A12Model<?> model, String elementId, String message) {
-    return new ModelValidationError(model, elementId, message, Severity.ERROR.name());
+  private static ModelValidationError error(A12Model<?> model, String elementId, String property, String message) {
+    return new ModelValidationError(model, elementId, property, message, Severity.ERROR.name());
   }
 
   /**

@@ -8,6 +8,7 @@ import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -86,10 +87,11 @@ public class IncludePropertiesPanelController extends AbstractPropertyEditor imp
     setFieldValue(referenceComboBox, includeConfig != null ? includeConfig.getReference() : null);
     setFieldValue(excludeValidationRulesCheckBox, includeConfig != null && Boolean.TRUE.equals(includeConfig.getExcludeRules()));
     setFieldValue(excludeComputationRulesCheckBox, includeConfig != null && Boolean.TRUE.equals(includeConfig.getExcludeComputations()));
+  }
 
-    // Reflects a reference that became invalid elsewhere (e.g. the referenced model was deleted) as soon as
-    // this Include is selected.
-    refreshValidationState();
+  @Override
+  protected String validationProperty() {
+    return ElementProperty.INCLUDE_REFERENCE;
   }
 
   private static IncludeConfig includeConfig(@NonNull GroupConfig config) {

@@ -10,6 +10,7 @@ import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.StringTypeOptions;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.LocalesChangedEvent;
@@ -40,6 +41,11 @@ import java.util.function.Function;
  * {@link #model}, {@link #module} and {@link #sceneCase} are mutually exclusive.
  */
 public class LocalizedTextPanelController extends AbstractPropertyEditor implements StudioEventListener {
+
+  // The fieldKey passed to configure() by configureErrorMessages(), reused in validationProperty() so only
+  // an instance actually configured as the error-messages panel claims that error, not every reuse of this
+  // controller (label, descriptions, helper text) that happens to share the bound element.
+  private static final String FIELD_KEY_ERROR_MESSAGES = "errorMessages";
 
   @FXML
   private GridPane localesGrid;
@@ -72,8 +78,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   }
 
   public void configureErrorMessages() {
-    configure(LocalizedTextPanelController::getErrorMessages, LocalizedTextPanelController::getOrCreateErrorMessages, "errorMessages",
-        "ERROR MESSAGES");
+    configure(LocalizedTextPanelController::getErrorMessages, LocalizedTextPanelController::getOrCreateErrorMessages,
+        FIELD_KEY_ERROR_MESSAGES, "ERROR MESSAGES");
   }
 
   public void configureExternal() {
@@ -135,6 +141,11 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
     super.setElement(element);
     buildLocaleFields();
     populateLocaleFields();
+  }
+
+  @Override
+  protected String validationProperty() {
+    return FIELD_KEY_ERROR_MESSAGES.equals(fieldKey) ? ElementProperty.ERROR_MESSAGE : null;
   }
 
   public void setModel(@NonNull A12Model<?> model) {

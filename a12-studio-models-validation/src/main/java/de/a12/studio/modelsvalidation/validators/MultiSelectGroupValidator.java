@@ -10,6 +10,7 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -41,12 +42,13 @@ public final class MultiSelectGroupValidator implements ModelValidator {
       }
       Integer repeatability = group.getRepeatability();
       if (repeatability == null || repeatability <= 1) {
-        errors.add(error(model, groupElement.getId(), "The multi-select group [" + groupElement.getName() + "] must be repeatable."));
+        errors.add(error(model, groupElement.getId(), ElementProperty.GROUP_PROPERTIES,
+            "The multi-select group [" + groupElement.getName() + "] must be repeatable."));
       }
       List<FieldElement> fieldsInGroup = group.getElements() == null ? List.of()
           : group.getElements().stream().filter(FieldElement.class::isInstance).map(FieldElement.class::cast).toList();
       if (fieldsInGroup.size() != 1) {
-        errors.add(error(model, groupElement.getId(),
+        errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL,
             "In the multi-select group [" + groupElement.getName() + "], there must be only one field."));
       } else {
         checkMultiSelectField(model, groupElement, group, fieldsInGroup.get(0), index, errors);
@@ -54,7 +56,7 @@ public final class MultiSelectGroupValidator implements ModelValidator {
       boolean otherElementsPresent = group.getElements() != null
           && group.getElements().stream().anyMatch(e -> !(e instanceof FieldElement) && !(e instanceof RuleElement));
       if (otherElementsPresent) {
-        errors.add(error(model, groupElement.getId(),
+        errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL,
             "Besides rules and one field, other elements are not allowed in the multi-select group [" + groupElement.getName() + "]."));
       }
     }
@@ -64,21 +66,21 @@ public final class MultiSelectGroupValidator implements ModelValidator {
   private static void checkMultiSelectField(A12Model<?> model, GroupElement groupElement, GroupConfig group, FieldElement field,
       ElementIndex index, List<ModelValidationError> errors) {
     if (field.getField() == null || field.getField().getRequirednessConfig() == null) {
-      errors.add(error(model, field.getId(),
+      errors.add(error(model, field.getId(), ElementProperty.TYPE,
           "The field [" + field.getName() + "] in the multi-select group [" + groupElement.getName() + "] must be marked as required."));
     }
     if (field.getName() != null && field.getName().equals(group.getIndexFieldName())) {
-      errors.add(error(model, field.getId(), "The field [" + field.getName() + "] in the multi-select group [" + groupElement.getName()
-          + "] may not be defined as index field."));
+      errors.add(error(model, field.getId(), ElementProperty.GENERAL, "The field [" + field.getName() + "] in the multi-select group ["
+          + groupElement.getName() + "] may not be defined as index field."));
     }
     FieldType effectiveType = field.getField() == null ? null : index.effectiveFieldType(field.getField().getFieldType());
     if (!(effectiveType instanceof EnumerationFieldType) && !(effectiveType instanceof StringFieldType)) {
-      errors.add(error(model, field.getId(), "The field [" + field.getName() + "] in the multi-select group [" + groupElement.getName()
-          + "] must be an enumeration or a string."));
+      errors.add(error(model, field.getId(), ElementProperty.TYPE, "The field [" + field.getName() + "] in the multi-select group ["
+          + groupElement.getName() + "] must be an enumeration or a string."));
     }
   }
 
-  private static ModelValidationError error(A12Model<?> model, String elementId, String message) {
-    return new ModelValidationError(model, elementId, message, Severity.ERROR.name());
+  private static ModelValidationError error(A12Model<?> model, String elementId, String property, String message) {
+    return new ModelValidationError(model, elementId, property, message, Severity.ERROR.name());
   }
 }

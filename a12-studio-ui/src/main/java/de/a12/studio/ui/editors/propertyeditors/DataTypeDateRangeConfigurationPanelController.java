@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DateRangeFieldType;
 import de.a12.studio.models.documentmodel.DateRangeTypeOptions;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -80,6 +81,11 @@ public class DataTypeDateRangeConfigurationPanelController extends AbstractPrope
     }
 
     setFieldValue(formatComboBox, format);
+  }
+
+  @Override
+  protected String validationProperty() {
+    return ElementProperty.DATA_TYPE;
   }
 
   private static void withDateRangeTypeOptions(Element element, Consumer<DateRangeTypeOptions> mutator) {

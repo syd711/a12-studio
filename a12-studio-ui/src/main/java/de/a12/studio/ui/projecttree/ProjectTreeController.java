@@ -86,29 +86,43 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   }
 
   /**
-   * Revalidates and redraws the tree node for {@code model} only, leaving every other node untouched. Use
-   * this instead of {@link #modelSaved}/{@link #modelDeleted}'s full-project revalidation + {@link
-   * TreeView#refresh()} when a change is known to be local to a single model (e.g. it can't affect any other
-   * document's cross-reference validation), since {@code refresh()} rebuilds every visible cell.
+   * Revalidates {@code model} plus every other model in the project, and redraws the tree row for any of
+   * them whose error set actually changed as a result - not just {@code model}'s own row. Several validators
+   * consult other documents' content (see {@link de.a12.studio.modelsvalidation.ValidationContext#otherDocumentModels()}/
+   * {@link de.a12.studio.modelsvalidation.ValidationContext#otherModels()}, e.g. an Include reference, a
+   * Relationship/Form/Print/Tree/MasterDetail document reference, or a project-wide check like duplicate
+   * model ids), so fixing (or introducing) an error in one document can change what's reported against a
+   * completely different one. There's no cheap way to know in advance which other models actually reference
+   * {@code model} without re-running their validators, so this simply revalidates all of them - the {@code
+   * errors.equals(previous)} check below still means only rows whose result actually changed get a new
+   * {@link ProjectItemViewModel} (and thus redraw); every other row is left untouched, unlike {@link
+   * TreeView#refresh()}, which would rebuild every visible cell regardless of whether anything in it changed.
    */
   public void refreshNode(@NonNull A12Model<?> model) {
-    if (project == null) {
+    if (project == null || findTreeItem(projectTree.getRoot(), model) == null) {
       return;
     }
 
-    TreeItem<ProjectItemViewModel> treeItem = findTreeItem(projectTree.getRoot(), model);
-    if (treeItem == null) {
-      return;
+    List<ProjectItem> modelItems = new ArrayList<>();
+    collectModelItems(project.getRoot(), modelItems);
+    for (ProjectItem item : modelItems) {
+      refreshItemIfChanged(item);
     }
+  }
 
-    ProjectItem projectItem = treeItem.getValue().getProjectItem();
+  private void refreshItemIfChanged(@NonNull ProjectItem projectItem) {
     List<ModelValidationError> errors;
     try {
-      errors = Studio.getValidationService().validate(model);
+      errors = Studio.getValidationService().validate(projectItem.getModel());
     }
     catch (Exception e) {
       log.warn("Failed to validate '{}': {}", projectItem.getPath(), e.getMessage(), e);
-      errors = List.of(new ModelValidationError(model, null, "Failed to parse document: " + e.getMessage(), "ERROR"));
+      errors = List.of(new ModelValidationError(projectItem.getModel(), null, "Failed to parse document: " + e.getMessage(), "ERROR"));
+    }
+
+    List<ModelValidationError> previous = validationErrorsByPath.getOrDefault(projectItem.getPath(), List.of());
+    if (errors.equals(previous)) {
+      return;
     }
 
     if (errors.isEmpty()) {
@@ -116,6 +130,11 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
     else {
       validationErrorsByPath.put(projectItem.getPath(), errors);
+    }
+
+    TreeItem<ProjectItemViewModel> treeItem = findTreeItem(projectTree.getRoot(), projectItem.getModel());
+    if (treeItem == null) {
+      return;
     }
 
     // TreeView has no API to redraw a single row. TreeItem.setValue() only notifies the cell when the new

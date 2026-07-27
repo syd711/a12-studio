@@ -159,6 +159,11 @@ public class SceneChangePanelController {
 
     Label typeLabel = new Label(directive.getType() != null ? directive.getType().getValue() : "");
     typeLabel.setPrefWidth(110.0);
+    typeLabel.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        editDirective(directives, directive);
+      }
+    });
 
     Label regionLabel = new Label(String.join(", ", directive.getRegion()));
     regionLabel.setMaxWidth(Double.MAX_VALUE);

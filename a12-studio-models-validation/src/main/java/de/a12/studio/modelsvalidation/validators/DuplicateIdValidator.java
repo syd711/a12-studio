@@ -3,6 +3,7 @@ package de.a12.studio.modelsvalidation.validators;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -36,7 +37,7 @@ public final class DuplicateIdValidator implements ModelValidator {
       if (elements.size() > 1) {
         String elementPaths = elements.stream().map(index::getPath).reduce((a, b) -> a + ", " + b).orElse("");
         for (Element element : elements) {
-          errors.add(new ModelValidationError(model, element.getId(),
+          errors.add(new ModelValidationError(model, element.getId(), ElementProperty.GENERAL,
               "The id [" + id + "] of element on path '" + index.getPath(element) + "' is not unique: Used by [" + elementPaths + "].",
               Severity.ERROR.name()));
         }

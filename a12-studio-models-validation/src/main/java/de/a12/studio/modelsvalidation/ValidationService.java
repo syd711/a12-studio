@@ -66,9 +66,15 @@ public class ValidationService {
     };
   }
 
-  /** The single problem reported against {@code elementId} in {@code model}, if any. */
-  public Optional<ModelValidationError> validateElement(A12Model<?> model, String elementId) {
-    return validate(model).stream().filter(error -> elementId.equals(error.elementId())).findFirst();
+  /**
+   * Every problem reported against {@code elementId} in {@code model}. A single element can accumulate
+   * several simultaneous, unrelated problems (e.g. its name is a duplicate AND its pattern error text is
+   * missing), each tagged with a different {@link ModelValidationError#property()} for a different property
+   * editor panel to claim (see {@link de.a12.studio.ui.editors.AbstractPropertyEditor#validationProperty()}
+   * in the UI module), so callers must not assume only the first result matters.
+   */
+  public List<ModelValidationError> validateElement(A12Model<?> model, String elementId) {
+    return validate(model).stream().filter(error -> elementId.equals(error.elementId())).toList();
   }
 
   /**

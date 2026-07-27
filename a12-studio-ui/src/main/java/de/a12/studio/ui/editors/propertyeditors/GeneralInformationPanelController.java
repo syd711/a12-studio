@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -74,6 +75,16 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor {
     setFieldValue(nameField, element.getName());
     idField.setText(element.getId());
     updatePathField(element.getName());
+  }
+
+  /**
+   * This panel is present on every element type's editor (field, group, include, attachment, rule,
+   * computation), so it doubles as the fallback home for structural element-level errors that have no more
+   * specific panel of their own (e.g. a duplicate id, or an attachment group missing a required field).
+   */
+  @Override
+  protected String validationProperty() {
+    return ElementProperty.GENERAL;
   }
 
   private void updatePathField(String name) {
