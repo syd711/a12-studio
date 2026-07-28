@@ -20,3 +20,4 @@ config/*.properties
 /a12-studio-ui/*log
 /testing/basic/logs/previewapp-server.log
 /testing/basic/bundled/seed.tar.gz
+/a12-studio-ui/config/settings.properties
