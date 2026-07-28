@@ -266,7 +266,7 @@ public class ContentModelEditorController extends AbstractEditorController imple
 
   private void commitChange() {
     projectItem.save();
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   @Override

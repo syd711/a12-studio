@@ -47,8 +47,14 @@ public class TabPaneController implements Initializable, StudioEventListener {
       Tab tabToSelect = null;
       for (String path : event.getProject().getSettings().getUISettings().getOpenedFiles()) {
         File file = new File(path);
-        if (file.exists()) {
-          open(new ProjectItem(file));
+        // Resolved through the project's own tree (rather than a fresh `new ProjectItem(file)`) so this
+        // shares the exact same ProjectItem/model instance as the rest of the UI, e.g. ProjectTreeController's
+        // tree - which looks up nodes by model reference equality when revalidating after a save, and would
+        // otherwise never find a match for edits made through a restored tab, permanently missing its
+        // validation-error updates.
+        ProjectItem item = file.exists() ? project.getRoot().findByPath(path) : null;
+        if (item != null) {
+          open(item);
           if (path.equals(selectedFile)) {
             tabToSelect = tabPane.getTabs().get(tabPane.getTabs().size() - 1);
           }

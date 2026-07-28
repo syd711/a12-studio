@@ -91,7 +91,8 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
     else if (ke.getCode() == KeyCode.S && ke.isControlDown()) {
       ProjectItem projectItem = Studio.getSelectedProjectItem();
       if (projectItem != null) {
-        StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+        projectItem.save();
+        StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
       }
       ke.consume();
     }

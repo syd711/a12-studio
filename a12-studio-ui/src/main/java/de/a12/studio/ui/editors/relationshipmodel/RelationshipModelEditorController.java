@@ -314,7 +314,7 @@ public class RelationshipModelEditorController extends AbstractEditorController 
 
   private void commitChange() {
     projectItem.save();
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   @Override

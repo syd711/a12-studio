@@ -189,6 +189,36 @@ public class ProjectItem {
     return null;
   }
 
+  /**
+   * Searches the whole project tree (from the root, regardless of where {@code this} sits in it) for the
+   * item whose {@link #getPath()} matches {@code path}, returning the exact same instance the tree already
+   * holds rather than a freshly-parsed duplicate. Callers that need to bind a {@link ProjectItem} from a
+   * stored path (e.g. restoring previously-open tabs) must use this instead of constructing a {@code new
+   * ProjectItem(file)} - a second, independent instance for the same file would carry its own {@link #model},
+   * so edits made against it would never be reflected in the (unrelated) instance the rest of the UI - e.g.
+   * the project tree's validation state - is watching.
+   */
+  public ProjectItem findByPath(String path) {
+    ProjectItem root = this;
+    while (root.parent != null) {
+      root = root.parent;
+    }
+    return root.findDescendantByPath(path);
+  }
+
+  private ProjectItem findDescendantByPath(String path) {
+    if (!isFolder()) {
+      return getPath().equals(path) ? this : null;
+    }
+    for (ProjectItem child : getChildren()) {
+      ProjectItem found = child.findDescendantByPath(path);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
+
   public boolean isAncestorOf(ProjectItem other) {
     for (ProjectItem current = other.parent; current != null; current = current.parent) {
       if (current.equals(this)) {

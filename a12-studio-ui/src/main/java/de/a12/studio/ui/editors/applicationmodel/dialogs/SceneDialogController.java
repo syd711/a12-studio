@@ -137,7 +137,7 @@ public class SceneDialogController implements DialogController {
       ProjectItem projectItem = Studio.getSelectedProjectItem();
       if (projectItem != null) {
         projectItem.save();
-        StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+        StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
       }
     }
     stage.close();

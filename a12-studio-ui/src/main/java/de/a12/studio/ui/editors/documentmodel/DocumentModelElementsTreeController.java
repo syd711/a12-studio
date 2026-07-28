@@ -159,7 +159,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     commandStack.undo();
     updateUndoRedoState();
     applyFilter(searchController.getText());
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    projectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   @FXML
@@ -167,7 +168,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     commandStack.redo();
     updateUndoRedoState();
     applyFilter(searchController.getText());
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    projectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   private void updateUndoRedoState() {
@@ -370,7 +372,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
     updateUndoRedoState();
     applyFilter(searchController.getText());
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    projectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   private List<TreeItem<ElementViewModel>> topLevelSelection(@NonNull List<TreeItem<ElementViewModel>> selection) {
@@ -459,7 +462,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     updateUndoRedoState();
     applyFilter(searchController.getText());
     selectElement(newElement);
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    projectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   /**
@@ -498,7 +502,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     updateUndoRedoState();
     applyFilter(searchController.getText());
     selectElement(newElement);
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    projectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   /**

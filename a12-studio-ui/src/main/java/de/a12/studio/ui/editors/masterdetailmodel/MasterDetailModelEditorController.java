@@ -9,7 +9,6 @@ import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -184,7 +183,7 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
 
   private void commitChange() {
     projectItem.save();
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   @Override

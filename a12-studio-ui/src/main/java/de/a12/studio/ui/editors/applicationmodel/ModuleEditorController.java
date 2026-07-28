@@ -118,6 +118,6 @@ public class ModuleEditorController implements Initializable {
       return;
     }
     projectItem.save();
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 }

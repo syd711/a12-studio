@@ -25,7 +25,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -442,7 +441,7 @@ public class TreeModelEditorController extends AbstractEditorController implemen
 
   private void commitChange() {
     projectItem.save();
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   @Override

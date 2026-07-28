@@ -4,7 +4,6 @@ import de.a12.studio.models.auth.AuthDocument;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.EditorFileToolbarButtonsController;
 import de.a12.studio.ui.events.ModelClosedEvent;
-import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
@@ -40,11 +39,6 @@ abstract public class AbstractAuthFileEditorController implements StudioEventLis
   private void onReload() {
     projectItem.reload();
     this.loadDocument(projectItem.getAuthDocument());
-  }
-
-  @Override
-  public void modelSaved(@NonNull ModelSaveEvent event) {
-    this.save();
   }
 
   @Override

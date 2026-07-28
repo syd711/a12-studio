@@ -321,7 +321,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
     }
     saveMode.commit(projectItem);
     applyValidationResult(field, validateElement(projectItem));
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   /**
@@ -341,7 +341,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
     List<ModelValidationError> errors = validateElement(projectItem);
     showValidationError(ownError(errors).orElse(null));
     StudioEventManager.getInstance().fireElementValidatedEvent(element.getId(), errors.isEmpty() ? null : errors.get(0));
-    StudioEventManager.getInstance().fireModelSaveEvent(projectItem);
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
   /**
