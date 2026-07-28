@@ -54,7 +54,7 @@ public class RegionPanelController extends AbstractPropertyEditor implements Ini
       }
       getOrCreateRegion().setName(newValue);
       refreshNameUniquenessError();
-      debouncer.debounce(regionCombo.getId(), this::commitChange, COMMIT_DEBOUNCE_MS, true);
+      debouncer.debounce(regionCombo.getId(), this::commitHeaderChange, COMMIT_DEBOUNCE_MS, true);
     });
   }
 

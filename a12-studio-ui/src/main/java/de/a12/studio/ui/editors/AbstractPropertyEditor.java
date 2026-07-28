@@ -350,6 +350,27 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   }
 
   /**
+   * Same as {@link #commitChange()} but for "model header" panels (e.g. {@link
+   * de.a12.studio.ui.editors.propertyeditors.RegionPanelController}, {@link
+   * de.a12.studio.ui.editors.propertyeditors.LayoutPanelController}) that edit part of a model not tied to a
+   * single {@link Element}, so {@code this.element} is never set and the plain {@link #commitChange()} would
+   * save the file but then bail out of its {@code element == null} check before firing {@link
+   * StudioEventManager#fireModelSavedEvent}. Without that event, {@code ProjectTreeController} never
+   * revalidates the project, so a project-item error banner can go stale even after the panel's own error
+   * container (managed directly via {@link #showError}/{@link #hideError}) has already updated. Callers still
+   * own their own validation/error-container display; this only handles the save and the project-wide
+   * revalidation notification.
+   */
+  protected void commitHeaderChange() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem == null) {
+      return;
+    }
+    saveMode.commit(projectItem);
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
+  }
+
+  /**
    * Re-validates the currently bound element against the model's current state and reflects the result in
    * this panel's error container, without saving. Unlike {@link #commitChange}, this isn't triggered by an
    * edit in one of this panel's own fields, so it's what makes validation problems caused by changes made

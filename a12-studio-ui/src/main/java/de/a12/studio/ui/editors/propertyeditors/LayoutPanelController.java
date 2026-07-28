@@ -90,7 +90,7 @@ public class LayoutPanelController extends AbstractPropertyEditor implements Ini
     hideError();
     getOrCreateLayout().setSettings(parsed);
 
-    debouncer.debounce(settingsArea.getId(), this::commitChange, COMMIT_DEBOUNCE_MS, true);
+    debouncer.debounce(settingsArea.getId(), this::commitHeaderChange, COMMIT_DEBOUNCE_MS, true);
   }
 
   private Layout getLayout() {
