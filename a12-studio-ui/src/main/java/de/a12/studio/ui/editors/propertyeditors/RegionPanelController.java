@@ -8,6 +8,7 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.application.ApplicationUniqueNamesValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.util.Debouncer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -20,32 +21,52 @@ import java.util.ResourceBundle;
 /**
  * Edits {@link ApplicationModelContent#getRegion()}'s name, the application model's top-level region. Not bound
  * to a single {@link Element} (the region lives on the model's content), so it follows the model-header pattern
- * used by e.g. {@link LayoutPanelController}.
+ * used by e.g. {@link LayoutPanelController}. The name needs its own uniqueness error, which {@link
+ * #bindComboBox} would clobber on every commit (it always clears the error container for header panels, see
+ * {@link AbstractPropertyEditor#commitChange(javafx.scene.Node)}), so {@link #regionCombo} is wired manually
+ * instead, following {@link SupportedCharactersPanelController}.
  */
 public class RegionPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final List<String> REGIONS = List.of("APP", "CONTENT", "SIDEBAR", "MODAL");
+
+  private static final int COMMIT_DEBOUNCE_MS = 150;
+
+  private final Debouncer debouncer = new Debouncer();
 
   @FXML
   private ComboBox<String> regionCombo;
 
   private ApplicationModel model;
 
+  // Set while setModel() is repopulating regionCombo from the model, so the listener below doesn't mistake
+  // that programmatic change for a user edit and write it straight back.
+  private boolean updatingFromModel;
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
     regionCombo.getItems().addAll(REGIONS);
 
-    bindComboBox(regionCombo, (element, value) -> {
-      getOrCreateRegion().setName(value);
+    regionCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      getOrCreateRegion().setName(newValue);
       refreshNameUniquenessError();
+      debouncer.debounce(regionCombo.getId(), this::commitChange, COMMIT_DEBOUNCE_MS, true);
     });
   }
 
   public void setModel(@NonNull ApplicationModel model) {
     this.model = model;
     Region region = getRegion();
-    setFieldValue(regionCombo, region != null ? region.getName() : null);
+    updatingFromModel = true;
+    try {
+      regionCombo.setValue(region != null ? region.getName() : null);
+    } finally {
+      updatingFromModel = false;
+    }
     refreshNameUniquenessError();
   }
 

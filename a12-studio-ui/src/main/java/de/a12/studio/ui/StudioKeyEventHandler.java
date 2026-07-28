@@ -4,6 +4,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.updater.Dialogs;
+import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.StudioVersion;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
@@ -14,7 +15,8 @@ import java.util.List;
 
 /**
  * Global keyboard shortcuts for the main studio window: saving the active model, resizing the
- * window to fixed presets, and opening the release notes dialog.
+ * window to fixed presets, snapping/maximizing the window with Win+arrow keys, and opening the
+ * release notes dialog.
  */
 public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
 
@@ -34,17 +36,46 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut("Ctrl+Shift+F", "Find in files"),
       new Shortcut("Ctrl+Alt+U", "Show update info"),
       new Shortcut("Ctrl+Alt+H", "Resize window to 1920x1080"),
-      new Shortcut("Ctrl+Alt+W", "Resize window to 2560x1440")
+      new Shortcut("Ctrl+Alt+W", "Resize window to 2560x1440"),
+      new Shortcut("Win+Left", "Snap window to the left half of the screen"),
+      new Shortcut("Win+Right", "Snap window to the right half of the screen"),
+      new Shortcut("Win+Up", "Maximize the window"),
+      new Shortcut("Win+Down", "Restore, then minimize the window")
   );
 
   private final Stage stage;
 
+  // the Windows key isn't reported as a modifier (like Ctrl/Alt/Shift) on KeyEvent, so its
+  // pressed state has to be tracked manually across KEY_PRESSED/KEY_RELEASED events
+  private boolean windowsKeyDown;
+
   public StudioKeyEventHandler(Stage stage) {
     this.stage = stage;
+    stage.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+      if (!isFocused) {
+        windowsKeyDown = false;
+      }
+    });
   }
 
   @Override
   public void handle(KeyEvent ke) {
+    if (ke.getEventType() == KeyEvent.KEY_RELEASED) {
+      if (ke.getCode() == KeyCode.WINDOWS) {
+        windowsKeyDown = false;
+      }
+      return;
+    }
+
+    if (ke.getCode() == KeyCode.WINDOWS) {
+      windowsKeyDown = true;
+      return;
+    }
+
+    if (windowsKeyDown && handleWindowsArrowShortcut(ke)) {
+      return;
+    }
+
     if (ke.getCode() == KeyCode.U && ke.isAltDown() && ke.isControlDown()) {
       Dialogs.openUpdateInfoDialog(StudioVersion.get());
       ke.consume();
@@ -88,6 +119,30 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       FileSearchDialogController.show(stage, Studio.getCurrentProject(), FileSearchDialogController.SearchMode.FIND_IN_FILES);
       ke.consume();
     }
+  }
+
+  /**
+   * Handles Win+Left/Right/Up/Down the same way a regular (decorated) Windows app would via
+   * Aero Snap. Returns true if the key was handled and consumed.
+   */
+  private boolean handleWindowsArrowShortcut(KeyEvent ke) {
+    if (!(stage.getUserData() instanceof FXResizeHelper helper)) {
+      return false;
+    }
+
+    // Windows sometimes drops the extended-key flag on Win+Arrow combos, which makes the OS
+    // report the dedicated arrow keys as their numpad (KP_*) equivalents instead - handle both.
+    switch (ke.getCode()) {
+      case LEFT, KP_LEFT -> helper.snapLeft();
+      case RIGHT, KP_RIGHT -> helper.snapRight();
+      case UP, KP_UP -> helper.maximize();
+      case DOWN, KP_DOWN -> helper.restoreOrMinimize();
+      default -> {
+        return false;
+      }
+    }
+    ke.consume();
+    return true;
   }
 
   private void resize(double width, double height) {

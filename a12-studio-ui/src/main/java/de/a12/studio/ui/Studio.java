@@ -58,7 +58,11 @@ public class Studio extends Application implements StudioEventListener {
     }
 
     Scene scene = new Scene(root, width, height, Color.TRANSPARENT);
-    scene.addEventHandler(KeyEvent.KEY_PRESSED, new StudioKeyEventHandler(stage));
+    StudioKeyEventHandler keyEventHandler = new StudioKeyEventHandler(stage);
+    scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
+    // also listen for KEY_RELEASED so StudioKeyEventHandler can track when the Windows key
+    // (Win+arrow window snapping) is released, since it isn't reported as a KeyEvent modifier
+    scene.addEventHandler(KeyEvent.KEY_RELEASED, keyEventHandler);
     stage.setTitle("A12 Studio");
     stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-180.png")));
     stage.setScene(scene);

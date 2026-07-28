@@ -86,17 +86,14 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   }
 
   /**
-   * Revalidates {@code model} plus every other model in the project, and redraws the tree row for any of
-   * them whose error set actually changed as a result - not just {@code model}'s own row. Several validators
-   * consult other documents' content (see {@link de.a12.studio.modelsvalidation.ValidationContext#otherDocumentModels()}/
+   * Revalidates {@code model} plus every other model in the project, and redraws the tree if any of their
+   * error sets actually changed as a result - not just {@code model}'s own. Several validators consult other
+   * documents' content (see {@link de.a12.studio.modelsvalidation.ValidationContext#otherDocumentModels()}/
    * {@link de.a12.studio.modelsvalidation.ValidationContext#otherModels()}, e.g. an Include reference, a
    * Relationship/Form/Print/Tree/MasterDetail document reference, or a project-wide check like duplicate
    * model ids), so fixing (or introducing) an error in one document can change what's reported against a
    * completely different one. There's no cheap way to know in advance which other models actually reference
-   * {@code model} without re-running their validators, so this simply revalidates all of them - the {@code
-   * errors.equals(previous)} check below still means only rows whose result actually changed get a new
-   * {@link ProjectItemViewModel} (and thus redraw); every other row is left untouched, unlike {@link
-   * TreeView#refresh()}, which would rebuild every visible cell regardless of whether anything in it changed.
+   * {@code model} without re-running their validators, so this simply revalidates all of them.
    */
   public void refreshNode(@NonNull A12Model<?> model) {
     if (project == null || findTreeItem(projectTree.getRoot(), model) == null) {
@@ -105,12 +102,24 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
     List<ProjectItem> modelItems = new ArrayList<>();
     collectModelItems(project.getRoot(), modelItems);
+    boolean changed = false;
     for (ProjectItem item : modelItems) {
-      refreshItemIfChanged(item);
+      changed |= refreshItemIfChanged(item);
+    }
+
+    // TreeView has no API to redraw a single row: TreeItem.setValue() fires TreeItem.valueChangedEvent(),
+    // but TreeView's internal listener only reacts to events that derive from
+    // TreeItem.expandedItemCountChangeEvent() (structural changes - children added/removed, branch
+    // expanded/collapsed), so a plain value change is silently ignored and never triggers a layout pass or
+    // re-invokes TreeCell.updateItem(). TreeView#refresh() is the only reliable way to get changed rows
+    // redrawn, so it's used here - but only when something actually changed, to avoid rebuilding every
+    // visible cell on every keystroke.
+    if (changed) {
+      projectTree.refresh();
     }
   }
 
-  private void refreshItemIfChanged(@NonNull ProjectItem projectItem) {
+  private boolean refreshItemIfChanged(@NonNull ProjectItem projectItem) {
     List<ModelValidationError> errors;
     try {
       errors = Studio.getValidationService().validate(projectItem.getModel());
@@ -122,7 +131,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
     List<ModelValidationError> previous = validationErrorsByPath.getOrDefault(projectItem.getPath(), List.of());
     if (errors.equals(previous)) {
-      return;
+      return false;
     }
 
     if (errors.isEmpty()) {
@@ -131,17 +140,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     else {
       validationErrorsByPath.put(projectItem.getPath(), errors);
     }
-
-    TreeItem<ProjectItemViewModel> treeItem = findTreeItem(projectTree.getRoot(), projectItem.getModel());
-    if (treeItem == null) {
-      return;
-    }
-
-    // TreeView has no API to redraw a single row. TreeItem.setValue() only notifies the cell when the new
-    // value is a different object (it's a plain reference-equality check), so re-setting the same
-    // ProjectItemViewModel would silently no-op - a fresh wrapper around the same ProjectItem/map is required
-    // to trigger the row's updateItem().
-    treeItem.setValue(new ProjectItemViewModel(projectItem, validationErrorsByPath));
+    return true;
   }
 
   private void collectModelItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {

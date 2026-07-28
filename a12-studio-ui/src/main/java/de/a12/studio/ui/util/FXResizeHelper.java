@@ -2,6 +2,7 @@ package de.a12.studio.ui.util;
 
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
@@ -34,6 +35,12 @@ public class FXResizeHelper {
   private boolean verticalOnly;
 
   private Object userData;
+
+  // tracks how the stage's geometry was last set, so keyboard/mouse maximize, snap, and
+  // restore actions agree on where "restore" should return the stage to
+  private enum WindowState { NORMAL, MAXIMIZED, SNAPPED_LEFT, SNAPPED_RIGHT }
+
+  private WindowState windowState = WindowState.NORMAL;
 
 
   public static void install(Stage stage, int dt, int rt) {
@@ -123,12 +130,10 @@ public class FXResizeHelper {
       if (height > 0) {
         STAGE.setHeight(height);
       }
+      windowState = WindowState.NORMAL;
     }
     else {
-      mXStore = STAGE.getX();
-      mYStore = STAGE.getY();
-      mWidthStore = STAGE.getWidth();
-      mHeightStore = STAGE.getHeight();
+      storeNormalGeometry();
 
       if (screen.equals(Screen.getPrimary())) {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -151,8 +156,81 @@ public class FXResizeHelper {
       if (screen.getVisualBounds().getHeight() > 0) {
         STAGE.setHeight(screen.getVisualBounds().getHeight());
       }
+      windowState = WindowState.MAXIMIZED;
     }
     return !mIsMaximized;
+  }
+
+  /**
+   * Maximizes the stage to fill the current screen's visual bounds, mirroring the OS Win+Up
+   * shortcut. No-op if already maximized.
+   */
+  public void maximize() {
+    if (windowState == WindowState.MAXIMIZED) {
+      return;
+    }
+    storeNormalGeometry();
+
+    Rectangle2D bounds = getScreen(STAGE).getVisualBounds();
+    STAGE.setX(bounds.getMinX());
+    STAGE.setY(bounds.getMinY());
+    STAGE.setWidth(bounds.getWidth());
+    STAGE.setHeight(bounds.getHeight());
+    windowState = WindowState.MAXIMIZED;
+  }
+
+  /**
+   * Snaps the stage to the left half of the current screen, mirroring the OS Win+Left shortcut.
+   */
+  public void snapLeft() {
+    snap(true);
+  }
+
+  /**
+   * Snaps the stage to the right half of the current screen, mirroring the OS Win+Right shortcut.
+   */
+  public void snapRight() {
+    snap(false);
+  }
+
+  private void snap(boolean left) {
+    storeNormalGeometry();
+
+    Rectangle2D bounds = getScreen(STAGE).getVisualBounds();
+    // the stage can't shrink below its min width, so on screens where a true half would be
+    // narrower than that, fall back to the min width and keep the window flush with its edge
+    double width = Math.min(Math.max(bounds.getWidth() / 2, STAGE.getMinWidth()), bounds.getWidth());
+
+    STAGE.setY(bounds.getMinY());
+    STAGE.setHeight(bounds.getHeight());
+    STAGE.setWidth(width);
+    STAGE.setX(left ? bounds.getMinX() : bounds.getMaxX() - width);
+    windowState = left ? WindowState.SNAPPED_LEFT : WindowState.SNAPPED_RIGHT;
+  }
+
+  /**
+   * Mirrors the OS Win+Down shortcut: restores a maximized/snapped stage to its previous bounds,
+   * or minimizes it if it's already at its normal (non-maximized, non-snapped) size.
+   */
+  public void restoreOrMinimize() {
+    if (windowState == WindowState.NORMAL) {
+      minimize();
+      return;
+    }
+    STAGE.setX(mXStore);
+    STAGE.setY(mYStore);
+    STAGE.setWidth(mWidthStore);
+    STAGE.setHeight(mHeightStore);
+    windowState = WindowState.NORMAL;
+  }
+
+  private void storeNormalGeometry() {
+    if (windowState == WindowState.NORMAL) {
+      mXStore = STAGE.getX();
+      mYStore = STAGE.getY();
+      mWidthStore = STAGE.getWidth();
+      mHeightStore = STAGE.getHeight();
+    }
   }
 
   private void createListener() {
@@ -264,6 +342,9 @@ public class FXResizeHelper {
     SCENE.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
       EventHandler<MouseEvent> handler = LISTENER.get(SCENE.getCursor());
       if (handler != null) {
+        // a manual move/resize makes the geometry user-defined again, so a later restore
+        // shouldn't jump back to a stale maximized/snapped position
+        windowState = WindowState.NORMAL;
         handler.handle(event);
       }
     });

@@ -12,6 +12,7 @@ import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preferences.PreferencesController;
 import de.a12.studio.ui.projecttree.ProjectTreeController;
 import de.a12.studio.ui.tabs.TabPaneController;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,6 +20,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -107,10 +109,20 @@ public class RootController implements Initializable, StudioEventListener {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("preferences/scene-preferences.fxml"));
       Parent preferencesRoot = loader.load();
       PreferencesController controller = loader.getController();
-      controller.setOnCloseRequested(() -> rootStack.getChildren().remove(preferencesRoot));
+      controller.setOnCloseRequested(() -> {
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(200), preferencesRoot);
+        fadeOut.setToValue(0);
+        fadeOut.setOnFinished(e -> rootStack.getChildren().remove(preferencesRoot));
+        fadeOut.play();
+      });
       controller.setProjectOpen(project != null);
       controller.showSection(event.getSection());
+
+      preferencesRoot.setOpacity(0);
       rootStack.getChildren().add(preferencesRoot);
+      FadeTransition fadeIn = new FadeTransition(Duration.millis(200), preferencesRoot);
+      fadeIn.setToValue(1);
+      fadeIn.play();
     }
     catch (IOException e) {
       throw new IllegalStateException("Could not load preferences", e);

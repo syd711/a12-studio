@@ -18,9 +18,6 @@ public class ErrorContainerController {
   private VBox root;
 
   @FXML
-  private Label errorTitle;
-
-  @FXML
   private Label errorMessage;
 
   private final StringProperty severity = new SimpleStringProperty();
@@ -47,7 +44,6 @@ public class ErrorContainerController {
     root.setVisible(true);
     root.pseudoClassStateChanged(WARNING_PSEUDO_CLASS, "WARNING".equalsIgnoreCase(severity));
     this.severity.set(severity);
-    errorTitle.setText(capitalize(severity));
     errorMessage.setText(message);
   }
 
