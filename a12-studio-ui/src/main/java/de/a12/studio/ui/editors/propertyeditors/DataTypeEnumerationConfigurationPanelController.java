@@ -14,8 +14,6 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.events.LocalesChangedEvent;
-import de.a12.studio.ui.events.StudioEventListener;
-import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
@@ -52,7 +50,7 @@ import java.util.function.Consumer;
  * the usual {@link AbstractPropertyEditor#bindTextField}/{@link AbstractPropertyEditor#bindComboBox} debounced
  * save. Pagination of the enumeration values list is intentionally not implemented.
  */
-public class DataTypeEnumerationConfigurationPanelController extends AbstractPropertyEditor implements Initializable, StudioEventListener {
+public class DataTypeEnumerationConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
 
   @FXML
   private HBox categoryColumnHeaders;
@@ -80,7 +78,6 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
-    StudioEventManager.getInstance().addListener(this);
     bindCheckBox(alphabeticalSortingCheckBox, (element, value) -> withEnumerationTypeOptions(element, options -> options.setAlphabeticalSorting(value ? true : null)));
   }
 
@@ -105,11 +102,6 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     if (event.getItem().equals(projectItem)) {
       rebuildEnumerationValuesGrid();
     }
-  }
-
-  @Override
-  public void destroy() {
-    StudioEventManager.getInstance().removeListener(this);
   }
 
   // ----- Category -----

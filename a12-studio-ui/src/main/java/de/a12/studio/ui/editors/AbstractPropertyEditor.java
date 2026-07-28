@@ -13,6 +13,8 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
+import de.a12.studio.ui.events.ElementValidatedEvent;
+import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -37,7 +39,7 @@ import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 
 @Slf4j
-abstract public class AbstractPropertyEditor implements Initializable {
+abstract public class AbstractPropertyEditor implements Initializable, StudioEventListener {
 
   private static final int COMMIT_DEBOUNCE_MS = 150;
 
@@ -76,10 +78,12 @@ abstract public class AbstractPropertyEditor implements Initializable {
 
   /**
    * Releases resources held by this panel once it (and the editor/dialog that embeds it) is torn down.
-   * Subclasses that register themselves with {@link StudioEventManager} (to react to events like
-   * {@code localesChanged}) must override this to unregister, since nothing else does so on their behalf.
+   * Unregisters this panel from {@link StudioEventManager}, registered in {@link #initialize}. Subclasses
+   * overriding this for their own cleanup (e.g. to react to {@code localesChanged}) must call
+   * {@code super.destroy()} to still unregister.
    */
   public void destroy() {
+    StudioEventManager.getInstance().removeListener(this);
   }
 
   public void setElement(@NonNull Element element) {
@@ -126,6 +130,7 @@ abstract public class AbstractPropertyEditor implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    StudioEventManager.getInstance().addListener(this);
     Platform.runLater(() -> {
       String settingsKey = getExpandedSettingsKey();
       if (settingsKey != null) {
@@ -362,6 +367,21 @@ abstract public class AbstractPropertyEditor implements Initializable {
       return;
     }
     showValidationError(ownError(validateElement(projectItem)).orElse(null));
+  }
+
+  /**
+   * Keeps this panel's error container in sync with validation changes caused by a sibling panel bound to the
+   * same {@link Element} (several panels are routinely bound to the same element at once, see {@link
+   * #validationProperty}). Without this, a panel only ever refreshes its own error container from its own
+   * field commits ({@link #commitChange}) or a fresh {@link #setElement}, so an error whose owning property
+   * belongs to a currently-hidden or not-yet-edited sibling panel would only appear after the whole editor is
+   * closed and reopened.
+   */
+  @Override
+  public void elementValidated(@NonNull ElementValidatedEvent event) {
+    if (element != null && event.getElementId().equals(element.getId())) {
+      refreshValidationState();
+    }
   }
 
   /**

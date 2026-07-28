@@ -13,8 +13,6 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.events.LocalesChangedEvent;
-import de.a12.studio.ui.events.StudioEventListener;
-import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
@@ -37,7 +35,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-public class DataTypeStringConfigurationPanelController extends AbstractPropertyEditor implements Initializable, StudioEventListener {
+public class DataTypeStringConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
 
   @FXML
   private TextField minLengthField;
@@ -68,7 +66,6 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
-    StudioEventManager.getInstance().addListener(this);
 
     WidgetFactory.restrictToNumericInput(minLengthField);
     WidgetFactory.restrictToNumericInput(maxLengthField);
@@ -108,11 +105,6 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     if (event.getItem().equals(projectItem)) {
       rebuildSuggestionsRows();
     }
-  }
-
-  @Override
-  public void destroy() {
-    StudioEventManager.getInstance().removeListener(this);
   }
 
   // ----- Suggestions -----

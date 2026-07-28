@@ -14,19 +14,15 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.LocalesChangedEvent;
-import de.a12.studio.ui.events.StudioEventListener;
-import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.jspecify.annotations.NonNull;
 
-import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.function.Function;
 
 /**
@@ -40,7 +36,7 @@ import java.util.function.Function;
  * after this controller is loaded from FXML, before setElement/setModel/setModule/setCase; {@code element},
  * {@link #model}, {@link #module} and {@link #sceneCase} are mutually exclusive.
  */
-public class LocalizedTextPanelController extends AbstractPropertyEditor implements StudioEventListener {
+public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   // The fieldKey passed to configure() by configureErrorMessages(), reused in validationProperty() so only
   // an instance actually configured as the error-messages panel claims that error, not every reuse of this
@@ -127,12 +123,6 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
   }
 
   @Override
-  public void initialize(URL location, ResourceBundle resources) {
-    super.initialize(location, resources);
-    StudioEventManager.getInstance().addListener(this);
-  }
-
-  @Override
   public void setElement(@NonNull Element element) {
     this.model = null;
     this.module = null;
@@ -184,11 +174,6 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor impleme
       buildLocaleFields();
       populateLocaleFields();
     }
-  }
-
-  @Override
-  public void destroy() {
-    StudioEventManager.getInstance().removeListener(this);
   }
 
   private List<Label> getTexts() {
