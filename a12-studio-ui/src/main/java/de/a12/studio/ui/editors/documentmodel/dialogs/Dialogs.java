@@ -18,10 +18,12 @@ public class Dialogs {
     FXMLLoader fxmlLoader = new FXMLLoader(TypeDefinitionSettingsDialog.class.getResource("document-model-typedefinitions-dialog.fxml"));
     Stage stage = WidgetFactory.createDialogStage("document-type-settings", fxmlLoader, Studio.stage, "Type Definitions");
     TypeDefinitionSettingsDialog controller = (TypeDefinitionSettingsDialog) stage.getUserData();
+    controller.setStage(stage);
 
     FXResizeHelper.install(stage, 30, 6);
     stage.setMinWidth(800);
     stage.setMinHeight(600);
+    stage.setOnHidden(event -> controller.destroy());
 
     stage.showAndWait();
   }

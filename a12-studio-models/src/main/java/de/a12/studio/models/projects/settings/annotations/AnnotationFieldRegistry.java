@@ -1,4 +1,4 @@
-package de.a12.studio.models.projects;
+package de.a12.studio.models.projects.settings.annotations;
 
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
@@ -6,6 +6,8 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -13,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Collects the annotation names (and their most recently used value) used across the whole project, grouped
@@ -26,13 +27,13 @@ import java.util.TreeMap;
  */
 public final class AnnotationFieldRegistry {
 
-  private Map<Key, TreeMap<String, NameUsage>> countsByKey = new HashMap<>();
+  private Map<String, AnnotationSet> setsByFieldType = new HashMap<>();
 
   public void rebuild(@NonNull Project project) {
     List<ProjectItem> documentItems = new ArrayList<>();
     collectDocumentItems(project.getRoot(), documentItems);
 
-    Map<Key, TreeMap<String, NameUsage>> collected = new HashMap<>();
+    Map<String, AnnotationSet> collected = new HashMap<>();
     for (ProjectItem item : documentItems) {
       if (item.getModel() instanceof DocumentModel documentModel
           && documentModel.getContent() != null && documentModel.getContent().getModelRoot() != null) {
@@ -41,7 +42,7 @@ public final class AnnotationFieldRegistry {
         }
       }
     }
-    this.countsByKey = collected;
+    this.setsByFieldType = collected;
   }
 
   /**
@@ -49,8 +50,8 @@ public final class AnnotationFieldRegistry {
    * alphabetically. Never {@code null}.
    */
   public @NonNull List<String> getNames(@Nullable ModelType modelType, @Nullable String fieldType) {
-    Map<String, NameUsage> counts = countsByKey.get(new Key(modelType, fieldType));
-    return counts == null ? List.of() : new ArrayList<>(counts.keySet());
+    Map<String, NameUsage> values = valuesFor(modelType, fieldType);
+    return values == null ? List.of() : new ArrayList<>(values.keySet());
   }
 
   /**
@@ -62,9 +63,9 @@ public final class AnnotationFieldRegistry {
     if (name == null || name.isBlank()) {
       return null;
     }
-    Map<String, NameUsage> counts = countsByKey.get(new Key(modelType, fieldType));
-    NameUsage usage = counts == null ? null : counts.get(name);
-    return usage == null ? null : usage.value;
+    Map<String, NameUsage> values = valuesFor(modelType, fieldType);
+    NameUsage usage = values == null ? null : values.get(name);
+    return usage == null ? null : usage.getValue();
   }
 
   /**
@@ -77,7 +78,8 @@ public final class AnnotationFieldRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    mergeUsage(countsByKey.computeIfAbsent(new Key(modelType, fieldType), k -> new TreeMap<>()), name, value);
+    AnnotationModelSet modelSet = getOrCreateModelSet(setsByFieldType, fieldType, modelType);
+    mergeUsage(modelSet.getValues(), name, value);
   }
 
   /**
@@ -88,17 +90,25 @@ public final class AnnotationFieldRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    Key key = new Key(modelType, fieldType);
-    TreeMap<String, NameUsage> counts = countsByKey.get(key);
-    if (counts == null) {
+    AnnotationSet set = setsByFieldType.get(fieldType);
+    if (set == null) {
       return;
     }
-    NameUsage usage = counts.get(name);
-    if (usage != null && --usage.count <= 0) {
-      counts.remove(name);
+    String modelTypeKey = modelTypeKey(modelType);
+    AnnotationModelSet modelSet = set.getModelSets().get(modelTypeKey);
+    if (modelSet == null) {
+      return;
     }
-    if (counts.isEmpty()) {
-      countsByKey.remove(key);
+    Map<String, NameUsage> values = modelSet.getValues();
+    NameUsage usage = values.get(name);
+    if (usage != null && usage.decrementCount() <= 0) {
+      values.remove(name);
+    }
+    if (values.isEmpty()) {
+      set.getModelSets().remove(modelTypeKey);
+    }
+    if (set.getModelSets().isEmpty()) {
+      setsByFieldType.remove(fieldType);
     }
   }
 
@@ -111,20 +121,51 @@ public final class AnnotationFieldRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    TreeMap<String, NameUsage> counts = countsByKey.get(new Key(modelType, fieldType));
-    NameUsage usage = counts == null ? null : counts.get(name);
+    Map<String, NameUsage> values = valuesFor(modelType, fieldType);
+    NameUsage usage = values == null ? null : values.get(name);
     if (usage != null) {
-      usage.value = value;
+      usage.setValue(value);
     }
   }
 
-  private static void mergeUsage(TreeMap<String, NameUsage> counts, String name, String value) {
-    NameUsage usage = counts.get(name);
+  private @Nullable Map<String, NameUsage> valuesFor(@Nullable ModelType modelType, @Nullable String fieldType) {
+    AnnotationSet set = setsByFieldType.get(fieldType);
+    if (set == null) {
+      return null;
+    }
+    AnnotationModelSet modelSet = set.getModelSets().get(modelTypeKey(modelType));
+    return modelSet == null ? null : modelSet.getValues();
+  }
+
+  private static AnnotationModelSet getOrCreateModelSet(Map<String, AnnotationSet> setsByFieldType, String fieldType,
+      ModelType modelType) {
+    AnnotationSet set = setsByFieldType.computeIfAbsent(fieldType, AnnotationFieldRegistry::newAnnotationSet);
+    return set.getModelSets().computeIfAbsent(modelTypeKey(modelType), AnnotationFieldRegistry::newAnnotationModelSet);
+  }
+
+  private static AnnotationSet newAnnotationSet(String fieldType) {
+    AnnotationSet set = new AnnotationSet();
+    set.setName(fieldType);
+    return set;
+  }
+
+  private static AnnotationModelSet newAnnotationModelSet(String modelTypeKey) {
+    AnnotationModelSet modelSet = new AnnotationModelSet();
+    modelSet.setModelType(modelTypeKey);
+    return modelSet;
+  }
+
+  private static @Nullable String modelTypeKey(@Nullable ModelType modelType) {
+    return modelType == null ? null : modelType.name();
+  }
+
+  private static void mergeUsage(Map<String, NameUsage> values, String name, String value) {
+    NameUsage usage = values.get(name);
     if (usage == null) {
-      counts.put(name, new NameUsage(value));
+      values.put(name, new NameUsage(value));
     } else {
-      usage.count++;
-      usage.value = value;
+      usage.incrementCount();
+      usage.setValue(value);
     }
   }
 
@@ -151,11 +192,12 @@ public final class AnnotationFieldRegistry {
   }
 
   private static void collectFromElement(@NonNull Element element, ModelType modelType,
-      @NonNull Map<Key, TreeMap<String, NameUsage>> collected) {
-    Key key = new Key(modelType, resolveFieldType(element));
+      @NonNull Map<String, AnnotationSet> collected) {
+    String fieldType = resolveFieldType(element);
     for (Annotation annotation : element.getAnnotations()) {
       if (annotation.getName() != null && !annotation.getName().isBlank()) {
-        mergeUsage(collected.computeIfAbsent(key, k -> new TreeMap<>()), annotation.getName(), annotation.getValue());
+        AnnotationModelSet modelSet = getOrCreateModelSet(collected, fieldType, modelType);
+        mergeUsage(modelSet.getValues(), annotation.getName(), annotation.getValue());
       }
     }
 
@@ -163,22 +205,6 @@ public final class AnnotationFieldRegistry {
       for (Element child : groupElement.getGroup().getElements()) {
         collectFromElement(child, modelType, collected);
       }
-    }
-  }
-
-  private record Key(ModelType modelType, String fieldType) {
-  }
-
-  /**
-   * How many elements currently use a given annotation name for a key, and the value most recently seen
-   * alongside it (used to prefill the value field when the name is picked from suggestions).
-   */
-  private static final class NameUsage {
-    private int count = 1;
-    private String value;
-
-    private NameUsage(String value) {
-      this.value = value;
     }
   }
 }

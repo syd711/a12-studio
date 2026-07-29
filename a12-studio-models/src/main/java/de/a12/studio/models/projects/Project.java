@@ -1,5 +1,8 @@
 package de.a12.studio.models.projects;
 
+import de.a12.studio.models.projects.settings.annotations.AnnotationFieldRegistry;
+import de.a12.studio.models.projects.settings.annotations.AnnotationHeaderRegistry;
+
 import java.io.File;
 
 public class Project {

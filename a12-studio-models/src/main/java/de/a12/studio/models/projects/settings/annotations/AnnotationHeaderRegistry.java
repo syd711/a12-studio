@@ -1,8 +1,10 @@
-package de.a12.studio.models.projects;
+package de.a12.studio.models.projects.settings.annotations;
 
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -10,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Collects the annotation names (and their most recently used value) stored at the json path
@@ -22,24 +23,24 @@ import java.util.TreeMap;
  */
 public final class AnnotationHeaderRegistry {
 
-  private Map<ModelType, TreeMap<String, NameUsage>> countsByModelType = new HashMap<>();
+  private Map<String, AnnotationModelSet> setsByModelType = new HashMap<>();
 
   public void rebuild(@NonNull Project project) {
     List<ProjectItem> documentItems = new ArrayList<>();
     collectDocumentItems(project.getRoot(), documentItems);
 
-    Map<ModelType, TreeMap<String, NameUsage>> collected = new HashMap<>();
+    Map<String, AnnotationModelSet> collected = new HashMap<>();
     for (ProjectItem item : documentItems) {
       if (item.getModel() instanceof DocumentModel documentModel) {
         for (Annotation annotation : documentModel.getAnnotations()) {
           if (annotation.getName() != null && !annotation.getName().isBlank()) {
-            mergeUsage(collected.computeIfAbsent(documentModel.getModelType(), k -> new TreeMap<>()),
-                annotation.getName(), annotation.getValue());
+            AnnotationModelSet modelSet = getOrCreateModelSet(collected, documentModel.getModelType());
+            mergeUsage(modelSet.getValues(), annotation.getName(), annotation.getValue());
           }
         }
       }
     }
-    this.countsByModelType = collected;
+    this.setsByModelType = collected;
   }
 
   /**
@@ -47,8 +48,8 @@ public final class AnnotationHeaderRegistry {
    * Never {@code null}.
    */
   public @NonNull List<String> getNames(@Nullable ModelType modelType) {
-    Map<String, NameUsage> counts = countsByModelType.get(modelType);
-    return counts == null ? List.of() : new ArrayList<>(counts.keySet());
+    Map<String, NameUsage> values = valuesFor(modelType);
+    return values == null ? List.of() : new ArrayList<>(values.keySet());
   }
 
   /**
@@ -60,9 +61,9 @@ public final class AnnotationHeaderRegistry {
     if (name == null || name.isBlank()) {
       return null;
     }
-    Map<String, NameUsage> counts = countsByModelType.get(modelType);
-    NameUsage usage = counts == null ? null : counts.get(name);
-    return usage == null ? null : usage.value;
+    Map<String, NameUsage> values = valuesFor(modelType);
+    NameUsage usage = values == null ? null : values.get(name);
+    return usage == null ? null : usage.getValue();
   }
 
   /**
@@ -75,7 +76,8 @@ public final class AnnotationHeaderRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    mergeUsage(countsByModelType.computeIfAbsent(modelType, k -> new TreeMap<>()), name, value);
+    AnnotationModelSet modelSet = getOrCreateModelSet(setsByModelType, modelType);
+    mergeUsage(modelSet.getValues(), name, value);
   }
 
   /**
@@ -86,16 +88,18 @@ public final class AnnotationHeaderRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    TreeMap<String, NameUsage> counts = countsByModelType.get(modelType);
-    if (counts == null) {
+    String modelTypeKey = modelTypeKey(modelType);
+    AnnotationModelSet modelSet = setsByModelType.get(modelTypeKey);
+    if (modelSet == null) {
       return;
     }
-    NameUsage usage = counts.get(name);
-    if (usage != null && --usage.count <= 0) {
-      counts.remove(name);
+    Map<String, NameUsage> values = modelSet.getValues();
+    NameUsage usage = values.get(name);
+    if (usage != null && usage.decrementCount() <= 0) {
+      values.remove(name);
     }
-    if (counts.isEmpty()) {
-      countsByModelType.remove(modelType);
+    if (values.isEmpty()) {
+      setsByModelType.remove(modelTypeKey);
     }
   }
 
@@ -108,20 +112,40 @@ public final class AnnotationHeaderRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    TreeMap<String, NameUsage> counts = countsByModelType.get(modelType);
-    NameUsage usage = counts == null ? null : counts.get(name);
+    Map<String, NameUsage> values = valuesFor(modelType);
+    NameUsage usage = values == null ? null : values.get(name);
     if (usage != null) {
-      usage.value = value;
+      usage.setValue(value);
     }
   }
 
-  private static void mergeUsage(TreeMap<String, NameUsage> counts, String name, String value) {
-    NameUsage usage = counts.get(name);
+  private @Nullable Map<String, NameUsage> valuesFor(@Nullable ModelType modelType) {
+    AnnotationModelSet modelSet = setsByModelType.get(modelTypeKey(modelType));
+    return modelSet == null ? null : modelSet.getValues();
+  }
+
+  private static AnnotationModelSet getOrCreateModelSet(Map<String, AnnotationModelSet> setsByModelType,
+      ModelType modelType) {
+    return setsByModelType.computeIfAbsent(modelTypeKey(modelType), AnnotationHeaderRegistry::newAnnotationModelSet);
+  }
+
+  private static AnnotationModelSet newAnnotationModelSet(String modelTypeKey) {
+    AnnotationModelSet modelSet = new AnnotationModelSet();
+    modelSet.setModelType(modelTypeKey);
+    return modelSet;
+  }
+
+  private static @Nullable String modelTypeKey(@Nullable ModelType modelType) {
+    return modelType == null ? null : modelType.name();
+  }
+
+  private static void mergeUsage(Map<String, NameUsage> values, String name, String value) {
+    NameUsage usage = values.get(name);
     if (usage == null) {
-      counts.put(name, new NameUsage(value));
+      values.put(name, new NameUsage(value));
     } else {
-      usage.count++;
-      usage.value = value;
+      usage.incrementCount();
+      usage.setValue(value);
     }
   }
 
@@ -132,19 +156,6 @@ public final class AnnotationHeaderRegistry {
       }
     } else if (item.getModel() instanceof DocumentModel) {
       result.add(item);
-    }
-  }
-
-  /**
-   * How many header annotations currently use a given name for a model type, and the value most recently seen
-   * alongside it (used to prefill the value field when the name is picked from suggestions).
-   */
-  private static final class NameUsage {
-    private int count = 1;
-    private String value;
-
-    private NameUsage(String value) {
-      this.value = value;
     }
   }
 }

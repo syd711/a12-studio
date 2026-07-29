@@ -1,7 +1,7 @@
 package de.a12.studio.models.projects;
 
 import de.a12.studio.models.projects.settings.JsonSettings;
-import de.a12.studio.models.projects.settings.AnnotationSettings;
+import de.a12.studio.models.projects.settings.annotations.AnnotationSettings;
 import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import de.a12.studio.models.projects.settings.UISettings;
 import org.jspecify.annotations.NonNull;

@@ -1,4 +1,4 @@
-package de.a12.studio.models.projects.settings;
+package de.a12.studio.models.projects.settings.annotations;
 
 import de.a12.studio.models.util.JsonSettings;
 import org.jspecify.annotations.NonNull;

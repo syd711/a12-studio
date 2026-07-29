@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
+import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -65,6 +66,16 @@ public class TypeDefinitionTableController implements Initializable {
   private Consumer<TypeDefinition> selectionListener;
 
   private Runnable onItemAddedListener;
+
+  // Immediate by default: Add/Delete are persisted right away, correct for this table bound to the currently
+  // selected project item outside of any dialog. Switched to a shared PropertyEditorSaveMode.Deferred instance
+  // via setSaveMode() when this table is embedded in a dialog with its own Save button, so Add/Delete are only
+  // persisted once that button is pressed.
+  private PropertyEditorSaveMode saveMode = PropertyEditorSaveMode.IMMEDIATE;
+
+  public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
+    this.saveMode = saveMode;
+  }
 
   public void setSelectionListener(@NonNull Consumer<TypeDefinition> selectionListener) {
     this.selectionListener = selectionListener;
@@ -230,7 +241,7 @@ public class TypeDefinitionTableController implements Initializable {
   private void save() {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null) {
-      projectItem.save();
+      saveMode.commit(projectItem);
     }
   }
 

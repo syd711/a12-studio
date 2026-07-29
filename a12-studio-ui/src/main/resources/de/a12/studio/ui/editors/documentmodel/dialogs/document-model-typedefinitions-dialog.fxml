@@ -3,25 +3,27 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.dialogs.TypeDefinitionSettingsDialog">
     <top>
         <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
     </top>
    <center>
+      <SplitPane dividerPositions="0.4" BorderPane.alignment="CENTER">
+          <items>
+              <fx:include fx:id="typeDefinitionsTable" source="../../typedefinitionmodel/typedefinition-table.fxml" />
+              <BorderPane fx:id="editorContainer" />
+          </items>
+      </SplitPane>
    </center>
    <bottom>
-      <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="panel-toolbar" BorderPane.alignment="CENTER">
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
         <items>
-          <Button mnemonicParsing="false" text="Button" />
+            <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#onSave" styleClass="primary-button" text="Save" />
+            <Button fx:id="cancelBtn" mnemonicParsing="false" onAction="#onCancel" styleClass="secondary-button" text="Cancel" />
         </items>
         <padding>
            <Insets bottom="8.0" right="8.0" />

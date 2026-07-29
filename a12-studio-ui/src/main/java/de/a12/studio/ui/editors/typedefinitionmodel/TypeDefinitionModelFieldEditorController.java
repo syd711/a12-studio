@@ -1,7 +1,9 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
 import de.a12.studio.ui.editors.propertyeditors.*;
 import javafx.fxml.FXML;
@@ -53,6 +55,27 @@ public class TypeDefinitionModelFieldEditorController implements ElementEditorCo
 
   public void focusNameField() {
     generalInformationController.focusNameField();
+  }
+
+  /**
+   * Wraps {@code typeDefinition} as the {@link Element} this editor binds to, keeping {@link
+   * TypeDefinitionFieldElement} package-private (it's just the adapter this editor needs internally to reuse
+   * the shared field property editors, not part of this class's public contract). Used both by {@code
+   * TypeDefintionModelEditorController} (the standalone type-definition-only editor tab) and {@link
+   * de.a12.studio.ui.editors.documentmodel.dialogs.TypeDefinitionSettingsDialog} (the type definitions section
+   * of a regular document model, edited from within a dialog).
+   */
+  public void setTypeDefinition(@NonNull TypeDefinition typeDefinition) {
+    setElement(new TypeDefinitionFieldElement(typeDefinition), List.of());
+  }
+
+  /**
+   * Forwarded to every embedded panel, so an owning dialog with its own Save button (see {@link
+   * de.a12.studio.ui.editors.documentmodel.dialogs.TypeDefinitionSettingsDialog}) can defer their commits
+   * until that button is pressed.
+   */
+  public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
+    propertyEditors.forEach(propertyEditor -> propertyEditor.setSaveMode(saveMode));
   }
 
   @Override
