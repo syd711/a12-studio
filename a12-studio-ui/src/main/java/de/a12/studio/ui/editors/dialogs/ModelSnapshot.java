@@ -95,8 +95,12 @@ class ModelSnapshot {
   }
 
   private static <T> void replaceContents(List<T> target, List<T> snapshot) {
-    target.clear();
-    target.addAll(snapshot);
+    if(target != null) {
+      target.clear();
+      if(snapshot != null) {
+        target.addAll(snapshot);
+      }
+    }
   }
 
   private static ModelConfig getModelConfig(DocumentModel model) {

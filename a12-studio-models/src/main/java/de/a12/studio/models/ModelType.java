@@ -12,16 +12,16 @@ import java.util.Map;
 
 public enum ModelType {
 
-  DOCUMENT("document", "Document Model"),
-  FORM("form", "Form Model"),
-  TYPEDEFINITION("typedefinition", "Type Definition Model"),
-  OVERVIEW("overview", "Overview Model"),
-  RELATIONSHIP("relationship", "Relationship Model"),
   APPLICATION("application", "Application Model"),
   CONTENT("content", "Content Model"),
+  DOCUMENT("document", "Document Model"),
+  FORM("form", "Form Model"),
   MASTERDETAIL("module-masterdetail", "Master-Detail Model"),
+  OVERVIEW("overview", "Overview Model"),
   PRINT("print", "Print Model"),
-  TREE("tree", "Tree Model");
+  RELATIONSHIP("relationship", "Relationship Model"),
+  TREE("tree", "Tree Model"),
+  TYPEDEFINITION("typedefinition", "Type Definition Model");
 
   private static final String VERSIONS_RESOURCE = "model-versions.json";
   private static final Map<String, String> CURRENT_VERSIONS = loadCurrentVersions();
