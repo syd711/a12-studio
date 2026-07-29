@@ -5,11 +5,11 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.projects.AnnotationFieldRegistry;
+import de.a12.studio.models.projects.AnnotationHeaderRegistry;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
-import de.a12.studio.ui.editors.AnnotationFieldRegistry;
-import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
@@ -131,12 +131,12 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     if (model != null) {
       currentModelType = model.getModelType();
       currentFieldType = null;
-      suggestedNames = AnnotationHeaderRegistry.getInstance().getNames(currentModelType);
+      suggestedNames = Studio.getCurrentProject().getAnnotationHeaderRegistry().getNames(currentModelType);
     } else {
       ProjectItem projectItem = Studio.getSelectedProjectItem();
       currentModelType = projectItem == null || projectItem.getModel() == null ? null : projectItem.getModel().getModelType();
       currentFieldType = AnnotationFieldRegistry.resolveFieldType(element);
-      suggestedNames = AnnotationFieldRegistry.getInstance().getNames(currentModelType, currentFieldType);
+      suggestedNames = Studio.getCurrentProject().getAnnotationFieldRegistry().getNames(currentModelType, currentFieldType);
     }
 
     List<Annotation> annotations = getAnnotations();
@@ -194,8 +194,8 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   private void refreshNameSuggestions() {
     List<String> suggestedNames = model != null
-        ? AnnotationHeaderRegistry.getInstance().getNames(currentModelType)
-        : AnnotationFieldRegistry.getInstance().getNames(currentModelType, currentFieldType);
+        ? Studio.getCurrentProject().getAnnotationHeaderRegistry().getNames(currentModelType)
+        : Studio.getCurrentProject().getAnnotationFieldRegistry().getNames(currentModelType, currentFieldType);
     for (ComboBox<String> nameField : nameFields) {
       nameField.getItems().setAll(suggestedNames);
     }
@@ -203,31 +203,31 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   private String getSuggestionValue(String name) {
     return model != null
-        ? AnnotationHeaderRegistry.getInstance().getValue(currentModelType, name)
-        : AnnotationFieldRegistry.getInstance().getValue(currentModelType, currentFieldType, name);
+        ? Studio.getCurrentProject().getAnnotationHeaderRegistry().getValue(currentModelType, name)
+        : Studio.getCurrentProject().getAnnotationFieldRegistry().getValue(currentModelType, currentFieldType, name);
   }
 
   private void setSuggestionValue(String name, String value) {
     if (model != null) {
-      AnnotationHeaderRegistry.getInstance().setValue(currentModelType, name, value);
+      Studio.getCurrentProject().getAnnotationHeaderRegistry().setValue(currentModelType, name, value);
     } else {
-      AnnotationFieldRegistry.getInstance().setValue(currentModelType, currentFieldType, name, value);
+      Studio.getCurrentProject().getAnnotationFieldRegistry().setValue(currentModelType, currentFieldType, name, value);
     }
   }
 
   private void addSuggestionName(String name, String value) {
     if (model != null) {
-      AnnotationHeaderRegistry.getInstance().addName(currentModelType, name, value);
+      Studio.getCurrentProject().getAnnotationHeaderRegistry().addName(currentModelType, name, value);
     } else {
-      AnnotationFieldRegistry.getInstance().addName(currentModelType, currentFieldType, name, value);
+      Studio.getCurrentProject().getAnnotationFieldRegistry().addName(currentModelType, currentFieldType, name, value);
     }
   }
 
   private void removeSuggestionName(String name) {
     if (model != null) {
-      AnnotationHeaderRegistry.getInstance().removeName(currentModelType, name);
+      Studio.getCurrentProject().getAnnotationHeaderRegistry().removeName(currentModelType, name);
     } else {
-      AnnotationFieldRegistry.getInstance().removeName(currentModelType, currentFieldType, name);
+      Studio.getCurrentProject().getAnnotationFieldRegistry().removeName(currentModelType, currentFieldType, name);
     }
   }
 

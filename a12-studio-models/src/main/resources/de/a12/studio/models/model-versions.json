@@ -9,7 +9,7 @@
   "print": "4.0.0",
   "printtypesettings": "3.2.0",
   "module-masterdetail": "1.0.0",
-  "relationship": "3.0.0",
+  "relationship": "4.0.0",
   "application": "6.0.0",
-  "content": "0.12.0"
+  "content": "0.8.0"
 }

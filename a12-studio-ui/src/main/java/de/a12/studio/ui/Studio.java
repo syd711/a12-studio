@@ -3,11 +3,13 @@ package de.a12.studio.ui;
 import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
+import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -28,15 +30,19 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * App bootstrap - undecorated window shell (custom draggable/resizable header, empty main
  * region).
  */
+@Slf4j
 public class Studio extends Application implements StudioEventListener {
 
   public static Stage stage;
@@ -177,5 +183,53 @@ public class Studio extends Application implements StudioEventListener {
 
     stage.setTitle("A12 Studio - " + currentProject.getName());
     rootController.setTitle("A12 Studio - " + currentProject.getName() + " (" + currentProject.getRoot().getPath() + ")");
+
+    boolean b = checkModelVersions(currentProject);
+
+//    if (!b) {
+//      PreviewAppProcess.getInstance().stop();
+//      StudioEventManager.getInstance().fireProjectClosedEvent(currentProject);
+//    }
+  }
+
+  @Override
+  public void projectClosed(@NonNull ProjectClosedEvent event) {
+    currentProject = null;
+    validationService = null;
+    stage.setTitle("A12 Studio");
+  }
+
+  private static boolean checkModelVersions(Project project) {
+    List<String> incompatibleModels = new ArrayList<>();
+    collectIncompatibleModels(project.getRoot(), incompatibleModels);
+    if (incompatibleModels.isEmpty()) {
+      return true;
+    }
+    incompatibleModels.forEach(log::warn);
+
+    WidgetFactory.showAlert(stage,
+        "Incompatible model versions found" , "Wrong Version: " + incompatibleModels.get(0));
+    return false;
+  }
+
+  private static void collectIncompatibleModels(ProjectItem item, List<String> incompatibleModels) {
+    if (item.isFolder()) {
+      for (ProjectItem child : item.getChildren()) {
+        collectIncompatibleModels(child, incompatibleModels);
+      }
+      return;
+    }
+
+    A12Model<?> model = item.getModel();
+    if (model == null) {
+      return;
+    }
+
+    String expectedVersion = model.getModelType().getCurrentVersion();
+    if (!expectedVersion.equals(model.getModelVersion())) {
+      incompatibleModels.add(
+          model.getId() + " (" + model.getModelType().getDisplayName() + "): expected " + expectedVersion + ", found "
+              + model.getModelVersion());
+    }
   }
 }

@@ -1,4 +1,4 @@
-package de.a12.studio.ui.editors;
+package de.a12.studio.models.projects;
 
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
@@ -6,11 +6,6 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
-import de.a12.studio.models.projects.Project;
-import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.ui.events.ProjectOpenedEvent;
-import de.a12.studio.ui.events.StudioEventListener;
-import de.a12.studio.ui.events.StudioEventManager;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -29,24 +24,9 @@ import java.util.TreeMap;
  * Names are reference-counted per key so callers can incrementally {@link #addName} / {@link #removeName} as
  * annotations are edited, without requiring a full {@link #rebuild} of the project.
  */
-public final class AnnotationFieldRegistry implements StudioEventListener {
-
-  private static final AnnotationFieldRegistry INSTANCE = new AnnotationFieldRegistry();
+public final class AnnotationFieldRegistry {
 
   private Map<Key, TreeMap<String, NameUsage>> countsByKey = new HashMap<>();
-
-  private AnnotationFieldRegistry() {
-    StudioEventManager.getInstance().addListener(this);
-  }
-
-  public static AnnotationFieldRegistry getInstance() {
-    return INSTANCE;
-  }
-
-  @Override
-  public void projectOpened(@NonNull ProjectOpenedEvent event) {
-    rebuild(event.getProject());
-  }
 
   public void rebuild(@NonNull Project project) {
     List<ProjectItem> documentItems = new ArrayList<>();

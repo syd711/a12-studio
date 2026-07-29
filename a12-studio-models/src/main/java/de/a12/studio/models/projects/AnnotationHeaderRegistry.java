@@ -1,13 +1,8 @@
-package de.a12.studio.ui.editors;
+package de.a12.studio.models.projects;
 
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.projects.Project;
-import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.ui.events.ProjectOpenedEvent;
-import de.a12.studio.ui.events.StudioEventListener;
-import de.a12.studio.ui.events.StudioEventManager;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -25,24 +20,9 @@ import java.util.TreeMap;
  * Names are reference-counted per model type so callers can incrementally {@link #addName} / {@link #removeName}
  * as header annotations are edited, without requiring a full {@link #rebuild} of the project.
  */
-public final class AnnotationHeaderRegistry implements StudioEventListener {
-
-  private static final AnnotationHeaderRegistry INSTANCE = new AnnotationHeaderRegistry();
+public final class AnnotationHeaderRegistry {
 
   private Map<ModelType, TreeMap<String, NameUsage>> countsByModelType = new HashMap<>();
-
-  private AnnotationHeaderRegistry() {
-    StudioEventManager.getInstance().addListener(this);
-  }
-
-  public static AnnotationHeaderRegistry getInstance() {
-    return INSTANCE;
-  }
-
-  @Override
-  public void projectOpened(@NonNull ProjectOpenedEvent event) {
-    rebuild(event.getProject());
-  }
 
   public void rebuild(@NonNull Project project) {
     List<ProjectItem> documentItems = new ArrayList<>();

@@ -4,7 +4,7 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
-import de.a12.studio.ui.editors.AnnotationHeaderRegistry;
+import de.a12.studio.ui.Studio;
 import javafx.scene.Node;
 import org.jspecify.annotations.NonNull;
 
@@ -52,17 +52,17 @@ public class RolesEditorPanelController extends AbstractRolesPanelController {
     if (joined.isEmpty()) {
       if (rolesAnnotation != null) {
         model.getAnnotations().remove(rolesAnnotation);
-        AnnotationHeaderRegistry.getInstance().removeName(currentModelType, ROLES_ANNOTATION_NAME);
+        Studio.getCurrentProject().getAnnotationHeaderRegistry().removeName(currentModelType, ROLES_ANNOTATION_NAME);
       }
     } else if (rolesAnnotation != null) {
       rolesAnnotation.setValue(joined);
-      AnnotationHeaderRegistry.getInstance().setValue(currentModelType, ROLES_ANNOTATION_NAME, joined);
+      Studio.getCurrentProject().getAnnotationHeaderRegistry().setValue(currentModelType, ROLES_ANNOTATION_NAME, joined);
     } else {
       Annotation annotation = new Annotation();
       annotation.setName(ROLES_ANNOTATION_NAME);
       annotation.setValue(joined);
       model.getAnnotations().add(annotation);
-      AnnotationHeaderRegistry.getInstance().addName(currentModelType, ROLES_ANNOTATION_NAME, joined);
+      Studio.getCurrentProject().getAnnotationHeaderRegistry().addName(currentModelType, ROLES_ANNOTATION_NAME, joined);
     }
 
     commitChange();
