@@ -66,6 +66,7 @@ public class PreferencesController implements Initializable {
     switch (section) {
       case ANNOTATION_SETS -> onAnnotationSets();
       case GENERAL_SETTINGS -> onGeneralSettings();
+      case A12_INSTALLATION -> onA12Installation();
       default -> onGeneralSettings();
     }
   }

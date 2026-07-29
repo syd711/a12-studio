@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="400.0" styleClass="navigation-panel" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.ConfirmationDialogController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="450.0" styleClass="navigation-panel" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.ConfirmationDialogController">
    <top>
       <fx:include fx:id="header" source="scene-dialog-header.fxml" />
    </top>

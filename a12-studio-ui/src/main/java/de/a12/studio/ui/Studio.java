@@ -1,10 +1,13 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.ui.util.FXResizeHelper;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.modelsvalidation.ValidationService;
+import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -17,6 +20,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
@@ -27,6 +31,7 @@ import javafx.stage.StageStyle;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * App bootstrap - undecorated window shell (custom draggable/resizable header, empty main
@@ -97,6 +102,22 @@ public class Studio extends Application implements StudioEventListener {
     // StudioKeyEventHandler already handles as a fallback). This hook intercepts them earlier.
     windowsSnapHook = new WindowsSnapHook(key -> Platform.runLater(() -> handleWindowsSnapKey(key)));
     windowsSnapHook.install();
+
+    Platform.runLater(Studio::checkA12InstallationFolder);
+  }
+
+  private static void checkA12InstallationFolder() {
+    String installationPath = A12Settings.load().getInstallationPath();
+    if (installationPath != null && !installationPath.isEmpty()) {
+      return;
+    }
+
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(stage,
+        "The A12 installation folder is not set.",
+        "Some features may not work correctly until it is configured.", null, "Go to Settings");
+    if (result.isPresent() && ButtonType.OK.equals(result.get())) {
+      StudioEventManager.getInstance().firePreferencesOpenRequestedEvent(PreferencesOpenRequestedEvent.Section.A12_INSTALLATION);
+    }
   }
 
   private static void handleWindowsSnapKey(WindowsSnapHook.SnapKey key) {
