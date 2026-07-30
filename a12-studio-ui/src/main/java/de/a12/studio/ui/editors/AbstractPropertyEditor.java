@@ -459,7 +459,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
     if (error == null || suppressErrorContainer()) {
       errorContainerController.hide();
     } else {
-      errorContainerController.show(error.severity(), error.message());
+      showError(error.severity(), error.message());
     }
   }
 
@@ -476,9 +476,11 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   /**
    * For subclasses whose validation isn't expressed as a {@link ModelValidationError} (e.g. a model-header
    * panel that isn't bound to a single {@link Element}, so {@link #commitChange()}'s element-based validation
-   * never runs): shows this panel's own error container directly.
+   * never runs): shows this panel's own error container directly. Also expands the root {@link TitledPane}, so
+   * a collapsed panel doesn't hide the fact that it's now showing an error.
    */
   protected void showError(@NonNull String severity, @NonNull String message) {
+    root.setExpanded(true);
     errorContainerController.show(severity, message);
   }
 

@@ -29,9 +29,8 @@
     ],
     "modelReferences": [
       {
-        "alias": null,
-        "modelType": "document",
         "purpose": "include",
+        "modelType": "document",
         "reference": "Person_DM"
       }
     ]
@@ -385,8 +384,7 @@
                           "reference": "Invoice_DM",
                           "excludeRules": true,
                           "excludeComputations": true
-                        },
-                        "elements": []
+                        }
                       }
                     },
                     {

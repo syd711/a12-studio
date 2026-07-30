@@ -77,6 +77,11 @@ public class AnnotationSetsController implements Initializable {
 
     table.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> updateButtonStates(newValue));
     updateButtonStates(null);
+    table.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 2) {
+        onEdit();
+      }
+    });
 
     reload();
   }

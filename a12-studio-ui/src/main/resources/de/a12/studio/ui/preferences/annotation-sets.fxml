@@ -69,8 +69,8 @@
                 <TableView fx:id="table" BorderPane.alignment="CENTER">
                     <columns>
                         <TableColumn fx:id="nameColumn" prefWidth="220.0" text="NAME" />
-                        <TableColumn fx:id="headerEntriesColumn" prefWidth="150.0" text="HEADER ENTRIES" />
-                        <TableColumn fx:id="contentEntriesColumn" prefWidth="150.0" text="CONTENT ENTRIES" />
+                        <TableColumn fx:id="headerEntriesColumn" prefWidth="150.0" text="# Header Usages" />
+                        <TableColumn fx:id="contentEntriesColumn" prefWidth="150.0" text="# Content Usages" />
                     </columns>
                 </TableView>
             </center>
