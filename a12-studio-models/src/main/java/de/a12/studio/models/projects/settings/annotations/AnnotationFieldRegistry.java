@@ -12,7 +12,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,22 +26,22 @@ import java.util.Map;
  */
 public final class AnnotationFieldRegistry {
 
-  private Map<String, AnnotationSet> setsByFieldType = new HashMap<>();
+  private AnnotationFieldSet fieldSet = new AnnotationFieldSet();
 
   public void rebuild(@NonNull Project project) {
     List<ProjectItem> documentItems = new ArrayList<>();
     collectDocumentItems(project.getRoot(), documentItems);
 
-    Map<String, AnnotationSet> collected = new HashMap<>();
+    AnnotationFieldSet collected = new AnnotationFieldSet();
     for (ProjectItem item : documentItems) {
       if (item.getModel() instanceof DocumentModel documentModel
           && documentModel.getContent() != null && documentModel.getContent().getModelRoot() != null) {
         for (GroupElement rootGroup : documentModel.getContent().getModelRoot().getRootGroups()) {
-          collectFromElement(rootGroup, documentModel.getModelType(), collected);
+          collectFromElement(rootGroup, documentModel.getModelType(), collected.getFieldTypes());
         }
       }
     }
-    this.setsByFieldType = collected;
+    this.fieldSet = collected;
   }
 
   /**
@@ -78,7 +77,7 @@ public final class AnnotationFieldRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    AnnotationModelSet modelSet = getOrCreateModelSet(setsByFieldType, fieldType, modelType);
+    AnnotationModelSet modelSet = getOrCreateModelSet(fieldSet.getFieldTypes(), fieldType, modelType);
     mergeUsage(modelSet.getValues(), name, value);
   }
 
@@ -90,7 +89,7 @@ public final class AnnotationFieldRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    AnnotationSet set = setsByFieldType.get(fieldType);
+    AnnotationSet set = fieldSet.getFieldTypes().get(fieldType);
     if (set == null) {
       return;
     }
@@ -108,7 +107,7 @@ public final class AnnotationFieldRegistry {
       set.getModelSets().remove(modelTypeKey);
     }
     if (set.getModelSets().isEmpty()) {
-      setsByFieldType.remove(fieldType);
+      fieldSet.getFieldTypes().remove(fieldType);
     }
   }
 
@@ -129,7 +128,7 @@ public final class AnnotationFieldRegistry {
   }
 
   private @Nullable Map<String, NameUsage> valuesFor(@Nullable ModelType modelType, @Nullable String fieldType) {
-    AnnotationSet set = setsByFieldType.get(fieldType);
+    AnnotationSet set = fieldSet.getFieldTypes().get(fieldType);
     if (set == null) {
       return null;
     }

@@ -9,7 +9,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,24 +22,24 @@ import java.util.Map;
  */
 public final class AnnotationHeaderRegistry {
 
-  private Map<String, AnnotationModelSet> setsByModelType = new HashMap<>();
+  private AnnotationHeaderSet headerSet = new AnnotationHeaderSet();
 
   public void rebuild(@NonNull Project project) {
     List<ProjectItem> documentItems = new ArrayList<>();
     collectDocumentItems(project.getRoot(), documentItems);
 
-    Map<String, AnnotationModelSet> collected = new HashMap<>();
+    AnnotationHeaderSet collected = new AnnotationHeaderSet();
     for (ProjectItem item : documentItems) {
       if (item.getModel() instanceof DocumentModel documentModel) {
         for (Annotation annotation : documentModel.getAnnotations()) {
           if (annotation.getName() != null && !annotation.getName().isBlank()) {
-            AnnotationModelSet modelSet = getOrCreateModelSet(collected, documentModel.getModelType());
+            AnnotationModelSet modelSet = getOrCreateModelSet(collected.getModelTypes(), documentModel.getModelType());
             mergeUsage(modelSet.getValues(), annotation.getName(), annotation.getValue());
           }
         }
       }
     }
-    this.setsByModelType = collected;
+    this.headerSet = collected;
   }
 
   /**
@@ -76,7 +75,7 @@ public final class AnnotationHeaderRegistry {
     if (name == null || name.isBlank()) {
       return;
     }
-    AnnotationModelSet modelSet = getOrCreateModelSet(setsByModelType, modelType);
+    AnnotationModelSet modelSet = getOrCreateModelSet(headerSet.getModelTypes(), modelType);
     mergeUsage(modelSet.getValues(), name, value);
   }
 
@@ -89,7 +88,7 @@ public final class AnnotationHeaderRegistry {
       return;
     }
     String modelTypeKey = modelTypeKey(modelType);
-    AnnotationModelSet modelSet = setsByModelType.get(modelTypeKey);
+    AnnotationModelSet modelSet = headerSet.getModelTypes().get(modelTypeKey);
     if (modelSet == null) {
       return;
     }
@@ -99,7 +98,7 @@ public final class AnnotationHeaderRegistry {
       values.remove(name);
     }
     if (values.isEmpty()) {
-      setsByModelType.remove(modelTypeKey);
+      headerSet.getModelTypes().remove(modelTypeKey);
     }
   }
 
@@ -120,7 +119,7 @@ public final class AnnotationHeaderRegistry {
   }
 
   private @Nullable Map<String, NameUsage> valuesFor(@Nullable ModelType modelType) {
-    AnnotationModelSet modelSet = setsByModelType.get(modelTypeKey(modelType));
+    AnnotationModelSet modelSet = headerSet.getModelTypes().get(modelTypeKey(modelType));
     return modelSet == null ? null : modelSet.getValues();
   }
 
