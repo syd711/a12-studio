@@ -21,6 +21,7 @@ import de.a12.studio.modelsvalidation.services.OverviewModelValidationService;
 import de.a12.studio.modelsvalidation.services.PrintModelValidationService;
 import de.a12.studio.modelsvalidation.services.RelationshipModelValidationService;
 import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
+import de.a12.studio.modelsvalidation.validators.ApplicationGroupValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
@@ -47,8 +48,31 @@ public class ValidationService {
   private final ContentModelValidationService contentModelValidationService = new ContentModelValidationService();
   private final MasterDetailModelValidationService masterDetailModelValidationService = new MasterDetailModelValidationService();
 
+  // One ModelType per distinct backing service above; TYPEDEFINITION is deliberately excluded since it
+  // shares documentModelValidationService with DOCUMENT (see #addValidator), and registering the same
+  // validator instance under both would run it twice against document/type-definition models.
+  private static final List<ModelType> MODEL_TYPES_WITH_OWN_SERVICE = List.of(ModelType.DOCUMENT, ModelType.OVERVIEW,
+      ModelType.FORM, ModelType.APPLICATION, ModelType.RELATIONSHIP, ModelType.TREE, ModelType.PRINT,
+      ModelType.CONTENT, ModelType.MASTERDETAIL);
+
+  private final ApplicationGroupValidator applicationGroupValidator = new ApplicationGroupValidator();
+
   public ValidationService(Project project) {
     this.project = project;
+    setApplicationGroupValidatorEnabled(project.getSettings().getAdvancedSettings().isUseApplicationGroups());
+  }
+
+  /** Registers or unregisters {@link ApplicationGroupValidator} against every model type, mirroring
+   * whether application groups are currently enabled for the project (see {@code AdvancedSettings}). */
+  public void setApplicationGroupValidatorEnabled(boolean enabled) {
+    for (ModelType modelType : MODEL_TYPES_WITH_OWN_SERVICE) {
+      if (enabled) {
+        addValidator(modelType, applicationGroupValidator);
+      }
+      else {
+        removeValidator(modelType, applicationGroupValidator);
+      }
+    }
   }
 
   /** Every validation problem found in {@code model}, depending on its concrete type. */

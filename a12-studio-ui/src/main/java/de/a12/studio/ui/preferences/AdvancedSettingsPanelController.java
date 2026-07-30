@@ -77,6 +77,7 @@ public class AdvancedSettingsPanelController implements Initializable {
       applyBtn.setDisable(!newVal);
       applicationGroupNameField.setDisable(!newVal);
       settings.save();
+      Studio.getValidationService().setApplicationGroupValidatorEnabled(newVal);
     });
 
     // --- Application Group Name ---
