@@ -1,7 +1,14 @@
+plugins {
+    id 'java-library'
+}
+
 dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.17'
-    implementation 'tools.jackson.core:jackson-databind:3.1.4'
-    implementation 'tools.jackson.dataformat:jackson-dataformat-yaml:3.1.4'
+    // Model classes carry Jackson annotations (@JsonInclude, @JsonTypeInfo, ...) that are part
+    // of this module's public surface, so downstream consumers need jackson-annotations on
+    // their own compile classpath too - api (not implementation) exposes it transitively.
+    api 'tools.jackson.core:jackson-databind:3.1.4'
+    api 'tools.jackson.dataformat:jackson-dataformat-yaml:3.1.4'
 
     testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

@@ -29,3 +29,9 @@
     -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
+
+.field-description {
+    -fx-text-fill: -fx-text-faint;
+    -fx-font-size: 14px;
+    -fx-padding: 0 0 0 22px;
+}

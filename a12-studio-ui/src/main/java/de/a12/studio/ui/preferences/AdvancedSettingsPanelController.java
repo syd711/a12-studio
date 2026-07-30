@@ -5,6 +5,7 @@ import de.a12.studio.models.projects.settings.AdvancedSettings;
 import de.a12.studio.ui.Studio;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
@@ -18,6 +19,14 @@ public class AdvancedSettingsPanelController implements Initializable {
 
   @FXML
   private TextField applicationGroupNameField;
+
+  @FXML
+  private Button applyBtn;
+
+  @FXML
+  private void onApplicationGroupApply() {
+
+  }
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {

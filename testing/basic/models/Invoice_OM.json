@@ -29,14 +29,94 @@
     ],
     "modelReferences": [
       {
-        "purpose": "document-model-for-overview",
-        "modelType": "document",
         "alias": "DM",
+        "modelType": "document",
+        "purpose": "document-model-for-overview",
         "reference": "Invoice_DM"
       }
     ]
   },
   "content": {
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "showRowCount": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "buttons": [
+          {
+            "event": "delete_selected",
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Delete Selected"
+                },
+                {
+                  "locale": "de",
+                  "text": "Ausgewählte Löschen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Do you want to delete all selected elements?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Möchten Sie alle ausgewählten Elemente löschen?"
+                }
+              ]
+            },
+            "icon": {
+              "name": "delete_forever",
+              "theme": "rounded"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Delete"
+              },
+              {
+                "locale": "de",
+                "text": "Löschen"
+              }
+            ],
+            "description": [
+              {
+                "locale": "en",
+                "text": "Delete Selected Elements"
+              },
+              {
+                "locale": "de",
+                "text": "Ausgewählte Elemente löschen"
+              }
+            ],
+            "destructive": true,
+            "primary": false
+          }
+        ],
+        "clearConfirmation": {
+          "enabled": true
+        }
+      }
+    },
+    "subHeaderBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
     "columns": [
       {
         "id": "column-7aca2",
@@ -50,7 +130,7 @@
             "text": "Name"
           }
         ],
-        "width": 1,
+        "width": 1.0,
         "elementRef": "include_7c34e_field_0b84d",
         "sortable": true,
         "preferredSorting": "ASC"
@@ -67,7 +147,7 @@
             "text": "Bestelldatum"
           }
         ],
-        "width": 1,
+        "width": 1.0,
         "elementRef": "include_d7e3e_field_e0d50",
         "sortable": true,
         "preferredSorting": "ASC"
@@ -84,7 +164,7 @@
             "text": "Zahlungsmethode"
           }
         ],
-        "width": 1,
+        "width": 1.0,
         "elementRef": "include_591ce_field_dda25",
         "sortable": true,
         "preferredSorting": "ASC"
@@ -101,9 +181,9 @@
             "text": "Bestellung"
           }
         ],
-        "width": 2,
+        "width": 2.0,
         "pinDirection": "RIGHT",
-        "styles": {},
+        "sortable": null,
         "name": "ExpressionColumn",
         "expression": "kontext(Invoice){\n    kontext(Order){\n        kontext(OrderInformation, delimiter = \", \"){\n            case [Quantity] != \"1\" {\n            [Quantity] \" \" (en: \"\", de:\"mal\") \" \" [Product] (en: \"s\", de:\"\")\n            }\n            case [Quantity] = \"1\" {\n            [Quantity] \" \" [Product]\n            }\n        }\n        case [TotalPrice] != \"\" {\n    \n\n        \"* * *\"\n    \n        }\n        kontext(OrderInformation){\n            case [Product] != \"\" {\n        \n            \"* \" [Product] \"\"(en: \"s:\", de:\":\")\" \" [TotalPriceProduct] \"€\"\n            \"  \"\n           }\n        }    \n        case [TotalPrice] != \"\" {\n    \n       \"* * *\"\n    \n        (en: \"Total Price of Ordered Products: \", de: \"Gesamtpreis der bestellten Artikel: \") [TotalPrice] \"€\"\n\n            \"* * *\"\n    \n        (en: \"Price including shipping costs: \", de: \"Preis inklusive der anfallenden Versandkosten: \") [TotalPriceWithShippingCosts] \"€\"\n        }\n\n           \"* * *\"\n    \n        (en: \"Granted discount: \", de: \"Gewährter Rabatt: \") [AmountOfGivenDiscount] \"€\"\n        }\n    }"
       },
@@ -119,9 +199,8 @@
             "text": "Endpreis"
           }
         ],
-        "width": 1,
+        "width": 1.0,
         "pinDirection": "RIGHT",
-        "styles": {},
         "elementRef": "include_d7e3e_field_0680a",
         "sortable": false,
         "suffix": [
@@ -174,116 +253,6 @@
           "primary": false
         }
       ]
-    },
-    "subHeaderBox": {
-      "leftSlot": [
-        {
-          "type": "button",
-          "label": [
-            {
-              "locale": "en",
-              "text": "New"
-            },
-            {
-              "locale": "de",
-              "text": "Neu"
-            }
-          ],
-          "event": "add",
-          "icon": {
-            "name": "add"
-          },
-          "destructive": false,
-          "primary": false
-        },
-        {
-          "type": "multi_selection"
-        }
-      ],
-      "rightSlot": [
-        {
-          "type": "search"
-        },
-        {
-          "type": "filter"
-        }
-      ]
-    },
-    "footerBox": {
-      "leftSlot": [],
-      "rightSlot": []
-    },
-    "configuration": {
-      "enableFilter": true,
-      "filterConfiguration": {
-        "showFilterButton": true,
-        "showFilterBar": true,
-        "filterMode": "all_columns"
-      },
-      "multiSelection": {
-        "collapseOption": "collapsible_collapsed",
-        "counterOption": "simple",
-        "selectionArea": "checkbox_and_row",
-        "buttons": [
-          {
-            "confirmation": {
-              "title": [
-                {
-                  "locale": "en",
-                  "text": "Delete Selected"
-                },
-                {
-                  "locale": "de",
-                  "text": "Ausgewählte Löschen"
-                }
-              ],
-              "message": [
-                {
-                  "locale": "en",
-                  "text": "Do you want to delete all selected elements?"
-                },
-                {
-                  "locale": "de",
-                  "text": "Möchten Sie alle ausgewählten Elemente löschen?"
-                }
-              ]
-            },
-            "icon": {
-              "name": "delete_forever",
-              "theme": "rounded"
-            },
-            "label": [
-              {
-                "locale": "en",
-                "text": "Delete"
-              },
-              {
-                "locale": "de",
-                "text": "Löschen"
-              }
-            ],
-            "description": [
-              {
-                "locale": "en",
-                "text": "Delete Selected Elements"
-              },
-              {
-                "locale": "de",
-                "text": "Ausgewählte Elemente löschen"
-              }
-            ],
-            "event": "delete_selected",
-            "destructive": true,
-            "primary": false
-          }
-        ],
-        "clearConfirmation": {
-          "enabled": true
-        }
-      },
-      "showFullTextSearch": true,
-      "pagingSize": 10,
-      "showRowCount": true
     }
   }
 }
