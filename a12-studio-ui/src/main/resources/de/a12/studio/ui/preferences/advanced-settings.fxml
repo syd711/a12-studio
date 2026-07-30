@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.preferences.AdvancedSettingsPanelController">
+    <top>
+        <VBox BorderPane.alignment="CENTER_LEFT">
+            <children>
+                <Label styleClass="preference-title" text="PROJECT SETTINGS" />
+                <Label styleClass="preference-subtitle" text="Advanced Settings" />
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="12.0" left="12.0" top="12.0" />
+            </BorderPane.margin>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="8.0" BorderPane.alignment="TOP_LEFT">
+            <children>
+                <CheckBox fx:id="useApplicationGroupsCheckBox" text="Use Application Groups" />
+                <Label styleClass="field-description" text="Used for multi A12 application setups.">
+                    <VBox.margin>
+                        <Insets left="24.0" top="-4.0" />
+                    </VBox.margin>
+                </Label>
+
+                <Label styleClass="field-label" text="Application Group Name:">
+                    <VBox.margin>
+                        <Insets top="12.0" />
+                    </VBox.margin>
+                </Label>
+                <TextField fx:id="applicationGroupNameField" prefWidth="280.0" />
+            </children>
+            <padding>
+                <Insets left="12.0" right="12.0" top="8.0" />
+            </padding>
+        </VBox>
+    </center>
+</BorderPane>
