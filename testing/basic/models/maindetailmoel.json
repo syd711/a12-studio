@@ -21,6 +21,9 @@
     "modelReferences": []
   },
   "content": {
-    "type": "overview"
+    "type": "overview",
+    "overviewModel": null,
+    "formWidth": null,
+    "formMapping": []
   }
 }

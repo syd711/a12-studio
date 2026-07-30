@@ -55,7 +55,12 @@
               "name": "WelcomePage"
             },
             "withoutData": true
-          }
+          },
+          "children": [
+            {
+              "name": "sdffwe"
+            }
+          ]
         },
         "flows": [
           {

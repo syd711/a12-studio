@@ -1,0 +1,48 @@
+{
+  "header": {
+    "id": "TypeDefinitionTest",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "tdonly",
+        "value": "true"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "TypeDefinitionTest",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_c7125d36-fdfd-49eb-bc37-59a6f32359d4",
+        "name": "NewType",
+        "fieldType": {
+          "type": "StringType"
+        }
+      }
+    ]
+  }
+}
