@@ -22,6 +22,9 @@ public class PreferencesController implements Initializable {
   private Button generalSettingsBtn;
 
   @FXML
+  private Button advancedSettingsBtn;
+
+  @FXML
   private Button aiSettingsBtn;
 
   @FXML
@@ -74,6 +77,11 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onGeneralSettings() {
     showPage(generalSettingsBtn, "general-settings.fxml");
+  }
+
+  @FXML
+  private void onAdvancedSettings() {
+    showPage(advancedSettingsBtn, "advanced-settings.fxml");
   }
 
   @FXML
