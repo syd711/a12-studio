@@ -7,6 +7,7 @@ import de.a12.studio.models.projects.settings.AdvancedSettings;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public final class ApplicationGroupValidator implements ModelValidator {
     }
     String expectedGroup = settings.getApplicationGroupName();
     String actualGroup = findApplicationGroup(model);
-    if (expectedGroup.equals(actualGroup)) {
+    if (expectedGroup.equals(actualGroup) || StringUtils.isEmpty(expectedGroup)) {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,

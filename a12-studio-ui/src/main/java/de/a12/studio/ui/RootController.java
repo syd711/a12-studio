@@ -110,6 +110,11 @@ public class RootController implements Initializable, StudioEventListener {
         fadeOut.setToValue(0);
         fadeOut.setOnFinished(e -> rootStack.getChildren().remove(preferencesRoot));
         fadeOut.play();
+        // Preferences can change project-wide validation rules (e.g. application groups), so revalidate
+        // everything once the dialog is gone instead of leaving stale errors in the tree.
+        if (project != null) {
+          projectTreeController.load(project);
+        }
       });
       controller.setProjectOpen(project != null);
       controller.showSection(event.getSection());
