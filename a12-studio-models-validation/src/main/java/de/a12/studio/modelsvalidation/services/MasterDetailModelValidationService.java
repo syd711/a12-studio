@@ -13,21 +13,30 @@ import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.masterdetail.MasterDetailReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.masterdetail.MasterDetailTypeConsistencyValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates a {@link MasterDetailModel}: generic header checks plus reference/type consistency. */
 public final class MasterDetailModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
       new MasterDetailReferenceValidator(),
-      new MasterDetailTypeConsistencyValidator());
+      new MasterDetailTypeConsistencyValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(MasterDetailModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }

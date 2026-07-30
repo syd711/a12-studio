@@ -14,12 +14,13 @@ import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnsNotEmptyValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates an {@link OverviewModel}: generic header checks plus the overview-specific rules ported from SME. */
 public final class OverviewModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
@@ -27,9 +28,17 @@ public final class OverviewModelValidationService {
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
       new OverviewColumnsNotEmptyValidator(),
-      new OverviewFieldReferenceValidator());
+      new OverviewFieldReferenceValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(OverviewModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }

@@ -1,6 +1,7 @@
 package de.a12.studio.modelsvalidation;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -21,6 +22,7 @@ import de.a12.studio.modelsvalidation.services.PrintModelValidationService;
 import de.a12.studio.modelsvalidation.services.RelationshipModelValidationService;
 import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
+import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
 
 import java.util.ArrayList;
@@ -64,6 +66,36 @@ public class ValidationService {
       case MasterDetailModel masterDetailModel -> masterDetailModelValidationService.validate(masterDetailModel, context);
       default -> List.of();
     };
+  }
+
+  /** Adds {@code validator} to the rules run against every model of {@code modelType}. */
+  public void addValidator(ModelType modelType, ModelValidator validator) {
+    switch (modelType) {
+      case DOCUMENT, TYPEDEFINITION -> documentModelValidationService.addValidator(validator);
+      case OVERVIEW -> overviewModelValidationService.addValidator(validator);
+      case FORM -> formModelValidationService.addValidator(validator);
+      case APPLICATION -> applicationModelValidationService.addValidator(validator);
+      case RELATIONSHIP -> relationshipModelValidationService.addValidator(validator);
+      case TREE -> treeModelValidationService.addValidator(validator);
+      case PRINT -> printModelValidationService.addValidator(validator);
+      case CONTENT -> contentModelValidationService.addValidator(validator);
+      case MASTERDETAIL -> masterDetailModelValidationService.addValidator(validator);
+    }
+  }
+
+  /** Removes a validator previously added via {@link #addValidator(ModelType, ModelValidator)} for {@code modelType}. */
+  public void removeValidator(ModelType modelType, ModelValidator validator) {
+    switch (modelType) {
+      case DOCUMENT, TYPEDEFINITION -> documentModelValidationService.removeValidator(validator);
+      case OVERVIEW -> overviewModelValidationService.removeValidator(validator);
+      case FORM -> formModelValidationService.removeValidator(validator);
+      case APPLICATION -> applicationModelValidationService.removeValidator(validator);
+      case RELATIONSHIP -> relationshipModelValidationService.removeValidator(validator);
+      case TREE -> treeModelValidationService.removeValidator(validator);
+      case PRINT -> printModelValidationService.removeValidator(validator);
+      case CONTENT -> contentModelValidationService.removeValidator(validator);
+      case MASTERDETAIL -> masterDetailModelValidationService.removeValidator(validator);
+    }
   }
 
   /**

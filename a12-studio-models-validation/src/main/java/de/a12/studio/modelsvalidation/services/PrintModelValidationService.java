@@ -19,12 +19,13 @@ import de.a12.studio.modelsvalidation.validators.print.PrintHeadlineOrderValidat
 import de.a12.studio.modelsvalidation.validators.print.PrintImageValidator;
 import de.a12.studio.modelsvalidation.validators.print.PrintTableColumnWidthValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates a {@link PrintModel}: generic header checks plus rules ported from the print engine's validation. */
 public final class PrintModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
@@ -37,9 +38,17 @@ public final class PrintModelValidationService {
       new PrintCalculationValidator(),
       new PrintTableColumnWidthValidator(),
       new PrintImageValidator(),
-      new PrintHeadlineOrderValidator());
+      new PrintHeadlineOrderValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(PrintModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }

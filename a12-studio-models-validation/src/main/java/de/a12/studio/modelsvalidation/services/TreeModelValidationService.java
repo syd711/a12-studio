@@ -18,12 +18,13 @@ import de.a12.studio.modelsvalidation.validators.tree.TreeHierarchicalColumnRefV
 import de.a12.studio.modelsvalidation.validators.tree.TreeNodesNotEmptyValidator;
 import de.a12.studio.modelsvalidation.validators.tree.TreeUniqueNodeValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates a {@link TreeModel}: generic header checks plus the tree-specific rules ported from SME. */
 public final class TreeModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
@@ -35,9 +36,17 @@ public final class TreeModelValidationService {
       new TreeUniqueNodeValidator(),
       new TreeDocumentModelReferenceValidator(),
       new TreeColumnFieldValidator(),
-      new TreeHierarchicalColumnRefValidator());
+      new TreeHierarchicalColumnRefValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(TreeModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }

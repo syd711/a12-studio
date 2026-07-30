@@ -14,12 +14,13 @@ import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentElementIdUniqueValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentRootElementValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates a {@link ContentModel}: generic header checks plus content-tree structure rules. */
 public final class ContentModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
@@ -27,9 +28,17 @@ public final class ContentModelValidationService {
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
       new ContentRootElementValidator(),
-      new ContentElementIdUniqueValidator());
+      new ContentElementIdUniqueValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(ContentModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }

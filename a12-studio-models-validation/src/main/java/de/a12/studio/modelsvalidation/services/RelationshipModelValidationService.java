@@ -18,12 +18,13 @@ import de.a12.studio.modelsvalidation.validators.relationship.RelationshipLinkDo
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipUniqueRolesValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipUpperLimitValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates a {@link RelationshipModel}: generic header checks plus the relationship-specific rules ported from SME. */
 public final class RelationshipModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
@@ -35,9 +36,17 @@ public final class RelationshipModelValidationService {
       new RelationshipUpperLimitValidator(),
       new RelationshipDocumentModelReferenceValidator(),
       new RelationshipLinkDocumentModelValidator(),
-      new RelationshipGeneratedDmNameLengthValidator());
+      new RelationshipGeneratedDmNameLengthValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(RelationshipModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }

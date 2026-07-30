@@ -20,13 +20,14 @@ import de.a12.studio.modelsvalidation.validators.StringPatternErrorMessageValida
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates a {@link DocumentModel} (and its {@code TypeDefinitionModel} subclass): structural reference
  * checks, the ported kernel consistency rules, and the generic header checks (locale, time zone). */
 public final class DocumentModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingReferenceValidator(),
       new SchemaVersionValidator(),
       new DuplicateIdValidator(),
@@ -40,9 +41,17 @@ public final class DocumentModelValidationService {
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
       new TimeZoneValidator(),
-      new StringPatternErrorMessageValidator());
+      new StringPatternErrorMessageValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(DocumentModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }

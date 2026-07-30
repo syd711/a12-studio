@@ -15,12 +15,13 @@ import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidato
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormSiblingNameUniquenessValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates a {@link FormModel}: generic header checks plus the form-specific rules ported from SME. */
 public final class FormModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
@@ -29,9 +30,17 @@ public final class FormModelValidationService {
       new FormDocumentModelReferenceValidator(),
       new FormFieldReferenceValidator(),
       new FormLayoutColumnSumValidator(),
-      new FormSiblingNameUniquenessValidator());
+      new FormSiblingNameUniquenessValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(FormModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }

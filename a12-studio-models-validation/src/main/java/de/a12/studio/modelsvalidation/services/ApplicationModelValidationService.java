@@ -15,12 +15,13 @@ import de.a12.studio.modelsvalidation.validators.application.ApplicationSceneGra
 import de.a12.studio.modelsvalidation.validators.application.ApplicationUniqueNamesValidator;
 import de.a12.studio.modelsvalidation.validators.application.ApplicationViewAddValidator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Validates an {@link ApplicationModel}: generic header checks plus the app-model rules ported from SME. */
 public final class ApplicationModelValidationService {
 
-  private static final List<ModelValidator> VALIDATORS = List.of(
+  private final List<ModelValidator> validators = new ArrayList<>(List.of(
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
@@ -29,9 +30,17 @@ public final class ApplicationModelValidationService {
       new HeaderModelReferenceValidator(),
       new ApplicationUniqueNamesValidator(),
       new ApplicationSceneGraphValidator(),
-      new ApplicationViewAddValidator());
+      new ApplicationViewAddValidator()));
+
+  public void addValidator(ModelValidator validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(ModelValidator validator) {
+    validators.remove(validator);
+  }
 
   public List<ModelValidationError> validate(ApplicationModel model, ValidationContext context) {
-    return ValidatorRunner.runAll(VALIDATORS, model, context);
+    return ValidatorRunner.runAll(validators, model, context);
   }
 }
