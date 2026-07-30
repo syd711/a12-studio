@@ -1,6 +1,7 @@
 package de.a12.studio.models.formmodel;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@JsonPropertyOrder({"type", "id", "name", "offset", "span", "style", "readonly", "messageExposition", "label",
+    "datePickerConfig", "elementRef", "tooltipsOnTop"})
 public class Control extends Cell {
 
   // Reference to the underlying Document Model field (or group, for attachments) this Control edits.

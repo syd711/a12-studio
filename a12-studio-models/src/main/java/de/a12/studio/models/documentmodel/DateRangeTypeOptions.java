@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 public class DateRangeTypeOptions {
 
-  private String rangeSeparator;
   private String format;
+  private String rangeSeparator;
   private Boolean youngerThan1900Check;
   private String interpretationOfYear;
   private String notInDCustomFormat;

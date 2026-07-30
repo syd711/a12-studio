@@ -14,6 +14,8 @@ import java.util.List;
 @Setter
 public abstract class AbstractRepeat extends ScreenElement {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean readonly;
   private List<RepeatOverviewColumn> repeatOverviewColumn = new ArrayList<>();
   // Reference to the repeatable Document Model group this repeat iterates over.
   private String groupRef;
@@ -29,8 +31,6 @@ public abstract class AbstractRepeat extends ScreenElement {
   private Boolean enableColumnsResize;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean infiniteScrolling;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Boolean readonly;
   // "TEXT" or "INPUT"; defines how readonly columns/controls of this repeat are rendered.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String readonlyPresentation;

@@ -27,7 +27,7 @@
             <VBox spacing="3.0">
                <children>
                       <CheckBox fx:id="useApplicationGroupsCheckBox" text="Use Application Groups" />
-                      <Label styleClass="field-description" text="Used for multi A12 application setups." />
+                      <Label styleClass="field-description" wrapText="true" text="Prefixes every model's id with the group name and updates all references, so this project's models stay unique when deployed alongside other A12 applications." />
                </children>
             </VBox>
             <VBox>

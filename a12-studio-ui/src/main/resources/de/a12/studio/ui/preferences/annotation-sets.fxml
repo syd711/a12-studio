@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.AnnotationSetsController">
     <top>
@@ -17,4 +24,56 @@
             </BorderPane.margin>
         </VBox>
     </top>
+    <center>
+        <BorderPane BorderPane.alignment="TOP_LEFT">
+            <top>
+                <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
+                    <items>
+                        <Button fx:id="editButton" disable="true" mnemonicParsing="false" onAction="#onEdit" styleClass="secondary-button" text="Edit">
+                            <tooltip>
+                                <Tooltip text="Rename the selected annotation set and prune its annotations." />
+                            </tooltip>
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="18" />
+                            </graphic>
+                        </Button>
+                        <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#onDelete" styleClass="delete-button">
+                            <tooltip>
+                                <Tooltip text="Delete the selected annotation set." />
+                            </tooltip>
+                            <graphic>
+                                <FontIcon iconColor="#c0392b" iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
+                            </graphic>
+                        </Button>
+                        <Separator orientation="VERTICAL" />
+                        <Button fx:id="exportButton" disable="true" mnemonicParsing="false" onAction="#onExport" styleClass="secondary-button" text="Export">
+                            <tooltip>
+                                <Tooltip text="Export the selected annotation set to a JSON file." />
+                            </tooltip>
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2f-file-export-outline" iconSize="18" />
+                            </graphic>
+                        </Button>
+                        <Button fx:id="importButton" mnemonicParsing="false" onAction="#onImport" styleClass="secondary-button" text="Import">
+                            <tooltip>
+                                <Tooltip text="Import one or more annotation sets from JSON files." />
+                            </tooltip>
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2f-file-import-outline" iconSize="18" />
+                            </graphic>
+                        </Button>
+                    </items>
+                </ToolBar>
+            </top>
+            <center>
+                <TableView fx:id="table" BorderPane.alignment="CENTER">
+                    <columns>
+                        <TableColumn fx:id="nameColumn" prefWidth="220.0" text="NAME" />
+                        <TableColumn fx:id="headerEntriesColumn" prefWidth="150.0" text="HEADER ENTRIES" />
+                        <TableColumn fx:id="contentEntriesColumn" prefWidth="150.0" text="CONTENT ENTRIES" />
+                    </columns>
+                </TableView>
+            </center>
+        </BorderPane>
+    </center>
 </BorderPane>

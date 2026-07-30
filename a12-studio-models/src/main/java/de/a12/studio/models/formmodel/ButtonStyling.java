@@ -12,11 +12,11 @@ public class ButtonStyling {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText label;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Icon icon;
   // "PRIMARY" or "SECONDARY".
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String priority;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean destructive;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Icon icon;
 }

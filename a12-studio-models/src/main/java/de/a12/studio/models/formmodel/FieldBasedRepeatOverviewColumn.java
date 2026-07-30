@@ -21,10 +21,10 @@ public class FieldBasedRepeatOverviewColumn extends RepeatOverviewColumn {
   private Alignment specificHorizontalAlignment;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Alignment specificVerticalAlignment;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String messageExposition;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean readonly;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String messageExposition;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private DatePickerConfig datePickerConfig;
   private String elementRef;

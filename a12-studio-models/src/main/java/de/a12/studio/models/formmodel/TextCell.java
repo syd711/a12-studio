@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 public class TextCell extends Cell {
 
-  private TextContainer content;
   // Display variant, e.g. "INFO", "WARNING", "SUCCESS", "ERROR".
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String decoration;
+  private TextContainer content;
 
   public TextCell() {
     setType(CellType.TEXT_CELL);

@@ -25,5 +25,6 @@ public class GroupConfig {
   private String indexFieldName;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private IncludeConfig includeConfig;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Element> elements = new ArrayList<>();
 }

@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 public class GroupConfigEntry {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private DependentConfig dependentGroup;
   private String groupRef;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer numberOfInitialRows;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private DependentConfig dependentGroup;
 }

@@ -24,6 +24,10 @@ public final class AnnotationHeaderRegistry {
 
   private AnnotationHeaderSet headerSet = new AnnotationHeaderSet();
 
+  public AnnotationHeaderSet getHeaderSet() {
+    return headerSet;
+  }
+
   public void rebuild(@NonNull Project project) {
     List<ProjectItem> documentItems = new ArrayList<>();
     collectDocumentItems(project.getRoot(), documentItems);

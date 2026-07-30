@@ -55,4 +55,18 @@ public class StudioFileChooser {
   public List<File> showOpenMultipleDialog(Stage stage) {
     return fileChooser.showOpenMultipleDialog(stage);
   }
+
+  public File showSaveDialog(Stage stage) {
+    try {
+      File file = fileChooser.showSaveDialog(stage);
+      if (file != null) {
+        LocalUISettings.saveLastFolderLocation(file);
+      }
+
+      return file;
+    } catch (Exception e) {
+      log.error("Error saving file location: " + e.getMessage(), e);
+    }
+    return null;
+  }
 }

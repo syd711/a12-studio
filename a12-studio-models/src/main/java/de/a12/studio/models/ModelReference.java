@@ -1,5 +1,6 @@
 package de.a12.studio.models;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +13,9 @@ public class ModelReference {
   public static final String PURPOSE_DOCUMENT_MODEL = "Document model";
   public static final String PURPOSE_DOCUMENT_MODEL_FOR_TREE = "document-model-for-tree";
 
-  private String alias;
-  private ModelType modelType;
   private String purpose;
+  private ModelType modelType;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String alias;
   private String reference;
 }

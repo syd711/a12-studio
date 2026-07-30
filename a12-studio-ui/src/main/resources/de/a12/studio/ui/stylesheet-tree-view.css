@@ -273,3 +273,17 @@
 #projectTree .tree-cell.drag-over-target .tree-icon {
     -fx-icon-color: -fx-text-color-inverse;
 }
+
+/*
+ * ID-scoped overrides for the annotation data set editor's TreeView (fx:id="annotationTree"),
+ * mirroring #projectTree above - an id selector always outranks Modena's built-in class/pseudo-class
+ * selectors, so this is used as a guaranteed override for row selection background/text regardless
+ * of focus state.
+ */
+#annotationTree .tree-cell:filled:selected,
+#annotationTree .tree-cell:filled:selected:focused,
+#annotationTree .tree-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+    -fx-text-fill: -fx-text-color-inverse;
+}

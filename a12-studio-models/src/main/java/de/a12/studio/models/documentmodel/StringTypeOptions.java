@@ -19,10 +19,10 @@ public class StringTypeOptions {
   private Boolean noValueValidation;
   private Integer minLength;
   private Integer maxLength;
-  private String pattern;
-  private Boolean alphabeticalSorting;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> errorMessage = new ArrayList<>();
+  private String pattern;
+  private Boolean alphabeticalSorting;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<HintList> hintList = new ArrayList<>();
 }

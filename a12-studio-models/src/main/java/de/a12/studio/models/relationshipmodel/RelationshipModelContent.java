@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.a12.studio.models.Label;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+// linkDocumentModel's JsonNode type otherwise gets pushed to the end of the property order by Jackson's
+// default introspection regardless of declaration order, so the order must be pinned explicitly here.
+@JsonPropertyOrder({"duplicatesAllowed", "linkDocumentModel", "labels", "entityCharacteristics"})
 public class RelationshipModelContent {
 
   private Boolean duplicatesAllowed;

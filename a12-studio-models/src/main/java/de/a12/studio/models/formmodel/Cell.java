@@ -24,8 +24,8 @@ public abstract class Cell {
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private CellType type;
   private String id;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String name;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private GridSpan span;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String name;
 }

@@ -4,7 +4,6 @@ import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
-import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
@@ -16,17 +15,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Collects the annotation names (and their most recently used value) used across the whole project, grouped
- * by model type and field type, so property editors can suggest previously used annotation names instead of
- * requiring users to retype them, and prefill the value that went with a suggested name.
- * "Field type" is the field's data type (e.g. "StringType") for {@link FieldElement}s, or the element's own
- * type (e.g. "Group", "Rule") for every other element, since annotations can be attached to any element.
- * Names are reference-counted per key so callers can incrementally {@link #addName} / {@link #removeName} as
- * annotations are edited, without requiring a full {@link #rebuild} of the project.
+ * Collects the annotation names (and their most recently used value) used on document content (as opposed to
+ * document headers, see {@link AnnotationHeaderRegistry}) across the whole project, grouped by model type, so
+ * property editors can suggest previously used annotation names instead of requiring users to retype them, and
+ * prefill the value that went with a suggested name.
+ * Names are reference-counted per model type so callers can incrementally {@link #addName} / {@link #removeName}
+ * as annotations are edited, without requiring a full {@link #rebuild} of the project.
  */
 public final class AnnotationFieldRegistry {
 
   private AnnotationFieldSet fieldSet = new AnnotationFieldSet();
+
+  public AnnotationFieldSet getFieldSet() {
+    return fieldSet;
+  }
 
   public void rebuild(@NonNull Project project) {
     List<ProjectItem> documentItems = new ArrayList<>();
@@ -37,7 +39,7 @@ public final class AnnotationFieldRegistry {
       if (item.getModel() instanceof DocumentModel documentModel
           && documentModel.getContent() != null && documentModel.getContent().getModelRoot() != null) {
         for (GroupElement rootGroup : documentModel.getContent().getModelRoot().getRootGroups()) {
-          collectFromElement(rootGroup, documentModel.getModelType(), collected.getFieldTypes());
+          collectFromElement(rootGroup, documentModel.getModelType(), collected.getModelTypes());
         }
       }
     }
@@ -45,56 +47,52 @@ public final class AnnotationFieldRegistry {
   }
 
   /**
-   * Returns the annotation names previously used for the given model type / field type combination, sorted
-   * alphabetically. Never {@code null}.
+   * Returns the annotation names previously used for the given model type, sorted alphabetically.
+   * Never {@code null}.
    */
-  public @NonNull List<String> getNames(@Nullable ModelType modelType, @Nullable String fieldType) {
-    Map<String, NameUsage> values = valuesFor(modelType, fieldType);
+  public @NonNull List<String> getNames(@Nullable ModelType modelType) {
+    Map<String, NameUsage> values = valuesFor(modelType);
     return values == null ? List.of() : new ArrayList<>(values.keySet());
   }
 
   /**
-   * Returns the value most recently used alongside {@code name} for the given key, so a property editor can
-   * prefill the value field when the user picks {@code name} from the suggestions. {@code null} if the name
-   * isn't known for this key.
+   * Returns the value most recently used alongside {@code name} for the given model type, so a property editor
+   * can prefill the value field when the user picks {@code name} from the suggestions. {@code null} if the name
+   * isn't known for this model type.
    */
-  public @Nullable String getValue(@Nullable ModelType modelType, @Nullable String fieldType, @Nullable String name) {
+  public @Nullable String getValue(@Nullable ModelType modelType, @Nullable String name) {
     if (name == null || name.isBlank()) {
       return null;
     }
-    Map<String, NameUsage> values = valuesFor(modelType, fieldType);
+    Map<String, NameUsage> values = valuesFor(modelType);
     NameUsage usage = values == null ? null : values.get(name);
     return usage == null ? null : usage.getValue();
   }
 
   /**
-   * Registers a new use of {@code name} (with {@code value}) for the given key, so it's offered as a
+   * Registers a new use of {@code name} (with {@code value}) for the given model type, so it's offered as a
    * suggestion even before the next full {@link #rebuild}. Blank names are ignored. Callers should pair this
    * with {@link #removeName} when an annotation's name changes or the annotation is deleted, so the registry
    * stays in sync with what's actually used in the project.
    */
-  public void addName(@Nullable ModelType modelType, @Nullable String fieldType, @Nullable String name, @Nullable String value) {
+  public void addName(@Nullable ModelType modelType, @Nullable String name, @Nullable String value) {
     if (name == null || name.isBlank()) {
       return;
     }
-    AnnotationModelSet modelSet = getOrCreateModelSet(fieldSet.getFieldTypes(), fieldType, modelType);
+    AnnotationModelSet modelSet = getOrCreateModelSet(fieldSet.getModelTypes(), modelType);
     mergeUsage(modelSet.getValues(), name, value);
   }
 
   /**
-   * Reverses a previous {@link #addName} call, dropping {@code name} from the suggestions for this key once
-   * its last use is gone. Blank names are ignored.
+   * Reverses a previous {@link #addName} call, dropping {@code name} from the suggestions for this model type
+   * once its last use is gone. Blank names are ignored.
    */
-  public void removeName(@Nullable ModelType modelType, @Nullable String fieldType, @Nullable String name) {
+  public void removeName(@Nullable ModelType modelType, @Nullable String name) {
     if (name == null || name.isBlank()) {
       return;
     }
-    AnnotationSet set = fieldSet.getFieldTypes().get(fieldType);
-    if (set == null) {
-      return;
-    }
     String modelTypeKey = modelTypeKey(modelType);
-    AnnotationModelSet modelSet = set.getModelSets().get(modelTypeKey);
+    AnnotationModelSet modelSet = fieldSet.getModelTypes().get(modelTypeKey);
     if (modelSet == null) {
       return;
     }
@@ -104,48 +102,34 @@ public final class AnnotationFieldRegistry {
       values.remove(name);
     }
     if (values.isEmpty()) {
-      set.getModelSets().remove(modelTypeKey);
-    }
-    if (set.getModelSets().isEmpty()) {
-      fieldSet.getFieldTypes().remove(fieldType);
+      fieldSet.getModelTypes().remove(modelTypeKey);
     }
   }
 
   /**
    * Updates the value on record for an already-registered {@code name}, without affecting its reference
    * count. Used when an annotation's value is edited without its name changing. A no-op if the name isn't
-   * registered for this key.
+   * registered for this model type.
    */
-  public void setValue(@Nullable ModelType modelType, @Nullable String fieldType, @Nullable String name, @Nullable String value) {
+  public void setValue(@Nullable ModelType modelType, @Nullable String name, @Nullable String value) {
     if (name == null || name.isBlank()) {
       return;
     }
-    Map<String, NameUsage> values = valuesFor(modelType, fieldType);
+    Map<String, NameUsage> values = valuesFor(modelType);
     NameUsage usage = values == null ? null : values.get(name);
     if (usage != null) {
       usage.setValue(value);
     }
   }
 
-  private @Nullable Map<String, NameUsage> valuesFor(@Nullable ModelType modelType, @Nullable String fieldType) {
-    AnnotationSet set = fieldSet.getFieldTypes().get(fieldType);
-    if (set == null) {
-      return null;
-    }
-    AnnotationModelSet modelSet = set.getModelSets().get(modelTypeKey(modelType));
+  private @Nullable Map<String, NameUsage> valuesFor(@Nullable ModelType modelType) {
+    AnnotationModelSet modelSet = fieldSet.getModelTypes().get(modelTypeKey(modelType));
     return modelSet == null ? null : modelSet.getValues();
   }
 
-  private static AnnotationModelSet getOrCreateModelSet(Map<String, AnnotationSet> setsByFieldType, String fieldType,
+  private static AnnotationModelSet getOrCreateModelSet(Map<String, AnnotationModelSet> setsByModelType,
       ModelType modelType) {
-    AnnotationSet set = setsByFieldType.computeIfAbsent(fieldType, AnnotationFieldRegistry::newAnnotationSet);
-    return set.getModelSets().computeIfAbsent(modelTypeKey(modelType), AnnotationFieldRegistry::newAnnotationModelSet);
-  }
-
-  private static AnnotationSet newAnnotationSet(String fieldType) {
-    AnnotationSet set = new AnnotationSet();
-    set.setName(fieldType);
-    return set;
+    return setsByModelType.computeIfAbsent(modelTypeKey(modelType), AnnotationFieldRegistry::newAnnotationModelSet);
   }
 
   private static AnnotationModelSet newAnnotationModelSet(String modelTypeKey) {
@@ -168,18 +152,6 @@ public final class AnnotationFieldRegistry {
     }
   }
 
-  /**
-   * The "field type" grouping key for an element: the field's data type for a {@link FieldElement}, or the
-   * element's own type (e.g. "Group", "Rule", "Computation") otherwise.
-   */
-  public static String resolveFieldType(@NonNull Element element) {
-    if (element instanceof FieldElement fieldElement && fieldElement.getField() != null
-        && fieldElement.getField().getFieldType() != null) {
-      return fieldElement.getField().getFieldType().getType();
-    }
-    return element.getType() == null ? null : element.getType().getValue();
-  }
-
   private static void collectDocumentItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
     if (item.isFolder()) {
       for (ProjectItem child : item.getChildren()) {
@@ -191,11 +163,10 @@ public final class AnnotationFieldRegistry {
   }
 
   private static void collectFromElement(@NonNull Element element, ModelType modelType,
-      @NonNull Map<String, AnnotationSet> collected) {
-    String fieldType = resolveFieldType(element);
+      @NonNull Map<String, AnnotationModelSet> collected) {
     for (Annotation annotation : element.getAnnotations()) {
       if (annotation.getName() != null && !annotation.getName().isBlank()) {
-        AnnotationModelSet modelSet = getOrCreateModelSet(collected, fieldType, modelType);
+        AnnotationModelSet modelSet = getOrCreateModelSet(collected, modelType);
         mergeUsage(modelSet.getValues(), annotation.getName(), annotation.getValue());
       }
     }

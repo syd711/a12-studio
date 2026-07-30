@@ -12,7 +12,7 @@ public class HeaderFooterBox {
 
   private String id;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private ButtonGroup majorButtons;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private ButtonGroup minorButtons;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private ButtonGroup majorButtons;
 }

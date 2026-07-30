@@ -12,21 +12,21 @@ import lombok.Setter;
 @Setter
 public class FieldConfigEntry {
 
-  private String elementRef;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText label;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private TextContainer placeholder;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private TextContainer hint;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String initialValue;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private TextContainer suffix;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String exposition;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String initialValue;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean readonly;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private DependentConfig dependentField;
+  private String elementRef;
 }

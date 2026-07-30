@@ -13,9 +13,9 @@ import java.util.List;
 @Setter
 public class EntityCharacteristic {
 
+  private Boolean ordered;
+  private LinkConstraints linkConstraints;
+  private List<Label> labels = new ArrayList<>();
   private String role;
   private String documentModel;
-  private Boolean ordered;
-  private List<Label> labels = new ArrayList<>();
-  private LinkConstraints linkConstraints;
 }

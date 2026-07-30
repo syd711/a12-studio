@@ -14,8 +14,8 @@ import java.util.Map;
 @Setter
 public class TreeNode {
 
-  private String id;
   private Map<String, Object> configuration;
+  private String id;
   private List<TreeNodeAction> actions = new ArrayList<>();
   private String documentModelRef;
   private List<TreeNodeColumn> columns = new ArrayList<>();

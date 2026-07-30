@@ -1,4 +1,5 @@
 {
-  "settingsType": "ANNOTATION",
-  "settingsName": "annotation-settings.json"
+  "dataSets": [],
+  "settingsName": "annotation-settings.json",
+  "settingsType": "ANNOTATION"
 }

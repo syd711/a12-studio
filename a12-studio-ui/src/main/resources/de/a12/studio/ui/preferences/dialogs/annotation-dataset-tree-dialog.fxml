@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="480.0" prefHeight="540.0" prefWidth="480.0" styleClass="navigation-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.dialogs.AnnotationDataSetTreeDialogController">
+   <top>
+      <fx:include fx:id="header" source="../../components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <VBox spacing="8.0" BorderPane.alignment="TOP_LEFT">
+         <children>
+            <Label styleClass="field-label" text="Name" />
+            <TextField fx:id="nameField" promptText="Enter the annotation set name here..." />
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+               <children>
+                  <Label styleClass="field-label" text="Annotations" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="removeButton" mnemonicParsing="false" onAction="#onRemove" styleClass="delete-button" text="Remove">
+                     <graphic>
+                        <FontIcon iconLiteral="mdi2t-trash-can-outline" iconSize="16" />
+                     </graphic>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets top="6.0" />
+               </VBox.margin>
+            </HBox>
+            <TreeView fx:id="annotationTree" prefHeight="360.0" VBox.vgrow="ALWAYS" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+   <bottom>
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <items>
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="Save" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel" />
+         </items>
+      </ToolBar>
+   </bottom>
+</BorderPane>

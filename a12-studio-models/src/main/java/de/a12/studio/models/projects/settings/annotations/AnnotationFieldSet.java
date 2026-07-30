@@ -4,17 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The annotation names used across a project, grouped by field type (see
- * {@link AnnotationFieldRegistry#resolveFieldType}), each further grouped by model type via {@link AnnotationSet}.
+ * The content (field) annotation names used across a project, grouped by model type via {@link AnnotationModelSet}.
  */
 public class AnnotationFieldSet {
-  private Map<String, AnnotationSet> fieldTypes = new HashMap<>();
+  private Map<String, AnnotationModelSet> modelTypes = new HashMap<>();
 
-  public Map<String, AnnotationSet> getFieldTypes() {
-    return fieldTypes;
+  public Map<String, AnnotationModelSet> getModelTypes() {
+    return modelTypes;
   }
 
-  public void setFieldTypes(Map<String, AnnotationSet> fieldTypes) {
-    this.fieldTypes = fieldTypes;
+  public void setModelTypes(Map<String, AnnotationModelSet> modelTypes) {
+    this.modelTypes = modelTypes;
   }
 }
