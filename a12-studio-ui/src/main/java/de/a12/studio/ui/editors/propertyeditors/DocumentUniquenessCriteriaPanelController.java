@@ -12,6 +12,7 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tooltip;
@@ -91,17 +92,28 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
     javafx.scene.control.Label nameLabel = new javafx.scene.control.Label(criterion.getName());
     nameLabel.setId("uniquenessCriterionName-" + index);
     nameLabel.setPrefWidth(160.0);
+    makeClickableToEdit(nameLabel, criterion);
 
     javafx.scene.control.Label fieldsLabel = new javafx.scene.control.Label(fieldsSummary(criterion));
     fieldsLabel.setId("uniquenessCriterionFields-" + index);
     fieldsLabel.setWrapText(true);
     fieldsLabel.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(fieldsLabel, Priority.ALWAYS);
+    makeClickableToEdit(fieldsLabel, criterion);
 
     HBox row = new HBox(10.0, nameLabel, fieldsLabel, createActionsBox(criterion, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
     return row;
+  }
+
+  private void makeClickableToEdit(javafx.scene.control.Label label, DocumentUniquenessCriterion criterion) {
+    label.setCursor(Cursor.HAND);
+    label.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        openEditDialog(criterion);
+      }
+    });
   }
 
   /** Every field's path (see {@link ElementIndex#getPath}), joined for a compact row summary. */
@@ -123,17 +135,20 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
         .orElse(fieldId);
   }
 
+  private void openEditDialog(DocumentUniquenessCriterion criterion) {
+    Dialogs.showUniquenessCriterion(Studio.stage, model, criterion, usedNames(criterion)).ifPresent(edited -> {
+      criterion.setName(edited.getName());
+      criterion.setFields(edited.getFields());
+      criterion.setErrorMessage(edited.getErrorMessage());
+      rebuildRows();
+      commitChange();
+    });
+  }
+
   private HBox createActionsBox(DocumentUniquenessCriterion criterion, int index, int rowCount) {
     VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () ->
-        Dialogs.showUniquenessCriterion(Studio.stage, model, criterion, usedNames(criterion)).ifPresent(edited -> {
-          criterion.setName(edited.getName());
-          criterion.setFields(edited.getFields());
-          criterion.setErrorMessage(edited.getErrorMessage());
-          rebuildRows();
-          commitChange();
-        }));
+    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(criterion));
 
     Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
       DocumentUniquenessCriterion copy = new DocumentUniquenessCriterion();
