@@ -10,6 +10,7 @@ import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
+import de.a12.studio.ui.editors.propertyeditors.DocumentUniquenessCriteriaPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModelReferencesPanelController;
@@ -53,6 +54,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   private AnnotationsPanelController annotationsController;
 
   @FXML
+  private DocumentUniquenessCriteriaPanelController documentUniquenessCriteriaController;
+
+  @FXML
   private ModelReferencesPanelController modelReferencesController;
 
   @FXML
@@ -86,6 +90,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     labelsController.setSaveMode(saveMode);
     rolesController.setSaveMode(saveMode);
     annotationsController.setSaveMode(saveMode);
+    documentUniquenessCriteriaController.setSaveMode(saveMode);
     modelReferencesController.setSaveMode(saveMode);
     timezoneController.setSaveMode(saveMode);
 
@@ -103,9 +108,12 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       annotationsController.setModel(model);
       modelReferencesController.setModel(model);
       if (model instanceof DocumentModel documentModel) {
+        documentUniquenessCriteriaController.setModel(documentModel);
+        documentUniquenessCriteriaController.setVisible(true);
         timezoneController.setModel(documentModel);
         timezoneController.setVisible(true);
       } else {
+        documentUniquenessCriteriaController.setVisible(false);
         timezoneController.setVisible(false);
       }
       supportedCharactersController.setVisible(!(model instanceof ApplicationModel));
@@ -128,6 +136,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         labelsController,
         rolesController,
         annotationsController,
+        documentUniquenessCriteriaController,
         modelReferencesController,
         timezoneController);
 

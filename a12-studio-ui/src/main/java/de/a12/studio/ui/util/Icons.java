@@ -41,6 +41,7 @@ public interface Icons {
   String STOP = "mdi2s-stop";
   String CONSOLE = "mdi2c-console";
   String SCENE = "mdi2m-movie-open";
+  String FLOW = "mdi2a-arrow-bottom-right-bold-box";
   String SERVER = "mdi2s-server";
 
   String ELEMENT_GROUP = "mdi2f-folder-outline";

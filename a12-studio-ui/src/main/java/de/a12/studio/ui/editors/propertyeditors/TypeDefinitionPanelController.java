@@ -149,9 +149,24 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
         return typeDefinitionLabelsById.getOrDefault(id, id);
       }
 
+      /**
+       * Editable combo boxes re-derive {@code value} from whatever text is currently showing the moment
+       * focus leaves the control, converting it back with this method - not just while the user is typing,
+       * but also right after clicking a popup item, since JavaFX can't tell those two cases apart here. That
+       * re-derivation must invert {@link #toString}, or picking a type definition whose label isn't its own
+       * id (every inherited one - see {@link #collectAvailableTypeDefinitionLabels}) gets silently
+       * overwritten with the raw label text a moment after being picked, corrupting the field's {@code
+       * typeDefinitionId} and making a fresh "Missing Type Definition" error flash back in right after it
+       * had just cleared. Falls back to the combo's current value for free-typed text that doesn't match any
+       * known label, rather than committing it as a bogus id.
+       */
       @Override
-      public String fromString(String name) {
-        return name;
+      public String fromString(String label) {
+        return typeDefinitionLabelsById.entrySet().stream()
+            .filter(entry -> entry.getValue().equals(label))
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElseGet(dataTypeCombo::getValue);
       }
     });
 
@@ -232,7 +247,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     super.setElement(element);
 
     typeDefinitionLabelsById = collectAvailableTypeDefinitionLabels(element.getId());
-    dataTypeCombo.getItems().setAll(typeDefinitionLabelsById.keySet());
+    setComboBoxItems(dataTypeCombo, List.copyOf(typeDefinitionLabelsById.keySet()));
 
     dataTypeComboBox.getItems().setAll(availableDataTypes());
     checkboxesGrid.setVisible(!checkboxesGridDisabled && !isMultiSelectParent());

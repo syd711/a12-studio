@@ -6,6 +6,7 @@ import de.a12.studio.models.Label;
 import de.a12.studio.models.Locale;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelContent;
+import de.a12.studio.models.documentmodel.DocumentUniquenessCriterion;
 import de.a12.studio.models.documentmodel.ModelConfig;
 import org.jspecify.annotations.NonNull;
 
@@ -14,12 +15,13 @@ import java.util.List;
 
 /**
  * Captures the subset of a {@link DocumentModel} that {@link ModelSettingsDialog}'s property editors
- * can change (the header fields, plus {@link ModelConfig#getSupportedCharacters()} and {@link
- * ModelConfig#getTimeZone()}), so {@link #restore()} can undo whatever they already applied to the live model
- * object while the dialog was open. Deliberately narrower than a whole-model snapshot: it never touches {@link
- * DocumentModelContent#getModelRoot()} (the element tree), which this dialog never edits and which other,
- * non-modal parts of the UI may already hold live {@code Element} references into - replacing it wholesale
- * (e.g. via a JSON round-trip of the whole model) would silently detach those references.
+ * can change (the header fields, plus {@link ModelConfig#getSupportedCharacters()}, {@link
+ * ModelConfig#getTimeZone()} and {@link ModelConfig#getUniquenessCriteria()}), so {@link #restore()} can undo
+ * whatever they already applied to the live model object while the dialog was open. Deliberately narrower than
+ * a whole-model snapshot: it never touches {@link DocumentModelContent#getModelRoot()} (the element tree),
+ * which this dialog never edits and which other, non-modal parts of the UI may already hold live {@code
+ * Element} references into - replacing it wholesale (e.g. via a JSON round-trip of the whole model) would
+ * silently detach those references.
  */
 class ModelSnapshot {
 
@@ -32,6 +34,7 @@ class ModelSnapshot {
   private final List<Annotation> annotations = new ArrayList<>();
   private final String timeZone;
   private final List<String> supportedCharacters;
+  private final List<DocumentUniquenessCriterion> uniquenessCriteria = new ArrayList<>();
 
   ModelSnapshot(@NonNull A12Model<?> model) {
     this.model = model;
@@ -47,6 +50,9 @@ class ModelSnapshot {
     this.supportedCharacters = modelConfig != null && modelConfig.getSupportedCharacters() != null
         ? new ArrayList<>(modelConfig.getSupportedCharacters())
         : null;
+    if (modelConfig != null) {
+      copyUniquenessCriteria(modelConfig.getUniquenessCriteria(), uniquenessCriteria);
+    }
   }
 
   /**
@@ -65,6 +71,7 @@ class ModelSnapshot {
     if (modelConfig != null) {
       modelConfig.setTimeZone(timeZone);
       replaceContents(modelConfig.getSupportedCharacters(), supportedCharacters);
+      replaceContents(modelConfig.getUniquenessCriteria(), uniquenessCriteria);
     }
   }
 
@@ -90,6 +97,16 @@ class ModelSnapshot {
       Annotation copy = new Annotation();
       copy.setName(annotation.getName());
       copy.setValue(annotation.getValue());
+      target.add(copy);
+    }
+  }
+
+  private static void copyUniquenessCriteria(List<DocumentUniquenessCriterion> source, List<DocumentUniquenessCriterion> target) {
+    for (DocumentUniquenessCriterion criterion : source) {
+      DocumentUniquenessCriterion copy = new DocumentUniquenessCriterion();
+      copy.setName(criterion.getName());
+      copy.setFields(new ArrayList<>(criterion.getFields()));
+      copyLabels(criterion.getErrorMessage(), copy.getErrorMessage());
       target.add(copy);
     }
   }

@@ -110,10 +110,11 @@ public class FlowsPanelController extends AbstractPropertyEditor {
           setGraphic(null);
           return;
         }
-        if (getTreeTableRow().getItem() instanceof Scene) {
+        Object item = getTreeTableRow().getItem();
+        if (item instanceof Scene || item instanceof Flow) {
           Label nameLabel = new Label(name);
           nameLabel.getStyleClass().add("tree-cell-name-label");
-          FontIcon icon = WidgetFactory.createIcon(Icons.SCENE);
+          FontIcon icon = WidgetFactory.createIcon(item instanceof Scene ? Icons.SCENE : Icons.FLOW);
           icon.getStyleClass().add("tree-icon");
           HBox graphic = new HBox(4, icon, nameLabel);
           graphic.setAlignment(Pos.CENTER_LEFT);

@@ -43,6 +43,9 @@
                           <!-- Annotations -->
                           <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
 
+                          <!-- Document Uniqueness Criteria -->
+                          <fx:include fx:id="documentUniquenessCriteria" source="../propertyeditors/document-uniqueness-criteria-panel.fxml" />
+
                           <!-- Model References -->
                           <fx:include fx:id="modelReferences" source="../propertyeditors/model-references-panel.fxml" />
 

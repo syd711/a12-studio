@@ -261,6 +261,11 @@
     -fx-background-color: transparent;
 }
 
+.dialog-scroll-pane,
+.dialog-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
 .shortcut-key {
     -fx-font-family: monospace;
     -fx-font-size: 13px;

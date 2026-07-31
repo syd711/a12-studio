@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors.dialogs;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.DocumentUniquenessCriterion;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ButtonType;
@@ -7,6 +9,7 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class Dialogs {
 
@@ -41,5 +44,21 @@ public class Dialogs {
       return Optional.empty();
     }
     return Optional.of(controller.getValues());
+  }
+
+  /**
+   * @param criterion the criterion to edit, or {@code null} to create a new one (an empty dialog).
+   * @param usedNames every other criterion's name already in use on {@code model}, so the dialog can reject a
+   *                   duplicate {@link DocumentUniquenessCriterion#getName()}.
+   */
+  public static Optional<DocumentUniquenessCriterion> showUniquenessCriterion(Stage owner, DocumentModel model,
+                                                                                DocumentUniquenessCriterion criterion, Set<String> usedNames) {
+    FXMLLoader fxmlLoader = new FXMLLoader(DocumentUniquenessCriterionDialogController.class.getResource("document-uniqueness-criterion-dialog.fxml"));
+    String title = criterion == null ? "New Uniqueness Criterion" : "Edit Uniqueness Criterion";
+    Stage stage = WidgetFactory.createDialogStage("uniqueness-criterion-dialog", fxmlLoader, owner, title);
+    DocumentUniquenessCriterionDialogController controller = (DocumentUniquenessCriterionDialogController) stage.getUserData();
+    controller.initDialog(stage, model, criterion, usedNames);
+    stage.showAndWait();
+    return controller.getResult();
   }
 }

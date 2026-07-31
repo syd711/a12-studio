@@ -40,8 +40,8 @@
      </ToolBar>
      <TreeTableView fx:id="flowsTree" prefHeight="220.0" VBox.vgrow="ALWAYS">
        <columns>
-         <TreeTableColumn fx:id="nameColumn" prefWidth="220.0" text="NAME" />
-         <TreeTableColumn fx:id="descriptionColumn" prefWidth="320.0" text="DESCRIPTION" />
+         <TreeTableColumn fx:id="nameColumn" prefWidth="270.0" text="NAME" />
+         <TreeTableColumn fx:id="descriptionColumn" prefWidth="270.0" text="DESCRIPTION" />
        </columns>
      </TreeTableView>
    </VBox>

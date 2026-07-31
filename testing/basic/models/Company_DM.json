@@ -73,7 +73,7 @@
                         "fieldType": {
                           "type": "TypeDefType",
                           "TypeDefType": {
-                            "typeDefinitionId": "Order_DM_ProductType"
+                            "typeDefinitionId": "typedef_1eeadc7f-65fb-4802-85a2-c055acfa64cd"
                           }
                         },
                         "label": [

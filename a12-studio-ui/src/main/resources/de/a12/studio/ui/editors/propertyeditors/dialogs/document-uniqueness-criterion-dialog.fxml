@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="560.0" minWidth="560.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.dialogs.DocumentUniquenessCriterionDialogController">
+   <top>
+      <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
+         <content>
+            <VBox spacing="14.0">
+               <children>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="Name*" />
+                        <TextField fx:id="nameField" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="Fields*" />
+                        <VBox fx:id="fieldsBox" spacing="6.0" />
+                        <Label fx:id="noFieldsLabel" styleClass="placeholder-label"
+                               text="No eligible fields. A field must be Required (not only if its parent group is filled), not repeatable, and not transient."
+                               wrapText="true" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="Error Messages" />
+                        <GridPane fx:id="errorMessagesGrid" hgap="10.0" vgap="6.0">
+                           <columnConstraints>
+                              <ColumnConstraints minWidth="70.0" prefWidth="90.0" />
+                              <ColumnConstraints hgrow="ALWAYS" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                           </rowConstraints>
+                        </GridPane>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel">
+               <HBox.margin>
+                  <Insets right="12.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="   OK   " />
+         </children>
+         <padding>
+            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+         </padding>
+      </HBox>
+   </bottom>
+</BorderPane>
