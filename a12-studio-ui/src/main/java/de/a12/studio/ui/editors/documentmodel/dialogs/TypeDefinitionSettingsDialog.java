@@ -11,6 +11,7 @@ import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionRow;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionTableController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -26,6 +28,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -130,15 +133,30 @@ public class TypeDefinitionSettingsDialog implements Initializable, DialogContro
   }
 
   /**
-   * Closes this dialog (discarding any not-yet-saved Add/Delete of this model's own type definitions, same as
-   * {@link #onCancel}: navigating away is not an implicit Save) and opens {@code ownerModelId}'s own Type
-   * Definitions dialog in its place. Deferred to a later pulse via {@link Platform#runLater}, mirroring {@code
-   * UpdateInfoDialogController#onUpdateNow}: {@code stage} is itself showing via {@code showAndWait()} (see
-   * {@link Dialogs#openTypeDefinitions()}), so opening the next modal stage before that call has truly
-   * returned would nest it inside this one's event loop instead of replacing it.
+   * Closes this dialog and opens {@code ownerModelId}'s own Type Definitions dialog in its place. If this
+   * dialog has uncommitted changes ({@link PropertyEditorSaveMode.Deferred#isDirty()}), asks the user to save
+   * or discard them first, same as {@link #onCancel} would otherwise discard silently; the user can also
+   * cancel the navigation entirely and stay on this dialog. Deferred to a later pulse via {@link
+   * Platform#runLater}, mirroring {@code UpdateInfoDialogController#onUpdateNow}: {@code stage} is itself
+   * showing via {@code showAndWait()} (see {@link Dialogs#openTypeDefinitions()}), so opening the next modal
+   * stage before that call has truly returned would nest it inside this one's event loop instead of replacing
+   * it.
    */
   private void openOwnerModel(String ownerModelId) {
-    onDialogCancel();
+    if (saveMode.isDirty()) {
+      Optional<ButtonType> result = WidgetFactory.showAlertOption(stage, "You have unsaved changes.",
+          "Discard", "Save", "Save or discard them before opening \"" + ownerModelId + "\".", null);
+      if (result.isEmpty() || ButtonType.CANCEL.equals(result.get())) {
+        return;
+      }
+      if (ButtonType.OK.equals(result.get())) {
+        saveMode.flush();
+      }
+      else {
+        onDialogCancel();
+      }
+    }
+
     stage.close();
     Platform.runLater(() -> ProjectDocumentModels.findProjectItemByModelId(ownerModelId).ifPresent(item -> {
       Project project = Studio.getCurrentProject();

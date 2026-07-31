@@ -13,9 +13,9 @@
       <fx:include fx:id="header" source="scene-dialog-header.fxml" />
    </top>
    <center>
-      <VBox alignment="BASELINE_LEFT" prefHeight="90.0" BorderPane.alignment="TOP_LEFT">
+      <VBox alignment="BASELINE_LEFT" maxWidth="600.0" prefHeight="90.0" BorderPane.alignment="TOP_LEFT">
          <children>
-            <Label fx:id="textLabel" styleClass="dialog-text" text="Label">
+            <Label fx:id="textLabel" maxWidth="600.0" styleClass="dialog-text" text="Label" wrapText="true">
                <font>
                   <Font size="18.0" />
                </font>
@@ -23,11 +23,11 @@
                   <Insets />
                </VBox.margin>
             </Label>
-            <Label fx:id="helpLabel1" styleClass="preference-description" text="Label" wrapText="true">
+            <Label fx:id="helpLabel1" maxWidth="600.0" styleClass="preference-description" text="Label" wrapText="true">
                <VBox.margin>
                   <Insets top="12.0" />
                </VBox.margin></Label>
-            <Label fx:id="helpLabel2" layoutX="10.0" layoutY="43.0" styleClass="preference-description" text="Label" wrapText="true" />
+            <Label fx:id="helpLabel2" layoutX="10.0" layoutY="43.0" maxWidth="600.0" styleClass="preference-description" text="Label" wrapText="true" />
          </children>
          <BorderPane.margin>
             <Insets bottom="24.0" left="24.0" right="24.0" top="12.0" />

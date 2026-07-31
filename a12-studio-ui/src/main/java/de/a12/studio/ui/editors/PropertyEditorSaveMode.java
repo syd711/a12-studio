@@ -29,6 +29,13 @@ public interface PropertyEditorSaveMode {
     }
 
     /**
+     * Whether some editor sharing this save mode has committed a change since the last {@link #flush()}.
+     */
+    public boolean isDirty() {
+      return pending != null;
+    }
+
+    /**
      * Persists the project item if any editor sharing this save mode committed a change since the last flush.
      * Returns whether there was anything to save.
      */
