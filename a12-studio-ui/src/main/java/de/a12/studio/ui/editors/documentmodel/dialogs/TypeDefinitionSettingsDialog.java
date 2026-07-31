@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.documentmodel.dialogs;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
@@ -8,14 +9,18 @@ import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionModelFieldEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionRow;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionTableController;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -104,17 +109,46 @@ public class TypeDefinitionSettingsDialog implements Initializable, DialogContro
   }
 
   /**
-   * A type definition inherited through an Include (see {@link TypeDefinitionRow#editable()}) belongs to
-   * whichever model {@link TypeDefinitionRow#source()} names, not to the one this dialog was opened for, so it
-   * can't be edited from here - shown as plain text instead of the editable field-editor panel.
+   * A type definition inherited transitively (see {@link TypeDefinitionRow#editable()}) belongs to whichever
+   * model {@link TypeDefinitionRow#ownerModelId()} names, not to the one this dialog was opened for, so it
+   * can't be edited from here - shown as plain text instead of the editable field-editor panel, with a button
+   * to jump straight to that model instead.
    */
   private Node readOnlyInfo(TypeDefinitionRow selected) {
-    Label label = new Label("\"" + selected.typeDefinition().getName() + "\" is inherited via Include from "
-        + selected.source() + ". Open that model to edit it.");
+    Label label = new Label("\"" + selected.typeDefinition().getName() + "\" is inherited (" + selected.source()
+        + "). Open that model to edit it.");
     label.setWrapText(true);
     label.getStyleClass().add("field-label");
-    label.setPadding(new Insets(12));
-    return label;
+
+    Button openButton = new Button("Open " + selected.ownerModelId());
+    openButton.getStyleClass().add("secondary-button");
+    openButton.setOnAction(event -> openOwnerModel(selected.ownerModelId()));
+
+    VBox box = new VBox(8, label, openButton);
+    box.setPadding(new Insets(12));
+    return box;
+  }
+
+  /**
+   * Closes this dialog (discarding any not-yet-saved Add/Delete of this model's own type definitions, same as
+   * {@link #onCancel}: navigating away is not an implicit Save) and opens {@code ownerModelId}'s own Type
+   * Definitions dialog in its place. Deferred to a later pulse via {@link Platform#runLater}, mirroring {@code
+   * UpdateInfoDialogController#onUpdateNow}: {@code stage} is itself showing via {@code showAndWait()} (see
+   * {@link Dialogs#openTypeDefinitions()}), so opening the next modal stage before that call has truly
+   * returned would nest it inside this one's event loop instead of replacing it.
+   */
+  private void openOwnerModel(String ownerModelId) {
+    onDialogCancel();
+    stage.close();
+    Platform.runLater(() -> ProjectDocumentModels.findProjectItemByModelId(ownerModelId).ifPresent(item -> {
+      Project project = Studio.getCurrentProject();
+      if (project != null) {
+        project.getSettings().getUISettings().addOpenedFile(item.getPath());
+        project.getSettings().getUISettings().save();
+      }
+      StudioEventManager.getInstance().fireModelOpenEvent(item);
+      Dialogs.openTypeDefinitions();
+    }));
   }
 
   @FXML

@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
+import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.FieldType;
@@ -7,6 +8,7 @@ import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
@@ -21,6 +23,8 @@ import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -33,6 +37,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +45,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class TypeDefinitionTableController implements Initializable {
 
@@ -70,13 +76,22 @@ public class TypeDefinitionTableController implements Initializable {
   @FXML
   private TableColumn<TypeDefinitionRow, String> sourceColumn;
 
+  @FXML
+  private Button deleteImportButton;
+
+  // The model this table is showing, and every other model in its project - both needed by Import/Delete
+  // Import (which mutate model.getModelReferences()) and by TransitiveTypeDefinitions (which needs a
+  // candidate pool to resolve Include/Import references against). Set on every load().
+  private DocumentModel model;
+  private List<DocumentModel> otherModels = List.of();
+
   // This model's own typeDefinitions: the live, mutable, ordered list backing the JSON file, exactly as
   // before. Add/Delete only ever touch this list - never the transitively-included rows below.
   private List<TypeDefinition> typeDefinitions = List.of();
 
-  // Type definitions inherited through this model's Include chain (see TransitiveTypeDefinitions), recomputed
-  // on every load(). Shown alongside typeDefinitions but never mutated by this table: they belong to whichever
-  // included model actually owns them.
+  // Type definitions inherited through this model's Include/Import graph (see TransitiveTypeDefinitions),
+  // recomputed on every load() and after every Import/Delete Import. Shown alongside typeDefinitions but never
+  // mutated by this table: they belong to whichever included/imported model actually owns them.
   private List<TypeDefinitionRow> includedTypeDefinitions = List.of();
 
   private Consumer<TypeDefinitionRow> selectionListener;
@@ -107,20 +122,27 @@ public class TypeDefinitionTableController implements Initializable {
 
   /**
    * @param otherModels every other {@link DocumentModel} in the current project, used to resolve {@code model}'s
-   *                     Include chain and pull in any type definitions it inherits from it (see
-   *                     {@link TransitiveTypeDefinitions}). Pass {@code List.of()} when {@code model} can't have
-   *                     Includes (e.g. a standalone Type Definition Model, whose modelRoot stays empty).
+   *                     Include/Import graph and pull in any type definitions it inherits from it (see
+   *                     {@link TransitiveTypeDefinitions}) and to offer candidates for the Import picker. Pass
+   *                     {@code List.of()} when {@code model} can't reference other models at all.
    */
   public void load(@NonNull DocumentModel model, @NonNull List<DocumentModel> otherModels) {
     String selectedId = getSelectedId();
+    this.model = model;
+    this.otherModels = otherModels;
     this.typeDefinitions = model.getContent().getTypeDefinitions();
+    refreshIncludedTypeDefinitions();
+    if (selectedId != null) {
+      selectById(selectedId);
+    }
+  }
+
+  private void refreshIncludedTypeDefinitions() {
     this.includedTypeDefinitions = TransitiveTypeDefinitions.resolve(model, otherModels).stream()
         .map(TypeDefinitionRow::included)
         .toList();
     applyFilter(searchController.getText());
-    if (selectedId != null) {
-      selectById(selectedId);
-    }
+    deleteImportButton.setDisable(importReferences().isEmpty());
   }
 
   private String getSelectedId() {
@@ -138,6 +160,7 @@ public class TypeDefinitionTableController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     searchController.setOnSearch(this::applyFilter);
+    deleteImportButton.setDisable(true);
 
     typeDefinitionsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     typeDefinitionsTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TypeDefinitionRow>) change -> {
@@ -200,6 +223,96 @@ public class TypeDefinitionTableController implements Initializable {
       onItemAddedListener.run();
     }
     save();
+  }
+
+  /**
+   * Opens {@link ImportTypeDefDialogController}'s picker (mirrors SME's Import: pick one whole Type Definition
+   * Model, not individual type definitions - see {@link TransitiveTypeDefinitions}'s class doc) and, if the
+   * user confirms, adds a header {@link ModelReference} of purpose {@link
+   * ModelReference#PURPOSE_TYPE_DEFINITIONS} for it. That reference is the only thing persisted; the imported
+   * type definitions themselves are never copied into this model, only resolved for display on every load/
+   * refresh (see {@link #refreshIncludedTypeDefinitions()}), same as an Include.
+   */
+  @FXML
+  private void onImport() {
+    if (model == null) {
+      return;
+    }
+    ImportTypeDefDialogController.show(Studio.stage, importCandidates()).ifPresent(chosenId -> {
+      ModelReference reference = new ModelReference();
+      reference.setAlias(chosenId);
+      reference.setModelType(ModelType.DOCUMENT);
+      reference.setPurpose(ModelReference.PURPOSE_TYPE_DEFINITIONS);
+      reference.setReference(chosenId);
+      model.getModelReferences().add(reference);
+      refreshIncludedTypeDefinitions();
+      save();
+    });
+  }
+
+  /**
+   * Every {@link TypeDefinitionModel} in the project that could still become a new Import: excludes ones
+   * already imported (a second Import of the same model would just be a no-op duplicate reference) and ones
+   * that would close an import cycle (a TDM that already imports {@code model}, directly or transitively -
+   * see {@link TransitiveTypeDefinitions#importedModelIds}), mirroring SME's own picker filter in
+   * {@code importTypeDefsView.tsx} (locale compatibility aside, which a12-studio doesn't enforce here).
+   */
+  private List<DocumentModel> importCandidates() {
+    Set<String> alreadyImported = importReferences().stream().map(ModelReference::getReference).collect(Collectors.toSet());
+    return otherModels.stream()
+        .filter(TypeDefinitionModel.class::isInstance)
+        .filter(candidate -> !alreadyImported.contains(candidate.getId()))
+        .filter(candidate -> !TransitiveTypeDefinitions.importedModelIds(candidate, otherModels).contains(model.getId()))
+        .sorted(Comparator.comparing(DocumentModel::getId))
+        .toList();
+  }
+
+  /**
+   * Shows every current Import (a header {@link ModelReference} of purpose {@link
+   * ModelReference#PURPOSE_TYPE_DEFINITIONS}) in a popup so the user can remove one - mirrors SME's own
+   * "Delete Import" popup ({@code removeTypeDefsView.tsx}'s {@code TDPopUpMenu}): deleting an Import always
+   * drops the whole reference (and with it every type definition it contributed), there is no way to delete
+   * just one imported type definition on its own (see {@link TypeDefinitionRow#editable()}, false for every
+   * imported row).
+   */
+  @FXML
+  private void onDeleteImport() {
+    List<ModelReference> imports = importReferences();
+    if (imports.isEmpty()) {
+      return;
+    }
+
+    ContextMenu menu = new ContextMenu();
+    for (ModelReference reference : imports) {
+      FontIcon deleteIcon = WidgetFactory.createIcon(Icons.TRASH);
+      deleteIcon.getStyleClass().add("menu-icon");
+      MenuItem item = new MenuItem(reference.getReference(), deleteIcon);
+      item.setOnAction(event -> removeImport(reference));
+      menu.getItems().add(item);
+    }
+    menu.show(deleteImportButton, Side.BOTTOM, 0, 0);
+  }
+
+  private void removeImport(@NonNull ModelReference reference) {
+    String message = "Delete the import of \"" + reference.getReference() + "\"? Every type definition it "
+        + "contributed to this table will disappear along with it.";
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, message, null, null, "Delete");
+    if (result.isEmpty() || result.get() != ButtonType.OK) {
+      return;
+    }
+
+    model.getModelReferences().remove(reference);
+    refreshIncludedTypeDefinitions();
+    save();
+  }
+
+  private List<ModelReference> importReferences() {
+    if (model == null || model.getModelReferences() == null) {
+      return List.of();
+    }
+    return model.getModelReferences().stream()
+        .filter(reference -> ModelReference.PURPOSE_TYPE_DEFINITIONS.equals(reference.getPurpose()))
+        .toList();
   }
 
   private ContextMenu createContextMenu(@NonNull TableRow<TypeDefinitionRow> row) {

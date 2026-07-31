@@ -7,6 +7,7 @@ import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,7 +46,8 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
   }
 
   private void load(@NonNull DocumentModel documentModel) {
-    typeDefinitionsTableController.load(documentModel);
+    List<DocumentModel> otherModels = projectItem != null ? ProjectDocumentModels.getOtherDocumentModels(projectItem) : List.of();
+    typeDefinitionsTableController.load(documentModel, otherModels);
   }
 
   @Override

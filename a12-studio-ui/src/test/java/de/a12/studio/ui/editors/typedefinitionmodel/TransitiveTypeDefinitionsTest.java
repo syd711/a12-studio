@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
+import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelContent;
 import de.a12.studio.models.documentmodel.GroupConfig;
@@ -8,11 +10,14 @@ import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.TypeDefinition;
+import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -76,6 +81,70 @@ class TransitiveTypeDefinitionsTest {
 
     assertEquals(1, resolved.size());
     assertEquals("Common", resolved.get(0).typeDefinition().getName());
+  }
+
+  @Test
+  void resolvesATypeDefinitionImportedFromATypeDefinitionModel() {
+    DocumentModel tdm = tdmWithTypeDefinitions("Currency_TDM", typeDef("typedef_currency", "Currency"));
+    DocumentModel model = modelWithImports("Invoice_DM", "Currency_TDM");
+
+    List<TransitiveTypeDefinitions.Entry> resolved = TransitiveTypeDefinitions.resolve(model, List.of(tdm));
+
+    assertEquals(1, resolved.size());
+    assertEquals("Currency", resolved.get(0).typeDefinition().getName());
+    assertEquals("Currency_TDM", resolved.get(0).sourcePath());
+    assertTrue(resolved.get(0).imported());
+  }
+
+  @Test
+  void resolvesATypeDefinitionImportedThroughATdmThatItselfImportsAnotherTdm() {
+    DocumentModel tdmA = tdmWithTypeDefinitions("A_TDM", typeDef("typedef_base", "Base"));
+    DocumentModel tdmB = modelWithImports("B_TDM", "A_TDM");
+    DocumentModel model = modelWithImports("Invoice_DM", "B_TDM");
+
+    List<TransitiveTypeDefinitions.Entry> resolved = TransitiveTypeDefinitions.resolve(model, List.of(tdmA, tdmB));
+
+    assertEquals(1, resolved.size());
+    assertEquals("Base", resolved.get(0).typeDefinition().getName());
+    assertEquals("B_TDM > A_TDM", resolved.get(0).sourcePath());
+    assertTrue(resolved.get(0).imported());
+  }
+
+  @Test
+  void importedModelIdsFindsTransitiveImportsForCycleDetectionInThePicker() {
+    DocumentModel tdmA = tdmWithTypeDefinitions("A_TDM");
+    DocumentModel tdmB = modelWithImports("B_TDM", "A_TDM");
+
+    assertEquals(Set.of("A_TDM"), TransitiveTypeDefinitions.importedModelIds(tdmB, List.of(tdmA)));
+    assertTrue(TransitiveTypeDefinitions.importedModelIds(tdmB, List.of(tdmA)).contains("A_TDM"));
+    assertFalse(TransitiveTypeDefinitions.importedModelIds(tdmA, List.of(tdmB)).contains("B_TDM"));
+  }
+
+  private static DocumentModel modelWithImports(String id, String... references) {
+    DocumentModel model = new DocumentModel();
+    model.setId(id);
+    DocumentModelContent content = new DocumentModelContent();
+    content.setModelRoot(new ModelRoot());
+    model.setContent(content);
+    for (String reference : references) {
+      ModelReference modelReference = new ModelReference();
+      modelReference.setAlias(reference);
+      modelReference.setModelType(ModelType.DOCUMENT);
+      modelReference.setPurpose(ModelReference.PURPOSE_TYPE_DEFINITIONS);
+      modelReference.setReference(reference);
+      model.getModelReferences().add(modelReference);
+    }
+    return model;
+  }
+
+  private static DocumentModel tdmWithTypeDefinitions(String id, TypeDefinition... typeDefinitions) {
+    TypeDefinitionModel model = new TypeDefinitionModel();
+    model.setId(id);
+    DocumentModelContent content = new DocumentModelContent();
+    content.setModelRoot(new ModelRoot());
+    content.setTypeDefinitions(new java.util.ArrayList<>(List.of(typeDefinitions)));
+    model.setContent(content);
+    return model;
   }
 
   private static DocumentModel modelWithIncludes(String id, String... references) {

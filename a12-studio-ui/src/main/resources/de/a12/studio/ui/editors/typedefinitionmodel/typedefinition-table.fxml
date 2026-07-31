@@ -28,17 +28,17 @@
                     </graphic>
                 </Button>
                 <Separator layoutX="412.0" layoutY="10.0" orientation="VERTICAL" />
-                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="secondary-button" text="Import">
+                <Button mnemonicParsing="false" onAction="#onImport" styleClass="secondary-button" text="Import">
                     <tooltip>
-                        <Tooltip text="Import a new set of types." />
+                        <Tooltip text="Import all type definitions from a Type Definition Model." />
                     </tooltip>
                <graphic>
                   <FontIcon iconLiteral="mdi2p-package-variant-closed-plus" iconSize="18" />
                </graphic>
                 </Button>
-                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" styleClass="delete-button" text="Delete Import">
+                <Button fx:id="deleteImportButton" mnemonicParsing="false" onAction="#onDeleteImport" styleClass="delete-button" text="Delete Import">
                     <tooltip>
-                        <Tooltip text="Delete the selected import" />
+                        <Tooltip text="Delete one of the current imports." />
                     </tooltip>
                     <graphic>
                         <FontIcon iconColor="#c0392b" iconLiteral="mdi2p-package-variant-closed-remove" iconSize="18" />

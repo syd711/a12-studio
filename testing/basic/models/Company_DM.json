@@ -705,6 +705,15 @@
           }
         }
       ]
-    }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_0f586126-6932-428a-b734-7c72da4fc7da",
+        "name": "abac",
+        "fieldType": {
+          "type": "StringType"
+        }
+      }
+    ]
   }
 }
