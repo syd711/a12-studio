@@ -71,7 +71,10 @@
                       "name": "CompanyName",
                       "Field": {
                         "fieldType": {
-                          "type": "NumberType"
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "Order_DM_ProductType"
+                          }
                         },
                         "label": [
                           {

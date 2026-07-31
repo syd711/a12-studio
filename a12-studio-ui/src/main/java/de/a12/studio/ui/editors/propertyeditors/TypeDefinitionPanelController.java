@@ -26,6 +26,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.typedefinitionmodel.TransitiveTypeDefinitions;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -42,8 +43,9 @@ import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -108,7 +110,11 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   @FXML
   private GridPane checkboxesGrid;
 
-  private List<TypeDefinition> availableTypeDefinitions = List.of();
+  // typeDefinitionId -> display label, computed in setElement(). SME-equivalent labels (see
+  // dmReferenceHelper.ts's createLabel): a model's own type definitions show just their name, while ones
+  // inherited from elsewhere are prefixed with the owning model's id ("<ownerModelId>_<name>") so it's clear
+  // where they actually live.
+  private Map<String, String> typeDefinitionLabelsById = Map.of();
 
   private List<Element> ancestors = List.of();
 
@@ -140,11 +146,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     dataTypeCombo.setConverter(new StringConverter<>() {
       @Override
       public String toString(String id) {
-        return availableTypeDefinitions.stream()
-            .filter(typeDefinition -> typeDefinition.getId().equals(id))
-            .findFirst()
-            .map(TypeDefinition::getName)
-            .orElse(id);
+        return typeDefinitionLabelsById.getOrDefault(id, id);
       }
 
       @Override
@@ -229,8 +231,8 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   public void setElement(@NonNull Element element) {
     super.setElement(element);
 
-    availableTypeDefinitions = collectAvailableTypeDefinitions(element.getId());
-//    dataTypeCombo.getItems().setAll(availableTypeDefinitions.stream().map(TypeDefinition::getId).toList());
+    typeDefinitionLabelsById = collectAvailableTypeDefinitionLabels(element.getId());
+    dataTypeCombo.getItems().setAll(typeDefinitionLabelsById.keySet());
 
     dataTypeComboBox.getItems().setAll(availableDataTypes());
     checkboxesGrid.setVisible(!checkboxesGridDisabled && !isMultiSelectParent());
@@ -348,25 +350,36 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   }
 
   /**
-   * Every type definition a field can point to via {@link TypeDefFieldType}: the current document model's
-   * own type definitions plus every other document model's in the same project (a type definition model is
-   * just a document model whose header carries the "tdonly" annotation, so it's included here too), minus
-   * {@code excludedId} itself so a type definition can't reference itself.
+   * Every type definition a field can point to via {@link TypeDefFieldType}, labelled: the current document
+   * model's own type definitions (shown by name alone) plus every one it inherits transitively through its
+   * Include/Import graph (see {@link TransitiveTypeDefinitions}, shown as {@code <ownerModelId>_<name>} -
+   * mirrors SME's own picker label format in {@code dmReferenceHelper.ts}'s {@code createLabel}), minus
+   * {@code excludedId} itself so a type definition can't reference itself. This panel is shared by two
+   * contexts (see {@link #setCustomTypeDisabled()}): editing a regular Field in a Document Model, where this
+   * matters, and editing a {@link TypeDefinition}'s own field type, where the whole "Use Custom Type" grid -
+   * this combo included - is hidden outright, matching SME's own editor (which never lets a type definition
+   * reference another one at all: {@code TypedefEditor.json} has no equivalent control).
    */
-  private static List<TypeDefinition> collectAvailableTypeDefinitions(@NonNull String excludedId) {
+  private static Map<String, String> collectAvailableTypeDefinitionLabels(@NonNull String excludedId) {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
-    if (projectItem == null) {
-      return List.of();
+    if (projectItem == null || !(projectItem.getModel() instanceof DocumentModel documentModel)) {
+      return Map.of();
     }
 
-    List<TypeDefinition> result = new ArrayList<>();
-    if (projectItem.getModel() instanceof DocumentModel documentModel) {
-      result.addAll(documentModel.getContent().getTypeDefinitions());
+    Map<String, String> labels = new LinkedHashMap<>();
+    for (TypeDefinition typeDefinition : documentModel.getContent().getTypeDefinitions()) {
+      if (!excludedId.equals(typeDefinition.getId())) {
+        labels.put(typeDefinition.getId(), typeDefinition.getName());
+      }
     }
-    for (DocumentModel other : ProjectDocumentModels.getOtherDocumentModels(projectItem)) {
-      result.addAll(other.getContent().getTypeDefinitions());
+
+    List<DocumentModel> otherModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    for (TransitiveTypeDefinitions.Entry entry : TransitiveTypeDefinitions.resolve(documentModel, otherModels)) {
+      String id = entry.typeDefinition().getId();
+      if (!excludedId.equals(id)) {
+        labels.putIfAbsent(id, entry.ownerModelId() + "_" + entry.typeDefinition().getName());
+      }
     }
-    result.removeIf(typeDefinition -> excludedId.equals(typeDefinition.getId()));
-    return result;
+    return labels;
   }
 }

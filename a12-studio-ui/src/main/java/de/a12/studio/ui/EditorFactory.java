@@ -21,7 +21,6 @@ import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
 import de.a12.studio.ui.editors.masterdetailmodel.MasterDetailModelEditorController;
 import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
-import de.a12.studio.ui.editors.printmodel.PrintModelEditorController;
 import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController;
 import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
@@ -96,10 +95,7 @@ public class EditorFactory {
         controller.load(item);
       }
       else if (item.getModel() instanceof PrintModel) {
-        FXMLLoader loader = new FXMLLoader(PrintModelEditorController.class.getResource("print-model-editor.fxml"));
-        content = loader.load();
-        PrintModelEditorController controller = loader.getController();
-        controller.load(item);
+        WidgetFactory.showAlert(Studio.stage, "Print models are not supported yet.");
       }
       else if (item.getAuthDocument() instanceof RolesDocument) {
         FXMLLoader loader = new FXMLLoader(RolesEditorController.class.getResource("roles-editor.fxml"));
