@@ -18,6 +18,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
@@ -46,6 +47,9 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private GridPane annotationsGrid;
+
+  @FXML
+  private Label emptyLabel;
 
   @FXML
   private Button annotationDatasetsButton;
@@ -137,6 +141,11 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     }
 
     List<Annotation> annotations = getAnnotations();
+    boolean empty = annotations.isEmpty();
+    emptyLabel.setVisible(empty);
+    emptyLabel.setManaged(empty);
+    annotationsGrid.setVisible(!empty);
+    annotationsGrid.setManaged(!empty);
     for (int index = 0; index < annotations.size(); index++) {
       addRow(annotations.get(index), index, annotations.size(), suggestedNames);
     }

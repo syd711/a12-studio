@@ -12,12 +12,11 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -40,7 +39,13 @@ import java.util.stream.Collectors;
 public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyEditor {
 
   @FXML
-  private GridPane criteriaGrid;
+  private HBox criteriaColumnHeaders;
+
+  @FXML
+  private VBox criteriaRows;
+
+  @FXML
+  private javafx.scene.control.Label criteriaEmptyLabel;
 
   private DocumentModel model;
 
@@ -68,46 +73,35 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
   }
 
   private void rebuildRows() {
-    criteriaGrid.getChildren().removeIf(node -> {
-      Integer rowIndex = GridPane.getRowIndex(node);
-      return rowIndex != null && rowIndex > 0;
-    });
+    criteriaRows.getChildren().clear();
 
     List<DocumentUniquenessCriterion> criteria = getCriteria();
-    setHeaderRowVisible(!criteria.isEmpty());
-    if (criteria.isEmpty()) {
-      javafx.scene.control.Label emptyLabel = new javafx.scene.control.Label("No uniqueness criteria defined.");
-      emptyLabel.getStyleClass().add("placeholder-label");
-      criteriaGrid.add(emptyLabel, 0, 1, 3, 1);
-      return;
-    }
+    boolean empty = criteria.isEmpty();
+    criteriaColumnHeaders.setVisible(!empty);
+    criteriaColumnHeaders.setManaged(!empty);
+    criteriaEmptyLabel.setVisible(empty);
+    criteriaEmptyLabel.setManaged(empty);
 
     for (int index = 0; index < criteria.size(); index++) {
-      addRow(criteria.get(index), index, criteria.size());
+      criteriaRows.getChildren().add(createRow(criteria.get(index), index, criteria.size()));
     }
   }
 
-  // The column title Labels (Name/Fields) live in row 0 of criteriaGrid, defined in FXML rather than built
-  // here, so they're found by row index instead of by fx:id.
-  private void setHeaderRowVisible(boolean visible) {
-    for (Node node : criteriaGrid.getChildren()) {
-      Integer rowIndex = GridPane.getRowIndex(node);
-      if (rowIndex == null || rowIndex == 0) {
-        node.setVisible(visible);
-        node.setManaged(visible);
-      }
-    }
-  }
-
-  private void addRow(DocumentUniquenessCriterion criterion, int index, int rowCount) {
+  private HBox createRow(DocumentUniquenessCriterion criterion, int index, int rowCount) {
     javafx.scene.control.Label nameLabel = new javafx.scene.control.Label(criterion.getName());
     nameLabel.setId("uniquenessCriterionName-" + index);
+    nameLabel.setPrefWidth(160.0);
 
     javafx.scene.control.Label fieldsLabel = new javafx.scene.control.Label(fieldsSummary(criterion));
     fieldsLabel.setId("uniquenessCriterionFields-" + index);
     fieldsLabel.setWrapText(true);
+    fieldsLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(fieldsLabel, Priority.ALWAYS);
 
-    criteriaGrid.addRow(index + 1, nameLabel, fieldsLabel, createActionsBox(criterion, index, rowCount));
+    HBox row = new HBox(10.0, nameLabel, fieldsLabel, createActionsBox(criterion, index, rowCount));
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("module-row");
+    return row;
   }
 
   /** Every field's path (see {@link ElementIndex#getPath}), joined for a compact row summary. */

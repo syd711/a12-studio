@@ -4,9 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="DOCUMENT UNIQUENESS CRITERIA" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -14,18 +12,12 @@
  <BorderPane>
  <center>
   <VBox spacing="10.0">
-    <GridPane fx:id="criteriaGrid" hgap="10.0" vgap="6.0">
-      <columnConstraints>
-        <ColumnConstraints hgrow="ALWAYS" percentWidth="30.0" />
-        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-        <ColumnConstraints hgrow="NEVER" minWidth="170.0" prefWidth="170.0" />
-      </columnConstraints>
-      <rowConstraints>
-        <RowConstraints />
-      </rowConstraints>
-      <Label styleClass="field-label" text="Name" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Fields" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-    </GridPane>
+    <HBox fx:id="criteriaColumnHeaders" spacing="10.0">
+      <Label styleClass="field-label" text="Name" prefWidth="160.0" />
+      <Label styleClass="field-label" text="Fields" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+    </HBox>
+    <VBox fx:id="criteriaRows" spacing="8.0" />
+    <Label fx:id="criteriaEmptyLabel" styleClass="placeholder-label" text="No uniqueness criteria defined." />
     <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" />
   </VBox>
  </center>

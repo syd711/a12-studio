@@ -46,7 +46,15 @@
       "conditionLanguage": {
         "code": "en_US"
       },
-      "supportedCharacters": []
+      "supportedCharacters": [],
+      "uniquenessCriteria": [
+        {
+          "name": "ssadfdsafsaf",
+          "fields": [
+            "field_6764d"
+          ]
+        }
+      ]
     },
     "modelRoot": {
       "rootGroups": [
@@ -143,7 +151,10 @@
                             "locale": "de",
                             "text": "Firmen ID"
                           }
-                        ]
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
                       }
                     },
                     {
@@ -702,6 +713,19 @@
                       }
                     }
                   ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_6764d",
+                "name": "uniqueIndicator",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
                 }
               }
             ]

@@ -250,6 +250,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     setComboBoxItems(dataTypeCombo, List.copyOf(typeDefinitionLabelsById.keySet()));
 
     dataTypeComboBox.getItems().setAll(availableDataTypes());
+    dataTypeComboBox.getItems().add(0, "");
     checkboxesGrid.setVisible(!checkboxesGridDisabled && !isMultiSelectParent());
 
     Optional<FieldConfig> fieldConfig = getFieldConfig(element);
