@@ -92,6 +92,32 @@
                     },
                     {
                       "type": "Field",
+                      "id": "field_11e24",
+                      "name": "VATID",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "BooleanType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Tax ID"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Steuer ID"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
                       "id": "field_16af2",
                       "name": "CompanyID",
                       "annotations": [
@@ -113,32 +139,6 @@
                           {
                             "locale": "de",
                             "text": "Firmen ID"
-                          }
-                        ]
-                      }
-                    },
-                    {
-                      "type": "Field",
-                      "id": "field_11e24",
-                      "name": "VATID",
-                      "annotations": [
-                        {
-                          "name": "enable_approximate_match_search",
-                          "value": "true"
-                        }
-                      ],
-                      "Field": {
-                        "fieldType": {
-                          "type": "BooleanType"
-                        },
-                        "label": [
-                          {
-                            "locale": "en",
-                            "text": "Tax ID"
-                          },
-                          {
-                            "locale": "de",
-                            "text": "Steuer ID"
                           }
                         ]
                       }
@@ -365,16 +365,6 @@
                       }
                     },
                     {
-                      "type": "Field",
-                      "id": "field_a5e1d",
-                      "name": "Field",
-                      "Field": {
-                        "fieldType": {
-                          "type": "StringType"
-                        }
-                      }
-                    },
-                    {
                       "type": "Group",
                       "id": "include_e823c",
                       "name": "People",
@@ -384,6 +374,16 @@
                           "reference": "Invoice_DM",
                           "excludeRules": true,
                           "excludeComputations": true
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_a5e1d",
+                      "name": "adfsadf",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
                         }
                       }
                     },
@@ -410,6 +410,17 @@
                             }
                           }
                         ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_87d39",
+                      "name": "enumtest",
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": null
+                        }
                       }
                     }
                   ]
@@ -519,6 +530,32 @@
                     },
                     {
                       "type": "Field",
+                      "id": "field_c7f7b",
+                      "name": "PostalCode",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Postal Code"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Postleitzahl"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
                       "id": "field_0a1e7",
                       "name": "Street",
                       "annotations": [
@@ -581,7 +618,8 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType"
+                          "type": "StringType",
+                          "StringType": {}
                         },
                         "label": [
                           {
@@ -591,32 +629,6 @@
                           {
                             "locale": "de",
                             "text": "Land"
-                          }
-                        ]
-                      }
-                    },
-                    {
-                      "type": "Field",
-                      "id": "field_c7f7b",
-                      "name": "PostalCode",
-                      "annotations": [
-                        {
-                          "name": "enable_approximate_match_search",
-                          "value": "true"
-                        }
-                      ],
-                      "Field": {
-                        "fieldType": {
-                          "type": "StringType"
-                        },
-                        "label": [
-                          {
-                            "locale": "en",
-                            "text": "Postal Code"
-                          },
-                          {
-                            "locale": "de",
-                            "text": "Postleitzahl"
                           }
                         ]
                       }

@@ -1,17 +1,20 @@
 package de.a12.studio.ui.editors.documentmodel.dialogs;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionModelFieldEditorController;
+import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionRow;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionTableController;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -61,11 +64,11 @@ public class TypeDefinitionSettingsDialog implements Initializable, DialogContro
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel) {
       snapshot = new TypeDefinitionsSnapshot(documentModel);
-      typeDefinitionsTableController.load(documentModel);
+      typeDefinitionsTableController.load(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
     }
   }
 
-  private void onTypeDefinitionSelectionChanged(TypeDefinition selected) {
+  private void onTypeDefinitionSelectionChanged(TypeDefinitionRow selected) {
     if (currentFieldEditorController != null) {
       currentFieldEditorController.destroy();
       currentFieldEditorController = null;
@@ -76,7 +79,7 @@ public class TypeDefinitionSettingsDialog implements Initializable, DialogContro
       return;
     }
 
-    editorContainer.setCenter(loadEditor(selected));
+    editorContainer.setCenter(selected.editable() ? loadEditor(selected) : readOnlyInfo(selected));
   }
 
   private void focusNameField() {
@@ -85,19 +88,33 @@ public class TypeDefinitionSettingsDialog implements Initializable, DialogContro
     }
   }
 
-  private Node loadEditor(TypeDefinition selected) {
+  private Node loadEditor(TypeDefinitionRow selected) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(FIELD_EDITOR_FXML));
       Node node = loader.load();
       TypeDefinitionModelFieldEditorController fieldEditorController = loader.getController();
       fieldEditorController.setSaveMode(saveMode);
-      fieldEditorController.setTypeDefinition(selected);
+      fieldEditorController.setTypeDefinition(selected.typeDefinition());
       currentFieldEditorController = fieldEditorController;
       return node;
     }
     catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+  }
+
+  /**
+   * A type definition inherited through an Include (see {@link TypeDefinitionRow#editable()}) belongs to
+   * whichever model {@link TypeDefinitionRow#source()} names, not to the one this dialog was opened for, so it
+   * can't be edited from here - shown as plain text instead of the editable field-editor panel.
+   */
+  private Node readOnlyInfo(TypeDefinitionRow selected) {
+    Label label = new Label("\"" + selected.typeDefinition().getName() + "\" is inherited via Include from "
+        + selected.source() + ". Open that model to edit it.");
+    label.setWrapText(true);
+    label.getStyleClass().add("field-label");
+    label.setPadding(new Insets(12));
+    return label;
   }
 
   @FXML

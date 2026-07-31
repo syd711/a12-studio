@@ -3,7 +3,6 @@ package de.a12.studio.ui.editors.typedefinitionmodel;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.documentmodel.ElementEditorController;
 import de.a12.studio.ui.events.ModelClosedEvent;
@@ -71,7 +70,7 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
     typeDefinitionsTableController.setOnItemAdded(this::focusNameField);
   }
 
-  private void onTypeDefinitionSelectionChanged(TypeDefinition selected) {
+  private void onTypeDefinitionSelectionChanged(TypeDefinitionRow selected) {
     if (currentFieldEditorController != null) {
       currentFieldEditorController.destroy();
       currentFieldEditorController = null;
@@ -91,12 +90,12 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
     }
   }
 
-  private Node loadEditor(@NonNull String fxml, @NonNull TypeDefinition selected) {
+  private Node loadEditor(@NonNull String fxml, @NonNull TypeDefinitionRow selected) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
       Node node = loader.load();
       if (loader.getController() instanceof ElementEditorController elementEditorController) {
-        elementEditorController.setElement(new TypeDefinitionFieldElement(selected), List.of());
+        elementEditorController.setElement(new TypeDefinitionFieldElement(selected.typeDefinition()), List.of());
       }
       currentFieldEditorController = loader.getController() instanceof TypeDefinitionModelFieldEditorController fieldEditorController
           ? fieldEditorController

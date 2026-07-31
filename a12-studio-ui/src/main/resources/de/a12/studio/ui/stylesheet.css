@@ -316,6 +316,16 @@
     -fx-fill: -fx-warning-bg;
 }
 
+/**
+ * Type definitions table: rows for definitions inherited transitively through a document model's Include
+ * chain, shown alongside the model's own definitions but read-only (see TypeDefinitionTableController).
+ */
+.table-row-cell:included,
+.table-row-cell:included .table-cell {
+    -fx-font-style: italic;
+    -fx-text-fill: -fx-text-muted;
+}
+
 .preview-app-status-bubble.status-stopped {
     -fx-fill: -fx-error-bg;
 }

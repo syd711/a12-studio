@@ -7,6 +7,7 @@ import de.a12.studio.modelsvalidation.ValidatorRunner;
 import de.a12.studio.modelsvalidation.validators.AttachmentGroupValidator;
 import de.a12.studio.modelsvalidation.validators.BasicConsistencyValidator;
 import de.a12.studio.modelsvalidation.validators.DuplicateIdValidator;
+import de.a12.studio.modelsvalidation.validators.EnumerationValuesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.MissingReferenceValidator;
@@ -32,6 +33,7 @@ public final class DocumentModelValidationService {
       new SchemaVersionValidator(),
       new DuplicateIdValidator(),
       new NumberFieldValueLimitValidator(),
+      new EnumerationValuesValidator(),
       new MultiSelectGroupValidator(),
       new AttachmentGroupValidator(),
       new BasicConsistencyValidator(),

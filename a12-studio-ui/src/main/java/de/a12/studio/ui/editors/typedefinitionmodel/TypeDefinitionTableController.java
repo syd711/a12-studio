@@ -18,6 +18,7 @@ import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
@@ -31,6 +32,7 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -45,25 +47,39 @@ public class TypeDefinitionTableController implements Initializable {
 
   private static final String NAME_COLUMN_ID = "name";
   private static final String BASE_TYPE_COLUMN_ID = "baseType";
+  private static final String SOURCE_COLUMN_ID = "source";
 
   private static final String ID_PREFIX = "typedef_";
   private static final String DEFAULT_NAME = "NewType";
+
+  /** Applied to rows holding a transitively-included (read-only) type definition, styled in stylesheet.css. */
+  private static final PseudoClass INCLUDED_ROW = PseudoClass.getPseudoClass("included");
 
   @FXML
   private SearchFieldController searchController;
 
   @FXML
-  private TableView<TypeDefinition> typeDefinitionsTable;
+  private TableView<TypeDefinitionRow> typeDefinitionsTable;
 
   @FXML
-  private TableColumn<TypeDefinition, String> nameColumn;
+  private TableColumn<TypeDefinitionRow, String> nameColumn;
 
   @FXML
-  private TableColumn<TypeDefinition, String> baseTypeColumn;
+  private TableColumn<TypeDefinitionRow, String> baseTypeColumn;
 
+  @FXML
+  private TableColumn<TypeDefinitionRow, String> sourceColumn;
+
+  // This model's own typeDefinitions: the live, mutable, ordered list backing the JSON file, exactly as
+  // before. Add/Delete only ever touch this list - never the transitively-included rows below.
   private List<TypeDefinition> typeDefinitions = List.of();
 
-  private Consumer<TypeDefinition> selectionListener;
+  // Type definitions inherited through this model's Include chain (see TransitiveTypeDefinitions), recomputed
+  // on every load(). Shown alongside typeDefinitions but never mutated by this table: they belong to whichever
+  // included model actually owns them.
+  private List<TypeDefinitionRow> includedTypeDefinitions = List.of();
+
+  private Consumer<TypeDefinitionRow> selectionListener;
 
   private Runnable onItemAddedListener;
 
@@ -77,7 +93,7 @@ public class TypeDefinitionTableController implements Initializable {
     this.saveMode = saveMode;
   }
 
-  public void setSelectionListener(@NonNull Consumer<TypeDefinition> selectionListener) {
+  public void setSelectionListener(@NonNull Consumer<TypeDefinitionRow> selectionListener) {
     this.selectionListener = selectionListener;
   }
 
@@ -86,8 +102,21 @@ public class TypeDefinitionTableController implements Initializable {
   }
 
   public void load(@NonNull DocumentModel model) {
+    load(model, List.of());
+  }
+
+  /**
+   * @param otherModels every other {@link DocumentModel} in the current project, used to resolve {@code model}'s
+   *                     Include chain and pull in any type definitions it inherits from it (see
+   *                     {@link TransitiveTypeDefinitions}). Pass {@code List.of()} when {@code model} can't have
+   *                     Includes (e.g. a standalone Type Definition Model, whose modelRoot stays empty).
+   */
+  public void load(@NonNull DocumentModel model, @NonNull List<DocumentModel> otherModels) {
     String selectedId = getSelectedId();
     this.typeDefinitions = model.getContent().getTypeDefinitions();
+    this.includedTypeDefinitions = TransitiveTypeDefinitions.resolve(model, otherModels).stream()
+        .map(TypeDefinitionRow::included)
+        .toList();
     applyFilter(searchController.getText());
     if (selectedId != null) {
       selectById(selectedId);
@@ -95,15 +124,15 @@ public class TypeDefinitionTableController implements Initializable {
   }
 
   private String getSelectedId() {
-    List<TypeDefinition> selectedItems = typeDefinitionsTable.getSelectionModel().getSelectedItems();
-    return selectedItems.size() == 1 ? selectedItems.get(0).getId() : null;
+    List<TypeDefinitionRow> selectedItems = typeDefinitionsTable.getSelectionModel().getSelectedItems();
+    return selectedItems.size() == 1 ? selectedItems.get(0).typeDefinition().getId() : null;
   }
 
   private void selectById(@NonNull String id) {
     typeDefinitionsTable.getItems().stream()
-        .filter(typeDefinition -> id.equals(typeDefinition.getId()))
+        .filter(row -> id.equals(row.typeDefinition().getId()))
         .findFirst()
-        .ifPresent(this::selectTypeDefinition);
+        .ifPresent(this::selectRow);
   }
 
   @Override
@@ -111,31 +140,36 @@ public class TypeDefinitionTableController implements Initializable {
     searchController.setOnSearch(this::applyFilter);
 
     typeDefinitionsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    typeDefinitionsTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TypeDefinition>) change -> {
+    typeDefinitionsTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TypeDefinitionRow>) change -> {
       if (selectionListener == null) {
         return;
       }
-      List<TypeDefinition> selectedItems = typeDefinitionsTable.getSelectionModel().getSelectedItems();
+      List<TypeDefinitionRow> selectedItems = typeDefinitionsTable.getSelectionModel().getSelectedItems();
       selectionListener.accept(selectedItems.size() == 1 ? selectedItems.get(0) : null);
     });
 
-    nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getName()));
-    baseTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(getBaseTypeName(param.getValue())));
+    nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().typeDefinition().getName()));
+    baseTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(getBaseTypeName(param.getValue().typeDefinition())));
+    sourceColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().source()));
 
     BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
     applyColumnWidth(nameColumn, tableSettings, NAME_COLUMN_ID);
     applyColumnWidth(baseTypeColumn, tableSettings, BASE_TYPE_COLUMN_ID);
+    applyColumnWidth(sourceColumn, tableSettings, SOURCE_COLUMN_ID);
 
     nameColumn.widthProperty().addListener((observable, oldValue, newValue) ->
         saveColumnWidth(NAME_COLUMN_ID, newValue.doubleValue()));
     baseTypeColumn.widthProperty().addListener((observable, oldValue, newValue) ->
         saveColumnWidth(BASE_TYPE_COLUMN_ID, newValue.doubleValue()));
+    sourceColumn.widthProperty().addListener((observable, oldValue, newValue) ->
+        saveColumnWidth(SOURCE_COLUMN_ID, newValue.doubleValue()));
 
     typeDefinitionsTable.setRowFactory(table -> new TableRow<>() {
       @Override
-      protected void updateItem(TypeDefinition item, boolean empty) {
+      protected void updateItem(TypeDefinitionRow item, boolean empty) {
         super.updateItem(item, empty);
-        setContextMenu(empty || item == null ? null : createContextMenu(this));
+        pseudoClassStateChanged(INCLUDED_ROW, !empty && item != null && !item.editable());
+        setContextMenu(empty || item == null || !item.editable() ? null : createContextMenu(this));
       }
     });
   }
@@ -161,14 +195,14 @@ public class TypeDefinitionTableController implements Initializable {
     typeDefinitions.add(typeDefinition);
     searchController.clear();
     applyFilter(searchController.getText());
-    selectTypeDefinition(typeDefinition);
+    selectRow(TypeDefinitionRow.own(typeDefinition));
     if (onItemAddedListener != null) {
       onItemAddedListener.run();
     }
     save();
   }
 
-  private ContextMenu createContextMenu(@NonNull TableRow<TypeDefinition> row) {
+  private ContextMenu createContextMenu(@NonNull TableRow<TypeDefinitionRow> row) {
     FontIcon deleteIcon = WidgetFactory.createIcon(Icons.TRASH);
     deleteIcon.getStyleClass().add("menu-icon");
 
@@ -180,24 +214,34 @@ public class TypeDefinitionTableController implements Initializable {
     return contextMenu;
   }
 
-  private void onDelete(@NonNull TableRow<TypeDefinition> row) {
-    List<TypeDefinition> selectedItems = List.copyOf(typeDefinitionsTable.getSelectionModel().getSelectedItems());
-    List<TypeDefinition> itemsToDelete = selectedItems.size() > 1 && selectedItems.contains(row.getItem())
+  private void onDelete(@NonNull TableRow<TypeDefinitionRow> row) {
+    List<TypeDefinitionRow> selectedItems = List.copyOf(typeDefinitionsTable.getSelectionModel().getSelectedItems());
+    List<TypeDefinitionRow> rowsToDelete = selectedItems.size() > 1 && selectedItems.contains(row.getItem())
         ? selectedItems
         : List.of(row.getItem());
-    deleteTypeDefinitions(itemsToDelete);
+    deleteTypeDefinitions(rowsToDelete);
   }
 
   @FXML
   private void onDelete() {
-    List<TypeDefinition> selectedItems = List.copyOf(typeDefinitionsTable.getSelectionModel().getSelectedItems());
+    List<TypeDefinitionRow> selectedItems = List.copyOf(typeDefinitionsTable.getSelectionModel().getSelectedItems());
     if (selectedItems.isEmpty()) {
       return;
     }
     deleteTypeDefinitions(selectedItems);
   }
 
-  private void deleteTypeDefinitions(@NonNull List<TypeDefinition> itemsToDelete) {
+  /** Silently ignores any selected row that isn't {@link TypeDefinitionRow#editable()}: those belong to an
+   * included model and can only be deleted by editing that model directly. */
+  private void deleteTypeDefinitions(@NonNull List<TypeDefinitionRow> rowsToDelete) {
+    List<TypeDefinition> itemsToDelete = rowsToDelete.stream()
+        .filter(TypeDefinitionRow::editable)
+        .map(TypeDefinitionRow::typeDefinition)
+        .toList();
+    if (itemsToDelete.isEmpty()) {
+      return;
+    }
+
     String message = itemsToDelete.size() > 1
         ? "Delete " + itemsToDelete.size() + " type definitions?"
         : "Delete this type definition?";
@@ -211,11 +255,11 @@ public class TypeDefinitionTableController implements Initializable {
     save();
   }
 
-  private void selectTypeDefinition(@NonNull TypeDefinition typeDefinition) {
-    int row = typeDefinitionsTable.getItems().indexOf(typeDefinition);
-    if (row >= 0) {
-      typeDefinitionsTable.getSelectionModel().clearAndSelect(row);
-      typeDefinitionsTable.scrollTo(row);
+  private void selectRow(@NonNull TypeDefinitionRow row) {
+    int index = typeDefinitionsTable.getItems().indexOf(row);
+    if (index >= 0) {
+      typeDefinitionsTable.getSelectionModel().clearAndSelect(index);
+      typeDefinitionsTable.scrollTo(index);
     }
   }
 
@@ -223,6 +267,9 @@ public class TypeDefinitionTableController implements Initializable {
     Set<String> usedNames = new HashSet<>();
     for (TypeDefinition typeDefinition : typeDefinitions) {
       usedNames.add(typeDefinition.getName());
+    }
+    for (TypeDefinitionRow row : includedTypeDefinitions) {
+      usedNames.add(row.typeDefinition().getName());
     }
     if (!usedNames.contains(baseName)) {
       return baseName;
@@ -247,10 +294,15 @@ public class TypeDefinitionTableController implements Initializable {
 
   private void applyFilter(String filter) {
     String term = filter == null ? "" : filter.trim().toLowerCase();
-    List<TypeDefinition> filtered = term.isEmpty()
-        ? typeDefinitions
-        : typeDefinitions.stream()
-            .filter(typeDefinition -> typeDefinition.getName() != null && typeDefinition.getName().toLowerCase().contains(term))
+
+    List<TypeDefinitionRow> rows = new ArrayList<>(typeDefinitions.size() + includedTypeDefinitions.size());
+    typeDefinitions.stream().map(TypeDefinitionRow::own).forEach(rows::add);
+    rows.addAll(includedTypeDefinitions);
+
+    List<TypeDefinitionRow> filtered = term.isEmpty()
+        ? rows
+        : rows.stream()
+            .filter(row -> row.typeDefinition().getName() != null && row.typeDefinition().getName().toLowerCase().contains(term))
             .toList();
     typeDefinitionsTable.setItems(FXCollections.observableArrayList(filtered));
   }
@@ -267,7 +319,7 @@ public class TypeDefinitionTableController implements Initializable {
     return type == null ? "" : type.replace("Type", "");
   }
 
-  private void applyColumnWidth(@NonNull TableColumn<TypeDefinition, String> column, BaseTableSettings tableSettings,
+  private void applyColumnWidth(@NonNull TableColumn<TypeDefinitionRow, String> column, BaseTableSettings tableSettings,
                                  @NonNull String columnId) {
     if (tableSettings == null) {
       return;

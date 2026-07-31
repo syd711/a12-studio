@@ -56,6 +56,24 @@ class DocumentModelValidatorsTest {
   }
 
   @Test
+  void enumerationValuesValidatorReportsEmptyEnumeration() {
+    DocumentModel model = load("EnumerationValuesValidator_invalid");
+    List<ModelValidationError> errors = new EnumerationValuesValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("field_choice", errors.get(0).elementId());
+  }
+
+  @Test
+  void enumerationValuesValidatorReportsTooFewValuesInMultiSelect() {
+    DocumentModel model = load("EnumerationValuesValidator_multiSelectInvalid");
+    List<ModelValidationError> errors = new EnumerationValuesValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size(), "A multi-select value field with only one value must be reported");
+    assertEquals("field_choice", errors.get(0).elementId());
+  }
+
+  @Test
   void multiSelectGroupValidatorReportsInvalidMultiSelectGroup() {
     DocumentModel model = load("MultiSelectGroupValidator_invalid");
     List<ModelValidationError> errors = new MultiSelectGroupValidator().validate(model, TestModels.context(model));

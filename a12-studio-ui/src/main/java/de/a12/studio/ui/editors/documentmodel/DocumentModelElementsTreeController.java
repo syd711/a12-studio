@@ -4,6 +4,7 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.projects.Project;
@@ -12,6 +13,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.documentmodel.commands.MoveNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController;
 import de.a12.studio.ui.events.ElementValidatedEvent;
@@ -33,7 +35,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.TransferMode;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -51,6 +57,14 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private static final String NAME_COLUMN_ID = "name";
 
   private static final String TYPE_COLUMN_ID = "type";
+
+  // Identifies a tree row reorder/reparent drag; the dragboard needs some content to be considered a valid
+  // drag source; the actual dragged node is tracked directly via the draggedTreeItem field below since it's
+  // an in-process, same-tree drag (no need to serialize the element itself onto the dragboard).
+  private static final DataFormat ELEMENT_DRAG_FORMAT = new DataFormat("application/x-a12-document-model-element");
+
+  private static final List<String> DROP_STYLE_CLASSES =
+      List.of("tree-row-drop-above", "tree-row-drop-below", "tree-row-drop-into");
 
   @FXML
   private ToolBar modelTreeToolbarBar;
@@ -85,6 +99,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private final CommandStack commandStack = new CommandStack();
 
   private Consumer<List<Element>> selectionListener;
+
+  private TreeItem<ElementViewModel> draggedTreeItem;
 
   public void load(@NonNull DocumentModel model) {
     load(projectItem, model.getContent().getModelRoot());
@@ -551,6 +567,247 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return null;
   }
 
+  private enum DropLocation {ABOVE, BELOW, INTO}
+
+  private record DropPosition(TreeItem<ElementViewModel> targetItem, DropLocation location) {
+
+  }
+
+  /**
+   * The list a tree item's element currently lives in: {@link ModelRoot#getRootGroups()} for a top-level
+   * group, or its parent group's {@link de.a12.studio.models.documentmodel.GroupConfig#getElements()} otherwise.
+   */
+  private List<? extends Element> siblingsOf(@NonNull TreeItem<ElementViewModel> item) {
+    TreeItem<ElementViewModel> parentItem = item.getParent();
+    if (parentItem == null || parentItem.getValue() == null) {
+      return modelRoot.getRootGroups();
+    }
+    Element parentElement = parentItem.getValue().getElement();
+    if (parentElement instanceof GroupElement parentGroup && parentGroup.getGroup() != null) {
+      return parentGroup.getGroup().getElements();
+    }
+    return List.of();
+  }
+
+  private boolean isSameOrDescendant(@NonNull TreeItem<ElementViewModel> item, @NonNull TreeItem<ElementViewModel> ancestorCandidate) {
+    TreeItem<ElementViewModel> current = item;
+    while (current != null) {
+      if (current == ancestorCandidate) {
+        return true;
+      }
+      current = current.getParent();
+    }
+    return false;
+  }
+
+  private boolean isAttachmentOrMultiSelectGroup(@NonNull Element element) {
+    return element instanceof GroupElement groupElement && groupElement.getGroup() != null
+        && (GroupConfig.USAGE_TYPE_ATTACHMENT.equals(groupElement.getGroup().getUsageType())
+            || GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType()));
+  }
+
+  /**
+   * Whether {@code target} is a valid drop location for {@code dragged}, and if so where: reparented as a
+   * child ("into", only offered for the middle 50% of a non-fixed-children group's row) or reordered as a
+   * sibling directly before/after {@code target} (the top/bottom 25%+50% of its row, or the whole row for a
+   * non-group target). Returns {@code null} when the drop would be invalid: onto itself or one of its own
+   * descendants (would create a cycle), into a fixed-children group (attachment/multi-select/include, see
+   * {@link ElementViewModel#hasFixedChildren}), next to a row inside one, directly after an attachment or
+   * multi-select group (see {@link #isAttachmentOrMultiSelectGroup}) - checked against the resulting sibling
+   * list position rather than just {@code target} itself, since hovering over the *next* row's top half lands
+   * in that same gap - or a non-{@link GroupElement} landing directly in the root list (which only holds
+   * top-level groups, see {@link ModelRoot#getRootGroups}).
+   */
+  private DropPosition resolveDropPosition(@NonNull TreeItem<ElementViewModel> dragged, @NonNull TreeItem<ElementViewModel> target,
+                                            double relativeY, double rowHeight) {
+    if (isSameOrDescendant(target, dragged)) {
+      return null;
+    }
+
+    Element draggedElement = dragged.getValue().getElement();
+    Element targetElement = target.getValue().getElement();
+    double fraction = rowHeight <= 0 ? 0.5 : relativeY / rowHeight;
+
+    boolean canDropInto = targetElement instanceof GroupElement targetGroup && targetGroup.getGroup() != null
+        && !new ElementViewModel(targetElement).hasFixedChildren();
+    if (canDropInto && fraction > 0.25 && fraction < 0.75) {
+      return new DropPosition(target, DropLocation.INTO);
+    }
+
+    if (hasFixedChildrenAncestor(targetElement)) {
+      return null;
+    }
+    List<? extends Element> siblings = siblingsOf(target);
+    if (siblings == modelRoot.getRootGroups() && !(draggedElement instanceof GroupElement)) {
+      return null;
+    }
+
+    DropLocation location = fraction < 0.5 ? DropLocation.ABOVE : DropLocation.BELOW;
+    int targetElementIndex = siblings.indexOf(targetElement);
+    int insertIndex = location == DropLocation.BELOW ? targetElementIndex + 1 : targetElementIndex;
+    if (insertIndex > 0 && isAttachmentOrMultiSelectGroup(siblings.get(insertIndex - 1))) {
+      return null;
+    }
+    return new DropPosition(target, location);
+  }
+
+  private void moveElement(@NonNull TreeItem<ElementViewModel> draggedItem, @NonNull DropPosition position) {
+    Element element = draggedItem.getValue().getElement();
+    List<? extends Element> sourceSiblings = siblingsOf(draggedItem);
+
+    List<? extends Element> targetSiblings;
+    int targetIndex;
+    if (position.location() == DropLocation.INTO) {
+      GroupElement targetGroup = (GroupElement) position.targetItem().getValue().getElement();
+      targetSiblings = targetGroup.getGroup().getElements();
+      targetIndex = targetSiblings.size();
+    }
+    else {
+      targetSiblings = siblingsOf(position.targetItem());
+      int targetElementIndex = targetSiblings.indexOf(position.targetItem().getValue().getElement());
+      targetIndex = position.location() == DropLocation.BELOW ? targetElementIndex + 1 : targetElementIndex;
+    }
+
+    commandStack.execute(new MoveNodeCommand(sourceSiblings, targetSiblings, element, targetIndex));
+    updateUndoRedoState();
+    applyFilter(searchController.getText());
+    selectElement(element);
+    projectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
+  }
+
+  /**
+   * Handles dropping a top-level group onto the empty area below the last row (no {@link TreeTableRow} covers
+   * that space, so {@link #setupTreeDragAndDrop} handles it directly on the table instead of a row): moves it
+   * to the end of {@link ModelRoot#getRootGroups()}. Non-group elements can't land here since the root list is
+   * typed to hold only groups.
+   */
+  private void moveElementToRootEnd(@NonNull TreeItem<ElementViewModel> draggedItem, @NonNull GroupElement draggedGroup) {
+    List<? extends Element> sourceSiblings = siblingsOf(draggedItem);
+    List<GroupElement> rootGroups = modelRoot.getRootGroups();
+
+    commandStack.execute(new MoveNodeCommand(sourceSiblings, rootGroups, draggedGroup, rootGroups.size()));
+    updateUndoRedoState();
+    applyFilter(searchController.getText());
+    selectElement(draggedGroup);
+    projectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
+  }
+
+  private void showDropIndicator(@NonNull TreeTableRow<ElementViewModel> row, @NonNull DropPosition position) {
+    String showClass = switch (position.location()) {
+      case ABOVE -> "tree-row-drop-above";
+      case BELOW -> "tree-row-drop-below";
+      case INTO -> "tree-row-drop-into";
+    };
+    for (String styleClass : DROP_STYLE_CLASSES) {
+      if (!styleClass.equals(showClass)) {
+        row.getStyleClass().remove(styleClass);
+      }
+    }
+    if (!row.getStyleClass().contains(showClass)) {
+      row.getStyleClass().add(showClass);
+    }
+  }
+
+  private void clearDropIndicator(@NonNull TreeTableRow<ElementViewModel> row) {
+    row.getStyleClass().removeAll(DROP_STYLE_CLASSES);
+  }
+
+  /**
+   * Wires up reorder/reparent drag-and-drop for one tree row: grabbing anywhere on the row starts the drag
+   * (no dedicated handle, unlike e.g. {@code ModulesPanelController}, since rows here nest to arbitrary depth
+   * and a per-row handle would fight with expand/collapse disclosure arrows). Hovering over another row shows
+   * exactly where the dragged element will land - as a sibling above/below it, or reparented into it - via
+   * {@link #showDropIndicator}, and {@link #resolveDropPosition} vetoes drops that would be invalid.
+   */
+  private void setupRowDragAndDrop(@NonNull TreeTableRow<ElementViewModel> row) {
+    row.setOnDragDetected(event -> {
+      if (row.isEmpty() || row.getTreeItem() == null) {
+        return;
+      }
+      draggedTreeItem = row.getTreeItem();
+      Dragboard dragboard = row.startDragAndDrop(TransferMode.MOVE);
+      ClipboardContent content = new ClipboardContent();
+      content.put(ELEMENT_DRAG_FORMAT, draggedTreeItem.getValue().getElement().getId());
+      dragboard.setContent(content);
+      event.consume();
+    });
+
+    row.setOnDragOver(event -> {
+      if (row.isEmpty() || row.getTreeItem() == null || draggedTreeItem == null
+          || !event.getDragboard().hasContent(ELEMENT_DRAG_FORMAT)) {
+        return;
+      }
+      DropPosition position = resolveDropPosition(draggedTreeItem, row.getTreeItem(), event.getY(), row.getHeight());
+      if (position != null) {
+        event.acceptTransferModes(TransferMode.MOVE);
+        showDropIndicator(row, position);
+      }
+      else {
+        clearDropIndicator(row);
+      }
+      event.consume();
+    });
+
+    row.setOnDragExited(event -> clearDropIndicator(row));
+
+    row.setOnDragDropped(event -> {
+      if (row.isEmpty() || row.getTreeItem() == null || draggedTreeItem == null) {
+        return;
+      }
+      DropPosition position = resolveDropPosition(draggedTreeItem, row.getTreeItem(), event.getY(), row.getHeight());
+      boolean success = position != null;
+      if (success) {
+        moveElement(draggedTreeItem, position);
+      }
+      clearDropIndicator(row);
+      event.setDropCompleted(success);
+      event.consume();
+    });
+
+    row.setOnDragDone(event -> draggedTreeItem = null);
+  }
+
+  /**
+   * Lets a top-level group be dropped onto the empty area below the last row, where no {@link TreeTableRow}
+   * exists to handle the drag itself (see {@link #moveElementToRootEnd}). Per-row handlers in {@link
+   * #setupRowDragAndDrop} consume drag-over/dropped events themselves, so this table-level handler only ever
+   * sees events that fell through from that empty area.
+   */
+  /**
+   * Whether a root-level group may be dropped after the current last root group: false if the dragged
+   * element isn't a group at all (root only holds groups, see {@link ModelRoot#getRootGroups}), or if the
+   * root list currently ends with an attachment/multi-select group - mirrors the "nothing lands directly
+   * after one of those" rule enforced for in-tree drops by {@link #resolveDropPosition}.
+   */
+  private boolean canAppendToRootEnd(@NonNull Element draggedElement) {
+    if (!(draggedElement instanceof GroupElement)) {
+      return false;
+    }
+    List<GroupElement> rootGroups = modelRoot.getRootGroups();
+    return rootGroups.isEmpty() || !isAttachmentOrMultiSelectGroup(rootGroups.get(rootGroups.size() - 1));
+  }
+
+  private void setupTreeDragAndDrop() {
+    elementsTreeTable.setOnDragOver(event -> {
+      if (draggedTreeItem != null && canAppendToRootEnd(draggedTreeItem.getValue().getElement())
+          && event.getDragboard().hasContent(ELEMENT_DRAG_FORMAT)) {
+        event.acceptTransferModes(TransferMode.MOVE);
+      }
+      event.consume();
+    });
+
+    elementsTreeTable.setOnDragDropped(event -> {
+      boolean success = draggedTreeItem != null && canAppendToRootEnd(draggedTreeItem.getValue().getElement());
+      if (success) {
+        moveElementToRootEnd(draggedTreeItem, (GroupElement) draggedTreeItem.getValue().getElement());
+      }
+      event.setDropCompleted(success);
+      event.consume();
+    });
+  }
+
   private void selectElement(@NonNull Element element) {
     TreeItem<ElementViewModel> treeItem = findTreeItem(elementsTreeTable.getRoot(), element.getId());
     if (treeItem == null) {
@@ -625,23 +882,28 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         onDeleteKeyPressed();
       }
     });
-    elementsTreeTable.setRowFactory(treeTable -> new TreeTableRow<>() {
-      @Override
-      protected void updateItem(ElementViewModel item, boolean empty) {
-        super.updateItem(item, empty);
-        setContextMenu(empty || item == null || hasFixedChildrenAncestor(item.getElement())
-            ? null : createContextMenu(item.getElement()));
-        boolean fixedChildLeaf = !empty && item != null && hasFixedChildrenAncestor(item.getElement());
-        if (fixedChildLeaf) {
-          if (!getStyleClass().contains("fixed-child-row")) {
-            getStyleClass().add("fixed-child-row");
+    elementsTreeTable.setRowFactory(treeTable -> {
+      TreeTableRow<ElementViewModel> row = new TreeTableRow<>() {
+        @Override
+        protected void updateItem(ElementViewModel item, boolean empty) {
+          super.updateItem(item, empty);
+          setContextMenu(empty || item == null || hasFixedChildrenAncestor(item.getElement())
+              ? null : createContextMenu(item.getElement()));
+          boolean fixedChildLeaf = !empty && item != null && hasFixedChildrenAncestor(item.getElement());
+          if (fixedChildLeaf) {
+            if (!getStyleClass().contains("fixed-child-row")) {
+              getStyleClass().add("fixed-child-row");
+            }
+          }
+          else {
+            getStyleClass().remove("fixed-child-row");
           }
         }
-        else {
-          getStyleClass().remove("fixed-child-row");
-        }
-      }
+      };
+      setupRowDragAndDrop(row);
+      return row;
     });
+    setupTreeDragAndDrop();
     nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
     nameColumn.setCellFactory(column -> new ElementNameTreeCell());
 

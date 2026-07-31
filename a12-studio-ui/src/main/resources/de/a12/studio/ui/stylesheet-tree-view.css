@@ -194,6 +194,27 @@
 }
 
 /*
+ * Drop indicators shown on a row of #elementsTreeTable while another row is dragged over it (see
+ * DocumentModelElementsTreeController#showDropIndicator): an accent-colored line on the row's top or
+ * bottom edge for a sibling reorder (mirrors .module-row-drop-above/-below), or a full accent border
+ * when the element would instead be reparented as a child of the hovered group.
+ */
+.tree-table-row-cell.tree-row-drop-above {
+    -fx-border-color: -fx-accent-color transparent transparent transparent;
+    -fx-border-width: 2px 0 0 0;
+}
+
+.tree-table-row-cell.tree-row-drop-below {
+    -fx-border-color: transparent transparent -fx-accent-color transparent;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.tree-table-row-cell.tree-row-drop-into {
+    -fx-border-color: -fx-accent-color;
+    -fx-border-width: 2px;
+}
+
+/*
  * Leaf elements (fields/rules) inside attachment/multi-select groups have a fixed
  * structure - they can't be added to or removed independently. A soft tint marks
  * them as behaving differently from regular, freely editable elements.

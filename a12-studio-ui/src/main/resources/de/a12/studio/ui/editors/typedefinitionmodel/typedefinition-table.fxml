@@ -54,7 +54,7 @@
             <columns>
                 <TableColumn fx:id="nameColumn" prefWidth="200.0" text="NAME" />
                 <TableColumn fx:id="baseTypeColumn" prefWidth="90.0" text="BASE TYPE" />
-                <TableColumn prefWidth="190.0" text="SOURCE" />
+                <TableColumn fx:id="sourceColumn" prefWidth="190.0" text="SOURCE" />
             </columns>
         </TableView>
     </center>
