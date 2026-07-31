@@ -28,7 +28,7 @@ public final class StringPatternErrorMessageValidator implements ModelValidator 
       return List.of();
     }
 
-    ElementIndex index = new ElementIndex(documentModel);
+    ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
     List<ModelValidationError> errors = new ArrayList<>();
     for (Element element : index.allElements()) {
       if (!(element instanceof FieldElement field) || field.getField() == null) {

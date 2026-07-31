@@ -26,7 +26,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
-import de.a12.studio.ui.editors.typedefinitionmodel.TransitiveTypeDefinitions;
+import de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;

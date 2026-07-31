@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;

@@ -26,12 +26,30 @@ import java.util.Optional;
 public class ElementIndex {
 
   private final DocumentModel model;
+  private final List<DocumentModel> otherModels;
   private final Map<String, Element> byId = new HashMap<>();
   private final Map<Element, GroupElement> parentOf = new HashMap<>();
   private final List<Element> all = new ArrayList<>();
 
+  // Lazily computed on first effectiveFieldType() lookup that needs it, then reused: TransitiveTypeDefinitions
+  // walks the whole Include/Import graph, and effectiveFieldType is called once per TypeDefType field, so this
+  // avoids re-walking it from scratch for every such field in the same model.
+  private List<TransitiveTypeDefinitions.Entry> transitiveTypeDefinitions;
+
   public ElementIndex(DocumentModel model) {
+    this(model, List.of());
+  }
+
+  /**
+   * @param otherModels every other {@link DocumentModel} in the project, needed by {@link #effectiveFieldType}
+   *                     to resolve a {@code TypeDefType} field pointing at a type definition this model
+   *                     doesn't own directly, but inherits transitively through an Include or Import (see
+   *                     {@link TransitiveTypeDefinitions}). Pass {@code List.of()} if the caller doesn't need
+   *                     that (e.g. a check that never touches {@code TypeDefType} fields).
+   */
+  public ElementIndex(DocumentModel model, List<DocumentModel> otherModels) {
     this.model = model;
+    this.otherModels = otherModels;
     List<GroupElement> rootGroups = model.getContent().getModelRoot().getRootGroups();
     if (rootGroups != null) {
       for (GroupElement rootGroup : rootGroups) {
@@ -147,7 +165,14 @@ public class ElementIndex {
     return element instanceof ComputationElement;
   }
 
-  /** Resolves a TypeDefType field to the field type it points to, mirroring the kernel's Field.getEffectiveType(). */
+  /**
+   * Resolves a TypeDefType field to the field type it points to, mirroring the kernel's
+   * Field.getEffectiveType(). Looks first at this model's own {@code typeDefinitions}, then - since a
+   * {@code TypeDefType} field can just as validly point at a type definition inherited transitively through
+   * an Include or Import (see {@link TransitiveTypeDefinitions}) - at every type definition reachable that
+   * way, so a field referencing one of those doesn't get wrongly flagged "Missing Type Definition" by {@link
+   * MissingReferenceValidator}.
+   */
   public FieldType effectiveFieldType(FieldType fieldType) {
     if (fieldType instanceof TypeDefFieldType typeDefFieldType
         && typeDefFieldType.getTypeDefType() != null
@@ -161,8 +186,20 @@ public class ElementIndex {
           }
         }
       }
+      for (TransitiveTypeDefinitions.Entry entry : transitiveTypeDefinitions()) {
+        if (typeDefId.equals(entry.typeDefinition().getId())) {
+          return entry.typeDefinition().getFieldType();
+        }
+      }
       return null;
     }
     return fieldType;
+  }
+
+  private List<TransitiveTypeDefinitions.Entry> transitiveTypeDefinitions() {
+    if (transitiveTypeDefinitions == null) {
+      transitiveTypeDefinitions = TransitiveTypeDefinitions.resolve(model, otherModels);
+    }
+    return transitiveTypeDefinitions;
   }
 }

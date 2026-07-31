@@ -44,7 +44,7 @@ public final class MissingReferenceValidator implements ModelValidator {
       return List.of();
     }
 
-    ElementIndex index = new ElementIndex(documentModel);
+    ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
     List<ModelValidationError> result = new ArrayList<>();
     for (Element element : index.allElements()) {
       if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {

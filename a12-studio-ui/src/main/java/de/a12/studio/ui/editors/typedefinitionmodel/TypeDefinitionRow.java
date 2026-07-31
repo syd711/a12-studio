@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
 import de.a12.studio.models.documentmodel.TypeDefinition;
+import de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions;
 import org.jspecify.annotations.NonNull;
 
 /**
