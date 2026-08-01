@@ -2,12 +2,15 @@ package de.a12.studio.models;
 
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.combinationmodel.CombinationModel;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
+import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
@@ -53,6 +56,9 @@ public class ModelFactory {
         case CONTENT -> JsonSettings.objectMapper.treeToValue(root, ContentModel.class);
         case PRINT -> JsonSettings.objectMapper.treeToValue(root, PrintModel.class);
         case TREE -> JsonSettings.objectMapper.treeToValue(root, TreeModel.class);
+        case COMBINATION -> JsonSettings.objectMapper.treeToValue(root, CombinationModel.class);
+        case MAPPING -> JsonSettings.objectMapper.treeToValue(root, MappingModel.class);
+        case QUERY -> JsonSettings.objectMapper.treeToValue(root, QueryModel.class);
         default -> {
           log.warn("Model type '{}' of '{}' is not supported yet", modelType, projectItem.getPath());
           yield null;

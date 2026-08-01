@@ -17,6 +17,7 @@ public class ModelReference {
   // reference (which inlines a whole other document model's element tree via a Group's includeConfig).
   public static final String PURPOSE_TYPE_DEFINITIONS = "typeDefinitions";
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String purpose;
   private ModelType modelType;
   @JsonInclude(JsonInclude.Include.NON_NULL)

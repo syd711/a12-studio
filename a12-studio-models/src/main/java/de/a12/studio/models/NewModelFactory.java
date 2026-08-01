@@ -2,6 +2,8 @@ package de.a12.studio.models;
 
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
+import de.a12.studio.models.combinationmodel.CombinationModel;
+import de.a12.studio.models.combinationmodel.CombinationModelContent;
 import de.a12.studio.models.contentmodel.ContentConfiguration;
 import de.a12.studio.models.contentmodel.ContentElement;
 import de.a12.studio.models.contentmodel.ContentModel;
@@ -14,6 +16,8 @@ import de.a12.studio.models.documentmodel.ModelInfo;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.models.mappingmodel.MappingModel;
+import de.a12.studio.models.mappingmodel.MappingModelContent;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModelContent;
 import de.a12.studio.models.overviewmodel.OverviewModel;
@@ -26,6 +30,8 @@ import de.a12.studio.models.printmodel.PrintModelContent;
 import de.a12.studio.models.printmodel.PrintSegments;
 import de.a12.studio.models.printmodel.PrintStructureEntry;
 import de.a12.studio.models.printmodel.SegmentDefaults;
+import de.a12.studio.models.querymodel.QueryModel;
+import de.a12.studio.models.querymodel.QueryModelContent;
 import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
 import de.a12.studio.models.relationshipmodel.LinkConstraints;
 import de.a12.studio.models.relationshipmodel.Multiplicity;
@@ -79,6 +85,9 @@ public class NewModelFactory {
       case CONTENT -> buildContentModel();
       case PRINT -> buildPrintModel(name);
       case TREE -> buildTreeModel();
+      case COMBINATION -> buildCombinationModel();
+      case MAPPING -> buildMappingModel();
+      case QUERY -> buildQueryModel();
     };
   }
 
@@ -240,6 +249,27 @@ public class NewModelFactory {
     content.setSubHeaderBox(new SlotBox());
     content.setFooterBox(new SlotBox());
     model.setContent(content);
+    model.setLocales(defaultLocales());
+    return model;
+  }
+
+  private static CombinationModel buildCombinationModel() {
+    CombinationModel model = new CombinationModel();
+    model.setContent(new CombinationModelContent());
+    model.setLocales(defaultLocales());
+    return model;
+  }
+
+  private static MappingModel buildMappingModel() {
+    MappingModel model = new MappingModel();
+    model.setContent(new MappingModelContent());
+    model.setLocales(defaultLocales());
+    return model;
+  }
+
+  private static QueryModel buildQueryModel() {
+    QueryModel model = new QueryModel();
+    model.setContent(new QueryModelContent());
     model.setLocales(defaultLocales());
     return model;
   }

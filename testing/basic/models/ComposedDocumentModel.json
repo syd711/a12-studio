@@ -1,0 +1,64 @@
+{
+  "header": {
+    "id": "ComposedDocumentModel",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "cdm.queryRoot",
+        "value": "Company_DM"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "composedData",
+        "reference": "Company_DM"
+      },
+      {
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Company_DM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "ComposedDocumentModel"
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "include_9a565",
+          "name": "Company",
+          "Group": {
+            "repeatability": 1,
+            "includeConfig": {
+              "reference": "Company_DM"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

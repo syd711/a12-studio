@@ -13,12 +13,15 @@ import java.util.Map;
 public enum ModelType {
 
   APPLICATION("application", "Application Model"),
+  COMBINATION("combination", "Combination Model"),
   CONTENT("content", "Content Model"),
   DOCUMENT("document", "Document Model"),
   FORM("form", "Form Model"),
+  MAPPING("mapping", "Mapping Model"),
   MASTERDETAIL("module-masterdetail", "Master-Detail Model"),
   OVERVIEW("overview", "Overview Model"),
   PRINT("print", "Print Model"),
+  QUERY("query", "Query Model"),
   RELATIONSHIP("relationship", "Relationship Model"),
   TREE("tree", "Tree Model"),
   TYPEDEFINITION("typedefinition", "Type Definition Model");

@@ -3,12 +3,15 @@ package de.a12.studio.ui;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.models.auth.UsersDocument;
+import de.a12.studio.models.combinationmodel.CombinationModel;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
+import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
@@ -16,11 +19,14 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.applicationmodel.ApplicationModelEditorController;
 import de.a12.studio.ui.editors.auth.RolesEditorController;
 import de.a12.studio.ui.editors.auth.UsersEditorController;
+import de.a12.studio.ui.editors.combinationmodel.CombinationModelEditorController;
 import de.a12.studio.ui.editors.contentmodel.ContentModelEditorController;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
+import de.a12.studio.ui.editors.mappingmodel.MappingModelEditorController;
 import de.a12.studio.ui.editors.masterdetailmodel.MasterDetailModelEditorController;
 import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
+import de.a12.studio.ui.editors.querymodel.QueryModelEditorController;
 import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController;
 import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
@@ -96,6 +102,24 @@ public class EditorFactory {
       }
       else if (item.getModel() instanceof PrintModel) {
         WidgetFactory.showAlert(Studio.stage, "Print models are not supported yet.");
+      }
+      else if (item.getModel() instanceof CombinationModel) {
+        FXMLLoader loader = new FXMLLoader(CombinationModelEditorController.class.getResource("combination-model-editor.fxml"));
+        content = loader.load();
+        CombinationModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof MappingModel) {
+        FXMLLoader loader = new FXMLLoader(MappingModelEditorController.class.getResource("mapping-model-editor.fxml"));
+        content = loader.load();
+        MappingModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof QueryModel) {
+        FXMLLoader loader = new FXMLLoader(QueryModelEditorController.class.getResource("query-model-editor.fxml"));
+        content = loader.load();
+        QueryModelEditorController controller = loader.getController();
+        controller.load(item);
       }
       else if (item.getAuthDocument() instanceof RolesDocument) {
         FXMLLoader loader = new FXMLLoader(RolesEditorController.class.getResource("roles-editor.fxml"));

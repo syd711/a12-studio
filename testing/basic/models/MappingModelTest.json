@@ -1,0 +1,32 @@
+{
+  "header": {
+    "id": "MappingModelTest",
+    "modelType": "mapping",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "reference": "Company_DM"
+      }
+    ]
+  },
+  "content": {
+    "Target": {
+      "dmId": "Company_DM"
+    }
+  }
+}
