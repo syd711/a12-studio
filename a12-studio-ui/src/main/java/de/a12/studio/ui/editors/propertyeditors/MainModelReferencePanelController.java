@@ -20,14 +20,14 @@ import java.util.ResourceBundle;
  * content.treeModel} directly, not a document-model {@link de.a12.studio.models.documentmodel.Element}, and
  * its owning editor already has its own updatingFromModel/commitChange save cycle to fold this into.
  */
-public class MasterModelReferencePanelController implements Initializable {
+public class MainModelReferencePanelController implements Initializable {
 
   @FXML
   private RadioButton overviewTypeField;
   @FXML
   private RadioButton treeTypeField;
   @FXML
-  private ComboBox<String> masterModelField;
+  private ComboBox<String> mainModelField;
 
   private MasterDetailModel model;
   private List<String> overviewModelIds = List.of();
@@ -52,7 +52,7 @@ public class MasterModelReferencePanelController implements Initializable {
         onTypeChanged();
       }
     });
-    masterModelField.valueProperty().addListener((observable, oldValue, newValue) -> {
+    mainModelField.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel || model == null) {
         return;
       }
@@ -104,14 +104,14 @@ public class MasterModelReferencePanelController implements Initializable {
   }
 
   private void populateCombo(boolean treeMode, String valueToSelect) {
-    masterModelField.getItems().setAll(treeMode ? treeModelIds : overviewModelIds);
-    masterModelField.setValue(valueToSelect);
+    mainModelField.getItems().setAll(treeMode ? treeModelIds : overviewModelIds);
+    mainModelField.setValue(valueToSelect);
   }
 
   /** Writes the current radio/combo selection back into {@code content}, clearing the other reference field. */
   private void applySelection() {
     boolean treeMode = treeTypeField.isSelected();
-    String selectedId = masterModelField.getValue();
+    String selectedId = mainModelField.getValue();
     model.getContent().setType(treeMode ? "tree" : "overview");
     model.getContent().setTreeModel(treeMode ? selectedId : null);
     model.getContent().setOverviewModel(treeMode ? null : selectedId);

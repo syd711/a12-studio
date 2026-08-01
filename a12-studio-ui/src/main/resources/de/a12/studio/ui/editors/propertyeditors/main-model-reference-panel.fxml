@@ -8,22 +8,22 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="MASTER MODEL" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.MasterModelReferencePanelController">
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="MAIN MODEL" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.MainModelReferencePanelController">
     <VBox spacing="6.0">
         <children>
-            <Label styleClass="field-label" text="Master Model*" />
+            <Label styleClass="field-label" text="Type*" />
             <HBox spacing="20.0">
                 <children>
                     <RadioButton fx:id="overviewTypeField" mnemonicParsing="false" text="Overview">
                         <toggleGroup>
-                            <ToggleGroup fx:id="masterModelTypeToggleGroup" />
+                            <ToggleGroup fx:id="mainModelTypeToggleGroup"/>
                         </toggleGroup>
                     </RadioButton>
-                    <RadioButton fx:id="treeTypeField" mnemonicParsing="false" text="Tree" toggleGroup="$masterModelTypeToggleGroup" />
+                    <RadioButton fx:id="treeTypeField" mnemonicParsing="false" text="Tree" toggleGroup="$mainModelTypeToggleGroup" />
                 </children>
             </HBox>
-            <ComboBox fx:id="masterModelField" editable="false" maxWidth="Infinity" />
+            <ComboBox fx:id="mainModelField" editable="false" maxWidth="Infinity" />
         </children>
     </VBox>
 </TitledPane>

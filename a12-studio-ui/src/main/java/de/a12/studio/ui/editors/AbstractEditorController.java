@@ -4,7 +4,6 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
-import de.a12.studio.ui.editors.dialogs.Dialogs;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -14,8 +13,6 @@ import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Tooltip;
-import javafx.scene.shape.Circle;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
@@ -25,8 +22,6 @@ import java.util.function.Consumer;
 
 @Slf4j
 abstract public class AbstractEditorController implements StudioEventListener {
-
-  private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
   protected ProjectItem projectItem;
   private BaseTableSettings baseTableSettings;
@@ -45,31 +40,17 @@ abstract public class AbstractEditorController implements StudioEventListener {
   protected EditorFileToolbarButtonsController fileToolbarButtonsController;
 
   /**
-   * Settings toolbar button badge, injected in every editor FXML that shows the settings button.
-   * Both may be null for editors without a settings button.
+   * Injected via {@code fx:include} in every editor FXML that shows the settings button.
+   * May be null for editors without a settings button.
    */
   @FXML
-  protected Tooltip settingsButtonTooltip;
-
-  @FXML
-  protected Circle settingsErrorBadge;
-
-  @FXML
-  public void onSettings(ActionEvent e) {
-    Dialogs.openSettings();
-    updateSettingsErrorBadge();
-  }
+  protected EditorSettingsToolbarButtonController settingsToolbarButtonController;
 
   protected void updateSettingsErrorBadge() {
-    if (settingsErrorBadge == null || settingsButtonTooltip == null) {
+    if (settingsToolbarButtonController == null) {
       return;
     }
-    List<String> issues = projectItem != null && projectItem.getModel() != null
-        ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
-        : List.of();
-
-    settingsErrorBadge.setVisible(!issues.isEmpty());
-    settingsButtonTooltip.setText(issues.isEmpty() ? DEFAULT_SETTINGS_TOOLTIP : String.join("\n\n", issues));
+    settingsToolbarButtonController.updateErrorBadge();
   }
 
   public void save() {
@@ -109,11 +90,18 @@ abstract public class AbstractEditorController implements StudioEventListener {
 
   public void load(@NonNull ProjectItem projectItem) {
     this.projectItem = projectItem;
-    this.loadModel(projectItem.getModel());
 
     if (fileToolbarButtonsController != null) {
       fileToolbarButtonsController.setFileSupplier(() -> projectItem.getFile());
     }
+
+    if (settingsToolbarButtonController != null) {
+      settingsToolbarButtonController.setIssuesSupplier(() -> projectItem != null && projectItem.getModel() != null
+          ? Studio.getValidationService().getSettingsIssueMessages(projectItem.getModel())
+          : List.of());
+    }
+
+    this.loadModel(projectItem.getModel());
 
     StudioEventManager.getInstance().addListener(this);
   }

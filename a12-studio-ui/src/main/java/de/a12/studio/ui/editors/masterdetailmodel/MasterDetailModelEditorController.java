@@ -7,7 +7,7 @@ import de.a12.studio.models.masterdetailmodel.FormMapping;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.propertyeditors.FormWidthPanelController;
-import de.a12.studio.ui.editors.propertyeditors.MasterModelReferencePanelController;
+import de.a12.studio.ui.editors.propertyeditors.MainModelReferencePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 public class MasterDetailModelEditorController extends AbstractEditorController implements Initializable {
 
   @FXML
-  private MasterModelReferencePanelController masterModelReferenceController;
+  private MainModelReferencePanelController masterModelReferenceController;
 
   @FXML
   private FormWidthPanelController formWidthPanelController;
