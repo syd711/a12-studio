@@ -333,7 +333,12 @@
             ]
           }
         ]
-      }
+      },
+      "initialSorting": [
+        {
+          "idref": "column-5847d"
+        }
+      ]
     }
   }
 }

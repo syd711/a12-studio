@@ -9,6 +9,7 @@ import de.a12.studio.models.auth.AuthFileFactory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,6 +85,10 @@ public class ProjectItem {
 
   public String getName() {
     return file.getName();
+  }
+
+  public String getDisplayName() {
+    return FilenameUtils.getBaseName(file.getName());
   }
 
   public List<ProjectItem> getChildren() {

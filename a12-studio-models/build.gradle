@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'commons-io:commons-io:2.22.0'
     // Model classes carry Jackson annotations (@JsonInclude, @JsonTypeInfo, ...) that are part
     // of this module's public surface, so downstream consumers need jackson-annotations on
     // their own compile classpath too - api (not implementation) exposes it transitively.

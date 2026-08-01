@@ -6,13 +6,9 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.overviewmodel.ClearConfirmation;
-import de.a12.studio.models.overviewmodel.Confirmation;
 import de.a12.studio.models.overviewmodel.FieldRef;
 import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.FilterSection;
-import de.a12.studio.models.overviewmodel.Icon;
-import de.a12.studio.models.overviewmodel.MultiSelectionConfig;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
@@ -20,6 +16,7 @@ import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewFeaturesPanelController;
+import de.a12.studio.ui.editors.propertyeditors.OverviewMultiSelectionPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewSortingPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -50,7 +47,8 @@ import java.util.function.BiConsumer;
  * Edits an {@link OverviewModel}'s "Overview" tab: General Settings (the Overview Reference, delegated to
  * {@link de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController}), Columns (delegated to
  * {@link de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController}), Features
- * (search/filter/paging/row-count/multi-selection), Filter and Multi-Selection. "Custom Actions" ({@code
+ * (search/filter/paging/row-count, delegated to {@link OverviewFeaturesPanelController}), Filter and
+ * Multi-Selection (delegated to {@link OverviewMultiSelectionPanelController}). "Custom Actions" ({@code
  * content.rowActionGroup}) is out of scope, mirroring the Java model's already-reduced feature set versus
  * SME (no content-level Styles). {@code subHeaderBox}/{@code footerBox} are left untouched: sample models
  * ({@code Company_OM.json}, {@code Invoice_OM.json}) show them written empty even with
@@ -62,15 +60,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   private static final List<String> FILTER_MODE_OPTIONS = List.of("",
       FilterConfiguration.FILTER_MODE_ALL, FilterConfiguration.FILTER_MODE_ALL_WITH_META,
       FilterConfiguration.FILTER_MODE_ALL_COLUMNS, FilterConfiguration.FILTER_MODE_CUSTOM_LIST);
-  private static final List<String> COLLAPSE_OPTIONS = List.of("",
-      MultiSelectionConfig.COLLAPSE_OPTION_COLLAPSIBLE_COLLAPSED, MultiSelectionConfig.COLLAPSE_OPTION_COLLAPSIBLE_EXPANDED,
-      MultiSelectionConfig.COLLAPSE_OPTION_NON_COLLAPSIBLE);
-  private static final List<String> COUNTER_OPTIONS = List.of("",
-      MultiSelectionConfig.COUNTER_OPTION_SIMPLE, MultiSelectionConfig.COUNTER_OPTION_NONE);
-  private static final List<String> SELECTION_AREA_OPTIONS = List.of("",
-      MultiSelectionConfig.SELECTION_AREA_CHECKBOX, MultiSelectionConfig.SELECTION_AREA_CHECKBOX_AND_ROW);
-  private static final List<String> ICON_THEME_OPTIONS = List.of("",
-      Icon.THEME_FILLED, Icon.THEME_OUTLINED, Icon.THEME_ROUNDED, Icon.THEME_CUSTOM);
 
   // General Settings
   @FXML
@@ -105,44 +94,9 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   @FXML
   private GridPane filterSectionFieldsGrid;
 
+  // Multi-Selection
   @FXML
-  private CheckBox enableMultiSelectionField;
-  @FXML
-  private VBox multiSelectionDetailsBox;
-  @FXML
-  private ComboBox<String> collapseOptionField;
-  @FXML
-  private ComboBox<String> counterOptionField;
-  @FXML
-  private ComboBox<String> selectionAreaField;
-  @FXML
-  private CheckBox clearConfirmationField;
-  @FXML
-  private ListView<de.a12.studio.models.overviewmodel.Button> multiSelectionButtonsList;
-  @FXML
-  private VBox multiSelectionButtonDetailBox;
-  @FXML
-  private TextField buttonEventField;
-  @FXML
-  private CheckBox buttonDestructiveField;
-  @FXML
-  private CheckBox buttonPrimaryField;
-  @FXML
-  private TextField buttonIconNameField;
-  @FXML
-  private ComboBox<String> buttonIconThemeField;
-  @FXML
-  private GridPane buttonLabelGrid;
-  @FXML
-  private GridPane buttonDescriptionGrid;
-  @FXML
-  private CheckBox buttonConfirmationField;
-  @FXML
-  private VBox buttonConfirmationDetailsBox;
-  @FXML
-  private GridPane buttonConfirmationTitleGrid;
-  @FXML
-  private GridPane buttonConfirmationMessageGrid;
+  private OverviewMultiSelectionPanelController overviewMultiSelectionController;
 
   // Columns
   @FXML
@@ -155,15 +109,11 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   private OverviewModel model;
   private List<DocumentModel> otherDocumentModels = List.of();
   private ElementIndex documentModelIndex;
-  // Preserves multi-selection settings across an uncheck/recheck of "Enable Multi-Selection" within the
-  // same session, since disabling it nulls configuration.multiSelection (matching SME's on-disk shape).
-  private MultiSelectionConfig cachedMultiSelectionConfig;
 
   @Override
   public void initialize(URL url, ResourceBundle resources) {
     initializeGeneralSettings();
     initializeFilter();
-    initializeMultiSelection();
   }
 
   private void initializeGeneralSettings() {
@@ -219,159 +169,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     });
   }
 
-  private void initializeMultiSelection() {
-    bindCheckBox(enableMultiSelectionField, value -> {
-      OverviewConfiguration configuration = ensureConfiguration();
-      if (value) {
-        configuration.setMultiSelection(configuration.getMultiSelection() != null ? configuration.getMultiSelection()
-            : (cachedMultiSelectionConfig != null ? cachedMultiSelectionConfig : new MultiSelectionConfig()));
-      }
-      else {
-        cachedMultiSelectionConfig = configuration.getMultiSelection();
-        configuration.setMultiSelection(null);
-      }
-      multiSelectionDetailsBox.setVisible(value);
-      multiSelectionDetailsBox.setManaged(value);
-      boolean wasUpdating = updatingFromModel;
-      updatingFromModel = true;
-      try {
-        populateMultiSelectionFields();
-      }
-      finally {
-        updatingFromModel = wasUpdating;
-      }
-    });
-
-    collapseOptionField.getItems().setAll(COLLAPSE_OPTIONS);
-    collapseOptionField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
-      ensureMultiSelectionConfig().setCollapseOption(newValue == null || newValue.isBlank() ? null : newValue);
-      commitChange();
-    });
-
-    counterOptionField.getItems().setAll(COUNTER_OPTIONS);
-    counterOptionField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
-      ensureMultiSelectionConfig().setCounterOption(newValue == null || newValue.isBlank() ? null : newValue);
-      commitChange();
-    });
-
-    selectionAreaField.getItems().setAll(SELECTION_AREA_OPTIONS);
-    selectionAreaField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
-      ensureMultiSelectionConfig().setSelectionArea(newValue == null || newValue.isBlank() ? null : newValue);
-      commitChange();
-    });
-
-    bindCheckBox(clearConfirmationField, value -> {
-      MultiSelectionConfig config = ensureMultiSelectionConfig();
-      if (value) {
-        ClearConfirmation confirmation = config.getClearConfirmation();
-        if (confirmation == null) {
-          confirmation = new ClearConfirmation();
-          config.setClearConfirmation(confirmation);
-        }
-        confirmation.setEnabled(true);
-      }
-      else {
-        config.setClearConfirmation(null);
-      }
-    });
-
-    multiSelectionButtonsList.setCellFactory(list -> new javafx.scene.control.ListCell<>() {
-      @Override
-      protected void updateItem(de.a12.studio.models.overviewmodel.Button button, boolean empty) {
-        super.updateItem(button, empty);
-        setText(empty || button == null ? null : describeMultiSelectionButton(button));
-      }
-    });
-    multiSelectionButtonsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showMultiSelectionButton(newValue));
-
-    buttonEventField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button == null) {
-        return;
-      }
-      button.setEvent(newValue == null || newValue.isBlank() ? null : newValue);
-      multiSelectionButtonsList.refresh();
-      commitChange();
-    });
-
-    bindCheckBox(buttonDestructiveField, value -> {
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button != null) {
-        button.setDestructive(value);
-      }
-    });
-    bindCheckBox(buttonPrimaryField, value -> {
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button != null) {
-        button.setPrimary(value);
-      }
-    });
-
-    buttonIconNameField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button == null) {
-        return;
-      }
-      setIconName(button, newValue);
-      commitChange();
-    });
-
-    buttonIconThemeField.getItems().setAll(ICON_THEME_OPTIONS);
-    buttonIconThemeField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button == null || button.getIcon() == null) {
-        return;
-      }
-      button.getIcon().setTheme(newValue == null || newValue.isBlank() ? null : newValue);
-      commitChange();
-    });
-
-    bindCheckBox(buttonConfirmationField, value -> {
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button == null) {
-        return;
-      }
-      if (value) {
-        ensureConfirmation(button);
-      }
-      else {
-        button.setConfirmation(null);
-      }
-      buttonConfirmationDetailsBox.setVisible(value);
-      buttonConfirmationDetailsBox.setManaged(value);
-      boolean wasUpdating = updatingFromModel;
-      updatingFromModel = true;
-      try {
-        rebuildLocaleGrid(buttonConfirmationTitleGrid, value ? ensureConfirmation(button).getTitle() : List.of(),
-            (code, text) -> setLabelText(ensureConfirmation(button).getTitle(), code, text));
-        rebuildLocaleGrid(buttonConfirmationMessageGrid, value ? ensureConfirmation(button).getMessage() : List.of(),
-            (code, text) -> setLabelText(ensureConfirmation(button).getMessage(), code, text));
-      }
-      finally {
-        updatingFromModel = wasUpdating;
-      }
-      multiSelectionButtonsList.refresh();
-    });
-  }
-
   @Override
   public void loadModel(@NonNull A12Model<?> model) {
     load((OverviewModel) model);
@@ -397,12 +194,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
       populateFilterFields();
 
-      OverviewConfiguration configuration = model.getContent().getConfiguration();
-      boolean multiSelectionEnabled = configuration != null && configuration.getMultiSelection() != null;
-      enableMultiSelectionField.setSelected(multiSelectionEnabled);
-      multiSelectionDetailsBox.setVisible(multiSelectionEnabled);
-      multiSelectionDetailsBox.setManaged(multiSelectionEnabled);
-      populateMultiSelectionFields();
+      overviewMultiSelectionController.setModel(model);
     }
     finally {
       updatingFromModel = false;
@@ -546,117 +338,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     commitChange();
   }
 
-  // ---- Multi-Selection ----
-
-  private void populateMultiSelectionFields() {
-    MultiSelectionConfig config = currentMultiSelectionConfig();
-    collapseOptionField.setValue(config != null ? orEmpty(config.getCollapseOption()) : "");
-    counterOptionField.setValue(config != null ? orEmpty(config.getCounterOption()) : "");
-    selectionAreaField.setValue(config != null ? orEmpty(config.getSelectionArea()) : "");
-    clearConfirmationField.setSelected(config != null && config.getClearConfirmation() != null
-        && Boolean.TRUE.equals(config.getClearConfirmation().getEnabled()));
-    refreshMultiSelectionButtonsList();
-    showMultiSelectionButton(null);
-  }
-
-  private MultiSelectionConfig currentMultiSelectionConfig() {
-    return model.getContent().getConfiguration() != null ? model.getContent().getConfiguration().getMultiSelection() : null;
-  }
-
-  private void refreshMultiSelectionButtonsList() {
-    de.a12.studio.models.overviewmodel.Button selected = multiSelectionButtonsList.getSelectionModel().getSelectedItem();
-    MultiSelectionConfig config = currentMultiSelectionConfig();
-    List<de.a12.studio.models.overviewmodel.Button> buttons = config != null ? config.getButtons() : List.of();
-    multiSelectionButtonsList.getItems().setAll(buttons);
-    if (selected != null && buttons.contains(selected)) {
-      multiSelectionButtonsList.getSelectionModel().select(selected);
-    }
-  }
-
-  private de.a12.studio.models.overviewmodel.Button selectedMultiSelectionButton() {
-    return multiSelectionButtonsList.getSelectionModel().getSelectedItem();
-  }
-
-  private void showMultiSelectionButton(de.a12.studio.models.overviewmodel.Button button) {
-    boolean wasUpdating = updatingFromModel;
-    updatingFromModel = true;
-    try {
-      boolean present = button != null;
-      multiSelectionButtonDetailBox.setVisible(present);
-      multiSelectionButtonDetailBox.setManaged(present);
-      if (!present) {
-        return;
-      }
-      buttonEventField.setText(button.getEvent() != null ? button.getEvent() : "");
-      buttonDestructiveField.setSelected(Boolean.TRUE.equals(button.getDestructive()));
-      buttonPrimaryField.setSelected(Boolean.TRUE.equals(button.getPrimary()));
-      buttonIconNameField.setText(button.getIcon() != null && button.getIcon().getName() != null ? button.getIcon().getName() : "");
-      buttonIconThemeField.setValue(button.getIcon() != null ? orEmpty(button.getIcon().getTheme()) : "");
-      rebuildLocaleGrid(buttonLabelGrid, button.getLabel(), (code, text) -> setLabelText(button.getLabel(), code, text));
-      rebuildLocaleGrid(buttonDescriptionGrid, button.getDescription(), (code, text) -> setLabelText(button.getDescription(), code, text));
-
-      boolean confirmationEnabled = button.getConfirmation() != null;
-      buttonConfirmationField.setSelected(confirmationEnabled);
-      buttonConfirmationDetailsBox.setVisible(confirmationEnabled);
-      buttonConfirmationDetailsBox.setManaged(confirmationEnabled);
-      Confirmation confirmation = button.getConfirmation();
-      rebuildLocaleGrid(buttonConfirmationTitleGrid, confirmation != null ? confirmation.getTitle() : List.of(),
-          (code, text) -> setLabelText(ensureConfirmation(button).getTitle(), code, text));
-      rebuildLocaleGrid(buttonConfirmationMessageGrid, confirmation != null ? confirmation.getMessage() : List.of(),
-          (code, text) -> setLabelText(ensureConfirmation(button).getMessage(), code, text));
-    }
-    finally {
-      updatingFromModel = wasUpdating;
-    }
-  }
-
-  @FXML
-  public void onAddMultiSelectionButton(ActionEvent e) {
-    MultiSelectionConfig config = ensureMultiSelectionConfig();
-    de.a12.studio.models.overviewmodel.Button button = new de.a12.studio.models.overviewmodel.Button();
-    button.setEvent("");
-    config.getButtons().add(button);
-    refreshMultiSelectionButtonsList();
-    multiSelectionButtonsList.getSelectionModel().select(button);
-    commitChange();
-  }
-
-  @FXML
-  public void onRemoveMultiSelectionButton(ActionEvent e) {
-    de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-    if (button == null) {
-      return;
-    }
-    MultiSelectionConfig config = currentMultiSelectionConfig();
-    if (config != null) {
-      config.getButtons().remove(button);
-    }
-    refreshMultiSelectionButtonsList();
-    commitChange();
-  }
-
-  private static void setIconName(de.a12.studio.models.overviewmodel.Button button, String value) {
-    if (value == null || value.isBlank()) {
-      if (button.getIcon() != null) {
-        button.getIcon().setName(null);
-      }
-      return;
-    }
-    Icon icon = button.getIcon();
-    if (icon == null) {
-      icon = new Icon();
-      button.setIcon(icon);
-    }
-    icon.setName(value);
-  }
-
-  private static Confirmation ensureConfirmation(de.a12.studio.models.overviewmodel.Button button) {
-    if (button.getConfirmation() == null) {
-      button.setConfirmation(new Confirmation());
-    }
-    return button.getConfirmation();
-  }
-
   // ---- Shared helpers ----
 
   private OverviewConfiguration ensureConfiguration() {
@@ -672,14 +353,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       configuration.setFilterConfiguration(new FilterConfiguration());
     }
     return configuration.getFilterConfiguration();
-  }
-
-  private MultiSelectionConfig ensureMultiSelectionConfig() {
-    OverviewConfiguration configuration = ensureConfiguration();
-    if (configuration.getMultiSelection() == null) {
-      configuration.setMultiSelection(cachedMultiSelectionConfig != null ? cachedMultiSelectionConfig : new MultiSelectionConfig());
-    }
-    return configuration.getMultiSelection();
   }
 
   /** Rebuilds a field-reference picker row per {@link FieldRef}, with an "Add"-driven, delete-per-row grid. */
@@ -777,14 +450,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   private String describeFilterSection(FilterSection section) {
     String label = firstNonBlankText(section.getLabel());
     return label != null ? label : (section.getId() != null ? section.getId() : "(new section)");
-  }
-
-  private String describeMultiSelectionButton(de.a12.studio.models.overviewmodel.Button button) {
-    String label = firstNonBlankText(button.getLabel());
-    if (label != null) {
-      return label;
-    }
-    return button.getEvent() != null && !button.getEvent().isBlank() ? button.getEvent() : "(new button)";
   }
 
   private static String orEmpty(String value) {

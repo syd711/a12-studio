@@ -43,3 +43,25 @@
     -fx-border-style: solid solid solid solid;
 }
 
+/**
+ * Sub-tab-panel: tab headers for a TabPane nested inside another panel (e.g. the
+ * Overview Model editor's Overview/Custom Actions tabs), rather than a top-level
+ * editor tab strip. Flat, solid tab backgrounds instead of Modena's default
+ * gradient, and a shorter header so it reads as a secondary tab strip.
+ */
+.tab-pane.sub-tab-panel {
+    -fx-tab-min-height: 24px;
+}
+
+.tab-pane.sub-tab-panel .tab-header-area .tab-header-background {
+    -fx-background-color: -fx-chrome-bg;
+}
+
+.tab-pane.sub-tab-panel .tab {
+    -fx-background-color: -fx-chrome-bg;
+}
+
+.tab-pane.sub-tab-panel .tab:selected {
+    -fx-background-color: -fx-surface-color;
+}
+

@@ -3,12 +3,16 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TARGET MODEL" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.TargetModelPanelController">
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TARGET MODEL" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.TargetModelPanelController">
     <BorderPane>
         <center>
-            <ComboBox fx:id="targetModelField" editable="false" maxWidth="Infinity" BorderPane.alignment="CENTER" />
+         <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+            <children>
+                  <ComboBox fx:id="targetModelField" editable="false" maxWidth="Infinity" />
+            </children>
+         </HBox>
         </center>
         <top>
             <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />

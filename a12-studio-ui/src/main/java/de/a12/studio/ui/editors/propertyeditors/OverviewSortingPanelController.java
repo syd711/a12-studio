@@ -11,6 +11,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.overviewmodel.OverviewColumnOptions;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -18,6 +19,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -34,6 +36,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.configuration.initialSorting}: one draggable, reorderable
@@ -248,9 +251,12 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
 
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
-      getSorting().remove(columnRef);
-      rebuildRows();
-      commitHeaderChange();
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this sorting entry?", null, null, "Delete");
+      if (result.isPresent() && result.get() == ButtonType.OK) {
+        getSorting().remove(columnRef);
+        rebuildRows();
+        commitHeaderChange();
+      }
     });
 
     HBox actionsBox = new HBox(4.0, moveButtonsBox, deleteButton);

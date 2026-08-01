@@ -119,7 +119,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
     if (content != null) {
       tab.setContent(content);
     }
-    tab.setText(item.getName());
+    tab.setText(item.getDisplayName());
     tab.setUserData(item);
 
     if (project != null) {
@@ -142,7 +142,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
       return;
     }
 
-    Tab tab = new Tab(item.getName(), content);
+    Tab tab = new Tab(item.getDisplayName(), content);
     tab.setUserData(item);
     tab.setClosable(true);
 

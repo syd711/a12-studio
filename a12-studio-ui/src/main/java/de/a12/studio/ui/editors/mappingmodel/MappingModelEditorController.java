@@ -7,6 +7,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.mappingmodel.MappingTarget;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.propertyeditors.SourceModelsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TargetModelPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -19,10 +20,13 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Edits a {@link MappingModel}: currently just its Target, the {@link DocumentModel} the mapping writes to.
- * More fields (Source, PreComputationFragment, StructuralMappingModel) are added later.
+ * Edits a {@link MappingModel}: currently its Source models and Target, the {@link DocumentModel} the mapping
+ * writes to. More fields (PreComputationFragment, StructuralMappingModel) are added later.
  */
 public class MappingModelEditorController extends AbstractEditorController implements Initializable {
+
+  @FXML
+  private SourceModelsPanelController sourceModelsPanelController;
 
   @FXML
   private TargetModelPanelController targetModelPanelController;
@@ -42,6 +46,7 @@ public class MappingModelEditorController extends AbstractEditorController imple
 
   private void load(@NonNull MappingModel model) {
     this.model = model;
+    sourceModelsPanelController.setModel(model);
     targetModelPanelController.load(documentModelOptions(), currentTargetDmId());
   }
 
