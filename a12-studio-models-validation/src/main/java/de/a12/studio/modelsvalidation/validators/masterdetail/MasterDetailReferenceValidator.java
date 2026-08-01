@@ -5,6 +5,7 @@ import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.masterdetailmodel.FormMapping;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -14,8 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The referenced Overview Model must exist and be an overview model; the same holds for every mapped
- * Form Model and Document Model in the form mapping (SME: "The given ... model could not be found.").
+ * The referenced Overview Model or Tree Model must exist and be of the matching type; the same holds for
+ * every mapped Form Model and Document Model in the form mapping (SME: "The given ... model could not be
+ * found.").
  */
 public final class MasterDetailReferenceValidator implements ModelValidator {
 
@@ -33,6 +35,13 @@ public final class MasterDetailReferenceValidator implements ModelValidator {
         && !(context.findOtherModel(overviewModel) instanceof OverviewModel)) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
           "The given overview model \"" + overviewModel + "\" could not be found.", Severity.ERROR.name()));
+    }
+
+    String treeModel = masterDetailModel.getContent().getTreeModel();
+    if (treeModel != null && !treeModel.isBlank()
+        && !(context.findOtherModel(treeModel) instanceof TreeModel)) {
+      errors.add(new ModelValidationError(model, ELEMENT_ID,
+          "The given tree model \"" + treeModel + "\" could not be found.", Severity.ERROR.name()));
     }
 
     for (FormMapping mapping : masterDetailModel.getContent().getFormMapping()) {

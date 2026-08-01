@@ -6,15 +6,14 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.masterdetailmodel.FormMapping;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.propertyeditors.FormWidthPanelController;
+import de.a12.studio.ui.editors.propertyeditors.MasterModelReferencePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
-import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.GridPane;
 import org.jspecify.annotations.NonNull;
 
@@ -25,50 +24,29 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Edits a {@link MasterDetailModel}: which {@link de.a12.studio.models.overviewmodel.OverviewModel} it
- * presents as the "master" list, the preferred detail form width, and a {@link FormMapping} per Document
- * Model the chosen Overview Model references (mirroring SME's {@code formMappingMiddleware}) — one row lets
- * the user assign which Form Model edits that Document Model's records.
+ * Edits a {@link MasterDetailModel}: whether it presents an {@link de.a12.studio.models.overviewmodel.OverviewModel}
+ * or a {@link de.a12.studio.models.treemodel.TreeModel} as the "master" list (and which one), the preferred
+ * detail form width, and a {@link FormMapping} per Document Model the chosen master model references
+ * (mirroring SME's {@code formMappingMiddleware}) — one row lets the user assign which Form Model edits that
+ * Document Model's records.
  */
 public class MasterDetailModelEditorController extends AbstractEditorController implements Initializable {
 
-  private static final int DEFAULT_FORM_WIDTH = 6;
-  private static final int MAX_FORM_WIDTH = 11;
+  @FXML
+  private MasterModelReferencePanelController masterModelReferenceController;
 
   @FXML
-  private ComboBox<String> overviewModelField;
-
-  @FXML
-  private Spinner<Integer> formWidthField;
+  private FormWidthPanelController formWidthPanelController;
 
   @FXML
   private GridPane formMappingGrid;
 
   private MasterDetailModel model;
 
-  // Set while fields are being repopulated from the model, so that programmatic updates aren't mistaken
-  // for user edits and don't trigger a save.
-  private boolean updatingFromModel;
-
   @Override
   public void initialize(URL url, ResourceBundle resources) {
-    formWidthField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, MAX_FORM_WIDTH, DEFAULT_FORM_WIDTH));
-    WidgetFactory.restrictToNumericInput(formWidthField.getEditor());
-
-    overviewModelField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
-      model.getContent().setOverviewModel(newValue);
+    masterModelReferenceController.setOnChange(() -> {
       refreshFormMapping();
-      commitChange();
-    });
-
-    formWidthField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
-      model.getContent().setFormWidth(newValue);
       commitChange();
     });
   }
@@ -82,17 +60,9 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
   private void load(@NonNull MasterDetailModel model) {
     this.model = model;
 
-    updatingFromModel = true;
-    try {
-      overviewModelField.getItems().setAll(overviewModelOptions());
-      overviewModelField.setValue(model.getContent().getOverviewModel());
-      formWidthField.getValueFactory().setValue(
-          model.getContent().getFormWidth() != null ? model.getContent().getFormWidth() : DEFAULT_FORM_WIDTH);
-    }
-    finally {
-      updatingFromModel = false;
-    }
+    masterModelReferenceController.load(model, overviewModelOptions(), treeModelOptions());
 
+    formWidthPanelController.setModel(model);
     refreshFormMapping();
   }
 
@@ -103,13 +73,20 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
         .toList();
   }
 
+  private List<String> treeModelOptions() {
+    return ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.TREE).stream()
+        .map(A12Model::getId)
+        .sorted(Comparator.naturalOrder())
+        .toList();
+  }
+
   /**
-   * Reconciles {@code content.formMapping} against the Document Models the currently selected Overview
-   * Model references (its header references with {@link ModelReference#PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW}),
-   * preserving any already-chosen Form Model per Document Model, then rebuilds the grid rows.
+   * Reconciles {@code content.formMapping} against the Document Models the currently selected master model
+   * (Overview or Tree, per {@code content.type}) references, preserving any already-chosen Form Model per
+   * Document Model, then rebuilds the grid rows.
    */
   private void refreshFormMapping() {
-    List<String> documentModelIds = referencedDocumentModelIds(model.getContent().getOverviewModel());
+    List<String> documentModelIds = referencedDocumentModelIds();
 
     List<FormMapping> formMapping = model.getContent().getFormMapping();
     List<FormMapping> reconciled = new ArrayList<>();
@@ -129,16 +106,26 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
     rebuildFormMappingRows();
   }
 
-  private List<String> referencedDocumentModelIds(String overviewModelId) {
-    if (overviewModelId == null) {
+  /**
+   * The Document Model ids referenced (via {@link ModelReference#PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW} or
+   * {@link ModelReference#PURPOSE_DOCUMENT_MODEL_FOR_TREE}) by whichever master model is currently selected.
+   */
+  private List<String> referencedDocumentModelIds() {
+    if ("tree".equals(model.getContent().getType())) {
+      return referencedDocumentModelIds(model.getContent().getTreeModel(), ModelType.TREE, ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_TREE);
+    }
+    return referencedDocumentModelIds(model.getContent().getOverviewModel(), ModelType.OVERVIEW, ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW);
+  }
+
+  private List<String> referencedDocumentModelIds(String masterModelId, ModelType masterModelType, String purpose) {
+    if (masterModelId == null) {
       return List.of();
     }
-    return ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.OVERVIEW).stream()
-        .filter(overviewModel -> overviewModelId.equals(overviewModel.getId()))
+    return ProjectDocumentModels.getOtherModelsOfType(projectItem, masterModelType).stream()
+        .filter(masterModel -> masterModelId.equals(masterModel.getId()))
         .findFirst()
-        .map(overviewModel -> overviewModel.getModelReferences().stream()
-            .filter(reference -> reference.getModelType() == ModelType.DOCUMENT
-                && ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW.equals(reference.getPurpose()))
+        .map(masterModel -> masterModel.getModelReferences().stream()
+            .filter(reference -> reference.getModelType() == ModelType.DOCUMENT && purpose.equals(reference.getPurpose()))
             .map(ModelReference::getReference)
             .toList())
         .orElse(List.of());

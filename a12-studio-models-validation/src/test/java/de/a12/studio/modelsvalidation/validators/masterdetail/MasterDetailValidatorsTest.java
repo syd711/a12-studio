@@ -30,4 +30,22 @@ class MasterDetailValidatorsTest {
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("overview model is required"));
   }
+
+  @Test
+  void referenceValidatorReportsMissingTreeModel() {
+    MasterDetailModel model = TestModels.load("/masterdetailmodel/MasterDetailReferenceValidator_tree_invalid.json", MasterDetailModel.class);
+    List<ModelValidationError> errors = new MasterDetailReferenceValidator().validate(model, TestModels.context(model));
+
+    // Missing tree model + missing document model + missing form model in the mapping.
+    assertEquals(3, errors.size());
+  }
+
+  @Test
+  void typeConsistencyValidatorReportsMissingTreeModel() {
+    MasterDetailModel model = TestModels.load("/masterdetailmodel/MasterDetailTypeConsistencyValidator_tree_invalid.json", MasterDetailModel.class);
+    List<ModelValidationError> errors = new MasterDetailTypeConsistencyValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("tree model is required"));
+  }
 }

@@ -63,13 +63,7 @@
                                    <children>
 
                                        <!-- General Settings -->
-                                       <Label styleClass="section-label" text="General Settings" />
-                                       <VBox spacing="4.0">
-                                           <children>
-                                               <Label styleClass="field-label" text="Document Model*" />
-                                               <ComboBox fx:id="documentModelField" editable="false" maxWidth="Infinity" />
-                                           </children>
-                                       </VBox>
+                                       <fx:include fx:id="overviewReference" source="../propertyeditors/overview-reference-panel.fxml" />
 
                                        <!-- Features -->
                                        <Label styleClass="section-label" text="Features" />

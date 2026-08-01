@@ -34,6 +34,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -72,6 +73,7 @@ public class WidgetFactory {
     Tooltip tooltip = new Tooltip(text);
     tooltip.setWrapText(true);
     tooltip.setMaxWidth(DEFAULT_TOOLTIP_WIDTH);
+    tooltip.setShowDuration(Duration.seconds(10));
     return tooltip;
   }
 

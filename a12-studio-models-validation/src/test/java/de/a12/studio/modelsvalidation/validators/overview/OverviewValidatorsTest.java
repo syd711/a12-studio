@@ -40,7 +40,7 @@ class OverviewValidatorsTest {
     List<ModelValidationError> errors = new OverviewDocumentModelRequiredValidator().validate(model, TestModels.context(model));
 
     assertEquals(1, errors.size());
-    assertTrue(errors.get(0).message().contains("Document Model is required"));
+    assertTrue(errors.get(0).message().contains("Document Model or Query Model reference is required"));
   }
 
   @Test

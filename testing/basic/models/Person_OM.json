@@ -27,14 +27,7 @@
         "value": "tester,reviewer"
       }
     ],
-    "modelReferences": [
-      {
-        "purpose": "document-model-for-overview",
-        "modelType": "document",
-        "alias": "DM",
-        "reference": "Person_DM"
-      }
-    ]
+    "modelReferences": []
   },
   "content": {
     "columns": [
@@ -50,7 +43,7 @@
             "text": "Profilbild"
           }
         ],
-        "width": 1,
+        "width": 1.0,
         "fixedWidth": true,
         "elementRef": "group_05909",
         "sortable": false,
@@ -162,39 +155,12 @@
       ]
     },
     "subHeaderBox": {
-      "leftSlot": [
-        {
-          "type": "button",
-          "label": [
-            {
-              "locale": "en",
-              "text": "New"
-            },
-            {
-              "locale": "de",
-              "text": "Neu"
-            }
-          ],
-          "event": "add",
-          "icon": {
-            "name": "add"
-          },
-          "destructive": false,
-          "primary": false
-        }
-      ],
-      "rightSlot": [
-        {
-          "type": "filter"
-        },
-        {
-          "type": "search"
-        }
-      ]
+      "majorElements": [],
+      "minorElements": []
     },
     "footerBox": {
-      "leftSlot": [],
-      "rightSlot": []
+      "majorElements": [],
+      "minorElements": []
     },
     "configuration": {
       "enableFilter": true,

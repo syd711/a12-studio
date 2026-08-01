@@ -19,8 +19,10 @@ import de.a12.studio.models.overviewmodel.MultiSelectionConfig;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.overviewmodel.SummaryConfig;
+import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -55,13 +57,14 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 /**
- * Edits an {@link OverviewModel}'s "Overview" tab: General Settings (the backing Document Model),
- * Features (search/filter/paging/row-count/multi-selection), and Columns. "Custom Actions" ({@code
- * content.rowActionGroup}) is out of scope, mirroring the Java model's already-reduced feature set
- * versus SME (no Query-Model-as-reference, no content-level Styles). {@code subHeaderBox}/{@code
- * footerBox} are left untouched: sample models ({@code Company_OM.json}, {@code Invoice_OM.json}) show
- * them written empty even with search/filter/multi-selection enabled, so the a12 runtime derives that UI
- * from the {@code configuration} flags rather than from manually-placed box elements.
+ * Edits an {@link OverviewModel}'s "Overview" tab: General Settings (the Overview Reference, delegated to
+ * {@link de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController}), Features
+ * (search/filter/paging/row-count/multi-selection), and Columns. "Custom Actions" ({@code
+ * content.rowActionGroup}) is out of scope, mirroring the Java model's already-reduced feature set versus
+ * SME (no content-level Styles). {@code subHeaderBox}/{@code footerBox} are left untouched: sample models
+ * ({@code Company_OM.json}, {@code Invoice_OM.json}) show them written empty even with
+ * search/filter/multi-selection enabled, so the a12 runtime derives that UI from the {@code configuration}
+ * flags rather than from manually-placed box elements.
  */
 public class OverviewModelEditorController extends AbstractEditorController implements Initializable {
 
@@ -89,7 +92,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
   // General Settings
   @FXML
-  private ComboBox<String> documentModelField;
+  private OverviewReferencePanelController overviewReferenceController;
 
   // Features
   @FXML
@@ -230,12 +233,8 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   }
 
   private void initializeGeneralSettings() {
-    documentModelField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
+    overviewReferenceController.setOnChange(() -> {
       refreshDocumentModelIndex();
-      syncModelReferences();
       refreshElementRefPickersAfterDocumentModelChange();
       commitChange();
     });
@@ -693,12 +692,11 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     updatingFromModel = true;
     try {
       otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
-      List<String> documentModelIds = otherDocumentModels.stream()
-          .map(DocumentModel::getId)
-          .sorted(Comparator.naturalOrder())
+      List<QueryModel> otherQueryModels = ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.QUERY).stream()
+          .filter(QueryModel.class::isInstance)
+          .map(QueryModel.class::cast)
           .toList();
-      documentModelField.getItems().setAll(documentModelIds);
-      documentModelField.setValue(currentDocumentModelId());
+      overviewReferenceController.load(model, otherDocumentModels, otherQueryModels);
       refreshDocumentModelIndex();
 
       OverviewConfiguration configuration = model.getContent().getConfiguration();
@@ -734,23 +732,8 @@ public class OverviewModelEditorController extends AbstractEditorController impl
         .orElse(null);
   }
 
-  /** Rebuilds the header's single Document Model reference (purpose "document-model-for-overview"). */
-  private void syncModelReferences() {
-    List<ModelReference> references = model.getModelReferences();
-    references.removeIf(reference -> ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW.equals(reference.getPurpose()));
-    String documentModelId = documentModelField.getValue();
-    if (documentModelId != null && !documentModelId.isBlank()) {
-      ModelReference reference = new ModelReference();
-      reference.setPurpose(ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW);
-      reference.setModelType(ModelType.DOCUMENT);
-      reference.setAlias("DM");
-      reference.setReference(documentModelId);
-      references.add(reference);
-    }
-  }
-
   private void refreshDocumentModelIndex() {
-    String documentModelId = documentModelField.getValue();
+    String documentModelId = currentDocumentModelId();
     DocumentModel documentModel = otherDocumentModels.stream()
         .filter(candidate -> documentModelId != null && documentModelId.equals(candidate.getId()))
         .findFirst()

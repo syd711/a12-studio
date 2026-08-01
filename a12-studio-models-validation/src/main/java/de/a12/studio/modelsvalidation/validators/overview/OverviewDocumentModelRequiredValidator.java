@@ -11,9 +11,10 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import java.util.List;
 
 /**
- * An overview model must reference exactly one Document Model (SME's "General Settings" - Document
- * Model is implicitly required). Whether the reference actually resolves in the workspace is checked
- * separately by the generic {@link de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator}.
+ * An overview model must have an Overview Reference: either a Document Model or a Query Model (SME's
+ * "General Settings" - one of the two is implicitly required). Whether the reference actually resolves in
+ * the workspace is checked separately by the generic {@link
+ * de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator}.
  */
 public final class OverviewDocumentModelRequiredValidator implements ModelValidator {
 
@@ -24,13 +25,15 @@ public final class OverviewDocumentModelRequiredValidator implements ModelValida
     if (!(model instanceof OverviewModel overviewModel)) {
       return List.of();
     }
-    boolean hasDocumentModel = overviewModel.getModelReferences() != null
+    boolean hasReference = overviewModel.getModelReferences() != null
         && overviewModel.getModelReferences().stream()
-            .anyMatch(reference -> ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW.equals(reference.getPurpose())
+            .anyMatch(reference -> (ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW.equals(reference.getPurpose())
+                    || ModelReference.PURPOSE_QUERY_MODEL_FOR_OVERVIEW.equals(reference.getPurpose()))
                 && reference.getReference() != null && !reference.getReference().isBlank());
-    if (hasDocumentModel) {
+    if (hasReference) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "A Document Model is required.", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID,
+        "A Document Model or Query Model reference is required.", Severity.ERROR.name()));
   }
 }

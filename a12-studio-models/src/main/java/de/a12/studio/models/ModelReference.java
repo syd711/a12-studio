@@ -10,6 +10,11 @@ public class ModelReference {
 
   public static final String PURPOSE_INCLUDE = "include";
   public static final String PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW = "document-model-for-overview";
+  // An Overview Model's alternative to PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW: references a Query Model
+  // instead of a Document Model directly. The Query Model's own targetDocumentModel is still mirrored into
+  // a PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW reference (see OverviewReferencePanelController), so this purpose
+  // only needs to be checked to tell which of the two modes is active.
+  public static final String PURPOSE_QUERY_MODEL_FOR_OVERVIEW = "query-model-for-overview";
   public static final String PURPOSE_DOCUMENT_MODEL = "Document model";
   public static final String PURPOSE_DOCUMENT_MODEL_FOR_TREE = "document-model-for-tree";
   // Matches SME's DocumentModelExpansion.importPurpose exactly: a header reference of this purpose means

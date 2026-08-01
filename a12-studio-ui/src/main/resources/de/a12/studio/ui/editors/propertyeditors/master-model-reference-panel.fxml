@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="MASTER MODEL" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.MasterModelReferencePanelController">
+    <VBox spacing="6.0">
+        <children>
+            <Label styleClass="field-label" text="Master Model*" />
+            <HBox spacing="20.0">
+                <children>
+                    <RadioButton fx:id="overviewTypeField" mnemonicParsing="false" text="Overview">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="masterModelTypeToggleGroup" />
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="treeTypeField" mnemonicParsing="false" text="Tree" toggleGroup="$masterModelTypeToggleGroup" />
+                </children>
+            </HBox>
+            <ComboBox fx:id="masterModelField" editable="false" maxWidth="Infinity" />
+        </children>
+    </VBox>
+</TitledPane>

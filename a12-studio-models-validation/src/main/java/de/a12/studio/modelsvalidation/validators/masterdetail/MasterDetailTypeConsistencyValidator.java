@@ -9,7 +9,10 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
 
-/** A master-detail module needs a type, and type "overview" requires an Overview Model to be selected. */
+/**
+ * A master-detail module needs a type, and that type requires the matching model to be selected: type
+ * "overview" requires an Overview Model, type "tree" requires a Tree Model.
+ */
 public final class MasterDetailTypeConsistencyValidator implements ModelValidator {
 
   public static final String ELEMENT_ID = "content/type";
@@ -28,6 +31,11 @@ public final class MasterDetailTypeConsistencyValidator implements ModelValidato
         && (masterDetailModel.getContent().getOverviewModel() == null || masterDetailModel.getContent().getOverviewModel().isBlank())) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
           "An overview model is required for master-detail type \"overview\".", Severity.ERROR.name()));
+    }
+    if ("tree".equals(type)
+        && (masterDetailModel.getContent().getTreeModel() == null || masterDetailModel.getContent().getTreeModel().isBlank())) {
+      return List.of(new ModelValidationError(model, ELEMENT_ID,
+          "A tree model is required for master-detail type \"tree\".", Severity.ERROR.name()));
     }
     return List.of();
   }

@@ -1,0 +1,22 @@
+{
+  "header": {
+    "id": "MasterDetailReferenceValidator_tree_invalid",
+    "modelType": "module-masterdetail",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "type": "tree",
+    "treeModel": "Missing_TM",
+    "formMapping": [
+      {
+        "documentModel": "Missing_DM",
+        "formModel": "Missing_FM"
+      }
+    ]
+  }
+}
