@@ -28,7 +28,7 @@ public class PreviewAppLogWindow {
 
     stage = new Stage();
     stage.initOwner(owner);
-    stage.setScene(new Scene(new BorderPane(textArea), 700, 450));
+    stage.setScene(new Scene(new BorderPane(textArea), 900, 550));
     stage.setOnCloseRequest(event -> {
       event.consume();
       stage.hide();

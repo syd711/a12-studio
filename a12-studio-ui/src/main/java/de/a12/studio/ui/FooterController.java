@@ -9,15 +9,16 @@ import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.events.TabSelectionChangedEvent;
+import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
 import de.a12.studio.ui.previewapp.PreviewAppStatusMonitor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import javafx.scene.shape.Circle;
 import org.apache.commons.io.FileUtils;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class FooterController implements Initializable, StudioEventListener {
   private Label previewAppStatusLabel;
 
   @FXML
-  private Circle previewAppStatusBubble;
+  private FontIcon previewAppStatusIcon;
 
   private ProjectItem currentItem;
 
@@ -95,22 +96,27 @@ public class FooterController implements Initializable, StudioEventListener {
   }
 
   private void updatePreviewAppStatus(PreviewAppStatusMonitor.Status status) {
-    previewAppStatusBubble.getStyleClass().removeAll(STATUS_BUBBLE_RUNNING, STATUS_BUBBLE_STARTING, STATUS_BUBBLE_STOPPED);
+    previewAppStatusIcon.getStyleClass().removeAll(STATUS_BUBBLE_RUNNING, STATUS_BUBBLE_STARTING, STATUS_BUBBLE_STOPPED);
 
     switch (status) {
       case RUNNING -> {
-        previewAppStatusBubble.getStyleClass().add(STATUS_BUBBLE_RUNNING);
+        previewAppStatusIcon.getStyleClass().add(STATUS_BUBBLE_RUNNING);
         previewAppStatusLabel.setText("Preview App running on port " + PreviewAppProcess.getInstance().getPort());
       }
       case STARTING -> {
-        previewAppStatusBubble.getStyleClass().add(STATUS_BUBBLE_STARTING);
+        previewAppStatusIcon.getStyleClass().add(STATUS_BUBBLE_STARTING);
         previewAppStatusLabel.setText("Preview App starting…");
       }
       case STOPPED -> {
-        previewAppStatusBubble.getStyleClass().add(STATUS_BUBBLE_STOPPED);
+        previewAppStatusIcon.getStyleClass().add(STATUS_BUBBLE_STOPPED);
         previewAppStatusLabel.setText("Preview App stopped");
       }
     }
+  }
+
+  @FXML
+  private void onOpenPreviewAppLog() {
+    PreviewAppLogWindow.show(Studio.stage);
   }
 
   @Override

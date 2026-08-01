@@ -80,4 +80,13 @@ class OverviewValidatorsTest {
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("at least 1"));
   }
+
+  @Test
+  void initialSortingReferenceValidatorReportsDeletedColumn() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewInitialSortingReferenceValidator_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewInitialSortingReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("no longer exists"));
+  }
 }

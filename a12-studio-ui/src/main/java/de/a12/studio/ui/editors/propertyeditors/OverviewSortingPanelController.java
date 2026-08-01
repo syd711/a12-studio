@@ -1,14 +1,16 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.ColumnRef;
+import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewInitialSortingReferenceValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.overviewmodel.OverviewColumnOptions;
-import de.a12.studio.ui.editors.overviewmodel.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
-import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -16,7 +18,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -24,6 +26,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.jspecify.annotations.NonNull;
@@ -31,63 +34,69 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
- * Edits an {@link OverviewModel}'s {@code content.columns}: one draggable, reorderable row per {@link
- * Column}, summarizing its Field (the referenced Document Model element, resolved via {@link
- * OverviewColumnOptions}), Sortable, Width and Pin Direction. Not bound to a single {@link
- * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
- * {@link OverviewFeaturesPanelController}. Clicking a row opens {@link Dialogs#showColumn}, which is
- * intentionally empty for now (no fields yet) - the full column editor is a follow-up.
+ * Edits an {@link OverviewModel}'s {@code content.configuration.initialSorting}: one draggable, reorderable
+ * row per {@link ColumnRef}, each picking one of the columns defined in the Columns panel via an inline combo
+ * box (order determines sort priority - only the first entry's sort direction icon is shown at runtime, per
+ * SME). Not bound to a single {@link de.a12.studio.models.documentmodel.Element}, so it follows the
+ * model-header pattern used by e.g. {@link OverviewColumnsPanelController}. {@link
+ * OverviewInitialSortingReferenceValidator} flags entries left pointing at a column that was since deleted;
+ * that error is queried directly (like {@link ModulesPanelController#refreshNameUniquenessError}) since there
+ * is no single bound Element for the base class's own validation plumbing to key off of.
  */
-public class OverviewColumnsPanelController extends AbstractPropertyEditor {
+public class OverviewSortingPanelController extends AbstractPropertyEditor {
 
-  // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into getColumns().
-  private static final DataFormat COLUMN_INDEX = new DataFormat("application/x-a12-overview-column-index");
-
-  @FXML
-  private HBox columnHeaders;
+  // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into getSorting().
+  private static final DataFormat SORTING_INDEX = new DataFormat("application/x-a12-overview-sorting-index");
 
   @FXML
-  private VBox columnRows;
+  private VBox sortingRows;
 
   @FXML
-  private Label columnsEmptyLabel;
+  private Label sortingEmptyLabel;
 
   private OverviewModel model;
 
   private ElementIndex documentModelIndex;
 
-  // Notified after every structural change (add/reorder/delete), so the owning editor can keep sibling
-  // panels whose choices derive from this list (e.g. the Sorting panel's column picker) in sync.
-  private Runnable onChange = () -> {
-  };
+  // Set while a row's combo box is being repopulated from the model, so that isn't mistaken for a user edit.
+  private boolean updatingFromModel;
 
   public void setModel(@NonNull OverviewModel model) {
     this.model = model;
     rebuildRows();
   }
 
-  /** Re-points the "Field" summary of every row at the currently referenced Document Model. */
+  /** Re-points the column picker's "Field" summary at the currently referenced Document Model. */
   public void setDocumentModelIndex(ElementIndex documentModelIndex) {
     this.documentModelIndex = documentModelIndex;
     rebuildRows();
   }
 
-  public void setOnChange(@NonNull Runnable onChange) {
-    this.onChange = onChange;
+  /** Called by the owning editor whenever the Columns panel changes, since this panel's picker choices and
+   * its own dangling-reference validation both derive from the current column list. */
+  public void refresh() {
+    rebuildRows();
   }
 
   @FXML
   private void onAdd() {
-    Column column = new Column();
-    column.setId("column-" + shortId());
-    column.setWidth(1.0);
-    getColumns().add(column);
+    ensureConfiguration().getInitialSorting().add(new ColumnRef());
     rebuildRows();
-    notifyChanged();
+    commitHeaderChange();
+  }
+
+  private List<ColumnRef> getSorting() {
+    OverviewConfiguration configuration = model.getContent().getConfiguration();
+    return configuration != null ? configuration.getInitialSorting() : List.of();
+  }
+
+  private OverviewConfiguration ensureConfiguration() {
+    if (model.getContent().getConfiguration() == null) {
+      model.getContent().setConfiguration(new OverviewConfiguration());
+    }
+    return model.getContent().getConfiguration();
   }
 
   private List<Column> getColumns() {
@@ -98,67 +107,79 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor {
     if (model == null) {
       return;
     }
-    columnRows.getChildren().clear();
+    refreshValidationError();
+    sortingRows.getChildren().clear();
 
-    List<Column> columns = getColumns();
-    boolean empty = columns.isEmpty();
-    columnHeaders.setVisible(!empty);
-    columnHeaders.setManaged(!empty);
-    columnsEmptyLabel.setVisible(empty);
-    columnsEmptyLabel.setManaged(empty);
+    List<ColumnRef> sorting = getSorting();
+    boolean empty = sorting.isEmpty();
+    sortingEmptyLabel.setVisible(empty);
+    sortingEmptyLabel.setManaged(empty);
 
-    for (int index = 0; index < columns.size(); index++) {
-      columnRows.getChildren().add(createRow(columns.get(index), index, columns.size()));
+    for (int index = 0; index < sorting.size(); index++) {
+      sortingRows.getChildren().add(createRow(sorting.get(index), index, sorting.size()));
     }
   }
 
-  private HBox createRow(Column column, int index, int rowCount) {
+  private void refreshValidationError() {
+    if (getSorting().isEmpty()) {
+      hideError();
+      return;
+    }
+    List<ModelValidationError> errors =
+        Studio.getValidationService().validateElement(model, OverviewInitialSortingReferenceValidator.ELEMENT_ID);
+    if (errors.isEmpty()) {
+      hideError();
+    } else {
+      showError(errors.get(0).severity(), errors.get(0).message());
+    }
+  }
+
+  private HBox createRow(ColumnRef columnRef, int index, int rowCount) {
+    List<Column> columns = getColumns();
+
     FontIcon dragHandle = new FontIcon(Icons.DRAG_HANDLE);
     dragHandle.setIconSize(18);
     dragHandle.getStyleClass().add("module-drag-handle");
     dragHandle.setCursor(Cursor.MOVE);
 
-    Label fieldLabel = createRowLabel(fieldSummary(column), "overviewColumnField-" + index, 200.0, column);
-    Label sortableLabel = createRowLabel(Boolean.TRUE.equals(column.getSortable()) ? "Yes" : "No", "overviewColumnSortable-" + index, 70.0, column);
-    Label widthLabel = createRowLabel(column.getWidth() != null ? String.valueOf(column.getWidth()) : "", "overviewColumnWidth-" + index, 70.0, column);
-    Label pinDirectionLabel = createRowLabel(column.getPinDirection() != null ? column.getPinDirection() : "", "overviewColumnPinDirection-" + index, 100.0, column);
+    ComboBox<String> columnField = new ComboBox<>();
+    columnField.setId("overviewSortingColumn-" + index);
+    columnField.setPromptText("Select a column");
+    columnField.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(columnField, Priority.ALWAYS);
+    columnField.getItems().setAll(OverviewColumnOptions.columnIds(columns));
+    OverviewColumnOptions.applyColumnConverter(columnField, columns, documentModelIndex);
 
-    HBox row = new HBox(10.0, dragHandle, fieldLabel, sortableLabel, widthLabel, pinDirectionLabel, createActionsBox(column, index, rowCount));
+    updatingFromModel = true;
+    try {
+      columnField.setValue(columnRef.getIdref());
+    }
+    finally {
+      updatingFromModel = false;
+    }
+    columnField.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      columnRef.setIdref(newValue);
+      commitHeaderChange();
+      refreshValidationError();
+    });
+
+    HBox row = new HBox(10.0, dragHandle, columnField, createActionsBox(columnRef, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
     setupDragAndDrop(row, dragHandle, index);
     return row;
   }
 
-  private Label createRowLabel(String text, String id, double width, Column column) {
-    Label label = new Label(text);
-    label.setId(id);
-    label.setPrefWidth(width);
-    label.setCursor(Cursor.HAND);
-    label.setOnMouseClicked(event -> {
-      if (event.getClickCount() == 1) {
-        openEditDialog(column);
-      }
-    });
-    return label;
-  }
-
-  private String fieldSummary(Column column) {
-    return OverviewColumnOptions.describe(column, documentModelIndex);
-  }
-
-  private void openEditDialog(Column column) {
-    Dialogs.showColumn(Studio.stage, documentModelIndex, column);
-    rebuildRows();
-  }
-
-  // Only the drag handle initiates a drag (so clicking a label or the action buttons doesn't start one); the
+  // Only the drag handle initiates a drag (so using the combo box or action buttons doesn't start one); the
   // whole row is the drop target, so hovering anywhere over another row while dragging offers reordering there.
   private void setupDragAndDrop(HBox row, Node dragHandle, int index) {
     dragHandle.setOnDragDetected(event -> {
       Dragboard dragboard = dragHandle.startDragAndDrop(TransferMode.MOVE);
       ClipboardContent content = new ClipboardContent();
-      content.put(COLUMN_INDEX, String.valueOf(index));
+      content.put(SORTING_INDEX, String.valueOf(index));
       dragboard.setContent(content);
 
       SnapshotParameters snapshotParams = new SnapshotParameters();
@@ -172,7 +193,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor {
     dragHandle.setOnDragDone(event -> row.getStyleClass().remove("module-row-dragging"));
 
     row.setOnDragOver(event -> {
-      if (event.getDragboard().hasContent(COLUMN_INDEX)) {
+      if (event.getDragboard().hasContent(SORTING_INDEX)) {
         event.acceptTransferModes(TransferMode.MOVE);
         showDropIndicator(row, isAboveMidpoint(row, event.getY()));
       }
@@ -181,10 +202,10 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor {
     row.setOnDragExited(event -> clearDropIndicator(row));
     row.setOnDragDropped(event -> {
       Dragboard dragboard = event.getDragboard();
-      boolean success = dragboard.hasContent(COLUMN_INDEX);
+      boolean success = dragboard.hasContent(SORTING_INDEX);
       if (success) {
         int insertBeforeIndex = isAboveMidpoint(row, event.getY()) ? index : index + 1;
-        moveColumn(Integer.parseInt((String) dragboard.getContent(COLUMN_INDEX)), insertBeforeIndex);
+        moveSorting(Integer.parseInt((String) dragboard.getContent(SORTING_INDEX)), insertBeforeIndex);
       }
       clearDropIndicator(row);
       event.setDropCompleted(success);
@@ -209,35 +230,30 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor {
     row.getStyleClass().removeAll("module-row-drop-above", "module-row-drop-below");
   }
 
-  // targetIndex is the position the moved column should end up at, indexed into the list as it stood before
+  // targetIndex is the position the moved entry should end up at, indexed into the list as it stood before
   // the drag started (e.g. "landed above the row currently at index 2" is targetIndex 2).
-  private void moveColumn(int fromIndex, int targetIndex) {
+  private void moveSorting(int fromIndex, int targetIndex) {
     int insertIndex = fromIndex < targetIndex ? targetIndex - 1 : targetIndex;
     if (insertIndex == fromIndex) {
       return;
     }
-    List<Column> columns = getColumns();
-    Column moved = columns.remove(fromIndex);
-    columns.add(insertIndex, moved);
+    List<ColumnRef> sorting = getSorting();
+    ColumnRef moved = sorting.remove(fromIndex);
+    sorting.add(insertIndex, moved);
     rebuildRows();
-    notifyChanged();
+    commitHeaderChange();
   }
 
-  private HBox createActionsBox(Column column, int index, int rowCount) {
+  private HBox createActionsBox(ColumnRef columnRef, int index, int rowCount) {
     VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(column));
-
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this column?", null, null, "Delete");
-      if (result.isPresent() && result.get() == ButtonType.OK) {
-        getColumns().remove(column);
-        rebuildRows();
-        notifyChanged();
-      }
+      getSorting().remove(columnRef);
+      rebuildRows();
+      commitHeaderChange();
     });
 
-    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
   }
@@ -257,14 +273,9 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor {
   }
 
   private void moveRow(int fromIndex, int toIndex) {
-    Collections.swap(getColumns(), fromIndex, toIndex);
+    Collections.swap(getSorting(), fromIndex, toIndex);
     rebuildRows();
-    notifyChanged();
-  }
-
-  private void notifyChanged() {
     commitHeaderChange();
-    onChange.run();
   }
 
   private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
@@ -278,9 +289,5 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor {
     button.setTooltip(new Tooltip(tooltip));
     button.setOnAction(event -> action.run());
     return button;
-  }
-
-  private static String shortId() {
-    return UUID.randomUUID().toString().replace("-", "").substring(0, 5);
   }
 }

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
@@ -19,4 +22,6 @@ public class OverviewConfiguration {
   private FilterConfiguration filterConfiguration;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private MultiSelectionConfig multiSelection;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<ColumnRef> initialSorting = new ArrayList<>();
 }

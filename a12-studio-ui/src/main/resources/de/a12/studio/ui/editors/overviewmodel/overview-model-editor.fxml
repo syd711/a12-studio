@@ -49,6 +49,9 @@
                                        <!-- Columns -->
                                        <fx:include fx:id="overviewColumns" source="../propertyeditors/overview-columns-panel.fxml" />
 
+                                       <!-- Sorting -->
+                                       <fx:include fx:id="overviewSorting" source="../propertyeditors/overview-sorting-panel.fxml" />
+
                                        <!-- Features -->
                                        <fx:include fx:id="overviewFeatures" source="../propertyeditors/overview-features-panel.fxml" />
 

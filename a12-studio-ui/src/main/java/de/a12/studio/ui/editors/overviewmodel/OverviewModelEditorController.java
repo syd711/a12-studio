@@ -21,6 +21,7 @@ import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewFeaturesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController;
+import de.a12.studio.ui.editors.propertyeditors.OverviewSortingPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -147,6 +148,10 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   @FXML
   private OverviewColumnsPanelController overviewColumnsController;
 
+  // Sorting
+  @FXML
+  private OverviewSortingPanelController overviewSortingController;
+
   private OverviewModel model;
   private List<DocumentModel> otherDocumentModels = List.of();
   private ElementIndex documentModelIndex;
@@ -167,6 +172,9 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       refreshElementRefPickersAfterDocumentModelChange();
       commitChange();
     });
+    // The Sorting panel's column picker and its own dangling-reference validation both derive from the
+    // Columns list, so keep it in sync with every structural change made there.
+    overviewColumnsController.setOnChange(() -> overviewSortingController.refresh());
   }
 
   private void initializeFilter() {
@@ -383,6 +391,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       overviewReferenceController.load(model, otherDocumentModels, otherQueryModels);
       refreshDocumentModelIndex();
       overviewColumnsController.setModel(model);
+      overviewSortingController.setModel(model);
 
       overviewFeaturesController.setModel(model);
 
@@ -419,6 +428,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
         .orElse(null);
     documentModelIndex = OverviewElementOptions.indexOf(documentModel);
     overviewColumnsController.setDocumentModelIndex(documentModelIndex);
+    overviewSortingController.setDocumentModelIndex(documentModelIndex);
   }
 
   /** Every "element reference" picker's options depend on the selected Document Model; re-point them all. */

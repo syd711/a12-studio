@@ -303,22 +303,26 @@
     -fx-text-fill: -fx-text-muted;
 }
 
-.footer-preview-app-icon {
-    -fx-icon-color: -fx-icon-color-theme;
+.footer-icon-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
 }
 
-.preview-app-status-bubble {
-    -fx-stroke: -fx-background;
-    -fx-stroke-width: 1px;
-    -fx-fill: -fx-error-bg;
+.footer-icon-button:hover {
+    -fx-opacity: 0.7;
 }
 
-.preview-app-status-bubble.status-running {
-    -fx-fill: -fx-success-bg;
+.preview-app-status-icon {
+    -fx-icon-color: -fx-error-bg;
 }
 
-.preview-app-status-bubble.status-starting {
-    -fx-fill: -fx-warning-bg;
+.preview-app-status-icon.status-running {
+    -fx-icon-color: -fx-success-bg;
+}
+
+.preview-app-status-icon.status-starting {
+    -fx-icon-color: -fx-warning-bg;
 }
 
 /**
@@ -331,6 +335,6 @@
     -fx-text-fill: -fx-text-muted;
 }
 
-.preview-app-status-bubble.status-stopped {
-    -fx-fill: -fx-error-bg;
+.preview-app-status-icon.status-stopped {
+    -fx-icon-color: -fx-error-bg;
 }

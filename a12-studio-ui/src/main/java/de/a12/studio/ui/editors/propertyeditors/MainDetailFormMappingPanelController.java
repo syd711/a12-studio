@@ -9,9 +9,12 @@ import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -79,6 +82,8 @@ public class MainDetailFormMappingPanelController extends AbstractPropertyEditor
 
   private void addRow(@NonNull FormMapping mapping, int index) {
     Label documentModelLabel = new Label(mapping.getDocumentModel());
+    documentModelLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(documentModelLabel, Priority.ALWAYS);
 
     ComboBox<String> formModelField = new ComboBox<>();
     formModelField.setId("formMappingFormModel-" + index);
@@ -90,8 +95,13 @@ public class MainDetailFormMappingPanelController extends AbstractPropertyEditor
       validate();
       commitHeaderChange();
     });
+    HBox.setHgrow(formModelField, Priority.ALWAYS);
 
-    formMappingGrid.addRow(index + 1, documentModelLabel, formModelField);
+    HBox row = new HBox(10.0, documentModelLabel, formModelField);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("module-row");
+
+    formMappingGrid.add(row, 0, index + 1, 2, 1);
   }
 
   /** Every row's Form Model selection is required. */
