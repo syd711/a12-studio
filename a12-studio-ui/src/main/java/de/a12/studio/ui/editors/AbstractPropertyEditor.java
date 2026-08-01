@@ -77,6 +77,17 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   }
 
   /**
+   * Whether this panel is embedded in a dialog with its own Save button, as opposed to being bound directly
+   * to the currently selected project item. Mirrors {@link #saveMode}: a {@link PropertyEditorSaveMode.Deferred}
+   * is only ever handed to panels embedded in such a dialog (see the callers of {@link #setSaveMode}), so it
+   * doubles as that signal for subclasses that need to adjust their UI accordingly (e.g. hiding a button that
+   * only makes sense outside a dialog).
+   */
+  protected boolean isEmbeddedInDialog() {
+    return saveMode instanceof PropertyEditorSaveMode.Deferred;
+  }
+
+  /**
    * Releases resources held by this panel once it (and the editor/dialog that embeds it) is torn down.
    * Unregisters this panel from {@link StudioEventManager}, registered in {@link #initialize}. Subclasses
    * overriding this for their own cleanup (e.g. to react to {@code localesChanged}) must call

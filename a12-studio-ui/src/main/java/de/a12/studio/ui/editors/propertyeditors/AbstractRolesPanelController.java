@@ -87,9 +87,14 @@ public abstract class AbstractRolesPanelController extends AbstractPropertyEdito
     StudioEventManager.getInstance().fireModelOpenEvent(item);
   }
 
+  /**
+   * Hidden when embedded in a dialog ({@link #isEmbeddedInDialog()}): opening the roles file in an editor tab
+   * from there would abandon whatever the dialog's own Save/Cancel flow was about, so the action doesn't make
+   * sense in that context.
+   */
   private void updateEditRolesButtonVisibility() {
     File rolesFile = resolveWorkspaceRolesFile();
-    boolean available = rolesFile != null && rolesFile.isFile();
+    boolean available = rolesFile != null && rolesFile.isFile() && !isEmbeddedInDialog();
     editRolesButton.setVisible(available);
     editRolesButton.setManaged(available);
   }

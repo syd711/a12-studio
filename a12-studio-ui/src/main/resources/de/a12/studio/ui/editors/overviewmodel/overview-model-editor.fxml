@@ -2,14 +2,26 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
@@ -49,6 +61,397 @@
                            <content>
                                <VBox spacing="12.0" styleClass="field-editor">
                                    <children>
+
+                                       <!-- General Settings -->
+                                       <Label styleClass="section-label" text="General Settings" />
+                                       <VBox spacing="4.0">
+                                           <children>
+                                               <Label styleClass="field-label" text="Document Model*" />
+                                               <ComboBox fx:id="documentModelField" editable="false" maxWidth="Infinity" />
+                                           </children>
+                                       </VBox>
+
+                                       <!-- Features -->
+                                       <Label styleClass="section-label" text="Features" />
+
+                                       <HBox spacing="24.0">
+                                           <children>
+                                               <CheckBox fx:id="showFullTextSearchField" mnemonicParsing="false" text="Show Full Text Search" />
+                                               <CheckBox fx:id="showRowCountField" mnemonicParsing="false" text="Show Number of Entries" />
+                                           </children>
+                                       </HBox>
+                                       <VBox spacing="4.0" maxWidth="200.0">
+                                           <children>
+                                               <Label styleClass="field-label" text="Paging Size*" />
+                                               <Spinner fx:id="pagingSizeField" editable="true" maxWidth="Infinity" />
+                                           </children>
+                                       </VBox>
+
+                                       <!-- Filter -->
+                                       <Label styleClass="field-label" text="Filter" />
+                                       <CheckBox fx:id="enableFilterField" mnemonicParsing="false" text="Enable Filter" />
+                                       <VBox fx:id="filterDetailsBox" spacing="10.0">
+                                           <padding>
+                                               <Insets left="20.0" />
+                                           </padding>
+                                           <children>
+                                               <HBox spacing="24.0">
+                                                   <children>
+                                                       <CheckBox fx:id="showFilterButtonField" mnemonicParsing="false" text="Show Filter Button" />
+                                                       <CheckBox fx:id="showFilterBarField" mnemonicParsing="false" text="Show Filter Bar" />
+                                                   </children>
+                                               </HBox>
+                                               <VBox spacing="4.0" maxWidth="300.0">
+                                                   <children>
+                                                       <Label styleClass="field-label" text="Filter Mode*" />
+                                                       <ComboBox fx:id="filterModeField" editable="false" maxWidth="Infinity" />
+                                                   </children>
+                                               </VBox>
+
+                                               <!-- Custom field list (filterMode == custom_list) -->
+                                               <VBox fx:id="customFieldsBox" spacing="6.0">
+                                                   <children>
+                                                       <Label styleClass="field-label" text="Custom Selection of Fields" />
+                                                       <GridPane fx:id="customFieldsGrid" hgap="8.0" vgap="6.0">
+                                                           <columnConstraints>
+                                                               <ColumnConstraints hgrow="ALWAYS" />
+                                                               <ColumnConstraints hgrow="NEVER" minWidth="32.0" />
+                                                           </columnConstraints>
+                                                       </GridPane>
+                                                       <Button fx:id="addCustomFieldButton" mnemonicParsing="false" onAction="#onAddCustomField" styleClass="secondary-button" text="Add Field" />
+                                                   </children>
+                                               </VBox>
+
+                                               <!-- Filter Sections -->
+                                               <VBox spacing="6.0">
+                                                   <children>
+                                                       <Label styleClass="field-label" text="Section Data" />
+                                                       <HBox spacing="10.0">
+                                                           <children>
+                                                               <ListView fx:id="filterSectionsList" prefHeight="120.0" prefWidth="220.0" />
+                                                               <VBox fx:id="filterSectionDetailBox" spacing="8.0" HBox.hgrow="ALWAYS">
+                                                                   <children>
+                                                                       <VBox spacing="4.0">
+                                                                           <children>
+                                                                               <Label styleClass="field-label" text="Section ID*" />
+                                                                               <TextField fx:id="filterSectionIdField" />
+                                                                           </children>
+                                                                       </VBox>
+                                                                       <VBox spacing="4.0">
+                                                                           <children>
+                                                                               <Label styleClass="field-label" text="Label" />
+                                                                               <GridPane fx:id="filterSectionLabelGrid" hgap="10.0" vgap="6.0">
+                                                                                   <columnConstraints>
+                                                                                       <ColumnConstraints minWidth="40.0" />
+                                                                                       <ColumnConstraints hgrow="ALWAYS" />
+                                                                                   </columnConstraints>
+                                                                               </GridPane>
+                                                                           </children>
+                                                                       </VBox>
+                                                                       <VBox spacing="4.0">
+                                                                           <children>
+                                                                               <Label styleClass="field-label" text="Fields*" />
+                                                                               <GridPane fx:id="filterSectionFieldsGrid" hgap="8.0" vgap="6.0">
+                                                                                   <columnConstraints>
+                                                                                       <ColumnConstraints hgrow="ALWAYS" />
+                                                                                       <ColumnConstraints hgrow="NEVER" minWidth="32.0" />
+                                                                                   </columnConstraints>
+                                                                               </GridPane>
+                                                                               <Button fx:id="addFilterSectionFieldButton" mnemonicParsing="false" onAction="#onAddFilterSectionField" styleClass="secondary-button" text="Add Field" />
+                                                                           </children>
+                                                                       </VBox>
+                                                                   </children>
+                                                               </VBox>
+                                                           </children>
+                                                       </HBox>
+                                                       <HBox spacing="8.0">
+                                                           <children>
+                                                               <Button fx:id="addFilterSectionButton" mnemonicParsing="false" onAction="#onAddFilterSection" styleClass="secondary-button" text="Add Section" />
+                                                               <Button fx:id="removeFilterSectionButton" mnemonicParsing="false" onAction="#onRemoveFilterSection" styleClass="secondary-button" text="Remove Section" />
+                                                           </children>
+                                                       </HBox>
+                                                   </children>
+                                               </VBox>
+                                           </children>
+                                       </VBox>
+
+                                       <!-- Multi-Selection -->
+                                       <Label styleClass="field-label" text="Multi-Selection" />
+                                       <CheckBox fx:id="enableMultiSelectionField" mnemonicParsing="false" text="Enable Multi-Selection" />
+                                       <VBox fx:id="multiSelectionDetailsBox" spacing="10.0">
+                                           <padding>
+                                               <Insets left="20.0" />
+                                           </padding>
+                                           <children>
+                                               <GridPane hgap="10.0" vgap="8.0">
+                                                   <columnConstraints>
+                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                                                   </columnConstraints>
+                                                   <children>
+                                                       <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Collapse Option" />
+                                                               <ComboBox fx:id="collapseOptionField" editable="false" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                       <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Counter Option" />
+                                                               <ComboBox fx:id="counterOptionField" editable="false" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                       <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Selection Area" />
+                                                               <ComboBox fx:id="selectionAreaField" editable="false" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                   </children>
+                                               </GridPane>
+                                               <CheckBox fx:id="clearConfirmationField" mnemonicParsing="false" text="Display confirmation before clearing selected rows" />
+
+                                               <Label styleClass="field-label" text="Actions for Multi-Selection" />
+                                               <HBox spacing="10.0">
+                                                   <children>
+                                                       <ListView fx:id="multiSelectionButtonsList" prefHeight="120.0" prefWidth="220.0" />
+                                                       <VBox fx:id="multiSelectionButtonDetailBox" spacing="8.0" HBox.hgrow="ALWAYS">
+                                                           <children>
+                                                               <GridPane hgap="10.0" vgap="8.0">
+                                                                   <columnConstraints>
+                                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                                                   </columnConstraints>
+                                                                   <children>
+                                                                       <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                                                           <children>
+                                                                               <Label styleClass="field-label" text="Event*" />
+                                                                               <TextField fx:id="buttonEventField" />
+                                                                           </children>
+                                                                       </VBox>
+                                                                       <HBox alignment="CENTER_LEFT" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                                                           <children>
+                                                                               <CheckBox fx:id="buttonDestructiveField" mnemonicParsing="false" text="Destructive" />
+                                                                               <CheckBox fx:id="buttonPrimaryField" mnemonicParsing="false" text="Primary" />
+                                                                           </children>
+                                                                       </HBox>
+                                                                       <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                                                           <children>
+                                                                               <Label styleClass="field-label" text="Icon Name" />
+                                                                               <TextField fx:id="buttonIconNameField" />
+                                                                           </children>
+                                                                       </VBox>
+                                                                       <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                                           <children>
+                                                                               <Label styleClass="field-label" text="Icon Theme" />
+                                                                               <ComboBox fx:id="buttonIconThemeField" editable="false" maxWidth="Infinity" />
+                                                                           </children>
+                                                                       </VBox>
+                                                                   </children>
+                                                               </GridPane>
+                                                               <VBox spacing="4.0">
+                                                                   <children>
+                                                                       <Label styleClass="field-label" text="Label" />
+                                                                       <GridPane fx:id="buttonLabelGrid" hgap="10.0" vgap="6.0">
+                                                                           <columnConstraints>
+                                                                               <ColumnConstraints minWidth="40.0" />
+                                                                               <ColumnConstraints hgrow="ALWAYS" />
+                                                                           </columnConstraints>
+                                                                       </GridPane>
+                                                                   </children>
+                                                               </VBox>
+                                                               <VBox spacing="4.0">
+                                                                   <children>
+                                                                       <Label styleClass="field-label" text="Description" />
+                                                                       <GridPane fx:id="buttonDescriptionGrid" hgap="10.0" vgap="6.0">
+                                                                           <columnConstraints>
+                                                                               <ColumnConstraints minWidth="40.0" />
+                                                                               <ColumnConstraints hgrow="ALWAYS" />
+                                                                           </columnConstraints>
+                                                                       </GridPane>
+                                                                   </children>
+                                                               </VBox>
+                                                               <CheckBox fx:id="buttonConfirmationField" mnemonicParsing="false" text="Require Confirmation" />
+                                                               <VBox fx:id="buttonConfirmationDetailsBox" spacing="8.0">
+                                                                   <padding>
+                                                                       <Insets left="20.0" />
+                                                                   </padding>
+                                                                   <children>
+                                                                       <VBox spacing="4.0">
+                                                                           <children>
+                                                                               <Label styleClass="field-label" text="Confirmation Title" />
+                                                                               <GridPane fx:id="buttonConfirmationTitleGrid" hgap="10.0" vgap="6.0">
+                                                                                   <columnConstraints>
+                                                                                       <ColumnConstraints minWidth="40.0" />
+                                                                                       <ColumnConstraints hgrow="ALWAYS" />
+                                                                                   </columnConstraints>
+                                                                               </GridPane>
+                                                                           </children>
+                                                                       </VBox>
+                                                                       <VBox spacing="4.0">
+                                                                           <children>
+                                                                               <Label styleClass="field-label" text="Confirmation Message" />
+                                                                               <GridPane fx:id="buttonConfirmationMessageGrid" hgap="10.0" vgap="6.0">
+                                                                                   <columnConstraints>
+                                                                                       <ColumnConstraints minWidth="40.0" />
+                                                                                       <ColumnConstraints hgrow="ALWAYS" />
+                                                                                   </columnConstraints>
+                                                                               </GridPane>
+                                                                           </children>
+                                                                       </VBox>
+                                                                   </children>
+                                                               </VBox>
+                                                           </children>
+                                                       </VBox>
+                                                   </children>
+                                               </HBox>
+                                               <HBox spacing="8.0">
+                                                   <children>
+                                                       <Button fx:id="addMultiSelectionButtonButton" mnemonicParsing="false" onAction="#onAddMultiSelectionButton" styleClass="secondary-button" text="Add Button" />
+                                                       <Button fx:id="removeMultiSelectionButtonButton" mnemonicParsing="false" onAction="#onRemoveMultiSelectionButton" styleClass="secondary-button" text="Remove Button" />
+                                                   </children>
+                                               </HBox>
+                                           </children>
+                                       </VBox>
+
+                                       <Separator />
+
+                                       <!-- Columns -->
+                                       <Label styleClass="section-label" text="Columns" />
+                                       <TableView fx:id="columnsTable" editable="true" prefHeight="180.0">
+                                           <columns>
+                                               <TableColumn fx:id="columnLabelColumn" prefWidth="180.0" text="Name" />
+                                               <TableColumn fx:id="columnTypeColumn" prefWidth="90.0" text="Type" />
+                                               <TableColumn fx:id="columnWidthColumn" prefWidth="70.0" text="Width" />
+                                               <TableColumn fx:id="columnSortableColumn" prefWidth="70.0" text="Sortable" />
+                                               <TableColumn fx:id="columnPinDirectionColumn" prefWidth="100.0" text="Pin Direction" />
+                                           </columns>
+                                       </TableView>
+                                       <HBox spacing="8.0">
+                                           <children>
+                                               <Button fx:id="addColumnButton" mnemonicParsing="false" onAction="#onAddColumn" styleClass="secondary-button" text="Add Column" />
+                                               <Button fx:id="removeColumnButton" mnemonicParsing="false" onAction="#onRemoveColumn" styleClass="secondary-button" text="Remove Column" />
+                                               <Button fx:id="moveColumnUpButton" mnemonicParsing="false" onAction="#onMoveColumnUp" styleClass="secondary-button" text="Move Up" />
+                                               <Button fx:id="moveColumnDownButton" mnemonicParsing="false" onAction="#onMoveColumnDown" styleClass="secondary-button" text="Move Down" />
+                                           </children>
+                                       </HBox>
+
+                                       <VBox fx:id="columnDetailBox" spacing="10.0">
+                                           <children>
+                                               <VBox spacing="4.0" maxWidth="200.0">
+                                                   <children>
+                                                       <Label styleClass="field-label" text="Column Type" />
+                                                       <ComboBox fx:id="columnTypeField" editable="false" maxWidth="Infinity" />
+                                                   </children>
+                                               </VBox>
+
+                                               <VBox fx:id="columnReferenceBox" spacing="10.0">
+                                                   <children>
+                                                       <VBox spacing="4.0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Element Reference*" />
+                                                               <ComboBox fx:id="columnElementRefField" editable="false" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                       <HBox alignment="CENTER_LEFT" spacing="20.0">
+                                                           <children>
+                                                               <CheckBox fx:id="columnSortableField" mnemonicParsing="false" text="Sortable" />
+                                                               <VBox spacing="4.0" maxWidth="200.0">
+                                                                   <children>
+                                                                       <Label styleClass="field-label" text="Preferred Sorting" />
+                                                                       <ComboBox fx:id="columnPreferredSortingField" editable="false" maxWidth="Infinity" />
+                                                                   </children>
+                                                               </VBox>
+                                                           </children>
+                                                       </HBox>
+                                                       <VBox spacing="4.0" maxWidth="260.0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Attachment Display Mode" />
+                                                               <ComboBox fx:id="columnAttachmentDisplayModeField" editable="false" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                   </children>
+                                               </VBox>
+
+                                               <VBox fx:id="columnExpressionBox" spacing="10.0">
+                                                   <children>
+                                                       <VBox spacing="4.0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Name*" />
+                                                               <TextField fx:id="columnNameField" />
+                                                           </children>
+                                                       </VBox>
+                                                       <VBox spacing="4.0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Expression" />
+                                                               <TextArea fx:id="columnExpressionField" prefRowCount="6" wrapText="true" />
+                                                           </children>
+                                                       </VBox>
+                                                   </children>
+                                               </VBox>
+
+                                               <VBox spacing="4.0">
+                                                   <children>
+                                                       <Label styleClass="field-label" text="Label" />
+                                                       <GridPane fx:id="columnLabelGrid" hgap="10.0" vgap="6.0">
+                                                           <columnConstraints>
+                                                               <ColumnConstraints minWidth="40.0" />
+                                                               <ColumnConstraints hgrow="ALWAYS" />
+                                                           </columnConstraints>
+                                                       </GridPane>
+                                                   </children>
+                                               </VBox>
+
+                                               <GridPane hgap="10.0" vgap="8.0">
+                                                   <columnConstraints>
+                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                                   </columnConstraints>
+                                                   <children>
+                                                       <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Width" />
+                                                               <Spinner fx:id="columnWidthField" editable="true" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                       <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Pin Direction" />
+                                                               <ComboBox fx:id="columnPinDirectionField" editable="false" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                       <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Header Alignment" />
+                                                               <ComboBox fx:id="columnAlignmentHeaderField" editable="false" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                       <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                           <children>
+                                                               <Label styleClass="field-label" text="Content Alignment" />
+                                                               <ComboBox fx:id="columnAlignmentContentField" editable="false" maxWidth="Infinity" />
+                                                           </children>
+                                                       </VBox>
+                                                   </children>
+                                               </GridPane>
+                                               <CheckBox fx:id="columnFixedWidthField" mnemonicParsing="false" text="Fixed Width" />
+
+                                               <VBox spacing="4.0">
+                                                   <children>
+                                                       <Label styleClass="field-label" text="Suffix" />
+                                                       <GridPane fx:id="columnSuffixGrid" hgap="10.0" vgap="6.0">
+                                                           <columnConstraints>
+                                                               <ColumnConstraints minWidth="40.0" />
+                                                               <ColumnConstraints hgrow="ALWAYS" />
+                                                           </columnConstraints>
+                                                       </GridPane>
+                                                   </children>
+                                               </VBox>
+                                               <CheckBox fx:id="columnShowSummaryField" mnemonicParsing="false" text="Show sum of all entries" />
+                                           </children>
+                                       </VBox>
+
                                    </children>
                                    <padding>
                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

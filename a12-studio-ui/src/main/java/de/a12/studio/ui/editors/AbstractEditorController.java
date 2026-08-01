@@ -13,6 +13,7 @@ import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Circle;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Slf4j
 abstract public class AbstractEditorController implements StudioEventListener {
@@ -28,6 +30,12 @@ abstract public class AbstractEditorController implements StudioEventListener {
 
   protected ProjectItem projectItem;
   private BaseTableSettings baseTableSettings;
+
+  /**
+   * Set while fields are being repopulated from the model, so that programmatic updates aren't
+   * mistaken for user edits and don't trigger a save.
+   */
+  protected boolean updatingFromModel;
 
   /**
    * Injected via {@code fx:include} in every editor FXML. After {@link #load} is called
@@ -66,6 +74,25 @@ abstract public class AbstractEditorController implements StudioEventListener {
 
   public void save() {
     projectItem.save();
+  }
+
+  /**
+   * Wires a {@link CheckBox} directly to a model setter: on every user toggle (guarded by {@link
+   * #updatingFromModel} so repopulating the control from {@link #loadModel} doesn't re-trigger a save),
+   * calls {@code onChange} with the new value and saves. The generic binding point for the many plain
+   * checkboxes used by flat, non-panel-based editors (e.g. {@code OverviewModelEditorController}). Not
+   * named {@code commitChange} to avoid colliding with the several existing editor controllers that
+   * already declare their own private method of that name.
+   */
+  protected void bindCheckBox(@NonNull CheckBox checkBox, @NonNull Consumer<Boolean> onChange) {
+    checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      onChange.accept(newValue);
+      projectItem.save();
+      StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
+    });
   }
 
   @FXML

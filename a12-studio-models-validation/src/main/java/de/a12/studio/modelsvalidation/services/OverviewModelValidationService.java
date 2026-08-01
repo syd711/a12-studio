@@ -12,7 +12,12 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnsNotEmptyValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewDocumentModelRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterCustomFieldsValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterSectionsValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewPagingSizeValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +33,12 @@ public final class OverviewModelValidationService {
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
       new OverviewColumnsNotEmptyValidator(),
-      new OverviewFieldReferenceValidator()));
+      new OverviewFieldReferenceValidator(),
+      new OverviewDocumentModelRequiredValidator(),
+      new OverviewFilterModeRequiredValidator(),
+      new OverviewFilterCustomFieldsValidator(),
+      new OverviewFilterSectionsValidator(),
+      new OverviewPagingSizeValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

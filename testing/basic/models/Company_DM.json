@@ -77,6 +77,12 @@
                       "type": "Field",
                       "id": "field_67684",
                       "name": "CompanyName",
+                      "annotations": [
+                        {
+                          "name": "",
+                          "value": null
+                        }
+                      ],
                       "Field": {
                         "fieldType": {
                           "type": "TypeDefType",
@@ -113,7 +119,7 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "BooleanType"
+                          "type": "StringType"
                         },
                         "label": [
                           {
