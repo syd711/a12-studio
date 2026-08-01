@@ -27,7 +27,14 @@
         "value": "tester,reviewer"
       }
     ],
-    "modelReferences": []
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Addresses_DM"
+      }
+    ]
   },
   "content": {
     "columns": [

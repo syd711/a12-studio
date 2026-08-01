@@ -25,7 +25,7 @@
                             <RadioButton fx:id="documentModelReferenceField" mnemonicParsing="false" text="Use Document Model as Reference" toggleGroup="$overviewReferenceToggleGroup" />
                         </children>
                     </VBox>
-                    <ComboBox fx:id="overviewReferenceField" editable="false" maxWidth="Infinity" />
+                    <ComboBox fx:id="overviewReferenceField" editable="false" />
                     <Label fx:id="queryModelReferenceInfoLabel" managed="false" styleClass="placeholder-label" text="The settings for Default Sorting and Paging Size of the Overview Model have priority over the settings in the Query Model. As a result, if Default Sorting is specified in the Overview Model, then this setting will be applied in the application." visible="false" wrapText="true" />
                 </children>
             </VBox>
