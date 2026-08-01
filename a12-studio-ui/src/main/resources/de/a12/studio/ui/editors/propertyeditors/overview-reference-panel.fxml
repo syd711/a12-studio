@@ -5,26 +5,33 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="OVERVIEW REFERENCE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController">
-    <VBox spacing="6.0">
-        <children>
-            <Label styleClass="field-label" text="Overview Reference*" />
-            <HBox spacing="20.0">
+    <BorderPane>
+        <center>
+            <VBox spacing="6.0">
                 <children>
-                    <RadioButton fx:id="queryModelReferenceField" mnemonicParsing="false" text="Use Query Model as Reference">
-                        <toggleGroup>
-                            <ToggleGroup fx:id="overviewReferenceToggleGroup" />
-                        </toggleGroup>
-                    </RadioButton>
-                    <RadioButton fx:id="documentModelReferenceField" mnemonicParsing="false" text="Use Document Model as Reference" toggleGroup="$overviewReferenceToggleGroup" />
+                    <VBox spacing="6.0">
+                        <children>
+                            <RadioButton fx:id="queryModelReferenceField" mnemonicParsing="false" text="Use Query Model as Reference">
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="overviewReferenceToggleGroup" />
+                                </toggleGroup>
+                            </RadioButton>
+                            <RadioButton fx:id="documentModelReferenceField" mnemonicParsing="false" text="Use Document Model as Reference" toggleGroup="$overviewReferenceToggleGroup" />
+                        </children>
+                    </VBox>
+                    <ComboBox fx:id="overviewReferenceField" editable="false" maxWidth="Infinity" />
+                    <Label fx:id="queryModelReferenceInfoLabel" managed="false" styleClass="placeholder-label" text="The settings for Default Sorting and Paging Size of the Overview Model have priority over the settings in the Query Model. As a result, if Default Sorting is specified in the Overview Model, then this setting will be applied in the application." visible="false" wrapText="true" />
                 </children>
-            </HBox>
-            <ComboBox fx:id="overviewReferenceField" editable="false" maxWidth="Infinity" />
-            <Label fx:id="queryModelReferenceInfoLabel" managed="false" styleClass="placeholder-label" text="The settings for Default Sorting and Paging Size of the Overview Model have priority over the settings in the Query Model. As a result, if Default Sorting is specified in the Overview Model, then this setting will be applied in the application." visible="false" wrapText="true" />
-        </children>
-    </VBox>
+            </VBox>
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+    </BorderPane>
 </TitledPane>

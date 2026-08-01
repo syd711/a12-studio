@@ -5,6 +5,7 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
+import de.a12.studio.ui.components.ErrorContainerController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -39,6 +40,9 @@ public class OverviewReferencePanelController implements Initializable {
   @FXML
   private Label queryModelReferenceInfoLabel;
 
+  @FXML
+  private ErrorContainerController errorContainerController;
+
   private OverviewModel model;
   private List<DocumentModel> documentModels = List.of();
   private List<QueryModel> queryModels = List.of();
@@ -63,6 +67,7 @@ public class OverviewReferencePanelController implements Initializable {
       }
     });
     overviewReferenceField.valueProperty().addListener((observable, oldValue, newValue) -> {
+      validate();
       if (updatingFromModel || model == null) {
         return;
       }
@@ -97,6 +102,7 @@ public class OverviewReferencePanelController implements Initializable {
     finally {
       updatingFromModel = false;
     }
+    validate();
   }
 
   /** Toggling the radio group switches the combobox between Query Models and Document Models. */
@@ -183,5 +189,15 @@ public class OverviewReferencePanelController implements Initializable {
     reference.setAlias(alias);
     reference.setReference(referenceId);
     return reference;
+  }
+
+  /** The combo box reference is required regardless of which radio button is selected. */
+  private void validate() {
+    if (overviewReferenceField.getValue() == null) {
+      errorContainerController.show("ERROR", "This field is required.");
+    }
+    else {
+      errorContainerController.hide();
+    }
   }
 }

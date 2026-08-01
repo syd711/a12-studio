@@ -1,4 +1,4 @@
-package de.a12.studio.models.combinationmodel;
+package de.a12.studio.models.combineddocumentmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;

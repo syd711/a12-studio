@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
+import de.a12.studio.ui.components.ErrorContainerController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -29,6 +30,9 @@ public class MainModelReferencePanelController implements Initializable {
   @FXML
   private ComboBox<String> mainModelField;
 
+  @FXML
+  private ErrorContainerController errorContainerController;
+
   private MasterDetailModel model;
   private List<String> overviewModelIds = List.of();
   private List<String> treeModelIds = List.of();
@@ -53,6 +57,7 @@ public class MainModelReferencePanelController implements Initializable {
       }
     });
     mainModelField.valueProperty().addListener((observable, oldValue, newValue) -> {
+      validate();
       if (updatingFromModel || model == null) {
         return;
       }
@@ -84,6 +89,7 @@ public class MainModelReferencePanelController implements Initializable {
     finally {
       updatingFromModel = false;
     }
+    validate();
   }
 
   /** Toggling the radio group switches the combobox between Tree Models and Overview Models. */
@@ -115,5 +121,15 @@ public class MainModelReferencePanelController implements Initializable {
     model.getContent().setType(treeMode ? "tree" : "overview");
     model.getContent().setTreeModel(treeMode ? selectedId : null);
     model.getContent().setOverviewModel(treeMode ? null : selectedId);
+  }
+
+  /** The combo box reference is required regardless of which radio button is selected. */
+  private void validate() {
+    if (mainModelField.getValue() == null) {
+      errorContainerController.show("ERROR", "This field is required.");
+    }
+    else {
+      errorContainerController.hide();
+    }
   }
 }

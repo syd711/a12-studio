@@ -93,6 +93,45 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
   }
 
+  /**
+   * Refreshes the tab of a renamed item in place (title + freshly rebuilt editor content) rather than
+   * closing and reopening it, so the tab keeps its position and selection. The old editor is unregistered
+   * via a synthetic {@link ModelClosedEvent} first - see {@link
+   * de.a12.studio.ui.editors.AbstractEditorController#modelClosed} - since it would otherwise keep reacting
+   * to events for a tab that visually no longer shows its content.
+   */
+  @Override
+  public void modelRenamed(@NonNull ModelRenamedEvent event) {
+    for (Tab tab : tabPane.getTabs()) {
+      ProjectItem tabItem = (ProjectItem) tab.getUserData();
+      if (tabItem != null && tabItem.getPath().equals(event.getOldPath())) {
+        reloadTab(tab, event);
+        return;
+      }
+    }
+  }
+
+  private void reloadTab(@NonNull Tab tab, @NonNull ModelRenamedEvent event) {
+    ProjectItem item = event.getItem();
+    StudioEventManager.getInstance().fireModelClosedEvent(item);
+
+    Parent content = EditorFactory.create(item);
+    if (content != null) {
+      tab.setContent(content);
+    }
+    tab.setText(item.getName());
+    tab.setUserData(item);
+
+    if (project != null) {
+      project.getSettings().getUISettings().removeOpenedFile(event.getOldPath());
+      project.getSettings().getUISettings().addOpenedFile(item.getPath());
+      if (event.getOldPath().equals(project.getSettings().getUISettings().getSelectedFile())) {
+        project.getSettings().getUISettings().setSelectedFile(item.getPath());
+      }
+      project.getSettings().getUISettings().save();
+    }
+  }
+
   private boolean isSameOrDescendant(@NonNull String path, @NonNull String ancestorPath) {
     return path.equals(ancestorPath) || path.startsWith(ancestorPath + File.separator);
   }

@@ -11,9 +11,6 @@
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -49,21 +46,11 @@
                                        <!-- General Settings -->
                                        <fx:include fx:id="overviewReference" source="../propertyeditors/overview-reference-panel.fxml" />
 
-                                       <!-- Features -->
-                                       <Label styleClass="section-label" text="Features" />
+                                       <!-- Columns -->
+                                       <fx:include fx:id="overviewColumns" source="../propertyeditors/overview-columns-panel.fxml" />
 
-                                       <HBox spacing="24.0">
-                                           <children>
-                                               <CheckBox fx:id="showFullTextSearchField" mnemonicParsing="false" text="Show Full Text Search" />
-                                               <CheckBox fx:id="showRowCountField" mnemonicParsing="false" text="Show Number of Entries" />
-                                           </children>
-                                       </HBox>
-                                       <VBox spacing="4.0" maxWidth="200.0">
-                                           <children>
-                                               <Label styleClass="field-label" text="Paging Size*" />
-                                               <Spinner fx:id="pagingSizeField" editable="true" maxWidth="Infinity" />
-                                           </children>
-                                       </VBox>
+                                       <!-- Features -->
+                                       <fx:include fx:id="overviewFeatures" source="../propertyeditors/overview-features-panel.fxml" />
 
                                        <!-- Filter -->
                                        <Label styleClass="field-label" text="Filter" />
@@ -290,143 +277,6 @@
                                                        <Button fx:id="removeMultiSelectionButtonButton" mnemonicParsing="false" onAction="#onRemoveMultiSelectionButton" styleClass="secondary-button" text="Remove Button" />
                                                    </children>
                                                </HBox>
-                                           </children>
-                                       </VBox>
-
-                                       <Separator />
-
-                                       <!-- Columns -->
-                                       <Label styleClass="section-label" text="Columns" />
-                                       <TableView fx:id="columnsTable" editable="true" prefHeight="180.0">
-                                           <columns>
-                                               <TableColumn fx:id="columnLabelColumn" prefWidth="180.0" text="Name" />
-                                               <TableColumn fx:id="columnTypeColumn" prefWidth="90.0" text="Type" />
-                                               <TableColumn fx:id="columnWidthColumn" prefWidth="70.0" text="Width" />
-                                               <TableColumn fx:id="columnSortableColumn" prefWidth="70.0" text="Sortable" />
-                                               <TableColumn fx:id="columnPinDirectionColumn" prefWidth="100.0" text="Pin Direction" />
-                                           </columns>
-                                       </TableView>
-                                       <HBox spacing="8.0">
-                                           <children>
-                                               <Button fx:id="addColumnButton" mnemonicParsing="false" onAction="#onAddColumn" styleClass="secondary-button" text="Add Column" />
-                                               <Button fx:id="removeColumnButton" mnemonicParsing="false" onAction="#onRemoveColumn" styleClass="secondary-button" text="Remove Column" />
-                                               <Button fx:id="moveColumnUpButton" mnemonicParsing="false" onAction="#onMoveColumnUp" styleClass="secondary-button" text="Move Up" />
-                                               <Button fx:id="moveColumnDownButton" mnemonicParsing="false" onAction="#onMoveColumnDown" styleClass="secondary-button" text="Move Down" />
-                                           </children>
-                                       </HBox>
-
-                                       <VBox fx:id="columnDetailBox" spacing="10.0">
-                                           <children>
-                                               <VBox spacing="4.0" maxWidth="200.0">
-                                                   <children>
-                                                       <Label styleClass="field-label" text="Column Type" />
-                                                       <ComboBox fx:id="columnTypeField" editable="false" maxWidth="Infinity" />
-                                                   </children>
-                                               </VBox>
-
-                                               <VBox fx:id="columnReferenceBox" spacing="10.0">
-                                                   <children>
-                                                       <VBox spacing="4.0">
-                                                           <children>
-                                                               <Label styleClass="field-label" text="Element Reference*" />
-                                                               <ComboBox fx:id="columnElementRefField" editable="false" maxWidth="Infinity" />
-                                                           </children>
-                                                       </VBox>
-                                                       <HBox alignment="CENTER_LEFT" spacing="20.0">
-                                                           <children>
-                                                               <CheckBox fx:id="columnSortableField" mnemonicParsing="false" text="Sortable" />
-                                                               <VBox spacing="4.0" maxWidth="200.0">
-                                                                   <children>
-                                                                       <Label styleClass="field-label" text="Preferred Sorting" />
-                                                                       <ComboBox fx:id="columnPreferredSortingField" editable="false" maxWidth="Infinity" />
-                                                                   </children>
-                                                               </VBox>
-                                                           </children>
-                                                       </HBox>
-                                                       <VBox spacing="4.0" maxWidth="260.0">
-                                                           <children>
-                                                               <Label styleClass="field-label" text="Attachment Display Mode" />
-                                                               <ComboBox fx:id="columnAttachmentDisplayModeField" editable="false" maxWidth="Infinity" />
-                                                           </children>
-                                                       </VBox>
-                                                   </children>
-                                               </VBox>
-
-                                               <VBox fx:id="columnExpressionBox" spacing="10.0">
-                                                   <children>
-                                                       <VBox spacing="4.0">
-                                                           <children>
-                                                               <Label styleClass="field-label" text="Name*" />
-                                                               <TextField fx:id="columnNameField" />
-                                                           </children>
-                                                       </VBox>
-                                                       <VBox spacing="4.0">
-                                                           <children>
-                                                               <Label styleClass="field-label" text="Expression" />
-                                                               <TextArea fx:id="columnExpressionField" prefRowCount="6" wrapText="true" />
-                                                           </children>
-                                                       </VBox>
-                                                   </children>
-                                               </VBox>
-
-                                               <VBox spacing="4.0">
-                                                   <children>
-                                                       <Label styleClass="field-label" text="Label" />
-                                                       <GridPane fx:id="columnLabelGrid" hgap="10.0" vgap="6.0">
-                                                           <columnConstraints>
-                                                               <ColumnConstraints minWidth="40.0" />
-                                                               <ColumnConstraints hgrow="ALWAYS" />
-                                                           </columnConstraints>
-                                                       </GridPane>
-                                                   </children>
-                                               </VBox>
-
-                                               <GridPane hgap="10.0" vgap="8.0">
-                                                   <columnConstraints>
-                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                                                       <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                                                   </columnConstraints>
-                                                   <children>
-                                                       <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                                           <children>
-                                                               <Label styleClass="field-label" text="Width" />
-                                                               <Spinner fx:id="columnWidthField" editable="true" maxWidth="Infinity" />
-                                                           </children>
-                                                       </VBox>
-                                                       <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                                           <children>
-                                                               <Label styleClass="field-label" text="Pin Direction" />
-                                                               <ComboBox fx:id="columnPinDirectionField" editable="false" maxWidth="Infinity" />
-                                                           </children>
-                                                       </VBox>
-                                                       <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                                           <children>
-                                                               <Label styleClass="field-label" text="Header Alignment" />
-                                                               <ComboBox fx:id="columnAlignmentHeaderField" editable="false" maxWidth="Infinity" />
-                                                           </children>
-                                                       </VBox>
-                                                       <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                                           <children>
-                                                               <Label styleClass="field-label" text="Content Alignment" />
-                                                               <ComboBox fx:id="columnAlignmentContentField" editable="false" maxWidth="Infinity" />
-                                                           </children>
-                                                       </VBox>
-                                                   </children>
-                                               </GridPane>
-                                               <CheckBox fx:id="columnFixedWidthField" mnemonicParsing="false" text="Fixed Width" />
-
-                                               <VBox spacing="4.0">
-                                                   <children>
-                                                       <Label styleClass="field-label" text="Suffix" />
-                                                       <GridPane fx:id="columnSuffixGrid" hgap="10.0" vgap="6.0">
-                                                           <columnConstraints>
-                                                               <ColumnConstraints minWidth="40.0" />
-                                                               <ColumnConstraints hgrow="ALWAYS" />
-                                                           </columnConstraints>
-                                                       </GridPane>
-                                                   </children>
-                                               </VBox>
-                                               <CheckBox fx:id="columnShowSummaryField" mnemonicParsing="false" text="Show sum of all entries" />
                                            </children>
                                        </VBox>
 

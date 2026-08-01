@@ -6,9 +6,6 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.overviewmodel.Alignment;
-import de.a12.studio.models.overviewmodel.Column;
-import de.a12.studio.models.overviewmodel.ColumnAlignment;
 import de.a12.studio.models.overviewmodel.ClearConfirmation;
 import de.a12.studio.models.overviewmodel.Confirmation;
 import de.a12.studio.models.overviewmodel.FieldRef;
@@ -18,16 +15,15 @@ import de.a12.studio.models.overviewmodel.Icon;
 import de.a12.studio.models.overviewmodel.MultiSelectionConfig;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
-import de.a12.studio.models.overviewmodel.SummaryConfig;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController;
+import de.a12.studio.ui.editors.propertyeditors.OverviewFeaturesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
-import de.a12.studio.ui.util.WidgetFactory;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -35,11 +31,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
@@ -49,8 +40,6 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -58,8 +47,9 @@ import java.util.function.BiConsumer;
 
 /**
  * Edits an {@link OverviewModel}'s "Overview" tab: General Settings (the Overview Reference, delegated to
- * {@link de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController}), Features
- * (search/filter/paging/row-count/multi-selection), and Columns. "Custom Actions" ({@code
+ * {@link de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController}), Columns (delegated to
+ * {@link de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController}), Features
+ * (search/filter/paging/row-count/multi-selection), Filter and Multi-Selection. "Custom Actions" ({@code
  * content.rowActionGroup}) is out of scope, mirroring the Java model's already-reduced feature set versus
  * SME (no content-level Styles). {@code subHeaderBox}/{@code footerBox} are left untouched: sample models
  * ({@code Company_OM.json}, {@code Invoice_OM.json}) show them written empty even with
@@ -67,9 +57,6 @@ import java.util.function.BiConsumer;
  * flags rather than from manually-placed box elements.
  */
 public class OverviewModelEditorController extends AbstractEditorController implements Initializable {
-
-  private static final String COLUMN_TYPE_REFERENCE = "Reference";
-  private static final String COLUMN_TYPE_EXPRESSION = "Expression";
 
   private static final List<String> FILTER_MODE_OPTIONS = List.of("",
       FilterConfiguration.FILTER_MODE_ALL, FilterConfiguration.FILTER_MODE_ALL_WITH_META,
@@ -83,12 +70,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       MultiSelectionConfig.SELECTION_AREA_CHECKBOX, MultiSelectionConfig.SELECTION_AREA_CHECKBOX_AND_ROW);
   private static final List<String> ICON_THEME_OPTIONS = List.of("",
       Icon.THEME_FILLED, Icon.THEME_OUTLINED, Icon.THEME_ROUNDED, Icon.THEME_CUSTOM);
-  private static final List<String> PIN_DIRECTION_OPTIONS = List.of("", Column.PIN_DIRECTION_LEFT, Column.PIN_DIRECTION_RIGHT);
-  private static final List<String> PREFERRED_SORTING_OPTIONS = List.of("", Column.PREFERRED_SORTING_ASC, Column.PREFERRED_SORTING_DESC);
-  private static final List<String> ATTACHMENT_DISPLAY_MODE_OPTIONS = List.of("",
-      Column.ATTACHMENT_DISPLAY_MODE_PREVIEW, Column.ATTACHMENT_DISPLAY_MODE_ICON,
-      Column.ATTACHMENT_DISPLAY_MODE_FILE_NAME, Column.ATTACHMENT_DISPLAY_MODE_ICON_WITH_FILE_NAME);
-  private static final List<String> ALIGNMENT_OPTIONS = List.of("", "left", "center", "right");
 
   // General Settings
   @FXML
@@ -96,11 +77,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
   // Features
   @FXML
-  private CheckBox showFullTextSearchField;
-  @FXML
-  private CheckBox showRowCountField;
-  @FXML
-  private Spinner<Integer> pagingSizeField;
+  private OverviewFeaturesPanelController overviewFeaturesController;
 
   @FXML
   private CheckBox enableFilterField;
@@ -168,53 +145,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
   // Columns
   @FXML
-  private TableView<Column> columnsTable;
-  @FXML
-  private TableColumn<Column, String> columnLabelColumn;
-  @FXML
-  private TableColumn<Column, String> columnTypeColumn;
-  @FXML
-  private TableColumn<Column, String> columnWidthColumn;
-  @FXML
-  private TableColumn<Column, String> columnSortableColumn;
-  @FXML
-  private TableColumn<Column, String> columnPinDirectionColumn;
-  @FXML
-  private VBox columnDetailBox;
-  @FXML
-  private ComboBox<String> columnTypeField;
-  @FXML
-  private VBox columnReferenceBox;
-  @FXML
-  private ComboBox<String> columnElementRefField;
-  @FXML
-  private CheckBox columnSortableField;
-  @FXML
-  private ComboBox<String> columnPreferredSortingField;
-  @FXML
-  private ComboBox<String> columnAttachmentDisplayModeField;
-  @FXML
-  private VBox columnExpressionBox;
-  @FXML
-  private TextField columnNameField;
-  @FXML
-  private TextArea columnExpressionField;
-  @FXML
-  private GridPane columnLabelGrid;
-  @FXML
-  private Spinner<Double> columnWidthField;
-  @FXML
-  private ComboBox<String> columnPinDirectionField;
-  @FXML
-  private ComboBox<String> columnAlignmentHeaderField;
-  @FXML
-  private ComboBox<String> columnAlignmentContentField;
-  @FXML
-  private CheckBox columnFixedWidthField;
-  @FXML
-  private GridPane columnSuffixGrid;
-  @FXML
-  private CheckBox columnShowSummaryField;
+  private OverviewColumnsPanelController overviewColumnsController;
 
   private OverviewModel model;
   private List<DocumentModel> otherDocumentModels = List.of();
@@ -226,31 +157,14 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   @Override
   public void initialize(URL url, ResourceBundle resources) {
     initializeGeneralSettings();
-    initializeFeatures();
     initializeFilter();
     initializeMultiSelection();
-    initializeColumns();
   }
 
   private void initializeGeneralSettings() {
     overviewReferenceController.setOnChange(() -> {
       refreshDocumentModelIndex();
       refreshElementRefPickersAfterDocumentModelChange();
-      commitChange();
-    });
-  }
-
-  private void initializeFeatures() {
-    bindCheckBox(showFullTextSearchField, value -> ensureConfiguration().setShowFullTextSearch(value));
-    bindCheckBox(showRowCountField, value -> ensureConfiguration().setShowRowCount(value ? Boolean.TRUE : null));
-
-    pagingSizeField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 10));
-    WidgetFactory.restrictToNumericInput(pagingSizeField.getEditor());
-    pagingSizeField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
-      ensureConfiguration().setPagingSize(newValue);
       commitChange();
     });
   }
@@ -450,236 +364,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     });
   }
 
-  private void initializeColumns() {
-    columnsTable.setEditable(true);
-    columnLabelColumn.setCellValueFactory(data -> new SimpleStringProperty(previewColumnLabel(data.getValue())));
-    columnTypeColumn.setCellValueFactory(data -> new SimpleStringProperty(columnTypeOf(data.getValue())));
-    columnWidthColumn.setCellValueFactory(data -> new SimpleStringProperty(
-        data.getValue().getWidth() != null ? String.valueOf(data.getValue().getWidth()) : ""));
-    columnSortableColumn.setCellValueFactory(data -> new SimpleStringProperty(
-        Boolean.TRUE.equals(data.getValue().getSortable()) ? "Yes" : "No"));
-    columnPinDirectionColumn.setCellValueFactory(data -> new SimpleStringProperty(
-        data.getValue().getPinDirection() != null ? data.getValue().getPinDirection() : ""));
-    columnsTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showColumn(newValue));
-
-    columnTypeField.getItems().setAll(COLUMN_TYPE_REFERENCE, COLUMN_TYPE_EXPRESSION);
-    columnTypeField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null || newValue == null) {
-        return;
-      }
-      refreshColumnTypeVisibility(newValue);
-      boolean wasUpdating = updatingFromModel;
-      updatingFromModel = true;
-      try {
-        if (COLUMN_TYPE_EXPRESSION.equals(newValue)) {
-          column.setElementRef(null);
-          column.setSortable(null);
-          column.setPreferredSorting(null);
-          column.setAttachmentDisplayMode(null);
-          if (column.getExpression() == null) {
-            column.setExpression("");
-          }
-          columnElementRefField.setValue(null);
-          columnSortableField.setSelected(false);
-          columnPreferredSortingField.setValue("");
-          columnAttachmentDisplayModeField.setValue("");
-          columnExpressionField.setText(column.getExpression());
-        }
-        else {
-          column.setExpression(null);
-          column.setName(null);
-          columnNameField.setText("");
-          columnExpressionField.setText("");
-        }
-      }
-      finally {
-        updatingFromModel = wasUpdating;
-      }
-      columnsTable.refresh();
-      commitChange();
-    });
-
-    columnElementRefField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      column.setElementRef(newValue == null || newValue.isBlank() ? null : newValue);
-      columnsTable.refresh();
-      commitChange();
-    });
-
-    bindCheckBox(columnSortableField, value -> {
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      column.setSortable(value);
-      columnPreferredSortingField.setDisable(!value);
-      if (!value) {
-        column.setPreferredSorting(null);
-        boolean wasUpdating = updatingFromModel;
-        updatingFromModel = true;
-        try {
-          columnPreferredSortingField.setValue("");
-        }
-        finally {
-          updatingFromModel = wasUpdating;
-        }
-      }
-      columnsTable.refresh();
-    });
-
-    columnPreferredSortingField.getItems().setAll(PREFERRED_SORTING_OPTIONS);
-    columnPreferredSortingField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      column.setPreferredSorting(newValue == null || newValue.isBlank() ? null : newValue);
-      commitChange();
-    });
-
-    columnAttachmentDisplayModeField.getItems().setAll(ATTACHMENT_DISPLAY_MODE_OPTIONS);
-    columnAttachmentDisplayModeField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      column.setAttachmentDisplayMode(newValue == null || newValue.isBlank() ? null : newValue);
-      commitChange();
-    });
-
-    columnNameField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      column.setName(newValue == null || newValue.isBlank() ? null : newValue);
-      columnsTable.refresh();
-      commitChange();
-    });
-
-    columnExpressionField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      column.setExpression(newValue);
-      commitChange();
-    });
-
-    columnWidthField.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0.3, 100.0, 1.0, 0.1));
-    columnWidthField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      column.setWidth(newValue);
-      commitChange();
-    });
-
-    columnPinDirectionField.getItems().setAll(PIN_DIRECTION_OPTIONS);
-    columnPinDirectionField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      column.setPinDirection(newValue == null || newValue.isBlank() ? null : newValue);
-      columnsTable.refresh();
-      commitChange();
-    });
-
-    columnAlignmentHeaderField.getItems().setAll(ALIGNMENT_OPTIONS);
-    columnAlignmentHeaderField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      if (newValue == null || newValue.isBlank()) {
-        if (column.getAlignment() != null) {
-          column.getAlignment().setHeader(null);
-        }
-      }
-      else {
-        ensureHeaderAlignment(column).setHorizontal(newValue);
-      }
-      commitChange();
-    });
-
-    columnAlignmentContentField.getItems().setAll(ALIGNMENT_OPTIONS);
-    columnAlignmentContentField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      if (newValue == null || newValue.isBlank()) {
-        if (column.getAlignment() != null) {
-          column.getAlignment().setContent(null);
-        }
-      }
-      else {
-        ensureContentAlignment(column).setHorizontal(newValue);
-      }
-      commitChange();
-    });
-
-    bindCheckBox(columnFixedWidthField, value -> {
-      Column column = selectedColumn();
-      if (column != null) {
-        column.setFixedWidth(value ? Boolean.TRUE : null);
-      }
-    });
-
-    bindCheckBox(columnShowSummaryField, value -> {
-      Column column = selectedColumn();
-      if (column == null) {
-        return;
-      }
-      if (value) {
-        if (column.getSummary().isEmpty()) {
-          SummaryConfig summary = new SummaryConfig();
-          summary.setOperation(SummaryConfig.OPERATION_SUM);
-          column.getSummary().add(summary);
-        }
-      }
-      else {
-        column.getSummary().clear();
-      }
-    });
-  }
-
   @Override
   public void loadModel(@NonNull A12Model<?> model) {
     load((OverviewModel) model);
@@ -698,23 +382,18 @@ public class OverviewModelEditorController extends AbstractEditorController impl
           .toList();
       overviewReferenceController.load(model, otherDocumentModels, otherQueryModels);
       refreshDocumentModelIndex();
+      overviewColumnsController.setModel(model);
 
-      OverviewConfiguration configuration = model.getContent().getConfiguration();
-      showFullTextSearchField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getShowFullTextSearch()));
-      showRowCountField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getShowRowCount()));
-      pagingSizeField.getValueFactory().setValue(
-          configuration != null && configuration.getPagingSize() != null ? configuration.getPagingSize() : 10);
+      overviewFeaturesController.setModel(model);
 
       populateFilterFields();
 
+      OverviewConfiguration configuration = model.getContent().getConfiguration();
       boolean multiSelectionEnabled = configuration != null && configuration.getMultiSelection() != null;
       enableMultiSelectionField.setSelected(multiSelectionEnabled);
       multiSelectionDetailsBox.setVisible(multiSelectionEnabled);
       multiSelectionDetailsBox.setManaged(multiSelectionEnabled);
       populateMultiSelectionFields();
-
-      refreshColumnsTable();
-      showColumn(null);
     }
     finally {
       updatingFromModel = false;
@@ -739,6 +418,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
         .findFirst()
         .orElse(null);
     documentModelIndex = OverviewElementOptions.indexOf(documentModel);
+    overviewColumnsController.setDocumentModelIndex(documentModelIndex);
   }
 
   /** Every "element reference" picker's options depend on the selected Document Model; re-point them all. */
@@ -749,11 +429,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     if (selectedSection != null) {
       rebuildFieldRefRows(filterSectionFieldsGrid, selectedSection.getFields());
     }
-    if (selectedColumn() != null) {
-      columnElementRefField.getItems().setAll(OverviewElementOptions.elementIds(documentModelIndex));
-      OverviewElementOptions.applyElementRefConverter(columnElementRefField, documentModelIndex);
-    }
-    columnsTable.refresh();
     filterSectionsList.refresh();
   }
 
@@ -970,161 +645,6 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       button.setConfirmation(new Confirmation());
     }
     return button.getConfirmation();
-  }
-
-  // ---- Columns ----
-
-  private void refreshColumnsTable() {
-    Column selected = columnsTable.getSelectionModel().getSelectedItem();
-    columnsTable.getItems().setAll(model.getContent().getColumns());
-    if (selected != null && model.getContent().getColumns().contains(selected)) {
-      columnsTable.getSelectionModel().select(selected);
-    }
-  }
-
-  private Column selectedColumn() {
-    return columnsTable.getSelectionModel().getSelectedItem();
-  }
-
-  private void showColumn(Column column) {
-    boolean wasUpdating = updatingFromModel;
-    updatingFromModel = true;
-    try {
-      boolean present = column != null;
-      columnDetailBox.setVisible(present);
-      columnDetailBox.setManaged(present);
-      if (!present) {
-        return;
-      }
-
-      String type = columnTypeOf(column);
-      columnTypeField.setValue(type);
-      refreshColumnTypeVisibility(type);
-
-      columnElementRefField.getItems().setAll(OverviewElementOptions.elementIds(documentModelIndex));
-      OverviewElementOptions.applyElementRefConverter(columnElementRefField, documentModelIndex);
-      columnElementRefField.setValue(column.getElementRef());
-      columnSortableField.setSelected(Boolean.TRUE.equals(column.getSortable()));
-      columnPreferredSortingField.setValue(orEmpty(column.getPreferredSorting()));
-      columnPreferredSortingField.setDisable(!Boolean.TRUE.equals(column.getSortable()));
-      columnAttachmentDisplayModeField.setValue(orEmpty(column.getAttachmentDisplayMode()));
-
-      columnNameField.setText(column.getName() != null ? column.getName() : "");
-      columnExpressionField.setText(column.getExpression() != null ? column.getExpression() : "");
-
-      rebuildLocaleGrid(columnLabelGrid, column.getLabel(), (code, text) -> setLabelText(column.getLabel(), code, text));
-      rebuildLocaleGrid(columnSuffixGrid, column.getSuffix(), (code, text) -> setLabelText(column.getSuffix(), code, text));
-
-      columnWidthField.getValueFactory().setValue(column.getWidth() != null ? column.getWidth() : 1.0);
-      columnPinDirectionField.setValue(orEmpty(column.getPinDirection()));
-      columnFixedWidthField.setSelected(Boolean.TRUE.equals(column.getFixedWidth()));
-      columnAlignmentHeaderField.setValue(column.getAlignment() != null && column.getAlignment().getHeader() != null
-          ? orEmpty(column.getAlignment().getHeader().getHorizontal()) : "");
-      columnAlignmentContentField.setValue(column.getAlignment() != null && column.getAlignment().getContent() != null
-          ? orEmpty(column.getAlignment().getContent().getHorizontal()) : "");
-      columnShowSummaryField.setSelected(!column.getSummary().isEmpty());
-    }
-    finally {
-      updatingFromModel = wasUpdating;
-    }
-  }
-
-  private void refreshColumnTypeVisibility(String type) {
-    boolean reference = COLUMN_TYPE_REFERENCE.equals(type);
-    columnReferenceBox.setVisible(reference);
-    columnReferenceBox.setManaged(reference);
-    columnExpressionBox.setVisible(!reference);
-    columnExpressionBox.setManaged(!reference);
-  }
-
-  private static String columnTypeOf(Column column) {
-    return column.getExpression() != null ? COLUMN_TYPE_EXPRESSION : COLUMN_TYPE_REFERENCE;
-  }
-
-  private String previewColumnLabel(Column column) {
-    String label = firstNonBlankText(column.getLabel());
-    if (label != null) {
-      return label;
-    }
-    if (column.getName() != null && !column.getName().isBlank()) {
-      return column.getName();
-    }
-    if (column.getElementRef() != null && !column.getElementRef().isBlank()) {
-      return OverviewElementOptions.displayPath(documentModelIndex, column.getElementRef());
-    }
-    return column.getId() != null ? column.getId() : "(new column)";
-  }
-
-  private static ColumnAlignment ensureAlignment(Column column) {
-    if (column.getAlignment() == null) {
-      column.setAlignment(new ColumnAlignment());
-    }
-    return column.getAlignment();
-  }
-
-  private static Alignment ensureHeaderAlignment(Column column) {
-    ColumnAlignment alignment = ensureAlignment(column);
-    if (alignment.getHeader() == null) {
-      alignment.setHeader(new Alignment());
-    }
-    return alignment.getHeader();
-  }
-
-  private static Alignment ensureContentAlignment(Column column) {
-    ColumnAlignment alignment = ensureAlignment(column);
-    if (alignment.getContent() == null) {
-      alignment.setContent(new Alignment());
-    }
-    return alignment.getContent();
-  }
-
-  @FXML
-  public void onAddColumn(ActionEvent e) {
-    Column column = new Column();
-    column.setId("column-" + shortId());
-    column.setWidth(1.0);
-    model.getContent().getColumns().add(column);
-    refreshColumnsTable();
-    columnsTable.getSelectionModel().select(column);
-    commitChange();
-  }
-
-  @FXML
-  public void onRemoveColumn(ActionEvent e) {
-    Column column = selectedColumn();
-    if (column == null) {
-      return;
-    }
-    model.getContent().getColumns().remove(column);
-    refreshColumnsTable();
-    commitChange();
-  }
-
-  @FXML
-  public void onMoveColumnUp(ActionEvent e) {
-    moveColumn(-1);
-  }
-
-  @FXML
-  public void onMoveColumnDown(ActionEvent e) {
-    moveColumn(1);
-  }
-
-  private void moveColumn(int direction) {
-    Column column = selectedColumn();
-    if (column == null) {
-      return;
-    }
-    List<Column> columns = model.getContent().getColumns();
-    int index = columns.indexOf(column);
-    int newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= columns.size()) {
-      return;
-    }
-    Collections.swap(columns, index, newIndex);
-    refreshColumnsTable();
-    columnsTable.getSelectionModel().select(column);
-    commitChange();
   }
 
   // ---- Shared helpers ----

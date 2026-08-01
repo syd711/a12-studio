@@ -126,8 +126,10 @@ public class ProjectTreeMenuActions {
       return;
     }
 
+    String oldPath = item.getPath();
     try {
       item.renameTo(name.trim());
+      StudioEventManager.getInstance().fireModelRenamedEvent(oldPath, item);
       onReload.run();
     }
     catch (IOException e) {

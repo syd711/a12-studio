@@ -143,6 +143,10 @@ public class ProjectItem {
   }
 
   public void renameTo(String newName) throws IOException {
+    if (!isFolder()) {
+      newName = ensureJsonExtension(newName);
+    }
+
     File newFile = new File(file.getParentFile(), newName);
     if (newFile.exists()) {
       throw new IOException("'" + newName + "' already exists");
@@ -155,6 +159,15 @@ public class ProjectItem {
       model.setId(idFromFileName(newFile.getName()));
       save();
     }
+  }
+
+  // Enforces the same lower-case ".json" suffix models are always created with (see #createChildModel),
+  // regardless of what case (or absence) the user typed it in when renaming.
+  private static String ensureJsonExtension(String name) {
+    if (name.toLowerCase().endsWith(".json")) {
+      return name.substring(0, name.length() - ".json".length()) + ".json";
+    }
+    return name + ".json";
   }
 
   // Convention: a model's header/id always matches its filename without the ".json" suffix.

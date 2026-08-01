@@ -2,7 +2,7 @@ package de.a12.studio.models;
 
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
-import de.a12.studio.models.combinationmodel.CombinationModel;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
@@ -56,7 +56,7 @@ public class ModelFactory {
         case CONTENT -> JsonSettings.objectMapper.treeToValue(root, ContentModel.class);
         case PRINT -> JsonSettings.objectMapper.treeToValue(root, PrintModel.class);
         case TREE -> JsonSettings.objectMapper.treeToValue(root, TreeModel.class);
-        case COMBINATION -> JsonSettings.objectMapper.treeToValue(root, CombinationModel.class);
+        case COMBINATION -> JsonSettings.objectMapper.treeToValue(root, CombinedDocumentModel.class);
         case MAPPING -> JsonSettings.objectMapper.treeToValue(root, MappingModel.class);
         case QUERY -> JsonSettings.objectMapper.treeToValue(root, QueryModel.class);
         default -> {

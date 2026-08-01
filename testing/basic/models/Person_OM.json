@@ -32,22 +32,21 @@
   "content": {
     "columns": [
       {
-        "id": "column-c3b30",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Profile Picture"
-          },
-          {
-            "locale": "de",
-            "text": "Profilbild"
-          }
-        ],
-        "width": 1.0,
+        "id": "column-3eb14",
+        "width": 1.5,
         "fixedWidth": true,
-        "elementRef": "group_05909",
-        "sortable": false,
-        "attachmentDisplayMode": "preview"
+        "alignment": {
+          "header": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          },
+          "content": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          }
+        },
+        "elementRef": "F7",
+        "sortable": false
       },
       {
         "id": "column-5bd25",
@@ -86,21 +85,22 @@
         "preferredSorting": "ASC"
       },
       {
-        "id": "column-3eb14",
-        "width": 1.5,
-        "fixedWidth": true,
-        "alignment": {
-          "header": {
-            "horizontal": "center",
-            "vertical": "bottom"
+        "id": "column-c3b30",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Profile Picture"
           },
-          "content": {
-            "horizontal": "center",
-            "vertical": "bottom"
+          {
+            "locale": "de",
+            "text": "Profilbild"
           }
-        },
-        "elementRef": "F7",
-        "sortable": false
+        ],
+        "width": 1.0,
+        "fixedWidth": true,
+        "elementRef": "group_05909",
+        "sortable": false,
+        "attachmentDisplayMode": "preview"
       },
       {
         "id": "column-d37d5",

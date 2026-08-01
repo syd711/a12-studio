@@ -1,4 +1,4 @@
-package de.a12.studio.ui.editors.masterdetailmodel;
+package de.a12.studio.ui.editors.maindetailmodel;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelReference;
@@ -6,19 +6,16 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.masterdetailmodel.FormMapping;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.propertyeditors.MainDetailFormMappingPanelController;
 import de.a12.studio.ui.editors.propertyeditors.FormWidthPanelController;
 import de.a12.studio.ui.editors.propertyeditors.MainModelReferencePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -30,7 +27,7 @@ import java.util.ResourceBundle;
  * (mirroring SME's {@code formMappingMiddleware}) — one row lets the user assign which Form Model edits that
  * Document Model's records.
  */
-public class MasterDetailModelEditorController extends AbstractEditorController implements Initializable {
+public class MainDetailModelEditorController extends AbstractEditorController implements Initializable {
 
   @FXML
   private MainModelReferencePanelController masterModelReferenceController;
@@ -39,7 +36,7 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
   private FormWidthPanelController formWidthPanelController;
 
   @FXML
-  private GridPane formMappingGrid;
+  private MainDetailFormMappingPanelController mainDetailFormMappingPanelController;
 
   private MasterDetailModel model;
 
@@ -81,29 +78,11 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
   }
 
   /**
-   * Reconciles {@code content.formMapping} against the Document Models the currently selected master model
-   * (Overview or Tree, per {@code content.type}) references, preserving any already-chosen Form Model per
-   * Document Model, then rebuilds the grid rows.
+   * Refreshes the Form Mapping panel with the Document Models the currently selected master model (Overview
+   * or Tree, per {@code content.type}) references.
    */
   private void refreshFormMapping() {
-    List<String> documentModelIds = referencedDocumentModelIds();
-
-    List<FormMapping> formMapping = model.getContent().getFormMapping();
-    List<FormMapping> reconciled = new ArrayList<>();
-    for (String documentModelId : documentModelIds) {
-      FormMapping existing = formMapping.stream()
-          .filter(mapping -> documentModelId.equals(mapping.getDocumentModel()))
-          .findFirst()
-          .orElse(null);
-      FormMapping mapping = new FormMapping();
-      mapping.setDocumentModel(documentModelId);
-      mapping.setFormModel(existing != null ? existing.getFormModel() : null);
-      reconciled.add(mapping);
-    }
-    formMapping.clear();
-    formMapping.addAll(reconciled);
-
-    rebuildFormMappingRows();
+    mainDetailFormMappingPanelController.load(model, projectItem, referencedDocumentModelIds());
   }
 
   /**
@@ -129,43 +108,6 @@ public class MasterDetailModelEditorController extends AbstractEditorController 
             .map(ModelReference::getReference)
             .toList())
         .orElse(List.of());
-  }
-
-  private void rebuildFormMappingRows() {
-    formMappingGrid.getChildren().removeIf(node -> {
-      Integer rowIndex = GridPane.getRowIndex(node);
-      return rowIndex != null && rowIndex > 0;
-    });
-
-    List<FormMapping> formMapping = model.getContent().getFormMapping();
-    for (int index = 0; index < formMapping.size(); index++) {
-      addFormMappingRow(formMapping.get(index), index);
-    }
-  }
-
-  private void addFormMappingRow(FormMapping mapping, int index) {
-    Label documentModelLabel = new Label(mapping.getDocumentModel());
-
-    ComboBox<String> formModelField = new ComboBox<>();
-    formModelField.setId("formMappingFormModel-" + index);
-    formModelField.setMaxWidth(Double.MAX_VALUE);
-    formModelField.getItems().setAll(formModelOptionsFor(mapping.getDocumentModel()));
-    formModelField.setValue(mapping.getFormModel());
-    formModelField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      mapping.setFormModel(newValue);
-      commitChange();
-    });
-
-    formMappingGrid.addRow(index + 1, documentModelLabel, formModelField);
-  }
-
-  private List<String> formModelOptionsFor(String documentModelId) {
-    return ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.FORM).stream()
-        .filter(formModel -> formModel.getModelReferences().stream()
-            .anyMatch(reference -> reference.getModelType() == ModelType.DOCUMENT && documentModelId.equals(reference.getReference())))
-        .map(A12Model::getId)
-        .sorted(Comparator.naturalOrder())
-        .toList();
   }
 
   private void commitChange() {

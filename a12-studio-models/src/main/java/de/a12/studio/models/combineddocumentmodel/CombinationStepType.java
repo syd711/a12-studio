@@ -1,4 +1,4 @@
-package de.a12.studio.models.combinationmodel;
+package de.a12.studio.models.combineddocumentmodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

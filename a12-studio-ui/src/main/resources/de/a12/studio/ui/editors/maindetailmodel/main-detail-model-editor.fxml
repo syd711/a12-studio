@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.masterdetailmodel.MasterDetailModelEditorController">
+            fx:controller="de.a12.studio.ui.editors.maindetailmodel.MainDetailModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
@@ -29,24 +25,7 @@
                     <children>
                         <fx:include fx:id="masterModelReference" source="../propertyeditors/main-model-reference-panel.fxml"/>
                         <fx:include fx:id="formWidthPanel" source="../propertyeditors/form-width-panel.fxml"/>
-                        <VBox spacing="8.0">
-                            <children>
-                                <Label styleClass="field-label" text="Form Mapping"/>
-                                <GridPane fx:id="formMappingGrid" hgap="10.0" vgap="6.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints/>
-                                    </rowConstraints>
-                                    <Label styleClass="field-label" text="Document Model" GridPane.columnIndex="0"
-                                           GridPane.rowIndex="0"/>
-                                    <Label styleClass="field-label" text="Form Model*" GridPane.columnIndex="1"
-                                           GridPane.rowIndex="0"/>
-                                </GridPane>
-                            </children>
-                        </VBox>
+                        <fx:include fx:id="mainDetailFormMappingPanel" source="../propertyeditors/main-detail-form-mapping-panel.fxml"/>
                     </children>
                     <padding>
                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>

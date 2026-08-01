@@ -3,7 +3,7 @@ package de.a12.studio.ui;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.models.auth.UsersDocument;
-import de.a12.studio.models.combinationmodel.CombinationModel;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
@@ -19,12 +19,12 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.editors.applicationmodel.ApplicationModelEditorController;
 import de.a12.studio.ui.editors.auth.RolesEditorController;
 import de.a12.studio.ui.editors.auth.UsersEditorController;
-import de.a12.studio.ui.editors.combinationmodel.CombinationModelEditorController;
+import de.a12.studio.ui.editors.combineddocumentmodel.CombinedDocumentModelEditorController;
 import de.a12.studio.ui.editors.contentmodel.ContentModelEditorController;
 import de.a12.studio.ui.editors.documentmodel.DocumentModelEditorController;
 import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
 import de.a12.studio.ui.editors.mappingmodel.MappingModelEditorController;
-import de.a12.studio.ui.editors.masterdetailmodel.MasterDetailModelEditorController;
+import de.a12.studio.ui.editors.maindetailmodel.MainDetailModelEditorController;
 import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
 import de.a12.studio.ui.editors.querymodel.QueryModelEditorController;
 import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController;
@@ -71,9 +71,9 @@ public class EditorFactory {
         controller.load(item);
       }
       else if (item.getModel() instanceof MasterDetailModel) {
-        FXMLLoader loader = new FXMLLoader(MasterDetailModelEditorController.class.getResource("master-detail-model-editor.fxml"));
+        FXMLLoader loader = new FXMLLoader(MainDetailModelEditorController.class.getResource("main-detail-model-editor.fxml"));
         content = loader.load();
-        MasterDetailModelEditorController controller = loader.getController();
+        MainDetailModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof FormModel) {
@@ -103,10 +103,10 @@ public class EditorFactory {
       else if (item.getModel() instanceof PrintModel) {
         WidgetFactory.showAlert(Studio.stage, "Print models are not supported yet.");
       }
-      else if (item.getModel() instanceof CombinationModel) {
-        FXMLLoader loader = new FXMLLoader(CombinationModelEditorController.class.getResource("combination-model-editor.fxml"));
+      else if (item.getModel() instanceof CombinedDocumentModel) {
+        FXMLLoader loader = new FXMLLoader(CombinedDocumentModelEditorController.class.getResource("combination-model-editor.fxml"));
         content = loader.load();
-        CombinationModelEditorController controller = loader.getController();
+        CombinedDocumentModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof MappingModel) {

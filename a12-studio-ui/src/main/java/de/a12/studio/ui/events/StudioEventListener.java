@@ -23,6 +23,10 @@ public interface StudioEventListener {
 
   }
 
+  default void modelRenamed(@NonNull ModelRenamedEvent event) {
+
+  }
+
   default void modelFocusRequested(@NonNull ModelFocusRequestedEvent event) {
 
   }

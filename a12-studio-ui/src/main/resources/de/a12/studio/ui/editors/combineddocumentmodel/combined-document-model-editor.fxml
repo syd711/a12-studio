@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.combineddocumentmodel.CombinedDocumentModelEditorController">
+    <right>
+        <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
+            <items>
+                <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
+                <Separator prefHeight="0.0" prefWidth="0.0" />
+                <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
+            </items>
+        </ToolBar>
+    </right>
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+            <content>
+                <VBox spacing="12.0" styleClass="field-editor">
+                    <children>
+
+                    </children>
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

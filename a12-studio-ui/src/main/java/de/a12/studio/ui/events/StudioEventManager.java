@@ -64,6 +64,13 @@ public class StudioEventManager {
     }
   }
 
+  public void fireModelRenamedEvent(@NonNull String oldPath, @NonNull ProjectItem projectItem) {
+    ModelRenamedEvent event = new ModelRenamedEvent(oldPath, projectItem);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.modelRenamed(event);
+    }
+  }
+
   public void fireModelSavedEvent(@NonNull ProjectItem projectItem) {
     ModelSaveEvent event = new ModelSaveEvent(projectItem);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {

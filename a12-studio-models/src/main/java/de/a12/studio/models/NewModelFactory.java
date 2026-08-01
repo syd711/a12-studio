@@ -2,8 +2,8 @@ package de.a12.studio.models;
 
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
-import de.a12.studio.models.combinationmodel.CombinationModel;
-import de.a12.studio.models.combinationmodel.CombinationModelContent;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelContent;
 import de.a12.studio.models.contentmodel.ContentConfiguration;
 import de.a12.studio.models.contentmodel.ContentElement;
 import de.a12.studio.models.contentmodel.ContentModel;
@@ -44,6 +44,7 @@ import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeModelContent;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class NewModelFactory {
   private static final String TD_ONLY_ANNOTATION = "tdonly";
 
   public static ProjectItem createModel(@NonNull ProjectItem parent, @NonNull ModelType modelType, @NonNull String name) throws IOException {
-    A12Model<?> model = buildModel(modelType, name);
+    A12Model<?> model = buildModel(modelType, name, resolveDefaultLocales(parent));
 
     ProjectItem item = parent.createChildModel(name);
     // Type Definition Models are persisted with header modelType "document" (see TD_ONLY_ANNOTATION
@@ -73,25 +74,25 @@ public class NewModelFactory {
     return item;
   }
 
-  private static A12Model<?> buildModel(ModelType modelType, String name) throws IOException {
+  private static A12Model<?> buildModel(ModelType modelType, String name, List<Locale> locales) throws IOException {
     return switch (modelType) {
-      case DOCUMENT -> buildDocumentModel(new DocumentModel(), name);
-      case TYPEDEFINITION -> buildTypeDefinitionModel(name);
+      case DOCUMENT -> buildDocumentModel(new DocumentModel(), name, locales);
+      case TYPEDEFINITION -> buildTypeDefinitionModel(name, locales);
       case FORM -> buildFormModel();
       case OVERVIEW -> buildOverviewModel();
       case APPLICATION -> buildApplicationModel();
       case MASTERDETAIL -> buildMasterDetailModel();
-      case RELATIONSHIP -> buildRelationshipModel();
-      case CONTENT -> buildContentModel();
-      case PRINT -> buildPrintModel(name);
-      case TREE -> buildTreeModel();
-      case COMBINATION -> buildCombinationModel();
-      case MAPPING -> buildMappingModel();
-      case QUERY -> buildQueryModel();
+      case RELATIONSHIP -> buildRelationshipModel(locales);
+      case CONTENT -> buildContentModel(locales);
+      case PRINT -> buildPrintModel(name, locales);
+      case TREE -> buildTreeModel(locales);
+      case COMBINATION -> buildCombinationModel(locales);
+      case MAPPING -> buildMappingModel(locales);
+      case QUERY -> buildQueryModel(locales);
     };
   }
 
-  private static <T extends DocumentModel> T buildDocumentModel(@NonNull T model, @NonNull String name) {
+  private static <T extends DocumentModel> T buildDocumentModel(@NonNull T model, @NonNull String name, List<Locale> locales) {
     DocumentModelContent content = new DocumentModelContent();
     ModelInfo modelInfo = new ModelInfo();
     modelInfo.setName(name);
@@ -99,7 +100,7 @@ public class NewModelFactory {
     content.setModelConfig(defaultModelConfig());
     content.setModelRoot(new ModelRoot());
     model.setContent(content);
-    model.setLocales(defaultLocales());
+    model.setLocales(locales);
     return model;
   }
 
@@ -115,7 +116,29 @@ public class NewModelFactory {
     return modelConfig;
   }
 
-  private static List<Locale> defaultLocales() {
+  // New models seed their locales from the project's settings.json (general.locales) so they stay
+  // consistent with the languages the rest of the project is maintained in.
+  private static List<Locale> resolveDefaultLocales(ProjectItem parent) {
+    ProjectItem root = parent;
+    while (root.getParent() != null) {
+      root = root.getParent();
+    }
+
+    List<Locale> projectLocales = ProjectRootSettings.load(root.getFile()).getGeneral().getLocales();
+    if (projectLocales.isEmpty()) {
+      return fallbackLocales();
+    }
+
+    List<Locale> locales = new ArrayList<>();
+    for (Locale projectLocale : projectLocales) {
+      Locale locale = new Locale();
+      locale.setCode(projectLocale.getCode());
+      locales.add(locale);
+    }
+    return locales;
+  }
+
+  private static List<Locale> fallbackLocales() {
     Locale en = new Locale();
     en.setCode("en");
     Locale de = new Locale();
@@ -123,8 +146,8 @@ public class NewModelFactory {
     return new ArrayList<>(List.of(en, de));
   }
 
-  private static TypeDefinitionModel buildTypeDefinitionModel(@NonNull String name) {
-    TypeDefinitionModel model = buildDocumentModel(new TypeDefinitionModel(), name);
+  private static TypeDefinitionModel buildTypeDefinitionModel(@NonNull String name, List<Locale> locales) {
+    TypeDefinitionModel model = buildDocumentModel(new TypeDefinitionModel(), name, locales);
 
     Annotation tdOnly = new Annotation();
     tdOnly.setName(TD_ONLY_ANNOTATION);
@@ -159,7 +182,7 @@ public class NewModelFactory {
     return model;
   }
 
-  private static RelationshipModel buildRelationshipModel() {
+  private static RelationshipModel buildRelationshipModel(List<Locale> locales) {
     RelationshipModel model = new RelationshipModel();
     RelationshipModelContent content = new RelationshipModelContent();
     content.setDuplicatesAllowed(false);
@@ -167,7 +190,7 @@ public class NewModelFactory {
     content.getEntityCharacteristics().add(emptyEntityCharacteristic());
     content.getEntityCharacteristics().add(emptyEntityCharacteristic());
     model.setContent(content);
-    model.setLocales(defaultLocales());
+    model.setLocales(locales);
     return model;
   }
 
@@ -182,7 +205,7 @@ public class NewModelFactory {
     return entity;
   }
 
-  private static ContentModel buildContentModel() {
+  private static ContentModel buildContentModel(List<Locale> locales) {
     ContentModel model = new ContentModel();
     ContentModelContent content = new ContentModelContent();
     content.setConfiguration(new ContentConfiguration());
@@ -195,13 +218,13 @@ public class NewModelFactory {
     content.setRoot(root);
 
     model.setContent(content);
-    model.setLocales(defaultLocales());
+    model.setLocales(locales);
     return model;
   }
 
   // Mirrors the empty print model skeleton the SME print editor creates (see PrintModel.json in the
   // basic testing workspace): metadata computations prefilled, no segments or element definitions.
-  private static PrintModel buildPrintModel(String name) {
+  private static PrintModel buildPrintModel(String name, List<Locale> locales) {
     PrintModel model = new PrintModel();
     PrintModelContent content = new PrintModelContent();
     content.setId("PRINT_MODEL_CONTENT");
@@ -227,7 +250,7 @@ public class NewModelFactory {
     content.setSegments(segments);
 
     model.setContent(content);
-    model.setLocales(defaultLocales());
+    model.setLocales(locales);
     return model;
   }
 
@@ -238,7 +261,7 @@ public class NewModelFactory {
     return step;
   }
 
-  private static TreeModel buildTreeModel() {
+  private static TreeModel buildTreeModel(List<Locale> locales) {
     TreeModel model = new TreeModel();
     TreeModelContent content = new TreeModelContent();
     TreeConfiguration configuration = new TreeConfiguration();
@@ -249,28 +272,28 @@ public class NewModelFactory {
     content.setSubHeaderBox(new SlotBox());
     content.setFooterBox(new SlotBox());
     model.setContent(content);
-    model.setLocales(defaultLocales());
+    model.setLocales(locales);
     return model;
   }
 
-  private static CombinationModel buildCombinationModel() {
-    CombinationModel model = new CombinationModel();
-    model.setContent(new CombinationModelContent());
-    model.setLocales(defaultLocales());
+  private static CombinedDocumentModel buildCombinationModel(List<Locale> locales) {
+    CombinedDocumentModel model = new CombinedDocumentModel();
+    model.setContent(new CombinedDocumentModelContent());
+    model.setLocales(locales);
     return model;
   }
 
-  private static MappingModel buildMappingModel() {
+  private static MappingModel buildMappingModel(List<Locale> locales) {
     MappingModel model = new MappingModel();
     model.setContent(new MappingModelContent());
-    model.setLocales(defaultLocales());
+    model.setLocales(locales);
     return model;
   }
 
-  private static QueryModel buildQueryModel() {
+  private static QueryModel buildQueryModel(List<Locale> locales) {
     QueryModel model = new QueryModel();
     model.setContent(new QueryModelContent());
-    model.setLocales(defaultLocales());
+    model.setLocales(locales);
     return model;
   }
 

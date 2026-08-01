@@ -1,4 +1,4 @@
-package de.a12.studio.models.combinationmodel;
+package de.a12.studio.models.combineddocumentmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,7 +12,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class CombinationModelContent {
+public class CombinedDocumentModelContent {
 
   private String baseModelId;
 
