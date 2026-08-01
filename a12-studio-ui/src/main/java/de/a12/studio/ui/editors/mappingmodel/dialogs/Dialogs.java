@@ -5,20 +5,37 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
+import java.util.Optional;
+
 public class Dialogs {
 
   private Dialogs() {
   }
 
   /**
-   * Opens the (currently empty) source model editor for {@code sourceModel}. No result is returned yet since
-   * the dialog has no fields to submit.
+   * Opens the Source Model dialog for a new, not-yet-attached {@link MappingSource}; the caller only attaches
+   * it to the model's Source list once this resolves with OK, so Cancel needs no undo.
    */
-  public static void showSourceModel(Stage owner, MappingSource sourceModel) {
+  public static Optional<MappingSource> showSourceModelForAdd(Stage owner) {
+    MappingSource sourceModel = new MappingSource();
+    return showSourceModel(owner, "Add Source Model", sourceModel) ? Optional.of(sourceModel) : Optional.empty();
+  }
+
+  /**
+   * Opens the Source Model dialog for an existing, already-attached {@link MappingSource}. Returns whether OK
+   * was pressed; {@code sourceModel} itself is only mutated on OK (see {@link SourceModelDialogController}), so
+   * Cancel leaves it untouched.
+   */
+  public static boolean showSourceModelForEdit(Stage owner, MappingSource sourceModel) {
+    return showSourceModel(owner, "Edit Source Model", sourceModel);
+  }
+
+  private static boolean showSourceModel(Stage owner, String title, MappingSource sourceModel) {
     FXMLLoader fxmlLoader = new FXMLLoader(SourceModelDialogController.class.getResource("source-model-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("source-model-dialog", fxmlLoader, owner, "Edit Source Model");
+    Stage stage = WidgetFactory.createDialogStage("sourcemodel-dialog", fxmlLoader, owner, title);
     SourceModelDialogController controller = (SourceModelDialogController) stage.getUserData();
     controller.initDialog(stage, sourceModel);
     stage.showAndWait();
+    return controller.isConfirmed();
   }
 }

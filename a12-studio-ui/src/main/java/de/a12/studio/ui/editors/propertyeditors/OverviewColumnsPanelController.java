@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
@@ -10,6 +11,7 @@ import de.a12.studio.ui.editors.overviewmodel.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -17,6 +19,7 @@ import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -29,9 +32,11 @@ import javafx.scene.paint.Color;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 /**
@@ -40,9 +45,12 @@ import java.util.UUID;
  * OverviewColumnOptions}), Sortable, Width and Pin Direction. Not bound to a single {@link
  * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
  * {@link OverviewFeaturesPanelController}. Clicking a row opens {@link Dialogs#showColumn}, which is
- * intentionally empty for now (no fields yet) - the full column editor is a follow-up.
+ * intentionally empty for now (no fields yet) - the full column editor is a follow-up. Also edits two
+ * {@link OverviewConfiguration} flags displayed alongside the column list: Enable Columns Resize and Show
+ * Number Of Entries (moved here from {@link OverviewFeaturesPanelController} since both are about how the
+ * resulting table of columns is presented).
  */
-public class OverviewColumnsPanelController extends AbstractPropertyEditor {
+public class OverviewColumnsPanelController extends AbstractPropertyEditor implements Initializable {
 
   // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into getColumns().
   private static final DataFormat COLUMN_INDEX = new DataFormat("application/x-a12-overview-column-index");
@@ -56,18 +64,65 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor {
   @FXML
   private Label columnsEmptyLabel;
 
+  @FXML
+  private CheckBox enableColumnsResizeField;
+
+  @FXML
+  private CheckBox showRowCountField;
+
   private OverviewModel model;
 
   private ElementIndex documentModelIndex;
+
+  // Set while enableColumnsResizeField/showRowCountField are being repopulated from the model, so those
+  // programmatic updates aren't mistaken for user edits and don't trigger a save.
+  private boolean updatingFromModel;
 
   // Notified after every structural change (add/reorder/delete), so the owning editor can keep sibling
   // panels whose choices derive from this list (e.g. the Sorting panel's column picker) in sync.
   private Runnable onChange = () -> {
   };
 
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
+    super.initialize(location, resources);
+
+    enableColumnsResizeField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel || model == null) {
+        return;
+      }
+      ensureConfiguration().setEnableColumnsResize(newValue ? Boolean.TRUE : null);
+      commitHeaderChange();
+    });
+    showRowCountField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel || model == null) {
+        return;
+      }
+      ensureConfiguration().setShowRowCount(newValue ? Boolean.TRUE : null);
+      commitHeaderChange();
+    });
+  }
+
   public void setModel(@NonNull OverviewModel model) {
     this.model = model;
     rebuildRows();
+
+    updatingFromModel = true;
+    try {
+      OverviewConfiguration configuration = model.getContent().getConfiguration();
+      enableColumnsResizeField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getEnableColumnsResize()));
+      showRowCountField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getShowRowCount()));
+    }
+    finally {
+      updatingFromModel = false;
+    }
+  }
+
+  private OverviewConfiguration ensureConfiguration() {
+    if (model.getContent().getConfiguration() == null) {
+      model.getContent().setConfiguration(new OverviewConfiguration());
+    }
+    return model.getContent().getConfiguration();
   }
 
   /** Re-points the "Field" summary of every row at the currently referenced Document Model. */

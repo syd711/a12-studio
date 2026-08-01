@@ -15,9 +15,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Edits {@link OverviewModel}'s "Features": full-text search, row count and paging size, all living on
- * {@link OverviewConfiguration} rather than a single {@link de.a12.studio.models.documentmodel.Element}, so
- * it follows the model-header pattern used by e.g. {@link FormWidthPanelController}.
+ * Edits {@link OverviewModel}'s "Features": full-text search and paging size, all living on {@link
+ * OverviewConfiguration} rather than a single {@link de.a12.studio.models.documentmodel.Element}, so it
+ * follows the model-header pattern used by e.g. {@link FormWidthPanelController}. Row count lives on the
+ * Columns panel instead ({@link OverviewColumnsPanelController}), next to the column list it's displayed
+ * alongside.
  */
 public class OverviewFeaturesPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -25,8 +27,6 @@ public class OverviewFeaturesPanelController extends AbstractPropertyEditor impl
 
   @FXML
   private CheckBox showFullTextSearchField;
-  @FXML
-  private CheckBox showRowCountField;
   @FXML
   private Spinner<Integer> pagingSizeField;
 
@@ -50,13 +50,6 @@ public class OverviewFeaturesPanelController extends AbstractPropertyEditor impl
       ensureConfiguration().setShowFullTextSearch(newValue);
       commitHeaderChange();
     });
-    showRowCountField.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
-      ensureConfiguration().setShowRowCount(newValue ? Boolean.TRUE : null);
-      commitHeaderChange();
-    });
     pagingSizeField.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel || model == null) {
         return;
@@ -73,7 +66,6 @@ public class OverviewFeaturesPanelController extends AbstractPropertyEditor impl
     try {
       OverviewConfiguration configuration = model.getContent().getConfiguration();
       showFullTextSearchField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getShowFullTextSearch()));
-      showRowCountField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getShowRowCount()));
       pagingSizeField.getValueFactory().setValue(
           configuration != null && configuration.getPagingSize() != null ? configuration.getPagingSize() : DEFAULT_PAGING_SIZE);
     }

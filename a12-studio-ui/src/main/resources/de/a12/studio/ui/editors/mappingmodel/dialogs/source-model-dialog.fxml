@@ -2,7 +2,12 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -15,8 +20,28 @@
    <center>
       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
          <content>
-            <!-- Intentionally empty for now; the Name/Model/Repetitions/Skip Document Validation fields are added here in a follow-up. -->
             <VBox spacing="14.0">
+               <children>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="Name*" />
+                        <TextField fx:id="nameField" promptText="Enter the source model name here..." />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="Model*" />
+                        <ComboBox fx:id="modelField" editable="false" maxWidth="Infinity" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="Repetitions*" />
+                        <Spinner fx:id="repetitionsField" editable="true" maxWidth="Infinity" />
+                     </children>
+                  </VBox>
+                  <CheckBox fx:id="skipValidationField" mnemonicParsing="false" text="Skip Document Validation" />
+               </children>
                <padding>
                   <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </padding>

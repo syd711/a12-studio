@@ -19,6 +19,7 @@ import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequ
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterSectionsValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewInitialSortingReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewPagingSizeValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewStylesValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,8 @@ public final class OverviewModelValidationService {
       new OverviewFilterCustomFieldsValidator(),
       new OverviewFilterSectionsValidator(),
       new OverviewPagingSizeValidator(),
-      new OverviewInitialSortingReferenceValidator()));
+      new OverviewInitialSortingReferenceValidator(),
+      new OverviewStylesValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

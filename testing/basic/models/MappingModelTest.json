@@ -22,15 +22,20 @@
       {
         "modelType": "document",
         "reference": "Company_DM"
+      },
+      {
+        "modelType": "document",
+        "reference": "Order_DM"
       }
     ]
   },
   "content": {
     "Source": [
       {
-        "name": null,
-        "dmId": null,
-        "maxRepeat": null
+        "name": "asdfasdf",
+        "dmId": "Order_DM",
+        "maxRepeat": 1,
+        "noSourceValidation": false
       }
     ],
     "Target": {

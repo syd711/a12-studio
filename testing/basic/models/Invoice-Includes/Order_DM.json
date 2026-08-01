@@ -32,153 +32,6 @@
         "code": "en_US"
       }
     },
-    "typeDefinitions": [
-      {
-        "id": "typedef_1eeadc7f-65fb-4802-85a2-c055acfa64cd",
-        "name": "ProductType",
-        "fieldType": {
-          "type": "EnumerationType",
-          "EnumerationType": {
-            "values": [
-              {
-                "value": "BB",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "BB (bread and buns)"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "BB (Brot und Brötchen)"
-                  }
-                ]
-              },
-              {
-                "value": "Deko",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "Decoration"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "Dekoration"
-                  }
-                ]
-              },
-              {
-                "value": "Troso",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "Troso (dry goods)"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "Troso (Trockensortiment)"
-                  }
-                ]
-              },
-              {
-                "value": "FF",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "Fresh meat"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "FF (Frisch Fleisch)"
-                  }
-                ]
-              },
-              {
-                "value": "Geschirr",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "Dishes"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "Geschirr"
-                  }
-                ]
-              },
-              {
-                "value": "HiFi",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "HiFi (High Fidelity)"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "HiFi (High Fidelity)"
-                  }
-                ]
-              },
-              {
-                "value": "Mopro",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "Dairy product"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "MoPro (Molkereiprodukte)"
-                  }
-                ]
-              },
-              {
-                "value": "ObstGemuese",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "F&V (fruit and vegetables)"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "O&G (Obst und Gemüse)"
-                  }
-                ]
-              },
-              {
-                "value": "Tiko",
-                "label": [
-                  {
-                    "locale": "en",
-                    "text": "FroFo (frozen food)"
-                  },
-                  {
-                    "locale": "de",
-                    "text": "Tiko (Tiefkühlkost)"
-                  }
-                ]
-              }
-            ],
-            "categories": [
-              {
-                "name": "Cat",
-                "values": [
-                  "Food",
-                  "Non-Food",
-                  "Food",
-                  "Food",
-                  "Non-Food",
-                  "Non-Food",
-                  "Food",
-                  "Food",
-                  "Food"
-                ],
-                "description": "Food oder Nonfood"
-              }
-            ]
-          }
-        }
-      }
-    ],
     "modelRoot": {
       "rootGroups": [
         {
@@ -634,7 +487,8 @@
                   "computedFieldRelPath": "../TotalAmountOfOrderedProducts",
                   "computationAlternatives": [
                     {
-                      "operation": "Sum(/Order/OrderInformation*/Quantity)"
+                      "operation": "Sum(/Order/OrderInformation*/Quantity)",
+                      "precondition": null
                     }
                   ],
                   "errorMessage": [
@@ -655,12 +509,7 @@
                 "name": "TotalPrice",
                 "Field": {
                   "fieldType": {
-                    "type": "NumberType",
-                    "NumberType": {
-                      "minFractionalDigits": 2,
-                      "maxFractionalDigits": 2,
-                      "trait": "amount"
-                    }
+                    "type": "StringType"
                   },
                   "label": [
                     {
@@ -2242,6 +2091,153 @@
           }
         }
       ]
-    }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_1eeadc7f-65fb-4802-85a2-c055acfa64cd",
+        "name": "ProductType",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "BB",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "BB (bread and buns)"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "BB (Brot und Brötchen)"
+                  }
+                ]
+              },
+              {
+                "value": "Deko",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Decoration"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Dekoration"
+                  }
+                ]
+              },
+              {
+                "value": "Troso",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Troso (dry goods)"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Troso (Trockensortiment)"
+                  }
+                ]
+              },
+              {
+                "value": "FF",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Fresh meat"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "FF (Frisch Fleisch)"
+                  }
+                ]
+              },
+              {
+                "value": "Geschirr",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Dishes"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Geschirr"
+                  }
+                ]
+              },
+              {
+                "value": "HiFi",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "HiFi (High Fidelity)"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "HiFi (High Fidelity)"
+                  }
+                ]
+              },
+              {
+                "value": "Mopro",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Dairy product"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "MoPro (Molkereiprodukte)"
+                  }
+                ]
+              },
+              {
+                "value": "ObstGemuese",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "F&V (fruit and vegetables)"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "O&G (Obst und Gemüse)"
+                  }
+                ]
+              },
+              {
+                "value": "Tiko",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "FroFo (frozen food)"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Tiko (Tiefkühlkost)"
+                  }
+                ]
+              }
+            ],
+            "categories": [
+              {
+                "name": "Cat",
+                "values": [
+                  "Food",
+                  "Non-Food",
+                  "Food",
+                  "Food",
+                  "Non-Food",
+                  "Non-Food",
+                  "Food",
+                  "Food",
+                  "Food"
+                ],
+                "description": "Food oder Nonfood"
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 }

@@ -4,10 +4,15 @@ import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.querymodel.QueryModel;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
+import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -37,6 +42,8 @@ public class OverviewReferencePanelController implements Initializable {
   private RadioButton queryModelReferenceField;
   @FXML
   private ComboBox<String> overviewReferenceField;
+  @FXML
+  private Button editReferenceButton;
   @FXML
   private Label queryModelReferenceInfoLabel;
 
@@ -73,6 +80,30 @@ public class OverviewReferencePanelController implements Initializable {
       }
       syncModelReferences();
       onChange.run();
+    });
+    editReferenceButton.disableProperty().bind(overviewReferenceField.valueProperty().isNull());
+  }
+
+  /**
+   * Opens whichever model is currently selected in the combo box - a Query Model or a Document Model,
+   * depending on the active mode - in an editor tab, selecting its tab instead if it's already open (see
+   * {@code TabPaneController#modelOpened}). Only enabled once a selection exists, via {@link
+   * #editReferenceButton}'s disable binding.
+   */
+  @FXML
+  private void onEditReference() {
+    String selectedId = overviewReferenceField.getValue();
+    if (selectedId == null) {
+      return;
+    }
+
+    ProjectDocumentModels.findProjectItemByModelId(selectedId).ifPresent(item -> {
+      Project project = Studio.getCurrentProject();
+      if (project != null) {
+        project.getSettings().getUISettings().addOpenedFile(item.getPath());
+        project.getSettings().getUISettings().save();
+      }
+      StudioEventManager.getInstance().fireModelOpenEvent(item);
     });
   }
 

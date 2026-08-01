@@ -338,7 +338,10 @@
         {
           "idref": "column-5847d"
         }
-      ]
+      ],
+      "screenReaderColumn": {
+        "idref": "column-c3b30"
+      }
     }
   }
 }

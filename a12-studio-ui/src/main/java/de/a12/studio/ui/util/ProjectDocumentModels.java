@@ -80,9 +80,10 @@ public final class ProjectDocumentModels {
   }
 
   /**
-   * The {@link ProjectItem} backing the {@link DocumentModel} with the given id, searched from the project's
-   * canonical root (see {@link #getOtherDocumentModels} for why). Used to open a referenced model (e.g. an
-   * Include's target) in an editor tab, which needs the {@link ProjectItem} rather than just the model.
+   * The {@link ProjectItem} backing the model (of any {@link ModelType}) with the given id, searched from the
+   * project's canonical root (see {@link #getOtherDocumentModels} for why). Used to open a referenced model
+   * (e.g. an Include's target, or an Overview Model's Query/Document Model reference) in an editor tab, which
+   * needs the {@link ProjectItem} rather than just the model.
    */
   public static Optional<ProjectItem> findProjectItemByModelId(@NonNull String modelId) {
     Project project = Studio.getCurrentProject();
@@ -102,7 +103,7 @@ public final class ProjectDocumentModels {
       }
       return Optional.empty();
     }
-    if (item.getModel() instanceof DocumentModel documentModel && modelId.equals(documentModel.getId())) {
+    if (item.getModel() != null && modelId.equals(item.getModel().getId())) {
       return Optional.of(item);
     }
     return Optional.empty();

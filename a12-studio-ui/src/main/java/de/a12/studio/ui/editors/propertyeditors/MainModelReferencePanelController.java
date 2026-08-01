@@ -1,9 +1,14 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
+import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import org.jspecify.annotations.NonNull;
@@ -29,6 +34,8 @@ public class MainModelReferencePanelController implements Initializable {
   private RadioButton treeTypeField;
   @FXML
   private ComboBox<String> mainModelField;
+  @FXML
+  private Button editMainModelButton;
 
   @FXML
   private ErrorContainerController errorContainerController;
@@ -63,6 +70,29 @@ public class MainModelReferencePanelController implements Initializable {
       }
       applySelection();
       onChange.run();
+    });
+    editMainModelButton.disableProperty().bind(mainModelField.valueProperty().isNull());
+  }
+
+  /**
+   * Opens the Document Model referenced by the combo box in an editor tab, selecting its tab instead if it's
+   * already open (see {@code TabPaneController#modelOpened}). Mirrors {@link
+   * IncludePropertiesPanelController#onEditReference}.
+   */
+  @FXML
+  private void onEditMainModel() {
+    String reference = mainModelField.getValue();
+    if (reference == null) {
+      return;
+    }
+
+    ProjectDocumentModels.findProjectItemByModelId(reference).ifPresent(item -> {
+      Project project = Studio.getCurrentProject();
+      if (project != null) {
+        project.getSettings().getUISettings().addOpenedFile(item.getPath());
+        project.getSettings().getUISettings().save();
+      }
+      StudioEventManager.getInstance().fireModelOpenEvent(item);
     });
   }
 

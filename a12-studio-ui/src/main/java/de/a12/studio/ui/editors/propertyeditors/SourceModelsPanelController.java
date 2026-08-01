@@ -35,8 +35,8 @@ import java.util.Optional;
  * Edits a {@link MappingModel}'s {@code content.Source}: one draggable, reorderable row per {@link
  * MappingSource}, summarizing its Name, Model, Repetitions and Skip Document Validation. Not bound to a
  * single {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by
- * e.g. {@link OverviewColumnsPanelController}. Clicking a row opens {@link Dialogs#showSourceModel}, which is
- * intentionally empty for now (no fields yet) - the full source model editor is a follow-up.
+ * e.g. {@link OverviewColumnsPanelController}. Clicking a row opens {@link Dialogs#showSourceModelForEdit}
+ * (Add uses {@link Dialogs#showSourceModelForAdd}) to edit its Name/Model/Repetitions/Skip Document Validation.
  */
 public class SourceModelsPanelController extends AbstractPropertyEditor {
 
@@ -54,18 +54,29 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
 
   private MappingModel model;
 
+  // Invoked after every add/remove/reorder/edit that may have changed a Source's dmId, so the owning
+  // MappingModelEditorController can resync the header's document-model references and save. This panel has
+  // no direct save of its own (unlike e.g. commitHeaderChange() elsewhere) because that resync must happen
+  // first - see MappingModelEditorController#onSourceModelsChanged.
+  private Runnable onChange = () -> {
+  };
+
   public void setModel(@NonNull MappingModel model) {
     this.model = model;
     rebuildRows();
   }
 
+  public void setOnChange(@NonNull Runnable onChange) {
+    this.onChange = onChange;
+  }
+
   @FXML
   private void onAdd() {
-    MappingSource sourceModel = new MappingSource();
-    getSource().add(sourceModel);
-    rebuildRows();
-    commitHeaderChange();
-    openEditDialog(sourceModel);
+    Dialogs.showSourceModelForAdd(Studio.stage).ifPresent(sourceModel -> {
+      getSource().add(sourceModel);
+      rebuildRows();
+      onChange.run();
+    });
   }
 
   private List<MappingSource> getSource() {
@@ -126,8 +137,10 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
   }
 
   private void openEditDialog(MappingSource sourceModel) {
-    Dialogs.showSourceModel(Studio.stage, sourceModel);
-    rebuildRows();
+    if (Dialogs.showSourceModelForEdit(Studio.stage, sourceModel)) {
+      rebuildRows();
+      onChange.run();
+    }
   }
 
   // Only the drag handle initiates a drag (so clicking a label or the action buttons doesn't start one); the
@@ -198,7 +211,7 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
     MappingSource moved = source.remove(fromIndex);
     source.add(insertIndex, moved);
     rebuildRows();
-    commitHeaderChange();
+    onChange.run();
   }
 
   private HBox createActionsBox(MappingSource sourceModel, int index, int rowCount) {
@@ -211,7 +224,7 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getSource().remove(sourceModel);
         rebuildRows();
-        commitHeaderChange();
+        onChange.run();
       }
     });
 
@@ -237,7 +250,7 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
   private void moveRow(int fromIndex, int toIndex) {
     Collections.swap(getSource(), fromIndex, toIndex);
     rebuildRows();
-    commitHeaderChange();
+    onChange.run();
   }
 
   private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {

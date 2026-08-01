@@ -5,6 +5,7 @@ import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.mappingmodel.MappingModel;
+import de.a12.studio.models.mappingmodel.MappingSource;
 import de.a12.studio.models.mappingmodel.MappingTarget;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.propertyeditors.SourceModelsPanelController;
@@ -16,6 +17,7 @@ import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -36,6 +38,7 @@ public class MappingModelEditorController extends AbstractEditorController imple
   @Override
   public void initialize(URL url, ResourceBundle resources) {
     targetModelPanelController.setOnChange(this::onTargetModelChanged);
+    sourceModelsPanelController.setOnChange(this::onSourceModelsChanged);
   }
 
   @Override
@@ -60,9 +63,18 @@ public class MappingModelEditorController extends AbstractEditorController imple
   }
 
   private void onTargetModelChanged() {
-    String selectedId = targetModelPanelController.getValue();
-    syncTargetReference(selectedId);
-    applyTarget(selectedId);
+    applyTarget(targetModelPanelController.getValue());
+    syncModelReferences();
+    commitChange();
+    updateSettingsErrorBadge();
+  }
+
+  /**
+   * Invoked after every add/remove/reorder/edit in {@link #sourceModelsPanelController} that may have changed
+   * a Source's dmId (see {@link SourceModelsPanelController#setOnChange}).
+   */
+  private void onSourceModelsChanged() {
+    syncModelReferences();
     commitChange();
     updateSettingsErrorBadge();
   }
@@ -77,22 +89,36 @@ public class MappingModelEditorController extends AbstractEditorController imple
   }
 
   /**
-   * Rebuilds the header's Document Model reference for the Target: drops the reference to the previously
-   * selected Document Model (if any) and adds one for the newly selected Document Model (unless it's already
-   * referenced, e.g. by a future Source entry pointing at the same model).
+   * Rebuilds the header's Document Model references to match every dmId currently referenced from content
+   * (the Target and every Source), so a shared Document Model stays referenced as long as any of them still
+   * points at it, and one no longer used by either drops out. Replaces the whole DOCUMENT-type subset rather
+   * than patching it incrementally, since with multiple Sources (and the Target) potentially sharing a dmId,
+   * an incremental add/remove can't tell "no longer used by the field that just changed" apart from "no longer
+   * used at all".
    */
-  private void syncTargetReference(String newDmId) {
+  private void syncModelReferences() {
     List<ModelReference> references = model.getModelReferences();
-    String previousDmId = currentTargetDmId();
-    if (previousDmId != null && !previousDmId.equals(newDmId)) {
-      references.removeIf(reference -> reference.getModelType() == ModelType.DOCUMENT && previousDmId.equals(reference.getReference()));
-    }
-    if (newDmId != null && references.stream().noneMatch(reference -> reference.getModelType() == ModelType.DOCUMENT && newDmId.equals(reference.getReference()))) {
+    references.removeIf(reference -> reference.getModelType() == ModelType.DOCUMENT);
+    for (String dmId : currentDmIds()) {
       ModelReference reference = new ModelReference();
       reference.setModelType(ModelType.DOCUMENT);
-      reference.setReference(newDmId);
+      reference.setReference(dmId);
       references.add(reference);
     }
+  }
+
+  private List<String> currentDmIds() {
+    List<String> dmIds = new ArrayList<>();
+    String targetDmId = currentTargetDmId();
+    if (targetDmId != null) {
+      dmIds.add(targetDmId);
+    }
+    for (MappingSource source : model.getContent().getSource()) {
+      if (source.getDmId() != null && !dmIds.contains(source.getDmId())) {
+        dmIds.add(source.getDmId());
+      }
+    }
+    return dmIds;
   }
 
   private void commitChange() {

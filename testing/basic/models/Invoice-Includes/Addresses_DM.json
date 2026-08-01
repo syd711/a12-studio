@@ -129,10 +129,7 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType",
-                          "StringType": {
-                            "minLength": 2
-                          }
+                          "type": "StringType"
                         },
                         "label": [
                           {

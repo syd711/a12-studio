@@ -1,9 +1,15 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.Project;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
+import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ProjectDocumentModels;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import org.jspecify.annotations.NonNull;
 
@@ -27,6 +33,9 @@ public class TargetModelPanelController implements Initializable {
   private ComboBox<String> targetModelField;
 
   @FXML
+  private Button editReferenceButton;
+
+  @FXML
   private ErrorContainerController errorContainerController;
 
   // Set while fields are being repopulated from the model, so that programmatic updates aren't mistaken
@@ -44,6 +53,28 @@ public class TargetModelPanelController implements Initializable {
         return;
       }
       onChange.run();
+    });
+    editReferenceButton.disableProperty().bind(targetModelField.valueProperty().isNull());
+  }
+
+  /**
+   * Opens the Document Model referenced by the combo box in an editor tab, selecting its tab instead if it's
+   * already open (see {@code TabPaneController#modelOpened}).
+   */
+  @FXML
+  private void onEditReference(ActionEvent event) {
+    String reference = targetModelField.getValue();
+    if (reference == null) {
+      return;
+    }
+
+    ProjectDocumentModels.findProjectItemByModelId(reference).ifPresent(item -> {
+      Project project = Studio.getCurrentProject();
+      if (project != null) {
+        project.getSettings().getUISettings().addOpenedFile(item.getPath());
+        project.getSettings().getUISettings().save();
+      }
+      StudioEventManager.getInstance().fireModelOpenEvent(item);
     });
   }
 

@@ -89,4 +89,13 @@ class OverviewValidatorsTest {
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("no longer exists"));
   }
+
+  @Test
+  void stylesValidatorReportsBlankEntry() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewStylesValidator_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewStylesValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("required"));
+  }
 }

@@ -14,11 +14,13 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.propertyeditors.OverviewAccessibilityPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewFeaturesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewMultiSelectionPanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController;
 import de.a12.studio.ui.editors.propertyeditors.OverviewSortingPanelController;
+import de.a12.studio.ui.editors.propertyeditors.StylesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -47,13 +49,15 @@ import java.util.function.BiConsumer;
  * Edits an {@link OverviewModel}'s "Overview" tab: General Settings (the Overview Reference, delegated to
  * {@link de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController}), Columns (delegated to
  * {@link de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController}), Features
- * (search/filter/paging/row-count, delegated to {@link OverviewFeaturesPanelController}), Filter and
- * Multi-Selection (delegated to {@link OverviewMultiSelectionPanelController}). "Custom Actions" ({@code
+ * (search/filter/paging/row-count, delegated to {@link OverviewFeaturesPanelController}), Filter,
+ * Multi-Selection (delegated to {@link OverviewMultiSelectionPanelController}), Accessibility (delegated to
+ * {@link OverviewAccessibilityPanelController}) and Styles (delegated to
+ * {@link de.a12.studio.ui.editors.propertyeditors.StylesPanelController}). "Custom Actions" ({@code
  * content.rowActionGroup}) is out of scope, mirroring the Java model's already-reduced feature set versus
- * SME (no content-level Styles). {@code subHeaderBox}/{@code footerBox} are left untouched: sample models
- * ({@code Company_OM.json}, {@code Invoice_OM.json}) show them written empty even with
- * search/filter/multi-selection enabled, so the a12 runtime derives that UI from the {@code configuration}
- * flags rather than from manually-placed box elements.
+ * SME. {@code subHeaderBox}/{@code footerBox} are left untouched: sample models ({@code Company_OM.json},
+ * {@code Invoice_OM.json}) show them written empty even with search/filter/multi-selection enabled, so the
+ * a12 runtime derives that UI from the {@code configuration} flags rather than from manually-placed box
+ * elements.
  */
 public class OverviewModelEditorController extends AbstractEditorController implements Initializable {
 
@@ -98,6 +102,14 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   @FXML
   private OverviewMultiSelectionPanelController overviewMultiSelectionController;
 
+  // Accessibility
+  @FXML
+  private OverviewAccessibilityPanelController overviewAccessibilityController;
+
+  // Styles
+  @FXML
+  private StylesPanelController overviewStylesController;
+
   // Columns
   @FXML
   private OverviewColumnsPanelController overviewColumnsController;
@@ -122,9 +134,13 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       refreshElementRefPickersAfterDocumentModelChange();
       commitChange();
     });
-    // The Sorting panel's column picker and its own dangling-reference validation both derive from the
-    // Columns list, so keep it in sync with every structural change made there.
-    overviewColumnsController.setOnChange(() -> overviewSortingController.refresh());
+    // The Sorting panel's column picker and its own dangling-reference validation, as well as the
+    // Accessibility panel's screen-reader column picker, both derive from the Columns list, so keep them in
+    // sync with every structural change made there.
+    overviewColumnsController.setOnChange(() -> {
+      overviewSortingController.refresh();
+      overviewAccessibilityController.refresh();
+    });
   }
 
   private void initializeFilter() {
@@ -195,6 +211,10 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       populateFilterFields();
 
       overviewMultiSelectionController.setModel(model);
+
+      overviewAccessibilityController.setModel(model);
+
+      overviewStylesController.setModel(model);
     }
     finally {
       updatingFromModel = false;
@@ -221,6 +241,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     documentModelIndex = OverviewElementOptions.indexOf(documentModel);
     overviewColumnsController.setDocumentModelIndex(documentModelIndex);
     overviewSortingController.setDocumentModelIndex(documentModelIndex);
+    overviewAccessibilityController.setDocumentModelIndex(documentModelIndex);
   }
 
   /** Every "element reference" picker's options depend on the selected Document Model; re-point them all. */

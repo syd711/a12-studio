@@ -27,21 +27,88 @@
         "value": "tester,reviewer"
       }
     ],
-    "modelReferences": [
-      {
-        "alias": "DM",
-        "modelType": "document",
-        "purpose": "document-model-for-overview",
-        "reference": "Company_DM"
-      }
-    ]
+    "modelReferences": []
   },
   "content": {
+    "columns": [
+      {
+        "id": "column-08f11",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Logo"
+          },
+          {
+            "locale": "de",
+            "text": "Logo"
+          }
+        ],
+        "width": 1.0,
+        "elementRef": "group_8e00a",
+        "sortable": false
+      },
+      {
+        "id": "column-4949b",
+        "width": 1.0,
+        "elementRef": "field_67684",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-9d296",
+        "width": 1.0,
+        "elementRef": "field_16af2",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "event_delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
     "configuration": {
       "enableFilter": true,
       "showFullTextSearch": true,
       "pagingSize": 10,
       "showRowCount": true,
+      "enableColumnsResize": true,
       "filterConfiguration": {
         "showFilterButton": true,
         "showFilterBar": true,
@@ -125,80 +192,15 @@
             ]
           }
         ]
+      },
+      "multiSelection": {
+        "collapseOption": null,
+        "counterOption": null,
+        "selectionArea": null
       }
     },
-    "subHeaderBox": {
-      "majorElements": [],
-      "minorElements": []
-    },
-    "footerBox": {
-      "majorElements": [],
-      "minorElements": []
-    },
-    "columns": [
-      {
-        "id": "column-08f11",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Logo"
-          },
-          {
-            "locale": "de",
-            "text": "Logo"
-          }
-        ],
-        "width": 1.0,
-        "elementRef": "group_8e00a",
-        "sortable": false
-      },
-      {
-        "id": "column-4949b",
-        "width": 1.0,
-        "elementRef": "field_67684",
-        "sortable": true,
-        "preferredSorting": "ASC"
-      },
-      {
-        "id": "column-9d296",
-        "width": 1.0,
-        "elementRef": "field_16af2",
-        "sortable": false
-      }
-    ],
-    "rowActionGroup": {
-      "actions": [
-        {
-          "event": "event_delete",
-          "confirmation": {
-            "title": [
-              {
-                "locale": "en",
-                "text": "Warning"
-              },
-              {
-                "locale": "de",
-                "text": "Warnung"
-              }
-            ],
-            "message": [
-              {
-                "locale": "en",
-                "text": "Do you really want to delete this entry?"
-              },
-              {
-                "locale": "de",
-                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
-              }
-            ]
-          },
-          "icon": {
-            "name": "delete"
-          },
-          "destructive": false,
-          "primary": false
-        }
-      ]
-    }
+    "styles": [
+      ""
+    ]
   }
 }

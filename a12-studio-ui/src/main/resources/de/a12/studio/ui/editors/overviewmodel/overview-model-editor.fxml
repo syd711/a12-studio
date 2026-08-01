@@ -21,14 +21,14 @@
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController">
     <right>
-        <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
+        <ToolBar orientation="VERTICAL" styleClass="properties-panel" BorderPane.alignment="CENTER">
             <items>
                 <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
                 <Separator prefHeight="0.0" prefWidth="0.0" />
                 <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
             </items>
          <BorderPane.margin>
-            <Insets />
+            <Insets top="36.0" />
          </BorderPane.margin>
         </ToolBar>
     </right>
@@ -144,6 +144,12 @@
 
                                        <!-- Multi-Selection -->
                                        <fx:include fx:id="overviewMultiSelection" source="../propertyeditors/overview-multi-selection-panel.fxml" />
+
+                                       <!-- Accessibility -->
+                                       <fx:include fx:id="overviewAccessibility" source="../propertyeditors/overview-accessibility-panel.fxml" />
+
+                                       <!-- Styles -->
+                                       <fx:include fx:id="overviewStyles" source="../propertyeditors/styles-panel.fxml" />
 
                                    </children>
                                    <padding>
