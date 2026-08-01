@@ -1,0 +1,32 @@
+{
+  "header": {
+    "id": "OverviewFilterCustomFieldsValidator_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10,
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "custom_list",
+        "fields": []
+      }
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ]
+  }
+}

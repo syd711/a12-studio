@@ -1,0 +1,25 @@
+{
+  "header": {
+    "id": "OverviewDocumentModelRequiredValidator_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ]
+  }
+}
