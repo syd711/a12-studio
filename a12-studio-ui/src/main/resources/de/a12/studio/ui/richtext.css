@@ -1,27 +1,31 @@
-.keyword {
+/*
+ * These override .styled-text-area .text's -fx-fill below, so they need at least the same specificity
+ * (two class selectors) to win regardless of declaration order.
+ */
+.styled-text-area .text.keyword {
     -fx-fill: purple;
     -fx-font-weight: bold;
 }
-.semicolon {
+.styled-text-area .text.semicolon {
     -fx-font-weight: bold;
 }
-.paren {
+.styled-text-area .text.paren {
     -fx-fill: firebrick;
     -fx-font-weight: bold;
 }
-.bracket {
+.styled-text-area .text.bracket {
     -fx-fill: darkgreen;
     -fx-font-weight: bold;
 }
-.brace {
+.styled-text-area .text.brace {
     -fx-fill: teal;
     -fx-font-weight: bold;
 }
-.string {
+.styled-text-area .text.string {
     -fx-fill: blue;
 }
 
-.comment {
+.styled-text-area .text.comment {
 	-fx-fill: darkgreen;
 }
 
