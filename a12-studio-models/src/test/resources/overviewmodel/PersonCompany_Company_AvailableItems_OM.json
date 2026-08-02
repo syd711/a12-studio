@@ -48,7 +48,7 @@
       }
     },
     "subHeaderBox": {
-      "majorElements": [
+      "leftSlot": [
         {
           "type": "search"
         },
@@ -56,11 +56,11 @@
           "type": "filter"
         }
       ],
-      "minorElements": []
+      "rightSlot": []
     },
     "footerBox": {
-      "majorElements": [],
-      "minorElements": []
+      "leftSlot": [],
+      "rightSlot": []
     },
     "columns": [
       {

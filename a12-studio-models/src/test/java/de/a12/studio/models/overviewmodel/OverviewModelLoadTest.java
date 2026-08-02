@@ -44,11 +44,11 @@ class OverviewModelLoadTest {
     assertEquals(3, filterConfiguration.getSectionData().size());
     assertEquals("Name", filterConfiguration.getSectionData().get(0).getLabel().get(0).getText());
 
-    assertEquals(2, content.getSubHeaderBox().getMajorElements().size());
-    assertInstanceOf(SearchElement.class, content.getSubHeaderBox().getMajorElements().get(0));
-    assertInstanceOf(FilterElement.class, content.getSubHeaderBox().getMajorElements().get(1));
+    assertEquals(2, content.getSubHeaderBox().getLeftSlot().size());
+    assertInstanceOf(SearchElement.class, content.getSubHeaderBox().getLeftSlot().get(0));
+    assertInstanceOf(FilterElement.class, content.getSubHeaderBox().getLeftSlot().get(1));
 
-    ButtonElement newButton = assertInstanceOf(ButtonElement.class, content.getSubHeaderBox().getMinorElements().get(0));
+    ButtonElement newButton = assertInstanceOf(ButtonElement.class, content.getSubHeaderBox().getRightSlot().get(0));
     assertEquals(BoxElementType.BUTTON, newButton.getType());
     assertEquals("add", newButton.getEvent());
     assertEquals("add", newButton.getIcon().getName());
@@ -87,7 +87,7 @@ class OverviewModelLoadTest {
     assertEquals("delete_selected", deleteSelected.getEvent());
     assertTrue(deleteSelected.getDestructive());
 
-    assertInstanceOf(MultiSelectionElement.class, content.getSubHeaderBox().getMinorElements().get(1));
+    assertInstanceOf(MultiSelectionElement.class, content.getSubHeaderBox().getRightSlot().get(1));
 
     Column expressionColumn = content.getColumns().stream()
         .filter(c -> "ExpressionColumn".equals(c.getName()))

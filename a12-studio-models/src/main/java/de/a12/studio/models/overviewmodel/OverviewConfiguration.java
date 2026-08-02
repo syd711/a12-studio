@@ -2,6 +2,7 @@ package de.a12.studio.models.overviewmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.a12.studio.models.Label;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,4 +37,6 @@ public class OverviewConfiguration {
   private Integer actionColumnWidth;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean enableInfiniteScroll;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Label> rowTitle = new ArrayList<>();
 }

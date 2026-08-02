@@ -204,7 +204,7 @@
       }
     },
     "subHeaderBox": {
-      "majorElements": [
+      "leftSlot": [
         {
           "type": "filter"
         },
@@ -212,7 +212,7 @@
           "type": "search"
         }
       ],
-      "minorElements": [
+      "rightSlot": [
         {
           "type": "button",
           "label": [
@@ -235,8 +235,8 @@
       ]
     },
     "footerBox": {
-      "majorElements": [],
-      "minorElements": []
+      "leftSlot": [],
+      "rightSlot": []
     },
     "columns": [
       {

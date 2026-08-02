@@ -19,6 +19,10 @@ public class OverviewModelContent {
   private ElementBox subHeaderBox;
   private ElementBox footerBox;
   private OverviewConfiguration configuration;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private RowAction defaultRowAction;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private ContextMenu contextMenu;
 
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<String> styles = new ArrayList<>();

@@ -6,14 +6,21 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.overviewmodel.BoxElement;
+import de.a12.studio.models.overviewmodel.Button;
+import de.a12.studio.models.overviewmodel.ButtonElement;
+import de.a12.studio.models.overviewmodel.ElementBox;
 import de.a12.studio.models.overviewmodel.FieldRef;
 import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.FilterSection;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.overviewmodel.RowAction;
+import de.a12.studio.models.overviewmodel.RowActionGroup;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -21,7 +28,6 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
@@ -39,20 +45,26 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 /**
- * Edits an {@link OverviewModel}'s "Overview" tab: General Settings (the Overview Reference, delegated to
- * {@link OverviewReferencePanelController}), Columns (delegated to
- * {@link OverviewColumnsPanelController}), Features
- * (search/filter/row-count, delegated to {@link OverviewFeaturesPanelController}), Filter,
- * Multi-Selection (delegated to {@link OverviewMultiSelectionPanelController}), Row Height And Action Column
- * Width (delegated to {@link RowHeightActionColumnWidthPanelController}), Paging Behaviour (delegated to
- * {@link PagingBehaviourPanelController}), Accessibility (delegated to
- * {@link OverviewAccessibilityPanelController}) and Styles (delegated to
- * {@link StylesPanelController}). "Custom Actions" ({@code
- * content.rowActionGroup}) is out of scope, mirroring the Java model's already-reduced feature set versus
- * SME. {@code subHeaderBox}/{@code footerBox} are left untouched: sample models ({@code Company_OM.json},
- * {@code Invoice_OM.json}) show them written empty even with search/filter/multi-selection enabled, so the
- * a12 runtime derives that UI from the {@code configuration} flags rather than from manually-placed box
- * elements.
+ * Edits an {@link OverviewModel}'s "Overview" and "Custom Actions" tabs.
+ * <p>
+ * "Overview": General Settings (the Overview Reference, delegated to {@link OverviewReferencePanelController}),
+ * Columns (delegated to {@link OverviewColumnsPanelController}), Features (search/filter/row-count, delegated
+ * to {@link OverviewFeaturesPanelController}), Filter, Multi-Selection (delegated to {@link
+ * OverviewMultiSelectionPanelController}), Row Height And Action Column Width (delegated to {@link
+ * RowHeightActionColumnWidthPanelController}), Paging Behaviour (delegated to {@link
+ * PagingBehaviourPanelController}), Accessibility (delegated to {@link OverviewAccessibilityPanelController})
+ * and Styles (delegated to {@link StylesPanelController}).
+ * <p>
+ * "Custom Actions": Row Action Group ({@code content.rowActionGroup.actions}, delegated to {@link
+ * de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}, and {@code content.contextMenu},
+ * delegated to {@link ContextMenuPanelController}), Row Activation ({@code content.defaultRowAction} and Title
+ * For Interactive Rows / {@code content.configuration.rowTitle}, both inline here), Subheader ({@code
+ * content.subHeaderBox}, delegated to {@link SubheaderSlotPanelController} - a mixed list of button/search/
+ * filter/multi-selection position markers) and Footer ({@code content.footerBox}, Button-only, delegated to
+ * {@link de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}). Per the {@code
+ * testing/basic/models} fixtures (e.g. {@code RelationshipOMs/*_OM.json}, {@code Invoice_OM.json}), both boxes
+ * persist as {@code {leftSlot: [...], rightSlot: [...]}}; "Major" (Subheader)/"Major Buttons" (Footer) map to
+ * {@code rightSlot}, "Minor"/"Minor Buttons" to {@code leftSlot}.
  */
 public class OverviewModelEditorController extends AbstractEditorController implements Initializable {
 
@@ -121,6 +133,40 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   @FXML
   private OverviewSortingPanelController overviewSortingController;
 
+  // Custom Actions: Row Action Group
+  @FXML
+  private EventButtonsPanelController rowActionButtonsController;
+  @FXML
+  private ContextMenuPanelController contextMenuController;
+
+  // Custom Actions: Row Activation
+  @FXML
+  private ComboBox<String> rowActivationTypeField;
+  @FXML
+  private javafx.scene.control.Label rowActivationInfoIcon;
+  @FXML
+  private VBox rowActivationEventBox;
+  @FXML
+  private TextField rowActivationEventField;
+  @FXML
+  private GridPane interactiveRowTitleGrid;
+
+  // Custom Actions: Subheader
+  @FXML
+  private SubheaderSlotPanelController subheaderMajorController;
+  @FXML
+  private SubheaderSlotPanelController subheaderMinorController;
+
+  // Custom Actions: Footer
+  @FXML
+  private EventButtonsPanelController footerMinorButtonsController;
+  @FXML
+  private EventButtonsPanelController footerMajorButtonsController;
+
+  private static final String ROW_ACTIVATION_DEFAULT = "Default Engine Behavior";
+  private static final String ROW_ACTIVATION_EVENT = "Event";
+  private static final String ROW_ACTIVATION_NON_INTERACTIVE = "Non Interactive";
+
   private OverviewModel model;
   private List<DocumentModel> otherDocumentModels = List.of();
   private ElementIndex documentModelIndex;
@@ -129,6 +175,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   public void initialize(URL url, ResourceBundle resources) {
     initializeGeneralSettings();
     initializeFilter();
+    initializeRowActivation();
   }
 
   private void initializeGeneralSettings() {
@@ -222,10 +269,123 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       overviewAccessibilityController.setModel(model);
 
       overviewStylesController.setModel(model);
+
+      loadCustomActions();
     }
     finally {
       updatingFromModel = false;
     }
+  }
+
+  // ---- Custom Actions ----
+
+  private void loadCustomActions() {
+    rowActionButtonsController.configure("ROW ACTION", ".rowAction", ensureRowActionGroup().getActions(), Button::new);
+    contextMenuController.setModel(model);
+
+    populateRowActivation();
+
+    ElementBox subHeaderBox = ensureSubHeaderBox();
+    subheaderMajorController.configure("MAJOR", ".subheaderMajor", subHeaderBox.getRightSlot());
+    subheaderMinorController.configure("MINOR", ".subheaderMinor", subHeaderBox.getLeftSlot());
+
+    ElementBox footerBox = ensureFooterBox();
+    footerMinorButtonsController.configure("MINOR BUTTONS", ".footerMinor", footerBox.getLeftSlot(), ButtonElement::new);
+    footerMajorButtonsController.configure("MAJOR BUTTONS", ".footerMajor", footerBox.getRightSlot(), ButtonElement::new);
+  }
+
+  private void initializeRowActivation() {
+    WidgetFactory.createHelpIcon(rowActivationInfoIcon,
+        "Default Engine Behavior: the Overview Engine's built-in row-click behavior applies. Event: clicking a row "
+            + "triggers the given event. Non Interactive: rows are explicitly not clickable.");
+
+    rowActivationTypeField.getItems().setAll(ROW_ACTIVATION_DEFAULT, ROW_ACTIVATION_EVENT, ROW_ACTIVATION_NON_INTERACTIVE);
+    rowActivationTypeField.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel || model == null) {
+        return;
+      }
+      applyRowActivationType(newValue);
+      refreshRowActivationEventVisibility(newValue);
+      commitChange();
+    });
+
+    rowActivationEventField.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel || model == null) {
+        return;
+      }
+      RowAction rowAction = model.getContent().getDefaultRowAction();
+      if (rowAction == null) {
+        return;
+      }
+      rowAction.setEvent(newValue == null || newValue.isBlank() ? null : newValue);
+      commitChange();
+    });
+  }
+
+  private void populateRowActivation() {
+    RowAction rowAction = model.getContent().getDefaultRowAction();
+    String type;
+    if (rowAction == null || !Boolean.TRUE.equals(rowAction.getCustom())) {
+      type = ROW_ACTIVATION_DEFAULT;
+    }
+    else if (rowAction.getEvent() != null && !rowAction.getEvent().isBlank()) {
+      type = ROW_ACTIVATION_EVENT;
+    }
+    else {
+      type = ROW_ACTIVATION_NON_INTERACTIVE;
+    }
+    rowActivationTypeField.setValue(type);
+    rowActivationEventField.setText(rowAction != null && rowAction.getEvent() != null ? rowAction.getEvent() : "");
+    refreshRowActivationEventVisibility(type);
+
+    rebuildLocaleGrid(interactiveRowTitleGrid, ensureConfiguration().getRowTitle(),
+        (code, text) -> setLabelText(ensureConfiguration().getRowTitle(), code, text));
+  }
+
+  private void applyRowActivationType(String type) {
+    if (ROW_ACTIVATION_DEFAULT.equals(type)) {
+      model.getContent().setDefaultRowAction(null);
+      return;
+    }
+    RowAction rowAction = model.getContent().getDefaultRowAction();
+    if (rowAction == null) {
+      rowAction = new RowAction();
+      model.getContent().setDefaultRowAction(rowAction);
+    }
+    rowAction.setCustom(true);
+    if (ROW_ACTIVATION_EVENT.equals(type)) {
+      rowAction.setEvent(rowActivationEventField.getText());
+    }
+    else {
+      rowAction.setEvent(null);
+    }
+  }
+
+  private void refreshRowActivationEventVisibility(String type) {
+    boolean showEvent = ROW_ACTIVATION_EVENT.equals(type);
+    rowActivationEventBox.setVisible(showEvent);
+    rowActivationEventBox.setManaged(showEvent);
+  }
+
+  private RowActionGroup ensureRowActionGroup() {
+    if (model.getContent().getRowActionGroup() == null) {
+      model.getContent().setRowActionGroup(new RowActionGroup());
+    }
+    return model.getContent().getRowActionGroup();
+  }
+
+  private ElementBox ensureSubHeaderBox() {
+    if (model.getContent().getSubHeaderBox() == null) {
+      model.getContent().setSubHeaderBox(new ElementBox());
+    }
+    return model.getContent().getSubHeaderBox();
+  }
+
+  private ElementBox ensureFooterBox() {
+    if (model.getContent().getFooterBox() == null) {
+      model.getContent().setFooterBox(new ElementBox());
+    }
+    return model.getContent().getFooterBox();
   }
 
   private String currentDocumentModelId() {
@@ -411,7 +571,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
         commitChange();
       });
 
-      Button deleteButton = createDeleteButton("Remove Field", () -> {
+      javafx.scene.control.Button deleteButton = createDeleteButton("Remove Field", () -> {
         fieldRefs.remove(ref);
         rebuildFieldRefRows(grid, fieldRefs);
         commitChange();
@@ -493,12 +653,12 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }
 
-  private static Button createDeleteButton(String tooltip, Runnable action) {
+  private static javafx.scene.control.Button createDeleteButton(String tooltip, Runnable action) {
     FontIcon icon = new FontIcon(Icons.TRASH);
     icon.setIconSize(16);
     icon.getStyleClass().add("toolbar-icon");
 
-    Button button = new Button();
+    javafx.scene.control.Button button = new javafx.scene.control.Button();
     button.getStyleClass().add("default-button");
     button.setGraphic(icon);
     button.setTooltip(WidgetFactory.createTooltip(tooltip));

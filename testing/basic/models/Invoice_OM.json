@@ -51,8 +51,6 @@
           }
         ],
         "width": 1.0,
-        "pinDirection": "RIGHT",
-        "styles": {},
         "elementRef": "include_7c34e_field_0b84d",
         "sortable": true,
         "preferredSorting": "ASC"
@@ -70,7 +68,6 @@
           }
         ],
         "width": 1.0,
-        "styles": {},
         "elementRef": "include_d7e3e_field_e0d50",
         "sortable": true,
         "preferredSorting": "ASC"
@@ -178,86 +175,39 @@
       ]
     },
     "subHeaderBox": {
-      "majorElements": [],
-      "minorElements": []
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "button",
+          "event": "add",
+          "destructive": false,
+          "primary": false
+        }
+      ]
     },
     "footerBox": {
-      "majorElements": [],
-      "minorElements": []
+      "leftSlot": [
+        {
+          "type": "button",
+          "event": null,
+          "destructive": null,
+          "primary": null
+        }
+      ],
+      "rightSlot": []
     },
     "configuration": {
-      "enableFilter": true,
-      "showFullTextSearch": true,
+      "enableFilter": false,
+      "showFullTextSearch": false,
       "pagingSize": 10,
       "showRowCount": true,
       "enableColumnsResize": true,
       "skipInitialLoad": true,
-      "filterConfiguration": {
-        "showFilterButton": true,
-        "showFilterBar": true,
-        "filterMode": "all_columns"
-      },
-      "multiSelection": {
-        "collapseOption": "collapsible_collapsed",
-        "counterOption": "simple",
-        "selectionArea": "checkbox_and_row",
-        "buttons": [
-          {
-            "event": "delete_selected",
-            "confirmation": {
-              "title": [
-                {
-                  "locale": "en",
-                  "text": "Delete Selected"
-                },
-                {
-                  "locale": "de",
-                  "text": "Ausgewählte Löschen"
-                }
-              ],
-              "message": [
-                {
-                  "locale": "en",
-                  "text": "Do you want to delete all selected elements?"
-                },
-                {
-                  "locale": "de",
-                  "text": "Möchten Sie alle ausgewählten Elemente löschen?"
-                }
-              ]
-            },
-            "icon": {
-              "name": "delete_forever",
-              "theme": "rounded"
-            },
-            "label": [
-              {
-                "locale": "en",
-                "text": "Delete"
-              },
-              {
-                "locale": "de",
-                "text": "Löschen"
-              }
-            ],
-            "description": [
-              {
-                "locale": "en",
-                "text": "Delete Selected Elements"
-              },
-              {
-                "locale": "de",
-                "text": "Ausgewählte Elemente löschen"
-              }
-            ],
-            "destructive": true,
-            "primary": false
-          }
-        ]
-      },
       "screenReaderColumn": {
-        "idref": "column-7aca2"
-      }
+        "idref": "column-95652"
+      },
+      "rowHeight": 5,
+      "actionColumnWidth": 1
     },
     "styles": [
       "adsfasf"

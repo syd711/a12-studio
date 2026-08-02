@@ -10,8 +10,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class ElementBox {
+public class ContextMenu {
 
-  private List<BoxElement> leftSlot = new ArrayList<>();
-  private List<BoxElement> rightSlot = new ArrayList<>();
+  private List<ActionGroup> groups = new ArrayList<>();
 }

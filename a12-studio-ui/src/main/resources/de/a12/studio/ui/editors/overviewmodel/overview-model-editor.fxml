@@ -11,6 +11,7 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -172,7 +173,63 @@
                </Tab>
                <Tab text="Custom Actions">
                    <content>
-                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+                           <content>
+                               <VBox spacing="12.0" styleClass="field-editor">
+                                   <children>
+
+                                       <!-- Row Action Group -->
+                                       <Label styleClass="field-label" text="Row Action Group" />
+                                       <fx:include fx:id="rowActionButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                       <fx:include fx:id="contextMenu" source="context-menu-panel.fxml" />
+
+                                       <!-- Row Activation -->
+                                       <Label styleClass="field-label" text="Row Activation" />
+                                       <VBox maxWidth="300.0" spacing="4.0">
+                                           <children>
+                                               <Label styleClass="field-label" text="Type" />
+                                               <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                                   <children>
+                                                       <ComboBox fx:id="rowActivationTypeField" editable="false" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                                                       <Label fx:id="rowActivationInfoIcon" />
+                                                   </children>
+                                               </HBox>
+                                           </children>
+                                       </VBox>
+                                       <VBox fx:id="rowActivationEventBox" maxWidth="300.0" spacing="4.0">
+                                           <children>
+                                               <Label styleClass="field-label" text="Event*" />
+                                               <TextField fx:id="rowActivationEventField" />
+                                           </children>
+                                       </VBox>
+                                       <TitledPane expanded="true" maxWidth="Infinity" text="Title For Interactive Rows">
+                                           <content>
+                                               <GridPane fx:id="interactiveRowTitleGrid" hgap="10.0" vgap="6.0">
+                                                   <columnConstraints>
+                                                       <ColumnConstraints minWidth="40.0" />
+                                                       <ColumnConstraints hgrow="ALWAYS" />
+                                                   </columnConstraints>
+                                               </GridPane>
+                                           </content>
+                                       </TitledPane>
+
+                                       <!-- Subheader -->
+                                       <Label styleClass="field-label" text="Subheader" />
+                                       <fx:include fx:id="subheaderMajor" source="subheader-slot-panel.fxml" />
+                                       <fx:include fx:id="subheaderMinor" source="subheader-slot-panel.fxml" />
+
+                                       <!-- Footer -->
+                                       <Label styleClass="field-label" text="Footer" />
+                                       <fx:include fx:id="footerMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                       <fx:include fx:id="footerMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+
+                                   </children>
+                                   <padding>
+                                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                   </padding>
+                               </VBox>
+                           </content>
+                       </ScrollPane>
                    </content>
                </Tab>
            </tabs>

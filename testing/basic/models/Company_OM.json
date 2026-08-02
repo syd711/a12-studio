@@ -96,12 +96,12 @@
       ]
     },
     "subHeaderBox": {
-      "majorElements": [],
-      "minorElements": []
+      "leftSlot": [],
+      "rightSlot": []
     },
     "footerBox": {
-      "majorElements": [],
-      "minorElements": []
+      "leftSlot": [],
+      "rightSlot": []
     },
     "configuration": {
       "enableFilter": true,

@@ -1,9 +1,6 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.models.formmodel.ButtonGroup;
-import de.a12.studio.models.formmodel.ButtonStyling;
-import de.a12.studio.models.formmodel.EventButton;
-import de.a12.studio.models.formmodel.Icon;
+import de.a12.studio.models.EventButtonLike;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.Icons;
@@ -24,14 +21,16 @@ import org.jspecify.annotations.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
- * Edits a {@link ButtonGroup}'s {@link EventButton} entries (e.g. a {@code HeaderFooterBox}'s major or minor
- * buttons): a compact, fully inline-editable table of Event/Priority/Destructive/Icon, matching the SME
- * reference's "Major Buttons"/"Minor Buttons" tables. Reusable for either list by calling {@link
- * #setButtonGroup} with the corresponding group and {@link #setTitle} with the desired heading. Entries in
- * the underlying {@link ButtonGroup#getButton()} that aren't an {@link EventButton} (e.g. a NavigationButton)
- * are left untouched but not rendered, since this panel only ever adds/edits event buttons.
+ * Edits a list of {@link EventButtonLike} rows (e.g. {@code content.rowActionGroup.actions} or a footer/
+ * subheader box's button entries) as a compact, fully inline-editable table of Event/Priority/Destructive/Icon,
+ * matching the SME reference's "Row Action"/"Major Buttons"/"Minor Buttons" tables. Reusable for any such list
+ * by calling {@link #configure} with the list, a title, a settings-key suffix (so several instances of this
+ * panel on the same editor don't collide on the same persisted expanded/collapsed state) and a factory for new
+ * rows. Not tied to a single {@code de.a12.studio.models.documentmodel.Element}, so it follows the
+ * model-header pattern ({@link #commitHeaderChange()}) rather than {@link #commitChange()}.
  */
 public class EventButtonsPanelController extends AbstractPropertyEditor {
 
@@ -44,24 +43,30 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   @FXML
   private Label emptyLabel;
 
-  private ButtonGroup buttonGroup;
+  private List<EventButtonLike> rows;
+  private Supplier<EventButtonLike> newRowFactory;
 
-  public void setButtonGroup(@NonNull ButtonGroup buttonGroup) {
-    this.buttonGroup = buttonGroup;
+  /**
+   * Binds this panel to {@code rows}. {@code rows} doesn't need to be declared as {@code List<EventButtonLike>}
+   * itself (e.g. a footer box's {@code List<BoxElement>}, whose entries this panel exclusively populates via
+   * {@code newRowFactory} and therefore knows are always the {@link EventButtonLike}-implementing subtype) -
+   * the erased list reference is shared, so add/remove/move here mutate the caller's real list in place.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> void configure(@NonNull String title, @NonNull String settingsKeySuffix, @NonNull List<T> rows,
+      @NonNull Supplier<T> newRowFactory) {
+    setTitle(title);
+    setSettingsKeySuffix(settingsKeySuffix);
+    this.rows = (List<EventButtonLike>) rows;
+    this.newRowFactory = () -> (EventButtonLike) newRowFactory.get();
     rebuildRows();
   }
 
   @FXML
   private void onAdd() {
-    EventButton eventButton = new EventButton();
-    eventButton.setButtonStyling(newButtonStyling());
-    getButtons().add(eventButton);
+    rows.add(newRowFactory.get());
     rebuildRows();
-    commitChange();
-  }
-
-  private List<de.a12.studio.models.formmodel.Button> getButtons() {
-    return buttonGroup.getButton();
+    commitHeaderChange();
   }
 
   private void rebuildRows() {
@@ -70,87 +75,54 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
       return rowIndex != null && rowIndex > 0;
     });
 
-    List<de.a12.studio.models.formmodel.Button> buttons = getButtons();
-    boolean empty = buttons.isEmpty();
+    boolean empty = rows.isEmpty();
     buttonsGrid.setVisible(!empty);
     buttonsGrid.setManaged(!empty);
     emptyLabel.setVisible(empty);
     emptyLabel.setManaged(empty);
 
-    for (int index = 0; index < buttons.size(); index++) {
-      if (buttons.get(index) instanceof EventButton eventButton) {
-        addRow(eventButton, index, buttons.size());
-      }
+    for (int index = 0; index < rows.size(); index++) {
+      addRow(rows.get(index), index, rows.size());
     }
   }
 
-  private void addRow(EventButton eventButton, int index, int rowCount) {
-    ButtonStyling styling = getOrCreateButtonStyling(eventButton);
-
+  private void addRow(EventButtonLike row, int index, int rowCount) {
     TextField eventField = new TextField();
     eventField.setId("eventButtonEvent-" + index);
     eventField.setMaxWidth(Double.MAX_VALUE);
-    setFieldValue(eventField, eventButton.getEvent());
-    bindTextField(eventField, (el, value) -> eventButton.setEvent(value.isEmpty() ? null : value));
+    setFieldValue(eventField, row.getEvent());
+    bindTextField(eventField, (el, value) -> row.setEvent(value.isEmpty() ? null : value));
 
     ComboBox<String> priorityField = new ComboBox<>();
     priorityField.setId("eventButtonPriority-" + index);
     priorityField.setMaxWidth(Double.MAX_VALUE);
     priorityField.getItems().setAll(PRIORITIES);
-    setFieldValue(priorityField, styling.getPriority());
-    bindComboBox(priorityField, (el, value) -> styling.setPriority(value));
+    setFieldValue(priorityField, Boolean.TRUE.equals(row.getPrimary()) ? "PRIMARY" : DEFAULT_PRIORITY);
+    bindComboBox(priorityField, (el, value) -> row.setPrimary("PRIMARY".equals(value)));
 
     CheckBox destructiveField = new CheckBox();
     destructiveField.setId("eventButtonDestructive-" + index);
-    setFieldValue(destructiveField, Boolean.TRUE.equals(styling.getDestructive()));
-    bindCheckBox(destructiveField, (el, value) -> styling.setDestructive(value ? Boolean.TRUE : null));
+    setFieldValue(destructiveField, Boolean.TRUE.equals(row.getDestructive()));
+    bindCheckBox(destructiveField, (el, value) -> row.setDestructive(value ? Boolean.TRUE : null));
 
     TextField iconField = new TextField();
     iconField.setId("eventButtonIcon-" + index);
     iconField.setMaxWidth(Double.MAX_VALUE);
-    setFieldValue(iconField, styling.getIcon() != null ? styling.getIcon().getName() : null);
-    bindTextField(iconField, (el, value) -> setIconName(styling, value));
+    setFieldValue(iconField, row.getIconName());
+    bindTextField(iconField, (el, value) -> row.setIconName(value.isEmpty() ? null : value));
 
-    buttonsGrid.addRow(index + 1, eventField, priorityField, destructiveField, iconField, createActionsBox(eventButton, index, rowCount));
+    buttonsGrid.addRow(index + 1, eventField, priorityField, destructiveField, iconField, createActionsBox(row, index, rowCount));
   }
 
-  private static void setIconName(ButtonStyling styling, String value) {
-    if (value == null || value.isEmpty()) {
-      styling.setIcon(null);
-      return;
-    }
-    Icon icon = styling.getIcon();
-    if (icon == null) {
-      icon = new Icon();
-      styling.setIcon(icon);
-    }
-    icon.setName(value);
-  }
-
-  private static ButtonStyling getOrCreateButtonStyling(EventButton eventButton) {
-    ButtonStyling styling = eventButton.getButtonStyling();
-    if (styling == null) {
-      styling = newButtonStyling();
-      eventButton.setButtonStyling(styling);
-    }
-    return styling;
-  }
-
-  private static ButtonStyling newButtonStyling() {
-    ButtonStyling styling = new ButtonStyling();
-    styling.setPriority(DEFAULT_PRIORITY);
-    return styling;
-  }
-
-  private HBox createActionsBox(EventButton eventButton, int index, int rowCount) {
+  private HBox createActionsBox(EventButtonLike row, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this button?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
-        getButtons().remove(eventButton);
+        rows.remove(row);
         rebuildRows();
-        commitChange();
+        commitHeaderChange();
       }
     });
 
@@ -160,8 +132,8 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   }
 
   private void moveRow(int fromIndex, int toIndex) {
-    Collections.swap(getButtons(), fromIndex, toIndex);
+    Collections.swap(rows, fromIndex, toIndex);
     rebuildRows();
-    commitChange();
+    commitHeaderChange();
   }
 }
