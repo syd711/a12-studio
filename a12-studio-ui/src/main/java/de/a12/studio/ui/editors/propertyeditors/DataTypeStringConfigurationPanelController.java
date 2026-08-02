@@ -22,12 +22,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.List;
@@ -135,7 +133,7 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     valuesLabel.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(valuesLabel, Priority.ALWAYS);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> openSuggestionsDialog(locale));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openSuggestionsDialog(locale));
 
     HBox row = new HBox(10.0, localeLabel, valuesLabel, editButton);
     row.setAlignment(Pos.CENTER_LEFT);
@@ -190,19 +188,6 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
       return List.of();
     }
     return projectItem.getModel().getLocales();
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 
   private static void withStringTypeOptions(Element element, Consumer<StringTypeOptions> mutator) {

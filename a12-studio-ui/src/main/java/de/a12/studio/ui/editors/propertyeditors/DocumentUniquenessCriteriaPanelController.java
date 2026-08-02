@@ -15,12 +15,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -146,11 +144,11 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
   }
 
   private HBox createActionsBox(DocumentUniquenessCriterion criterion, int index, int rowCount) {
-    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(criterion));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(criterion));
 
-    Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
       DocumentUniquenessCriterion copy = new DocumentUniquenessCriterion();
       copy.setName(uniqueCopyName(criterion.getName()));
       copy.setFields(new ArrayList<>(criterion.getFields()));
@@ -166,7 +164,7 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
       commitChange();
     });
 
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this uniqueness criterion?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getCriteria().remove(criterion);
@@ -178,20 +176,6 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
     HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, copyButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
-  }
-
-  // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
-  // "move-button" style class), so the pair together takes up the same width/height as a single normal button.
-  private VBox createMoveButtonsBox(int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
-    moveUpButton.setDisable(index == 0);
-    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
-    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
-
-    return new VBox(1, moveUpButton, moveDownButton);
   }
 
   private void moveRow(int fromIndex, int toIndex) {
@@ -220,18 +204,5 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
       suffix++;
     }
     return candidate;
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 }

@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.ColumnStyles;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewStylesValidator;
@@ -10,37 +12,32 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Edits {@link de.a12.studio.models.overviewmodel.OverviewModelContent#getStyles()}: a list of CSS style
  * class names, each reorderable (drag handle or move up/down), copyable and deletable, with a directly
  * editable text field per row that must not be blank (see {@link OverviewStylesValidator}). Not bound to a
  * single Element (styles live on the model's content), so it follows the model-header pattern used by e.g.
- * {@link ModulesPanelController}.
+ * {@link ModulesPanelController}. Also reused, via {@link #setColumn}, for a single {@link Column}'s header-
+ * cell and content-cell style lists ({@link #configureColumnHeaderStyles} / {@link #configureColumnContentStyles}),
+ * which have no dedicated validator (that only exists for the model-level list), so {@link #refreshStylesError}
+ * is a no-op in that mode.
  */
 public class StylesPanelController extends AbstractPropertyEditor {
 
@@ -61,9 +58,40 @@ public class StylesPanelController extends AbstractPropertyEditor {
 
   private OverviewModel model;
 
+  private Column column;
+
+  private Function<Column, List<String>> columnStylesAccessor;
+
+  public void configureColumnHeaderStyles() {
+    this.columnStylesAccessor = column -> ensureColumnStyles(column).getHeader();
+    setTitle("STYLE FOR HEADER CELLS");
+    setSettingsKeySuffix(".headerStyles");
+  }
+
+  public void configureColumnContentStyles() {
+    this.columnStylesAccessor = column -> ensureColumnStyles(column).getContent();
+    setTitle("STYLE FOR CONTENT CELLS");
+    setSettingsKeySuffix(".contentStyles");
+  }
+
   public void setModel(@NonNull OverviewModel model) {
+    this.column = null;
     this.model = model;
     rebuildRows();
+  }
+
+  /** {@link #configureColumnHeaderStyles} or {@link #configureColumnContentStyles} must be called first. */
+  public void setColumn(@NonNull Column column) {
+    this.model = null;
+    this.column = column;
+    rebuildRows();
+  }
+
+  private static ColumnStyles ensureColumnStyles(Column column) {
+    if (column.getStyles() == null) {
+      column.setStyles(new ColumnStyles());
+    }
+    return column.getStyles();
   }
 
   @FXML
@@ -74,7 +102,7 @@ public class StylesPanelController extends AbstractPropertyEditor {
   }
 
   private List<String> getStyles() {
-    return model.getContent().getStyles();
+    return column != null ? columnStylesAccessor.apply(column) : model.getContent().getStyles();
   }
 
   private void rebuildRows() {
@@ -112,10 +140,7 @@ public class StylesPanelController extends AbstractPropertyEditor {
   }
 
   private HBox createRow(int index, int rowCount) {
-    FontIcon dragHandle = new FontIcon(Icons.DRAG_HANDLE);
-    dragHandle.setIconSize(18);
-    dragHandle.getStyleClass().add("module-drag-handle");
-    dragHandle.setCursor(Cursor.MOVE);
+    FontIcon dragHandle = RowFactory.createDragHandle();
 
     TextField styleField = new TextField();
     styleField.setId("style-" + index);
@@ -136,95 +161,28 @@ public class StylesPanelController extends AbstractPropertyEditor {
     HBox row = new HBox(10.0, dragHandle, styleField, createActionsBox(index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
-    setupDragAndDrop(row, dragHandle, index);
+    RowFactory.setupRowDragAndDrop(row, dragHandle, STYLE_INDEX, index, this::moveStyle);
     return row;
   }
 
-  // Only the drag handle initiates a drag (so clicking the text field or the action buttons doesn't start
-  // one); the whole row is the drop target, so hovering anywhere over another row while dragging offers
-  // reordering there. The drop position is shown as an accent-colored line on the row's top or bottom edge,
-  // depending on which half of the row the cursor is over, so it's unambiguous whether the dragged style
-  // will land above or below.
-  private void setupDragAndDrop(HBox row, Node dragHandle, int index) {
-    dragHandle.setOnDragDetected(event -> {
-      Dragboard dragboard = dragHandle.startDragAndDrop(TransferMode.MOVE);
-      ClipboardContent content = new ClipboardContent();
-      content.put(STYLE_INDEX, String.valueOf(index));
-      dragboard.setContent(content);
-
-      SnapshotParameters snapshotParams = new SnapshotParameters();
-      snapshotParams.setFill(Color.TRANSPARENT);
-      Point2D cursorInRow = dragHandle.localToParent(event.getX(), event.getY());
-      dragboard.setDragView(row.snapshot(snapshotParams, null), cursorInRow.getX(), cursorInRow.getY());
-
-      row.getStyleClass().add("module-row-dragging");
-      event.consume();
-    });
-    dragHandle.setOnDragDone(event -> row.getStyleClass().remove("module-row-dragging"));
-
-    row.setOnDragOver(event -> {
-      if (event.getDragboard().hasContent(STYLE_INDEX)) {
-        event.acceptTransferModes(TransferMode.MOVE);
-        showDropIndicator(row, isAboveMidpoint(row, event.getY()));
-      }
-      event.consume();
-    });
-    row.setOnDragExited(event -> clearDropIndicator(row));
-    row.setOnDragDropped(event -> {
-      Dragboard dragboard = event.getDragboard();
-      boolean success = dragboard.hasContent(STYLE_INDEX);
-      if (success) {
-        int insertBeforeIndex = isAboveMidpoint(row, event.getY()) ? index : index + 1;
-        moveStyle(Integer.parseInt((String) dragboard.getContent(STYLE_INDEX)), insertBeforeIndex);
-      }
-      clearDropIndicator(row);
-      event.setDropCompleted(success);
-      event.consume();
-    });
-  }
-
-  private static boolean isAboveMidpoint(HBox row, double dragY) {
-    return dragY < row.getHeight() / 2;
-  }
-
-  private static void showDropIndicator(HBox row, boolean above) {
-    String showClass = above ? "module-row-drop-above" : "module-row-drop-below";
-    String hideClass = above ? "module-row-drop-below" : "module-row-drop-above";
-    row.getStyleClass().remove(hideClass);
-    if (!row.getStyleClass().contains(showClass)) {
-      row.getStyleClass().add(showClass);
+  private void moveStyle(int fromIndex, int insertBeforeIndex) {
+    if (RowFactory.reorder(getStyles(), fromIndex, insertBeforeIndex)) {
+      rebuildRows();
+      commitChange();
     }
-  }
-
-  private static void clearDropIndicator(HBox row) {
-    row.getStyleClass().removeAll("module-row-drop-above", "module-row-drop-below");
-  }
-
-  // targetIndex is the position the moved style should end up at, indexed into the list as it stood before
-  // the drag started (e.g. "landed above the row currently at index 2" is targetIndex 2).
-  private void moveStyle(int fromIndex, int targetIndex) {
-    int insertIndex = fromIndex < targetIndex ? targetIndex - 1 : targetIndex;
-    if (insertIndex == fromIndex) {
-      return;
-    }
-    List<String> styles = getStyles();
-    String moved = styles.remove(fromIndex);
-    styles.add(insertIndex, moved);
-    rebuildRows();
-    commitChange();
   }
 
   private HBox createActionsBox(int index, int rowCount) {
-    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
       List<String> styles = getStyles();
       styles.add(index + 1, styles.get(index));
       rebuildRows();
       commitChange();
     });
 
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this style?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getStyles().remove(index);
@@ -238,36 +196,9 @@ public class StylesPanelController extends AbstractPropertyEditor {
     return actionsBox;
   }
 
-  // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
-  // "move-button" style class), so the pair together takes up the same width/height as a single normal button.
-  private VBox createMoveButtonsBox(int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
-    moveUpButton.setDisable(index == 0);
-    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
-    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
-
-    return new VBox(1, moveUpButton, moveDownButton);
-  }
-
   private void moveRow(int fromIndex, int toIndex) {
     Collections.swap(getStyles(), fromIndex, toIndex);
     rebuildRows();
     commitChange();
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 }

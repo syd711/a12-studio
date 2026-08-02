@@ -76,6 +76,11 @@ public class ElementIndex {
     return all;
   }
 
+  /** The {@link DocumentModel} this index was built from. */
+  public DocumentModel getModel() {
+    return model;
+  }
+
   Optional<Element> findById(String id) {
     return Optional.ofNullable(id == null ? null : byId.get(id));
   }

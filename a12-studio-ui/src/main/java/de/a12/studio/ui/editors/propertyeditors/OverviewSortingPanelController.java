@@ -13,24 +13,15 @@ import de.a12.studio.ui.editors.overviewmodel.OverviewColumnOptions;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -140,10 +131,7 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
   private HBox createRow(ColumnRef columnRef, int index, int rowCount) {
     List<Column> columns = getColumns();
 
-    FontIcon dragHandle = new FontIcon(Icons.DRAG_HANDLE);
-    dragHandle.setIconSize(18);
-    dragHandle.getStyleClass().add("module-drag-handle");
-    dragHandle.setCursor(Cursor.MOVE);
+    FontIcon dragHandle = RowFactory.createDragHandle();
 
     ComboBox<String> columnField = new ComboBox<>();
     columnField.setId("overviewSortingColumn-" + index);
@@ -172,85 +160,21 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     HBox row = new HBox(10.0, dragHandle, columnField, createActionsBox(columnRef, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
-    setupDragAndDrop(row, dragHandle, index);
+    RowFactory.setupRowDragAndDrop(row, dragHandle, SORTING_INDEX, index, this::moveSorting);
     return row;
   }
 
-  // Only the drag handle initiates a drag (so using the combo box or action buttons doesn't start one); the
-  // whole row is the drop target, so hovering anywhere over another row while dragging offers reordering there.
-  private void setupDragAndDrop(HBox row, Node dragHandle, int index) {
-    dragHandle.setOnDragDetected(event -> {
-      Dragboard dragboard = dragHandle.startDragAndDrop(TransferMode.MOVE);
-      ClipboardContent content = new ClipboardContent();
-      content.put(SORTING_INDEX, String.valueOf(index));
-      dragboard.setContent(content);
-
-      SnapshotParameters snapshotParams = new SnapshotParameters();
-      snapshotParams.setFill(Color.TRANSPARENT);
-      Point2D cursorInRow = dragHandle.localToParent(event.getX(), event.getY());
-      dragboard.setDragView(row.snapshot(snapshotParams, null), cursorInRow.getX(), cursorInRow.getY());
-
-      row.getStyleClass().add("module-row-dragging");
-      event.consume();
-    });
-    dragHandle.setOnDragDone(event -> row.getStyleClass().remove("module-row-dragging"));
-
-    row.setOnDragOver(event -> {
-      if (event.getDragboard().hasContent(SORTING_INDEX)) {
-        event.acceptTransferModes(TransferMode.MOVE);
-        showDropIndicator(row, isAboveMidpoint(row, event.getY()));
-      }
-      event.consume();
-    });
-    row.setOnDragExited(event -> clearDropIndicator(row));
-    row.setOnDragDropped(event -> {
-      Dragboard dragboard = event.getDragboard();
-      boolean success = dragboard.hasContent(SORTING_INDEX);
-      if (success) {
-        int insertBeforeIndex = isAboveMidpoint(row, event.getY()) ? index : index + 1;
-        moveSorting(Integer.parseInt((String) dragboard.getContent(SORTING_INDEX)), insertBeforeIndex);
-      }
-      clearDropIndicator(row);
-      event.setDropCompleted(success);
-      event.consume();
-    });
-  }
-
-  private static boolean isAboveMidpoint(HBox row, double dragY) {
-    return dragY < row.getHeight() / 2;
-  }
-
-  private static void showDropIndicator(HBox row, boolean above) {
-    String showClass = above ? "module-row-drop-above" : "module-row-drop-below";
-    String hideClass = above ? "module-row-drop-below" : "module-row-drop-above";
-    row.getStyleClass().remove(hideClass);
-    if (!row.getStyleClass().contains(showClass)) {
-      row.getStyleClass().add(showClass);
+  private void moveSorting(int fromIndex, int insertBeforeIndex) {
+    if (RowFactory.reorder(getSorting(), fromIndex, insertBeforeIndex)) {
+      rebuildRows();
+      commitHeaderChange();
     }
-  }
-
-  private static void clearDropIndicator(HBox row) {
-    row.getStyleClass().removeAll("module-row-drop-above", "module-row-drop-below");
-  }
-
-  // targetIndex is the position the moved entry should end up at, indexed into the list as it stood before
-  // the drag started (e.g. "landed above the row currently at index 2" is targetIndex 2).
-  private void moveSorting(int fromIndex, int targetIndex) {
-    int insertIndex = fromIndex < targetIndex ? targetIndex - 1 : targetIndex;
-    if (insertIndex == fromIndex) {
-      return;
-    }
-    List<ColumnRef> sorting = getSorting();
-    ColumnRef moved = sorting.remove(fromIndex);
-    sorting.add(insertIndex, moved);
-    rebuildRows();
-    commitHeaderChange();
   }
 
   private HBox createActionsBox(ColumnRef columnRef, int index, int rowCount) {
-    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this sorting entry?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getSorting().remove(columnRef);
@@ -264,36 +188,9 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     return actionsBox;
   }
 
-  // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
-  // "move-button" style class), so the pair together takes up the same width/height as a single normal button.
-  private VBox createMoveButtonsBox(int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
-    moveUpButton.setDisable(index == 0);
-    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
-    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
-
-    return new VBox(1, moveUpButton, moveDownButton);
-  }
-
   private void moveRow(int fromIndex, int toIndex) {
     Collections.swap(getSorting(), fromIndex, toIndex);
     rebuildRows();
     commitHeaderChange();
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 }

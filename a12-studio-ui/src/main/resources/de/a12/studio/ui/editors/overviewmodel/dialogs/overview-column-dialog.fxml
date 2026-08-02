@@ -2,41 +2,209 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="360.0" minWidth="480.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="760.0" minWidth="700.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@../../../stylesheet.css" BorderPane.alignment="CENTER">
          <content>
-            <!-- Intentionally empty for now; the column's Field/Sortable/Width/Pin Direction/etc. fields are added here in a follow-up. -->
-            <VBox spacing="14.0">
+            <VBox spacing="14.0" styleClass="field-editor">
                <padding>
                   <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </padding>
+
+               <!-- Column Type / Target Document Model -->
+               <HBox spacing="12.0">
+                  <children>
+                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label styleClass="field-label" text="Column Type*" />
+                           <ComboBox fx:id="columnTypeCombo" maxWidth="Infinity" />
+                        </children>
+                     </VBox>
+                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label styleClass="field-label" text="Target Document Model" />
+                           <TextField fx:id="targetDocumentModelField" editable="false" focusTraversable="false" />
+                        </children>
+                     </VBox>
+                  </children>
+               </HBox>
+
+               <!-- Reference Column fields -->
+               <VBox fx:id="referenceSection" spacing="14.0">
+                  <children>
+                     <VBox spacing="2.0">
+                        <children>
+                           <Label styleClass="field-label" text="Element Reference*" />
+                           <ComboBox fx:id="elementRefCombo" maxWidth="Infinity" />
+                        </children>
+                     </VBox>
+                     <HBox spacing="12.0">
+                        <children>
+                           <VBox alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <CheckBox fx:id="sortableField" mnemonicParsing="false" text="Sortable" />
+                              </children>
+                           </VBox>
+                           <VBox fx:id="preferredSortingBox" spacing="2.0" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <Label styleClass="field-label" text="Preferred Sorting" />
+                                 <ComboBox fx:id="preferredSortingCombo" maxWidth="Infinity" />
+                              </children>
+                           </VBox>
+                        </children>
+                     </HBox>
+                  </children>
+               </VBox>
+
+               <!-- Expression Column fields -->
+               <VBox fx:id="expressionSection" spacing="14.0">
+                  <children>
+                     <VBox spacing="2.0">
+                        <children>
+                           <Label styleClass="field-label" text="Name" />
+                           <TextField fx:id="nameField" promptText="Distinguishes this column from others, e.g. FullName" />
+                        </children>
+                     </VBox>
+                     <VBox spacing="2.0">
+                        <children>
+                           <Label styleClass="field-label" text="Expression" />
+                           <TextArea fx:id="expressionArea" prefRowCount="5" wrapText="true" />
+                        </children>
+                     </VBox>
+                  </children>
+               </VBox>
+
+               <!-- ID / Icon -->
+               <HBox spacing="12.0">
+                  <children>
+                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label styleClass="field-label" text="ID" />
+                           <TextField fx:id="idField" editable="false" focusTraversable="false" />
+                        </children>
+                     </VBox>
+                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label styleClass="field-label" text="Icon" />
+                           <TextField fx:id="iconField" promptText="Start typing an icon name..." />
+                        </children>
+                     </VBox>
+                  </children>
+               </HBox>
+
+               <!-- Pin Direction / Width / Fixed Width -->
+               <HBox spacing="12.0">
+                  <children>
+                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label styleClass="field-label" text="Pin Direction" />
+                           <ComboBox fx:id="pinDirectionCombo" maxWidth="Infinity" />
+                        </children>
+                     </VBox>
+                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label styleClass="field-label" text="Width*" />
+                           <TextField fx:id="widthField" />
+                        </children>
+                     </VBox>
+                     <VBox alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <CheckBox fx:id="fixedWidthField" mnemonicParsing="false" text="Fixed Width" />
+                        </children>
+                     </VBox>
+                  </children>
+               </HBox>
+
+               <!-- Label -->
+               <VBox spacing="6.0">
+                  <children>
+                     <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
+                     <CheckBox fx:id="hideLabelField" mnemonicParsing="false" text="Hide Label" />
+                  </children>
+               </VBox>
+
+               <!-- Alignment -->
+               <VBox spacing="10.0">
+                  <children>
+                     <Label styleClass="section-header" text="Alignment" />
+
+                     <Label styleClass="field-label" text="Horizontal" />
+                     <HBox spacing="12.0">
+                        <children>
+                           <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <Label styleClass="field-label" text="Header" />
+                                 <ComboBox fx:id="horizontalHeaderCombo" maxWidth="Infinity" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <Label styleClass="field-label" text="Content" />
+                                 <ComboBox fx:id="horizontalContentCombo" maxWidth="Infinity" />
+                              </children>
+                           </VBox>
+                        </children>
+                     </HBox>
+
+                     <Label styleClass="field-label" text="Vertical" />
+                     <HBox spacing="12.0">
+                        <children>
+                           <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <Label styleClass="field-label" text="Header" />
+                                 <ComboBox fx:id="verticalHeaderCombo" maxWidth="Infinity" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                              <children>
+                                 <Label styleClass="field-label" text="Content" />
+                                 <ComboBox fx:id="verticalContentCombo" maxWidth="Infinity" />
+                              </children>
+                           </VBox>
+                        </children>
+                     </HBox>
+                  </children>
+               </VBox>
+
+               <!-- Styles -->
+               <VBox spacing="10.0">
+                  <children>
+                     <Label styleClass="section-header" text="Styles" />
+                     <fx:include fx:id="stylesHeader" source="../../propertyeditors/styles-panel.fxml" />
+                     <fx:include fx:id="stylesContent" source="../../propertyeditors/styles-panel.fxml" />
+                  </children>
+               </VBox>
             </VBox>
          </content>
+         <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+         </padding>
       </ScrollPane>
    </center>
    <bottom>
-      <HBox alignment="CENTER_RIGHT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
-         <children>
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel">
-               <HBox.margin>
-                  <Insets right="12.0" />
-               </HBox.margin>
-            </Button>
-            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="   OK   " />
-         </children>
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <items>
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="OK" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel" />
+         </items>
          <padding>
-            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+            <Insets bottom="8.0" right="8.0" />
          </padding>
-      </HBox>
+      </ToolBar>
    </bottom>
 </BorderPane>

@@ -12,24 +12,16 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -228,10 +220,7 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
   }
 
   private HBox createRow(de.a12.studio.models.overviewmodel.Button button, int index, int rowCount) {
-    FontIcon dragHandle = new FontIcon(Icons.DRAG_HANDLE);
-    dragHandle.setIconSize(18);
-    dragHandle.getStyleClass().add("module-drag-handle");
-    dragHandle.setCursor(Cursor.MOVE);
+    FontIcon dragHandle = RowFactory.createDragHandle();
 
     Label eventLabel = createRowLabel(orEmpty(button.getEvent()), "multiSelectionActionEvent-" + index, 160.0, button);
     Label priorityLabel = createRowLabel("", "multiSelectionActionPriority-" + index, 90.0, button);
@@ -241,7 +230,7 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
     HBox row = new HBox(10.0, dragHandle, eventLabel, priorityLabel, destructiveLabel, iconLabel, createActionsBox(button, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
-    setupDragAndDrop(row, dragHandle, index);
+    RowFactory.setupRowDragAndDrop(row, dragHandle, ACTION_INDEX, index, this::moveAction);
     return row;
   }
 
@@ -265,83 +254,19 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
     }
   }
 
-  // Only the drag handle initiates a drag (so clicking a label or the action buttons doesn't start one); the
-  // whole row is the drop target, so hovering anywhere over another row while dragging offers reordering there.
-  private void setupDragAndDrop(HBox row, Node dragHandle, int index) {
-    dragHandle.setOnDragDetected(event -> {
-      Dragboard dragboard = dragHandle.startDragAndDrop(TransferMode.MOVE);
-      ClipboardContent content = new ClipboardContent();
-      content.put(ACTION_INDEX, String.valueOf(index));
-      dragboard.setContent(content);
-
-      SnapshotParameters snapshotParams = new SnapshotParameters();
-      snapshotParams.setFill(Color.TRANSPARENT);
-      Point2D cursorInRow = dragHandle.localToParent(event.getX(), event.getY());
-      dragboard.setDragView(row.snapshot(snapshotParams, null), cursorInRow.getX(), cursorInRow.getY());
-
-      row.getStyleClass().add("module-row-dragging");
-      event.consume();
-    });
-    dragHandle.setOnDragDone(event -> row.getStyleClass().remove("module-row-dragging"));
-
-    row.setOnDragOver(event -> {
-      if (event.getDragboard().hasContent(ACTION_INDEX)) {
-        event.acceptTransferModes(TransferMode.MOVE);
-        showDropIndicator(row, isAboveMidpoint(row, event.getY()));
-      }
-      event.consume();
-    });
-    row.setOnDragExited(event -> clearDropIndicator(row));
-    row.setOnDragDropped(event -> {
-      Dragboard dragboard = event.getDragboard();
-      boolean success = dragboard.hasContent(ACTION_INDEX);
-      if (success) {
-        int insertBeforeIndex = isAboveMidpoint(row, event.getY()) ? index : index + 1;
-        moveAction(Integer.parseInt((String) dragboard.getContent(ACTION_INDEX)), insertBeforeIndex);
-      }
-      clearDropIndicator(row);
-      event.setDropCompleted(success);
-      event.consume();
-    });
-  }
-
-  private static boolean isAboveMidpoint(HBox row, double dragY) {
-    return dragY < row.getHeight() / 2;
-  }
-
-  private static void showDropIndicator(HBox row, boolean above) {
-    String showClass = above ? "module-row-drop-above" : "module-row-drop-below";
-    String hideClass = above ? "module-row-drop-below" : "module-row-drop-above";
-    row.getStyleClass().remove(hideClass);
-    if (!row.getStyleClass().contains(showClass)) {
-      row.getStyleClass().add(showClass);
+  private void moveAction(int fromIndex, int insertBeforeIndex) {
+    if (RowFactory.reorder(getActions(), fromIndex, insertBeforeIndex)) {
+      rebuildActionRows();
+      commitHeaderChange();
     }
-  }
-
-  private static void clearDropIndicator(HBox row) {
-    row.getStyleClass().removeAll("module-row-drop-above", "module-row-drop-below");
-  }
-
-  // targetIndex is the position the moved action should end up at, indexed into the list as it stood before
-  // the drag started (e.g. "landed above the row currently at index 2" is targetIndex 2).
-  private void moveAction(int fromIndex, int targetIndex) {
-    int insertIndex = fromIndex < targetIndex ? targetIndex - 1 : targetIndex;
-    if (insertIndex == fromIndex) {
-      return;
-    }
-    List<de.a12.studio.models.overviewmodel.Button> actions = getActions();
-    de.a12.studio.models.overviewmodel.Button moved = actions.remove(fromIndex);
-    actions.add(insertIndex, moved);
-    rebuildActionRows();
-    commitHeaderChange();
   }
 
   private HBox createActionsBox(de.a12.studio.models.overviewmodel.Button button, int index, int rowCount) {
-    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(button));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(button));
 
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this action?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getActions().remove(button);
@@ -355,37 +280,10 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
     return actionsBox;
   }
 
-  // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
-  // "move-button" style class), so the pair together takes up the same width/height as a single normal button.
-  private VBox createMoveButtonsBox(int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
-    moveUpButton.setDisable(index == 0);
-    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
-    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
-
-    return new VBox(1, moveUpButton, moveDownButton);
-  }
-
   private void moveRow(int fromIndex, int toIndex) {
     Collections.swap(getActions(), fromIndex, toIndex);
     rebuildActionRows();
     commitHeaderChange();
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 
   private static String orEmpty(String value) {

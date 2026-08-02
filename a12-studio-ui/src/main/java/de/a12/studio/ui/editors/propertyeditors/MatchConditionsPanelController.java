@@ -11,12 +11,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Collections;
 import java.util.List;
@@ -118,9 +116,9 @@ public class MatchConditionsPanelController {
   }
 
   private HBox createActionsBox(MatchCondition matchCondition, int index, int rowCount) {
-    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button copyButton = createActionButton(Icons.COPY, "Duplicate", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Duplicate", () -> {
       MatchCondition copy = new MatchCondition();
       copy.setKey(matchCondition.getKey());
       copy.setMustEqual(matchCondition.getMustEqual());
@@ -130,7 +128,7 @@ public class MatchConditionsPanelController {
       onChange.run();
     });
 
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this match condition?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         matchConditions.remove(matchCondition);
@@ -144,34 +142,9 @@ public class MatchConditionsPanelController {
     return actionsBox;
   }
 
-  private VBox createMoveButtonsBox(int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
-    moveUpButton.setDisable(index == 0);
-    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
-    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
-
-    return new VBox(1, moveUpButton, moveDownButton);
-  }
-
   private void moveRow(int fromIndex, int toIndex) {
     Collections.swap(matchConditions, fromIndex, toIndex);
     rebuildRows();
     onChange.run();
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 }

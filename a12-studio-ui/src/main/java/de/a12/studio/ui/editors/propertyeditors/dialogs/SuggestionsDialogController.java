@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors.dialogs;
 
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.editors.propertyeditors.RowFactory;
 import de.a12.studio.ui.util.Icons;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -8,12 +9,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +98,7 @@ public class SuggestionsDialogController implements DialogController {
     HBox.setHgrow(textField, Priority.ALWAYS);
     textField.textProperty().addListener((observable, oldValue, newValue) -> values.set(index, newValue));
 
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       values.remove(index);
       rebuildRows();
     });
@@ -107,18 +106,5 @@ public class SuggestionsDialogController implements DialogController {
     HBox row = new HBox(8.0, textField, deleteButton);
     row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
     return row;
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 }

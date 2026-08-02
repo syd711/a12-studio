@@ -20,12 +20,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -238,9 +236,9 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   }
 
   private HBox createActionsBox(Annotation annotation, int index, int rowCount) {
-    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button copyButton = createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
       Annotation copy = new Annotation();
       copy.setName(annotation.getName());
       copy.setValue(annotation.getValue());
@@ -251,7 +249,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
       commitChange();
     });
 
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this annotation?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getBackingAnnotations().remove(annotation);
@@ -266,20 +264,6 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     return actionsBox;
   }
 
-  // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
-  // "move-button" style class), so the pair together takes up the same width/height as a single normal button.
-  private VBox createMoveButtonsBox(int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
-    moveUpButton.setDisable(index == 0);
-    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
-    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
-
-    return new VBox(1, moveUpButton, moveDownButton);
-  }
-
   private void moveRow(int fromIndex, int toIndex) {
     List<Annotation> visible = getAnnotations();
     Annotation moved = visible.get(fromIndex);
@@ -288,18 +272,5 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     Collections.swap(backing, backing.indexOf(moved), backing.indexOf(neighbor));
     rebuildRows();
     commitChange();
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 }

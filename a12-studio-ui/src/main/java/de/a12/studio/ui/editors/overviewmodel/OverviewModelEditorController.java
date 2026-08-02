@@ -239,7 +239,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
         .findFirst()
         .orElse(null);
     documentModelIndex = OverviewElementOptions.indexOf(documentModel);
-    overviewColumnsController.setDocumentModelIndex(documentModelIndex);
+    overviewColumnsController.setDocumentModelIndex(documentModelIndex, documentModelId);
     overviewSortingController.setDocumentModelIndex(documentModelIndex);
     overviewAccessibilityController.setDocumentModelIndex(documentModelIndex);
   }

@@ -1,4 +1,4 @@
-package de.a12.studio.ui.projecttree;
+package de.a12.studio.ui.projecttree.dialogs;
 
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.util.FileUtils;

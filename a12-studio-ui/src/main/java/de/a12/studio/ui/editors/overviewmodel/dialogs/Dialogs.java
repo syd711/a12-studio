@@ -14,15 +14,13 @@ public class Dialogs {
   private Dialogs() {
   }
 
-  /**
-   * Opens the (currently empty) column editor for {@code column}. No result is returned yet since the dialog
-   * has no fields to submit.
-   */
-  public static void showColumn(Stage owner, ElementIndex documentModelIndex, Column column) {
+  /** Opens the column editor for {@code column}, editing it live so a Cancel can undo the changes. */
+  public static void showColumn(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column) {
     FXMLLoader fxmlLoader = new FXMLLoader(OverviewColumnDialogController.class.getResource("overview-column-dialog.fxml"));
     Stage stage = WidgetFactory.createDialogStage("overview-column-dialog", fxmlLoader, owner, "Edit Column");
     OverviewColumnDialogController controller = (OverviewColumnDialogController) stage.getUserData();
-    controller.initDialog(stage, documentModelIndex, column);
+    controller.init(stage, documentModelIndex, documentModelId, column);
+    stage.setOnHidden(event -> controller.destroy());
     stage.showAndWait();
   }
 

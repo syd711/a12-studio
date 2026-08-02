@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
@@ -37,8 +35,12 @@ public class Column {
   private ColumnAlignment alignment;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String pinDirection;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private Map<String, Object> styles = new LinkedHashMap<>();
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private ColumnStyles styles;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Icon icon;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean labelHidden;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String elementRef;
   private Boolean sortable;

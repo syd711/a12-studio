@@ -17,12 +17,10 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -111,7 +109,7 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
   }
 
   private HBox createActionsBox(int index) {
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this locale?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         model.getLocales().remove(index);
@@ -138,18 +136,5 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
   private void updateValidation() {
     Studio.getValidationService().getMissingLocaleError(model)
         .ifPresentOrElse(message -> showError("ERROR", message), this::hideError);
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 }

@@ -32,7 +32,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.Collections;
@@ -153,12 +152,10 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
   }
 
   private HBox createCategoryActionsBox(Category category, int index, int rowCount) {
-    VBox moveButtonsBox = createMoveButtonsBox(
-        () -> moveCategory(index, index - 1), index == 0,
-        () -> moveCategory(index, index + 1), index == rowCount - 1);
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveCategory);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> onEditCategory(category));
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> onDeleteCategory(category));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> onEditCategory(category));
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> onDeleteCategory(category));
 
     HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
@@ -337,7 +334,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
         currentColumn++;
       }
 
-      Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> onDeleteValue(value));
+      Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> onDeleteValue(value));
       GridPane.setHalignment(deleteButton, HPos.CENTER);
       enumerationValuesGrid.add(deleteButton, currentColumn, gridRow);
     }
@@ -439,28 +436,4 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     return Optional.empty();
   }
 
-  private static VBox createMoveButtonsBox(Runnable moveUp, boolean upDisabled, Runnable moveDown, boolean downDisabled) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", moveUp);
-    moveUpButton.setDisable(upDisabled);
-    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", moveDown);
-    moveDownButton.setDisable(downDisabled);
-    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
-
-    return new VBox(1, moveUpButton, moveDownButton);
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
-  }
 }

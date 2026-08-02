@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.StringTypeOptions;
+import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.Confirmation;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ElementProperty;
@@ -35,9 +36,11 @@ import java.util.function.Function;
  * (via {@link #setModule} after {@link #configureModuleMenuLabel}), for a {@link Case}'s label (via
  * {@link #setCase} after {@link #configureCaseLabel}), and for a {@link Confirmation}'s title or message
  * (via {@link #setConfirmation} after {@link #configureConfirmationTitle} / {@link
- * #configureConfirmationMessage}). Exactly one configure method must be called once after this controller
- * is loaded from FXML, before setElement/setModel/setModule/setCase/setConfirmation; {@code element},
- * {@link #model}, {@link #module}, {@link #sceneCase} and {@link #confirmation} are mutually exclusive.
+ * #configureConfirmationMessage}), and for an {@link de.a12.studio.models.overviewmodel.Column}'s label (via
+ * {@link #setColumn} after {@link #configureColumnLabel}). Exactly one configure method must be called once
+ * after this controller is loaded from FXML, before setElement/setModel/setModule/setCase/setConfirmation/setColumn;
+ * {@code element}, {@link #model}, {@link #module}, {@link #sceneCase}, {@link #confirmation} and {@link
+ * #column} are mutually exclusive.
  */
 public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
@@ -56,6 +59,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   private Case sceneCase;
 
   private Confirmation confirmation;
+
+  private Column column;
 
   // Captured whenever setElement/setModel is called, i.e. whenever this panel is (re)bound to whichever
   // project item is currently selected. Used to tell apart a locales-changed event meant for this panel's own
@@ -116,6 +121,12 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     setSettingsKeySuffix("." + fieldKey);
   }
 
+  public void configureColumnLabel() {
+    this.fieldKey = "label";
+    setTitle("LABEL");
+    setSettingsKeySuffix("." + fieldKey);
+  }
+
   public void configureConfirmationTitle() {
     configureConfirmation(Confirmation::getTitle, "confirmationTitle", "CONFIRMATION TITLE");
   }
@@ -150,6 +161,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.module = null;
     this.sceneCase = null;
     this.confirmation = null;
+    this.column = null;
     this.projectItem = Studio.getSelectedProjectItem();
     super.setElement(element);
     buildLocaleFields();
@@ -166,6 +178,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.module = null;
     this.sceneCase = null;
     this.confirmation = null;
+    this.column = null;
     this.model = model;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -177,6 +190,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.model = null;
     this.sceneCase = null;
     this.confirmation = null;
+    this.column = null;
     this.module = module;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -188,7 +202,20 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.model = null;
     this.module = null;
     this.confirmation = null;
+    this.column = null;
     this.sceneCase = sceneCase;
+    this.projectItem = Studio.getSelectedProjectItem();
+    buildLocaleFields();
+    populateLocaleFields();
+  }
+
+  public void setColumn(@NonNull Column column) {
+    this.element = null;
+    this.model = null;
+    this.module = null;
+    this.sceneCase = null;
+    this.confirmation = null;
+    this.column = column;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
     populateLocaleFields();
@@ -199,6 +226,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.model = null;
     this.module = null;
     this.sceneCase = null;
+    this.column = null;
     this.confirmation = confirmation;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -222,6 +250,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     }
     if (module != null) {
       return moduleTextsAccessor.apply(module);
+    }
+    if (column != null) {
+      return column.getLabel();
     }
     return model != null ? modelTextsAccessor.apply(model) : elementTextsAccessor.apply(element);
   }
@@ -268,6 +299,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     }
     if (module != null) {
       return moduleTextsAccessor.apply(module);
+    }
+    if (column != null) {
+      return column.getLabel();
     }
     return model != null ? modelTextsAccessor.apply(model) : elementTextsWriteAccessor.apply(element);
   }

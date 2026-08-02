@@ -18,12 +18,10 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Collections;
 import java.util.List;
@@ -132,15 +130,15 @@ public class CasesPanelController {
   }
 
   private HBox createActionsBox(Case caseObj, int index, int rowCount) {
-    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveCase);
 
-    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> onEditCase(caseObj));
-    Button copyButton = createActionButton(Icons.COPY, "Duplicate", () -> {
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> onEditCase(caseObj));
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Duplicate", () -> {
       scene.getCases().add(index + 1, cloneCase(caseObj));
       rebuildRows();
       onChange.run();
     });
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> onDeleteCase(caseObj));
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> onDeleteCase(caseObj));
 
     HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, copyButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
@@ -164,18 +162,6 @@ public class CasesPanelController {
     onChange.run();
   }
 
-  private VBox createMoveButtonsBox(int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveCase(index, index - 1));
-    moveUpButton.setDisable(index == 0);
-    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
-
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveCase(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
-    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
-
-    return new VBox(1, moveUpButton, moveDownButton);
-  }
-
   private void moveCase(int fromIndex, int toIndex) {
     Collections.swap(scene.getCases(), fromIndex, toIndex);
     rebuildRows();
@@ -185,18 +171,5 @@ public class CasesPanelController {
   private static Case cloneCase(@NonNull Case caseObj) {
     String json = JsonSettings.objectMapper.writeValueAsString(caseObj);
     return JsonSettings.objectMapper.readValue(json, Case.class);
-  }
-
-  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
-    FontIcon icon = new FontIcon(iconLiteral);
-    icon.setIconSize(16);
-    icon.getStyleClass().add("toolbar-icon");
-
-    Button button = new Button();
-    button.getStyleClass().add("default-button");
-    button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
-    button.setOnAction(event -> action.run());
-    return button;
   }
 }
