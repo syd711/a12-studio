@@ -47,3 +47,13 @@
     -fx-border-width: 0;
     -fx-border-insets: 0;
 }
+
+/* Nested TitledPane shown as a child inside another TitledPane's content, indented to signal the hierarchy. */
+.titled-pane-child {
+    -fx-padding: 0 0 0 24px;
+}
+
+/* TitledPane nested two levels deep, i.e. inside a .titled-pane-child's content. */
+.titled-pane-sub-child {
+    -fx-padding: 0 0 0 24px;
+}

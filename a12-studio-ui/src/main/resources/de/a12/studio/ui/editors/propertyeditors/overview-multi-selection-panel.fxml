@@ -49,7 +49,7 @@
                         </children>
                     </GridPane>
 
-                    <TitledPane fx:id="clearConfirmationPane" maxWidth="Infinity" text="CLEAR SELECTION CONFIRMATION">
+                    <TitledPane fx:id="clearConfirmationPane" maxWidth="Infinity" styleClass="titled-pane-child" text="CLEAR SELECTION CONFIRMATION">
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -58,18 +58,15 @@
                                 <CheckBox fx:id="clearConfirmationField" mnemonicParsing="false" text="Display confirmation before clearing selected rows" />
                                 <VBox fx:id="clearConfirmationDetails" spacing="10.0">
                                     <children>
-                                        <fx:include fx:id="clearConfirmationTitle" source="localized-text-panel.fxml" />
-                                        <fx:include fx:id="clearConfirmationMessage" source="localized-text-panel.fxml" />
+                                        <fx:include fx:id="clearConfirmationTitle" source="localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
+                                        <fx:include fx:id="clearConfirmationMessage" source="localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
                                     </children>
                                 </VBox>
                             </children>
                         </VBox>
-                        <VBox.margin>
-                            <Insets left="-8.0" />
-                        </VBox.margin>
                     </TitledPane>
 
-                    <TitledPane fx:id="actionsPane" maxWidth="Infinity" text="ACTIONS FOR MULTI-SELECTION">
+                    <TitledPane fx:id="actionsPane" maxWidth="Infinity" styleClass="titled-pane-child" text="ACTIONS FOR MULTI-SELECTION">
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -89,9 +86,6 @@
                                 <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="primary-button" text="Add" />
                             </children>
                         </VBox>
-                        <VBox.margin>
-                            <Insets left="-8.0" />
-                        </VBox.margin>
                     </TitledPane>
                 </children>
             </VBox>
