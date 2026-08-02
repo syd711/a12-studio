@@ -14,5 +14,6 @@
   "content": "0.8.0",
   "combination": "1.0.0",
   "mapping": "1.0.0",
-  "query": "0.1.0"
+  "query": "0.1.0",
+  "structuralmapping": "1.0.0"
 }

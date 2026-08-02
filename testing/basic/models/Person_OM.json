@@ -334,6 +334,15 @@
           }
         ]
       },
+      "multiSelection": {
+        "collapseOption": null,
+        "counterOption": null,
+        "selectionArea": null,
+        "clearConfirmation": {
+          "enabled": true,
+          "confirmation": {}
+        }
+      },
       "initialSorting": [
         {
           "idref": "column-5847d"

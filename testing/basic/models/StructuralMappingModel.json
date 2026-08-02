@@ -1,0 +1,26 @@
+{
+  "header": {
+    "id": "StructuralMappingModel",
+    "modelType": "structuralmapping",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "GroupsToClearOnFirstFill": [],
+    "MappingBlocks": []
+  }
+}

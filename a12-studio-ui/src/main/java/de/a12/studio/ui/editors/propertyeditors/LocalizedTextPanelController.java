@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.StringTypeOptions;
+import de.a12.studio.models.overviewmodel.Confirmation;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
@@ -31,10 +32,12 @@ import java.util.function.Function;
  * #setElement}, distinguished via {@link #configureLabel} / {@link #configureInternal} / {@link
  * #configureExternal} / {@link #configureHelperText}), for a model's own header labels (via {@link
  * #setModel} after {@link #configureModelLabels}), for an application model {@link Module}'s menu label
- * (via {@link #setModule} after {@link #configureModuleMenuLabel}), and for a {@link Case}'s label (via
- * {@link #setCase} after {@link #configureCaseLabel}). Exactly one configure method must be called once
- * after this controller is loaded from FXML, before setElement/setModel/setModule/setCase; {@code element},
- * {@link #model}, {@link #module} and {@link #sceneCase} are mutually exclusive.
+ * (via {@link #setModule} after {@link #configureModuleMenuLabel}), for a {@link Case}'s label (via
+ * {@link #setCase} after {@link #configureCaseLabel}), and for a {@link Confirmation}'s title or message
+ * (via {@link #setConfirmation} after {@link #configureConfirmationTitle} / {@link
+ * #configureConfirmationMessage}). Exactly one configure method must be called once after this controller
+ * is loaded from FXML, before setElement/setModel/setModule/setCase/setConfirmation; {@code element},
+ * {@link #model}, {@link #module}, {@link #sceneCase} and {@link #confirmation} are mutually exclusive.
  */
 public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
@@ -52,6 +55,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   private Case sceneCase;
 
+  private Confirmation confirmation;
+
   // Captured whenever setElement/setModel is called, i.e. whenever this panel is (re)bound to whichever
   // project item is currently selected. Used to tell apart a locales-changed event meant for this panel's own
   // model from one fired for a different, unrelated model open in another tab.
@@ -64,6 +69,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   private Function<A12Model<?>, List<Label>> modelTextsAccessor = A12Model::getLabels;
 
   private Function<Module, List<Label>> moduleTextsAccessor = module -> module.getOrCreateMenu().getLabel();
+
+  private Function<Confirmation, List<Label>> confirmationTextsAccessor = Confirmation::getTitle;
 
   private String fieldKey = "external";
 
@@ -109,6 +116,21 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     setSettingsKeySuffix("." + fieldKey);
   }
 
+  public void configureConfirmationTitle() {
+    configureConfirmation(Confirmation::getTitle, "confirmationTitle", "CONFIRMATION TITLE");
+  }
+
+  public void configureConfirmationMessage() {
+    configureConfirmation(Confirmation::getMessage, "confirmationMessage", "CONFIRMATION MESSAGE");
+  }
+
+  private void configureConfirmation(Function<Confirmation, List<Label>> textsAccessor, String fieldKey, String title) {
+    this.confirmationTextsAccessor = textsAccessor;
+    this.fieldKey = fieldKey;
+    setTitle(title);
+    setSettingsKeySuffix("." + fieldKey);
+  }
+
   private void configure(Function<Element, List<Label>> textsAccessor, String fieldKey, String title) {
     configure(textsAccessor, textsAccessor, fieldKey, title);
   }
@@ -127,6 +149,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.model = null;
     this.module = null;
     this.sceneCase = null;
+    this.confirmation = null;
     this.projectItem = Studio.getSelectedProjectItem();
     super.setElement(element);
     buildLocaleFields();
@@ -142,6 +165,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.element = null;
     this.module = null;
     this.sceneCase = null;
+    this.confirmation = null;
     this.model = model;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -152,6 +176,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.element = null;
     this.model = null;
     this.sceneCase = null;
+    this.confirmation = null;
     this.module = module;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -162,7 +187,19 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.element = null;
     this.model = null;
     this.module = null;
+    this.confirmation = null;
     this.sceneCase = sceneCase;
+    this.projectItem = Studio.getSelectedProjectItem();
+    buildLocaleFields();
+    populateLocaleFields();
+  }
+
+  public void setConfirmation(@NonNull Confirmation confirmation) {
+    this.element = null;
+    this.model = null;
+    this.module = null;
+    this.sceneCase = null;
+    this.confirmation = confirmation;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
     populateLocaleFields();
@@ -177,6 +214,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   private List<Label> getTexts() {
+    if (confirmation != null) {
+      return confirmationTextsAccessor.apply(confirmation);
+    }
     if (sceneCase != null) {
       return sceneCase.getLabel();
     }
@@ -220,6 +260,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   private List<Label> getWriteTexts() {
+    if (confirmation != null) {
+      return confirmationTextsAccessor.apply(confirmation);
+    }
     if (sceneCase != null) {
       return sceneCase.getLabel();
     }

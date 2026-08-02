@@ -37,6 +37,8 @@ import de.a12.studio.models.relationshipmodel.LinkConstraints;
 import de.a12.studio.models.relationshipmodel.Multiplicity;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModelContent;
+import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
+import de.a12.studio.models.structuralmappingmodel.StructuralMappingModelContent;
 import de.a12.studio.models.treemodel.ExpansionStrategy;
 import de.a12.studio.models.treemodel.SlotBox;
 import de.a12.studio.models.treemodel.TreeConfiguration;
@@ -89,6 +91,7 @@ public class NewModelFactory {
       case COMBINATION -> buildCombinationModel(locales);
       case MAPPING -> buildMappingModel(locales);
       case QUERY -> buildQueryModel(locales);
+      case STRUCTURALMAPPING -> buildStructuralMappingModel(locales);
     };
   }
 
@@ -293,6 +296,13 @@ public class NewModelFactory {
   private static QueryModel buildQueryModel(List<Locale> locales) {
     QueryModel model = new QueryModel();
     model.setContent(new QueryModelContent());
+    model.setLocales(locales);
+    return model;
+  }
+
+  private static StructuralMappingModel buildStructuralMappingModel(List<Locale> locales) {
+    StructuralMappingModel model = new StructuralMappingModel();
+    model.setContent(new StructuralMappingModelContent());
     model.setLocales(locales);
     return model;
   }

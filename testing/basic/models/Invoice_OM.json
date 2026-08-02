@@ -100,10 +100,7 @@
             "destructive": true,
             "primary": false
           }
-        ],
-        "clearConfirmation": {
-          "enabled": true
-        }
+        ]
       },
       "showFullTextSearch": true,
       "pagingSize": 10,
@@ -111,7 +108,8 @@
       "enableColumnsResize": true,
       "screenReaderColumn": {
         "idref": "column-95652"
-      }
+      },
+      "skipInitialLoad": true
     },
     "subHeaderBox": {
       "leftSlot": [],

@@ -38,6 +38,17 @@
           </graphic>
         </Label>
       </HBox>
+      <HBox alignment="CENTER_LEFT" spacing="6.0">
+        <CheckBox fx:id="skipInitialLoadField" mnemonicParsing="false" text="Skip Initial Load" />
+        <Label prefHeight="9.0" prefWidth="7.0">
+          <tooltip>
+            <Tooltip prefWidth="300.0" text="Prevents the overview from querying Data Services until the user applies a filter or search. The overview shows an empty table until constraints are provided." wrapText="true" />
+          </tooltip>
+          <graphic>
+            <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+          </graphic>
+        </Label>
+      </HBox>
     </HBox>
   </VBox>
  </center>

@@ -45,10 +45,10 @@ import java.util.UUID;
  * OverviewColumnOptions}), Sortable, Width and Pin Direction. Not bound to a single {@link
  * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
  * {@link OverviewFeaturesPanelController}. Clicking a row opens {@link Dialogs#showColumn}, which is
- * intentionally empty for now (no fields yet) - the full column editor is a follow-up. Also edits two
- * {@link OverviewConfiguration} flags displayed alongside the column list: Enable Columns Resize and Show
- * Number Of Entries (moved here from {@link OverviewFeaturesPanelController} since both are about how the
- * resulting table of columns is presented).
+ * intentionally empty for now (no fields yet) - the full column editor is a follow-up. Also edits
+ * {@link OverviewConfiguration} flags displayed alongside the column list: Enable Columns Resize, Show
+ * Number Of Entries and Skip Initial Load (moved here from {@link OverviewFeaturesPanelController} since
+ * all are about how the resulting table of columns is presented).
  */
 public class OverviewColumnsPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -69,6 +69,9 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
 
   @FXML
   private CheckBox showRowCountField;
+
+  @FXML
+  private CheckBox skipInitialLoadField;
 
   private OverviewModel model;
 
@@ -101,6 +104,13 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
       ensureConfiguration().setShowRowCount(newValue ? Boolean.TRUE : null);
       commitHeaderChange();
     });
+    skipInitialLoadField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel || model == null) {
+        return;
+      }
+      ensureConfiguration().setSkipInitialLoad(newValue ? Boolean.TRUE : null);
+      commitHeaderChange();
+    });
   }
 
   public void setModel(@NonNull OverviewModel model) {
@@ -112,6 +122,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
       OverviewConfiguration configuration = model.getContent().getConfiguration();
       enableColumnsResizeField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getEnableColumnsResize()));
       showRowCountField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getShowRowCount()));
+      skipInitialLoadField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getSkipInitialLoad()));
     }
     finally {
       updatingFromModel = false;

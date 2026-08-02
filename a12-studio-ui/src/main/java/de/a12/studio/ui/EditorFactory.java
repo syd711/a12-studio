@@ -13,6 +13,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
@@ -28,6 +29,7 @@ import de.a12.studio.ui.editors.maindetailmodel.MainDetailModelEditorController;
 import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
 import de.a12.studio.ui.editors.querymodel.QueryModelEditorController;
 import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController;
+import de.a12.studio.ui.editors.structuralmappingmodel.StructuralMappingModelEditorController;
 import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -119,6 +121,12 @@ public class EditorFactory {
         FXMLLoader loader = new FXMLLoader(QueryModelEditorController.class.getResource("query-model-editor.fxml"));
         content = loader.load();
         QueryModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof StructuralMappingModel) {
+        FXMLLoader loader = new FXMLLoader(StructuralMappingModelEditorController.class.getResource("structural-mapping-model-editor.fxml"));
+        content = loader.load();
+        StructuralMappingModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getAuthDocument() instanceof RolesDocument) {

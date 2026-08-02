@@ -23,6 +23,7 @@ public enum ModelType {
   PRINT("print", "Print Model"),
   QUERY("query", "Query Model"),
   RELATIONSHIP("relationship", "Relationship Model"),
+  STRUCTURALMAPPING("structuralmapping", "Structural Mapping Model"),
   TREE("tree", "Tree Model"),
   TYPEDEFINITION("typedefinition", "Type Definition Model");
 

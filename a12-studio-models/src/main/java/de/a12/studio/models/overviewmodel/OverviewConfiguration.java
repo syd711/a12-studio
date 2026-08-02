@@ -21,6 +21,8 @@ public class OverviewConfiguration {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean enableColumnsResize;
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean skipInitialLoad;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private FilterConfiguration filterConfiguration;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private MultiSelectionConfig multiSelection;

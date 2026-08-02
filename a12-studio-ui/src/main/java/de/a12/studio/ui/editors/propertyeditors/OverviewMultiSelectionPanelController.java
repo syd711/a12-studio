@@ -1,38 +1,58 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.models.Label;
-import de.a12.studio.models.Locale;
 import de.a12.studio.models.overviewmodel.ClearConfirmation;
 import de.a12.studio.models.overviewmodel.Confirmation;
-import de.a12.studio.models.overviewmodel.Icon;
 import de.a12.studio.models.overviewmodel.MultiSelectionConfig;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.overviewmodel.dialogs.Dialogs;
+import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.BiConsumer;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.configuration.multiSelection}: the collapse/counter/
- * selection-area options, the clear-selection confirmation, and one draggable-free {@link ListView} of
- * {@link de.a12.studio.models.overviewmodel.Button} entries with their own detail form. Not bound to a
- * single {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by
- * e.g. {@link OverviewFeaturesPanelController}.
+ * selection-area options, the clear-selection confirmation, and one draggable, reorderable row per
+ * {@link de.a12.studio.models.overviewmodel.Button} action, summarizing its Event, Priority, Destructive and
+ * Icon. Not bound to a single {@link de.a12.studio.models.documentmodel.Element}, so it follows the
+ * model-header pattern used by e.g. {@link OverviewFeaturesPanelController}. Clicking a row (or its Edit
+ * button) opens {@link Dialogs#showMultiSelectionActionForEdit}, which is intentionally empty for now (no
+ * fields yet) - the full action editor is a follow-up, matching {@link OverviewColumnsPanelController}'s
+ * column dialog.
  */
 public class OverviewMultiSelectionPanelController extends AbstractPropertyEditor implements Initializable {
+
+  // Identifies a row-reorder drag; the dragboard content is the dragged action's current index into getActions().
+  private static final DataFormat ACTION_INDEX = new DataFormat("application/x-a12-multi-selection-action-index");
 
   private static final List<String> COLLAPSE_OPTIONS = List.of("",
       MultiSelectionConfig.COLLAPSE_OPTION_COLLAPSIBLE_COLLAPSED, MultiSelectionConfig.COLLAPSE_OPTION_COLLAPSIBLE_EXPANDED,
@@ -41,13 +61,7 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
       MultiSelectionConfig.COUNTER_OPTION_SIMPLE, MultiSelectionConfig.COUNTER_OPTION_NONE);
   private static final List<String> SELECTION_AREA_OPTIONS = List.of("",
       MultiSelectionConfig.SELECTION_AREA_CHECKBOX, MultiSelectionConfig.SELECTION_AREA_CHECKBOX_AND_ROW);
-  private static final List<String> ICON_THEME_OPTIONS = List.of("",
-      Icon.THEME_FILLED, Icon.THEME_OUTLINED, Icon.THEME_ROUNDED, Icon.THEME_CUSTOM);
 
-  @FXML
-  private CheckBox enableMultiSelectionField;
-  @FXML
-  private VBox multiSelectionDetailsBox;
   @FXML
   private ComboBox<String> collapseOptionField;
   @FXML
@@ -57,31 +71,17 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
   @FXML
   private CheckBox clearConfirmationField;
   @FXML
-  private ListView<de.a12.studio.models.overviewmodel.Button> multiSelectionButtonsList;
+  private VBox clearConfirmationDetails;
   @FXML
-  private VBox multiSelectionButtonDetailBox;
+  private LocalizedTextPanelController clearConfirmationTitleController;
   @FXML
-  private TextField buttonEventField;
+  private LocalizedTextPanelController clearConfirmationMessageController;
   @FXML
-  private CheckBox buttonDestructiveField;
+  private HBox actionColumnHeaders;
   @FXML
-  private CheckBox buttonPrimaryField;
+  private VBox actionRows;
   @FXML
-  private TextField buttonIconNameField;
-  @FXML
-  private ComboBox<String> buttonIconThemeField;
-  @FXML
-  private GridPane buttonLabelGrid;
-  @FXML
-  private GridPane buttonDescriptionGrid;
-  @FXML
-  private CheckBox buttonConfirmationField;
-  @FXML
-  private VBox buttonConfirmationDetailsBox;
-  @FXML
-  private GridPane buttonConfirmationTitleGrid;
-  @FXML
-  private GridPane buttonConfirmationMessageGrid;
+  private Label actionsEmptyLabel;
 
   private OverviewModel model;
 
@@ -89,39 +89,9 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
   // for user edits and don't trigger a save.
   private boolean updatingFromModel;
 
-  // Preserves multi-selection settings across an uncheck/recheck of "Enable Multi-Selection" within the
-  // same session, since disabling it nulls configuration.multiSelection (matching SME's on-disk shape).
-  private MultiSelectionConfig cachedMultiSelectionConfig;
-
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-
-    enableMultiSelectionField.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel || model == null) {
-        return;
-      }
-      OverviewConfiguration configuration = ensureConfiguration();
-      if (newValue) {
-        configuration.setMultiSelection(configuration.getMultiSelection() != null ? configuration.getMultiSelection()
-            : (cachedMultiSelectionConfig != null ? cachedMultiSelectionConfig : new MultiSelectionConfig()));
-      }
-      else {
-        cachedMultiSelectionConfig = configuration.getMultiSelection();
-        configuration.setMultiSelection(null);
-      }
-      multiSelectionDetailsBox.setVisible(newValue);
-      multiSelectionDetailsBox.setManaged(newValue);
-      boolean wasUpdating = updatingFromModel;
-      updatingFromModel = true;
-      try {
-        populateMultiSelectionFields();
-      }
-      finally {
-        updatingFromModel = wasUpdating;
-      }
-      commitHeaderChange();
-    });
 
     collapseOptionField.getItems().setAll(COLLAPSE_OPTIONS);
     collapseOptionField.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -162,111 +132,19 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
           config.setClearConfirmation(confirmation);
         }
         confirmation.setEnabled(true);
+        bindConfirmationControllers(ensureConfirmationDetails(confirmation));
       }
       else {
         config.setClearConfirmation(null);
+        bindConfirmationControllers(new Confirmation());
       }
       commitHeaderChange();
     });
 
-    multiSelectionButtonsList.setCellFactory(list -> new javafx.scene.control.ListCell<>() {
-      @Override
-      protected void updateItem(de.a12.studio.models.overviewmodel.Button button, boolean empty) {
-        super.updateItem(button, empty);
-        setText(empty || button == null ? null : describeMultiSelectionButton(button));
-      }
-    });
-    multiSelectionButtonsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showMultiSelectionButton(newValue));
-
-    buttonEventField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button == null) {
-        return;
-      }
-      button.setEvent(newValue == null || newValue.isBlank() ? null : newValue);
-      multiSelectionButtonsList.refresh();
-      commitHeaderChange();
-    });
-
-    buttonDestructiveField.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button != null) {
-        button.setDestructive(newValue);
-        commitHeaderChange();
-      }
-    });
-    buttonPrimaryField.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button != null) {
-        button.setPrimary(newValue);
-        commitHeaderChange();
-      }
-    });
-
-    buttonIconNameField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button == null) {
-        return;
-      }
-      setIconName(button, newValue);
-      commitHeaderChange();
-    });
-
-    buttonIconThemeField.getItems().setAll(ICON_THEME_OPTIONS);
-    buttonIconThemeField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button == null || button.getIcon() == null) {
-        return;
-      }
-      button.getIcon().setTheme(newValue == null || newValue.isBlank() ? null : newValue);
-      commitHeaderChange();
-    });
-
-    buttonConfirmationField.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-      if (button == null) {
-        return;
-      }
-      if (newValue) {
-        ensureConfirmation(button);
-      }
-      else {
-        button.setConfirmation(null);
-      }
-      buttonConfirmationDetailsBox.setVisible(newValue);
-      buttonConfirmationDetailsBox.setManaged(newValue);
-      boolean wasUpdating = updatingFromModel;
-      updatingFromModel = true;
-      try {
-        rebuildLocaleGrid(buttonConfirmationTitleGrid, newValue ? ensureConfirmation(button).getTitle() : List.of(),
-            (code, text) -> setLabelText(ensureConfirmation(button).getTitle(), code, text));
-        rebuildLocaleGrid(buttonConfirmationMessageGrid, newValue ? ensureConfirmation(button).getMessage() : List.of(),
-            (code, text) -> setLabelText(ensureConfirmation(button).getMessage(), code, text));
-      }
-      finally {
-        updatingFromModel = wasUpdating;
-      }
-      multiSelectionButtonsList.refresh();
-      commitHeaderChange();
-    });
+    clearConfirmationTitleController.configureConfirmationTitle();
+    clearConfirmationMessageController.configureConfirmationMessage();
+    clearConfirmationDetails.visibleProperty().bind(clearConfirmationField.selectedProperty());
+    clearConfirmationDetails.managedProperty().bind(clearConfirmationDetails.visibleProperty());
   }
 
   public void setModel(@NonNull OverviewModel model) {
@@ -274,125 +152,23 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
 
     updatingFromModel = true;
     try {
-      OverviewConfiguration configuration = model.getContent().getConfiguration();
-      boolean multiSelectionEnabled = configuration != null && configuration.getMultiSelection() != null;
-      enableMultiSelectionField.setSelected(multiSelectionEnabled);
-      multiSelectionDetailsBox.setVisible(multiSelectionEnabled);
-      multiSelectionDetailsBox.setManaged(multiSelectionEnabled);
-      populateMultiSelectionFields();
+      MultiSelectionConfig config = currentMultiSelectionConfig();
+      collapseOptionField.setValue(config != null ? orEmpty(config.getCollapseOption()) : "");
+      counterOptionField.setValue(config != null ? orEmpty(config.getCounterOption()) : "");
+      selectionAreaField.setValue(config != null ? orEmpty(config.getSelectionArea()) : "");
+      ClearConfirmation clearConfirmation = config != null ? config.getClearConfirmation() : null;
+      boolean confirmationEnabled = clearConfirmation != null && Boolean.TRUE.equals(clearConfirmation.getEnabled());
+      clearConfirmationField.setSelected(confirmationEnabled);
+      bindConfirmationControllers(confirmationEnabled ? ensureConfirmationDetails(clearConfirmation) : new Confirmation());
+      rebuildActionRows();
     }
     finally {
       updatingFromModel = false;
     }
   }
 
-  private void populateMultiSelectionFields() {
-    MultiSelectionConfig config = currentMultiSelectionConfig();
-    collapseOptionField.setValue(config != null ? orEmpty(config.getCollapseOption()) : "");
-    counterOptionField.setValue(config != null ? orEmpty(config.getCounterOption()) : "");
-    selectionAreaField.setValue(config != null ? orEmpty(config.getSelectionArea()) : "");
-    clearConfirmationField.setSelected(config != null && config.getClearConfirmation() != null
-        && Boolean.TRUE.equals(config.getClearConfirmation().getEnabled()));
-    refreshMultiSelectionButtonsList();
-    showMultiSelectionButton(null);
-  }
-
   private MultiSelectionConfig currentMultiSelectionConfig() {
     return model.getContent().getConfiguration() != null ? model.getContent().getConfiguration().getMultiSelection() : null;
-  }
-
-  private void refreshMultiSelectionButtonsList() {
-    de.a12.studio.models.overviewmodel.Button selected = multiSelectionButtonsList.getSelectionModel().getSelectedItem();
-    MultiSelectionConfig config = currentMultiSelectionConfig();
-    List<de.a12.studio.models.overviewmodel.Button> buttons = config != null ? config.getButtons() : List.of();
-    multiSelectionButtonsList.getItems().setAll(buttons);
-    if (selected != null && buttons.contains(selected)) {
-      multiSelectionButtonsList.getSelectionModel().select(selected);
-    }
-  }
-
-  private de.a12.studio.models.overviewmodel.Button selectedMultiSelectionButton() {
-    return multiSelectionButtonsList.getSelectionModel().getSelectedItem();
-  }
-
-  private void showMultiSelectionButton(de.a12.studio.models.overviewmodel.Button button) {
-    boolean wasUpdating = updatingFromModel;
-    updatingFromModel = true;
-    try {
-      boolean present = button != null;
-      multiSelectionButtonDetailBox.setVisible(present);
-      multiSelectionButtonDetailBox.setManaged(present);
-      if (!present) {
-        return;
-      }
-      buttonEventField.setText(button.getEvent() != null ? button.getEvent() : "");
-      buttonDestructiveField.setSelected(Boolean.TRUE.equals(button.getDestructive()));
-      buttonPrimaryField.setSelected(Boolean.TRUE.equals(button.getPrimary()));
-      buttonIconNameField.setText(button.getIcon() != null && button.getIcon().getName() != null ? button.getIcon().getName() : "");
-      buttonIconThemeField.setValue(button.getIcon() != null ? orEmpty(button.getIcon().getTheme()) : "");
-      rebuildLocaleGrid(buttonLabelGrid, button.getLabel(), (code, text) -> setLabelText(button.getLabel(), code, text));
-      rebuildLocaleGrid(buttonDescriptionGrid, button.getDescription(), (code, text) -> setLabelText(button.getDescription(), code, text));
-
-      boolean confirmationEnabled = button.getConfirmation() != null;
-      buttonConfirmationField.setSelected(confirmationEnabled);
-      buttonConfirmationDetailsBox.setVisible(confirmationEnabled);
-      buttonConfirmationDetailsBox.setManaged(confirmationEnabled);
-      Confirmation confirmation = button.getConfirmation();
-      rebuildLocaleGrid(buttonConfirmationTitleGrid, confirmation != null ? confirmation.getTitle() : List.of(),
-          (code, text) -> setLabelText(ensureConfirmation(button).getTitle(), code, text));
-      rebuildLocaleGrid(buttonConfirmationMessageGrid, confirmation != null ? confirmation.getMessage() : List.of(),
-          (code, text) -> setLabelText(ensureConfirmation(button).getMessage(), code, text));
-    }
-    finally {
-      updatingFromModel = wasUpdating;
-    }
-  }
-
-  @FXML
-  public void onAddMultiSelectionButton() {
-    MultiSelectionConfig config = ensureMultiSelectionConfig();
-    de.a12.studio.models.overviewmodel.Button button = new de.a12.studio.models.overviewmodel.Button();
-    button.setEvent("");
-    config.getButtons().add(button);
-    refreshMultiSelectionButtonsList();
-    multiSelectionButtonsList.getSelectionModel().select(button);
-    commitHeaderChange();
-  }
-
-  @FXML
-  public void onRemoveMultiSelectionButton() {
-    de.a12.studio.models.overviewmodel.Button button = selectedMultiSelectionButton();
-    if (button == null) {
-      return;
-    }
-    MultiSelectionConfig config = currentMultiSelectionConfig();
-    if (config != null) {
-      config.getButtons().remove(button);
-    }
-    refreshMultiSelectionButtonsList();
-    commitHeaderChange();
-  }
-
-  private static void setIconName(de.a12.studio.models.overviewmodel.Button button, String value) {
-    if (value == null || value.isBlank()) {
-      if (button.getIcon() != null) {
-        button.getIcon().setName(null);
-      }
-      return;
-    }
-    Icon icon = button.getIcon();
-    if (icon == null) {
-      icon = new Icon();
-      button.setIcon(icon);
-    }
-    icon.setName(value);
-  }
-
-  private static Confirmation ensureConfirmation(de.a12.studio.models.overviewmodel.Button button) {
-    if (button.getConfirmation() == null) {
-      button.setConfirmation(new Confirmation());
-    }
-    return button.getConfirmation();
   }
 
   private OverviewConfiguration ensureConfiguration() {
@@ -405,71 +181,211 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
   private MultiSelectionConfig ensureMultiSelectionConfig() {
     OverviewConfiguration configuration = ensureConfiguration();
     if (configuration.getMultiSelection() == null) {
-      configuration.setMultiSelection(cachedMultiSelectionConfig != null ? cachedMultiSelectionConfig : new MultiSelectionConfig());
+      configuration.setMultiSelection(new MultiSelectionConfig());
     }
     return configuration.getMultiSelection();
   }
 
-  /** One text field per model locale, in {@code grid}, calling {@code onTextChange} with (locale, text) on edit. */
-  private void rebuildLocaleGrid(GridPane grid, List<Label> labels, BiConsumer<String, String> onTextChange) {
-    grid.getChildren().clear();
-    int row = 0;
-    for (Locale locale : model.getLocales()) {
-      String code = locale.getCode();
-      javafx.scene.control.Label localeLabel = new javafx.scene.control.Label(code);
-      localeLabel.getStyleClass().add("field-label");
+  private Confirmation ensureConfirmationDetails(ClearConfirmation clearConfirmation) {
+    if (clearConfirmation.getConfirmation() == null) {
+      clearConfirmation.setConfirmation(new Confirmation());
+    }
+    return clearConfirmation.getConfirmation();
+  }
 
-      TextField textField = new TextField(labelText(labels, code));
-      textField.setMaxWidth(Double.MAX_VALUE);
-      GridPane.setHgrow(textField, Priority.ALWAYS);
-      textField.textProperty().addListener((observable, oldValue, newValue) -> {
-        if (updatingFromModel) {
-          return;
-        }
-        onTextChange.accept(code, newValue);
+  private void bindConfirmationControllers(Confirmation confirmation) {
+    clearConfirmationTitleController.setConfirmation(confirmation);
+    clearConfirmationMessageController.setConfirmation(confirmation);
+  }
+
+  private List<de.a12.studio.models.overviewmodel.Button> getActions() {
+    return ensureMultiSelectionConfig().getButtons();
+  }
+
+  @FXML
+  private void onAddAction() {
+    Dialogs.showMultiSelectionActionForAdd(Studio.stage).ifPresent(button -> {
+      getActions().add(button);
+      rebuildActionRows();
+      commitHeaderChange();
+    });
+  }
+
+  private void rebuildActionRows() {
+    actionRows.getChildren().clear();
+
+    MultiSelectionConfig config = currentMultiSelectionConfig();
+    List<de.a12.studio.models.overviewmodel.Button> actions = config != null ? config.getButtons() : List.of();
+    boolean empty = actions.isEmpty();
+    actionColumnHeaders.setVisible(!empty);
+    actionColumnHeaders.setManaged(!empty);
+    actionsEmptyLabel.setVisible(empty);
+    actionsEmptyLabel.setManaged(empty);
+
+    for (int index = 0; index < actions.size(); index++) {
+      actionRows.getChildren().add(createRow(actions.get(index), index, actions.size()));
+    }
+  }
+
+  private HBox createRow(de.a12.studio.models.overviewmodel.Button button, int index, int rowCount) {
+    FontIcon dragHandle = new FontIcon(Icons.DRAG_HANDLE);
+    dragHandle.setIconSize(18);
+    dragHandle.getStyleClass().add("module-drag-handle");
+    dragHandle.setCursor(Cursor.MOVE);
+
+    Label eventLabel = createRowLabel(orEmpty(button.getEvent()), "multiSelectionActionEvent-" + index, 160.0, button);
+    Label priorityLabel = createRowLabel("", "multiSelectionActionPriority-" + index, 90.0, button);
+    Label destructiveLabel = createRowLabel(Boolean.TRUE.equals(button.getDestructive()) ? "Yes" : "No", "multiSelectionActionDestructive-" + index, 90.0, button);
+    Label iconLabel = createRowLabel(button.getIcon() != null ? orEmpty(button.getIcon().getName()) : "", "multiSelectionActionIcon-" + index, 120.0, button);
+
+    HBox row = new HBox(10.0, dragHandle, eventLabel, priorityLabel, destructiveLabel, iconLabel, createActionsBox(button, index, rowCount));
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("module-row");
+    setupDragAndDrop(row, dragHandle, index);
+    return row;
+  }
+
+  private Label createRowLabel(String text, String id, double width, de.a12.studio.models.overviewmodel.Button button) {
+    Label label = new Label(text);
+    label.setId(id);
+    label.setPrefWidth(width);
+    label.setCursor(Cursor.HAND);
+    label.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        openEditDialog(button);
+      }
+    });
+    return label;
+  }
+
+  private void openEditDialog(de.a12.studio.models.overviewmodel.Button button) {
+    if (Dialogs.showMultiSelectionActionForEdit(Studio.stage, button)) {
+      rebuildActionRows();
+      commitHeaderChange();
+    }
+  }
+
+  // Only the drag handle initiates a drag (so clicking a label or the action buttons doesn't start one); the
+  // whole row is the drop target, so hovering anywhere over another row while dragging offers reordering there.
+  private void setupDragAndDrop(HBox row, Node dragHandle, int index) {
+    dragHandle.setOnDragDetected(event -> {
+      Dragboard dragboard = dragHandle.startDragAndDrop(TransferMode.MOVE);
+      ClipboardContent content = new ClipboardContent();
+      content.put(ACTION_INDEX, String.valueOf(index));
+      dragboard.setContent(content);
+
+      SnapshotParameters snapshotParams = new SnapshotParameters();
+      snapshotParams.setFill(Color.TRANSPARENT);
+      Point2D cursorInRow = dragHandle.localToParent(event.getX(), event.getY());
+      dragboard.setDragView(row.snapshot(snapshotParams, null), cursorInRow.getX(), cursorInRow.getY());
+
+      row.getStyleClass().add("module-row-dragging");
+      event.consume();
+    });
+    dragHandle.setOnDragDone(event -> row.getStyleClass().remove("module-row-dragging"));
+
+    row.setOnDragOver(event -> {
+      if (event.getDragboard().hasContent(ACTION_INDEX)) {
+        event.acceptTransferModes(TransferMode.MOVE);
+        showDropIndicator(row, isAboveMidpoint(row, event.getY()));
+      }
+      event.consume();
+    });
+    row.setOnDragExited(event -> clearDropIndicator(row));
+    row.setOnDragDropped(event -> {
+      Dragboard dragboard = event.getDragboard();
+      boolean success = dragboard.hasContent(ACTION_INDEX);
+      if (success) {
+        int insertBeforeIndex = isAboveMidpoint(row, event.getY()) ? index : index + 1;
+        moveAction(Integer.parseInt((String) dragboard.getContent(ACTION_INDEX)), insertBeforeIndex);
+      }
+      clearDropIndicator(row);
+      event.setDropCompleted(success);
+      event.consume();
+    });
+  }
+
+  private static boolean isAboveMidpoint(HBox row, double dragY) {
+    return dragY < row.getHeight() / 2;
+  }
+
+  private static void showDropIndicator(HBox row, boolean above) {
+    String showClass = above ? "module-row-drop-above" : "module-row-drop-below";
+    String hideClass = above ? "module-row-drop-below" : "module-row-drop-above";
+    row.getStyleClass().remove(hideClass);
+    if (!row.getStyleClass().contains(showClass)) {
+      row.getStyleClass().add(showClass);
+    }
+  }
+
+  private static void clearDropIndicator(HBox row) {
+    row.getStyleClass().removeAll("module-row-drop-above", "module-row-drop-below");
+  }
+
+  // targetIndex is the position the moved action should end up at, indexed into the list as it stood before
+  // the drag started (e.g. "landed above the row currently at index 2" is targetIndex 2).
+  private void moveAction(int fromIndex, int targetIndex) {
+    int insertIndex = fromIndex < targetIndex ? targetIndex - 1 : targetIndex;
+    if (insertIndex == fromIndex) {
+      return;
+    }
+    List<de.a12.studio.models.overviewmodel.Button> actions = getActions();
+    de.a12.studio.models.overviewmodel.Button moved = actions.remove(fromIndex);
+    actions.add(insertIndex, moved);
+    rebuildActionRows();
+    commitHeaderChange();
+  }
+
+  private HBox createActionsBox(de.a12.studio.models.overviewmodel.Button button, int index, int rowCount) {
+    VBox moveButtonsBox = createMoveButtonsBox(index, rowCount);
+
+    Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(button));
+
+    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this action?", null, null, "Delete");
+      if (result.isPresent() && result.get() == ButtonType.OK) {
+        getActions().remove(button);
+        rebuildActionRows();
         commitHeaderChange();
-      });
+      }
+    });
 
-      grid.addRow(row++, localeLabel, textField);
-    }
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
+    actionsBox.setAlignment(Pos.CENTER_LEFT);
+    return actionsBox;
   }
 
-  private static String labelText(List<Label> labels, String locale) {
-    return labels.stream()
-        .filter(label -> locale.equals(label.getLocale()))
-        .map(Label::getText)
-        .filter(text -> text != null)
-        .findFirst()
-        .orElse("");
+  // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
+  // "move-button" style class), so the pair together takes up the same width/height as a single normal button.
+  private VBox createMoveButtonsBox(int index, int rowCount) {
+    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveRow(index, index - 1));
+    moveUpButton.setDisable(index == 0);
+    moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
+
+    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveRow(index, index + 1));
+    moveDownButton.setDisable(index == rowCount - 1);
+    moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
+
+    return new VBox(1, moveUpButton, moveDownButton);
   }
 
-  private static void setLabelText(List<Label> labels, String locale, String text) {
-    Label existing = labels.stream()
-        .filter(label -> locale.equals(label.getLocale()))
-        .findFirst()
-        .orElse(null);
-    if (existing == null) {
-      existing = new Label();
-      existing.setLocale(locale);
-      labels.add(existing);
-    }
-    existing.setText(text == null || text.isBlank() ? null : text);
+  private void moveRow(int fromIndex, int toIndex) {
+    Collections.swap(getActions(), fromIndex, toIndex);
+    rebuildActionRows();
+    commitHeaderChange();
   }
 
-  private static String firstNonBlankText(List<Label> labels) {
-    return labels.stream()
-        .map(Label::getText)
-        .filter(text -> text != null && !text.isBlank())
-        .findFirst()
-        .orElse(null);
-  }
+  private static Button createActionButton(String iconLiteral, String tooltip, Runnable action) {
+    FontIcon icon = new FontIcon(iconLiteral);
+    icon.setIconSize(16);
+    icon.getStyleClass().add("toolbar-icon");
 
-  private String describeMultiSelectionButton(de.a12.studio.models.overviewmodel.Button button) {
-    String label = firstNonBlankText(button.getLabel());
-    if (label != null) {
-      return label;
-    }
-    return button.getEvent() != null && !button.getEvent().isBlank() ? button.getEvent() : "(new button)";
+    Button button = new Button();
+    button.getStyleClass().add("default-button");
+    button.setGraphic(icon);
+    button.setTooltip(new Tooltip(tooltip));
+    button.setOnAction(event -> action.run());
+    return button;
   }
 
   private static String orEmpty(String value) {

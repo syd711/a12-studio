@@ -12,6 +12,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
@@ -59,6 +60,7 @@ public class ModelFactory {
         case COMBINATION -> JsonSettings.objectMapper.treeToValue(root, CombinedDocumentModel.class);
         case MAPPING -> JsonSettings.objectMapper.treeToValue(root, MappingModel.class);
         case QUERY -> JsonSettings.objectMapper.treeToValue(root, QueryModel.class);
+        case STRUCTURALMAPPING -> JsonSettings.objectMapper.treeToValue(root, StructuralMappingModel.class);
         default -> {
           log.warn("Model type '{}' of '{}' is not supported yet", modelType, projectItem.getPath());
           yield null;

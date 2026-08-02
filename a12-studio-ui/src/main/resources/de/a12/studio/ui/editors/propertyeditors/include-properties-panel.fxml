@@ -25,7 +25,7 @@
               <ComboBox fx:id="referenceComboBox" editable="false" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
               <Button fx:id="editReferenceButton" mnemonicParsing="false" onAction="#onEditReference" styleClass="default-button">
                 <graphic>
-                  <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="16" />
+                  <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" />
                 </graphic>
                 <tooltip>
                   <Tooltip text="Open Document Model" />

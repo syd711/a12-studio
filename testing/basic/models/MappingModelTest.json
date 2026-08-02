@@ -21,11 +21,15 @@
     "modelReferences": [
       {
         "modelType": "document",
-        "reference": "Company_DM"
+        "reference": "Order_DM"
       },
       {
         "modelType": "document",
-        "reference": "Order_DM"
+        "reference": "Company_DM"
+      },
+      {
+        "modelType": "structuralmapping",
+        "reference": "StructuralMappingModel"
       }
     ]
   },
@@ -40,6 +44,9 @@
     ],
     "Target": {
       "dmId": "Company_DM"
+    },
+    "StructuralMappingModel": {
+      "id": "StructuralMappingModel"
     }
   }
 }

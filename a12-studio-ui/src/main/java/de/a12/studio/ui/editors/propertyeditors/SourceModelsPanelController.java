@@ -2,10 +2,13 @@ package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.mappingmodel.MappingSource;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.mappingmodel.dialogs.Dialogs;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -219,6 +222,9 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
 
     Button editButton = createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(sourceModel));
 
+    Button openModelButton = createActionButton(Icons.OPEN_IN_NEW, "Open Model", () -> openModel(sourceModel));
+    openModelButton.setDisable(sourceModel.getDmId() == null || sourceModel.getDmId().isBlank());
+
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this source model?", null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -228,9 +234,25 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
       }
     });
 
-    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, openModelButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
+  }
+
+  /**
+   * Opens the Document Model referenced by {@code sourceModel}'s {@code dmId} in an editor tab, selecting its
+   * tab instead if it's already open (see {@code TabPaneController#modelOpened}), mirroring {@link
+   * TargetModelPanelController#onEditReference}.
+   */
+  private void openModel(MappingSource sourceModel) {
+    ProjectDocumentModels.findProjectItemByModelId(sourceModel.getDmId()).ifPresent(item -> {
+      Project project = Studio.getCurrentProject();
+      if (project != null) {
+        project.getSettings().getUISettings().addOpenedFile(item.getPath());
+        project.getSettings().getUISettings().save();
+      }
+      StudioEventManager.getInstance().fireModelOpenEvent(item);
+    });
   }
 
   // Move up/down stacked in a VBox instead of side by side in the HBox: each button is half-height (see the
