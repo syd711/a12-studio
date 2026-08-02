@@ -30,4 +30,10 @@ public class OverviewConfiguration {
   private List<ColumnRef> initialSorting = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private ColumnRef screenReaderColumn;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer rowHeight;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer actionColumnWidth;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean enableInfiniteScroll;
 }

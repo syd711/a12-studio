@@ -22,6 +22,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -206,7 +207,8 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
       cell.getChildren().add(0, icon);
     }
     cell.setAlignment(Pos.CENTER_LEFT);
-    cell.setPrefWidth(250.0);
+    cell.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(cell, Priority.ALWAYS);
     cell.setCursor(Cursor.HAND);
     cell.setOnMouseClicked(event -> {
       if (event.getClickCount() == 1) {

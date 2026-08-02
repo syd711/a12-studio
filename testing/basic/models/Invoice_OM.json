@@ -37,8 +37,164 @@
     ]
   },
   "content": {
+    "columns": [
+      {
+        "id": "column-7aca2",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "width": 1.0,
+        "elementRef": "include_7c34e_field_0b84d",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-cad21",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Ordering Date"
+          },
+          {
+            "locale": "de",
+            "text": "Bestelldatum"
+          }
+        ],
+        "width": 1.0,
+        "elementRef": "include_d7e3e_field_e0d50",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-95652",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Method of Payment"
+          },
+          {
+            "locale": "de",
+            "text": "Zahlungsmethode"
+          }
+        ],
+        "width": 1.0,
+        "elementRef": "include_591ce_field_dda25",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-4ca07",
+        "width": 1.0,
+        "styles": {},
+        "sortable": false
+      },
+      {
+        "id": "column-c15aa",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Order"
+          },
+          {
+            "locale": "de",
+            "text": "Bestellung"
+          }
+        ],
+        "width": 2.0,
+        "pinDirection": "RIGHT",
+        "sortable": null,
+        "name": "ExpressionColumn",
+        "expression": "kontext(Invoice){\n    kontext(Order){\n        kontext(OrderInformation, delimiter = \", \"){\n            case [Quantity] != \"1\" {\n            [Quantity] \" \" (en: \"\", de:\"mal\") \" \" [Product] (en: \"s\", de:\"\")\n            }\n            case [Quantity] = \"1\" {\n            [Quantity] \" \" [Product]\n            }\n        }\n        case [TotalPrice] != \"\" {\n    \n\n        \"* * *\"\n    \n        }\n        kontext(OrderInformation){\n            case [Product] != \"\" {\n        \n            \"* \" [Product] \"\"(en: \"s:\", de:\":\")\" \" [TotalPriceProduct] \"€\"\n            \"  \"\n           }\n        }    \n        case [TotalPrice] != \"\" {\n    \n       \"* * *\"\n    \n        (en: \"Total Price of Ordered Products: \", de: \"Gesamtpreis der bestellten Artikel: \") [TotalPrice] \"€\"\n\n            \"* * *\"\n    \n        (en: \"Price including shipping costs: \", de: \"Preis inklusive der anfallenden Versandkosten: \") [TotalPriceWithShippingCosts] \"€\"\n        }\n\n           \"* * *\"\n    \n        (en: \"Granted discount: \", de: \"Gewährter Rabatt: \") [AmountOfGivenDiscount] \"€\"\n        }\n    }"
+      },
+      {
+        "id": "column-8e484",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Final Price"
+          },
+          {
+            "locale": "de",
+            "text": "Endpreis"
+          }
+        ],
+        "width": 1.0,
+        "pinDirection": "RIGHT",
+        "elementRef": "include_d7e3e_field_0680a",
+        "sortable": false,
+        "suffix": [
+          {
+            "locale": "en",
+            "text": "€"
+          },
+          {
+            "locale": "de",
+            "text": "€"
+          }
+        ],
+        "summary": [
+          {
+            "operation": "sum"
+          }
+        ]
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Wollen Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
+    "footerBox": {
+      "majorElements": [],
+      "minorElements": []
+    },
     "configuration": {
       "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "showRowCount": true,
+      "enableColumnsResize": true,
+      "skipInitialLoad": true,
       "filterConfiguration": {
         "showFilterButton": true,
         "showFilterBar": true,
@@ -102,164 +258,9 @@
           }
         ]
       },
-      "showFullTextSearch": true,
-      "pagingSize": 10,
-      "showRowCount": true,
-      "enableColumnsResize": true,
       "screenReaderColumn": {
-        "idref": "column-95652"
-      },
-      "skipInitialLoad": true
-    },
-    "subHeaderBox": {
-      "leftSlot": [],
-      "rightSlot": []
-    },
-    "footerBox": {
-      "leftSlot": [],
-      "rightSlot": []
-    },
-    "columns": [
-      {
-        "id": "column-7aca2",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Name"
-          },
-          {
-            "locale": "de",
-            "text": "Name"
-          }
-        ],
-        "width": 1,
-        "elementRef": "include_7c34e_field_0b84d",
-        "sortable": true,
-        "preferredSorting": "ASC"
-      },
-      {
-        "id": "column-cad21",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Ordering Date"
-          },
-          {
-            "locale": "de",
-            "text": "Bestelldatum"
-          }
-        ],
-        "width": 1,
-        "elementRef": "include_d7e3e_field_e0d50",
-        "sortable": true,
-        "preferredSorting": "ASC"
-      },
-      {
-        "id": "column-95652",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Method of Payment"
-          },
-          {
-            "locale": "de",
-            "text": "Zahlungsmethode"
-          }
-        ],
-        "width": 1,
-        "elementRef": "include_591ce_field_dda25",
-        "sortable": true,
-        "preferredSorting": "ASC"
-      },
-      {
-        "id": "column-4ca07",
-        "width": 1,
-        "styles": {},
-        "sortable": false
-      },
-      {
-        "id": "column-c15aa",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Order"
-          },
-          {
-            "locale": "de",
-            "text": "Bestellung"
-          }
-        ],
-        "width": 2,
-        "pinDirection": "RIGHT",
-        "name": "ExpressionColumn",
-        "expression": "kontext(Invoice){\n    kontext(Order){\n        kontext(OrderInformation, delimiter = \", \"){\n            case [Quantity] != \"1\" {\n            [Quantity] \" \" (en: \"\", de:\"mal\") \" \" [Product] (en: \"s\", de:\"\")\n            }\n            case [Quantity] = \"1\" {\n            [Quantity] \" \" [Product]\n            }\n        }\n        case [TotalPrice] != \"\" {\n    \n\n        \"* * *\"\n    \n        }\n        kontext(OrderInformation){\n            case [Product] != \"\" {\n        \n            \"* \" [Product] \"\"(en: \"s:\", de:\":\")\" \" [TotalPriceProduct] \"€\"\n            \"  \"\n           }\n        }    \n        case [TotalPrice] != \"\" {\n    \n       \"* * *\"\n    \n        (en: \"Total Price of Ordered Products: \", de: \"Gesamtpreis der bestellten Artikel: \") [TotalPrice] \"€\"\n\n            \"* * *\"\n    \n        (en: \"Price including shipping costs: \", de: \"Preis inklusive der anfallenden Versandkosten: \") [TotalPriceWithShippingCosts] \"€\"\n        }\n\n           \"* * *\"\n    \n        (en: \"Granted discount: \", de: \"Gewährter Rabatt: \") [AmountOfGivenDiscount] \"€\"\n        }\n    }"
-      },
-      {
-        "id": "column-8e484",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Final Price"
-          },
-          {
-            "locale": "de",
-            "text": "Endpreis"
-          }
-        ],
-        "width": 1,
-        "pinDirection": "RIGHT",
-        "elementRef": "include_d7e3e_field_0680a",
-        "sortable": false,
-        "suffix": [
-          {
-            "locale": "en",
-            "text": "€"
-          },
-          {
-            "locale": "de",
-            "text": "€"
-          }
-        ],
-        "summary": [
-          {
-            "operation": "sum"
-          }
-        ]
+        "idref": "column-7aca2"
       }
-    ],
-    "rowActionGroup": {
-      "actions": [
-        {
-          "event": "delete",
-          "confirmation": {
-            "title": [
-              {
-                "locale": "en",
-                "text": "Warning"
-              },
-              {
-                "locale": "de",
-                "text": "Warnung"
-              }
-            ],
-            "message": [
-              {
-                "locale": "en",
-                "text": "Do you really want to delete this entry?"
-              },
-              {
-                "locale": "de",
-                "text": "Wollen Sie diesen Eintrag wirklich löschen?"
-              }
-            ]
-          },
-          "icon": {
-            "name": "delete"
-          },
-          "destructive": false,
-          "primary": false
-        }
-      ]
     },
     "styles": [
       "adsfasf"

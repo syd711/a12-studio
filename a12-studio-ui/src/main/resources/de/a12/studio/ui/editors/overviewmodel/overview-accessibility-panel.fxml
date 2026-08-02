@@ -12,7 +12,7 @@
             <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
         </top>
       <left>
-            <VBox maxWidth="300.0" spacing="4.0" BorderPane.alignment="CENTER">
+            <VBox spacing="4.0" BorderPane.alignment="CENTER">
                 <children>
                     <Label styleClass="field-label" text="Screen Reader Column" />
                     <ComboBox fx:id="screenReaderColumnField" editable="false" maxWidth="Infinity" />

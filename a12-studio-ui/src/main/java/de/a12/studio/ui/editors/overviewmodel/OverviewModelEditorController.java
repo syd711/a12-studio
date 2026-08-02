@@ -42,8 +42,10 @@ import java.util.function.BiConsumer;
  * Edits an {@link OverviewModel}'s "Overview" tab: General Settings (the Overview Reference, delegated to
  * {@link OverviewReferencePanelController}), Columns (delegated to
  * {@link OverviewColumnsPanelController}), Features
- * (search/filter/paging/row-count, delegated to {@link OverviewFeaturesPanelController}), Filter,
- * Multi-Selection (delegated to {@link OverviewMultiSelectionPanelController}), Accessibility (delegated to
+ * (search/filter/row-count, delegated to {@link OverviewFeaturesPanelController}), Filter,
+ * Multi-Selection (delegated to {@link OverviewMultiSelectionPanelController}), Row Height And Action Column
+ * Width (delegated to {@link RowHeightActionColumnWidthPanelController}), Paging Behaviour (delegated to
+ * {@link PagingBehaviourPanelController}), Accessibility (delegated to
  * {@link OverviewAccessibilityPanelController}) and Styles (delegated to
  * {@link StylesPanelController}). "Custom Actions" ({@code
  * content.rowActionGroup}) is out of scope, mirroring the Java model's already-reduced feature set versus
@@ -94,6 +96,14 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   // Multi-Selection
   @FXML
   private OverviewMultiSelectionPanelController overviewMultiSelectionController;
+
+  // Paging Behaviour
+  @FXML
+  private PagingBehaviourPanelController overviewPagingBehaviourController;
+
+  // Row Height And Action Column Width
+  @FXML
+  private RowHeightActionColumnWidthPanelController overviewRowHeightActionColumnWidthController;
 
   // Accessibility
   @FXML
@@ -204,6 +214,10 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       populateFilterFields();
 
       overviewMultiSelectionController.setModel(model);
+
+      overviewPagingBehaviourController.setModel(model);
+
+      overviewRowHeightActionColumnWidthController.setModel(model);
 
       overviewAccessibilityController.setModel(model);
 

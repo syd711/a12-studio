@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="ROW HEIGHT AND ACTION COLUMN WIDTH" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.overviewmodel.RowHeightActionColumnWidthPanelController">
+    <BorderPane>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+        <center>
+            <HBox spacing="24.0">
+                <children>
+                    <VBox maxWidth="200.0" spacing="4.0">
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                <children>
+                                    <Label styleClass="field-label" text="Row Height" />
+                                    <Label>
+                                        <graphic>
+                                            <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip prefWidth="300.0"
+                                                     text="Specify a fixed height for the rows. Row height should be larger than a button height (32px). Note that infinite scrolling only supports fixed height rows."
+                                                     wrapText="true" />
+                                        </tooltip>
+                                    </Label>
+                                </children>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                <children>
+                                    <Spinner fx:id="rowHeightField" editable="true" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                                    <Label text="px" />
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+                    <VBox maxWidth="200.0" spacing="4.0">
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                <children>
+                                    <Label styleClass="field-label" text="Action Column Width" />
+                                    <Label>
+                                        <graphic>
+                                            <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip prefWidth="300.0"
+                                                     text="Specify the max width of the action column when all buttons are displayed."
+                                                     wrapText="true" />
+                                        </tooltip>
+                                    </Label>
+                                </children>
+                            </HBox>
+                            <TextField fx:id="actionColumnWidthField" maxWidth="Infinity" />
+                        </children>
+                    </VBox>
+                </children>
+            </HBox>
+        </center>
+    </BorderPane>
+</TitledPane>

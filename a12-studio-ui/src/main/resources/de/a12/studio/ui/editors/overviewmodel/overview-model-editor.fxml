@@ -145,6 +145,12 @@
                                        <!-- Multi-Selection -->
                                        <fx:include fx:id="overviewMultiSelection" source="overview-multi-selection-panel.fxml" />
 
+                                       <!-- Paging Behaviour -->
+                                       <fx:include fx:id="overviewPagingBehaviour" source="paging-behaviour-panel.fxml" />
+
+                                       <!-- Row Height And Action Column Width -->
+                                       <fx:include fx:id="overviewRowHeightActionColumnWidth" source="row-height-action-column-width-panel.fxml" />
+
                                        <!-- Accessibility -->
                                        <fx:include fx:id="overviewAccessibility" source="overview-accessibility-panel.fxml" />
 
