@@ -22,12 +22,16 @@ public final class OverviewElementOptions {
   private OverviewElementOptions() {
   }
 
-  /** {@code null} if {@code documentModel} is {@code null} or has no model root yet. */
-  public static ElementIndex indexOf(DocumentModel documentModel) {
+  /**
+   * {@code null} if {@code documentModel} is {@code null} or has no model root yet. {@code otherModels} is
+   * every other Document Model in the project, needed to follow an Include's reference when resolving a
+   * field that lives inside an included model (see {@link ElementIndex#resolveDisplayPath}).
+   */
+  public static ElementIndex indexOf(DocumentModel documentModel, List<DocumentModel> otherModels) {
     if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
       return null;
     }
-    return new ElementIndex(documentModel);
+    return new ElementIndex(documentModel, otherModels);
   }
 
   public static List<String> elementIds(ElementIndex index) {
@@ -45,11 +49,7 @@ public final class OverviewElementOptions {
     if (index == null || elementId == null) {
       return elementId;
     }
-    return index.allElements().stream()
-        .filter(element -> elementId.equals(element.getId()))
-        .findFirst()
-        .map(index::getPath)
-        .orElse(elementId);
+    return index.resolveDisplayPath(elementId);
   }
 
   /** Renders ids as their display path in a {@code ComboBox<String>} while keeping the id as the stored value. */

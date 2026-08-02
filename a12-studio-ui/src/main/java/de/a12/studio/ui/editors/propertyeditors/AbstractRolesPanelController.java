@@ -19,7 +19,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import lombok.extern.slf4j.Slf4j;
@@ -225,7 +224,7 @@ public abstract class AbstractRolesPanelController extends AbstractPropertyEdito
     Button button = new Button();
     button.getStyleClass().add("default-button");
     button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
+    button.setTooltip(WidgetFactory.createTooltip(tooltip));
     button.setOnAction(event -> action.run());
     return button;
   }

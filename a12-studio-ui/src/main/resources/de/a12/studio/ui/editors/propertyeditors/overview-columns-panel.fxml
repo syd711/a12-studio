@@ -17,7 +17,7 @@
   <VBox spacing="10.0">
     <HBox fx:id="columnHeaders" spacing="10.0">
       <Label styleClass="field-label" text="" prefWidth="18.0" />
-      <Label styleClass="field-label" text="Field" prefWidth="200.0" />
+      <Label styleClass="field-label" text="Field" prefWidth="250.0" />
       <Label styleClass="field-label" text="Sortable" prefWidth="70.0" />
       <Label styleClass="field-label" text="Width" prefWidth="70.0" />
       <Label styleClass="field-label" text="Pin Direction" prefWidth="100.0" />

@@ -1,12 +1,12 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
@@ -128,7 +128,7 @@ public final class RowFactory {
     Button button = new Button();
     button.getStyleClass().add("default-button");
     button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
+    button.setTooltip(WidgetFactory.createTooltip(tooltip));
     button.setOnAction(event -> action.run());
     return button;
   }

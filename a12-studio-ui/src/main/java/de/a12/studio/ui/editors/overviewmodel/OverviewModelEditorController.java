@@ -24,6 +24,7 @@ import de.a12.studio.ui.editors.propertyeditors.StylesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -32,7 +33,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -238,7 +238,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
         .filter(candidate -> documentModelId != null && documentModelId.equals(candidate.getId()))
         .findFirst()
         .orElse(null);
-    documentModelIndex = OverviewElementOptions.indexOf(documentModel);
+    documentModelIndex = OverviewElementOptions.indexOf(documentModel, otherDocumentModels);
     overviewColumnsController.setDocumentModelIndex(documentModelIndex, documentModelId);
     overviewSortingController.setDocumentModelIndex(documentModelIndex);
     overviewAccessibilityController.setDocumentModelIndex(documentModelIndex);
@@ -494,7 +494,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     Button button = new Button();
     button.getStyleClass().add("default-button");
     button.setGraphic(icon);
-    button.setTooltip(new Tooltip(tooltip));
+    button.setTooltip(WidgetFactory.createTooltip(tooltip));
     button.setOnAction(event -> action.run());
     return button;
   }

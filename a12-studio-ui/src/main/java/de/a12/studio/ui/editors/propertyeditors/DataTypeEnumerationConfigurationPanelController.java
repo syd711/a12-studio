@@ -141,7 +141,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
     if (category.getDescription() != null && !category.getDescription().isEmpty()) {
-      Tooltip.install(row, new Tooltip(category.getDescription()));
+      Tooltip.install(row, WidgetFactory.createTooltip(category.getDescription()));
     }
     nameLabel.setOnMouseClicked(event -> {
       if (event.getClickCount() == 1) {

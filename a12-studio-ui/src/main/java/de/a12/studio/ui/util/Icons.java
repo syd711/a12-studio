@@ -73,6 +73,7 @@ public interface Icons {
   String ELEMENT_REQUIRED = "mdi2a-asterisk-circle-outline";
 
   String ELEMENT_VALIDATION_RULE = "mdi2a-alpha-v-circle";
+  String ELEMENT_EXPRESSION = "mdi2e-epsilon";
 
   static String forModelType(ModelType modelType) {
     if (modelType == null) {

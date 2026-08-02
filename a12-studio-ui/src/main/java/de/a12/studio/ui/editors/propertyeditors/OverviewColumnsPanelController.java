@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -176,16 +177,42 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   private HBox createRow(Column column, int index, int rowCount) {
     FontIcon dragHandle = RowFactory.createDragHandle();
 
-    Label fieldLabel = createRowLabel(fieldSummary(column), "overviewColumnField-" + index, 200.0, column);
+    Node fieldCell = createFieldCell(column, index);
     Label sortableLabel = createRowLabel(Boolean.TRUE.equals(column.getSortable()) ? "Yes" : "No", "overviewColumnSortable-" + index, 70.0, column);
     Label widthLabel = createRowLabel(column.getWidth() != null ? String.valueOf(column.getWidth()) : "", "overviewColumnWidth-" + index, 70.0, column);
     Label pinDirectionLabel = createRowLabel(column.getPinDirection() != null ? column.getPinDirection() : "", "overviewColumnPinDirection-" + index, 100.0, column);
 
-    HBox row = new HBox(10.0, dragHandle, fieldLabel, sortableLabel, widthLabel, pinDirectionLabel, createActionsBox(column, index, rowCount));
+    HBox row = new HBox(10.0, dragHandle, fieldCell, sortableLabel, widthLabel, pinDirectionLabel, createActionsBox(column, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
     RowFactory.setupRowDragAndDrop(row, dragHandle, COLUMN_INDEX, index, this::moveColumn);
     return row;
+  }
+
+  /** The "Field" cell: the resolved field path, or - for an expression column, per {@link
+   * OverviewColumnOptions#isExpressionColumn} - "Expression Column" next to an epsilon icon, mirroring SME's
+   * inline expression-column icon in its own Columns repeat table. */
+  private Node createFieldCell(Column column, int index) {
+    String summary = fieldSummary(column);
+    Label label = new Label(summary);
+    label.setId("overviewColumnField-" + index);
+    label.setTooltip(WidgetFactory.createTooltip(summary));
+
+    HBox cell = new HBox(6.0, label);
+    if (OverviewColumnOptions.isExpressionColumn(column)) {
+      FontIcon icon = new FontIcon(Icons.ELEMENT_EXPRESSION);
+      icon.setIconSize(16);
+      cell.getChildren().add(0, icon);
+    }
+    cell.setAlignment(Pos.CENTER_LEFT);
+    cell.setPrefWidth(250.0);
+    cell.setCursor(Cursor.HAND);
+    cell.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        openEditDialog(column);
+      }
+    });
+    return cell;
   }
 
   private Label createRowLabel(String text, String id, double width, Column column) {

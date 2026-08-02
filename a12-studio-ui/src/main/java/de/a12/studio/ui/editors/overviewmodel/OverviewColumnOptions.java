@@ -26,13 +26,20 @@ public final class OverviewColumnOptions {
     if (column == null) {
       return null;
     }
+    if (isExpressionColumn(column)) {
+      return "Expression Column";
+    }
     if (column.getElementRef() != null && !column.getElementRef().isBlank()) {
       return OverviewElementOptions.displayPath(documentModelIndex, column.getElementRef());
     }
-    if (column.getExpression() != null) {
-      return column.getName() != null && !column.getName().isBlank() ? column.getName() : "(expression)";
-    }
     return "(unset)";
+  }
+
+  /** A column with no field reference is an expression column, shown as "Expression Column" wherever it's
+   * picked from (see {@link de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController}'s
+   * epsilon-icon row), never by its own {@link Column#getName()}. */
+  public static boolean isExpressionColumn(Column column) {
+    return column != null && (column.getElementRef() == null || column.getElementRef().isBlank()) && column.getExpression() != null;
   }
 
   /** {@code columnId} as-is if it no longer matches any column in {@code columns} (a dangling reference,

@@ -14,9 +14,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Id lookup, parent tracking, and path/relative-path resolution for one {@link DocumentModel}'s element
@@ -102,6 +104,58 @@ public class ElementIndex {
       current = parentOf.get(current);
     }
     return new ArrayList<>(names);
+  }
+
+  /**
+   * Resolves {@code elementId} to a display path: either a direct element of this model, or - if not found
+   * here - a compound {@code "<includeGroupId>_<targetId>"} reference into an included model's own element
+   * tree (an Include is a {@link GroupElement} whose {@link
+   * de.a12.studio.models.documentmodel.GroupConfig#getIncludeConfig()} is set; its elements live entirely in
+   * the referenced model, not locally - see {@link TransitiveTypeDefinitions}), resolved transitively through
+   * nested includes the same way SME's {@code dmGetReferenceCandidates.resolveIncludedElementTargets} strips
+   * the include's id prefix and looks the remainder up in the included model's own graph. Falls back to
+   * {@code elementId} itself if nothing resolves (a dangling reference, or this index wasn't built with the
+   * {@code otherModels} needed to follow the include).
+   */
+  public String resolveDisplayPath(String elementId) {
+    if (elementId == null) {
+      return null;
+    }
+    return resolve(elementId, new HashSet<>(List.of(model.getId()))).orElse(elementId);
+  }
+
+  private Optional<String> resolve(String elementId, Set<String> visitedModelIds) {
+    Optional<Element> direct = findById(elementId);
+    if (direct.isPresent()) {
+      return Optional.of(getPath(direct.get()));
+    }
+    for (Element element : all) {
+      if (!(element instanceof GroupElement group) || group.getGroup() == null
+          || group.getGroup().getIncludeConfig() == null || element.getId() == null) {
+        continue;
+      }
+      String prefix = element.getId() + "_";
+      if (!elementId.startsWith(prefix)) {
+        continue;
+      }
+      DocumentModel included = resolveIncludedModel(group.getGroup().getIncludeConfig().getReference());
+      if (included == null || included.getContent() == null || included.getContent().getModelRoot() == null
+          || !visitedModelIds.add(included.getId())) {
+        continue;
+      }
+      Optional<String> innerPath = new ElementIndex(included, otherModels).resolve(elementId.substring(prefix.length()), visitedModelIds);
+      if (innerPath.isPresent()) {
+        return Optional.of(getPath(group) + innerPath.get());
+      }
+    }
+    return Optional.empty();
+  }
+
+  private DocumentModel resolveIncludedModel(String reference) {
+    if (reference == null) {
+      return null;
+    }
+    return otherModels.stream().filter(candidate -> reference.equals(candidate.getId())).findFirst().orElse(null);
   }
 
   /**
