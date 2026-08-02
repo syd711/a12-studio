@@ -3,13 +3,14 @@ package de.a12.studio.ui.editors.overviewmodel.dialogs;
 import de.a12.studio.models.overviewmodel.Alignment;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.ColumnAlignment;
-import de.a12.studio.models.overviewmodel.Icon;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
+import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.StylesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -19,7 +20,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -67,17 +67,19 @@ public class OverviewColumnDialogController implements DialogController {
   @FXML
   private TextField nameField;
   @FXML
-  private TextArea expressionArea;
+  private RichtextEditorController expressionPanelController;
 
   @FXML
   private TextField idField;
   @FXML
-  private TextField iconField;
+  private IconPanelController iconPanelController;
 
   @FXML
   private ComboBox<String> pinDirectionCombo;
   @FXML
   private TextField widthField;
+  @FXML
+  private VBox fixedWidthBox;
   @FXML
   private CheckBox fixedWidthField;
 
@@ -127,6 +129,8 @@ public class OverviewColumnDialogController implements DialogController {
     stylesHeaderController.setSaveMode(saveMode);
     stylesContentController.configureColumnContentStyles();
     stylesContentController.setSaveMode(saveMode);
+    iconPanelController.setSaveMode(saveMode);
+    expressionPanelController.setSaveMode(saveMode);
 
     columnTypeCombo.setItems(FXCollections.observableArrayList(TYPE_REFERENCE, TYPE_EXPRESSION));
     columnTypeCombo.setConverter(displayConverter(OverviewColumnDialogController::capitalize));
@@ -158,6 +162,7 @@ public class OverviewColumnDialogController implements DialogController {
     pinDirectionCombo.setItems(FXCollections.observableArrayList(null, Column.PIN_DIRECTION_LEFT, Column.PIN_DIRECTION_RIGHT));
     pinDirectionCombo.setConverter(displayConverter(value -> value == null ? "(None)" : capitalize(value.toLowerCase())));
     pinDirectionCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+      updateFixedWidthVisibility();
       if (!updatingFromModel) {
         column.setPinDirection(newValue);
       }
@@ -201,16 +206,6 @@ public class OverviewColumnDialogController implements DialogController {
         column.setName(blankToNull(newValue));
       }
     });
-    expressionArea.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (!updatingFromModel) {
-        column.setExpression(blankToNull(newValue));
-      }
-    });
-    iconField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (!updatingFromModel) {
-        setIconName(blankToNull(newValue));
-      }
-    });
     widthField.textProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
         column.setWidth(parseWidth(newValue));
@@ -248,9 +243,6 @@ public class OverviewColumnDialogController implements DialogController {
       preferredSortingCombo.setValue(column.getPreferredSorting());
 
       nameField.setText(column.getName());
-      expressionArea.setText(column.getExpression());
-
-      iconField.setText(column.getIcon() != null ? column.getIcon().getName() : null);
 
       pinDirectionCombo.setValue(column.getPinDirection());
       widthField.setText(column.getWidth() != null ? String.valueOf(column.getWidth()) : "");
@@ -270,10 +262,13 @@ public class OverviewColumnDialogController implements DialogController {
     }
 
     updateTypeVisibility();
+    updateFixedWidthVisibility();
 
     labelController.setColumn(column);
     stylesHeaderController.setColumn(column);
     stylesContentController.setColumn(column);
+    iconPanelController.setColumn(column);
+    expressionPanelController.setColumn(column);
 
     validate();
   }
@@ -285,6 +280,8 @@ public class OverviewColumnDialogController implements DialogController {
     labelController.destroy();
     stylesHeaderController.destroy();
     stylesContentController.destroy();
+    iconPanelController.destroy();
+    expressionPanelController.destroy();
   }
 
   @Override
@@ -318,6 +315,13 @@ public class OverviewColumnDialogController implements DialogController {
     preferredSortingBox.setManaged(visible);
   }
 
+  private void updateFixedWidthVisibility() {
+    String pinDirection = pinDirectionCombo.getValue();
+    boolean visible = !Column.PIN_DIRECTION_LEFT.equals(pinDirection) && !Column.PIN_DIRECTION_RIGHT.equals(pinDirection);
+    fixedWidthBox.setVisible(visible);
+    fixedWidthBox.setManaged(visible);
+  }
+
   private void validate() {
     boolean expression = TYPE_EXPRESSION.equals(columnTypeCombo.getValue());
     boolean elementRefOk = expression || elementRefCombo.getValue() != null;
@@ -346,17 +350,6 @@ public class OverviewColumnDialogController implements DialogController {
       alignment.setContent(new Alignment());
     }
     return alignment.getContent();
-  }
-
-  private void setIconName(String name) {
-    if (name == null) {
-      column.setIcon(null);
-      return;
-    }
-    if (column.getIcon() == null) {
-      column.setIcon(new Icon());
-    }
-    column.getIcon().setName(name);
   }
 
   private void setComboValue(ComboBox<String> comboBox, String value) {

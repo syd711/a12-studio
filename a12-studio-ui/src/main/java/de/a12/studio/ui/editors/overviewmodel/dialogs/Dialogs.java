@@ -15,9 +15,9 @@ public class Dialogs {
   }
 
   /** Opens the column editor for {@code column}, editing it live so a Cancel can undo the changes. */
-  public static void showColumn(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column) {
+  public static void showColumnDialog(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column) {
     FXMLLoader fxmlLoader = new FXMLLoader(OverviewColumnDialogController.class.getResource("overview-column-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("overview-column-dialog", fxmlLoader, owner, "Edit Column");
+    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, "Edit Column");
     OverviewColumnDialogController controller = (OverviewColumnDialogController) stage.getUserData();
     controller.init(stage, documentModelIndex, documentModelId, column);
     stage.setOnHidden(event -> controller.destroy());

@@ -5,16 +5,14 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ScrollPane?><?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="760.0" minWidth="700.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController">
+<BorderPane fx:id="root" maxHeight="700" maxWidth="-Infinity" minHeight="760.0" minWidth="700.0" styleClass="navigation-panel"
+            stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
    </top>
@@ -38,7 +36,7 @@
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
                            <Label styleClass="field-label" text="Target Document Model" />
-                           <TextField fx:id="targetDocumentModelField" editable="false" focusTraversable="false" />
+                           <TextField fx:id="targetDocumentModelField" disable="true" editable="false" focusTraversable="false" />
                         </children>
                      </VBox>
                   </children>
@@ -59,6 +57,9 @@
                               <children>
                                  <CheckBox fx:id="sortableField" mnemonicParsing="false" text="Sortable" />
                               </children>
+                              <HBox.margin>
+                                 <Insets bottom="8.0" />
+                              </HBox.margin>
                            </VBox>
                            <VBox fx:id="preferredSortingBox" spacing="2.0" HBox.hgrow="ALWAYS">
                               <children>
@@ -80,32 +81,24 @@
                            <TextField fx:id="nameField" promptText="Distinguishes this column from others, e.g. FullName" />
                         </children>
                      </VBox>
-                     <VBox spacing="2.0">
-                        <children>
-                           <Label styleClass="field-label" text="Expression" />
-                           <TextArea fx:id="expressionArea" prefRowCount="5" wrapText="true" />
-                        </children>
-                     </VBox>
+                     <fx:include fx:id="expressionPanel" source="../../propertyeditors/richtext-editor.fxml" />
                   </children>
                </VBox>
 
-               <!-- ID / Icon -->
+               <!-- ID -->
                <HBox spacing="12.0">
                   <children>
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
                            <Label styleClass="field-label" text="ID" />
-                           <TextField fx:id="idField" editable="false" focusTraversable="false" />
-                        </children>
-                     </VBox>
-                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
-                        <children>
-                           <Label styleClass="field-label" text="Icon" />
-                           <TextField fx:id="iconField" promptText="Start typing an icon name..." />
+                           <TextField fx:id="idField" disable="true" editable="false" focusTraversable="false" />
                         </children>
                      </VBox>
                   </children>
                </HBox>
+
+               <!-- Icon -->
+               <fx:include fx:id="iconPanel" source="../../propertyeditors/icon-panel.fxml" />
 
                <!-- Pin Direction / Width / Fixed Width -->
                <HBox spacing="12.0">
@@ -122,10 +115,13 @@
                            <TextField fx:id="widthField" />
                         </children>
                      </VBox>
-                     <VBox alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
+                     <VBox fx:id="fixedWidthBox" alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
                            <CheckBox fx:id="fixedWidthField" mnemonicParsing="false" text="Fixed Width" />
                         </children>
+                        <HBox.margin>
+                           <Insets bottom="8.0" />
+                        </HBox.margin>
                      </VBox>
                   </children>
                </HBox>
@@ -141,9 +137,7 @@
                <!-- Alignment -->
                <VBox spacing="10.0">
                   <children>
-                     <Label styleClass="section-header" text="Alignment" />
-
-                     <Label styleClass="field-label" text="Horizontal" />
+                     <Label styleClass="section-header" text="Horizontal Alignment" />
                      <HBox spacing="12.0">
                         <children>
                            <VBox spacing="2.0" HBox.hgrow="ALWAYS">
@@ -161,7 +155,7 @@
                         </children>
                      </HBox>
 
-                     <Label styleClass="field-label" text="Vertical" />
+                     <Label styleClass="section-header" text="Vertical Alignment" />
                      <HBox spacing="12.0">
                         <children>
                            <VBox spacing="2.0" HBox.hgrow="ALWAYS">
@@ -184,7 +178,6 @@
                <!-- Styles -->
                <VBox spacing="10.0">
                   <children>
-                     <Label styleClass="section-header" text="Styles" />
                      <fx:include fx:id="stylesHeader" source="../../propertyeditors/styles-panel.fxml" />
                      <fx:include fx:id="stylesContent" source="../../propertyeditors/styles-panel.fxml" />
                   </children>

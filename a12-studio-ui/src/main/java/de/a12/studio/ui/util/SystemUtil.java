@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.List;
 
@@ -272,6 +274,111 @@ public class SystemUtil {
       case SYSTEM_DEFAULT -> throw new IllegalStateException("handled by the caller");
     };
     return List.of(executable, url);
+  }
+
+  /**
+   * Opens the given URL in a borderless kiosk window (no toolbar, address bar or window chrome) using
+   * whichever browser is currently registered as the OS default, falling back to {@link #openUrl(String)}'s
+   * normal-window behavior if that browser can't be identified or doesn't support a kiosk mode.
+   *
+   * @param url The URL to open.
+   */
+  public static void openUrlInKioskWindow(String url) {
+    try {
+      if (isWindows()) {
+        openUrlInKioskWindowOnWindows(url);
+      }
+      else {
+        log.warn("Kiosk-mode browser launch isn't implemented for this OS; opening \"{}\" in the default browser window instead.", url);
+        openUrl(url);
+      }
+    }
+    catch (IOException e) {
+      log.error("Failed to open URL in a kiosk window: " + e.getMessage(), e);
+      openUrl(url);
+    }
+  }
+
+  /**
+   * Resolves the default browser via the same {@code UserChoice} registry entry Windows itself consults for
+   * {@code http} links, then relaunches it with that browser's kiosk-mode flag. Chromium-based browsers
+   * (Chrome, Edge, Brave) and Firefox all support this; browsers that don't (e.g. Safari - not applicable on
+   * Windows - or Internet Explorer) fall back to {@link #openUrl(String)}.
+   */
+  private static void openUrlInKioskWindowOnWindows(String url) throws IOException {
+    String progId = queryRegistryValue(
+        "HKCU\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\http\\UserChoice", "ProgId");
+    String kioskFlag = kioskFlagForProgId(progId);
+    String executable = progId != null ? queryDefaultCommandExecutable(progId) : null;
+
+    if (executable == null || kioskFlag == null) {
+      log.warn("Could not resolve a kiosk-capable default browser (ProgId \"{}\"); opening \"{}\" in the default browser window instead.", progId, url);
+      openUrl(url);
+      return;
+    }
+
+    new ProcessBuilder(executable, kioskFlag, url).start();
+  }
+
+  private static String kioskFlagForProgId(String progId) {
+    if (progId == null) {
+      return null;
+    }
+    String normalized = progId.toLowerCase();
+    if (normalized.startsWith("chromehtml") || normalized.startsWith("msedgehtm") || normalized.contains("brave") || normalized.contains("chromium")) {
+      return "--kiosk";
+    }
+    if (normalized.startsWith("firefoxurl")) {
+      return "-kiosk";
+    }
+    return null;
+  }
+
+  private static String queryRegistryValue(String keyPath, String valueName) throws IOException {
+    String output = runAndCaptureOutput(List.of("reg", "query", keyPath, "/v", valueName));
+    for (String line : output.split("\\R")) {
+      line = line.trim();
+      if (line.startsWith(valueName)) {
+        String[] parts = line.split("\\s+", 3);
+        if (parts.length == 3) {
+          return parts[2].trim();
+        }
+      }
+    }
+    return null;
+  }
+
+  private static String queryDefaultCommandExecutable(String progId) throws IOException {
+    String output = runAndCaptureOutput(List.of("reg", "query", "HKCR\\" + progId + "\\shell\\open\\command", "/ve"));
+    for (String line : output.split("\\R")) {
+      line = line.trim();
+      if (!line.startsWith("(Default)")) {
+        continue;
+      }
+      int firstQuote = line.indexOf('"');
+      int secondQuote = firstQuote >= 0 ? line.indexOf('"', firstQuote + 1) : -1;
+      if (firstQuote >= 0 && secondQuote > firstQuote) {
+        return line.substring(firstQuote + 1, secondQuote);
+      }
+    }
+    return null;
+  }
+
+  private static String runAndCaptureOutput(List<String> command) throws IOException {
+    Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+      StringBuilder output = new StringBuilder();
+      String line;
+      while ((line = reader.readLine()) != null) {
+        output.append(line).append('\n');
+      }
+      process.waitFor();
+      return output.toString();
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new IOException("Interrupted while running: " + String.join(" ", command), e);
+    }
   }
 
   /**

@@ -72,6 +72,10 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   // commits are only persisted once that button is pressed.
   private PropertyEditorSaveMode saveMode = PropertyEditorSaveMode.IMMEDIATE;
 
+  public void setCollapsed() {
+    root.setCollapsible(false);
+  }
+
   public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
     this.saveMode = saveMode;
   }

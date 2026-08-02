@@ -36,7 +36,7 @@ import java.util.UUID;
  * Column}, summarizing its Field (the referenced Document Model element, resolved via {@link
  * OverviewColumnOptions}), Sortable, Width and Pin Direction. Not bound to a single {@link
  * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
- * {@link OverviewFeaturesPanelController}. Clicking a row opens {@link Dialogs#showColumn}, the full column
+ * {@link OverviewFeaturesPanelController}. Clicking a row opens {@link Dialogs#showColumnDialog}, the full column
  * editor. Also edits
  * {@link OverviewConfiguration} flags displayed alongside the column list: Enable Columns Resize, Show
  * Number Of Entries and Skip Initial Load (moved here from {@link OverviewFeaturesPanelController} since
@@ -206,7 +206,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   }
 
   private void openEditDialog(Column column) {
-    Dialogs.showColumn(Studio.stage, documentModelIndex, documentModelId, column);
+    Dialogs.showColumnDialog(Studio.stage, documentModelIndex, documentModelId, column);
     rebuildRows();
   }
 

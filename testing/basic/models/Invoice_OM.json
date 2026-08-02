@@ -138,6 +138,11 @@
             "operation": "sum"
           }
         ]
+      },
+      {
+        "id": "column-5345c",
+        "width": 1.0,
+        "sortable": null
       }
     ],
     "rowActionGroup": {
@@ -255,9 +260,6 @@
       "screenReaderColumn": {
         "idref": "column-95652"
       }
-    },
-    "styles": [
-      "adsfasf"
-    ]
+    }
   }
 }

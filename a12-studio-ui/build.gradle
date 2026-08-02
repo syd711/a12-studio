@@ -39,6 +39,7 @@ dependencies {
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0'
     implementation 'org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.4.0'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.7'
     // Windows-only: low-level keyboard hook so Win+Left/Right window snapping can be
     // intercepted before the shell's own reserved Snap Assist handling consumes it.
     implementation 'net.java.dev.jna:jna-platform:5.15.0'

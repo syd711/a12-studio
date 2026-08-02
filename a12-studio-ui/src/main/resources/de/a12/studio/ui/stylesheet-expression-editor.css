@@ -1,0 +1,28 @@
+/**
+ * Expression Editor (RichTextFX CodeArea)
+ */
+.expression-code-area {
+    -fx-font-family: "Consolas", "Monospaced";
+    -fx-font-size: 13.5px;
+    -fx-background-color: -fx-input-bg;
+    -fx-border-color: -fx-border-input;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.expression-code-area:focused {
+    -fx-border-color: -fx-accent-color;
+}
+
+.expression-code-area .paragraph-box {
+    -fx-padding: 8px;
+}
+
+.expression-code-area .text {
+    -fx-fill: -fx-text-color;
+}
+
+.expression-code-area .selection {
+    -fx-fill: -fx-selection-bg;
+}
