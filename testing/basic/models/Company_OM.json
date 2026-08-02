@@ -196,7 +196,11 @@
       "multiSelection": {
         "collapseOption": null,
         "counterOption": null,
-        "selectionArea": null
+        "selectionArea": null,
+        "clearConfirmation": {
+          "enabled": true,
+          "confirmation": {}
+        }
       }
     }
   }

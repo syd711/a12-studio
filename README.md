@@ -47,3 +47,8 @@ You find an up-to-date overview about all supported model type and their status 
 | Structural Mapping Model | |
 | Tree Model | |
 | Type Definition Model | |
+
+
+## Q&A
+
+Please visit https://a12-studio.discourse.group/ for questions, issues and feature requests.

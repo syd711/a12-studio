@@ -225,7 +225,8 @@ public class OverviewReferencePanelController implements Initializable {
   /** The combo box reference is required regardless of which radio button is selected. */
   private void validate() {
     if (overviewReferenceField.getValue() == null) {
-      errorContainerController.show("ERROR", "This field is required.");
+      String missing = queryModelReferenceField.isSelected() ? "A Query Model" : "A Document Model";
+      errorContainerController.show("ERROR", missing + " must be selected.");
     }
     else {
       errorContainerController.hide();

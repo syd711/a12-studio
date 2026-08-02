@@ -106,9 +106,13 @@ public class MainDetailFormMappingPanelController extends AbstractPropertyEditor
 
   /** Every row's Form Model selection is required. */
   private void validate() {
-    boolean missing = model.getContent().getFormMapping().stream().anyMatch(mapping -> mapping.getFormModel() == null);
-    if (missing) {
-      errorContainerController.show("ERROR", "This field is required.");
+    List<String> missingDocumentModels = model.getContent().getFormMapping().stream()
+        .filter(mapping -> mapping.getFormModel() == null)
+        .map(FormMapping::getDocumentModel)
+        .toList();
+    if (!missingDocumentModels.isEmpty()) {
+      errorContainerController.show("ERROR",
+          "A Form Model must be selected for: " + String.join(", ", missingDocumentModels) + ".");
     }
     else {
       errorContainerController.hide();

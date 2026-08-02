@@ -107,7 +107,7 @@ public class TargetModelPanelController implements Initializable {
 
   private void validate() {
     if (targetModelField.getValue() == null) {
-      errorContainerController.show("ERROR", "This field is required.");
+      errorContainerController.show("ERROR", "A Target Model must be selected.");
     }
     else {
       errorContainerController.hide();

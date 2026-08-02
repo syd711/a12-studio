@@ -144,7 +144,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       if (!getStyleClass().contains("validation-error")) {
         getStyleClass().add("validation-error");
       }
-      String messages = validationErrors.stream().map(ModelValidationError::message).collect(Collectors.joining("\n"));
+      String messages = validationErrors.stream().map(error -> "• " + error.message()).collect(Collectors.joining("\n"));
       setTooltip(WidgetFactory.createTooltip(item.getDisplayName() + "\n" + messages));
     }
     if (item.isFolder()) {

@@ -156,7 +156,8 @@ public class MainModelReferencePanelController implements Initializable {
   /** The combo box reference is required regardless of which radio button is selected. */
   private void validate() {
     if (mainModelField.getValue() == null) {
-      errorContainerController.show("ERROR", "This field is required.");
+      String missing = treeTypeField.isSelected() ? "A Tree Model" : "An Overview Model";
+      errorContainerController.show("ERROR", missing + " must be selected.");
     }
     else {
       errorContainerController.hide();
