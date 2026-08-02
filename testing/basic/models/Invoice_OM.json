@@ -51,6 +51,8 @@
           }
         ],
         "width": 1.0,
+        "pinDirection": "RIGHT",
+        "styles": {},
         "elementRef": "include_7c34e_field_0b84d",
         "sortable": true,
         "preferredSorting": "ASC"
@@ -68,6 +70,7 @@
           }
         ],
         "width": 1.0,
+        "styles": {},
         "elementRef": "include_d7e3e_field_e0d50",
         "sortable": true,
         "preferredSorting": "ASC"
@@ -88,12 +91,6 @@
         "elementRef": "include_591ce_field_dda25",
         "sortable": true,
         "preferredSorting": "ASC"
-      },
-      {
-        "id": "column-4ca07",
-        "width": 1.0,
-        "styles": {},
-        "sortable": false
       },
       {
         "id": "column-c15aa",

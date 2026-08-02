@@ -21,16 +21,20 @@
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController">
     <right>
-        <ToolBar orientation="VERTICAL" styleClass="properties-panel" BorderPane.alignment="CENTER">
-            <items>
-                <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
-                <Separator prefHeight="0.0" prefWidth="0.0" />
-                <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
-            </items>
+      <VBox BorderPane.alignment="CENTER" styleClass="properties-panel">
          <BorderPane.margin>
             <Insets top="36.0" />
          </BorderPane.margin>
-        </ToolBar>
+         <children>
+              <ToolBar orientation="VERTICAL">
+                  <items>
+                      <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
+                      <Separator prefHeight="0.0" prefWidth="0.0" />
+                      <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
+                  </items>
+              </ToolBar>
+         </children>
+      </VBox>
     </right>
    <center>
        <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
