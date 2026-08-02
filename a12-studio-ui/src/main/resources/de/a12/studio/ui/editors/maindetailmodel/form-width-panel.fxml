@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="FORM WIDTH" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.maindetailmodel.FormWidthPanelController">
+ <BorderPane>
+ <center>
+  <HBox alignment="CENTER_LEFT" spacing="6.0">
+    <children>
+      <Spinner fx:id="formWidthField" editable="true"/>
+      <Label>
+        <graphic>
+          <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18"/>
+        </graphic>
+        <tooltip>
+          <Tooltip prefWidth="300.0"
+                   text="The layout of the whole screen is fragmented in 12. The width of the form, which is the detail view on the right side, can take from 1 to 11 of the 12 availabe layout grid slots, leaving the remaining space for another view visible on the left. If only one view is visible, it uses all available space."
+                   wrapText="true"/>
+        </tooltip>
+      </Label>
+    </children>
+  </HBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

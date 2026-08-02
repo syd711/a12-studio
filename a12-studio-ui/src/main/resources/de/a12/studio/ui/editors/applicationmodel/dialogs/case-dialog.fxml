@@ -34,7 +34,7 @@
                <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
 
                <!-- Scene Change (onEnter only) -->
-               <fx:include fx:id="sceneChange" source="../../propertyeditors/scene-change-panel.fxml" />
+               <fx:include fx:id="sceneChange" source="../scene-change-panel.fxml" />
             </VBox>
          </content>
          <padding>

@@ -18,10 +18,10 @@
             <fx:include fx:id="generalInformation" source="../propertyeditors/general-information-panel.fxml"/>
 
             <!-- Include Properties -->
-            <fx:include fx:id="includeProperties" source="../propertyeditors/include-properties-panel.fxml"/>
+            <fx:include fx:id="includeProperties" source="include-properties-panel.fxml"/>
 
             <!-- Properties -->
-            <fx:include fx:id="properties" source="../propertyeditors/group-properties-panel.fxml"/>
+            <fx:include fx:id="properties" source="group-properties-panel.fxml"/>
 
             <!-- Label -->
             <fx:include fx:id="label" source="../propertyeditors/localized-text-panel.fxml"/>

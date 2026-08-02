@@ -5,7 +5,6 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.propertyeditors.*;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;

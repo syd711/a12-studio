@@ -11,7 +11,7 @@ import java.util.Optional;
 
 /**
  * Add/edit dialog for a single {@link de.a12.studio.models.applicationmodel.Region} entry of {@link
- * de.a12.studio.ui.editors.propertyeditors.SubregionsPanelController}. Currently only edits the subregion name;
+ * de.a12.studio.ui.editors.applicationmodel.SubregionsPanelController}. Currently only edits the subregion name;
  * further subregion details (layout) are expected to be added to this dialog later.
  */
 public class SubregionDialogController implements DialogController {

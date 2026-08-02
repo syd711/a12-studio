@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" text="EXPRESSION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.RichtextEditorController">
+    <BorderPane>
+        <center>
+            <StackPane fx:id="editorContainer" prefHeight="220.0" BorderPane.alignment="CENTER" />
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+    </BorderPane>
+   <stylesheets>
+      <URL value="@../../stylesheet.css" />
+      <URL value="@../../richtext.css" />
+   </stylesheets>
+</TitledPane>

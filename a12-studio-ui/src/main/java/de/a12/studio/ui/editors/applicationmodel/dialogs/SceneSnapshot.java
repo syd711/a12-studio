@@ -6,9 +6,9 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * Captures a deep, JSON-based clone of a {@link Scene} before {@link SceneDialogController} lets its embedded
- * panels ({@link de.a12.studio.ui.editors.propertyeditors.MatchConditionsPanelController}, {@link
- * de.a12.studio.ui.editors.propertyeditors.SceneChangePanelController}, {@link
- * de.a12.studio.ui.editors.propertyeditors.CasesPanelController}) mutate it live, so {@link #restore()} can
+ * panels ({@link de.a12.studio.ui.editors.applicationmodel.MatchConditionsPanelController}, {@link
+ * de.a12.studio.ui.editors.applicationmodel.SceneChangePanelController}, {@link
+ * de.a12.studio.ui.editors.applicationmodel.CasesPanelController}) mutate it live, so {@link #restore()} can
  * undo those changes on Cancel. See {@link CaseSnapshot} for why a JSON round-trip is used instead of a manual
  * field-by-field copy like {@link MenuSnapshot}. Only needed for an edit of an already-attached scene; a newly
  * added one isn't attached to its parent flow's scenes list until the dialog resolves with OK, so it needs no

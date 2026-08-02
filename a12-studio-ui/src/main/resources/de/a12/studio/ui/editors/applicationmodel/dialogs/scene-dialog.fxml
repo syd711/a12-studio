@@ -56,13 +56,13 @@
                </VBox>
 
                <!-- Match Conditions -->
-               <fx:include fx:id="matchConditions" source="../../propertyeditors/match-conditions-panel.fxml" />
+               <fx:include fx:id="matchConditions" source="../match-conditions-panel.fxml" />
 
                <!-- Scene Change -->
-               <fx:include fx:id="sceneChange" source="../../propertyeditors/scene-change-panel.fxml" />
+               <fx:include fx:id="sceneChange" source="../scene-change-panel.fxml" />
 
                <!-- Cases -->
-               <fx:include fx:id="cases" source="../../propertyeditors/cases-panel.fxml" />
+               <fx:include fx:id="cases" source="../cases-panel.fxml" />
             </VBox>
          </content>
          <padding>

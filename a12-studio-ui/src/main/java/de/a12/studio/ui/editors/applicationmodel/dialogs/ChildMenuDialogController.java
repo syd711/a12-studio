@@ -6,9 +6,9 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
-import de.a12.studio.ui.editors.propertyeditors.ActivityPanelController;
+import de.a12.studio.ui.editors.applicationmodel.ActivityPanelController;
+import de.a12.studio.ui.editors.applicationmodel.ModuleRolesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
-import de.a12.studio.ui.editors.propertyeditors.ModuleRolesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.FileUtils;
 import javafx.fxml.FXML;
@@ -21,7 +21,7 @@ import java.util.Optional;
 
 /**
  * Add/edit dialog for a single child {@link Menu} entry of {@link
- * de.a12.studio.ui.editors.propertyeditors.ChildMenuPanelController}, i.e. a {@link Menu} nested under {@link
+ * de.a12.studio.ui.editors.applicationmodel.ChildMenuPanelController}, i.e. a {@link Menu} nested under {@link
  * Menu#getChildren()}. Edits the same fields as a {@link Module}'s own menu (name, activity descriptor, label,
  * roles), reusing those panels via a throwaway {@link Module} wrapper whose menu is the {@link Menu} being
  * edited/added, since those panels are written against {@link Module#getOrCreateMenu()}.

@@ -4,7 +4,6 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController;
-import de.a12.studio.ui.editors.propertyeditors.GroupPropertiesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

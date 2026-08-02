@@ -14,13 +14,6 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.propertyeditors.OverviewAccessibilityPanelController;
-import de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController;
-import de.a12.studio.ui.editors.propertyeditors.OverviewFeaturesPanelController;
-import de.a12.studio.ui.editors.propertyeditors.OverviewMultiSelectionPanelController;
-import de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController;
-import de.a12.studio.ui.editors.propertyeditors.OverviewSortingPanelController;
-import de.a12.studio.ui.editors.propertyeditors.StylesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -47,12 +40,12 @@ import java.util.function.BiConsumer;
 
 /**
  * Edits an {@link OverviewModel}'s "Overview" tab: General Settings (the Overview Reference, delegated to
- * {@link de.a12.studio.ui.editors.propertyeditors.OverviewReferencePanelController}), Columns (delegated to
- * {@link de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController}), Features
+ * {@link OverviewReferencePanelController}), Columns (delegated to
+ * {@link OverviewColumnsPanelController}), Features
  * (search/filter/paging/row-count, delegated to {@link OverviewFeaturesPanelController}), Filter,
  * Multi-Selection (delegated to {@link OverviewMultiSelectionPanelController}), Accessibility (delegated to
  * {@link OverviewAccessibilityPanelController}) and Styles (delegated to
- * {@link de.a12.studio.ui.editors.propertyeditors.StylesPanelController}). "Custom Actions" ({@code
+ * {@link StylesPanelController}). "Custom Actions" ({@code
  * content.rowActionGroup}) is out of scope, mirroring the Java model's already-reduced feature set versus
  * SME. {@code subHeaderBox}/{@code footerBox} are left untouched: sample models ({@code Company_OM.json},
  * {@code Invoice_OM.json}) show them written empty even with search/filter/multi-selection enabled, so the

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 /**
  * Add/edit dialog for a single multi-selection {@link Button} action, opened from {@link
- * de.a12.studio.ui.editors.propertyeditors.OverviewMultiSelectionPanelController} by clicking a row or its
+ * de.a12.studio.ui.editors.overviewmodel.OverviewMultiSelectionPanelController} by clicking a row or its
  * Edit button, or by the Add button. Content is intentionally empty for now - the Event/Priority/Destructive/
  * Icon/etc. controls are a follow-up, matching {@link OverviewColumnDialogController}.
  */

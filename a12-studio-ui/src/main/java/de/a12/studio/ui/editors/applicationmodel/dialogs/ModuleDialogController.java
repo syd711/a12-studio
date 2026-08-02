@@ -11,7 +11,7 @@ import java.util.Optional;
 
 /**
  * Add/edit dialog for a single {@link de.a12.studio.models.applicationmodel.Module} entry of {@link
- * de.a12.studio.ui.editors.propertyeditors.ModulesPanelController}. Currently only edits the module name;
+ * de.a12.studio.ui.editors.applicationmodel.ModulesPanelController}. Currently only edits the module name;
  * further module details (menu, flows) are expected to be added to this dialog later.
  */
 public class ModuleDialogController implements DialogController {

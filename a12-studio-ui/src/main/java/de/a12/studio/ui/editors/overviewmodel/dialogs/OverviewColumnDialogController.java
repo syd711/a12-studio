@@ -9,10 +9,10 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
+import de.a12.studio.ui.editors.overviewmodel.RichtextEditorController;
+import de.a12.studio.ui.editors.overviewmodel.StylesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
-import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
-import de.a12.studio.ui.editors.propertyeditors.StylesPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.collections.FXCollections;
@@ -32,7 +32,7 @@ import java.util.function.Function;
 
 /**
  * Modal dialog for editing a single {@link Column}, opened from {@link
- * de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController} by clicking a column row. Edits the
+ * de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController} by clicking a column row. Edits the
  * real, already-attached {@link Column} live (there's no "add" mode - {@code OverviewColumnsPanelController}
  * attaches a new column directly, without going through this dialog), so a {@link ColumnSnapshot} taken before
  * showing the dialog can undo those edits on Cancel, mirroring {@link

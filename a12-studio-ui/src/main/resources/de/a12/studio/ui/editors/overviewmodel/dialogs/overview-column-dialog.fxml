@@ -81,7 +81,7 @@
                            <TextField fx:id="nameField" promptText="Distinguishes this column from others, e.g. FullName" />
                         </children>
                      </VBox>
-                     <fx:include fx:id="expressionPanel" source="../../propertyeditors/richtext-editor.fxml" />
+                     <fx:include fx:id="expressionPanel" source="../richtext-editor.fxml" />
                   </children>
                </VBox>
 
@@ -178,8 +178,8 @@
                <!-- Styles -->
                <VBox spacing="10.0">
                   <children>
-                     <fx:include fx:id="stylesHeader" source="../../propertyeditors/styles-panel.fxml" />
-                     <fx:include fx:id="stylesContent" source="../../propertyeditors/styles-panel.fxml" />
+                     <fx:include fx:id="stylesHeader" source="../styles-panel.fxml" />
+                     <fx:include fx:id="stylesContent" source="../styles-panel.fxml" />
                   </children>
                </VBox>
             </VBox>

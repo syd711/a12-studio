@@ -7,7 +7,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Captures a deep, JSON-based clone of a {@link Column} before {@link OverviewColumnDialogController} lets its
  * fields and embedded panels ({@link de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController} for
- * the label, {@link de.a12.studio.ui.editors.propertyeditors.StylesPanelController} for the header/content cell
+ * the label, {@link de.a12.studio.ui.editors.overviewmodel.StylesPanelController} for the header/content cell
  * styles) mutate it live, so {@link #restore()} can undo those changes on Cancel. See {@code CaseSnapshot} for
  * the same pattern.
  */

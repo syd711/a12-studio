@@ -9,9 +9,9 @@ import java.util.List;
 
 /**
  * Describes {@link Column}s for display in pickers outside the Columns panel itself (currently the Sorting
- * panel's per-row combo box, see {@link de.a12.studio.ui.editors.propertyeditors.OverviewSortingPanelController}),
+ * panel's per-row combo box, see {@link de.a12.studio.ui.editors.overviewmodel.OverviewSortingPanelController}),
  * so a column reads the same wherever it's picked from as it does in {@link
- * de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController}'s own rows.
+ * de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController}'s own rows.
  */
 public final class OverviewColumnOptions {
 
@@ -36,7 +36,7 @@ public final class OverviewColumnOptions {
   }
 
   /** A column with no field reference is an expression column, shown as "Expression Column" wherever it's
-   * picked from (see {@link de.a12.studio.ui.editors.propertyeditors.OverviewColumnsPanelController}'s
+   * picked from (see {@link de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController}'s
    * epsilon-icon row), never by its own {@link Column#getName()}. */
   public static boolean isExpressionColumn(Column column) {
     return column != null && (column.getElementRef() == null || column.getElementRef().isBlank()) && column.getExpression() != null;

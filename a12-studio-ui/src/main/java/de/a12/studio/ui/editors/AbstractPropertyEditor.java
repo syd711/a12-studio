@@ -366,8 +366,8 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
 
   /**
    * Same as {@link #commitChange()} but for "model header" panels (e.g. {@link
-   * de.a12.studio.ui.editors.propertyeditors.RegionPanelController}, {@link
-   * de.a12.studio.ui.editors.propertyeditors.LayoutPanelController}) that edit part of a model not tied to a
+   * de.a12.studio.ui.editors.applicationmodel.RegionPanelController}, {@link
+   * de.a12.studio.ui.editors.applicationmodel.LayoutPanelController}) that edit part of a model not tied to a
    * single {@link Element}, so {@code this.element} is never set and the plain {@link #commitChange()} would
    * save the file but then bail out of its {@code element == null} check before firing {@link
    * StudioEventManager#fireModelSavedEvent}. Without that event, {@code ProjectTreeController} never

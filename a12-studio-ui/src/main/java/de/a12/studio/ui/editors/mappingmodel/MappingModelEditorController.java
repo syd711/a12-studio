@@ -8,8 +8,6 @@ import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.mappingmodel.MappingSource;
 import de.a12.studio.models.mappingmodel.MappingTarget;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.propertyeditors.SourceModelsPanelController;
-import de.a12.studio.ui.editors.propertyeditors.TargetModelPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;

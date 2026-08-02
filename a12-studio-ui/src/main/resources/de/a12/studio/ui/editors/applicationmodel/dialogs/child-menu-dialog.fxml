@@ -31,13 +31,13 @@
                </VBox>
 
                <!-- Activity Descriptor -->
-               <fx:include fx:id="activity" source="../../propertyeditors/activity-panel.fxml" />
+               <fx:include fx:id="activity" source="../activity-panel.fxml" />
 
                <!-- Label -->
                <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
 
                <!-- Roles -->
-               <fx:include fx:id="roles" source="../../propertyeditors/module-roles-panel.fxml" />
+               <fx:include fx:id="roles" source="../module-roles-panel.fxml" />
             </VBox>
          </content>
          <padding>

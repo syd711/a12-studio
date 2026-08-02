@@ -5,8 +5,8 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
+import de.a12.studio.ui.editors.applicationmodel.SceneChangePanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
-import de.a12.studio.ui.editors.propertyeditors.SceneChangePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 /**
  * Add/edit dialog for a single {@link Case} of a {@link de.a12.studio.models.applicationmodel.Scene}, opened
- * from {@link de.a12.studio.ui.editors.propertyeditors.CasesPanelController}. Follows the same edit-in-place
+ * from {@link de.a12.studio.ui.editors.applicationmodel.CasesPanelController}. Follows the same edit-in-place
  * pattern as {@link ChildMenuDialogController}: for an edit, the embedded panels mutate the real, already-
  * attached {@link Case} live, so a {@link CaseSnapshot} taken before showing the dialog can undo it on Cancel;
  * for an add, they mutate a new, not-yet-attached {@link Case} that the caller only attaches to the parent

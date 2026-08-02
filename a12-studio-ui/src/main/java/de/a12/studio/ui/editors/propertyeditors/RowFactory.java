@@ -22,7 +22,9 @@ import java.util.function.BiConsumer;
 
 /**
  * Shared row-building blocks for the reorderable-list property editors in this package (e.g.
- * {@link ModulesPanelController}, {@link OverviewColumnsPanelController}, {@link StylesPanelController}):
+ * {@link de.a12.studio.ui.editors.applicationmodel.ModulesPanelController}, {@link
+ * de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController}, {@link
+ * de.a12.studio.ui.editors.overviewmodel.StylesPanelController}):
  * the drag handle icon, drag-and-drop reordering, the up/down move-buttons column, and the generic action
  * button used for edit/copy/delete. Every method is stateless; callers own their row list and re-render
  * (typically a {@code rebuildRows()}) plus persist (typically {@code commitChange()}) after a mutation.

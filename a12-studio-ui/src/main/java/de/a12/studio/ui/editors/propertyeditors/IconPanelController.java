@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
  * directly, for icons outside the bundled classic set. Not bound to a single {@link
  * de.a12.studio.models.documentmodel.Element} (the icon lives on the {@link Column} being edited by {@link
  * de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController}), so it follows the same
- * per-Column pattern as {@link StylesPanelController#setColumn}.
+ * per-Column pattern as {@link de.a12.studio.ui.editors.overviewmodel.StylesPanelController#setColumn}.
  */
 public class IconPanelController extends AbstractPropertyEditor implements Initializable {
 

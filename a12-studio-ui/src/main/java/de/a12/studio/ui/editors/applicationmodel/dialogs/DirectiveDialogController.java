@@ -39,7 +39,7 @@ import java.util.Optional;
 /**
  * Add/edit dialog for a single {@link Directive} of a {@link de.a12.studio.models.applicationmodel.SceneChange}'s
  * {@code onEnter}/{@code onExit} list, opened from {@link
- * de.a12.studio.ui.editors.propertyeditors.SceneChangePanelController}. Since a directive's shape depends on its
+ * de.a12.studio.ui.editors.applicationmodel.SceneChangePanelController}. Since a directive's shape depends on its
  * {@link DirectiveType} (a {@link RegionClearDirective} carries a {@link Layout}, a {@link ViewAddDirective}
  * carries a component name/{@link Constraints}/model list/configuration), this dialog always builds and returns a
  * brand new {@link Directive} instance on OK (see {@link #getResult()}) rather than mutating the one passed to

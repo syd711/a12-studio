@@ -6,9 +6,9 @@ import de.a12.studio.models.applicationmodel.Scene;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
-import de.a12.studio.ui.editors.propertyeditors.CasesPanelController;
-import de.a12.studio.ui.editors.propertyeditors.MatchConditionsPanelController;
-import de.a12.studio.ui.editors.propertyeditors.SceneChangePanelController;
+import de.a12.studio.ui.editors.applicationmodel.CasesPanelController;
+import de.a12.studio.ui.editors.applicationmodel.MatchConditionsPanelController;
+import de.a12.studio.ui.editors.applicationmodel.SceneChangePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -23,7 +23,7 @@ import java.util.Optional;
 
 /**
  * Add/edit dialog for a single {@link Scene} of a {@link Flow} in {@link
- * de.a12.studio.ui.editors.propertyeditors.FlowsPanelController}. Own fields (Name, Description, Prior Scene,
+ * de.a12.studio.ui.editors.applicationmodel.FlowsPanelController}. Own fields (Name, Description, Prior Scene,
  * Default Case) are wired directly here; the Match Conditions, Scene Change and Cases sections are delegated to
  * {@link MatchConditionsPanelController}, {@link SceneChangePanelController} and {@link CasesPanelController}.
  * Follows the same edit-in-place pattern as {@link ChildMenuDialogController}/{@link CaseDialogController}: for

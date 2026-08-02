@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="REFERENCE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewReferencePanelController">
+    <BorderPane>
+        <center>
+            <VBox spacing="6.0">
+                <children>
+                    <VBox spacing="6.0">
+                        <children>
+                            <RadioButton fx:id="queryModelReferenceField" mnemonicParsing="false" text="Use Query Model as Reference">
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="overviewReferenceToggleGroup" />
+                                </toggleGroup>
+                            </RadioButton>
+                            <RadioButton fx:id="documentModelReferenceField" mnemonicParsing="false" text="Use Document Model as Reference" toggleGroup="$overviewReferenceToggleGroup" />
+                        </children>
+                    </VBox>
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                        <children>
+                            <ComboBox fx:id="overviewReferenceField" editable="false" HBox.hgrow="ALWAYS" />
+                            <Button fx:id="editReferenceButton" mnemonicParsing="false" onAction="#onEditReference" styleClass="default-button">
+                                <graphic>
+                                    <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" />
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Open Model" />
+                                </tooltip>
+                            </Button>
+                        </children>
+                    </HBox>
+                    <Label fx:id="queryModelReferenceInfoLabel" managed="false" styleClass="placeholder-label" text="The settings for Default Sorting and Paging Size of the Overview Model have priority over the settings in the Query Model. As a result, if Default Sorting is specified in the Overview Model, then this setting will be applied in the application." visible="false" wrapText="true" />
+                </children>
+            </VBox>
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+    </BorderPane>
+</TitledPane>

@@ -6,6 +6,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.events.StudioEventManager;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -107,5 +108,31 @@ public final class ProjectDocumentModels {
       return Optional.of(item);
     }
     return Optional.empty();
+  }
+
+  /**
+   * Opens the model referenced by {@code modelId} in an editor tab, selecting its tab instead if it's already
+   * open (see {@code TabPaneController#modelOpened}). Does nothing if no model with that id exists in the
+   * current project. Shared by every "edit reference" button across the property editors (e.g. {@link
+   * de.a12.studio.ui.editors.mappingmodel.TargetModelPanelController}, {@link
+   * de.a12.studio.ui.editors.maindetailmodel.MainModelReferencePanelController}, {@link
+   * de.a12.studio.ui.editors.documentmodel.IncludePropertiesPanelController}, {@link
+   * de.a12.studio.ui.editors.overviewmodel.OverviewReferencePanelController}).
+   */
+  public static void openModelInEditor(@NonNull String modelId) {
+    findProjectItemByModelId(modelId).ifPresent(ProjectDocumentModels::openModelInEditor);
+  }
+
+  /**
+   * Opens {@code item} in an editor tab, selecting its tab instead if it's already open, adding it to the
+   * project's opened-files list and firing a {@code ModelOpenedEvent} so the tab pane picks it up.
+   */
+  public static void openModelInEditor(@NonNull ProjectItem item) {
+    Project project = Studio.getCurrentProject();
+    if (project != null) {
+      project.getSettings().getUISettings().addOpenedFile(item.getPath());
+      project.getSettings().getUISettings().save();
+    }
+    StudioEventManager.getInstance().fireModelOpenEvent(item);
   }
 }

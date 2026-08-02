@@ -64,7 +64,7 @@
                         </VBox>
 
                         <!-- Activity Descriptor -->
-                        <fx:include fx:id="activity" source="../propertyeditors/activity-panel.fxml" />
+                        <fx:include fx:id="activity" source="activity-panel.fxml" />
                     </children>
                 </VBox>
             </TitledPane>
@@ -73,13 +73,13 @@
             <fx:include fx:id="label" source="../propertyeditors/localized-text-panel.fxml" />
 
             <!-- Roles -->
-            <fx:include fx:id="roles" source="../propertyeditors/module-roles-panel.fxml" />
+            <fx:include fx:id="roles" source="module-roles-panel.fxml" />
 
             <!-- Child Menu -->
-            <fx:include fx:id="childMenu" source="../propertyeditors/child-menu-panel.fxml" />
+            <fx:include fx:id="childMenu" source="child-menu-panel.fxml" />
 
             <!-- Flows -->
-            <fx:include fx:id="flows" source="../propertyeditors/flows-panel.fxml" />
+            <fx:include fx:id="flows" source="flows-panel.fxml" />
         </VBox>
     </content>
 </ScrollPane>

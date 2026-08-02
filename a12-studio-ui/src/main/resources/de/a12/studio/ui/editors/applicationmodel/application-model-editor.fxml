@@ -43,11 +43,11 @@
                <content>
                   <VBox spacing="12.0" styleClass="field-editor">
                      <children>
-                        <fx:include fx:id="region" source="../propertyeditors/region-panel.fxml" />
-                        <fx:include fx:id="subregions" source="../propertyeditors/subregions-panel.fxml" />
-                        <fx:include fx:id="layout" source="../propertyeditors/layout-panel.fxml" />
-                        <fx:include fx:id="modules" source="../propertyeditors/modules-panel.fxml" />
-                        <fx:include fx:id="activity" source="../propertyeditors/activity-panel.fxml" />
+                        <fx:include fx:id="region" source="region-panel.fxml" />
+                        <fx:include fx:id="subregions" source="subregions-panel.fxml" />
+                        <fx:include fx:id="layout" source="layout-panel.fxml" />
+                        <fx:include fx:id="modules" source="modules-panel.fxml" />
+                        <fx:include fx:id="activity" source="activity-panel.fxml" />
                      </children>
                      <padding>
                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

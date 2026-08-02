@@ -43,16 +43,16 @@
                                    <children>
 
                                        <!-- General Settings -->
-                                       <fx:include fx:id="overviewReference" source="../propertyeditors/overview-reference-panel.fxml" />
+                                       <fx:include fx:id="overviewReference" source="overview-reference-panel.fxml" />
 
                                        <!-- Columns -->
-                                       <fx:include fx:id="overviewColumns" source="../propertyeditors/overview-columns-panel.fxml" />
+                                       <fx:include fx:id="overviewColumns" source="overview-columns-panel.fxml" />
 
                                        <!-- Sorting -->
-                                       <fx:include fx:id="overviewSorting" source="../propertyeditors/overview-sorting-panel.fxml" />
+                                       <fx:include fx:id="overviewSorting" source="overview-sorting-panel.fxml" />
 
                                        <!-- Features -->
-                                       <fx:include fx:id="overviewFeatures" source="../propertyeditors/overview-features-panel.fxml" />
+                                       <fx:include fx:id="overviewFeatures" source="overview-features-panel.fxml" />
 
                                        <!-- Filter -->
                                        <Label styleClass="field-label" text="Filter" />
@@ -143,13 +143,13 @@
                                        </VBox>
 
                                        <!-- Multi-Selection -->
-                                       <fx:include fx:id="overviewMultiSelection" source="../propertyeditors/overview-multi-selection-panel.fxml" />
+                                       <fx:include fx:id="overviewMultiSelection" source="overview-multi-selection-panel.fxml" />
 
                                        <!-- Accessibility -->
-                                       <fx:include fx:id="overviewAccessibility" source="../propertyeditors/overview-accessibility-panel.fxml" />
+                                       <fx:include fx:id="overviewAccessibility" source="overview-accessibility-panel.fxml" />
 
                                        <!-- Styles -->
-                                       <fx:include fx:id="overviewStyles" source="../propertyeditors/styles-panel.fxml" />
+                                       <fx:include fx:id="overviewStyles" source="styles-panel.fxml" />
 
                                    </children>
                                    <padding>

@@ -1,7 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel.dialogs;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
@@ -9,7 +8,6 @@ import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionModelFieldEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionRow;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefinitionTableController;
-import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
@@ -159,12 +157,7 @@ public class TypeDefinitionSettingsDialog implements Initializable, DialogContro
 
     stage.close();
     Platform.runLater(() -> ProjectDocumentModels.findProjectItemByModelId(ownerModelId).ifPresent(item -> {
-      Project project = Studio.getCurrentProject();
-      if (project != null) {
-        project.getSettings().getUISettings().addOpenedFile(item.getPath());
-        project.getSettings().getUISettings().save();
-      }
-      StudioEventManager.getInstance().fireModelOpenEvent(item);
+      ProjectDocumentModels.openModelInEditor(item);
       Dialogs.openTypeDefinitions();
     }));
   }

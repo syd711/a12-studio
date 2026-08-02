@@ -24,7 +24,7 @@ import java.util.Optional;
 
 /**
  * Modal Add/Edit dialog for a single {@link MappingSource}, opened from {@link
- * de.a12.studio.ui.editors.propertyeditors.SourceModelsPanelController} by clicking a row (or its Edit
+ * de.a12.studio.ui.editors.mappingmodel.SourceModelsPanelController} by clicking a row (or its Edit
  * button/Add button). Unlike e.g. {@link de.a12.studio.ui.editors.applicationmodel.dialogs.CaseDialogController},
  * {@code sourceModel} is only ever mutated once, in {@link #onDialogSubmit}, so Cancel needs no snapshot/undo -
  * an in-progress edit simply never gets applied.

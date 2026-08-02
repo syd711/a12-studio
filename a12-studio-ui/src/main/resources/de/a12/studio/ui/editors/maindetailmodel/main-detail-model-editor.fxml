@@ -23,9 +23,9 @@
             <content>
                 <VBox spacing="16.0" styleClass="field-editor">
                     <children>
-                        <fx:include fx:id="masterModelReference" source="../propertyeditors/main-model-reference-panel.fxml"/>
-                        <fx:include fx:id="formWidthPanel" source="../propertyeditors/form-width-panel.fxml"/>
-                        <fx:include fx:id="mainDetailFormMappingPanel" source="../propertyeditors/main-detail-form-mapping-panel.fxml"/>
+                        <fx:include fx:id="masterModelReference" source="main-model-reference-panel.fxml"/>
+                        <fx:include fx:id="formWidthPanel" source="form-width-panel.fxml"/>
+                        <fx:include fx:id="mainDetailFormMappingPanel" source="main-detail-form-mapping-panel.fxml"/>
                     </children>
                     <padding>
                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
