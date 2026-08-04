@@ -32,12 +32,12 @@ public final class TreeUniqueNodeValidator implements ModelValidator {
     for (TreeNode node : treeModel.getContent().getNodes()) {
       if (node.getId() != null && !seenIds.add(node.getId())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_node_id"" + node.getId() + "\" is used more than once.", Severity.ERROR.name()));
+            "The node id \"" + node.getId() + "\" is used more than once.", Severity.ERROR.name()));
       }
       if (node.getDocumentModelRef() != null && !node.getDocumentModelRef().isBlank()
           && !seenDocumentModels.add(node.getDocumentModelRef())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.one_document_model_can_be_used_for_only_one_node_d""
+            "One document model can be used for only one node document model reference (\""
                 + node.getDocumentModelRef() + "\").", Severity.ERROR.name()));
       }
     }

@@ -25,6 +25,6 @@ public final class MissingLocaleValidator implements ModelValidator {
     if (!missing) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "validation.validation_please_add_at_least_one_locale", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID, "Please add at least one locale.", Severity.ERROR.name()));
   }
 }

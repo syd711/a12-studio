@@ -26,6 +26,6 @@ public final class OverviewPagingSizeValidator implements ModelValidator {
     if (pagingSize == null || pagingSize >= 1) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "validation.validation_paging_size_must_be_at_least_1", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID, "Paging Size must be at least 1.", Severity.ERROR.name()));
   }
 }

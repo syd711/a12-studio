@@ -27,6 +27,7 @@ public class Dialogs {
 
   private static boolean showChildMenu(Stage owner, String title, Menu menu, MenuSnapshot snapshot) {
     FXMLLoader fxmlLoader = new FXMLLoader(ChildMenuDialogController.class.getResource("child-menu-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-children-menu", fxmlLoader, owner, title);
     ChildMenuDialogController controller = (ChildMenuDialogController) stage.getUserData();
     controller.init(stage, menu, snapshot);
@@ -50,6 +51,7 @@ public class Dialogs {
 
   private static Optional<String> showModule(Stage owner, String title, String initialName) {
     FXMLLoader fxmlLoader = new FXMLLoader(ModuleDialogController.class.getResource("module-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-module", fxmlLoader, owner, title);
     ModuleDialogController controller = (ModuleDialogController) stage.getUserData();
     controller.init(stage, initialName);
@@ -67,6 +69,7 @@ public class Dialogs {
 
   private static Optional<String> showSubregion(Stage owner, String title, String initialName) {
     FXMLLoader fxmlLoader = new FXMLLoader(SubregionDialogController.class.getResource("subregion-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-subregion", fxmlLoader, owner, title);
     SubregionDialogController controller = (SubregionDialogController) stage.getUserData();
     controller.init(stage, initialName);
@@ -105,6 +108,7 @@ public class Dialogs {
 
   private static boolean showScene(Stage owner, String title, Flow flow, Scene scene, SceneSnapshot snapshot) {
     FXMLLoader fxmlLoader = new FXMLLoader(SceneDialogController.class.getResource("scene-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialogscene", fxmlLoader, owner, title);
     SceneDialogController controller = (SceneDialogController) stage.getUserData();
     controller.init(stage, flow, scene, snapshot);
@@ -129,6 +133,7 @@ public class Dialogs {
 
   private static boolean showCase(Stage owner, String title, Case caseObj, CaseSnapshot snapshot) {
     FXMLLoader fxmlLoader = new FXMLLoader(CaseDialogController.class.getResource("case-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-case", fxmlLoader, owner, title);
     CaseDialogController controller = (CaseDialogController) stage.getUserData();
     controller.init(stage, caseObj, snapshot);
@@ -152,6 +157,7 @@ public class Dialogs {
 
   private static Optional<Directive> showDirective(Stage owner, String title, Directive existing) {
     FXMLLoader fxmlLoader = new FXMLLoader(DirectiveDialogController.class.getResource("directive-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-directive", fxmlLoader, owner, title);
     DirectiveDialogController controller = (DirectiveDialogController) stage.getUserData();
     controller.init(stage, existing);

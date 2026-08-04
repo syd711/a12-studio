@@ -122,6 +122,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   private Node loadEditor(@NonNull String fxml, @NonNull Element selected) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+loader.setResources(StudioBundle.getBundle());
       Node node = loader.load();
       if (loader.getController() instanceof ElementEditorController elementEditorController) {
         elementEditorController.setElement(selected, elementsTreeController.getAncestors(selected));

@@ -17,6 +17,7 @@ public class Dialogs {
   /** Opens the column editor for {@code column}, editing it live so a Cancel can undo the changes. */
   public static void showColumnDialog(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column) {
     FXMLLoader fxmlLoader = new FXMLLoader(OverviewColumnDialogController.class.getResource("overview-column-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, "Edit Column");
     OverviewColumnDialogController controller = (OverviewColumnDialogController) stage.getUserData();
     controller.init(stage, documentModelIndex, documentModelId, column);
@@ -35,6 +36,7 @@ public class Dialogs {
 
   private static boolean showMultiSelectionAction(Stage owner, String title, Button button) {
     FXMLLoader fxmlLoader = new FXMLLoader(MultiSelectionActionDialogController.class.getResource("overview-multi-selection-action-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("overview-multi-selection-action-dialog", fxmlLoader, owner, title);
     MultiSelectionActionDialogController controller = (MultiSelectionActionDialogController) stage.getUserData();
     controller.initDialog(stage, button);

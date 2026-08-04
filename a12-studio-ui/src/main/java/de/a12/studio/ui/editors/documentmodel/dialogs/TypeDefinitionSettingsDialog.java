@@ -98,6 +98,7 @@ public class TypeDefinitionSettingsDialog implements Initializable, DialogContro
   private Node loadEditor(TypeDefinitionRow selected) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(FIELD_EDITOR_FXML));
+loader.setResources(StudioBundle.getBundle());
       Node node = loader.load();
       TypeDefinitionModelFieldEditorController fieldEditorController = loader.getController();
       fieldEditorController.setSaveMode(saveMode);

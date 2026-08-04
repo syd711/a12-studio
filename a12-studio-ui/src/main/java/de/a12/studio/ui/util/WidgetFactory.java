@@ -305,12 +305,14 @@ public class WidgetFactory {
 
   public static Stage createDialogStage(Class clazz, Stage owner, String title, String fxml) {
     FXMLLoader fxmlLoader = new FXMLLoader(clazz.getResource(fxml));
+fxmlLoader.setResources(StudioBundle.getBundle());
     String stateId = FilenameUtils.getBaseName(fxml);
     return createDialogStage(stateId, fxmlLoader, owner, title);
   }
 
   public static Stage createDialogStage(String stateId, Class clazz, Stage owner, String title, String fxml) {
     FXMLLoader fxmlLoader = new FXMLLoader(clazz.getResource(fxml));
+fxmlLoader.setResources(StudioBundle.getBundle());
     return createDialogStage(stateId, fxmlLoader, owner, title);
   }
 

@@ -71,6 +71,7 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     super.initialize(url, resourceBundle);
 
     FXMLLoader loader = new FXMLLoader(DataTypeStringConfigurationPanelController.class.getResource("data-type-string-configuration-panel.fxml"));
+loader.setResources(StudioBundle.getBundle());
     try {
       stringConfigurationNode = loader.load();
     } catch (IOException e) {
@@ -80,6 +81,7 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     stringConfigurationController = loader.getController();
 
     FXMLLoader numberLoader = new FXMLLoader(DataTypeNumberConfigurationPanelController.class.getResource("data-type-number-configuration-panel.fxml"));
+numberLoader.setResources(StudioBundle.getBundle());
     try {
       numberConfigurationNode = numberLoader.load();
     } catch (IOException e) {
@@ -89,6 +91,7 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     numberConfigurationController = numberLoader.getController();
 
     FXMLLoader dateFragmentLoader = new FXMLLoader(DataTypeDateFragmentConfigurationPanelController.class.getResource("data-type-date-fragment-configuration-panel.fxml"));
+dateFragmentLoader.setResources(StudioBundle.getBundle());
     try {
       dateFragmentConfigurationNode = dateFragmentLoader.load();
     } catch (IOException e) {
@@ -98,6 +101,7 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     dateFragmentConfigurationController = dateFragmentLoader.getController();
 
     FXMLLoader dateRangeLoader = new FXMLLoader(DataTypeDateRangeConfigurationPanelController.class.getResource("data-type-date-range-configuration-panel.fxml"));
+dateRangeLoader.setResources(StudioBundle.getBundle());
     try {
       dateRangeConfigurationNode = dateRangeLoader.load();
     } catch (IOException e) {
@@ -107,6 +111,7 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     dateRangeConfigurationController = dateRangeLoader.getController();
 
     FXMLLoader customLoader = new FXMLLoader(DataTypeCustomConfigurationPanelController.class.getResource("data-type-custom-configuration-panel.fxml"));
+customLoader.setResources(StudioBundle.getBundle());
     try {
       customConfigurationNode = customLoader.load();
     } catch (IOException e) {
@@ -116,6 +121,7 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
     customConfigurationController = customLoader.getController();
 
     FXMLLoader enumerationLoader = new FXMLLoader(DataTypeEnumerationConfigurationPanelController.class.getResource("data-type-enumeration-configuration-panel.fxml"));
+enumerationLoader.setResources(StudioBundle.getBundle());
     try {
       enumerationConfigurationNode = enumerationLoader.load();
     } catch (IOException e) {

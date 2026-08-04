@@ -31,7 +31,7 @@ public final class TreeHierarchicalColumnRefValidator implements ModelValidator 
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "validation.the_hierarchical_column_reference"" + hierarchicalColumnRef + "\" does not exist in the tree's columns.",
+        "The hierarchical column reference \"" + hierarchicalColumnRef + "\" does not exist in the tree's columns.",
         Severity.ERROR.name()));
   }
 }

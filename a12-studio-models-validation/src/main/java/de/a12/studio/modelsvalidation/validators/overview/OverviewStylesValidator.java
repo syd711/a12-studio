@@ -23,7 +23,7 @@ public final class OverviewStylesValidator implements ModelValidator {
     List<ModelValidationError> errors = new ArrayList<>();
     for (String style : overviewModel.getContent().getStyles()) {
       if (style == null || style.isBlank()) {
-        errors.add(new ModelValidationError(model, ELEMENT_ID, "validation.a_style_value_is_required_remove_the_empty_entry_o", Severity.ERROR.name()));
+        errors.add(new ModelValidationError(model, ELEMENT_ID, "A style value is required; remove the empty entry or set a value.", Severity.ERROR.name()));
       }
     }
     return errors;

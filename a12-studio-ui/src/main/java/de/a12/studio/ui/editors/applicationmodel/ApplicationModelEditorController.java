@@ -74,6 +74,7 @@ public class ApplicationModelEditorController extends AbstractEditorController i
 
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(MODULE_EDITOR_FXML));
+loader.setResources(StudioBundle.getBundle());
       Node node = loader.load();
       VBox.setVgrow(node, Priority.ALWAYS);
       currentModuleEditorController = loader.getController();

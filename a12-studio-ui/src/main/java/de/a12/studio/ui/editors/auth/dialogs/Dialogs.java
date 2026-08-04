@@ -21,6 +21,7 @@ public class Dialogs {
 
   private static boolean showRole(Stage owner, String title, Role role) {
     FXMLLoader fxmlLoader = new FXMLLoader(RoleDialogController.class.getResource("role-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-role", fxmlLoader, owner, title);
     RoleDialogController controller = (RoleDialogController) stage.getUserData();
     controller.init(stage, role);
@@ -39,6 +40,7 @@ public class Dialogs {
 
   private static boolean showUser(Stage owner, String title, User user) {
     FXMLLoader fxmlLoader = new FXMLLoader(UserDialogController.class.getResource("user-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-user", fxmlLoader, owner, title);
     UserDialogController controller = (UserDialogController) stage.getUserData();
     controller.init(stage, user);

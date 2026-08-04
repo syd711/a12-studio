@@ -78,6 +78,7 @@ public class NewModelDialogController implements DialogController {
 
   public static Optional<NewModelInput> show(Stage owner, @NonNull ProjectItem targetFolder, ModelType preselectedType) {
     FXMLLoader fxmlLoader = new FXMLLoader(NewModelDialogController.class.getResource("dialog-new-model.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-new-model", fxmlLoader, owner, "New Model");
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;

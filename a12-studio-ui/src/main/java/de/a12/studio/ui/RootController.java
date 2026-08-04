@@ -103,6 +103,7 @@ public class RootController implements Initializable, StudioEventListener {
   public void preferencesOpenRequested(@NonNull PreferencesOpenRequestedEvent event) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("preferences/scene-preferences.fxml"));
+loader.setResources(StudioBundle.getBundle());
       Parent preferencesRoot = loader.load();
       PreferencesController controller = loader.getController();
       controller.setOnCloseRequested(() -> {

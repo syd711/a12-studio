@@ -49,7 +49,7 @@ public final class PrintTableColumnWidthValidator implements ModelValidator {
         double value = width.doubleValue();
         if (value != Math.floor(value) || value < 1 || value > 100) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the" + type + " element \"" + definition.getId()
+              "The " + type + " element \"" + definition.getId()
                   + "\" has a column width of " + width + "; widths must be integers between 1 and 100.",
               Severity.ERROR.name()));
         }
@@ -57,7 +57,7 @@ public final class PrintTableColumnWidthValidator implements ModelValidator {
       }
       if (anyWidth && sum > 100) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_column_widths_of_the" + type + " element \"" + definition.getId()
+            "The column widths of the " + type + " element \"" + definition.getId()
                 + "\" sum to " + sum + "; the sum must not exceed 100.", Severity.ERROR.name()));
       }
     }

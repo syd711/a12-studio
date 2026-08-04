@@ -21,11 +21,11 @@ public final class ContentRootElementValidator implements ModelValidator {
     }
     if (contentModel.getContent().getRoot() == null) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "validation.the_content_model_has_no_root_element", Severity.ERROR.name()));
+          "The content model has no root element.", Severity.ERROR.name()));
     }
     if (contentModel.getContent().getRoot().getType() == null || contentModel.getContent().getRoot().getType().isBlank()) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "validation.the_root_element_has_no_type", Severity.ERROR.name()));
+          "The root element has no type.", Severity.ERROR.name()));
     }
     return List.of();
   }

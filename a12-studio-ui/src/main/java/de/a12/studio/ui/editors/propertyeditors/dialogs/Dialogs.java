@@ -18,6 +18,7 @@ public class Dialogs {
 
   public static Optional<CategoryInput> showCategory(Stage owner, String title, String name, String description) {
     FXMLLoader fxmlLoader = new FXMLLoader(CategoryDialogController.class.getResource("category-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("category-dialog", fxmlLoader, owner, title);
     CategoryDialogController controller = (CategoryDialogController) stage.getUserData();
     controller.initDialog(stage, name, description);
@@ -35,6 +36,7 @@ public class Dialogs {
 
   public static Optional<List<String>> showSuggestions(Stage owner, String title, List<String> initialValues) {
     FXMLLoader fxmlLoader = new FXMLLoader(SuggestionsDialogController.class.getResource("suggestions-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
     SuggestionsDialogController controller = (SuggestionsDialogController) stage.getUserData();
     controller.initDialog(stage, initialValues);
@@ -54,6 +56,7 @@ public class Dialogs {
   public static Optional<DocumentUniquenessCriterion> showUniquenessCriterion(Stage owner, DocumentModel model,
                                                                                 DocumentUniquenessCriterion criterion, Set<String> usedNames) {
     FXMLLoader fxmlLoader = new FXMLLoader(DocumentUniquenessCriterionDialogController.class.getResource("document-uniqueness-criterion-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     String title = criterion == null ? "New Uniqueness Criterion" : "Edit Uniqueness Criterion";
     Stage stage = WidgetFactory.createDialogStage("uniqueness-criterion-dialog", fxmlLoader, owner, title);
     DocumentUniquenessCriterionDialogController controller = (DocumentUniquenessCriterionDialogController) stage.getUserData();

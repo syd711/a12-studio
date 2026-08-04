@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane resources="@/messages" fx:id="root" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%initial_activity" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.applicationmodel.ActivityPanelController">
+<TitledPane resources="messages" fx:id="root" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%initial_activity" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.applicationmodel.ActivityPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">

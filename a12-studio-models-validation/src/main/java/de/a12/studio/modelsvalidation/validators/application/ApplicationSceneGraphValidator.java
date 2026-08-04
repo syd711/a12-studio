@@ -48,11 +48,11 @@ public final class ApplicationSceneGraphValidator implements ModelValidator {
           }
           if (priorScene.equals(scene.getName())) {
             errors.add(new ModelValidationError(model, ELEMENT_ID,
-                "validation.the_scene"" + scene.getName() + "\" cannot be its own prior scene.", Severity.ERROR.name()));
+                "The scene \"" + scene.getName() + "\" cannot be its own prior scene.", Severity.ERROR.name()));
           }
           else if (!sceneNames.contains(priorScene)) {
             errors.add(new ModelValidationError(model, ELEMENT_ID,
-                "validation.the_prior_scene"" + priorScene + "\" of scene \"" + scene.getName()
+                "The prior scene \"" + priorScene + "\" of scene \"" + scene.getName()
                     + "\" is not known within the flow.", Severity.ERROR.name()));
           }
         }
@@ -66,7 +66,7 @@ public final class ApplicationSceneGraphValidator implements ModelValidator {
       for (String name : defaultRegion) {
         if (!regionNames.contains(name)) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.this_default_region_is_unknown"" + name + "\".", Severity.ERROR.name()));
+              "This default region is unknown: \"" + name + "\".", Severity.ERROR.name()));
         }
       }
     }

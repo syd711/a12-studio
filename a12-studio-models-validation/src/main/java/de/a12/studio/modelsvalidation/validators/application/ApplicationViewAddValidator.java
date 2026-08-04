@@ -65,13 +65,13 @@ public final class ApplicationViewAddValidator implements ModelValidator {
       }
       if (viewAdd.getName() == null || viewAdd.getName().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.a_name_is_required_for_view_add_directives", Severity.ERROR.name()));
+            "A name is required for VIEW_ADD directives.", Severity.ERROR.name()));
       }
       for (ModelDescriptor descriptor : viewAdd.getModels()) {
         if (descriptor.getName() != null && !descriptor.getName().isBlank()
             && context.findOtherModel(descriptor.getName()) == null) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the_model"" + descriptor.getName() + "\" referenced by a VIEW_ADD directive does not exist in the workspace.",
+              "The model \"" + descriptor.getName() + "\" referenced by a VIEW_ADD directive does not exist in the workspace.",
               Severity.ERROR.name()));
         }
       }

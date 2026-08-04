@@ -22,6 +22,6 @@ public final class TreeNodesNotEmptyValidator implements ModelValidator {
     if (!treeModel.getContent().getNodes().isEmpty()) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "validation.validation_node_types_must_not_be_empty", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID, "Node types must not be empty.", Severity.ERROR.name()));
   }
 }

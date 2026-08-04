@@ -22,6 +22,6 @@ public final class OverviewColumnsNotEmptyValidator implements ModelValidator {
     if (overviewModel.getContent().getColumns() != null && !overviewModel.getContent().getColumns().isEmpty()) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "validation.validation_columns_must_not_be_empty", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID, "Columns must not be empty.", Severity.ERROR.name()));
   }
 }

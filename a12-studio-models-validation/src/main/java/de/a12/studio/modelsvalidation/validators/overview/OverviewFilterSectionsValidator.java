@@ -43,11 +43,11 @@ public final class OverviewFilterSectionsValidator implements ModelValidator {
 
     for (FilterSection section : filterConfig.getSectionData()) {
       if (section.getId() == null || section.getId().isBlank()) {
-        errors.add(new ModelValidationError(model, ELEMENT_ID, "validation.a_section_id_is_required", Severity.ERROR.name()));
+        errors.add(new ModelValidationError(model, ELEMENT_ID, "A section id is required.", Severity.ERROR.name()));
       }
       if (section.getFields().isEmpty()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.section"" + describeSection(section) + "\" must have at least one field.", Severity.ERROR.name()));
+            "Section \"" + describeSection(section) + "\" must have at least one field.", Severity.ERROR.name()));
       }
 
       // Deduplicated first, so a field repeated within one section is only reported once (as an
@@ -60,7 +60,7 @@ public final class OverviewFilterSectionsValidator implements ModelValidator {
         }
         if (!fieldIdsInSection.add(fieldId)) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the_field"" + fieldId + "\" is selected more than once in section \"" + describeSection(section) + "\".",
+              "The field \"" + fieldId + "\" is selected more than once in section \"" + describeSection(section) + "\".",
               Severity.ERROR.name()));
           continue;
         }
@@ -71,13 +71,13 @@ public final class OverviewFilterSectionsValidator implements ModelValidator {
         Element element = OverviewElementResolution.resolve(index, fieldId);
         if (element == null) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the_reference_is_invalid_the_referenced_field"" + fieldId + "\" does not exist in the document model.",
+              "The reference is invalid. The referenced field \"" + fieldId + "\" does not exist in the document model.",
               Severity.ERROR.name()));
           continue;
         }
         if (OverviewElementResolution.isIndexedFalse(element)) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the"indexed\" annotation of field \"" + element.getName()
+              "The \"indexed\" annotation of field \"" + element.getName()
                   + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
               Severity.ERROR.name()));
         }
@@ -85,7 +85,7 @@ public final class OverviewFilterSectionsValidator implements ModelValidator {
       for (String fieldId : fieldIdsInSection) {
         if (!fieldIdsSeenAcrossSections.add(fieldId)) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the_field"" + fieldId + "\" is used in more than one section.", Severity.ERROR.name()));
+              "The field \"" + fieldId + "\" is used in more than one section.", Severity.ERROR.name()));
         }
       }
     }

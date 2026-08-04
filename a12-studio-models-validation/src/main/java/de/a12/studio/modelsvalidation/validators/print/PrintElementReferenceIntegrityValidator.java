@@ -54,7 +54,7 @@ public final class PrintElementReferenceIntegrityValidator implements ModelValid
       for (PrintElementReference reference : segment.getElementReferences()) {
         if (reference.getRefId() == null || !definitionIds.contains(reference.getRefId())) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.segment"" + segment.getTitle() + "\" references the element definition \"" + reference.getRefId()
+              "Segment \"" + segment.getTitle() + "\" references the element definition \"" + reference.getRefId()
                   + "\" which does not exist.", Severity.ERROR.name()));
         }
       }
@@ -65,7 +65,7 @@ public final class PrintElementReferenceIntegrityValidator implements ModelValid
         for (EntityRef entity : text.getText().getEntities()) {
           if (entity.getRefId() == null || !definitionIds.contains(entity.getRefId())) {
             errors.add(new ModelValidationError(model, ELEMENT_ID,
-                "validation.the_text_element"" + definition.getId() + "\" embeds the entity \"" + entity.getRefId()
+                "The text element \"" + definition.getId() + "\" embeds the entity \"" + entity.getRefId()
                     + "\" which does not exist in the element definitions.", Severity.ERROR.name()));
           }
         }
@@ -76,7 +76,7 @@ public final class PrintElementReferenceIntegrityValidator implements ModelValid
       for (PrintStructureEntry entry : printModel.getContent().getGeneral().getStructure()) {
         if (entry.getId() == null || !segmentIds.contains(entry.getId())) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the_document_structure_references_the_segment"" + entry.getId() + "\" which does not exist.",
+              "The document structure references the segment \"" + entry.getId() + "\" which does not exist.",
               Severity.ERROR.name()));
         }
       }

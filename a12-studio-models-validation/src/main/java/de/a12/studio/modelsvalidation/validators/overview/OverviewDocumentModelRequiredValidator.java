@@ -34,6 +34,6 @@ public final class OverviewDocumentModelRequiredValidator implements ModelValida
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "validation.a_document_model_or_query_model_reference_is_requi", Severity.ERROR.name()));
+        "A Document Model or Query Model reference is required.", Severity.ERROR.name()));
   }
 }

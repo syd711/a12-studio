@@ -25,17 +25,17 @@ public final class MasterDetailTypeConsistencyValidator implements ModelValidato
     String type = masterDetailModel.getContent().getType();
     if (type == null || type.isBlank()) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "validation.the_master_detail_type_is_required", Severity.ERROR.name()));
+          "The master-detail type is required.", Severity.ERROR.name()));
     }
     if ("overview".equals(type)
         && (masterDetailModel.getContent().getOverviewModel() == null || masterDetailModel.getContent().getOverviewModel().isBlank())) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "validation.an_overview_model_is_required_for_master_detail_ty"overview\".", Severity.ERROR.name()));
+          "An overview model is required for master-detail type \"overview\".", Severity.ERROR.name()));
     }
     if ("tree".equals(type)
         && (masterDetailModel.getContent().getTreeModel() == null || masterDetailModel.getContent().getTreeModel().isBlank())) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "validation.a_tree_model_is_required_for_master_detail_type"tree\".", Severity.ERROR.name()));
+          "A tree model is required for master-detail type \"tree\".", Severity.ERROR.name()));
     }
     return List.of();
   }

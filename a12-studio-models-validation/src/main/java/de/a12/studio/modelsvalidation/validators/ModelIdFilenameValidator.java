@@ -30,7 +30,7 @@ public final class ModelIdFilenameValidator implements ModelValidator {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "validation.the_model_name"" + model.getId() + "\" differs from the file name \"" + fileName + "\". Model name and file name must match.",
+        "The model name \"" + model.getId() + "\" differs from the file name \"" + fileName + "\". Model name and file name must match.",
         Severity.ERROR.name()));
   }
 }

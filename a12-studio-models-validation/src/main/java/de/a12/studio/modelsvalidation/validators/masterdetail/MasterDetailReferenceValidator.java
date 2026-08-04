@@ -34,26 +34,26 @@ public final class MasterDetailReferenceValidator implements ModelValidator {
     if (overviewModel != null && !overviewModel.isBlank()
         && !(context.findOtherModel(overviewModel) instanceof OverviewModel)) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "validation.the_given_overview_model"" + overviewModel + "\" could not be found.", Severity.ERROR.name()));
+          "The given overview model \"" + overviewModel + "\" could not be found.", Severity.ERROR.name()));
     }
 
     String treeModel = masterDetailModel.getContent().getTreeModel();
     if (treeModel != null && !treeModel.isBlank()
         && !(context.findOtherModel(treeModel) instanceof TreeModel)) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "validation.the_given_tree_model"" + treeModel + "\" could not be found.", Severity.ERROR.name()));
+          "The given tree model \"" + treeModel + "\" could not be found.", Severity.ERROR.name()));
     }
 
     for (FormMapping mapping : masterDetailModel.getContent().getFormMapping()) {
       if (mapping.getDocumentModel() != null && !mapping.getDocumentModel().isBlank()
           && context.findOtherDocumentModel(mapping.getDocumentModel()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_given_document_model"" + mapping.getDocumentModel() + "\" could not be found.", Severity.ERROR.name()));
+            "The given document model \"" + mapping.getDocumentModel() + "\" could not be found.", Severity.ERROR.name()));
       }
       if (mapping.getFormModel() != null && !mapping.getFormModel().isBlank()
           && !(context.findOtherModel(mapping.getFormModel()) instanceof FormModel)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_given_form_model"" + mapping.getFormModel() + "\" could not be found.", Severity.ERROR.name()));
+            "The given form model \"" + mapping.getFormModel() + "\" could not be found.", Severity.ERROR.name()));
       }
     }
     return errors;

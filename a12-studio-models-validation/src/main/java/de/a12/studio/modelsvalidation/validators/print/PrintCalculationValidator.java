@@ -35,19 +35,19 @@ public final class PrintCalculationValidator implements ModelValidator {
       Calculation calculation = element.getCalculation();
       if (calculation.getName() == null || calculation.getName().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_calculation_element"" + definition.getId() + "\" has no name.", Severity.ERROR.name()));
+            "The calculation element \"" + definition.getId() + "\" has no name.", Severity.ERROR.name()));
       }
       boolean anyOperation = calculation.getComputationAlternatives().stream()
           .map(ComputationStep::getOperation)
           .anyMatch(operation -> operation != null && !operation.isBlank());
       if (!anyOperation) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_calculation"" + calculation.getName() + "\" has no computation operation.", Severity.ERROR.name()));
+            "The calculation \"" + calculation.getName() + "\" has no computation operation.", Severity.ERROR.name()));
       }
       if (calculation.getModel() != null && !calculation.getModel().isBlank()
           && context.findOtherDocumentModel(calculation.getModel()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_document_model"" + calculation.getModel() + "\" referenced by calculation \""
+            "The Document Model \"" + calculation.getModel() + "\" referenced by calculation \""
                 + calculation.getName() + "\" does not exist in the workspace.", Severity.ERROR.name()));
       }
     }

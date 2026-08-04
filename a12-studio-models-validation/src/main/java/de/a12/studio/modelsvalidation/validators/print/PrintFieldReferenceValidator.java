@@ -42,14 +42,14 @@ public final class PrintFieldReferenceValidator implements ModelValidator {
       FieldRef field = fieldElement.getField();
       if (field.getModel() == null || field.getModel().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_field_element"" + definition.getId() + "\" does not reference a Document Model.",
+            "The field element \"" + definition.getId() + "\" does not reference a Document Model.",
             Severity.ERROR.name()));
         continue;
       }
       DocumentModel documentModel = context.findOtherDocumentModel(field.getModel());
       if (documentModel == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_document_model"" + field.getModel() + "\" referenced by a field element does not exist in the workspace.",
+            "The Document Model \"" + field.getModel() + "\" referenced by a field element does not exist in the workspace.",
             Severity.ERROR.name()));
         continue;
       }
@@ -59,7 +59,7 @@ public final class PrintFieldReferenceValidator implements ModelValidator {
       ElementIndex index = indexCache.computeIfAbsent(field.getModel(), key -> new ElementIndex(documentModel));
       if (!pathResolves(index, field.getPath())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_field_path"" + field.getPath() + "\" does not resolve against the Document Model \""
+            "The field path \"" + field.getPath() + "\" does not resolve against the Document Model \""
                 + field.getModel() + "\".", Severity.ERROR.name()));
       }
     }

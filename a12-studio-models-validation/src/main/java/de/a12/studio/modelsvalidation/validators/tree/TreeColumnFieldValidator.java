@@ -42,7 +42,7 @@ public final class TreeColumnFieldValidator implements ModelValidator {
       for (TreeNodeColumn mapping : node.getColumns()) {
         if (mapping.getColumnRef() == null || !columnIds.contains(mapping.getColumnRef())) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the_column_reference"" + mapping.getColumnRef() + "\" of node type \"" + node.getId()
+              "The column reference \"" + mapping.getColumnRef() + "\" of node type \"" + node.getId()
                   + "\" does not exist in the tree's columns.", Severity.ERROR.name()));
         }
         if (index == null || mapping.getElementRef() == null || mapping.getElementRef().isBlank()) {
@@ -54,13 +54,13 @@ public final class TreeColumnFieldValidator implements ModelValidator {
             .orElse(null);
         if (element == null) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the_reference_is_invalid_the_referenced_field"" + mapping.getElementRef()
+              "The reference is invalid. The referenced field \"" + mapping.getElementRef()
                   + "\" does not exist in the document model \"" + node.getDocumentModelRef() + "\".",
               Severity.ERROR.name()));
         }
         else if (isIndexedFalse(element)) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.the"indexed\" annotation of field \"" + element.getName()
+              "The \"indexed\" annotation of field \"" + element.getName()
                   + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
               Severity.ERROR.name()));
         }

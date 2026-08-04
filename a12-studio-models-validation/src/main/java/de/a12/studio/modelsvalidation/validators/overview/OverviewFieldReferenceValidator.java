@@ -43,19 +43,19 @@ public final class OverviewFieldReferenceValidator implements ModelValidator {
       Element element = OverviewElementResolution.resolve(index, elementRef);
       if (element == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_reference_is_invalid_the_referenced_field"" + elementRef
+            "The reference is invalid. The referenced field \"" + elementRef
                 + "\" does not exist in the document model.", Severity.ERROR.name()));
         continue;
       }
       if (OverviewElementResolution.isIndexedFalse(element)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the"indexed\" annotation of field \"" + element.getName()
+            "The \"indexed\" annotation of field \"" + element.getName()
                 + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
             Severity.ERROR.name()));
       }
       if (OverviewElementResolution.isInRepeatableGroup(index, element)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.the_reference_is_invalid_the_referenced_field"" + element.getName() + "\" is repeatable.",
+            "The reference is invalid. The referenced field \"" + element.getName() + "\" is repeatable.",
             Severity.ERROR.name()));
       }
     }

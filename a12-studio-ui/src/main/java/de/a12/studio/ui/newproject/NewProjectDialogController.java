@@ -99,6 +99,7 @@ public class NewProjectDialogController implements DialogController {
 
   public static Optional<File> show(Stage owner) {
     FXMLLoader fxmlLoader = new FXMLLoader(NewProjectDialogController.class.getResource("dialog-new-project.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, "New Project");
     NewProjectDialogController controller = (NewProjectDialogController) stage.getUserData();
     controller.stage = stage;

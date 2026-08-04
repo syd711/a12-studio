@@ -64,7 +64,7 @@ public final class FormLayoutColumnSumValidator implements ModelValidator {
     }
     if (sum > 12) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "validation.layout_lg_sum_must_not_be_12_multi_column_section"" + section.getName() + "\" has " + sum + ").",
+          "Layout lg sum must not be > 12 (multi-column section \"" + section.getName() + "\" has " + sum + ").",
           Severity.ERROR.name()));
     }
     checkSameColumnCount(model, section, "md", section.getLayout().getMd(), lg.length, errors);
@@ -78,7 +78,7 @@ public final class FormLayoutColumnSumValidator implements ModelValidator {
     }
     if (parse(layout).length != lgColumns) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "validation.number_of_columns_for" + breakpoint + " must be the same as for lg (multi-column section \""
+          "Number of columns for " + breakpoint + " must be the same as for lg (multi-column section \""
               + section.getName() + "\").", Severity.ERROR.name()));
     }
   }

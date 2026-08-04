@@ -95,6 +95,7 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
   private Node loadEditor(@NonNull String fxml, @NonNull TypeDefinitionRow selected) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+loader.setResources(StudioBundle.getBundle());
       Node node = loader.load();
       if (loader.getController() instanceof ElementEditorController elementEditorController) {
         elementEditorController.setElement(new TypeDefinitionFieldElement(selected.typeDefinition()), List.of());

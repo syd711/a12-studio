@@ -66,6 +66,7 @@ public class Studio extends Application implements StudioEventListener {
     StudioEventManager.getInstance().addListener(this);
 
     FXMLLoader loader = new FXMLLoader(Studio.class.getResource("scene-root.fxml"));
+loader.setResources(StudioBundle.getBundle());
     Parent root = loader.load();
     rootController = loader.getController();
 

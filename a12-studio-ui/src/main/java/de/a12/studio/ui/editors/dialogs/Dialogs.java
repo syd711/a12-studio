@@ -10,6 +10,7 @@ public class Dialogs {
 
   public static void openSettings() {
     FXMLLoader fxmlLoader = new FXMLLoader(ModelSettingsDialog.class.getResource("/de/a12/studio/ui/editors/dialogs/document-model-settings-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("document-mode-settings", fxmlLoader, Studio.stage, "Model Settings");
     ModelSettingsDialog controller = (ModelSettingsDialog) stage.getUserData();
     controller.setStage(stage);

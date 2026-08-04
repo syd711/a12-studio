@@ -30,7 +30,7 @@ public final class RelationshipUpperLimitValidator implements ModelValidator {
       }
       if (multiplicity.getUpperLimit() == null || multiplicity.getUpperLimit() < 1) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "validation.when_not_unbounded_the_multiplicity_of_role"" + entity.getRole() + "\" must have an upper limit of at least 1.",
+            "When not unbounded, the multiplicity of role \"" + entity.getRole() + "\" must have an upper limit of at least 1.",
             Severity.ERROR.name()));
       }
     }

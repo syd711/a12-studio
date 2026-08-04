@@ -38,7 +38,7 @@ public final class PrintHeadlineOrderValidator implements ModelValidator {
         }
         if (level > lastLevel + 1) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "validation.headline_level" + level + " is used before level " + (lastLevel + 1)
+              "Headline level " + level + " is used before level " + (lastLevel + 1)
                   + ". Headline levels must be used in order.", Severity.WARNING.name()));
         }
         lastLevel = level;

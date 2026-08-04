@@ -18,6 +18,7 @@ public class Dialogs {
 
   public static void openTypeDefinitions() {
     FXMLLoader fxmlLoader = new FXMLLoader(TypeDefinitionSettingsDialog.class.getResource("document-model-typedefinitions-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("document-type-settings", fxmlLoader, Studio.stage, StudioBundle.get("type_definitions") + titleSuffix());
     TypeDefinitionSettingsDialog controller = (TypeDefinitionSettingsDialog) stage.getUserData();
     controller.setStage(stage);
@@ -40,6 +41,7 @@ public class Dialogs {
 
   public static Optional<IncludeInput> showInclude(Stage owner, @NonNull Project project, DocumentModel excludedModel, String defaultName) {
     FXMLLoader fxmlLoader = new FXMLLoader(IncludeDialogController.class.getResource("include-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("include-dialog", fxmlLoader, owner, "New Include");
     IncludeDialogController controller = (IncludeDialogController) stage.getUserData();
     controller.init(stage, project, excludedModel, defaultName);
