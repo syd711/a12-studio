@@ -1,5 +1,7 @@
 package de.a12.studio.ui.preferences.dialogs;
 
+import de.a12.studio.ui.util.StudioBundle;
+
 import de.a12.studio.models.projects.settings.annotations.AnnotationDataSet;
 import de.a12.studio.ui.preferences.AnnotationDataSetSupport;
 import de.a12.studio.ui.util.WidgetFactory;

@@ -2,6 +2,7 @@ package de.a12.studio.ui.projecttree.dialogs;
 
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.util.FileUtils;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
@@ -78,7 +79,7 @@ public class NewModelDialogController implements DialogController {
 
   public static Optional<NewModelInput> show(Stage owner, @NonNull ProjectItem targetFolder, ModelType preselectedType) {
     FXMLLoader fxmlLoader = new FXMLLoader(NewModelDialogController.class.getResource("dialog-new-model.fxml"));
-fxmlLoader.setResources(StudioBundle.getBundle());
+    fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-new-model", fxmlLoader, owner, "New Model");
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;

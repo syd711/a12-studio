@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane resources="messages" styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
+<BorderPane styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
    <left>
       <HBox alignment="CENTER_LEFT" prefHeight="42.0" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
@@ -21,12 +21,8 @@
               <menus>
                 <Menu mnemonicParsing="true" text="%file">
                   <items>
-                    <MenuItem mnemonicParsing="true" onAction="#onNew" text="%new">
-                    <accelerator><KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" /></accelerator>
-                  </MenuItem>
-                    <MenuItem mnemonicParsing="true" onAction="#onOpen" text="%open">
-                    <accelerator><KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" /></accelerator>
-                  </MenuItem>
+                    <MenuItem fx:id="newMenuItem" mnemonicParsing="true" onAction="#onNew" text="%new" />
+                    <MenuItem fx:id="openMenuItem" mnemonicParsing="true" onAction="#onOpen" text="%open" />
                     <Menu fx:id="recentProjectsMenu" mnemonicParsing="true" text="%recent_projects" />
                     <MenuItem mnemonicParsing="true" onAction="#onCloseProject" text="%close_project" />
                     <SeparatorMenuItem />

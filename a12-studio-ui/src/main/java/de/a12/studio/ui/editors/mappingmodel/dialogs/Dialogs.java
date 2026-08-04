@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.mappingmodel.dialogs;
 
 import de.a12.studio.models.mappingmodel.MappingSource;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -32,7 +33,7 @@ public class Dialogs {
 
   private static boolean showSourceModel(Stage owner, String title, MappingSource sourceModel) {
     FXMLLoader fxmlLoader = new FXMLLoader(SourceModelDialogController.class.getResource("source-model-dialog.fxml"));
-fxmlLoader.setResources(StudioBundle.getBundle());
+    fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("sourcemodel-dialog", fxmlLoader, owner, title);
     SourceModelDialogController controller = (SourceModelDialogController) stage.getUserData();
     controller.initDialog(stage, sourceModel);

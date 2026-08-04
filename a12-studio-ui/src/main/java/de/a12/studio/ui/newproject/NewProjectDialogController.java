@@ -1,5 +1,7 @@
 package de.a12.studio.ui.newproject;
 
+import de.a12.studio.ui.util.StudioBundle;
+
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.util.FileUtils;

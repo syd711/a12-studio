@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.documentmodel;
 
+import de.a12.studio.ui.util.StudioBundle;
+
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;

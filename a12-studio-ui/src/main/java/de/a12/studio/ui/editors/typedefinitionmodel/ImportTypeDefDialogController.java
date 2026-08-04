@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
+import de.a12.studio.ui.util.StudioBundle;
+
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.util.WidgetFactory;

@@ -4,7 +4,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane resources="messages" fitToWidth="true" styleClass="properties-panel" xmlns="http://javafx.com/javafx/18"
+<ScrollPane fitToWidth="true" styleClass="properties-panel" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelValidationRuleEditorController">
     <content>

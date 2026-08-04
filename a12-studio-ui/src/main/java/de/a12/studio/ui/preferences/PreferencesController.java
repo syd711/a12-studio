@@ -1,6 +1,7 @@
 package de.a12.studio.ui.preferences;
 
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -130,7 +131,9 @@ public class PreferencesController implements Initializable {
 
   private Parent loadPage(String fxml) {
     try {
-      return FXMLLoader.load(getClass().getResource(fxml));
+      FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+      loader.setResources(StudioBundle.getBundle());
+      return loader.load();
     }
     catch (IOException e) {
       throw new IllegalStateException("Could not load preferences page '" + fxml + "'", e);

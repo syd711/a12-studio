@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.applicationmodel.dialogs;
 
+import de.a12.studio.ui.util.StudioBundle;
+
 import de.a12.studio.models.applicationmodel.Case;
 import de.a12.studio.models.applicationmodel.Directive;
 import de.a12.studio.models.applicationmodel.Flow;

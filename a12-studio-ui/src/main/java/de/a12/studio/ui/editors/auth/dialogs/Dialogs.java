@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.auth.dialogs;
 
+import de.a12.studio.ui.util.StudioBundle;
+
 import de.a12.studio.models.auth.Role;
 import de.a12.studio.models.auth.User;
 import de.a12.studio.ui.util.WidgetFactory;

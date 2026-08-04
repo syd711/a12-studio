@@ -30,6 +30,9 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
@@ -69,6 +72,12 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private Menu recentProjectsMenu;
+
+  @FXML
+  private MenuItem newMenuItem;
+
+  @FXML
+  private MenuItem openMenuItem;
 
   private Project project;
 
@@ -310,6 +319,9 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    newMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
+    openMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
+
     refreshRecentProjectsMenu();
     updateBtn.managedProperty().bind(updateBtn.visibleProperty());
     runUpdateCheck();

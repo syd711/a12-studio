@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane resources="messages" fx:id="root" maxHeight="700" maxWidth="-Infinity" minHeight="760.0" minWidth="700.0" styleClass="navigation-panel"
+<BorderPane fx:id="root" maxHeight="700" maxWidth="-Infinity" minHeight="760.0" minWidth="700.0" styleClass="navigation-panel"
             stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />

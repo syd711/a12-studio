@@ -10,6 +10,7 @@ import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preferences.PreferencesController;
 import de.a12.studio.ui.projecttree.ProjectTreeController;
 import de.a12.studio.ui.tabs.TabPaneController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -103,7 +104,7 @@ public class RootController implements Initializable, StudioEventListener {
   public void preferencesOpenRequested(@NonNull PreferencesOpenRequestedEvent event) {
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("preferences/scene-preferences.fxml"));
-loader.setResources(StudioBundle.getBundle());
+      loader.setResources(StudioBundle.getBundle());
       Parent preferencesRoot = loader.load();
       PreferencesController controller = loader.getController();
       controller.setOnCloseRequested(() -> {

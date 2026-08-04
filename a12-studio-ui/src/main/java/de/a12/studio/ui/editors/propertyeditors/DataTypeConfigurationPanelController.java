@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.ui.util.StudioBundle;
+
 import de.a12.studio.models.documentmodel.CustomFieldFieldType;
 import de.a12.studio.models.documentmodel.DateFragmentFieldType;
 import de.a12.studio.models.documentmodel.DateRangeFieldType;

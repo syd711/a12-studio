@@ -1,8 +1,6 @@
 package de.a12.studio.ui;
 
-import de.a12.studio.ui.util.FXResizeHelper;
-import de.a12.studio.ui.util.StudioVersion;
-import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.ui.util.*;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.projects.Project;
@@ -16,7 +14,6 @@ import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preview.PreviewServer;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
-import de.a12.studio.ui.util.WindowsSnapHook;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -66,7 +63,7 @@ public class Studio extends Application implements StudioEventListener {
     StudioEventManager.getInstance().addListener(this);
 
     FXMLLoader loader = new FXMLLoader(Studio.class.getResource("scene-root.fxml"));
-loader.setResources(StudioBundle.getBundle());
+    loader.setResources(StudioBundle.getBundle());
     Parent root = loader.load();
     rootController = loader.getController();
 
@@ -218,7 +215,7 @@ loader.setResources(StudioBundle.getBundle());
     incompatibleModels.forEach(log::warn);
 
     WidgetFactory.showAlert(stage,
-        "Incompatible model versions found" , "Wrong Version: " + incompatibleModels.get(0));
+        "Incompatible model versions found", "Wrong Version: " + incompatibleModels.get(0));
     return false;
   }
 

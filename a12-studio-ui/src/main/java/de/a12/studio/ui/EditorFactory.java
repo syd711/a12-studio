@@ -32,6 +32,7 @@ import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorControl
 import de.a12.studio.ui.editors.structuralmappingmodel.StructuralMappingModelEditorController;
 import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -50,63 +51,63 @@ public class EditorFactory {
       // TypeDefinitionModel extends DocumentModel, so this check must come first.
       if (item.getModel() instanceof TypeDefinitionModel) {
         FXMLLoader loader = new FXMLLoader(TypeDefintionModelEditorController.class.getResource("typedefinition-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         TypeDefintionModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof DocumentModel) {
         FXMLLoader loader = new FXMLLoader(DocumentModelEditorController.class.getResource("document-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         DocumentModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof ApplicationModel) {
         FXMLLoader loader = new FXMLLoader(ApplicationModelEditorController.class.getResource("application-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         ApplicationModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof OverviewModel) {
         FXMLLoader loader = new FXMLLoader(OverviewModelEditorController.class.getResource("overview-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         OverviewModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof MasterDetailModel) {
         FXMLLoader loader = new FXMLLoader(MainDetailModelEditorController.class.getResource("main-detail-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         MainDetailModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof FormModel) {
         FXMLLoader loader = new FXMLLoader(FormModelEditorController.class.getResource("form-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         FormModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof RelationshipModel) {
         FXMLLoader loader = new FXMLLoader(RelationshipModelEditorController.class.getResource("relationship-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         RelationshipModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof ContentModel) {
         FXMLLoader loader = new FXMLLoader(ContentModelEditorController.class.getResource("content-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         ContentModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof TreeModel) {
         FXMLLoader loader = new FXMLLoader(TreeModelEditorController.class.getResource("tree-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         TreeModelEditorController controller = loader.getController();
         controller.load(item);
@@ -116,42 +117,42 @@ loader.setResources(StudioBundle.getBundle());
       }
       else if (item.getModel() instanceof CombinedDocumentModel) {
         FXMLLoader loader = new FXMLLoader(CombinedDocumentModelEditorController.class.getResource("combination-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         CombinedDocumentModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof MappingModel) {
         FXMLLoader loader = new FXMLLoader(MappingModelEditorController.class.getResource("mapping-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         MappingModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof QueryModel) {
         FXMLLoader loader = new FXMLLoader(QueryModelEditorController.class.getResource("query-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         QueryModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof StructuralMappingModel) {
         FXMLLoader loader = new FXMLLoader(StructuralMappingModelEditorController.class.getResource("structural-mapping-model-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         StructuralMappingModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getAuthDocument() instanceof RolesDocument) {
         FXMLLoader loader = new FXMLLoader(RolesEditorController.class.getResource("roles-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         RolesEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getAuthDocument() instanceof UsersDocument) {
         FXMLLoader loader = new FXMLLoader(UsersEditorController.class.getResource("users-editor.fxml"));
-loader.setResources(StudioBundle.getBundle());
+        loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         UsersEditorController controller = loader.getController();
         controller.load(item);
