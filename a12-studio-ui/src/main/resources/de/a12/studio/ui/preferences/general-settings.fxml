@@ -7,13 +7,13 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane resources="@/messages" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.preferences.GeneralSettingsPanelController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
-                <Label styleClass="preference-title" text="PROJECT SETTINGS" />
-                <Label styleClass="preference-subtitle" text="General" />
+                <Label styleClass="preference-title" text="%project_settings" />
+                <Label styleClass="preference-subtitle" text="%general" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="12.0" left="12.0" top="12.0" />
@@ -23,14 +23,26 @@
     <center>
         <VBox spacing="12.0" BorderPane.alignment="TOP_LEFT">
             <children>
-                <Label styleClass="field-label" text="Relationship Engine Mode" />
+                <Label styleClass="field-label" text="%relationship_engine_mode" />
                 <ComboBox fx:id="relationshipEngineModeCombo" prefWidth="220.0" />
 
-                <CheckBox fx:id="showMetaDataCheckBox" text="Show metadata in UI models">
+                <CheckBox fx:id="showMetaDataCheckBox" text="%show_metadata_in_ui_models">
                     <VBox.margin>
                         <Insets top="8.0" />
                     </VBox.margin>
                 </CheckBox>
+
+                <Label styleClass="field-label" text="%language">
+                    <VBox.margin>
+                        <Insets top="16.0" />
+                    </VBox.margin>
+                </Label>
+                <ComboBox fx:id="languageCombo" prefWidth="220.0" />
+                <Label styleClass="field-description" text="%restart_required">
+                    <VBox.margin>
+                        <Insets top="2.0" />
+                    </VBox.margin>
+                </Label>
 
                 <VBox>
                     <VBox.margin>

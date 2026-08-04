@@ -8,12 +8,12 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreviewSettingsController">
+<BorderPane resources="@/messages" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreviewSettingsController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
-                <Label styleClass="preference-title" text="A12 STUDIO SETTINGS" />
-                <Label styleClass="preference-subtitle" text="Preview Settings" />
+                <Label styleClass="preference-title" text="%a12_studio_settings" />
+                <Label styleClass="preference-subtitle" text="%preview_settings" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="12.0" left="12.0" top="12.0" />
@@ -23,13 +23,13 @@
     <center>
         <VBox spacing="6.0" BorderPane.alignment="TOP_LEFT">
             <children>
-                <Label styleClass="field-label" text="Browser" />
+                <Label styleClass="field-label" text="%browser" />
                 <ComboBox fx:id="browserTypeCombo" prefWidth="200.0" />
 
                 <VBox spacing="6.0">
                     <children>
-                        <CheckBox fx:id="autoRefreshCheckBox" text="Automatically refresh the preview" />
-                        <Label styleClass="field-label" text="Refresh Delay (ms)" />
+                        <CheckBox fx:id="autoRefreshCheckBox" text="%automatically_refresh_the_preview" />
+                        <Label styleClass="field-label" text="%refresh_delay_ms" />
                         <TextField fx:id="autoRefreshDelayField" prefWidth="120.0" />
                     </children>
                     <VBox.margin>

@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="STRING TYPE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%string_type" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeStringConfigurationPanelController">
  <BorderPane>
  <center>
@@ -25,21 +25,21 @@
       </columnConstraints>
 
       <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
-        <Label styleClass="field-label" text="Min. Length" />
+        <Label styleClass="field-label" text="%min_length" />
         <TextField fx:id="minLengthField" />
       </VBox>
       <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
-        <Label styleClass="field-label" text="Max. Length" />
+        <Label styleClass="field-label" text="%max_length" />
         <TextField fx:id="maxLengthField" />
       </VBox>
       <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
-        <Label styleClass="field-label" text="Pattern" />
+        <Label styleClass="field-label" text="%pattern" />
         <TextField fx:id="patternField" />
       </VBox>
 
       <HBox spacing="16.0" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1">
-        <CheckBox fx:id="lineBreaksCheckBox" text="Line Breaks Permitted" />
-        <CheckBox fx:id="alphabeticalSortingCheckBox" text="Alphabetical Sorting" />
+        <CheckBox fx:id="lineBreaksCheckBox" text="%line_breaks_permitted" />
+        <CheckBox fx:id="alphabeticalSortingCheckBox" text="%alphabetical_sorting" />
            <GridPane.margin>
               <Insets top="6.0" />
            </GridPane.margin>
@@ -50,17 +50,17 @@
         </rowConstraints>
     </GridPane>
 
-    <TitledPane fx:id="suggestionsPane" maxWidth="Infinity" styleClass="titled-pane-child" text="SUGGESTIONS">
+    <TitledPane fx:id="suggestionsPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%suggestions">
       <VBox spacing="8.0">
         <padding>
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </padding>
         <HBox fx:id="suggestionsColumnHeaders" spacing="10.0">
-          <Label styleClass="field-label" text="Locale" prefWidth="80.0" />
-          <Label styleClass="field-label" text="Suggestions" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+          <Label styleClass="field-label" text="%locale" prefWidth="80.0" />
+          <Label styleClass="field-label" text="%suggestions" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
         </HBox>
         <VBox fx:id="suggestionsRows" spacing="8.0" />
-        <Label fx:id="suggestionsEmptyLabel" styleClass="placeholder-label" text="No suggestions available yet." />
+        <Label fx:id="suggestionsEmptyLabel" styleClass="placeholder-label" text="%no_suggestions_available_yet" />
       </VBox>
     </TitledPane>
   </VBox>

@@ -9,12 +9,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.A12InstallationSettingsController">
+<BorderPane resources="@/messages" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.A12InstallationSettingsController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
-                <Label styleClass="preference-title" text="A12 STUDIO SETTINGS" />
-                <Label styleClass="preference-subtitle" text="A12 Installation" />
+                <Label styleClass="preference-title" text="%a12_studio_settings" />
+                <Label styleClass="preference-subtitle" text="%a12_installation" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="12.0" left="12.0" top="12.0" />
@@ -24,12 +24,12 @@
     <center>
         <VBox spacing="6.0" BorderPane.alignment="TOP_LEFT">
             <children>
-                <Label styleClass="field-label" text="Installation Folder" />
+                <Label styleClass="field-label" text="%installation_folder" />
                 <HBox alignment="CENTER_LEFT" spacing="6.0">
                     <children>
-                        <TextField fx:id="installationPathField" prefWidth="360.0" promptText="Select the a12 installation folder..." />
-                        <Button fx:id="browseButton" onAction="#onBrowseInstallationPath" styleClass="primary-button" text="Browse..." >
-                <tooltip><Tooltip text="Browse for A12 installation folder" /></tooltip>
+                        <TextField fx:id="installationPathField" prefWidth="360.0" promptText="%select_the_a12_installation_folder" />
+                        <Button fx:id="browseButton" onAction="#onBrowseInstallationPath" styleClass="primary-button" text="%browse" >
+                <tooltip><Tooltip text="%browse_for_a12_installation_folder" /></tooltip>
             </Button>
                     </children>
                 </HBox>

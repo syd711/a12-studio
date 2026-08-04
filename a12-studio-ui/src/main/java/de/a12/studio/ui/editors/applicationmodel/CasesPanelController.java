@@ -27,6 +27,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits a {@link Scene}'s {@link Case} list: a non-inline-editable row list (row = Name summary, edited via a
@@ -154,7 +155,7 @@ public class CasesPanelController {
   }
 
   private void onDeleteCase(Case caseObj) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this case?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_case"), null, null, "Delete");
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }

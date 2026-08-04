@@ -30,7 +30,7 @@ public final class LocaleCodeValidator implements ModelValidator {
       String code = locale.getCode();
       if (code == null || !LOCALE_PATTERN.matcher(code).matches()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "\"" + code + "\" is not a valid locale code. Valid values are e.g. \"en\" or \"en_US\".",
+            "validation."" + code + "validation." is not a valid locale code. Valid values are e.g. \"en\" or \"en_US\".",
             Severity.ERROR.name()));
       }
     }

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits a {@link SceneChange}'s {@code onEnter} and {@code onExit} {@link Directive} lists: each is a
@@ -206,7 +207,7 @@ public class SceneChangePanelController {
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this directive?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_directive"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         directives.remove(directive);
         rebuildAll();

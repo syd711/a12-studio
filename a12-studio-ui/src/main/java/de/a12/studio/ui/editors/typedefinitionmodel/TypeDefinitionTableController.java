@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import de.a12.studio.ui.util.StudioBundle;
 
 public class TypeDefinitionTableController implements Initializable {
 
@@ -207,7 +208,7 @@ public class TypeDefinitionTableController implements Initializable {
 
     name = name.trim();
     if (!FileUtils.isValidWindowsFilename(name)) {
-      WidgetFactory.showAlert(Studio.stage, "Invalid name", "The name must be a valid filename and must not contain whitespace.");
+      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("invalid_name"), StudioBundle.get("the_name_must_be_a_valid_filename_and_must_not_con"));
       return;
     }
 
@@ -297,7 +298,7 @@ public class TypeDefinitionTableController implements Initializable {
   private void removeImport(@NonNull ModelReference reference) {
     String message = "Delete the import of \"" + reference.getReference() + "\"? Every type definition it "
         + "contributed to this table will disappear along with it.";
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, message, null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, message, null, null, StudioBundle.get("delete"));
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }
@@ -320,7 +321,7 @@ public class TypeDefinitionTableController implements Initializable {
     FontIcon deleteIcon = WidgetFactory.createIcon(Icons.TRASH);
     deleteIcon.getStyleClass().add("menu-icon");
 
-    MenuItem deleteItem = new MenuItem("Delete", deleteIcon);
+    MenuItem deleteItem = new MenuItem(StudioBundle.get("delete"), deleteIcon);
     deleteItem.setOnAction(event -> onDelete(row));
 
     ContextMenu contextMenu = new ContextMenu();
@@ -359,7 +360,7 @@ public class TypeDefinitionTableController implements Initializable {
     String message = itemsToDelete.size() > 1
         ? "Delete " + itemsToDelete.size() + " type definitions?"
         : "Delete this type definition?";
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, message, null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, message, null, null, StudioBundle.get("delete"));
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }

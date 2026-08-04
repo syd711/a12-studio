@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="CONTEXT MENU" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%context_menu" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.ContextMenuPanelController">
  <BorderPane>
  <top>
@@ -29,13 +29,13 @@
             <children>
               <VBox spacing="4.0">
                 <children>
-                  <Label styleClass="field-label" text="Group Name*" />
+                  <Label styleClass="field-label" text="%group_name" />
                   <TextField fx:id="groupNameField" />
                 </children>
               </VBox>
               <VBox spacing="4.0">
                 <children>
-                  <Label styleClass="field-label" text="Label" />
+                  <Label styleClass="field-label" text="%label" />
                   <GridPane fx:id="groupTitleGrid" hgap="10.0" vgap="6.0">
                     <columnConstraints>
                       <ColumnConstraints minWidth="40.0" />
@@ -46,7 +46,7 @@
               </VBox>
               <VBox spacing="4.0">
                 <children>
-                  <Label styleClass="field-label" text="Actions" />
+                  <Label styleClass="field-label" text="%actions" />
                   <GridPane fx:id="actionsGrid" hgap="8.0" vgap="6.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
@@ -54,9 +54,9 @@
                       <ColumnConstraints hgrow="NEVER" minWidth="32.0" />
                     </columnConstraints>
                   </GridPane>
-                  <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-                  <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="secondary-button" text="Add Action" >
-                <tooltip><Tooltip text="Add context menu action" /></tooltip>
+                  <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+                  <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="secondary-button" text="%add_action" >
+                <tooltip><Tooltip text="%add_context_menu_action" /></tooltip>
             </Button>
                 </children>
               </VBox>
@@ -69,11 +69,11 @@
       </HBox>
       <HBox spacing="8.0">
         <children>
-          <Button fx:id="addGroupButton" mnemonicParsing="false" onAction="#onAddGroup" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add group" /></tooltip>
+          <Button fx:id="addGroupButton" mnemonicParsing="false" onAction="#onAddGroup" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_group" /></tooltip>
             </Button>
-          <Button fx:id="removeGroupButton" mnemonicParsing="false" onAction="#onRemoveGroup" styleClass="secondary-button" text="Remove Group" >
-                <tooltip><Tooltip text="Remove selected group" /></tooltip>
+          <Button fx:id="removeGroupButton" mnemonicParsing="false" onAction="#onRemoveGroup" styleClass="secondary-button" text="%remove_group" >
+                <tooltip><Tooltip text="%remove_selected_group" /></tooltip>
             </Button>
         </children>
       </HBox>

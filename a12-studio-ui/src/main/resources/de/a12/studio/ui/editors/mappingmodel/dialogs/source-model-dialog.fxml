@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="360.0" minWidth="480.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="360.0" minWidth="480.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.mappingmodel.dialogs.SourceModelDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
@@ -24,23 +24,23 @@
                <children>
                   <VBox spacing="6.0">
                      <children>
-                        <Label styleClass="field-label" text="Name*" />
-                        <TextField fx:id="nameField" promptText="Enter the source model name here..." />
+                        <Label styleClass="field-label" text="%name" />
+                        <TextField fx:id="nameField" promptText="%enter_the_source_model_name_here" />
                      </children>
                   </VBox>
                   <VBox spacing="6.0">
                      <children>
-                        <Label styleClass="field-label" text="Model*" />
+                        <Label styleClass="field-label" text="%model" />
                         <ComboBox fx:id="modelField" editable="false" maxWidth="Infinity" />
                      </children>
                   </VBox>
                   <VBox spacing="6.0">
                      <children>
-                        <Label styleClass="field-label" text="Repetitions*" />
+                        <Label styleClass="field-label" text="%repetitions" />
                         <Spinner fx:id="repetitionsField" editable="true" maxWidth="Infinity" />
                      </children>
                   </VBox>
-                  <CheckBox fx:id="skipValidationField" mnemonicParsing="false" text="Skip Document Validation" />
+                  <CheckBox fx:id="skipValidationField" mnemonicParsing="false" text="%skip_document_validation" />
                </children>
                <padding>
                   <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
@@ -52,12 +52,12 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel">
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel">
                <HBox.margin>
                   <Insets right="12.0" />
                </HBox.margin>
             </Button>
-            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="   OK   " />
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
          </children>
          <padding>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

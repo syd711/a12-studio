@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="DESCRIPTION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController">
+<TitledPane resources="@/messages" fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%description" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController">
  <BorderPane>
  <center>
   <VBox>
@@ -17,8 +17,8 @@
         <ColumnConstraints minWidth="70.0" prefWidth="90.0" />
         <ColumnConstraints hgrow="ALWAYS" />
       </columnConstraints>
-      <Label styleClass="field-label" text="Locale" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Text" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%locale" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%text" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                <rowConstraints>
                   <RowConstraints />
                </rowConstraints>

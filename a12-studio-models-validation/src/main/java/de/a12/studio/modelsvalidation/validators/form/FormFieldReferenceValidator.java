@@ -46,7 +46,7 @@ public final class FormFieldReferenceValidator implements ModelValidator {
       if (entry.getElementRef() != null && !entry.getElementRef().isBlank()
           && !knownElementIds.contains(entry.getElementRef())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The field \"" + entry.getElementRef()
+            "validation.the_field"" + entry.getElementRef()
                 + "\" is referenced in the Form Model but does not exist in the referenced Document Model.",
             Severity.ERROR.name()));
       }

@@ -5,7 +5,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.querymodel.QueryModelEditorController">
+<BorderPane resources="@/messages" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.querymodel.QueryModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
@@ -16,6 +16,6 @@
         </ToolBar>
     </right>
     <center>
-        <Label styleClass="section-label" text="Query Model editing is not implemented yet." BorderPane.alignment="CENTER" />
+        <Label styleClass="section-label" text="%query_model_editing_is_not_implemented_yet" BorderPane.alignment="CENTER" />
     </center>
 </BorderPane>

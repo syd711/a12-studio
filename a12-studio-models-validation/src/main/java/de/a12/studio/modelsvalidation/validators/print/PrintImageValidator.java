@@ -34,7 +34,7 @@ public final class PrintImageValidator implements ModelValidator {
       Object alternativeText = generic.getExtras().get("alternativeText");
       if (alternativeText == null || String.valueOf(alternativeText).isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The image element \"" + definition.getId() + "\" has no alternative text. An alternative text is required.",
+            "validation.the_image_element"" + definition.getId() + "\" has no alternative text. An alternative text is required.",
             Severity.ERROR.name()));
       }
     }

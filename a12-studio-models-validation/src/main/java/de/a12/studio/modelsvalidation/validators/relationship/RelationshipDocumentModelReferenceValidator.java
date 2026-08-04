@@ -25,11 +25,11 @@ public final class RelationshipDocumentModelReferenceValidator implements ModelV
     for (EntityCharacteristic entity : relationshipModel.getContent().getEntityCharacteristics()) {
       if (entity.getDocumentModel() == null || entity.getDocumentModel().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "A Document Model must be selected for role \"" + entity.getRole() + "\".", Severity.ERROR.name()));
+            "validation.a_document_model_must_be_selected_for_role"" + entity.getRole() + "\".", Severity.ERROR.name()));
       }
       else if (context.findOtherDocumentModel(entity.getDocumentModel()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The Document Model \"" + entity.getDocumentModel() + "\" of role \"" + entity.getRole()
+            "validation.the_document_model"" + entity.getDocumentModel() + "\" of role \"" + entity.getRole()
                 + "\" does not exist in the workspace.", Severity.ERROR.name()));
       }
     }
@@ -38,7 +38,7 @@ public final class RelationshipDocumentModelReferenceValidator implements ModelV
     if (linkDocumentModel != null && !linkDocumentModel.isBlank()
         && context.findOtherDocumentModel(linkDocumentModel) == null) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "The Link Document Model \"" + linkDocumentModel + "\" does not exist in the workspace.", Severity.ERROR.name()));
+          "validation.the_link_document_model"" + linkDocumentModel + "\" does not exist in the workspace.", Severity.ERROR.name()));
     }
     return errors;
   }

@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="330.0" styleClass="navigation-panel" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="330.0" styleClass="navigation-panel" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.newproject.NewProjectDialogController">
    <top>
       <fx:include fx:id="header" source="../components/scene-dialog-header.fxml" />
@@ -22,14 +22,14 @@
          <children>
             <VBox>
                <children>
-                  <Label styleClass="field-label" text="Project Template" />
+                  <Label styleClass="field-label" text="%project_template" />
                   <ComboBox fx:id="templateComboBox" maxWidth="1.7976931348623157E308" />
                </children>
             </VBox>
             <VBox>
                <children>
-                  <Label styleClass="field-label" text="Project Name*" />
-                  <TextField fx:id="nameField" promptText="Enter the project name here...">
+                  <Label styleClass="field-label" text="%project_name" />
+                  <TextField fx:id="nameField" promptText="%enter_the_project_name_here">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -38,16 +38,16 @@
             </VBox>
             <VBox>
                <children>
-                  <Label styleClass="field-label" text="Location*" />
+                  <Label styleClass="field-label" text="%location" />
                   <HBox alignment="CENTER_LEFT" spacing="6.0">
                      <children>
-                        <TextField fx:id="locationField" editable="false" maxWidth="1.7976931348623157E308" promptText="Select the project location..." HBox.hgrow="ALWAYS">
+                        <TextField fx:id="locationField" editable="false" maxWidth="1.7976931348623157E308" promptText="%select_the_project_location" HBox.hgrow="ALWAYS">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </TextField>
-                        <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseLocation" styleClass="primary-button" text="Browse..." >
-                <tooltip><Tooltip text="Browse for project location" /></tooltip>
+                        <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowseLocation" styleClass="primary-button" text="%browse" >
+                <tooltip><Tooltip text="%browse_for_project_location" /></tooltip>
             </Button>
                      </children>
                   </HBox>
@@ -62,8 +62,8 @@
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
          <items>
-          <Button fx:id="createButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="Create" />
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel" />
+          <Button fx:id="createButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%create" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
          </items>
       </ToolBar>
    </bottom>

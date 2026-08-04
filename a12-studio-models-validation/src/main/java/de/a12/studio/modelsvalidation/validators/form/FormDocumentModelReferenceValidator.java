@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * A form model must reference at least one Document Model, and every referenced Document Model must
- * exist in the workspace (SME: "The document model reference is required. Select a valid one and apply." /
+ * exist in the workspace (SME: "validation.the_document_model_reference_is_required_select_a_" /
  * "No valid referenced document model.").
  */
 public final class FormDocumentModelReferenceValidator implements ModelValidator {
@@ -32,14 +32,14 @@ public final class FormDocumentModelReferenceValidator implements ModelValidator
             .toList();
     if (documentReferences.isEmpty()) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "The document model reference is required. Select a valid one and apply.", Severity.ERROR.name()));
+          "validation.the_document_model_reference_is_required_select_a_", Severity.ERROR.name()));
     }
 
     List<ModelValidationError> errors = new ArrayList<>();
     for (ModelReference reference : documentReferences) {
       if (context.findOtherDocumentModel(reference.getReference()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "No valid referenced document model: \"" + reference.getReference() + "\" does not exist in the workspace.",
+            "validation.no_valid_referenced_document_model"" + reference.getReference() + "\" does not exist in the workspace.",
             Severity.ERROR.name()));
       }
     }

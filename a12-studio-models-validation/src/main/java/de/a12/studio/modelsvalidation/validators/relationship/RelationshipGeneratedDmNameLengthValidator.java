@@ -36,7 +36,7 @@ public final class RelationshipGeneratedDmNameLengthValidator implements ModelVa
       }
       if (model.getId().length() + entity.getRole().length() + GENERATED_SUFFIX_LENGTH > MAX_NAME_LENGTH) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "Given the role \"" + entity.getRole() + "\" and the model name \"" + model.getId()
+            "validation.given_the_role"" + entity.getRole() + "\" and the model name \"" + model.getId()
                 + "\", the generated document model name will exceed 100 characters.",
             Severity.ERROR.name()));
       }

@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Function;
+import de.a12.studio.ui.util.StudioBundle;
 
 public class UsersEditorController extends AbstractAuthFileEditorController implements Initializable {
 
@@ -127,7 +128,7 @@ public class UsersEditorController extends AbstractAuthFileEditorController impl
     FontIcon deleteIcon = WidgetFactory.createIcon(Icons.TRASH);
     deleteIcon.getStyleClass().add("menu-icon");
 
-    MenuItem deleteItem = new MenuItem("Delete", deleteIcon);
+    MenuItem deleteItem = new MenuItem(StudioBundle.get("delete"), deleteIcon);
     deleteItem.setOnAction(event -> onDeleteUser(row.getItem()));
 
     ContextMenu contextMenu = new ContextMenu();
@@ -136,7 +137,7 @@ public class UsersEditorController extends AbstractAuthFileEditorController impl
   }
 
   private void onDeleteUser(@NonNull User user) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete user '" + user.getUsername() + "'?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("confirm_delete_user", user.getUsername()), null, null, "Delete");
     if (result.isPresent() && result.get() == ButtonType.OK) {
       usersTable.getItems().remove(user);
       save();

@@ -27,6 +27,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits one slot (left or right) of an {@link de.a12.studio.models.overviewmodel.OverviewModel}'s
@@ -170,8 +171,8 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(BoxElement element, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this entry?", null, null, "Delete");
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_entry"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         rows.remove(element);
         rebuildRows();

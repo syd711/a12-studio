@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="700" maxWidth="-Infinity" minHeight="760.0" minWidth="700.0" styleClass="navigation-panel"
+<BorderPane resources="@/messages" fx:id="root" maxHeight="700" maxWidth="-Infinity" minHeight="760.0" minWidth="700.0" styleClass="navigation-panel"
             stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
@@ -29,13 +29,13 @@
                   <children>
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
-                           <Label styleClass="field-label" text="Column Type*" />
+                           <Label styleClass="field-label" text="%column_type" />
                            <ComboBox fx:id="columnTypeCombo" maxWidth="Infinity" />
                         </children>
                      </VBox>
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
-                           <Label styleClass="field-label" text="Target Document Model" />
+                           <Label styleClass="field-label" text="%target_document_model" />
                            <TextField fx:id="targetDocumentModelField" disable="true" editable="false" focusTraversable="false" />
                         </children>
                      </VBox>
@@ -47,7 +47,7 @@
                   <children>
                      <VBox spacing="2.0">
                         <children>
-                           <Label styleClass="field-label" text="Element Reference*" />
+                           <Label styleClass="field-label" text="%element_reference" />
                            <ComboBox fx:id="elementRefCombo" maxWidth="Infinity" />
                         </children>
                      </VBox>
@@ -55,7 +55,7 @@
                         <children>
                            <VBox alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
                               <children>
-                                 <CheckBox fx:id="sortableField" mnemonicParsing="false" text="Sortable" />
+                                 <CheckBox fx:id="sortableField" mnemonicParsing="false" text="%sortable" />
                               </children>
                               <HBox.margin>
                                  <Insets bottom="8.0" />
@@ -63,7 +63,7 @@
                            </VBox>
                            <VBox fx:id="preferredSortingBox" spacing="2.0" HBox.hgrow="ALWAYS">
                               <children>
-                                 <Label styleClass="field-label" text="Preferred Sorting" />
+                                 <Label styleClass="field-label" text="%preferred_sorting" />
                                  <ComboBox fx:id="preferredSortingCombo" maxWidth="Infinity" />
                               </children>
                            </VBox>
@@ -77,8 +77,8 @@
                   <children>
                      <VBox spacing="2.0">
                         <children>
-                           <Label styleClass="field-label" text="Name" />
-                           <TextField fx:id="nameField" promptText="Distinguishes this column from others, e.g. FullName" />
+                           <Label styleClass="field-label" text="%name" />
+                           <TextField fx:id="nameField" promptText="%distinguishes_this_column_from_others_e_g_fullname" />
                         </children>
                      </VBox>
                      <fx:include fx:id="expressionPanel" source="../richtext-editor.fxml" />
@@ -90,7 +90,7 @@
                   <children>
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
-                           <Label styleClass="field-label" text="ID" />
+                           <Label styleClass="field-label" text="%id" />
                            <TextField fx:id="idField" disable="true" editable="false" focusTraversable="false" />
                         </children>
                      </VBox>
@@ -105,19 +105,19 @@
                   <children>
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
-                           <Label styleClass="field-label" text="Pin Direction" />
+                           <Label styleClass="field-label" text="%pin_direction" />
                            <ComboBox fx:id="pinDirectionCombo" maxWidth="Infinity" />
                         </children>
                      </VBox>
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
-                           <Label styleClass="field-label" text="Width*" />
+                           <Label styleClass="field-label" text="%width" />
                            <TextField fx:id="widthField" />
                         </children>
                      </VBox>
                      <VBox fx:id="fixedWidthBox" alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
-                           <CheckBox fx:id="fixedWidthField" mnemonicParsing="false" text="Fixed Width" />
+                           <CheckBox fx:id="fixedWidthField" mnemonicParsing="false" text="%fixed_width" />
                         </children>
                         <HBox.margin>
                            <Insets bottom="8.0" />
@@ -130,43 +130,43 @@
                <VBox spacing="6.0">
                   <children>
                      <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
-                     <CheckBox fx:id="hideLabelField" mnemonicParsing="false" text="Hide Label" />
+                     <CheckBox fx:id="hideLabelField" mnemonicParsing="false" text="%hide_label" />
                   </children>
                </VBox>
 
                <!-- Alignment -->
                <VBox spacing="10.0">
                   <children>
-                     <Label styleClass="section-header" text="Horizontal Alignment" />
+                     <Label styleClass="section-header" text="%horizontal_alignment" />
                      <HBox spacing="12.0">
                         <children>
                            <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                               <children>
-                                 <Label styleClass="field-label" text="Header" />
+                                 <Label styleClass="field-label" text="%header" />
                                  <ComboBox fx:id="horizontalHeaderCombo" maxWidth="Infinity" />
                               </children>
                            </VBox>
                            <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                               <children>
-                                 <Label styleClass="field-label" text="Content" />
+                                 <Label styleClass="field-label" text="%content" />
                                  <ComboBox fx:id="horizontalContentCombo" maxWidth="Infinity" />
                               </children>
                            </VBox>
                         </children>
                      </HBox>
 
-                     <Label styleClass="section-header" text="Vertical Alignment" />
+                     <Label styleClass="section-header" text="%vertical_alignment" />
                      <HBox spacing="12.0">
                         <children>
                            <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                               <children>
-                                 <Label styleClass="field-label" text="Header" />
+                                 <Label styleClass="field-label" text="%header" />
                                  <ComboBox fx:id="verticalHeaderCombo" maxWidth="Infinity" />
                               </children>
                            </VBox>
                            <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                               <children>
-                                 <Label styleClass="field-label" text="Content" />
+                                 <Label styleClass="field-label" text="%content" />
                                  <ComboBox fx:id="verticalContentCombo" maxWidth="Infinity" />
                               </children>
                            </VBox>
@@ -192,8 +192,8 @@
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
          <items>
-            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="OK" />
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel" />
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
          </items>
          <padding>
             <Insets bottom="8.0" right="8.0" />

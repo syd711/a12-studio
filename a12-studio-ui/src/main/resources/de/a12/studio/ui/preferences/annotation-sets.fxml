@@ -12,12 +12,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.AnnotationSetsController">
+<BorderPane resources="@/messages" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.AnnotationSetsController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
-                <Label styleClass="preference-title" text="PROJECT SETTINGS" />
-                <Label styleClass="preference-subtitle" text="Annotation Sets" />
+                <Label styleClass="preference-title" text="%project_settings" />
+                <Label styleClass="preference-subtitle" text="%annotation_sets" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="12.0" left="12.0" top="12.0" />
@@ -29,9 +29,9 @@
             <top>
                 <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
                     <items>
-                        <Button fx:id="editButton" disable="true" mnemonicParsing="false" onAction="#onEdit" styleClass="secondary-button" text="Edit">
+                        <Button fx:id="editButton" disable="true" mnemonicParsing="false" onAction="#onEdit" styleClass="secondary-button" text="%edit">
                             <tooltip>
-                                <Tooltip text="Rename the selected annotation set and prune its annotations." />
+                                <Tooltip text="%rename_the_selected_annotation_set_and_prune_its_annotations" />
                             </tooltip>
                             <graphic>
                                 <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="18" />
@@ -39,24 +39,24 @@
                         </Button>
                         <Button fx:id="deleteButton" disable="true" mnemonicParsing="false" onAction="#onDelete" styleClass="delete-button">
                             <tooltip>
-                                <Tooltip text="Delete the selected annotation set." />
+                                <Tooltip text="%delete_the_selected_annotation_set" />
                             </tooltip>
                             <graphic>
                                 <FontIcon iconColor="#c0392b" iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
                             </graphic>
                         </Button>
                         <Separator orientation="VERTICAL" />
-                        <Button fx:id="exportButton" disable="true" mnemonicParsing="false" onAction="#onExport" styleClass="secondary-button" text="Export">
+                        <Button fx:id="exportButton" disable="true" mnemonicParsing="false" onAction="#onExport" styleClass="secondary-button" text="%export">
                             <tooltip>
-                                <Tooltip text="Export the selected annotation set to a JSON file." />
+                                <Tooltip text="%export_the_selected_annotation_set_to_a_json_file" />
                             </tooltip>
                             <graphic>
                                 <FontIcon iconLiteral="mdi2f-file-export-outline" iconSize="18" />
                             </graphic>
                         </Button>
-                        <Button fx:id="importButton" mnemonicParsing="false" onAction="#onImport" styleClass="secondary-button" text="Import">
+                        <Button fx:id="importButton" mnemonicParsing="false" onAction="#onImport" styleClass="secondary-button" text="%import">
                             <tooltip>
-                                <Tooltip text="Import one or more annotation sets from JSON files." />
+                                <Tooltip text="%import_one_or_more_annotation_sets_from_json_files" />
                             </tooltip>
                             <graphic>
                                 <FontIcon iconLiteral="mdi2f-file-import-outline" iconSize="18" />
@@ -68,7 +68,7 @@
             <center>
                 <TableView fx:id="table" BorderPane.alignment="CENTER">
                     <columns>
-                        <TableColumn fx:id="nameColumn" prefWidth="220.0" text="NAME" />
+                        <TableColumn fx:id="nameColumn" prefWidth="220.0" text="%name" />
                         <TableColumn fx:id="headerEntriesColumn" prefWidth="150.0" text="# Header Usages" />
                         <TableColumn fx:id="contentEntriesColumn" prefWidth="150.0" text="# Content Usages" />
                     </columns>

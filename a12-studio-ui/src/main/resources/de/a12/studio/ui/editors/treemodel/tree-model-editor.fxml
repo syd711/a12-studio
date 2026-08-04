@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.treemodel.TreeModelEditorController">
+<BorderPane resources="@/messages" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.treemodel.TreeModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
@@ -34,7 +34,7 @@
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="Columns">
+                <Tab text="%columns">
                     <content>
                         <BorderPane>
                             <top>
@@ -45,7 +45,7 @@
                                                 <FontIcon iconLiteral="mdi2p-plus" iconSize="16" />
                                             </graphic>
                                             <tooltip>
-                                                <Tooltip text="Add column" />
+                                                <Tooltip text="%add_column" />
                                             </tooltip>
                                         </Button>
                                         <Button mnemonicParsing="false" onAction="#onRemoveColumn" styleClass="default-button">
@@ -53,7 +53,7 @@
                                                 <FontIcon iconLiteral="mdi2d-delete-outline" iconSize="16" />
                                             </graphic>
                                             <tooltip>
-                                                <Tooltip text="Remove column" />
+                                                <Tooltip text="%remove_column" />
                                             </tooltip>
                                         </Button>
                                     </items>
@@ -62,17 +62,17 @@
                             <center>
                                 <TableView fx:id="columnsTable" editable="true" BorderPane.alignment="CENTER">
                                     <columns>
-                                        <TableColumn fx:id="columnNameColumn" prefWidth="200.0" text="Name" />
-                                        <TableColumn fx:id="columnWidthColumn" prefWidth="80.0" text="Width" />
-                                        <TableColumn fx:id="columnFixedWidthColumn" prefWidth="100.0" text="Fixed Width" />
-                                        <TableColumn fx:id="columnPinDirectionColumn" prefWidth="110.0" text="Pin Direction" />
+                                        <TableColumn fx:id="columnNameColumn" prefWidth="200.0" text="%name" />
+                                        <TableColumn fx:id="columnWidthColumn" prefWidth="80.0" text="%width" />
+                                        <TableColumn fx:id="columnFixedWidthColumn" prefWidth="100.0" text="%fixed_width" />
+                                        <TableColumn fx:id="columnPinDirectionColumn" prefWidth="110.0" text="%pin_direction" />
                                     </columns>
                                 </TableView>
                             </center>
                         </BorderPane>
                     </content>
                 </Tab>
-                <Tab text="Nodes">
+                <Tab text="%nodes">
                     <content>
                         <SplitPane dividerPositions="0.35">
                             <items>
@@ -85,7 +85,7 @@
                                                         <FontIcon iconLiteral="mdi2p-plus" iconSize="16" />
                                                     </graphic>
                                                     <tooltip>
-                                                        <Tooltip text="Add node type" />
+                                                        <Tooltip text="%add_node_type" />
                                                     </tooltip>
                                                 </Button>
                                                 <Button mnemonicParsing="false" onAction="#onRemoveNode" styleClass="default-button">
@@ -93,7 +93,7 @@
                                                         <FontIcon iconLiteral="mdi2d-delete-outline" iconSize="16" />
                                                     </graphic>
                                                     <tooltip>
-                                                        <Tooltip text="Remove node type" />
+                                                        <Tooltip text="%remove_node_type" />
                                                     </tooltip>
                                                 </Button>
                                             </items>
@@ -109,7 +109,7 @@
                                             <children>
                                                 <VBox spacing="4.0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Document Model*" />
+                                                        <Label styleClass="field-label" text="%document_model" />
                                                         <ComboBox fx:id="nodeDocumentModelField" editable="false" maxWidth="Infinity" />
                                                     </children>
                                                 </VBox>
@@ -117,7 +117,7 @@
                                                 <Separator />
                                                 <VBox spacing="8.0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Column Mapping" />
+                                                        <Label styleClass="field-label" text="%column_mapping" />
                                                         <GridPane fx:id="nodeColumnMappingGrid" hgap="10.0" vgap="6.0">
                                                             <columnConstraints>
                                                                 <ColumnConstraints minWidth="120.0" />
@@ -137,7 +137,7 @@
                         </SplitPane>
                     </content>
                 </Tab>
-                <Tab text="Configuration">
+                <Tab text="%configuration">
                     <content>
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
                             <content>
@@ -145,13 +145,13 @@
                                     <children>
                                         <VBox spacing="4.0">
                                             <children>
-                                                <Label styleClass="field-label" text="Hierarchical Column" />
+                                                <Label styleClass="field-label" text="%hierarchical_column" />
                                                 <ComboBox fx:id="hierarchicalColumnField" editable="false" maxWidth="Infinity" />
                                             </children>
                                         </VBox>
                                         <VBox spacing="4.0">
                                             <children>
-                                                <Label styleClass="field-label" text="Expansion Strategy" />
+                                                <Label styleClass="field-label" text="%expansion_strategy" />
                                                 <ComboBox fx:id="expansionStrategyField" editable="false" maxWidth="Infinity" />
                                             </children>
                                         </VBox>

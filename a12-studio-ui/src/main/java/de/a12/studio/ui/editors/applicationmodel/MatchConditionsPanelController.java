@@ -20,6 +20,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits a {@link de.a12.studio.models.applicationmodel.Scene}'s {@link MatchCondition} list: a compact,
@@ -130,7 +131,7 @@ public class MatchConditionsPanelController {
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this match condition?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_match_condition"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         matchConditions.remove(matchCondition);
         rebuildRows();

@@ -11,12 +11,12 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="DATE FRAGMENT TYPE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%date_fragment_type" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeDateFragmentConfigurationPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
-    <Label styleClass="field-label" text="Format" />
+    <Label styleClass="field-label" text="%format" />
     <HBox alignment="CENTER_LEFT" spacing="6.0">
       <children>
         <ComboBox fx:id="formatComboBox" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
@@ -25,7 +25,7 @@
               <Font size="14.0" />
            </font>
            <tooltip>
-              <Tooltip prefWidth="300.0" text="The chosen format only defines which date fragments are shown, but not how it is displayed within a control. The exact format shown in the target application depends on the selected language and can be adapted by custom code." wrapText="true" />
+              <Tooltip prefWidth="300.0" text="%the_chosen_format_only_defines_which_date_fragments_are_show" wrapText="true" />
            </tooltip>
            <graphic>
               <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />

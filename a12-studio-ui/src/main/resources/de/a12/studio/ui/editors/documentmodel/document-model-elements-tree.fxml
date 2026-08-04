@@ -10,35 +10,35 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane resources="@/messages" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelElementsTreeController">
     <top>
         <ToolBar fx:id="modelTreeToolbarBar" styleClass="panel-toolbar" BorderPane.alignment="CENTER">
             <items>
-                <Button fx:id="undoButton" accessibleText="Undo" mnemonicParsing="false" onAction="#onUndo" styleClass="default-button">
+                <Button fx:id="undoButton" accessibleText="%undo" mnemonicParsing="false" onAction="#onUndo" styleClass="default-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2u-undo" iconSize="18" styleClass="toolbar-icon" />
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Undo" />
+                        <Tooltip text="%undo" />
                     </tooltip>
                 </Button>
-                <Button fx:id="redoButton" accessibleText="Redo" mnemonicParsing="false" onAction="#onRedo" styleClass="default-button">
+                <Button fx:id="redoButton" accessibleText="%redo" mnemonicParsing="false" onAction="#onRedo" styleClass="default-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2r-redo" iconSize="18" styleClass="toolbar-icon" />
                     </graphic>
                     <tooltip>
-                        <Tooltip text="Redo" />
+                        <Tooltip text="%redo" />
                     </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL" />
-                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="secondary-button" text="Add">
+                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="secondary-button" text="%add">
                <graphic>
                   <FontIcon iconLiteral="mdi2p-plus-circle-outline" iconSize="18" text="󰐙" />
                </graphic></MenuButton>
                 <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteButton" styleClass="delete-button">
                     <tooltip>
-                        <Tooltip text="Delete the selected element(s)" />
+                        <Tooltip text="%delete_the_selected_element_s" />
                     </tooltip>
                     <graphic>
                         <FontIcon iconColor="#c0392b" iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
@@ -52,8 +52,8 @@
    <center>
       <TreeTableView fx:id="elementsTreeTable">
         <columns>
-          <TreeTableColumn fx:id="nameColumn" prefWidth="350.0" text="NAME" />
-          <TreeTableColumn fx:id="typeColumn" prefWidth="120.0" text="DATA TYPE" />
+          <TreeTableColumn fx:id="nameColumn" prefWidth="350.0" text="%name" />
+          <TreeTableColumn fx:id="typeColumn" prefWidth="120.0" text="%data_type" />
             <TreeTableColumn fx:id="spacerColumn" prefWidth="400.0" />
         </columns>
       </TreeTableView>

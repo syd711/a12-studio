@@ -9,14 +9,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="800.0" styleClass="base-component" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.OutputDialogController">
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="800.0" styleClass="base-component" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.OutputDialogController">
    <top>
       <fx:include fx:id="header" source="scene-dialog-header.fxml" />
    </top>
    <center>
       <VBox BorderPane.alignment="TOP_LEFT">
          <children>
-            <Label fx:id="textLabel" styleClass="dialog-text" text="Label">
+            <Label fx:id="textLabel" styleClass="dialog-text" text="%label">
                <font>
                   <Font size="18.0" />
                </font>
@@ -24,7 +24,7 @@
                   <Insets />
                </VBox.margin>
             </Label>
-            <Label fx:id="descriptionLabel" styleClass="preference-description" text="Label" wrapText="true">
+            <Label fx:id="descriptionLabel" styleClass="preference-description" text="%label" wrapText="true">
                <VBox.margin>
                   <Insets top="12.0" />
                </VBox.margin></Label>
@@ -42,7 +42,7 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
          <children>
-          <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="   OK   " />
+          <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
          </children>
          <BorderPane.margin>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

@@ -27,6 +27,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import de.a12.studio.ui.util.StudioBundle;
 
 public class RolesEditorController extends AbstractAuthFileEditorController implements Initializable {
 
@@ -168,7 +169,7 @@ public class RolesEditorController extends AbstractAuthFileEditorController impl
     FontIcon deleteIcon = WidgetFactory.createIcon(Icons.TRASH);
     deleteIcon.getStyleClass().add("menu-icon");
 
-    MenuItem deleteItem = new MenuItem("Delete", deleteIcon);
+    MenuItem deleteItem = new MenuItem(StudioBundle.get("delete"), deleteIcon);
     deleteItem.setOnAction(event -> onDeleteRole(row.getItem()));
 
     ContextMenu contextMenu = new ContextMenu();
@@ -177,7 +178,7 @@ public class RolesEditorController extends AbstractAuthFileEditorController impl
   }
 
   private void onDeleteRole(@NonNull Role role) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete role '" + role.getName() + "'?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("confirm_delete_role", role.getName()), null, null, "Delete");
     if (result.isPresent() && result.get() == ButtonType.OK) {
       rolesTable.getItems().remove(role);
       save();

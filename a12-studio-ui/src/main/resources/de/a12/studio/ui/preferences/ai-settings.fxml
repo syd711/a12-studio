@@ -12,12 +12,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.AiSettingsController">
+<BorderPane resources="@/messages" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.AiSettingsController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
-                <Label styleClass="preference-title" text="PROJECT SETTINGS" />
-                <Label styleClass="preference-subtitle" text="AI Settings" />
+                <Label styleClass="preference-title" text="%project_settings" />
+                <Label styleClass="preference-subtitle" text="%ai_settings" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="12.0" left="12.0" top="12.0" />
@@ -27,26 +27,26 @@
     <center>
         <VBox spacing="6.0" BorderPane.alignment="TOP_LEFT">
             <children>
-            <Label styleClass="field-label" text="Claude Support" />
-                <CheckBox fx:id="claudeConsoleButtonCheckBox" text="Add Claude console button to the menu bar" />
+            <Label styleClass="field-label" text="%claude_support" />
+                <CheckBox fx:id="claudeConsoleButtonCheckBox" text="%add_claude_console_button_to_the_menu_bar" />
 
                 <VBox spacing="6.0">
                     <children>
-                        <Label styleClass="field-label" text="Claude Executable">
+                        <Label styleClass="field-label" text="%claude_executable">
                      <VBox.margin>
                         <Insets top="12.0" />
                      </VBox.margin></Label>
-                        <RadioButton fx:id="openFromPathRadioButton" text="Open from path">
+                        <RadioButton fx:id="openFromPathRadioButton" text="%open_from_path">
                             <toggleGroup>
                                 <ToggleGroup fx:id="claudePathToggleGroup" />
                             </toggleGroup>
                         </RadioButton>
-                        <RadioButton fx:id="configurePathRadioButton" text="Configure Path" toggleGroup="$claudePathToggleGroup" />
+                        <RadioButton fx:id="configurePathRadioButton" text="%configure_path" toggleGroup="$claudePathToggleGroup" />
                         <HBox alignment="CENTER_LEFT" spacing="6.0">
                             <children>
-                                <TextField fx:id="claudePathField" prefWidth="360.0" promptText="Configure the path to the claude.exe here..." />
-                                <Button fx:id="claudePathBrowseButton" onAction="#onBrowseClaudePath" styleClass="primary-button" text="Browse..." >
-                <tooltip><Tooltip text="Browse for Claude executable" /></tooltip>
+                                <TextField fx:id="claudePathField" prefWidth="360.0" promptText="%configure_the_path_to_the_claude_exe_here" />
+                                <Button fx:id="claudePathBrowseButton" onAction="#onBrowseClaudePath" styleClass="primary-button" text="%browse" >
+                <tooltip><Tooltip text="%browse_for_claude_executable" /></tooltip>
             </Button>
                             </children>
                      <VBox.margin>

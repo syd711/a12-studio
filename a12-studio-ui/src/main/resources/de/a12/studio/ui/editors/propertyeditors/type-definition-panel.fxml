@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TYPE DEFINITION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%type_definition" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.TypeDefinitionPanelController">
     <BorderPane>
         <center>
@@ -33,7 +33,7 @@
                                 <HBox alignment="CENTER_LEFT" prefHeight="42.0" spacing="12.0">
                                     <children>
 
-                                        <CheckBox fx:id="typeDefinitionCheckBox" text="Use Custom Type" />
+                                        <CheckBox fx:id="typeDefinitionCheckBox" text="%use_custom_type" />
                                         <ComboBox fx:id="dataTypeCombo" editable="true" prefWidth="280.0" />
                                     </children>
                                 </HBox>
@@ -53,7 +53,7 @@
                         <VBox GridPane.columnSpan="3">
                             <children>
 
-                                <Label prefWidth="90.0" styleClass="field-label" text="Data Type*" />
+                                <Label prefWidth="90.0" styleClass="field-label" text="%data_type" />
                                 <ComboBox fx:id="dataTypeComboBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" />
                             </children>
                         </VBox>
@@ -69,18 +69,18 @@
                             <ColumnConstraints hgrow="ALWAYS" />
                         </columnConstraints>
                         <HBox spacing="16.0" GridPane.columnIndex="0" GridPane.columnSpan="4" GridPane.rowIndex="0">
-                            <CheckBox fx:id="globalCheckBox" prefWidth="100.0" text="Global" />
-                            <CheckBox fx:id="transientCheckBox" text="Transient" />
+                            <CheckBox fx:id="globalCheckBox" prefWidth="100.0" text="%global" />
+                            <CheckBox fx:id="transientCheckBox" text="%transient" />
                             <GridPane.margin>
                                 <Insets top="6.0" />
                             </GridPane.margin>
                         </HBox>
                         <HBox layoutX="10.0" layoutY="152.0" spacing="16.0" GridPane.columnSpan="4" GridPane.rowIndex="1">
                             <children>
-                                <CheckBox fx:id="requiredCheckBox" prefWidth="100.0" text="Required" />
+                                <CheckBox fx:id="requiredCheckBox" prefWidth="100.0" text="%required" />
                                 <HBox fx:id="requiredParentBox" alignment="CENTER_LEFT" spacing="6.0">
                                     <children>
-                                        <CheckBox fx:id="requiredParentCheckBox" text="Only if the Parent Group is filled?" />
+                                        <CheckBox fx:id="requiredParentCheckBox" text="%only_if_the_parent_group_is_filled" />
                                         <Label prefHeight="9.0" prefWidth="7.0">
                                             <font>
                                                 <Font size="14.0" />
@@ -110,7 +110,7 @@
                         </columnConstraints>
                         <HBox fx:id="defaultErrorMessagesBox" alignment="CENTER_LEFT" spacing="6.0" GridPane.columnSpan="4" GridPane.rowIndex="0">
                             <children>
-                                <CheckBox fx:id="defaultErrorMessagesCheckbox" text="Use default error messages" />
+                                <CheckBox fx:id="defaultErrorMessagesCheckbox" text="%use_default_error_messages" />
                             </children>
                         </HBox>
                         <rowConstraints>

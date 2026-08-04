@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
+import de.a12.studio.ui.util.StudioBundle;
 
 class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
 
@@ -38,13 +39,13 @@ class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
       if (viewModel.hasAnnotations()) {
         Node annotationIcon = WidgetFactory.createIcon(Icons.ELEMENT_ANNOTATION);
         annotationIcon.getStyleClass().addAll("tree-icon", "tree-icon-badge");
-        Tooltip.install(annotationIcon, WidgetFactory.createTooltip("Element has annotations"));
+        Tooltip.install(annotationIcon, WidgetFactory.createTooltip(StudioBundle.get("element_has_annotations")));
         graphic.getChildren().add(annotationIcon);
       }
       if (viewModel.isRequired()) {
         Node requiredIcon = WidgetFactory.createIcon(Icons.ELEMENT_REQUIRED);
         requiredIcon.getStyleClass().addAll("tree-icon", "tree-icon-badge");
-        Tooltip.install(requiredIcon, WidgetFactory.createTooltip("Required element"));
+        Tooltip.install(requiredIcon, WidgetFactory.createTooltip(StudioBundle.get("required_element")));
         graphic.getChildren().add(requiredIcon);
       }
       setText(null);

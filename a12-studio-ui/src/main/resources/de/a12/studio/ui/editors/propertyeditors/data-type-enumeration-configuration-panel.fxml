@@ -11,46 +11,46 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="CATEGORY" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%category" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeEnumerationConfigurationPanelController">
  <BorderPane>
  <center>
   <VBox spacing="14.0">
     <VBox spacing="8.0">
       <HBox fx:id="categoryColumnHeaders" spacing="10.0">
-        <Label styleClass="field-label" text="Name" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-        <Label styleClass="field-label" text="Description" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+        <Label styleClass="field-label" text="%name" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+        <Label styleClass="field-label" text="%description" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
       </HBox>
       <VBox fx:id="categoryRows" spacing="8.0" />
-      <Label fx:id="categoryRowsEmptyLabel" styleClass="placeholder-label" text="No categories configured." />
+      <Label fx:id="categoryRowsEmptyLabel" styleClass="placeholder-label" text="%no_categories_configured" />
       <HBox spacing="8.0">
-        <Button fx:id="addCategoryButton" mnemonicParsing="false" onAction="#onAddCategory" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add category" /></tooltip>
+        <Button fx:id="addCategoryButton" mnemonicParsing="false" onAction="#onAddCategory" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_category" /></tooltip>
             </Button>
       </HBox>
     </VBox>
 
-    <TitledPane fx:id="enumerationValuesPane" maxWidth="Infinity" styleClass="titled-pane-child" text="ENUMERATION VALUES">
+    <TitledPane fx:id="enumerationValuesPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%enumeration_values">
       <VBox spacing="10.0">
         <padding>
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </padding>
         <HBox spacing="8.0" fx:id="buttonPanel">
-          <Button fx:id="fillEmptyTextsButton" mnemonicParsing="false" onAction="#onFillEmptyTexts" styleClass="secondary-button" text="Fill Empty Texts" >
-                <tooltip><Tooltip text="Auto-fill empty text fields" /></tooltip>
+          <Button fx:id="fillEmptyTextsButton" mnemonicParsing="false" onAction="#onFillEmptyTexts" styleClass="secondary-button" text="%fill_empty_texts" >
+                <tooltip><Tooltip text="%auto_fill_empty_text_fields" /></tooltip>
             </Button>
         </HBox>
         <GridPane fx:id="enumerationValuesGrid" hgap="10.0" vgap="6.0" />
-        <Label fx:id="enumerationValuesEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
+        <Label fx:id="enumerationValuesEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
         <HBox spacing="8.0">
-          <Button fx:id="addValueButton" mnemonicParsing="false" onAction="#onAddValue" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add value" /></tooltip>
+          <Button fx:id="addValueButton" mnemonicParsing="false" onAction="#onAddValue" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_value" /></tooltip>
             </Button>
         </HBox>
       </VBox>
     </TitledPane>
 
-    <CheckBox fx:id="alphabeticalSortingCheckBox" text="Alphabetical Sorting" />
+    <CheckBox fx:id="alphabeticalSortingCheckBox" text="%alphabetical_sorting" />
   </VBox>
  </center>
  <top>

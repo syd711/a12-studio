@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="GENERAL INFORMATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController">
+<TitledPane resources="@/messages" fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%general_information" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController">
  <BorderPane>
  <center>
   <GridPane hgap="16.0" vgap="8.0">
@@ -23,13 +23,13 @@
       <children>
         <VBox>
           <children>
-            <Label styleClass="field-label" text="Name*" />
+            <Label styleClass="field-label" text="%name" />
             <TextField fx:id="nameField" />
           </children>
         </VBox>
         <VBox>
           <children>
-            <Label styleClass="field-label" text="Model Version" />
+            <Label styleClass="field-label" text="%model_version" />
             <TextField fx:id="versionField" editable="false" styleClass="readonly-field" />
           </children>
         </VBox>
@@ -38,7 +38,7 @@
 
     <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
       <children>
-        <Label styleClass="field-label" text="Description (internal)" />
+        <Label styleClass="field-label" text="%description_internal" />
         <TextArea fx:id="descriptionArea" prefRowCount="4" wrapText="true" VBox.vgrow="ALWAYS" />
       </children>
     </VBox>

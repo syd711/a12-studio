@@ -8,19 +8,19 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="SUBREGIONS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%subregions" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.applicationmodel.SubregionsPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
     <HBox fx:id="columnHeaders" spacing="10.0">
-      <Label styleClass="field-label" text="Name" />
-      <Label styleClass="field-label" text="Layout" />
+      <Label styleClass="field-label" text="%name" />
+      <Label styleClass="field-label" text="%layout" />
     </HBox>
     <VBox fx:id="subregionsList" spacing="8.0" />
     <HBox spacing="8.0">
-      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add subregion" /></tooltip>
+      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_subregion" /></tooltip>
             </Button>
     </HBox>
   </VBox>

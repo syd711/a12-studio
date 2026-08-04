@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.dialogs.ModelSettingsDialog">
+<BorderPane resources="@/messages" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.dialogs.ModelSettingsDialog">
     <top>
         <fx:include fx:id="header" source="../../components/scene-dialog-header.fxml" />
     </top>
@@ -67,8 +67,8 @@
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
         <items>
-            <Button fx:id="saveBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onSave" styleClass="primary-button" text="Save" />
-          <Button fx:id="cancelBtn" mnemonicParsing="false" onAction="#onCancel" styleClass="secondary-button" text="Cancel" />
+            <Button fx:id="saveBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onSave" styleClass="primary-button" text="%save" />
+          <Button fx:id="cancelBtn" mnemonicParsing="false" onAction="#onCancel" styleClass="secondary-button" text="%cancel" />
         </items>
         <padding>
            <Insets bottom="8.0" right="8.0" />

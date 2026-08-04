@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="PAGING BEHAVIOUR" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%paging_behaviour" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.PagingBehaviourPanelController">
     <BorderPane>
         <top>
@@ -19,13 +19,13 @@
                 <children>
                     <VBox maxWidth="200.0" spacing="4.0">
                         <children>
-                            <Label styleClass="field-label" text="Behaviour*" />
+                            <Label styleClass="field-label" text="%behaviour" />
                             <ComboBox fx:id="behaviourField" editable="false" maxWidth="Infinity" />
                         </children>
                     </VBox>
                     <VBox maxWidth="200.0" spacing="4.0">
                         <children>
-                            <Label styleClass="field-label" text="Paging Size*" />
+                            <Label styleClass="field-label" text="%paging_size" />
                             <Spinner fx:id="pagingSizeField" editable="true" maxWidth="Infinity" />
                         </children>
                     </VBox>

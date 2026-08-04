@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Builds the document model tree's context menu and carries out its actions (element creation,
@@ -179,7 +180,7 @@ public class DocumentModelActions {
       if (FileUtils.isValidWindowsFilename(name)) {
         return name;
       }
-      WidgetFactory.showAlert(Studio.stage, "Please enter a valid name without whitespace.");
+      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("please_enter_a_valid_name_without_whitespace"));
     }
   }
 
@@ -224,7 +225,7 @@ public class DocumentModelActions {
     boolean hasChildren = topLevelSelection(selection).stream().anyMatch(treeItem -> !treeItem.getChildren().isEmpty());
     String help = hasChildren ? "Child elements will be deleted as well." : null;
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
-        "Delete the selected element(s)?", help, null, "Delete");
+        StudioBundle.get("delete_the_selected_element_s_confirm"), help, null, StudioBundle.get("delete"));
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }

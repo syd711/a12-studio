@@ -9,14 +9,14 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="400.0" styleClass="navigation-panel" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.ConfirmationDialogController">
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="400.0" styleClass="navigation-panel" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.ConfirmationDialogController">
    <top>
       <fx:include fx:id="header" source="scene-dialog-header.fxml" />
    </top>
    <center>
       <VBox alignment="BASELINE_LEFT" maxWidth="600.0" BorderPane.alignment="TOP_LEFT">
          <children>
-            <Label fx:id="textLabel" styleClass="dialog-text" text="Label">
+            <Label fx:id="textLabel" styleClass="dialog-text" text="%label">
                <font>
                   <Font size="18.0" />
                </font>
@@ -24,11 +24,11 @@
                   <Insets />
                </VBox.margin>
             </Label>
-            <Label fx:id="helpLabel1" maxWidth="800.0" prefWidth="600.0" styleClass="preference-description" text="Label" wrapText="true">
+            <Label fx:id="helpLabel1" maxWidth="800.0" prefWidth="600.0" styleClass="preference-description" text="%label" wrapText="true">
                <VBox.margin>
                   <Insets top="12.0" />
                </VBox.margin></Label>
-            <Label fx:id="helpLabel2" layoutX="10.0" layoutY="43.0" maxWidth="800.0" styleClass="preference-description" text="Label" wrapText="true" />
+            <Label fx:id="helpLabel2" layoutX="10.0" layoutY="43.0" maxWidth="800.0" styleClass="preference-description" text="%label" wrapText="true" />
          </children>
          <BorderPane.margin>
             <Insets bottom="24.0" left="24.0" right="24.0" top="12.0" />
@@ -38,11 +38,11 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel">
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel">
                <HBox.margin>
                   <Insets right="12.0" />
                </HBox.margin></Button>
-          <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="   OK   " />
+          <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
          </children>
          <BorderPane.margin>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

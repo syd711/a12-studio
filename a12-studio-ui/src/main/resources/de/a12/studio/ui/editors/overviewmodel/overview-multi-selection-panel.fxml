@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="MULTI-SELECTION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%multi_selection" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewMultiSelectionPanelController">
     <BorderPane>
         <top>
@@ -31,32 +31,32 @@
                         <children>
                             <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                 <children>
-                                    <Label styleClass="field-label" text="Collapse Option" />
+                                    <Label styleClass="field-label" text="%collapse_option" />
                                     <ComboBox fx:id="collapseOptionField" editable="false" maxWidth="Infinity" />
                                 </children>
                             </VBox>
                             <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                 <children>
-                                    <Label styleClass="field-label" text="Counter Option" />
+                                    <Label styleClass="field-label" text="%counter_option" />
                                     <ComboBox fx:id="counterOptionField" editable="false" maxWidth="Infinity" />
                                 </children>
                             </VBox>
                             <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
                                 <children>
-                                    <Label styleClass="field-label" text="Selection Area" />
+                                    <Label styleClass="field-label" text="%selection_area" />
                                     <ComboBox fx:id="selectionAreaField" editable="false" maxWidth="Infinity" />
                                 </children>
                             </VBox>
                         </children>
                     </GridPane>
 
-                    <TitledPane fx:id="clearConfirmationPane" maxWidth="Infinity" styleClass="titled-pane-child" text="CLEAR SELECTION CONFIRMATION">
+                    <TitledPane fx:id="clearConfirmationPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%clear_selection_confirmation">
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                             </padding>
                             <children>
-                                <CheckBox fx:id="clearConfirmationField" mnemonicParsing="false" text="Display confirmation before clearing selected rows" />
+                                <CheckBox fx:id="clearConfirmationField" mnemonicParsing="false" text="%display_confirmation_before_clearing_selected_rows" />
                                 <VBox fx:id="clearConfirmationDetails" spacing="10.0">
                                     <children>
                                         <fx:include fx:id="clearConfirmationTitle" source="../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
@@ -67,7 +67,7 @@
                         </VBox>
                     </TitledPane>
 
-                    <TitledPane fx:id="actionsPane" maxWidth="Infinity" styleClass="titled-pane-child" text="ACTIONS FOR MULTI-SELECTION">
+                    <TitledPane fx:id="actionsPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%actions_for_multi_selection">
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -76,16 +76,16 @@
                                 <HBox fx:id="actionColumnHeaders" spacing="10.0">
                                     <children>
                                         <Label prefWidth="18.0" text="" />
-                                        <Label styleClass="field-label" prefWidth="160.0" text="Event" />
-                                        <Label styleClass="field-label" prefWidth="90.0" text="Priority*" />
-                                        <Label styleClass="field-label" prefWidth="90.0" text="Destructive" />
-                                        <Label styleClass="field-label" prefWidth="120.0" text="Icon" />
+                                        <Label styleClass="field-label" prefWidth="160.0" text="%event" />
+                                        <Label styleClass="field-label" prefWidth="90.0" text="%priority" />
+                                        <Label styleClass="field-label" prefWidth="90.0" text="%destructive" />
+                                        <Label styleClass="field-label" prefWidth="120.0" text="%icon" />
                                     </children>
                                 </HBox>
                                 <VBox fx:id="actionRows" spacing="8.0" />
-                                <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="No actions defined." />
-                                <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add action" /></tooltip>
+                                <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="%no_actions_defined" />
+                                <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_action" /></tooltip>
             </Button>
                             </children>
                         </VBox>

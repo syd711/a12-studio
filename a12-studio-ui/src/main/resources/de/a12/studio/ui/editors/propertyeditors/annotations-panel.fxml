@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="ANNOTATIONS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%annotations" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController">
  <BorderPane>
  <center>
@@ -25,16 +25,16 @@
       <rowConstraints>
         <RowConstraints />
       </rowConstraints>
-      <Label styleClass="field-label" text="Name*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%name" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
     </GridPane>
-    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
+    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
     <HBox spacing="8.0">
-      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add annotation" /></tooltip>
+      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_annotation" /></tooltip>
             </Button>
-      <Button fx:id="annotationDatasetsButton" mnemonicParsing="false" onAction="#onAnnotationDatasets" styleClass="secondary-button" text="Annotation Datasets" >
-                <tooltip><Tooltip text="Open annotation datasets" /></tooltip>
+      <Button fx:id="annotationDatasetsButton" mnemonicParsing="false" onAction="#onAnnotationDatasets" styleClass="secondary-button" text="%annotation_datasets" >
+                <tooltip><Tooltip text="%open_annotation_datasets" /></tooltip>
             </Button>
     </HBox>
   </VBox>

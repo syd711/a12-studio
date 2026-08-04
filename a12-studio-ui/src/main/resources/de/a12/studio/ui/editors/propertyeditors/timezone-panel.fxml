@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TIMEZONE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%timezone" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.TimezonePanelController">
  <BorderPane>
  <center>
@@ -22,7 +22,7 @@
             <Font size="14.0" />
          </font>
          <tooltip>
-            <Tooltip prefWidth="300.0" text="The time zone is an expert feature that is only relevant for cross-over projects and does not offer a general handling of time zones" wrapText="true" />
+            <Tooltip prefWidth="300.0" text="%the_time_zone_is_an_expert_feature_that_is_only_relevant_for" wrapText="true" />
          </tooltip>
          <graphic>
             <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />

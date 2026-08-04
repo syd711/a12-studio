@@ -15,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.configuration.screenReaderColumn}: a single combo box
@@ -42,7 +43,7 @@ public class OverviewAccessibilityPanelController extends AbstractPropertyEditor
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
 
-    screenReaderColumnField.setPromptText("Select a column");
+    screenReaderColumnField.setPromptText(StudioBundle.get("select_a_column"));
     screenReaderColumnField.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel || model == null) {
         return;

@@ -43,7 +43,7 @@ public final class OverviewInitialSortingReferenceValidator implements ModelVali
       String idref = columnRef.getIdref();
       if (idref != null && !idref.isBlank() && !columnIds.contains(idref)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "Sorting references a column that no longer exists (\"" + idref + "\").", Severity.ERROR.name()));
+            "validation.sorting_references_a_column_that_no_longer_exists"" + idref + "\").", Severity.ERROR.name()));
       }
     }
     return errors;

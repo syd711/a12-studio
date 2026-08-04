@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="EVENT BUTTONS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%event_buttons" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController">
  <BorderPane>
  <center>
@@ -26,14 +26,14 @@
       <rowConstraints>
         <RowConstraints />
       </rowConstraints>
-      <Label styleClass="field-label" text="Event" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Priority*" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Destructive" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Icon" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%event" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%priority" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%destructive" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%icon" GridPane.columnIndex="3" GridPane.rowIndex="0" />
     </GridPane>
-    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add event button" /></tooltip>
+    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_event_button" /></tooltip>
             </Button>
   </VBox>
  </center>

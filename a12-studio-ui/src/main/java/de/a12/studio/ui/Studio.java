@@ -37,6 +37,7 @@ import org.jspecify.annotations.NonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -55,6 +56,12 @@ public class Studio extends Application implements StudioEventListener {
   @Override
   public void start(Stage stage) throws IOException {
     Studio.stage = stage;
+
+    // Apply stored language preference before any FXML is loaded.
+    String storedLang = LocalUISettings.getString("language");
+    if (storedLang != null && !storedLang.isBlank()) {
+      Locale.setDefault(Locale.forLanguageTag(storedLang));
+    }
 
     StudioEventManager.getInstance().addListener(this);
 

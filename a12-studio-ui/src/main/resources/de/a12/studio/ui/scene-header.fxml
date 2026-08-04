@@ -7,9 +7,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="header" onMouseClicked="#onMouseClick" styleClass="window-header" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.HeaderController">
+<BorderPane resources="@/messages" fx:id="header" onMouseClicked="#onMouseClick" styleClass="window-header" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.HeaderController">
     <left>
-        <Label fx:id="titleLabel" styleClass="window-header-title" text="A12 Studio" textFill="WHITE" BorderPane.alignment="TOP_LEFT">
+        <Label fx:id="titleLabel" styleClass="window-header-title" text="%a12_studio" textFill="WHITE" BorderPane.alignment="TOP_LEFT">
             <BorderPane.margin>
                 <Insets left="12.0" top="6.0" />
             </BorderPane.margin>
@@ -19,19 +19,19 @@
         <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
             <children>
                 <Button fx:id="minimizeBtn" mnemonicParsing="false" onAction="#onHideClick" prefHeight="24.0" prefWidth="24.0" styleClass="header-button" stylesheets="@stylesheet.css">
-                    <tooltip><Tooltip text="Minimize" /></tooltip>
+                    <tooltip><Tooltip text="%minimize" /></tooltip>
                     <graphic>
                         <FontIcon iconLiteral="mdi2w-window-minimize" iconSize="16" styleClass="header-icon" />
                     </graphic>
                 </Button>
                 <Button fx:id="maximizeBtn" mnemonicParsing="false" onAction="#onMaximize" prefHeight="24.0" prefWidth="24.0" styleClass="header-button" stylesheets="@stylesheet.css">
-                    <tooltip><Tooltip text="Maximize" /></tooltip>
+                    <tooltip><Tooltip text="%maximize" /></tooltip>
                     <graphic>
                         <FontIcon iconLiteral="mdi2w-window-maximize" iconSize="16" styleClass="header-icon" />
                     </graphic>
                 </Button>
                 <Button mnemonicParsing="false" onAction="#onCloseClick" prefHeight="24.0" prefWidth="24.0" styleClass="header-button" stylesheets="@stylesheet.css">
-                    <tooltip><Tooltip text="Close" /></tooltip>
+                    <tooltip><Tooltip text="%close" /></tooltip>
                     <graphic>
                         <FontIcon iconLiteral="mdi2w-window-close" iconSize="16" styleClass="header-icon" />
                     </graphic>

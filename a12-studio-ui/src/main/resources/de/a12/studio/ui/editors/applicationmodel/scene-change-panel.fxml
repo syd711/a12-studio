@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="SCENE CHANGE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%scene_change" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.applicationmodel.SceneChangePanelController">
  <BorderPane>
  <center>
@@ -16,16 +16,16 @@
     <!-- On Enter -->
     <VBox spacing="10.0">
       <children>
-        <Label styleClass="section-header" text="On Enter" />
+        <Label styleClass="section-header" text="%on_enter" />
         <HBox fx:id="onEnterColumnHeaders" spacing="10.0">
-          <Label styleClass="field-label" text="Type" />
-          <Label styleClass="field-label" text="Region" />
-          <Label styleClass="field-label" text="Name" />
+          <Label styleClass="field-label" text="%type" />
+          <Label styleClass="field-label" text="%region" />
+          <Label styleClass="field-label" text="%name" />
         </HBox>
         <VBox fx:id="onEnterRows" spacing="8.0" />
-        <Label fx:id="onEnterEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-        <Button mnemonicParsing="false" onAction="#onAddOnEnter" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add on-enter scene change" /></tooltip>
+        <Label fx:id="onEnterEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+        <Button mnemonicParsing="false" onAction="#onAddOnEnter" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_on_enter_scene_change" /></tooltip>
             </Button>
       </children>
     </VBox>
@@ -33,16 +33,16 @@
     <!-- On Exit -->
     <VBox fx:id="onExitSection" spacing="10.0">
       <children>
-        <Label styleClass="section-header" text="On Exit" />
+        <Label styleClass="section-header" text="%on_exit" />
         <HBox fx:id="onExitColumnHeaders" spacing="10.0">
-          <Label styleClass="field-label" text="Type" />
-          <Label styleClass="field-label" text="Region" />
-          <Label styleClass="field-label" text="Name" />
+          <Label styleClass="field-label" text="%type" />
+          <Label styleClass="field-label" text="%region" />
+          <Label styleClass="field-label" text="%name" />
         </HBox>
         <VBox fx:id="onExitRows" spacing="8.0" />
-        <Label fx:id="onExitEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-        <Button mnemonicParsing="false" onAction="#onAddOnExit" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add on-exit scene change" /></tooltip>
+        <Label fx:id="onExitEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+        <Button mnemonicParsing="false" onAction="#onAddOnExit" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_on_exit_scene_change" /></tooltip>
             </Button>
       </children>
     </VBox>

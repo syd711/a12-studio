@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="GENERAL INFORMATION" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%general_information" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController">
    <BorderPane>
       <center>
@@ -27,16 +27,16 @@
             <VBox GridPane.columnSpan="2">
                <children>
 
-                <Label prefWidth="90.0" styleClass="field-label" text="Name*" />
+                <Label prefWidth="90.0" styleClass="field-label" text="%name" />
                 <HBox alignment="CENTER_LEFT" spacing="6.0">
                   <children>
-                    <TextField fx:id="nameField" editable="false" styleClass="readonly-field" text="Country" HBox.hgrow="ALWAYS" />
+                    <TextField fx:id="nameField" editable="false" styleClass="readonly-field" text="%country" HBox.hgrow="ALWAYS" />
                     <Button fx:id="editNameButton" mnemonicParsing="false" onAction="#onEditName" styleClass="default-button">
                       <graphic>
                         <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="16" />
                       </graphic>
                       <tooltip>
-                        <Tooltip text="Edit Model Settings" />
+                        <Tooltip text="%edit_model_settings" />
                       </tooltip>
                     </Button>
                   </children>
@@ -45,14 +45,14 @@
             </VBox>
             <VBox GridPane.columnIndex="2" GridPane.columnSpan="2">
                <children>
-                <Label prefWidth="90.0" styleClass="field-label" text="ID" />
-                <TextField fx:id="idField" editable="false" styleClass="readonly-field" text="field_2f4c1" />
+                <Label prefWidth="90.0" styleClass="field-label" text="%id" />
+                <TextField fx:id="idField" editable="false" styleClass="readonly-field" text="%field_2f4c1" />
                </children>
             </VBox>
             <VBox GridPane.columnSpan="4" GridPane.rowIndex="1">
                <children>
             
-                <Label prefWidth="90.0" styleClass="field-label" text="Path" />
+                <Label prefWidth="90.0" styleClass="field-label" text="%path" />
                 <HBox alignment="CENTER_LEFT" spacing="6.0">
                   <children>
                     <TextField fx:id="pathField" editable="false" styleClass="readonly-field" text="" HBox.hgrow="ALWAYS" />
@@ -61,7 +61,7 @@
                         <FontIcon iconLiteral="mdi2c-content-copy" iconSize="16" />
                       </graphic>
                       <tooltip>
-                        <Tooltip text="Copy Path" />
+                        <Tooltip text="%copy_path" />
                       </tooltip>
                     </Button>
                   </children>

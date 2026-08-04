@@ -24,6 +24,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits a {@link MappingModel}'s {@code content.Source}: one draggable, reorderable row per {@link
@@ -150,7 +151,7 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
     openModelButton.setDisable(sourceModel.getDmId() == null || sourceModel.getDmId().isBlank());
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this source model?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_source_model"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getSource().remove(sourceModel);
         rebuildRows();

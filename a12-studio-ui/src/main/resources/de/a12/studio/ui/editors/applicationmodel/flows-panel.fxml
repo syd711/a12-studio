@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="FLOWS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%flows" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.applicationmodel.FlowsPanelController">
  <BorderPane>
  <top>
@@ -25,7 +25,7 @@
              <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="18" styleClass="toolbar-icon" />
            </graphic>
            <tooltip>
-             <Tooltip text="Edit" />
+             <Tooltip text="%edit" />
            </tooltip>
          </Button>
          <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDelete" styleClass="delete-button">
@@ -33,15 +33,15 @@
              <FontIcon iconColor="#c0392b" iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
            </graphic>
            <tooltip>
-             <Tooltip text="Delete" />
+             <Tooltip text="%delete" />
            </tooltip>
          </Button>
        </items>
      </ToolBar>
      <TreeTableView fx:id="flowsTree" prefHeight="220.0" VBox.vgrow="ALWAYS">
        <columns>
-         <TreeTableColumn fx:id="nameColumn" prefWidth="270.0" text="NAME" />
-         <TreeTableColumn fx:id="descriptionColumn" prefWidth="270.0" text="DESCRIPTION" />
+         <TreeTableColumn fx:id="nameColumn" prefWidth="270.0" text="%name" />
+         <TreeTableColumn fx:id="descriptionColumn" prefWidth="270.0" text="%description" />
        </columns>
      </TreeTableView>
    </VBox>

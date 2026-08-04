@@ -9,13 +9,13 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane resources="@/messages" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.preferences.AdvancedSettingsPanelController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
-                <Label styleClass="preference-title" text="PROJECT SETTINGS" />
-                <Label styleClass="preference-subtitle" text="Advanced Settings" />
+                <Label styleClass="preference-title" text="%project_settings" />
+                <Label styleClass="preference-subtitle" text="%advanced_settings" />
             </children>
             <BorderPane.margin>
                 <Insets bottom="12.0" left="12.0" top="12.0" />
@@ -27,15 +27,15 @@
             <children>
             <VBox spacing="3.0">
                <children>
-                      <CheckBox fx:id="useApplicationGroupsCheckBox" text="Use Application Groups" />
-                      <Label styleClass="field-description" wrapText="true" text="Prefixes every model's id with the group name and updates all references, so this project's models stay unique when deployed alongside other A12 applications." />
+                      <CheckBox fx:id="useApplicationGroupsCheckBox" text="%use_application_groups" />
+                      <Label styleClass="field-description" wrapText="true" text="%prefixes_every_model_s_id_with_the_group_name_and_updates_al" />
                </children>
             </VBox>
             <VBox>
                <children>
       
-                      <Label styleClass="field-label" text="Application Group Name:" />
-                      <TextField fx:id="applicationGroupNameField" prefWidth="280.0" promptText="Enter the application group name here..." />
+                      <Label styleClass="field-label" text="%application_group_name" />
+                      <TextField fx:id="applicationGroupNameField" prefWidth="280.0" promptText="%enter_the_application_group_name_here" />
                </children>
                <VBox.margin>
                   <Insets left="22.0" top="12.0" />
@@ -43,8 +43,8 @@
             </VBox>
             <VBox alignment="CENTER_RIGHT">
                <children>
-                  <Button fx:id="applyBtn" mnemonicParsing="false" onAction="#onApplicationGroupApply" styleClass="primary-button" text="Apply Application Group" >
-                <tooltip><Tooltip text="Apply application group name" /></tooltip>
+                  <Button fx:id="applyBtn" mnemonicParsing="false" onAction="#onApplicationGroupApply" styleClass="primary-button" text="%apply_application_group" >
+                <tooltip><Tooltip text="%apply_application_group_name" /></tooltip>
             </Button>
                </children>
             </VBox>

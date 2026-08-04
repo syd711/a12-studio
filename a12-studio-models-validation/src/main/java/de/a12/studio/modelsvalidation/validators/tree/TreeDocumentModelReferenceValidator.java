@@ -25,11 +25,11 @@ public final class TreeDocumentModelReferenceValidator implements ModelValidator
     for (TreeNode node : treeModel.getContent().getNodes()) {
       if (node.getDocumentModelRef() == null || node.getDocumentModelRef().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "A Document Model must be selected for node type \"" + node.getId() + "\".", Severity.ERROR.name()));
+            "validation.a_document_model_must_be_selected_for_node_type"" + node.getId() + "\".", Severity.ERROR.name()));
       }
       else if (context.findOtherDocumentModel(node.getDocumentModelRef()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The Document Model \"" + node.getDocumentModelRef() + "\" of node type \"" + node.getId()
+            "validation.the_document_model"" + node.getDocumentModelRef() + "\" of node type \"" + node.getId()
                 + "\" does not exist in the workspace.", Severity.ERROR.name()));
       }
     }

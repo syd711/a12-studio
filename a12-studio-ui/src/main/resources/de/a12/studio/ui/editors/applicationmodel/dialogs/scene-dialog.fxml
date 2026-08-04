@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="650.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="650.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.applicationmodel.dialogs.SceneDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
@@ -26,23 +26,23 @@
                <!-- Name -->
                <VBox>
                   <children>
-                     <Label styleClass="field-label" text="Name*" />
-                     <TextField fx:id="nameField" promptText="Enter the scene name here..." />
+                     <Label styleClass="field-label" text="%name" />
+                     <TextField fx:id="nameField" promptText="%enter_the_scene_name_here" />
                   </children>
                </VBox>
 
                <!-- Description -->
                <VBox>
                   <children>
-                     <Label styleClass="field-label" text="Description" />
-                     <TextField fx:id="descriptionField" promptText="Enter a description here..." />
+                     <Label styleClass="field-label" text="%description" />
+                     <TextField fx:id="descriptionField" promptText="%enter_a_description_here" />
                   </children>
                </VBox>
 
                <!-- Prior Scene -->
                <VBox>
                   <children>
-                     <Label styleClass="field-label" text="Prior Scene" />
+                     <Label styleClass="field-label" text="%prior_scene" />
                      <ComboBox fx:id="priorSceneCombo" maxWidth="Infinity" />
                   </children>
                </VBox>
@@ -50,7 +50,7 @@
                <!-- Default Case -->
                <VBox>
                   <children>
-                     <Label styleClass="field-label" text="Default Case" />
+                     <Label styleClass="field-label" text="%default_case" />
                      <ComboBox fx:id="defaultCaseCombo" maxWidth="Infinity" />
                   </children>
                </VBox>
@@ -73,8 +73,8 @@
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
          <items>
-            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="OK" />
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel" />
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
          </items>
          <padding>
             <Insets bottom="8.0" right="8.0" />

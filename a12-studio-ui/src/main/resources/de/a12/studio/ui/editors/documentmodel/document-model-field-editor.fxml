@@ -5,14 +5,14 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<ScrollPane resources="@/messages" fitToWidth="true" styleClass="properties-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.documentmodel.DocumentModelFieldEditorController">
   <content>
     <VBox spacing="12.0" styleClass="field-editor">
       <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
       </padding>
-         <Label styleClass="editor-type-label" text="Field Editor" />
+         <Label styleClass="editor-type-label" text="%field_editor" />
 
       <!-- General Information -->
       <fx:include fx:id="generalInformation" source="../propertyeditors/general-information-panel.fxml" />

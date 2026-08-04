@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits {@link ApplicationModelContent#getRegion()}'s {@link Region#getSubRegions()}: a list of subregions, each
@@ -164,7 +165,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this subregion?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_subregion"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getOrCreateSubRegions().remove(subregion);
         rebuildRows();

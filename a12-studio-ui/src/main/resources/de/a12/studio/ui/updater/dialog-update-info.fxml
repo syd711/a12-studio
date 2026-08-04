@@ -9,14 +9,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="800.0" styleClass="base-component" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.updater.UpdateInfoDialogController">
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="800.0" styleClass="base-component" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.updater.UpdateInfoDialogController">
    <top>
       <fx:include fx:id="header" source="../components/scene-dialog-header.fxml" />
    </top>
    <center>
       <VBox BorderPane.alignment="TOP_LEFT">
          <children>
-            <Label styleClass="dialog-text" text="Release Notes">
+            <Label styleClass="dialog-text" text="%release_notes">
                <font>
                   <Font size="18.0" />
                </font>
@@ -35,12 +35,12 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="closeBtn" cancelButton="true" mnemonicParsing="false" onAction="#onClose" styleClass="secondary-button" text="Close">
+            <Button fx:id="closeBtn" cancelButton="true" mnemonicParsing="false" onAction="#onClose" styleClass="secondary-button" text="%close">
                <HBox.margin>
                   <Insets right="12.0" />
                </HBox.margin>
             </Button>
-            <Button fx:id="updateBtn" defaultButton="true" mnemonicParsing="false" onAction="#onUpdate" styleClass="primary-button" text="Update" />
+            <Button fx:id="updateBtn" defaultButton="true" mnemonicParsing="false" onAction="#onUpdate" styleClass="primary-button" text="%update" />
          </children>
          <BorderPane.margin>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

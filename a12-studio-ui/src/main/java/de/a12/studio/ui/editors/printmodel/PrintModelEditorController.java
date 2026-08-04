@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadLocalRandom;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Full-canvas editor for a {@link PrintModel}: segments as tabs over an A4-scaled page pane (see
@@ -218,7 +219,7 @@ public class PrintModelEditorController extends AbstractEditorController impleme
       segment.setTitle(newValue);
       Tab tab = segmentTabs.getSelectionModel().getSelectedItem();
       if (tab != null) {
-        tab.setText(newValue == null || newValue.isBlank() ? "Segment" : newValue);
+        tab.setText(newValue == null || newValue.isBlank() ? StudioBundle.get("segment") : newValue);
       }
       rebuildStructureTree();
       commitChange();
@@ -399,7 +400,7 @@ public class PrintModelEditorController extends AbstractEditorController impleme
   private void rebuildSegmentTabs() {
     segmentTabs.getTabs().clear();
     for (PrintSegmentDefinition segment : orderedSegments()) {
-      Tab tab = new Tab(segment.getTitle() == null || segment.getTitle().isBlank() ? "Segment" : segment.getTitle());
+      Tab tab = new Tab(segment.getTitle() == null || segment.getTitle().isBlank() ? StudioBundle.get("segment") : segment.getTitle());
       tab.setClosable(false);
       tab.setUserData(segment);
       segmentTabs.getTabs().add(tab);
@@ -435,7 +436,7 @@ public class PrintModelEditorController extends AbstractEditorController impleme
 
   private String describe(Object value) {
     if (value instanceof PrintSegmentDefinition segment) {
-      return segment.getTitle() == null || segment.getTitle().isBlank() ? "Segment" : segment.getTitle();
+      return segment.getTitle() == null || segment.getTitle().isBlank() ? StudioBundle.get("segment") : segment.getTitle();
     }
     if (value instanceof PrintElementReference reference) {
       PrintElementDefinition definition = resolveDefinition(reference);
@@ -588,7 +589,7 @@ public class PrintModelEditorController extends AbstractEditorController impleme
   @FXML
   public void onAddSegment(ActionEvent e) {
     TextInputDialog dialog = new TextInputDialog("Segment " + (orderedSegments().size() + 1));
-    dialog.setTitle("Add Segment");
+    dialog.setTitle(StudioBundle.get("add_segment"));
     dialog.setHeaderText("New print segment");
     dialog.setContentText("Title:");
     String title = dialog.showAndWait().orElse(null);

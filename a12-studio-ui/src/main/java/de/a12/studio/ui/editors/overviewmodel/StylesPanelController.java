@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits {@link de.a12.studio.models.overviewmodel.OverviewModelContent#getStyles()}: a list of CSS style
@@ -65,13 +66,13 @@ public class StylesPanelController extends AbstractPropertyEditor {
 
   public void configureColumnHeaderStyles() {
     this.columnStylesAccessor = column -> ensureColumnStyles(column).getHeader();
-    setTitle("STYLE FOR HEADER CELLS");
+    setTitle(StudioBundle.get("style_for_header_cells"));
     setSettingsKeySuffix(".headerStyles");
   }
 
   public void configureColumnContentStyles() {
     this.columnStylesAccessor = column -> ensureColumnStyles(column).getContent();
-    setTitle("STYLE FOR CONTENT CELLS");
+    setTitle(StudioBundle.get("style_for_content_cells"));
     setSettingsKeySuffix(".contentStyles");
   }
 
@@ -183,8 +184,8 @@ public class StylesPanelController extends AbstractPropertyEditor {
       commitChange();
     });
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this style?", null, null, "Delete");
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_style"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getStyles().remove(index);
         rebuildRows();

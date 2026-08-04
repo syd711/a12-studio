@@ -29,6 +29,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.configuration.initialSorting}: one draggable, reorderable
@@ -136,7 +137,7 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
 
     ComboBox<String> columnField = new ComboBox<>();
     columnField.setId("overviewSortingColumn-" + index);
-    columnField.setPromptText("Select a column");
+    columnField.setPromptText(StudioBundle.get("select_a_column"));
     columnField.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(columnField, Priority.ALWAYS);
     columnField.getItems().setAll(OverviewColumnOptions.columnIds(columns));
@@ -175,8 +176,8 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(ColumnRef columnRef, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this sorting entry?", null, null, "Delete");
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_sorting_entry"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getSorting().remove(columnRef);
         rebuildRows();

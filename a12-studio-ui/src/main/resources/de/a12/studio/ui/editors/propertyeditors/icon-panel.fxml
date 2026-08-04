@@ -9,20 +9,20 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="ICON" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%icon" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.IconPanelController">
     <BorderPane>
         <center>
             <HBox alignment="CENTER_LEFT" spacing="6.0" BorderPane.alignment="CENTER">
                 <children>
                     <Label fx:id="previewLabel" alignment="CENTER" minWidth="24.0" prefWidth="24.0" />
-                    <ComboBox fx:id="iconCombo" editable="true" maxWidth="Infinity" promptText="Start typing an icon name..." HBox.hgrow="ALWAYS" />
+                    <ComboBox fx:id="iconCombo" editable="true" maxWidth="Infinity" promptText="%start_typing_an_icon_name" HBox.hgrow="ALWAYS" />
                     <Button fx:id="browseIconsButton" mnemonicParsing="false" onAction="#onBrowseKioskMode" styleClass="default-button">
                         <graphic>
                             <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" />
                         </graphic>
                         <tooltip>
-                            <Tooltip text="Browse Icons (fonts.google.com)" />
+                            <Tooltip text="%browse_icons_fonts_google_com" />
                         </tooltip>
                     </Button>
                 </children>

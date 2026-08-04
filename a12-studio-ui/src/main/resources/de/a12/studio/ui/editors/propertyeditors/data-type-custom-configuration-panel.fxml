@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="CUSTOM TYPE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeCustomConfigurationPanelController">
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%custom_type" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.DataTypeCustomConfigurationPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
@@ -20,11 +20,11 @@
       </columnConstraints>
 
       <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
-        <Label styleClass="field-label" text="Name" />
+        <Label styleClass="field-label" text="%name" />
         <TextField fx:id="nameField" />
       </VBox>
       <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
-        <Label styleClass="field-label" text="Display Name" />
+        <Label styleClass="field-label" text="%display_name" />
         <TextField fx:id="displayNameField" />
       </VBox>
 
@@ -40,11 +40,11 @@
       </columnConstraints>
 
       <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
-        <Label styleClass="field-label" text="Min. Length" />
+        <Label styleClass="field-label" text="%min_length" />
         <TextField fx:id="minLengthField" />
       </VBox>
       <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
-        <Label styleClass="field-label" text="Max. Length" />
+        <Label styleClass="field-label" text="%max_length" />
         <TextField fx:id="maxLengthField" />
       </VBox>
 

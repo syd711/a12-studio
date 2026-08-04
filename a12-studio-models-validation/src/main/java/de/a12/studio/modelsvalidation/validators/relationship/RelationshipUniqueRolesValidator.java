@@ -26,7 +26,7 @@ public final class RelationshipUniqueRolesValidator implements ModelValidator {
     for (EntityCharacteristic entity : relationshipModel.getContent().getEntityCharacteristics()) {
       if (entity.getRole() != null && !entity.getRole().isBlank() && !seen.add(entity.getRole())) {
         return List.of(new ModelValidationError(model, ELEMENT_ID,
-            "The role \"" + entity.getRole() + "\" is already taken by the other entity. Roles must be unique.",
+            "validation.the_role"" + entity.getRole() + "\" is already taken by the other entity. Roles must be unique.",
             Severity.ERROR.name()));
       }
     }

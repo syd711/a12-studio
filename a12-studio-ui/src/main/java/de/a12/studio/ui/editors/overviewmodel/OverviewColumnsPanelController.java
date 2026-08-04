@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.columns}: one draggable, reorderable row per {@link
@@ -252,8 +253,8 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(column));
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this column?", null, null, "Delete");
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_column"), null, null, StudioBundle.get("delete"));
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getColumns().remove(column);
         rebuildRows();

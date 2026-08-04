@@ -31,7 +31,7 @@ public final class PrintDocumentModelReferenceValidator implements ModelValidato
       if (reference.getModelType() == ModelType.DOCUMENT
           && reference.getReference() != null && reference.getReference().contains(".")) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The referenced Document Model \"" + reference.getReference()
+            "validation.the_referenced_document_model"" + reference.getReference()
                 + "\" must not contain dots in its name.", Severity.ERROR.name()));
       }
     }

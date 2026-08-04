@@ -31,7 +31,7 @@ public final class ContentElementIdUniqueValidator implements ModelValidator {
   private void collectDuplicates(ContentModel model, ContentElement element, Set<String> seen, List<ModelValidationError> errors) {
     if (element.getId() != null && !seen.add(element.getId())) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "The element id \"" + element.getId() + "\" is used more than once in the content tree.",
+          "validation.the_element_id"" + element.getId() + "\" is used more than once in the content tree.",
           Severity.ERROR.name()));
     }
     if (element.getChildren() != null) {

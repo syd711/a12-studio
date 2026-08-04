@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController">
+<BorderPane resources="@/messages" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController">
     <right>
       <VBox BorderPane.alignment="CENTER" styleClass="properties-panel">
          <BorderPane.margin>
@@ -41,7 +41,7 @@
    <center>
        <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
            <tabs>
-               <Tab text="Overview">
+               <Tab text="%overview">
                    <content>
                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
                            <content>
@@ -61,8 +61,8 @@
                                        <fx:include fx:id="overviewFeatures" source="overview-features-panel.fxml" />
 
                                        <!-- Filter -->
-                                       <Label styleClass="field-label" text="Filter" />
-                                       <CheckBox fx:id="enableFilterField" mnemonicParsing="false" text="Enable Filter" />
+                                       <Label styleClass="field-label" text="%filter" />
+                                       <CheckBox fx:id="enableFilterField" mnemonicParsing="false" text="%enable_filter" />
                                        <VBox fx:id="filterDetailsBox" spacing="10.0">
                                            <padding>
                                                <Insets left="20.0" />
@@ -70,13 +70,13 @@
                                            <children>
                                                <HBox spacing="24.0">
                                                    <children>
-                                                       <CheckBox fx:id="showFilterButtonField" mnemonicParsing="false" text="Show Filter Button" />
-                                                       <CheckBox fx:id="showFilterBarField" mnemonicParsing="false" text="Show Filter Bar" />
+                                                       <CheckBox fx:id="showFilterButtonField" mnemonicParsing="false" text="%show_filter_button" />
+                                                       <CheckBox fx:id="showFilterBarField" mnemonicParsing="false" text="%show_filter_bar" />
                                                    </children>
                                                </HBox>
                                                <VBox maxWidth="300.0" spacing="4.0">
                                                    <children>
-                                                       <Label styleClass="field-label" text="Filter Mode*" />
+                                                       <Label styleClass="field-label" text="%filter_mode" />
                                                        <ComboBox fx:id="filterModeField" editable="false" maxWidth="Infinity" />
                                                    </children>
                                                </VBox>
@@ -84,15 +84,15 @@
                                                <!-- Custom field list (filterMode == custom_list) -->
                                                <VBox fx:id="customFieldsBox" spacing="6.0">
                                                    <children>
-                                                       <Label styleClass="field-label" text="Custom Selection of Fields" />
+                                                       <Label styleClass="field-label" text="%custom_selection_of_fields" />
                                                        <GridPane fx:id="customFieldsGrid" hgap="8.0" vgap="6.0">
                                                            <columnConstraints>
                                                                <ColumnConstraints hgrow="ALWAYS" />
                                                                <ColumnConstraints hgrow="NEVER" minWidth="32.0" />
                                                            </columnConstraints>
                                                        </GridPane>
-                                                       <Button fx:id="addCustomFieldButton" mnemonicParsing="false" onAction="#onAddCustomField" styleClass="secondary-button" text="Add Field" >
-                <tooltip><Tooltip text="Add custom field" /></tooltip>
+                                                       <Button fx:id="addCustomFieldButton" mnemonicParsing="false" onAction="#onAddCustomField" styleClass="secondary-button" text="%add_field" >
+                <tooltip><Tooltip text="%add_custom_field" /></tooltip>
             </Button>
                                                    </children>
                                                </VBox>
@@ -100,7 +100,7 @@
                                                <!-- Filter Sections -->
                                                <VBox spacing="6.0">
                                                    <children>
-                                                       <Label styleClass="field-label" text="Section Data" />
+                                                       <Label styleClass="field-label" text="%section_data" />
                                                        <HBox spacing="10.0">
                                                            <children>
                                                                <ListView fx:id="filterSectionsList" prefHeight="120.0" prefWidth="220.0" />
@@ -108,13 +108,13 @@
                                                                    <children>
                                                                        <VBox spacing="4.0">
                                                                            <children>
-                                                                               <Label styleClass="field-label" text="Section ID*" />
+                                                                               <Label styleClass="field-label" text="%section_id" />
                                                                                <TextField fx:id="filterSectionIdField" />
                                                                            </children>
                                                                        </VBox>
                                                                        <VBox spacing="4.0">
                                                                            <children>
-                                                                               <Label styleClass="field-label" text="Label" />
+                                                                               <Label styleClass="field-label" text="%label" />
                                                                                <GridPane fx:id="filterSectionLabelGrid" hgap="10.0" vgap="6.0">
                                                                                    <columnConstraints>
                                                                                        <ColumnConstraints minWidth="40.0" />
@@ -125,15 +125,15 @@
                                                                        </VBox>
                                                                        <VBox spacing="4.0">
                                                                            <children>
-                                                                               <Label styleClass="field-label" text="Fields*" />
+                                                                               <Label styleClass="field-label" text="%fields" />
                                                                                <GridPane fx:id="filterSectionFieldsGrid" hgap="8.0" vgap="6.0">
                                                                                    <columnConstraints>
                                                                                        <ColumnConstraints hgrow="ALWAYS" />
                                                                                        <ColumnConstraints hgrow="NEVER" minWidth="32.0" />
                                                                                    </columnConstraints>
                                                                                </GridPane>
-                                                                               <Button fx:id="addFilterSectionFieldButton" mnemonicParsing="false" onAction="#onAddFilterSectionField" styleClass="secondary-button" text="Add Field" >
-                <tooltip><Tooltip text="Add filter field" /></tooltip>
+                                                                               <Button fx:id="addFilterSectionFieldButton" mnemonicParsing="false" onAction="#onAddFilterSectionField" styleClass="secondary-button" text="%add_field" >
+                <tooltip><Tooltip text="%add_filter_field" /></tooltip>
             </Button>
                                                                            </children>
                                                                        </VBox>
@@ -143,11 +143,11 @@
                                                        </HBox>
                                                        <HBox spacing="8.0">
                                                            <children>
-                                                               <Button fx:id="addFilterSectionButton" mnemonicParsing="false" onAction="#onAddFilterSection" styleClass="secondary-button" text="Add Section" >
-                <tooltip><Tooltip text="Add filter section" /></tooltip>
+                                                               <Button fx:id="addFilterSectionButton" mnemonicParsing="false" onAction="#onAddFilterSection" styleClass="secondary-button" text="%add_section" >
+                <tooltip><Tooltip text="%add_filter_section" /></tooltip>
             </Button>
-                                                               <Button fx:id="removeFilterSectionButton" mnemonicParsing="false" onAction="#onRemoveFilterSection" styleClass="secondary-button" text="Remove Section" >
-                <tooltip><Tooltip text="Remove selected filter section" /></tooltip>
+                                                               <Button fx:id="removeFilterSectionButton" mnemonicParsing="false" onAction="#onRemoveFilterSection" styleClass="secondary-button" text="%remove_section" >
+                <tooltip><Tooltip text="%remove_selected_filter_section" /></tooltip>
             </Button>
                                                            </children>
                                                        </HBox>
@@ -180,7 +180,7 @@
                        </ScrollPane>
                    </content>
                </Tab>
-               <Tab text="Custom Actions">
+               <Tab text="%custom_actions">
                    <content>
                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
                            <content>
@@ -188,15 +188,15 @@
                                    <children>
 
                                        <!-- Row Action Group -->
-                                       <Label styleClass="field-label" text="Row Action Group" />
+                                       <Label styleClass="field-label" text="%row_action_group" />
                                        <fx:include fx:id="rowActionButtons" source="../propertyeditors/event-buttons-panel.fxml" />
                                        <fx:include fx:id="contextMenu" source="context-menu-panel.fxml" />
 
                                        <!-- Row Activation -->
-                                       <Label styleClass="field-label" text="Row Activation" />
+                                       <Label styleClass="field-label" text="%row_activation" />
                                        <VBox maxWidth="300.0" spacing="4.0">
                                            <children>
-                                               <Label styleClass="field-label" text="Type" />
+                                               <Label styleClass="field-label" text="%type" />
                                                <HBox alignment="CENTER_LEFT" spacing="6.0">
                                                    <children>
                                                        <ComboBox fx:id="rowActivationTypeField" editable="false" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
@@ -207,11 +207,11 @@
                                        </VBox>
                                        <VBox fx:id="rowActivationEventBox" maxWidth="300.0" spacing="4.0">
                                            <children>
-                                               <Label styleClass="field-label" text="Event*" />
+                                               <Label styleClass="field-label" text="%event" />
                                                <TextField fx:id="rowActivationEventField" />
                                            </children>
                                        </VBox>
-                                       <TitledPane expanded="true" maxWidth="Infinity" text="Title For Interactive Rows">
+                                       <TitledPane expanded="true" maxWidth="Infinity" text="%title_for_interactive_rows">
                                            <content>
                                                <GridPane fx:id="interactiveRowTitleGrid" hgap="10.0" vgap="6.0">
                                                    <columnConstraints>
@@ -223,12 +223,12 @@
                                        </TitledPane>
 
                                        <!-- Subheader -->
-                                       <Label styleClass="field-label" text="Subheader" />
+                                       <Label styleClass="field-label" text="%subheader" />
                                        <fx:include fx:id="subheaderMajor" source="subheader-slot-panel.fxml" />
                                        <fx:include fx:id="subheaderMinor" source="subheader-slot-panel.fxml" />
 
                                        <!-- Footer -->
-                                       <Label styleClass="field-label" text="Footer" />
+                                       <Label styleClass="field-label" text="%footer" />
                                        <fx:include fx:id="footerMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
                                        <fx:include fx:id="footerMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
 

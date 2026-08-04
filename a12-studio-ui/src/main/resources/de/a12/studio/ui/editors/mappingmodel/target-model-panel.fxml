@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="TARGET MODEL" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.mappingmodel.TargetModelPanelController">
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%target_model" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.mappingmodel.TargetModelPanelController">
     <BorderPane>
         <center>
          <HBox alignment="CENTER_LEFT" spacing="6.0" BorderPane.alignment="CENTER">
@@ -19,7 +19,7 @@
                       <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" />
                     </graphic>
                     <tooltip>
-                      <Tooltip text="Open Document Model" />
+                      <Tooltip text="%open_document_model" />
                     </tooltip>
                   </Button>
             </children>

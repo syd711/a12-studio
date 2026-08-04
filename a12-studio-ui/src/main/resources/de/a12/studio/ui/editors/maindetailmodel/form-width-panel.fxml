@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="FORM WIDTH" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%form_width" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.maindetailmodel.FormWidthPanelController">
  <BorderPane>
  <center>
@@ -21,7 +21,7 @@
         </graphic>
         <tooltip>
           <Tooltip prefWidth="300.0"
-                   text="The layout of the whole screen is fragmented in 12. The width of the form, which is the detail view on the right side, can take from 1 to 11 of the 12 availabe layout grid slots, leaving the remaining space for another view visible on the left. If only one view is visible, it uses all available space."
+                   text="%the_layout_of_the_whole_screen_is_fragmented_in_12_the_width"
                    wrapText="true"/>
         </tooltip>
       </Label>

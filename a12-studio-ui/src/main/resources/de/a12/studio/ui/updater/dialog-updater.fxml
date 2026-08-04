@@ -9,14 +9,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="640.0" styleClass="base-component" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.updater.UpdateDialogController">
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="640.0" styleClass="base-component" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.updater.UpdateDialogController">
    <top>
       <fx:include fx:id="header" source="../components/scene-dialog-header.fxml" />
    </top>
    <center>
       <VBox spacing="3.0" BorderPane.alignment="TOP_LEFT">
          <children>
-            <Label text="A12 Studio Update Progress">
+            <Label text="%a12_studio_update_progress">
                <font>
                   <Font size="14.0" />
                </font>
@@ -32,7 +32,7 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#onClose" styleClass="primary-button" text="Cancel" />
+            <Button fx:id="closeBtn" mnemonicParsing="false" onAction="#onClose" styleClass="primary-button" text="%cancel" />
          </children>
          <BorderPane.margin>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

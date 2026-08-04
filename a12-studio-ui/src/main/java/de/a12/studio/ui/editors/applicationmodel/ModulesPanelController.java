@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits {@link ApplicationModelContent#getModules()}: a list of module names, each reorderable (move up/down),
@@ -157,7 +158,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this module?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_module"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getModules().remove(module);
         rebuildRows();

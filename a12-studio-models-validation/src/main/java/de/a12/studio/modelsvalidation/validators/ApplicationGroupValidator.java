@@ -35,7 +35,7 @@ public final class ApplicationGroupValidator implements ModelValidator {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "This model's application group (\"" + (actualGroup == null ? "" : actualGroup)
+        "validation.this_model_s_application_group"" + (actualGroup == null ? "" : actualGroup)
             + "\") does not match the project's configured application group \"" + expectedGroup
             + "\". Re-apply the Application Group feature to fix this.",
         Severity.ERROR.name()));

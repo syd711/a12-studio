@@ -39,7 +39,7 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
     List<FieldRef> fields = filterConfig.getFields();
     if (fields.isEmpty()) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "At least one field must be selected for a custom field selection.", Severity.ERROR.name()));
+          "validation.at_least_one_field_must_be_selected_for_a_custom_f", Severity.ERROR.name()));
     }
 
     List<ModelValidationError> errors = new ArrayList<>();
@@ -51,7 +51,7 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
       }
       if (!seen.add(fieldId)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The field \"" + fieldId + "\" is selected more than once.", Severity.ERROR.name()));
+            "validation.the_field"" + fieldId + "\" is selected more than once.", Severity.ERROR.name()));
       }
     }
 
@@ -68,19 +68,19 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
       Element element = OverviewElementResolution.resolve(index, fieldId);
       if (element == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The reference is invalid. The referenced field \"" + fieldId + "\" does not exist in the document model.",
+            "validation.the_reference_is_invalid_the_referenced_field"" + fieldId + "\" does not exist in the document model.",
             Severity.ERROR.name()));
         continue;
       }
       if (OverviewElementResolution.isIndexedFalse(element)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The \"indexed\" annotation of field \"" + element.getName()
+            "validation.the"indexed\" annotation of field \"" + element.getName()
                 + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
             Severity.ERROR.name()));
       }
       if (OverviewElementResolution.isInRepeatableGroup(index, element)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The reference is invalid. The referenced field \"" + element.getName() + "\" is repeatable.",
+            "validation.the_reference_is_invalid_the_referenced_field"" + element.getName() + "\" is repeatable.",
             Severity.ERROR.name()));
       }
     }

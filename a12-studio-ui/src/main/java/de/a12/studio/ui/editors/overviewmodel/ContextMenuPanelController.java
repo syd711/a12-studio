@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.contextMenu}: named {@link ActionGroup}s, each holding
@@ -100,7 +101,7 @@ public class ContextMenuPanelController extends AbstractPropertyEditor {
     if (group == null) {
       return;
     }
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this context menu group?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_context_menu_group"), null, null, "Delete");
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }

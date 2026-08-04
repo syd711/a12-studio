@@ -42,6 +42,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Controller for the app's main menu bar (File/Edit/Help).
@@ -83,7 +84,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
   private void onOpen() {
     StudioFolderChooser chooser = new StudioFolderChooser();
     chooser.setInitialDirectory(LocalUISettings.getLastFolderSelection());
-    chooser.setTitle("Choose Project Workspace");
+    chooser.setTitle(StudioBundle.get("choose_project_workspace"));
 
     File file = chooser.showOpenDialog(Studio.stage);
     if (file != null) {
@@ -106,7 +107,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
     List<String> recentProjects = LocalUISettings.getRecentProjects();
     if (recentProjects.isEmpty()) {
-      MenuItem emptyItem = new MenuItem("No projects found.");
+      MenuItem emptyItem = new MenuItem(StudioBundle.get("no_projects_found"));
       emptyItem.setDisable(true);
       recentProjectsMenu.getItems().add(emptyItem);
       return;
@@ -118,14 +119,14 @@ public class MenuBarController implements Initializable, StudioEventListener {
     }
 
     recentProjectsMenu.getItems().add(new SeparatorMenuItem());
-    MenuItem clearItem = new MenuItem("Clear Recent Projects");
+    MenuItem clearItem = new MenuItem(StudioBundle.get("clear_recent_projects"));
     clearItem.setOnAction(event -> onClearRecentProjects());
     recentProjectsMenu.getItems().add(clearItem);
   }
 
   private void onClearRecentProjects() {
     Optional<ButtonType> result = WidgetFactory.showConfirmation(
-        Studio.stage, "Clear all recent projects?", null, null, "Clear");
+        Studio.stage, StudioBundle.get("clear_all_recent_projects"), null, null, "Clear");
     if (result.isPresent() && result.get() == ButtonType.OK) {
       LocalUISettings.clearRecentProjects();
       refreshRecentProjectsMenu();
@@ -175,7 +176,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
     Button removeBtn = new Button();
     removeBtn.setGraphic(removeIcon);
     removeBtn.getStyleClass().add("recent-project-remove-btn");
-    removeBtn.setTooltip(WidgetFactory.createTooltip("Remove from Recent Projects"));
+    removeBtn.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("remove_from_recent_projects")));
     removeBtn.setOnAction(event -> {
       event.consume();
       LocalUISettings.removeRecentProject(path);

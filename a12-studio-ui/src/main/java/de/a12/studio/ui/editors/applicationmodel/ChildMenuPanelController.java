@@ -25,6 +25,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits {@link Menu#getChildren()} of a {@link Module}'s menu: a list of child menu names, each reorderable
@@ -107,8 +108,8 @@ public class ChildMenuPanelController extends AbstractPropertyEditor {
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> editMenu(menu));
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this child menu?", null, null, "Delete");
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_child_menu"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getChildMenus().remove(menu);
         rebuildRows();

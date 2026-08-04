@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="MODEL REFERENCES" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%model_references" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.ModelReferencesPanelController">
  <BorderPane>
  <center>
@@ -26,13 +26,13 @@
       <rowConstraints>
         <RowConstraints />
       </rowConstraints>
-      <Label styleClass="field-label" text="Alias" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Purpose" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Model Type*" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Reference*" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%alias" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%purpose" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%model_type" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%reference" GridPane.columnIndex="3" GridPane.rowIndex="0" />
     </GridPane>
-    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add model reference" /></tooltip>
+    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_model_reference" /></tooltip>
             </Button>
   </VBox>
  </center>

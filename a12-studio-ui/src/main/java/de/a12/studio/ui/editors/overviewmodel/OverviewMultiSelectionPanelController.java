@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.configuration.multiSelection}: the collapse/counter/
@@ -268,8 +269,8 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(button));
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this action?", null, null, "Delete");
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_action"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getActions().remove(button);
         rebuildActionRows();

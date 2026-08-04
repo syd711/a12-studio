@@ -32,7 +32,7 @@ public final class FormSiblingNameUniquenessValidator implements ModelValidator 
     for (Screen screen : formModel.getContent().getScreens()) {
       if (screen.getName() != null && !screenNames.add(screen.getName())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The screen name \"" + screen.getName() + "\" is used more than once.", Severity.ERROR.name()));
+            "validation.the_screen_name"" + screen.getName() + "\" is used more than once.", Severity.ERROR.name()));
       }
       checkSiblings(model, screen.getScreenElements(), errors);
     }
@@ -47,7 +47,7 @@ public final class FormSiblingNameUniquenessValidator implements ModelValidator 
     for (ScreenElement element : siblings) {
       if (element.getName() != null && !element.getName().isBlank() && !names.add(element.getName())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The element name \"" + element.getName() + "\" is used more than once among siblings.",
+            "validation.the_element_name"" + element.getName() + "\" is used more than once among siblings.",
             Severity.ERROR.name()));
       }
       if (element instanceof MultiColumnSection section) {

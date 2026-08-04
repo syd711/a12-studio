@@ -13,34 +13,34 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
+<BorderPane resources="@/messages" styleClass="dark-panel" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
    <left>
       <HBox alignment="CENTER_LEFT" prefHeight="42.0" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
             <MenuBar fx:id="menuBar" styleClass="base-component">
               <menus>
-                <Menu mnemonicParsing="true" text="_File">
+                <Menu mnemonicParsing="true" text="%file">
                   <items>
-                    <MenuItem mnemonicParsing="true" onAction="#onNew" text="_New...">
+                    <MenuItem mnemonicParsing="true" onAction="#onNew" text="%new">
                     <accelerator><KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" /></accelerator>
                   </MenuItem>
-                    <MenuItem mnemonicParsing="true" onAction="#onOpen" text="_Open">
+                    <MenuItem mnemonicParsing="true" onAction="#onOpen" text="%open">
                     <accelerator><KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" /></accelerator>
                   </MenuItem>
-                    <Menu fx:id="recentProjectsMenu" mnemonicParsing="true" text="_Recent Projects" />
-                    <MenuItem mnemonicParsing="true" onAction="#onCloseProject" text="Close _Project" />
+                    <Menu fx:id="recentProjectsMenu" mnemonicParsing="true" text="%recent_projects" />
+                    <MenuItem mnemonicParsing="true" onAction="#onCloseProject" text="%close_project" />
                     <SeparatorMenuItem />
-                    <MenuItem mnemonicParsing="true" onAction="#onExit" text="E_xit" />
+                    <MenuItem mnemonicParsing="true" onAction="#onExit" text="%e_xit" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="true" text="_Edit">
+                <Menu mnemonicParsing="true" text="%edit">
                   <items>
-                    <MenuItem mnemonicParsing="true" text="_Delete" />
+                    <MenuItem mnemonicParsing="true" text="%delete" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="true" text="_Help">
+                <Menu mnemonicParsing="true" text="%help">
                   <items>
-                    <MenuItem mnemonicParsing="true" onAction="#onAbout" text="_About" />
+                    <MenuItem mnemonicParsing="true" onAction="#onAbout" text="%about" />
                   </items>
                 </Menu>
               </menus>
@@ -59,28 +59,28 @@
          <children>
             <HBox alignment="CENTER_LEFT" spacing="3.0">
                <children>
-                  <Button fx:id="launchPreviewAppBtn" accessibleText="Launch Preview App" managed="false" mnemonicParsing="false" onAction="#onLaunchPreviewApp" styleClass="menu-bar-button, launch-preview-app-button, preview-app-button" visible="false">
+                  <Button fx:id="launchPreviewAppBtn" accessibleText="%launch_preview_app" managed="false" mnemonicParsing="false" onAction="#onLaunchPreviewApp" styleClass="menu-bar-button, launch-preview-app-button, preview-app-button" visible="false">
                       <graphic>
                           <FontIcon iconLiteral="mdi2p-play" iconSize="20" styleClass="toolbar-icon" />
                       </graphic>
                       <tooltip>
-                          <Tooltip text="Launch Preview App" />
+                          <Tooltip text="%launch_preview_app" />
                       </tooltip>
                   </Button>
-                  <Button fx:id="stopPreviewAppBtn" accessibleText="Stop Preview App" disable="true" managed="false" mnemonicParsing="false" onAction="#onStopPreviewApp" styleClass="menu-bar-button, stop-preview-app-button, preview-app-button" visible="false">
+                  <Button fx:id="stopPreviewAppBtn" accessibleText="%stop_preview_app" disable="true" managed="false" mnemonicParsing="false" onAction="#onStopPreviewApp" styleClass="menu-bar-button, stop-preview-app-button, preview-app-button" visible="false">
                       <graphic>
                           <FontIcon iconLiteral="mdi2s-stop" iconSize="20" styleClass="toolbar-icon" />
                       </graphic>
                       <tooltip>
-                          <Tooltip text="Stop Preview App" />
+                          <Tooltip text="%stop_preview_app" />
                       </tooltip>
                   </Button>
-                  <Button fx:id="previewAppLogBtn" accessibleText="Preview App Log" managed="false" mnemonicParsing="false" onAction="#onOpenPreviewAppLog" styleClass="menu-bar-button, preview-app-button" visible="false">
+                  <Button fx:id="previewAppLogBtn" accessibleText="%preview_app_log" managed="false" mnemonicParsing="false" onAction="#onOpenPreviewAppLog" styleClass="menu-bar-button, preview-app-button" visible="false">
                       <graphic>
                           <FontIcon iconLiteral="mdi2c-console" iconSize="20" styleClass="toolbar-icon" />
                       </graphic>
                       <tooltip>
-                          <Tooltip text="Preview App Log" />
+                          <Tooltip text="%preview_app_log" />
                       </tooltip>
                   </Button>
                </children>
@@ -89,24 +89,24 @@
                </HBox.margin>
             </HBox>
 
-             <Button fx:id="updateBtn" accessibleText="Update available" managed="false" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button" visible="false">
+             <Button fx:id="updateBtn" accessibleText="%update_available" managed="false" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button" visible="false">
                  <graphic>
                      <FontIcon iconColor="#03A905" iconLiteral="mdi2a-arrow-down-bold" iconSize="18" />
                  </graphic>
                  <tooltip>
-                     <Tooltip text="Update available" />
+                     <Tooltip text="%update_available" />
                  </tooltip>
              </Button>
 
-            <Button fx:id="searchBtn" accessibleText="Search Files" mnemonicParsing="false" onAction="#onSearch" styleClass="menu-bar-button">
+            <Button fx:id="searchBtn" accessibleText="%search_files" mnemonicParsing="false" onAction="#onSearch" styleClass="menu-bar-button">
                 <graphic>
                     <FontIcon iconLiteral="mdi2m-magnify" iconSize="20" styleClass="toolbar-icon" />
                 </graphic>
                 <tooltip>
-                    <Tooltip text="Search Files" />
+                    <Tooltip text="%search_files" />
                 </tooltip>
             </Button>
-            <Button fx:id="claudeConsoleBtn" accessibleText="Claude Console" mnemonicParsing="false" onAction="#onOpenClaudeConsole" styleClass="menu-bar-button">
+            <Button fx:id="claudeConsoleBtn" accessibleText="%claude_console" mnemonicParsing="false" onAction="#onOpenClaudeConsole" styleClass="menu-bar-button">
                 <graphic>
                     <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                         <image>
@@ -115,15 +115,15 @@
                     </ImageView>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="Open Claude Console" />
+                    <Tooltip text="%open_claude_console" />
                 </tooltip>
             </Button>
-            <Button accessibleText="Preferences" mnemonicParsing="false" onAction="#onPreferences" styleClass="menu-bar-button">
+            <Button accessibleText="%preferences" mnemonicParsing="false" onAction="#onPreferences" styleClass="menu-bar-button">
                 <graphic>
                     <FontIcon iconLiteral="mdi2c-cog-outline" iconSize="24" styleClass="toolbar-icon" />
                 </graphic>
                 <tooltip>
-                    <Tooltip text="Preferences" />
+                    <Tooltip text="%preferences" />
                 </tooltip>
             </Button>
          </children>

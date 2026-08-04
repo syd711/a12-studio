@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Displays {@link Module#getFlows()} as a tree grid, each {@link Flow} expandable to its {@link Scene}s, with
@@ -241,7 +242,7 @@ public class FlowsPanelController extends AbstractPropertyEditor {
   }
 
   private void deleteFlow(@NonNull Flow flow) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this flow?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_flow"), null, null, "Delete");
     if (result.isPresent() && result.get() == ButtonType.OK) {
       module.getFlows().remove(flow);
       rebuildTree();
@@ -253,7 +254,7 @@ public class FlowsPanelController extends AbstractPropertyEditor {
     if (parentFlow == null) {
       return;
     }
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this scene?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_scene"), null, null, "Delete");
     if (result.isPresent() && result.get() == ButtonType.OK) {
       parentFlow.getScenes().remove(scene);
       rebuildTree();

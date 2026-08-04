@@ -28,6 +28,7 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Lets the user edit a {@link DocumentModel}'s {@code typeDefinitions} section from within its regular editor
@@ -142,7 +143,7 @@ public class TypeDefinitionSettingsDialog implements Initializable, DialogContro
    */
   private void openOwnerModel(String ownerModelId) {
     if (saveMode.isDirty()) {
-      Optional<ButtonType> result = WidgetFactory.showAlertOption(stage, "You have unsaved changes.",
+      Optional<ButtonType> result = WidgetFactory.showAlertOption(stage, StudioBundle.get("you_have_unsaved_changes"),
           "Discard", "Save", "Save or discard them before opening \"" + ownerModelId + "\".", null);
       if (result.isEmpty() || ButtonType.CANCEL.equals(result.get())) {
         return;

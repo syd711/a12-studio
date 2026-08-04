@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="MATCH CONDITIONS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%match_conditions" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.applicationmodel.MatchConditionsPanelController">
  <BorderPane>
  <center>
@@ -25,13 +25,13 @@
       <rowConstraints>
         <RowConstraints />
       </rowConstraints>
-      <Label styleClass="field-label" text="Key*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Must Equal" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="Is Set" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%key" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%must_equal" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+      <Label styleClass="field-label" text="%is_set" GridPane.columnIndex="2" GridPane.rowIndex="0" />
     </GridPane>
-    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add match condition" /></tooltip>
+    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_match_condition" /></tooltip>
             </Button>
   </VBox>
  </center>

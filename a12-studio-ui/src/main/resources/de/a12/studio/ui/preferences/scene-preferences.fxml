@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane styleClass="preferences-overlay" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane resources="@/messages" styleClass="preferences-overlay" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.preferences.PreferencesController">
     <center>
         <HBox alignment="TOP_CENTER">
@@ -24,17 +24,17 @@
                                 <children>
                               <VBox>
                                  <children>
-                                    <Label styleClass="preference-section" text="A12 STUDIO SETTINGS">
+                                    <Label styleClass="preference-section" text="%a12_studio_settings">
                                        <VBox.margin>
                                           <Insets bottom="6.0" />
                                        </VBox.margin>
                                     </Label>
                                     <VBox spacing="3.0">
                                        <children>
-                                                <Button fx:id="modelVersionBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onModelVersion" styleClass="preference-button" text="Model Version" />
-                                                <Button fx:id="a12InstallationBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onA12Installation" styleClass="preference-button" text="A12 Installation" />
-                                                <Button fx:id="previewSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPreviewSettings" styleClass="preference-button" text="Preview Settings" />
-                                                <Button fx:id="shortcutsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onShortcuts" styleClass="preference-button" text="Shortcuts" />
+                                                <Button fx:id="modelVersionBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onModelVersion" styleClass="preference-button" text="%model_version" />
+                                                <Button fx:id="a12InstallationBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onA12Installation" styleClass="preference-button" text="%a12_installation" />
+                                                <Button fx:id="previewSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPreviewSettings" styleClass="preference-button" text="%preview_settings" />
+                                                <Button fx:id="shortcutsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onShortcuts" styleClass="preference-button" text="%shortcuts" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -44,17 +44,17 @@
                               </VBox>
                               <VBox fx:id="projectSettingsNav">
                                  <children>
-                                    <Label styleClass="preference-section" text="PROJECT SETTINGS">
+                                    <Label styleClass="preference-section" text="%project_settings">
                                        <VBox.margin>
                                           <Insets bottom="6.0" top="24.0" />
                                        </VBox.margin>
                                     </Label>
                                     <VBox spacing="3.0">
                                        <children>
-                                                <Button fx:id="generalSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onGeneralSettings" styleClass="preference-button" text="General" />
-                                                <Button fx:id="advancedSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAdvancedSettings" styleClass="preference-button" text="Advanced Settings" />
-                                                <Button fx:id="aiSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAiSettings" styleClass="preference-button" text="AI Settings" />
-                                                <Button fx:id="annotationSetsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAnnotationSets" styleClass="preference-button" text="Annotation Sets" />
+                                                <Button fx:id="generalSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onGeneralSettings" styleClass="preference-button" text="%general" />
+                                                <Button fx:id="advancedSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAdvancedSettings" styleClass="preference-button" text="%advanced_settings" />
+                                                <Button fx:id="aiSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAiSettings" styleClass="preference-button" text="%ai_settings" />
+                                                <Button fx:id="annotationSetsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAnnotationSets" styleClass="preference-button" text="%annotation_sets" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -89,7 +89,7 @@
                                 <FontIcon iconColor="#272828" iconLiteral="mdi2c-close-circle-outline" iconSize="48" />
                             </graphic>
                         
-                    <tooltip><Tooltip text="Close Preferences" /></tooltip>
+                    <tooltip><Tooltip text="%close_preferences" /></tooltip>
                 </Button>
                     </children>
                     <HBox.margin>

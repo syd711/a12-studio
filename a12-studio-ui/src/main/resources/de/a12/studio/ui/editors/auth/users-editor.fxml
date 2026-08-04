@@ -11,18 +11,18 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.auth.UsersEditorController">
+<BorderPane resources="@/messages" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.auth.UsersEditorController">
     <center>
       <BorderPane BorderPane.alignment="CENTER">
          <center>
               <TableView fx:id="usersTable">
                   <columns>
-                      <TableColumn fx:id="usernameColumn" prefWidth="140.0" text="Username" />
-                      <TableColumn fx:id="passwordColumn" prefWidth="140.0" text="Password" />
-                      <TableColumn fx:id="authoritiesColumn" prefWidth="200.0" text="Authorities" />
-                      <TableColumn fx:id="emailColumn" prefWidth="180.0" text="Email" />
-                      <TableColumn fx:id="firstnameColumn" prefWidth="140.0" text="First Name" />
-                      <TableColumn fx:id="lastnameColumn" prefWidth="140.0" text="Last Name" />
+                      <TableColumn fx:id="usernameColumn" prefWidth="140.0" text="%username" />
+                      <TableColumn fx:id="passwordColumn" prefWidth="140.0" text="%password" />
+                      <TableColumn fx:id="authoritiesColumn" prefWidth="200.0" text="%authorities" />
+                      <TableColumn fx:id="emailColumn" prefWidth="180.0" text="%email" />
+                      <TableColumn fx:id="firstnameColumn" prefWidth="140.0" text="%first_name" />
+                      <TableColumn fx:id="lastnameColumn" prefWidth="140.0" text="%last_name" />
                   </columns>
               </TableView>
          </center>
@@ -34,7 +34,7 @@
                               <FontIcon iconLiteral="mdi2p-plus" iconSize="18" />
                           </graphic>
                           <tooltip>
-                              <Tooltip text="Add User" />
+                              <Tooltip text="%add_user" />
                           </tooltip>
                       </Button>
                       <Button mnemonicParsing="false" onAction="#onEditUser" styleClass="default-button">
@@ -42,7 +42,7 @@
                               <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="18" />
                           </graphic>
                           <tooltip>
-                              <Tooltip text="Edit User" />
+                              <Tooltip text="%edit_user" />
                           </tooltip>
                       </Button>
                   <Separator orientation="VERTICAL" prefHeight="0.0" prefWidth="0.0" />
@@ -51,16 +51,16 @@
                               <FontIcon iconLiteral="mdi2t-trash-can-outline" iconSize="18" />
                           </graphic>
                           <tooltip>
-                              <Tooltip text="Delete User" />
+                              <Tooltip text="%delete_user" />
                           </tooltip>
                       </Button>
                   <Separator orientation="VERTICAL" prefHeight="0.0" prefWidth="0.0" />
-                      <Button accessibleText="Reload file" mnemonicParsing="false" onAction="#onReload" styleClass="default-button">
+                      <Button accessibleText="%reload_file" mnemonicParsing="false" onAction="#onReload" styleClass="default-button">
                           <graphic>
                               <FontIcon iconLiteral="mdi2r-refresh" iconSize="18" />
                           </graphic>
                           <tooltip>
-                              <Tooltip text="Reload File" />
+                              <Tooltip text="%reload_file" />
                           </tooltip>
                       </Button>
                   </items>

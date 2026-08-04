@@ -31,7 +31,7 @@ public final class HeaderModelReferenceValidator implements ModelValidator {
       if (context.findOtherModel(reference.getReference()) == null) {
         String type = reference.getModelType() != null ? reference.getModelType().getDisplayName() : "model";
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The referenced " + type + " \"" + reference.getReference() + "\" is missing in the workspace.",
+            "validation.the_referenced" + type + " \"" + reference.getReference() + "\" is missing in the workspace.",
             Severity.ERROR.name()));
       }
     }

@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.printmodel.PrintModelEditorController">
+<BorderPane resources="@/messages" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.printmodel.PrintModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
@@ -46,7 +46,7 @@
                                                 <FontIcon iconLiteral="mdi2b-book-plus-outline" iconSize="16" />
                                             </graphic>
                                             <tooltip>
-                                                <Tooltip text="Add segment" />
+                                                <Tooltip text="%add_segment" />
                                             </tooltip>
                                         </Button>
                                         <Button mnemonicParsing="false" onAction="#onRemoveSegment" styleClass="default-button">
@@ -54,7 +54,7 @@
                                                 <FontIcon iconLiteral="mdi2b-book-minus-outline" iconSize="16" />
                                             </graphic>
                                             <tooltip>
-                                                <Tooltip text="Remove segment" />
+                                                <Tooltip text="%remove_segment" />
                                             </tooltip>
                                         </Button>
                                         <Separator orientation="VERTICAL" />
@@ -63,7 +63,7 @@
                                                 <FontIcon iconLiteral="mdi2f-format-text" iconSize="16" />
                                             </graphic>
                                             <tooltip>
-                                                <Tooltip text="Add text element" />
+                                                <Tooltip text="%add_text_element" />
                                             </tooltip>
                                         </Button>
                                         <Button mnemonicParsing="false" onAction="#onAddFieldElement" styleClass="default-button">
@@ -71,7 +71,7 @@
                                                 <FontIcon iconLiteral="mdi2f-form-textbox" iconSize="16" />
                                             </graphic>
                                             <tooltip>
-                                                <Tooltip text="Add field element" />
+                                                <Tooltip text="%add_field_element" />
                                             </tooltip>
                                         </Button>
                                         <Button mnemonicParsing="false" onAction="#onRemoveElement" styleClass="default-button">
@@ -79,14 +79,14 @@
                                                 <FontIcon iconLiteral="mdi2d-delete-outline" iconSize="16" />
                                             </graphic>
                                             <tooltip>
-                                                <Tooltip text="Remove selected element" />
+                                                <Tooltip text="%remove_selected_element" />
                                             </tooltip>
                                         </Button>
                                         <Separator orientation="VERTICAL" />
-                                        <Label text="Zoom" />
+                                        <Label text="%zoom" />
                                         <ComboBox fx:id="zoomField" editable="true" prefWidth="90.0" />
                                         <Separator orientation="VERTICAL" />
-                                        <Label fx:id="orientationLabel" text="Portrait" />
+                                        <Label fx:id="orientationLabel" text="%portrait" />
                                     </items>
                                 </ToolBar>
                                 <TabPane fx:id="segmentTabs" tabClosingPolicy="UNAVAILABLE" />
@@ -107,16 +107,16 @@
                             <children>
                                 <VBox fx:id="segmentPropertiesBox" spacing="16.0">
                                     <children>
-                                        <Label styleClass="section-label" text="Segment" />
+                                        <Label styleClass="section-label" text="%segment" />
                                         <VBox spacing="4.0">
                                             <children>
-                                                <Label styleClass="field-label" text="Title" />
+                                                <Label styleClass="field-label" text="%title" />
                                                 <TextField fx:id="segmentTitleField" />
                                             </children>
                                         </VBox>
                                         <VBox spacing="4.0">
                                             <children>
-                                                <Label styleClass="field-label" text="Page Orientation" />
+                                                <Label styleClass="field-label" text="%page_orientation" />
                                                 <ComboBox fx:id="segmentOrientationField" maxWidth="Infinity" />
                                             </children>
                                         </VBox>
@@ -126,7 +126,7 @@
                                     <children>
                                         <HBox spacing="8.0">
                                             <children>
-                                                <Label styleClass="section-label" text="Element:" />
+                                                <Label styleClass="section-label" text="%element" />
                                                 <Label fx:id="elementTypeLabel" styleClass="section-label" />
                                             </children>
                                         </HBox>
@@ -138,25 +138,25 @@
                                             <children>
                                                 <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="X (mm)" />
+                                                        <Label styleClass="field-label" text="%x_mm" />
                                                         <TextField fx:id="elementXField" />
                                                     </children>
                                                 </VBox>
                                                 <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Y (mm)" />
+                                                        <Label styleClass="field-label" text="%y_mm" />
                                                         <TextField fx:id="elementYField" />
                                                     </children>
                                                 </VBox>
                                                 <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Min Width (mm)" />
+                                                        <Label styleClass="field-label" text="%min_width_mm" />
                                                         <TextField fx:id="elementMinWidthField" />
                                                     </children>
                                                 </VBox>
                                                 <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Min Height (mm)" />
+                                                        <Label styleClass="field-label" text="%min_height_mm" />
                                                         <TextField fx:id="elementMinHeightField" />
                                                     </children>
                                                 </VBox>
@@ -164,7 +164,7 @@
                                         </GridPane>
                                         <VBox fx:id="textPropertiesBox" managed="false" spacing="4.0" visible="false">
                                             <children>
-                                                <Label styleClass="field-label" text="Text (HTML)" />
+                                                <Label styleClass="field-label" text="%text_html" />
                                                 <TextArea fx:id="textHtmlField" prefRowCount="10" wrapText="true" />
                                             </children>
                                         </VBox>
@@ -172,13 +172,13 @@
                                             <children>
                                                 <VBox spacing="4.0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Document Model" />
+                                                        <Label styleClass="field-label" text="%document_model" />
                                                         <TextField fx:id="fieldModelField" />
                                                     </children>
                                                 </VBox>
                                                 <VBox spacing="4.0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Field Path" />
+                                                        <Label styleClass="field-label" text="%field_path" />
                                                         <TextField fx:id="fieldPathField" />
                                                     </children>
                                                 </VBox>
@@ -188,19 +188,19 @@
                                             <children>
                                                 <VBox spacing="4.0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Name" />
+                                                        <Label styleClass="field-label" text="%name" />
                                                         <TextField fx:id="calculationNameField" />
                                                     </children>
                                                 </VBox>
                                                 <VBox spacing="4.0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Operation" />
+                                                        <Label styleClass="field-label" text="%operation" />
                                                         <TextArea fx:id="calculationOperationField" prefRowCount="4" wrapText="true" />
                                                     </children>
                                                 </VBox>
                                                 <VBox spacing="4.0">
                                                     <children>
-                                                        <Label styleClass="field-label" text="Result Type" />
+                                                        <Label styleClass="field-label" text="%result_type" />
                                                         <TextField fx:id="calculationResultTypeField" />
                                                     </children>
                                                 </VBox>
@@ -208,7 +208,7 @@
                                         </VBox>
                                         <VBox fx:id="genericPropertiesBox" managed="false" spacing="4.0" visible="false">
                                             <children>
-                                                <Label styleClass="field-label" text="Element JSON (read-only)" />
+                                                <Label styleClass="field-label" text="%element_json_read_only" />
                                                 <TextArea fx:id="genericJsonField" editable="false" prefRowCount="14" wrapText="false" />
                                             </children>
                                         </VBox>

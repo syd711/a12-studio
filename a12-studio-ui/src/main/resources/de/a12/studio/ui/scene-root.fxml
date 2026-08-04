@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 
-<BorderPane fx:id="root" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.RootController">
+<BorderPane resources="@/messages" fx:id="root" styleClass="root" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.RootController">
    <top>
        <fx:include fx:id="header" source="scene-header.fxml" />
    </top>
@@ -21,7 +21,7 @@
                      <children>
                         <BorderPane>
                            <center>
-                              <Label text="Open project from the menu" BorderPane.alignment="CENTER" />
+                              <Label text="%open_project_from_the_menu" BorderPane.alignment="CENTER" />
                            </center>
                         </BorderPane>
                         <SplitPane fx:id="mainSplitPane" dividerPositions="0.3">

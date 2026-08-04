@@ -12,12 +12,13 @@ import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
+import de.a12.studio.ui.util.StudioBundle;
 
 public class Dialogs {
 
   public static void openTypeDefinitions() {
     FXMLLoader fxmlLoader = new FXMLLoader(TypeDefinitionSettingsDialog.class.getResource("document-model-typedefinitions-dialog.fxml"));
-    Stage stage = WidgetFactory.createDialogStage("document-type-settings", fxmlLoader, Studio.stage, "Type Definitions" + titleSuffix());
+    Stage stage = WidgetFactory.createDialogStage("document-type-settings", fxmlLoader, Studio.stage, StudioBundle.get("type_definitions") + titleSuffix());
     TypeDefinitionSettingsDialog controller = (TypeDefinitionSettingsDialog) stage.getUserData();
     controller.setStage(stage);
 

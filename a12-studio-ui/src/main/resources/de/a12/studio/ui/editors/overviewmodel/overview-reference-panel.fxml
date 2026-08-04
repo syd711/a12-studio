@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="REFERENCE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%reference" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewReferencePanelController">
     <BorderPane>
         <center>
@@ -20,12 +20,12 @@
                 <children>
                     <VBox spacing="6.0">
                         <children>
-                            <RadioButton fx:id="queryModelReferenceField" mnemonicParsing="false" text="Use Query Model as Reference">
+                            <RadioButton fx:id="queryModelReferenceField" mnemonicParsing="false" text="%use_query_model_as_reference">
                                 <toggleGroup>
                                     <ToggleGroup fx:id="overviewReferenceToggleGroup" />
                                 </toggleGroup>
                             </RadioButton>
-                            <RadioButton fx:id="documentModelReferenceField" mnemonicParsing="false" text="Use Document Model as Reference" toggleGroup="$overviewReferenceToggleGroup" />
+                            <RadioButton fx:id="documentModelReferenceField" mnemonicParsing="false" text="%use_document_model_as_reference" toggleGroup="$overviewReferenceToggleGroup" />
                         </children>
                     </VBox>
                     <HBox alignment="CENTER_LEFT" spacing="6.0">
@@ -36,12 +36,12 @@
                                     <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" />
                                 </graphic>
                                 <tooltip>
-                                    <Tooltip text="Open Model" />
+                                    <Tooltip text="%open_model" />
                                 </tooltip>
                             </Button>
                         </children>
                     </HBox>
-                    <Label fx:id="queryModelReferenceInfoLabel" managed="false" styleClass="placeholder-label" text="The settings for Default Sorting and Paging Size of the Overview Model have priority over the settings in the Query Model. As a result, if Default Sorting is specified in the Overview Model, then this setting will be applied in the application." visible="false" wrapText="true" />
+                    <Label fx:id="queryModelReferenceInfoLabel" managed="false" styleClass="placeholder-label" text="%the_settings_for_default_sorting_and_paging_size_of_the_over" visible="false" wrapText="true" />
                 </children>
             </VBox>
         </center>

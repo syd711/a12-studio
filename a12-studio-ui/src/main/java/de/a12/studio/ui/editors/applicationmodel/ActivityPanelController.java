@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits {@link InitialActivity#getDescriptor()}. Same row-based Name/Value layout as {@link
@@ -135,7 +136,7 @@ public class ActivityPanelController extends AbstractPropertyEditor {
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this entry?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_entry"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         entries.remove(entry);
         syncDescriptorToModel();

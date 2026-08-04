@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="450.0" minWidth="550.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="450.0" minWidth="550.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.dialogs.SuggestionsDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
@@ -24,7 +24,7 @@
                            <VBox.margin>
                               <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                            </VBox.margin></VBox>
-                        <Label fx:id="emptyLabel" styleClass="placeholder-label" text="There are no suggestions yet.">
+                        <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_suggestions_yet">
                            <VBox.margin>
                               <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                            </VBox.margin></Label>
@@ -33,7 +33,7 @@
                </content>
             </ScrollPane>
             <HBox spacing="8.0">
-               <Button fx:id="addItemButton" mnemonicParsing="false" onAction="#onAddItem" styleClass="primary-button" text="Add" />
+               <Button fx:id="addItemButton" mnemonicParsing="false" onAction="#onAddItem" styleClass="primary-button" text="%add" />
                <VBox.margin>
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                </VBox.margin>
@@ -47,12 +47,12 @@
    <bottom>
       <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel">
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel">
                <HBox.margin>
                   <Insets right="12.0" />
                </HBox.margin>
             </Button>
-            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="   OK   " />
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
          </children>
          <BorderPane.margin>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

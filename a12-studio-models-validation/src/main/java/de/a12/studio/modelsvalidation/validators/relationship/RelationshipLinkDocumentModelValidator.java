@@ -36,12 +36,12 @@ public final class RelationshipLinkDocumentModelValidator implements ModelValida
     String linkDocumentModel = relationshipModel.getContent().getLinkDocumentModelValue();
     if (linkDocumentModel != null && !linkDocumentModel.isBlank()) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "Due to the link constraints of the related entities, no link document model may be configured.",
+          "validation.due_to_the_link_constraints_of_the_related_entitie",
           Severity.WARNING.name()));
     }
     if (Boolean.TRUE.equals(relationshipModel.getContent().getDuplicatesAllowed())) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "Due to the link constraints of the related entities, duplicates are not allowed.",
+          "validation.due_to_the_link_constraints_of_the_related_entitie",
           Severity.WARNING.name()));
     }
     return errors;

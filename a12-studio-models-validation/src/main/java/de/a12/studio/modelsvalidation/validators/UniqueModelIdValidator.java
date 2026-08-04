@@ -26,7 +26,7 @@ public final class UniqueModelIdValidator implements ModelValidator {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "The chosen name already exists in the workspace, please choose another name.",
+        "validation.the_chosen_name_already_exists_in_the_workspace_pl",
         Severity.ERROR.name()));
   }
 }

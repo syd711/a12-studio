@@ -12,24 +12,24 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="480.0" prefHeight="540.0" prefWidth="480.0" styleClass="navigation-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.dialogs.AnnotationDataSetTreeDialogController">
+<BorderPane resources="@/messages" fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="480.0" prefHeight="540.0" prefWidth="480.0" styleClass="navigation-panel" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.dialogs.AnnotationDataSetTreeDialogController">
    <top>
       <fx:include fx:id="header" source="../../components/scene-dialog-header.fxml" />
    </top>
    <center>
       <VBox spacing="8.0" BorderPane.alignment="TOP_LEFT">
          <children>
-            <Label styleClass="field-label" text="Name" />
-            <TextField fx:id="nameField" promptText="Enter the annotation set name here..." />
+            <Label styleClass="field-label" text="%name" />
+            <TextField fx:id="nameField" promptText="%enter_the_annotation_set_name_here" />
             <HBox alignment="CENTER_LEFT" spacing="8.0">
                <children>
-                  <Label styleClass="field-label" text="Annotations" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="removeButton" mnemonicParsing="false" onAction="#onRemove" styleClass="delete-button" text="Remove">
+                  <Label styleClass="field-label" text="%annotations" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="removeButton" mnemonicParsing="false" onAction="#onRemove" styleClass="delete-button" text="%remove">
                      <graphic>
                         <FontIcon iconLiteral="mdi2t-trash-can-outline" iconSize="16" />
                      </graphic>
                   
-                    <tooltip><Tooltip text="Remove selected annotation dataset" /></tooltip>
+                    <tooltip><Tooltip text="%remove_selected_annotation_dataset" /></tooltip>
                 </Button>
                </children>
                <VBox.margin>
@@ -46,8 +46,8 @@
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
          <items>
-            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="Save" />
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="Cancel" />
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%save" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
          </items>
       </ToolBar>
    </bottom>

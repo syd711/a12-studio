@@ -8,16 +8,16 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="STYLES" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%styles" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.StylesPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
     <VBox fx:id="stylesList" spacing="8.0" />
-    <Label fx:id="stylesEmptyLabel" styleClass="placeholder-label" text="No styles defined." />
+    <Label fx:id="stylesEmptyLabel" styleClass="placeholder-label" text="%no_styles_defined" />
     <HBox spacing="8.0">
-      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add style" /></tooltip>
+      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_style" /></tooltip>
             </Button>
     </HBox>
   </VBox>

@@ -7,9 +7,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="header" styleClass="window-header" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.DialogHeaderController">
+<BorderPane resources="@/messages" fx:id="header" styleClass="window-header" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.DialogHeaderController">
    <left>
-      <Label fx:id="titleLabel" text="A12 Studio" textFill="WHITE" styleClass="window-header-title" BorderPane.alignment="TOP_LEFT">
+      <Label fx:id="titleLabel" text="%a12_studio" textFill="WHITE" styleClass="window-header-title" BorderPane.alignment="TOP_LEFT">
          <BorderPane.margin>
             <Insets left="12.0" top="6.0" />
          </BorderPane.margin>
@@ -23,7 +23,7 @@
          <graphic>
             <FontIcon iconLiteral="mdi2w-window-close" iconSize="16" styleClass="header-icon" />
          </graphic>
-         <tooltip><Tooltip text="Close" /></tooltip>
+         <tooltip><Tooltip text="%close" /></tooltip>
          <BorderPane.margin>
             <Insets bottom="3.0" left="3.0" right="6.0" top="6.0" />
          </BorderPane.margin>

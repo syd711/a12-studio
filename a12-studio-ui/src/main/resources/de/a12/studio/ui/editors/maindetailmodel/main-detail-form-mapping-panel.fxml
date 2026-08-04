@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="FORM MAPPING" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%form_mapping" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.maindetailmodel.MainDetailFormMappingPanelController">
  <BorderPane>
  <center>
@@ -19,9 +19,9 @@
         <rowConstraints>
             <RowConstraints/>
         </rowConstraints>
-        <Label styleClass="field-label" text="Document Model" GridPane.columnIndex="0"
+        <Label styleClass="field-label" text="%document_model" GridPane.columnIndex="0"
                GridPane.rowIndex="0"/>
-        <Label styleClass="field-label" text="Form Model*" GridPane.columnIndex="1"
+        <Label styleClass="field-label" text="%form_model" GridPane.columnIndex="1"
                GridPane.rowIndex="0"/>
     </GridPane>
  </center>

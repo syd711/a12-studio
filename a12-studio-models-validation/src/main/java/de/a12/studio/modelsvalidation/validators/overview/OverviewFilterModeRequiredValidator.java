@@ -28,6 +28,6 @@ public final class OverviewFilterModeRequiredValidator implements ModelValidator
     if (filterMode != null && !filterMode.isBlank()) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "The field is mandatory.", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID, "validation.validation_the_field_is_mandatory", Severity.ERROR.name()));
   }
 }

@@ -8,18 +8,18 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="CASES" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%cases" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.applicationmodel.CasesPanelController">
  <BorderPane>
  <center>
   <VBox spacing="8.0">
     <HBox spacing="10.0">
-      <Label styleClass="field-label" text="Name" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+      <Label styleClass="field-label" text="%name" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
     </HBox>
     <VBox fx:id="rows" spacing="8.0" />
-    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-    <Button mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add case" /></tooltip>
+    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+    <Button mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_case" /></tooltip>
             </Button>
   </VBox>
  </center>

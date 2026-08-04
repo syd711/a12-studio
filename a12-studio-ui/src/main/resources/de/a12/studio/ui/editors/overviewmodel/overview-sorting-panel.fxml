@@ -7,15 +7,15 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="SORTING" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane resources="@/messages" fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%sorting" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewSortingPanelController">
  <BorderPane>
  <center>
   <VBox spacing="10.0">
     <VBox fx:id="sortingRows" spacing="8.0" />
-    <Label fx:id="sortingEmptyLabel" styleClass="placeholder-label" text="No sorting defined." />
-    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
-                <tooltip><Tooltip text="Add sort field" /></tooltip>
+    <Label fx:id="sortingEmptyLabel" styleClass="placeholder-label" text="%no_sorting_defined" />
+    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+                <tooltip><Tooltip text="%add_sort_field" /></tooltip>
             </Button>
   </VBox>
  </center>

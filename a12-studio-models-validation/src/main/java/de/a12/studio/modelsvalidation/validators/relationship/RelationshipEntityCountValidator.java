@@ -9,7 +9,7 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
 
-/** A relationship must connect exactly two related entities (SME: "Please ensure that exactly two related entities are specified."). */
+/** A relationship must connect exactly two related entities (SME: "validation.please_ensure_that_exactly_two_related_entities_ar"). */
 public final class RelationshipEntityCountValidator implements ModelValidator {
 
   public static final String ELEMENT_ID = "content/entityCharacteristics";
@@ -24,6 +24,6 @@ public final class RelationshipEntityCountValidator implements ModelValidator {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "Please ensure that exactly two related entities are specified.", Severity.ERROR.name()));
+        "validation.please_ensure_that_exactly_two_related_entities_ar", Severity.ERROR.name()));
   }
 }
