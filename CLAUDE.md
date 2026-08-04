@@ -40,3 +40,29 @@ Overall a12 platform documentation (kernel, CMS, form_engine, expression, diagra
 **Pre-existing `BasicProjectModelsRoundTripTest` failures.** `BasicProjectModelsRoundTripTest` (`a12-studio-models`) walks every JSON file under `testing/basic` and asserts load-then-save doesn't change content. As of 2026-08-01 it has ~11 pre-existing failures on `main`, unrelated to any specific in-progress feature work: `Invoice_FM.json`, `Person_OM.json`, `PrintModel.json`, `Invoice-Includes/Order_DM.json`, `GeneratedDMs/*`, `RelationshipOMs/*`. Confirmed via `git stash` isolation that these fail identically with zero code changes applied. When this test fails for files unrelated to what you're actively changing, don't assume you introduced it — check with `git stash` first.
 
 Two root causes: (1) `A12Model.Header.labels` has no `@JsonInclude(NON_EMPTY)` (unlike `description`), so an absent `labels` key in the source file comes back as `"labels": []` after save — but some *other* fixtures (e.g. `RelationshipModel.json`, `TreeModel.json`, `TypeDefinition.json`) rely on labels round-tripping as an explicit `[]`, so naively adding `NON_EMPTY` to fix the first group breaks the second (tried and reverted — needs an absent-vs-explicit-empty-aware fix, same pattern as `RelationshipModelContent.linkDocumentModel`'s `JsonNode` trick, not a plain annotation). (2) `DocumentModelContent.modelInfo` writes `"immutable": false` when the source omits the key. Fixing the `labels` gap properly requires per-field absent/explicit tracking (JsonNode-based), not a blanket `@JsonInclude` change on the shared `A12Model.Header` class.
+
+## Model Types
+
+| Model Name                  | Abbr. | `modelType`                      |
+| --------------------------- | ----- | -------------------------------- |
+| Document Model              | DcM   | `document`                       |
+| Type Definition Model       | TdM   | `document`                       |
+| Composed Document Model     | CdM   | `document` (with CdM annotation) |
+| Additive Document Model     | AdM   | `document` (with AdM annotation) |
+| Relationship Model          | ReM   | `relationship`                   |
+| Relationship UI Model       | RuM   | `relationship-ui`                |
+| Tree Model                  | TrM   | `tree`                           |
+| Form Model                  | FmM   | `form`                           |
+| Overview Model              | OvM   | `overview`                       |
+| Print Model                 | PtM   | `print`                          |
+| Application Model           | ApM   | `application`                    |
+| Query Model                 | QeM   | `query`                          |
+| Mapping Model               | MaM   | `mapping`                        |
+| Structural Mapping Model    | SmM   | `structuralmapping`              |
+| Content Model               | CtM   | `content`                        |
+| Combined Document Model     | CmM   | `combination`                    |
+| Master Details Module Model | MdM   | `module-masterdetail`            |
+| Transformer Model           | TfM   | `transformer`                    |
+| Selection Model             | SeM   | `selection`                      |
+| Print Setting Model         | —     | `print-setting` (deprecated)     |
+| Print Typesetting Model     | TsM   | `typesetting`                    |
