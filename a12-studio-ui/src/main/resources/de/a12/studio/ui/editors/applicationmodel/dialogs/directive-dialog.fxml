@@ -120,7 +120,9 @@
                         <Label styleClass="field-label" text="Document Model" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                      </GridPane>
                      <Label fx:id="modelsEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-                     <Button mnemonicParsing="false" onAction="#onAddModel" styleClass="primary-button" text="Add" />
+                     <Button mnemonicParsing="false" onAction="#onAddModel" styleClass="primary-button" text="Add" >
+                <tooltip><Tooltip text="Add model reference" /></tooltip>
+            </Button>
 
                      <VBox>
                         <children>

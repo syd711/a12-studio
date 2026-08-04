@@ -21,8 +21,12 @@
               <menus>
                 <Menu mnemonicParsing="true" text="_File">
                   <items>
-                    <MenuItem mnemonicParsing="true" onAction="#onNew" text="_New..." />
-                    <MenuItem mnemonicParsing="true" onAction="#onOpen" text="_Open" />
+                    <MenuItem mnemonicParsing="true" onAction="#onNew" text="_New...">
+                    <accelerator><KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" /></accelerator>
+                  </MenuItem>
+                    <MenuItem mnemonicParsing="true" onAction="#onOpen" text="_Open">
+                    <accelerator><KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" /></accelerator>
+                  </MenuItem>
                     <Menu fx:id="recentProjectsMenu" mnemonicParsing="true" text="_Recent Projects" />
                     <MenuItem mnemonicParsing="true" onAction="#onCloseProject" text="Close _Project" />
                     <SeparatorMenuItem />

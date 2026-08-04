@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
@@ -54,7 +55,9 @@
                     </columnConstraints>
                   </GridPane>
                   <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-                  <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="secondary-button" text="Add Action" />
+                  <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="secondary-button" text="Add Action" >
+                <tooltip><Tooltip text="Add context menu action" /></tooltip>
+            </Button>
                 </children>
               </VBox>
             </children>
@@ -66,8 +69,12 @@
       </HBox>
       <HBox spacing="8.0">
         <children>
-          <Button fx:id="addGroupButton" mnemonicParsing="false" onAction="#onAddGroup" styleClass="primary-button" text="Add" />
-          <Button fx:id="removeGroupButton" mnemonicParsing="false" onAction="#onRemoveGroup" styleClass="secondary-button" text="Remove Group" />
+          <Button fx:id="addGroupButton" mnemonicParsing="false" onAction="#onAddGroup" styleClass="primary-button" text="Add" >
+                <tooltip><Tooltip text="Add group" /></tooltip>
+            </Button>
+          <Button fx:id="removeGroupButton" mnemonicParsing="false" onAction="#onRemoveGroup" styleClass="secondary-button" text="Remove Group" >
+                <tooltip><Tooltip text="Remove selected group" /></tooltip>
+            </Button>
         </children>
       </HBox>
     </children>

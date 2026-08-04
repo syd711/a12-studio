@@ -25,7 +25,9 @@
     <VBox fx:id="columnRows" spacing="8.0" />
     <Label fx:id="columnsEmptyLabel" styleClass="placeholder-label" text="No columns defined." />
     <HBox  alignment="CENTER_LEFT" spacing="24.0">
-        <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" />
+        <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
+                <tooltip><Tooltip text="Add column" /></tooltip>
+            </Button>
       <CheckBox fx:id="enableColumnsResizeField" mnemonicParsing="false" text="Enable Columns Resize" />
       <HBox alignment="CENTER_LEFT" spacing="6.0">
         <CheckBox fx:id="showRowCountField" mnemonicParsing="false" text="Show Number Of Entries" />

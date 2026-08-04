@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -23,7 +24,9 @@
         </HBox>
         <VBox fx:id="onEnterRows" spacing="8.0" />
         <Label fx:id="onEnterEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-        <Button mnemonicParsing="false" onAction="#onAddOnEnter" styleClass="primary-button" text="Add" />
+        <Button mnemonicParsing="false" onAction="#onAddOnEnter" styleClass="primary-button" text="Add" >
+                <tooltip><Tooltip text="Add on-enter scene change" /></tooltip>
+            </Button>
       </children>
     </VBox>
 
@@ -38,7 +41,9 @@
         </HBox>
         <VBox fx:id="onExitRows" spacing="8.0" />
         <Label fx:id="onExitEmptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-        <Button mnemonicParsing="false" onAction="#onAddOnExit" styleClass="primary-button" text="Add" />
+        <Button mnemonicParsing="false" onAction="#onAddOnExit" styleClass="primary-button" text="Add" >
+                <tooltip><Tooltip text="Add on-exit scene change" /></tooltip>
+            </Button>
       </children>
     </VBox>
   </VBox>

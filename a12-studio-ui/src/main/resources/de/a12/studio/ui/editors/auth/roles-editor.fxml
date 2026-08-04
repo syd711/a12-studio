@@ -36,8 +36,12 @@
                               <ListView fx:id="accessRightsList" VBox.vgrow="ALWAYS" />
                               <HBox spacing="8.0">
                                   <children>
-                                      <Button fx:id="addAccessRightButton" mnemonicParsing="false" onAction="#onAddAccessRight" styleClass="secondary-button" text="Add" />
-                                      <Button fx:id="removeAccessRightButton" mnemonicParsing="false" onAction="#onRemoveAccessRight" styleClass="secondary-button" text="Remove" />
+                                      <Button fx:id="addAccessRightButton" mnemonicParsing="false" onAction="#onAddAccessRight" styleClass="secondary-button" text="Add" >
+                <tooltip><Tooltip text="Add access right" /></tooltip>
+            </Button>
+                                      <Button fx:id="removeAccessRightButton" mnemonicParsing="false" onAction="#onRemoveAccessRight" styleClass="secondary-button" text="Remove" >
+                <tooltip><Tooltip text="Remove selected access right" /></tooltip>
+            </Button>
                                   </children>
                               </HBox>
                           </children>

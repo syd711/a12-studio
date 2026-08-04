@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -31,7 +32,9 @@
       <Label styleClass="field-label" text="Icon" GridPane.columnIndex="3" GridPane.rowIndex="0" />
     </GridPane>
     <Label fx:id="emptyLabel" styleClass="placeholder-label" text="There are no entries yet." />
-    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" />
+    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
+                <tooltip><Tooltip text="Add event button" /></tooltip>
+            </Button>
   </VBox>
  </center>
  <top>

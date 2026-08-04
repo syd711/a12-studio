@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -26,8 +27,12 @@
       <Label fx:id="roleHeaderLabel" styleClass="field-label" text="Role*" GridPane.columnIndex="0" GridPane.rowIndex="0" />
     </GridPane>
     <HBox spacing="8.0">
-      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" />
-      <Button fx:id="editRolesButton" mnemonicParsing="false" onAction="#onEditRoles" styleClass="secondary-button" text="Edit Roles" />
+      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="Add" >
+                <tooltip><Tooltip text="Add module role" /></tooltip>
+            </Button>
+      <Button fx:id="editRolesButton" mnemonicParsing="false" onAction="#onEditRoles" styleClass="secondary-button" text="Edit Roles" >
+                <tooltip><Tooltip text="Edit roles configuration" /></tooltip>
+            </Button>
     </HBox>
   </VBox>
  </center>

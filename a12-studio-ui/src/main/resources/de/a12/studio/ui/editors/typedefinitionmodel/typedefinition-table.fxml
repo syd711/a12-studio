@@ -18,6 +18,8 @@
                     <graphic>
                         <FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus-circle-outline" iconSize="18" />
                     </graphic>
+                
+                    <tooltip><Tooltip text="Add type definition" /></tooltip>
                 </Button>
                 <Button layoutX="169.0" layoutY="11.0" mnemonicParsing="false" onAction="#onDelete" styleClass="delete-button">
                     <tooltip>

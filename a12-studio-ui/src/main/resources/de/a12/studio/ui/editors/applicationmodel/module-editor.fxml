@@ -24,7 +24,8 @@
                   <Label styleClass="editor-type-label" text="Module Editor" BorderPane.alignment="CENTER" />
             </left>
             <right>
-               <Button mnemonicParsing="false" onAction="#onClose" styleClass="ghost-button-default" BorderPane.alignment="CENTER">
+               <Button mnemonicParsing="false" onAction="#onClose" styleClass="ghost-button-default">
+                    <tooltip><Tooltip text="Close" /></tooltip>
                   <graphic>
                      <FontIcon iconColor="#272828" iconLiteral="mdi2c-close-circle-outline" iconSize="32" />
                   </graphic>

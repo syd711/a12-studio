@@ -27,6 +27,8 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
    * shortcut is added to {@link #handle(KeyEvent)}, add a matching entry here.
    */
   public static final List<Shortcut> SHORTCUTS = List.of(
+      new Shortcut("Ctrl+N", "New project"),
+      new Shortcut("Ctrl+O", "Open project"),
       new Shortcut("Ctrl+S", "Save the active model"),
       new Shortcut("Ctrl+W", "Close the selected tab"),
       new Shortcut("Ctrl+Tab", "Select the next tab"),
