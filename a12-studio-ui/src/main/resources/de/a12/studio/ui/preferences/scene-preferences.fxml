@@ -30,6 +30,7 @@
                                     </Label>
                                     <VBox spacing="3.0">
                                        <children>
+                                                <Button fx:id="modelVersionBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onModelVersion" styleClass="preference-button" text="Model Version" />
                                                 <Button fx:id="a12InstallationBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onA12Installation" styleClass="preference-button" text="A12 Installation" />
                                                 <Button fx:id="previewSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPreviewSettings" styleClass="preference-button" text="Preview Settings" />
                                                 <Button fx:id="shortcutsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onShortcuts" styleClass="preference-button" text="Shortcuts" />

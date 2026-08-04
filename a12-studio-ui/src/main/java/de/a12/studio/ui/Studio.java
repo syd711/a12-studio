@@ -1,6 +1,7 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.ui.util.FXResizeHelper;
+import de.a12.studio.ui.util.StudioVersion;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.A12Model;
@@ -181,8 +182,9 @@ public class Studio extends Application implements StudioEventListener {
     currentProject = event.getProject();
     validationService = new ValidationService(currentProject);
 
-    stage.setTitle("A12 Studio - " + currentProject.getName());
-    rootController.setTitle("A12 Studio - " + currentProject.getName() + " (" + currentProject.getRoot().getPath() + ")");
+    String studioVersion = StudioVersion.get();
+    stage.setTitle("A12 Studio - " + studioVersion + " - " + currentProject.getName());
+    rootController.setTitle("A12 Studio - " + studioVersion + " - " + currentProject.getName() + " (" + currentProject.getRoot().getPath() + ")");
 
     boolean b = checkModelVersions(currentProject);
 

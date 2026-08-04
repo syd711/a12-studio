@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tooltip?>
@@ -115,14 +114,6 @@
                     <Tooltip text="Open Claude Console" />
                 </tooltip>
             </Button>
-            <MenuButton fx:id="versionMenuButton" accessibleText="Version Info" mnemonicParsing="false" styleClass="version-menu-button">
-                <graphic>
-                    <FontIcon iconLiteral="mdi2i-information-outline" iconSize="18" styleClass="toolbar-icon" />
-                </graphic>
-                <tooltip>
-                    <Tooltip text="Version Info" />
-                </tooltip>
-            </MenuButton>
             <Button accessibleText="Preferences" mnemonicParsing="false" onAction="#onPreferences" styleClass="menu-bar-button">
                 <graphic>
                     <FontIcon iconLiteral="mdi2c-cog-outline" iconSize="24" styleClass="toolbar-icon" />

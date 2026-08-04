@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.preferences.ModelVersionSettingsPanelController">
+    <top>
+        <VBox BorderPane.alignment="CENTER_LEFT">
+            <children>
+                <Label styleClass="preference-title" text="A12 STUDIO SETTINGS" />
+                <Label styleClass="preference-subtitle" text="Model Version" />
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="12.0" left="12.0" top="12.0" />
+            </BorderPane.margin>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="8.0" BorderPane.alignment="TOP_LEFT">
+            <children>
+                <TableView fx:id="modelVersionTable" editable="false">
+                    <columns>
+                        <TableColumn fx:id="modelNameColumn" prefWidth="260.0" text="Model" />
+                        <TableColumn fx:id="modelVersionColumn" prefWidth="160.0" text="Version" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </children>
+            <padding>
+                <Insets left="12.0" right="12.0" top="8.0" />
+            </padding>
+        </VBox>
+    </center>
+</BorderPane>

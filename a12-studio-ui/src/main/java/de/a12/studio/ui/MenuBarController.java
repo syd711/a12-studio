@@ -6,7 +6,6 @@ import de.a12.studio.ui.newproject.NewProjectDialogController;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
-import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.models.projects.settings.JsonSettings;
@@ -16,7 +15,6 @@ import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.updater.Dialogs;
 import de.a12.studio.ui.updater.UpdaterService;
 import de.a12.studio.ui.util.Icons;
-import de.a12.studio.ui.util.StudioVersion;
 import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
@@ -29,7 +27,6 @@ import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SeparatorMenuItem;
@@ -51,14 +48,8 @@ import java.util.ResourceBundle;
  */
 public class MenuBarController implements Initializable, StudioEventListener {
 
-  // No published a12-release-line concept exists yet for the Java stack; update by hand until one does.
-  private static final String A12_RELEASE_VERSION = "2026.06";
-
   @FXML
   private MenuBar menuBar;
-
-  @FXML
-  private MenuButton versionMenuButton;
 
   @FXML
   private Button updateBtn;
@@ -319,7 +310,6 @@ public class MenuBarController implements Initializable, StudioEventListener {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     refreshRecentProjectsMenu();
-    initializeVersionMenu();
     updateBtn.managedProperty().bind(updateBtn.visibleProperty());
     runUpdateCheck();
 
@@ -356,43 +346,5 @@ public class MenuBarController implements Initializable, StudioEventListener {
     t.setName("Update Check");
     t.setDaemon(true);
     t.start();
-  }
-
-  private void initializeVersionMenu() {
-    String studioVersion = StudioVersion.get();
-    versionMenuButton.setText(studioVersion);
-
-    versionMenuButton.getItems().addAll(
-        versionHeaderItem("A12 Studio Version"),
-        versionValueItem(studioVersion),
-        new SeparatorMenuItem(),
-        versionHeaderItem("A12 Release Version"),
-        versionValueItem(A12_RELEASE_VERSION),
-        new SeparatorMenuItem(),
-        versionHeaderItem("Model Versions"));
-
-    for (ModelType modelType : ModelType.values()) {
-      versionMenuButton.getItems().add(versionValueItem(modelType.getDisplayName() + " " + modelType.getCurrentVersion()));
-    }
-  }
-
-  private static CustomMenuItem versionHeaderItem(String text) {
-    Label label = new Label(text);
-    label.getStyleClass().add("version-menu-header");
-    return versionMenuItem(label);
-  }
-
-  private static CustomMenuItem versionValueItem(String text) {
-    Label label = new Label(text);
-    label.getStyleClass().add("version-menu-value");
-    return versionMenuItem(label);
-  }
-
-  private static CustomMenuItem versionMenuItem(Label label) {
-    CustomMenuItem item = new CustomMenuItem(label, false);
-    item.setHideOnClick(false);
-    // Marks read-only rows so CSS can suppress the standard hover/focus highlight for just this menu.
-    item.getStyleClass().add("version-menu-item");
-    return item;
   }
 }

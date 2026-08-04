@@ -31,6 +31,9 @@ public class PreferencesController implements Initializable {
   private Button annotationSetsBtn;
 
   @FXML
+  private Button modelVersionBtn;
+
+  @FXML
   private Button a12InstallationBtn;
 
   @FXML
@@ -92,6 +95,11 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onAnnotationSets() {
     showPage(annotationSetsBtn, "annotation-sets.fxml");
+  }
+
+  @FXML
+  private void onModelVersion() {
+    showPage(modelVersionBtn, "model-version-settings.fxml");
   }
 
   @FXML
