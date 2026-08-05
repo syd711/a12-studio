@@ -22,8 +22,6 @@ public class GeneralSettings {
 
   private List<Locale> locales = new ArrayList<>();
 
-  /** BCP-47 language tag, e.g. "en" or "de". Empty string means use the OS default. */
-  private String language = "";
 
   public RelationshipEngineMode getRelationshipEngineMode() {
     return relationshipEngineMode;
@@ -49,11 +47,4 @@ public class GeneralSettings {
     this.locales = locales;
   }
 
-  public String getLanguage() {
-    return language;
-  }
-
-  public void setLanguage(String language) {
-    this.language = language;
-  }
 }

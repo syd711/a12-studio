@@ -21,6 +21,9 @@ public class LocalUISettings {
 
   public static final String RECENT_PROJECTS = "recentProjects";
 
+  /** BCP-47 language tag persisted across sessions, e.g. "en", "de", or "" for OS default. */
+  public static final String LANGUAGE = "language";
+
   private static PropertiesStore store;
 
   private static List<LocalSettingsChangeListener> listeners;

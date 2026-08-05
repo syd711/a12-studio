@@ -55,7 +55,7 @@ public class Studio extends Application implements StudioEventListener {
     Studio.stage = stage;
 
     // Apply stored language preference before any FXML is loaded.
-    String storedLang = LocalUISettings.getString("language");
+    String storedLang = LocalUISettings.getString(LocalUISettings.LANGUAGE);
     if (storedLang != null && !storedLang.isBlank()) {
       Locale.setDefault(Locale.forLanguageTag(storedLang));
     }

@@ -20,6 +20,9 @@ import java.util.ResourceBundle;
 public class PreferencesController implements Initializable {
 
   @FXML
+  private Button appGeneralSettingsBtn;
+
+  @FXML
   private Button generalSettingsBtn;
 
   @FXML
@@ -66,7 +69,7 @@ public class PreferencesController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    showPage(aiSettingsBtn, "general-settings.fxml");
+    showPage(appGeneralSettingsBtn, "app-general-settings.fxml");
   }
 
   public void showSection(PreferencesOpenRequestedEvent.@NonNull Section section) {
@@ -76,6 +79,11 @@ public class PreferencesController implements Initializable {
       case A12_INSTALLATION -> onA12Installation();
       default -> onGeneralSettings();
     }
+  }
+
+  @FXML
+  private void onAppGeneralSettings() {
+    showPage(appGeneralSettingsBtn, "app-general-settings.fxml");
   }
 
   @FXML
