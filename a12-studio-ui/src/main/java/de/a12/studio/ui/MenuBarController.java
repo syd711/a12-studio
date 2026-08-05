@@ -106,9 +106,47 @@ public class MenuBarController implements Initializable, StudioEventListener {
     project = new Project();
     project.load(file);
 
+    autoDetectApplicationGroups(project);
+
     StudioEventManager.getInstance().fireProjectOpenEvent(project);
 
     refreshRecentProjectsMenu();
+  }
+
+  /**
+   * Scans all models in the project tree for the "applicationGroup" annotation.
+   * If found and the feature is not yet enabled in AdvancedSettings,
+   * it is activated and persisted automatically.
+   */
+  private void autoDetectApplicationGroups(@NonNull Project project) {
+    de.a12.studio.models.projects.settings.AdvancedSettings settings =
+        project.getSettings().getAdvancedSettings();
+    if (settings.isUseApplicationGroups()) {
+      return;
+    }
+    if (hasApplicationGroupAnnotation(project.getRoot())) {
+      settings.setUseApplicationGroups(true);
+      settings.save();
+    }
+  }
+
+  private boolean hasApplicationGroupAnnotation(
+      @NonNull de.a12.studio.models.projects.ProjectItem item) {
+    if (item.isFolder()) {
+      for (de.a12.studio.models.projects.ProjectItem child : item.getChildren()) {
+        if (hasApplicationGroupAnnotation(child)) {
+          return true;
+        }
+      }
+    }
+    else if (item.getModel() != null) {
+      for (de.a12.studio.models.Annotation annotation : item.getModel().getAnnotations()) {
+        if ("applicationGroup".equals(annotation.getName())) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private void refreshRecentProjectsMenu() {
