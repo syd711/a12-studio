@@ -6,7 +6,9 @@ import de.a12.studio.ui.newproject.NewProjectDialogController;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
+import de.a12.studio.models.Annotation;
 import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.models.projects.settings.JsonSettings;
 import de.a12.studio.ui.events.SettingsChangedEvent;
@@ -130,17 +132,16 @@ public class MenuBarController implements Initializable, StudioEventListener {
     }
   }
 
-  private boolean hasApplicationGroupAnnotation(
-      @NonNull de.a12.studio.models.projects.ProjectItem item) {
+  private boolean hasApplicationGroupAnnotation(@NonNull ProjectItem item) {
     if (item.isFolder()) {
-      for (de.a12.studio.models.projects.ProjectItem child : item.getChildren()) {
+      for (ProjectItem child : item.getChildren()) {
         if (hasApplicationGroupAnnotation(child)) {
           return true;
         }
       }
     }
     else if (item.getModel() != null) {
-      for (de.a12.studio.models.Annotation annotation : item.getModel().getAnnotations()) {
+      for (Annotation annotation : item.getModel().getAnnotations()) {
         if ("applicationGroup".equals(annotation.getName())) {
           return true;
         }
