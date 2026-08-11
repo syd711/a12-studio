@@ -76,6 +76,7 @@ jobs:
             --main-jar a12-studio-ui.jar \
             --main-class de.a12.studio.ui.Launcher \
             --type app-image \
+            --icon ../mac-package/A12-Studio.icns \
             --dest ./ \
             --runtime-image ../${{ matrix.jre_folder }} \
             @../mac-package/jpackage_args.txt
@@ -193,6 +194,7 @@ jobs:
             --main-jar a12-studio-ui.jar \
             --main-class de.a12.studio.ui.Launcher \
             --type app-image \
+            --icon ../mac-package/A12-Studio-512.png \
             --dest ./ \
             --runtime-image ../zulu21.42.19-ca-fx-jre21.0.7-linux_x64 \
             @../mac-package/jpackage_args.txt
