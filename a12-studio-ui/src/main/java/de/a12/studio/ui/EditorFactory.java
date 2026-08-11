@@ -46,6 +46,15 @@ public class EditorFactory {
 
   public static Parent create(@NonNull ProjectItem item) {
     try {
+      // Check whether the model type is enabled before opening an editor.
+      // Types marked enabled=false in model-versions.json are not yet supported.
+      if (item.getModel() != null && item.getModel().getModelType() != null) {
+        if (!item.getModel().getModelType().isEnabled()) {
+          WidgetFactory.showAlert(Studio.stage, StudioBundle.getBundle().getString("model_not_supported_yet"));
+          return null;
+        }
+      }
+
       Parent content = null;
 
       // TypeDefinitionModel extends DocumentModel, so this check must come first.
@@ -111,9 +120,6 @@ public class EditorFactory {
         content = loader.load();
         TreeModelEditorController controller = loader.getController();
         controller.load(item);
-      }
-      else if (item.getModel() instanceof PrintModel) {
-        WidgetFactory.showAlert(Studio.stage, "Print models are not supported yet.");
       }
       else if (item.getModel() instanceof CombinedDocumentModel) {
         FXMLLoader loader = new FXMLLoader(CombinedDocumentModelEditorController.class.getResource("combination-model-editor.fxml"));

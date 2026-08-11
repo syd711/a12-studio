@@ -3,6 +3,7 @@ package de.a12.studio.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public enum ModelType {
   TYPEDEFINITION("typedefinition", "Type Definition Model");
 
   private static final String VERSIONS_RESOURCE = "model-versions.json";
-  private static final Map<String, String> CURRENT_VERSIONS = loadCurrentVersions();
+  private static final Map<String, JsonNode> MODEL_CONFIG = loadModelConfig();
 
   private final String value;
   private final String displayName;
@@ -48,11 +49,24 @@ public enum ModelType {
   }
 
   public String getCurrentVersion() {
-    String version = CURRENT_VERSIONS.get(value);
-    if (version == null) {
+    JsonNode config = MODEL_CONFIG.get(value);
+    if (config == null || !config.has("version")) {
       throw new IllegalStateException("No version configured for model type \"" + value + "\" in " + VERSIONS_RESOURCE);
     }
-    return version;
+    return config.get("version").asText();
+  }
+
+  /**
+   * Returns {@code true} when this model type has a working editor and can be opened.
+   * Types with {@code "enabled": false} in {@code model-versions.json} show a
+   * "not supported yet" message instead of opening an editor.
+   */
+  public boolean isEnabled() {
+    JsonNode config = MODEL_CONFIG.get(value);
+    if (config == null || !config.has("enabled")) {
+      return true; // default to enabled if the flag is absent
+    }
+    return config.get("enabled").asBoolean(true);
   }
 
   @JsonCreator
@@ -65,12 +79,12 @@ public enum ModelType {
     throw new IllegalArgumentException("Unknown model type: " + value);
   }
 
-  private static Map<String, String> loadCurrentVersions() {
+  private static Map<String, JsonNode> loadModelConfig() {
     try (InputStream in = ModelType.class.getResourceAsStream(VERSIONS_RESOURCE)) {
       if (in == null) {
         throw new IllegalStateException("Missing resource: " + VERSIONS_RESOURCE);
       }
-      return JsonMapper.shared().readValue(in, new TypeReference<Map<String, String>>() {
+      return JsonMapper.shared().readValue(in, new TypeReference<Map<String, JsonNode>>() {
       });
     }
     catch (IOException e) {
