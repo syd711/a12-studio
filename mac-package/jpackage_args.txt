@@ -1,0 +1,2 @@
+--java-options "-Xmx512m"
+--java-options "--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED"

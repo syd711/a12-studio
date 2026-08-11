@@ -14,11 +14,208 @@ concurrency:
 
 jobs:
   ######################################################################################################################
-  # Windows Packaging
+  # macOS Build (Matrix for x64 and arm64)
+  ######################################################################################################################
+  mac-app-build:
+    name: mac-app-build-${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+            java_arch: x64
+            os: macos-15-intel
+            jre_bundle: zulu21.42.19-ca-fx-jre21.0.7-macosx_x64.tar.gz
+            jre_folder: zulu21.42.19-ca-fx-jre21.0.7-macosx_x64
+          - arch: arm64
+            java_arch: aarch64
+            os: macos-15
+            jre_bundle: zulu21.42.19-ca-fx-jre21.0.7-macosx_aarch64.tar.gz
+            jre_folder: zulu21.42.19-ca-fx-jre21.0.7-macosx_aarch64
+
+    steps:
+      - name: Checkout A12 Studio
+        uses: actions/checkout@v6
+
+      - name: Set up Zulu JDK 21 with JavaFX
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-package: 'jdk+fx'
+          java-version: '21'
+          architecture: ${{ matrix.java_arch }}
+          cache: 'gradle'
+
+      - name: Extract project version
+        id: project
+        run: |
+          VERSION=$(grep "^version" build.gradle | sed "s/version = '//;s/'//")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Download Zulu JRE with JavaFX for macOS
+        run: |
+          curl -L -o ${{ matrix.jre_bundle }} https://cdn.azul.com/zulu/bin/${{ matrix.jre_bundle }}
+
+      - name: Build fat JAR with Gradle
+        run: ./gradlew :a12-studio-ui:shadowJar
+
+      - name: Prepare Java Runtime
+        run: tar -xzf ${{ matrix.jre_bundle }}
+
+      - name: Build structure for packaging
+        run: |
+          mkdir -p ./mac-build/input
+          cp ./a12-studio-ui/build/libs/a12-studio-ui.jar ./mac-build/input/
+
+      - name: Create macOS App Image
+        working-directory: ./mac-build
+        run: |
+          jpackage --name A12-Studio \
+            --input input \
+            --app-version ${{ steps.project.outputs.version }} \
+            --main-jar a12-studio-ui.jar \
+            --main-class de.a12.studio.ui.Launcher \
+            --type app-image \
+            --dest ./ \
+            --runtime-image ../${{ matrix.jre_folder }} \
+            @../mac-package/jpackage_args.txt
+
+      - name: Create JRE Update Artifact from App Bundle
+        working-directory: ./mac-build
+        run: |
+          mkdir -p jre-artifact
+          cp -R A12-Studio.app/Contents/runtime ./jre-artifact/runtime
+          cd jre-artifact
+          zip -r ../../java-runtime-mac-${{ matrix.arch }}.zip runtime
+
+      - name: Ad-hoc sign the app (macOS)
+        working-directory: ./mac-build
+        run: |
+          codesign --force --deep --sign - A12-Studio.app
+          codesign --verify --verbose A12-Studio.app
+        shell: bash
+
+      - name: Remove extended attributes (macOS)
+        working-directory: ./mac-build
+        run: |
+          sudo xattr -rc A12-Studio.app
+        shell: bash
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+        shell: bash
+
+      - name: Package as DMG (macOS)
+        working-directory: ./mac-build
+        run: |
+          mkdir deploy-mac
+          mv A12-Studio.app deploy-mac/A12-Studio.app
+          cd deploy-mac
+          create-dmg \
+            --volname "A12-Studio" \
+            --window-pos 100 100 \
+            --window-size 565 300 \
+            --icon-size 128 \
+            --icon "A12-Studio.app" 140 130 \
+            --hide-extension "A12-Studio.app" \
+            --app-drop-link 425 130 \
+            --hdiutil-quiet \
+            "A12-Studio-${{ steps.project.outputs.version }}.dmg" \
+            "A12-Studio.app"
+        shell: bash
+
+      - name: Copy DMG for Upload
+        working-directory: ./mac-build
+        run: |
+          cp deploy-mac/A12-Studio-${{ steps.project.outputs.version }}.dmg A12-Studio-Client-MacOS-${{ matrix.arch }}.dmg
+
+      - name: Upload macOS Build Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: macOS-build-${{ matrix.arch }}
+          path: |
+            ./mac-build/A12-Studio-Client-MacOS-${{ matrix.arch }}.dmg
+
+      - name: Upload macOS JRE Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: java-runtime-mac-${{ matrix.arch }}
+          path: |
+            ./java-runtime-mac-${{ matrix.arch }}.zip
+
+  ######################################################################################################################
+  # Linux Build (x64)
+  ######################################################################################################################
+  linux-app-build:
+    name: linux-app-build-x64
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout A12 Studio
+        uses: actions/checkout@v6
+
+      - name: Set up Zulu JDK 21 with JavaFX
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-package: 'jdk+fx'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Extract project version
+        id: project
+        run: |
+          VERSION=$(grep "^version" build.gradle | sed "s/version = '//;s/'//")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Download Zulu JRE with JavaFX for Linux
+        run: |
+          curl -L -o zulu21-fx-jre-linux-x64.tar.gz \
+            https://cdn.azul.com/zulu/bin/zulu21.42.19-ca-fx-jre21.0.7-linux_x64.tar.gz
+
+      - name: Build fat JAR with Gradle
+        run: ./gradlew :a12-studio-ui:shadowJar
+
+      - name: Prepare Java Runtime
+        run: tar -xzf zulu21-fx-jre-linux-x64.tar.gz
+
+      - name: Build structure for packaging
+        run: |
+          mkdir -p ./linux-build/input
+          cp ./a12-studio-ui/build/libs/a12-studio-ui.jar ./linux-build/input/
+
+      - name: Create Linux App Image
+        working-directory: ./linux-build
+        run: |
+          jpackage --name A12-Studio \
+            --input input \
+            --app-version ${{ steps.project.outputs.version }} \
+            --main-jar a12-studio-ui.jar \
+            --main-class de.a12.studio.ui.Launcher \
+            --type app-image \
+            --dest ./ \
+            --runtime-image ../zulu21.42.19-ca-fx-jre21.0.7-linux_x64 \
+            @../mac-package/jpackage_args.txt
+
+      - name: Package Linux App Image as ZIP
+        working-directory: ./linux-build
+        run: |
+          zip -r A12-Studio-Client-linux-x64.zip A12-Studio/
+
+      - name: Upload Linux Build Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-build-x64
+          path: |
+            ./linux-build/A12-Studio-Client-linux-x64.zip
+
+  ######################################################################################################################
+  # Windows Packaging and Release
   ######################################################################################################################
   build:
     name: Packaging
     runs-on: windows-latest
+    needs: [mac-app-build, linux-app-build]
     permissions:
       contents: write
       pull-requests: write
@@ -46,6 +243,36 @@ jobs:
       - name: Build Installer
         run: .\gradlew.bat :a12-studio-ui:buildInstaller
 
+      - name: Download macOS x64 Artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: macOS-build-x64
+          path: ./Output/A12-Studio/
+
+      - name: Download macOS arm64 Artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: macOS-build-arm64
+          path: ./Output/A12-Studio/
+
+      - name: Download macOS x64 JRE Artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: java-runtime-mac-x64
+          path: ./Output/A12-Studio/
+
+      - name: Download macOS arm64 JRE Artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: java-runtime-mac-arm64
+          path: ./Output/A12-Studio/
+
+      - name: Download Linux x64 Artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: linux-build-x64
+          path: ./Output/A12-Studio/
+
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v7
         with:
@@ -63,7 +290,11 @@ jobs:
           files: |
             ./Output/A12-Studio/A12-Studio-Full-Installer-*.exe
             ./Output/A12-Studio/A12-Studio.exe
-
+            ./Output/A12-Studio/A12-Studio-Client-MacOS-arm64.dmg
+            ./Output/A12-Studio/A12-Studio-Client-MacOS-x64.dmg
+            ./Output/A12-Studio/A12-Studio-Client-linux-x64.zip
+            ./Output/A12-Studio/java-runtime-mac-x64.zip
+            ./Output/A12-Studio/java-runtime-mac-arm64.zip
 
   ######################################################################################################################
   # Cleanup Old Workflow Runs
