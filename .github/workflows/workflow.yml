@@ -287,6 +287,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
         with:
+          body_path: RELEASE_NOTES.md
           draft: true
           tag_name: ${{ steps.project.outputs.version }}
           files: |
