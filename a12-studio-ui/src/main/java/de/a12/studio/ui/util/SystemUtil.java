@@ -28,38 +28,30 @@ public class SystemUtil {
 
 
   public static boolean editFile(@Nullable File file) {
-    if (file != null && file.exists()) {
-      String osName = System.getProperty("os.name");
-      if (osName.contains("Windows")) {
-//        Studio.hostServices.showDocument(file.getAbsolutePath());
-        try {
-          new ProcessBuilder("cmd", "/c", "start", "", file.getAbsolutePath()).start();
-        }
-        catch (IOException e) {
-          log.error("Open failed: {}", e.getMessage());
-        }
+    if (file == null || !file.exists()) {
+      return false;
+    }
+    try {
+      if (isWindows()) {
+        // "start" with an empty title routes through the registry to the default editor
+        new ProcessBuilder("cmd.exe", "/c", "start", "", file.getAbsolutePath()).start();
       }
-      else if (osName.toLowerCase().contains("mac")) {
-        try {
-          Runtime.getRuntime().exec(new String[]{"/usr/bin/open", "-t", file.getAbsolutePath()});
-        }
-        catch (IOException e) {
-          log.error("Error opening browser: " + e.getMessage(), e);
-          WidgetFactory.showAlert(Studio.stage, "Error", "Error opening browser: " + e.getMessage());
-        }
+      else if (isMac()) {
+        // "-t" forces TextEdit (or the default text editor) instead of the default app for the file type
+        new ProcessBuilder("/usr/bin/open", "-t", file.getAbsolutePath()).start();
       }
-      else if (osName.toLowerCase().contains("nux")) {
-        try {
-          Runtime.getRuntime().exec(new String[]{"xdg-open", file.getAbsolutePath()});
-        }
-        catch (IOException e) {
-          log.error("Error opening browser: " + e.getMessage(), e);
-          WidgetFactory.showAlert(Studio.stage, "Error", "Error opening browser: " + e.getMessage());
-        }
+      else if (isLinux()) {
+        // xdg-open delegates to the desktop environment's default handler (gedit, kate, etc.)
+        new ProcessBuilder("xdg-open", file.getAbsolutePath()).start();
       }
       else {
-        WidgetFactory.showAlert(Studio.stage, "Error", "Failed to determine operating system for name \"" + osName + "\".");
+        WidgetFactory.showAlert(Studio.stage, "Error",
+            "Failed to determine operating system for name \"" + System.getProperty("os.name") + "\".");
       }
+    }
+    catch (IOException e) {
+      log.error("Failed to edit file: {}", e.getMessage(), e);
+      WidgetFactory.showAlert(Studio.stage, "Error", "Failed to open file for editing: " + e.getMessage());
     }
     return false;
   }
@@ -136,7 +128,11 @@ public class SystemUtil {
       }
     }
     else if (isMac()) {
-      new ProcessBuilder("open", absolutePath).start();  // macOS command
+      new ProcessBuilder("open", absolutePath).start();
+    }
+    else if (isLinux()) {
+      // xdg-open delegates to the desktop environment's file manager (Nautilus, Dolphin, Thunar, etc.)
+      new ProcessBuilder("xdg-open", absolutePath).start();
     }
     else {
       throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os.name"));
@@ -391,10 +387,17 @@ public class SystemUtil {
    */
   private static void openFileWithOS(String absolutePath) throws IOException {
     if (isWindows()) {
+      // /select highlights the file inside Explorer
       new ProcessBuilder("explorer.exe", "/select,", absolutePath).start();
     }
     else if (isMac()) {
+      // -R reveals the file in Finder
       new ProcessBuilder("open", "-R", absolutePath).start();
+    }
+    else if (isLinux()) {
+      // xdg-open on a file opens it with the default application for its MIME type;
+      // most desktop file managers (Nautilus, Dolphin, Thunar) handle this correctly.
+      new ProcessBuilder("xdg-open", absolutePath).start();
     }
     else {
       throw new UnsupportedOperationException("Unsupported operating system: " + System.getProperty("os.name"));
