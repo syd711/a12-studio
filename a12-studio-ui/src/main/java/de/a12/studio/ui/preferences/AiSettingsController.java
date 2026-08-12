@@ -2,6 +2,7 @@ package de.a12.studio.ui.preferences;
 
 import de.a12.studio.models.projects.settings.JsonSettings;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -72,7 +73,7 @@ public class AiSettingsController implements Initializable {
   @FXML
   private void onBrowseClaudePath() {
     FileChooser chooser = new FileChooser();
-    chooser.setTitle("Select Claude Executable");
+    chooser.setTitle(StudioBundle.get("select_claude_executable"));
 
     String currentPath = claudePathField.getText();
     if (currentPath != null && !currentPath.isEmpty()) {

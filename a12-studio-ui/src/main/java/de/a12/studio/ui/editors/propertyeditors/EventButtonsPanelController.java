@@ -4,6 +4,7 @@ import de.a12.studio.models.EventButtonLike;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -118,7 +119,7 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this button?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_button"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         rows.remove(row);
         rebuildRows();

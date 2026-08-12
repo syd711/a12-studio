@@ -5,6 +5,7 @@ import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.updater.Dialogs;
 import de.a12.studio.ui.util.FXResizeHelper;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.StudioVersion;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
@@ -27,22 +28,22 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
    * shortcut is added to {@link #handle(KeyEvent)}, add a matching entry here.
    */
   public static final List<Shortcut> SHORTCUTS = List.of(
-      new Shortcut("Ctrl+N", "New project"),
-      new Shortcut("Ctrl+O", "Open project"),
-      new Shortcut("Ctrl+S", "Save the active model"),
-      new Shortcut("Ctrl+W", "Close the selected tab"),
-      new Shortcut("Ctrl+Tab", "Select the next tab"),
-      new Shortcut("Ctrl+Shift+Tab", "Select the previous tab"),
-      new Shortcut("Ctrl+Alt+P", "Open Preferences"),
-      new Shortcut("Ctrl+Shift+N", "Search files"),
-      new Shortcut("Ctrl+Shift+F", "Find in files"),
-      new Shortcut("Ctrl+Alt+U", "Show update info"),
-      new Shortcut("Ctrl+Alt+H", "Resize window to 1920x1080"),
-      new Shortcut("Ctrl+Alt+W", "Resize window to 2560x1440"),
-      new Shortcut("Win+Left", "Snap window to the left half of the screen"),
-      new Shortcut("Win+Right", "Snap window to the right half of the screen"),
-      new Shortcut("Win+Up", "Maximize the window"),
-      new Shortcut("Win+Down", "Restore, then minimize the window")
+      new Shortcut(StudioBundle.get("ctrl_n"), StudioBundle.get("new_project")),
+      new Shortcut(StudioBundle.get("ctrl_o"), StudioBundle.get("open_project")),
+      new Shortcut(StudioBundle.get("ctrl_s"), StudioBundle.get("save_the_active_model")),
+      new Shortcut(StudioBundle.get("ctrl_w"), StudioBundle.get("close_the_selected_tab")),
+      new Shortcut(StudioBundle.get("ctrl_tab"), StudioBundle.get("select_the_next_tab")),
+      new Shortcut(StudioBundle.get("ctrl_shift_tab"), StudioBundle.get("select_the_previous_tab")),
+      new Shortcut(StudioBundle.get("ctrl_alt_p"), StudioBundle.get("open_preferences")),
+      new Shortcut(StudioBundle.get("ctrl_shift_n"), StudioBundle.get("search_files")),
+      new Shortcut(StudioBundle.get("ctrl_shift_f"), StudioBundle.get("find_in_files")),
+      new Shortcut(StudioBundle.get("ctrl_alt_u"), StudioBundle.get("show_update_info")),
+      new Shortcut(StudioBundle.get("ctrl_alt_h"), StudioBundle.get("resize_window_to_1920x1080")),
+      new Shortcut(StudioBundle.get("ctrl_alt_w"), StudioBundle.get("resize_window_to_2560x1440")),
+      new Shortcut(StudioBundle.get("win_left"), StudioBundle.get("snap_window_to_the_left_half_of_the_screen")),
+      new Shortcut(StudioBundle.get("win_right"), StudioBundle.get("snap_window_to_the_right_half_of_the_screen")),
+      new Shortcut(StudioBundle.get("win_up"), StudioBundle.get("maximize_the_window")),
+      new Shortcut(StudioBundle.get("win_down"), StudioBundle.get("restore_then_minimize_the_window"))
   );
 
   private final Stage stage;

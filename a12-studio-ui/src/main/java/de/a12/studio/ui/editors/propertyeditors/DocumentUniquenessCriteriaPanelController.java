@@ -9,6 +9,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -148,7 +149,7 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(criterion));
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       DocumentUniquenessCriterion copy = new DocumentUniquenessCriterion();
       copy.setName(uniqueCopyName(criterion.getName()));
       copy.setFields(new ArrayList<>(criterion.getFields()));
@@ -165,7 +166,7 @@ public class DocumentUniquenessCriteriaPanelController extends AbstractPropertyE
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this uniqueness criterion?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_uniqueness_criterion"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getCriteria().remove(criterion);
         rebuildRows();

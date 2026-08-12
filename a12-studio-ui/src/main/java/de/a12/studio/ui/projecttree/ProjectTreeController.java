@@ -10,6 +10,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -314,7 +315,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       newButton.getItems().add(modelItem);
     }
     newButton.getItems().add(new SeparatorMenuItem());
-    MenuItem folderItem = new MenuItem("Folder");
+    MenuItem folderItem = new MenuItem(StudioBundle.get("folder"));
     FontIcon folderIcon = WidgetFactory.createIcon(Icons.FOLDER_OUTLINE);
     folderIcon.getStyleClass().add("menu-icon");
     folderItem.setGraphic(folderIcon);

@@ -15,6 +15,7 @@ import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.events.LocalesChangedEvent;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -190,7 +191,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
   }
 
   private void onDeleteCategory(Category category) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this category?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_category"), null, null, "Delete");
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }
@@ -234,7 +235,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
   }
 
   private void onDeleteValue(EnumerationValue value) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this enumeration value?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_enumeration_value"), null, null, "Delete");
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }

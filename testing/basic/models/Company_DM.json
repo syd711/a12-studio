@@ -145,8 +145,7 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType",
-                          "StringType": {}
+                          "type": "StringType"
                         },
                         "label": [
                           {
@@ -215,11 +214,7 @@
                             ],
                             "Field": {
                               "fieldType": {
-                                "type": "StringType",
-                                "StringType": {
-                                  "lineBreaksPermitted": true,
-                                  "noValueValidation": true
-                                }
+                                "type": "StringType"
                               }
                             }
                           },

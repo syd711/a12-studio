@@ -84,6 +84,7 @@ public class NewModelDialogController implements DialogController {
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;
     controller.pathLabel.setText(targetFolder.getPath());
+    controller.pathLabel.setTooltip(WidgetFactory.createTooltip(targetFolder.getPath()));
     if (preselectedType != null) {
       controller.typeComboBox.getSelectionModel().select(preselectedType);
     }

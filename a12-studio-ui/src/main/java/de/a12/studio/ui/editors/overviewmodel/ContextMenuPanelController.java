@@ -191,7 +191,7 @@ public class ContextMenuPanelController extends AbstractPropertyEditor {
         commitHeaderChange();
       });
 
-      javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Remove Action", () -> {
+      javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("remove_action"), () -> {
         actions.remove(action);
         rebuildActionsGrid(group);
         groupsList.refresh();

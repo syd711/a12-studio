@@ -128,7 +128,7 @@ public class ActivityPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(DescriptorEntry entry, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       entries.add(entries.indexOf(entry) + 1, new DescriptorEntry(entry.key, entry.value));
       syncDescriptorToModel();
       rebuildRows();

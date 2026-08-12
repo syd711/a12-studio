@@ -86,7 +86,7 @@
                                                 <Font size="14.0" />
                                             </font>
                                             <tooltip>
-                                                <Tooltip prefWidth="300.0" text="If set to &quot;yes&quot;, the condition &quot;GroupFilled(RuleGroup)&quot; will be added to the requiredness evaluation. This is always done for Required Fields that are a direct child of a repeatable Group. The Field will then only be mandatory, if, for example, data is present in any sibling Field or a new repetition of the parent Group is created. To test this property, at least one field in the parent group must be selected along with the field in the Ad Hoc Test. Please check the Document Modeling Documentation for more information." wrapText="true" />
+                                                <Tooltip prefWidth="300.0" text="%if_set_to_yes_the_condition_groupfilled_rulegroup_will_be_ad" wrapText="true" />
                                             </tooltip>
                                             <graphic>
                                                 <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />

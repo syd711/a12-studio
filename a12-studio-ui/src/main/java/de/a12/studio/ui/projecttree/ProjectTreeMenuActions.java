@@ -1,6 +1,7 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.ui.components.StudioFolderChooser;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.zip.ZipUtil;
 import de.a12.studio.models.ModelType;
@@ -44,34 +45,34 @@ public class ProjectTreeMenuActions {
   public ContextMenu createTreeItemContextMenu(@NonNull ProjectItemViewModel viewModel) {
     ProjectItem projectItem = viewModel.getProjectItem();
 
-    Menu newMenu = new Menu("_New...");
-    MenuItem newFolder = new MenuItem("_Folder");
+    Menu newMenu = new Menu(StudioBundle.get("new"));
+    MenuItem newFolder = new MenuItem(StudioBundle.get("new_folder"));
     newFolder.setOnAction(event -> onCreateNewFolder(projectItem));
     newFolder.setGraphic(withMenuIconStyle(WidgetFactory.createIcon("mdi2f-folder-plus-outline")));
-    MenuItem newModel = new MenuItem("_Model");
+    MenuItem newModel = new MenuItem(StudioBundle.get("new_model"));
     newModel.setOnAction(event -> onCreateNewModel(projectItem));
     newModel.setGraphic(withMenuIconStyle(WidgetFactory.createIcon("mdi2f-file-document-plus-outline")));
     newMenu.getItems().addAll(newFolder, newModel);
 
-    MenuItem open = new MenuItem("_Open");
+    MenuItem open = new MenuItem(StudioBundle.get("open"));
     open.setDisable(viewModel.isFolder());
     open.setOnAction(event -> onOpen.accept(viewModel));
 
-    MenuItem rename = new MenuItem("_Rename");
+    MenuItem rename = new MenuItem(StudioBundle.get("rename"));
     rename.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     rename.setOnAction(event -> onRenameItem(projectItem));
 
-    MenuItem createCopy = new MenuItem("_Create Copy");
+    MenuItem createCopy = new MenuItem(StudioBundle.get("create_copy"));
     createCopy.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.COPY)));
     createCopy.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     createCopy.setOnAction(event -> onCreateCopy(projectItem));
 
-    MenuItem zipFolder = new MenuItem("_Zip Folder");
+    MenuItem zipFolder = new MenuItem(StudioBundle.get("zip_folder"));
     zipFolder.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.ZIP)));
     zipFolder.setVisible(projectItem.isRoot());
     zipFolder.setOnAction(event -> onZipFolder(projectItem));
 
-    MenuItem delete = new MenuItem("_Delete");
+    MenuItem delete = new MenuItem(StudioBundle.get("delete"));
     delete.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.TRASH)));
     delete.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     delete.setOnAction(event -> onDeleteItem(projectItem));
@@ -85,7 +86,8 @@ public class ProjectTreeMenuActions {
   }
 
   void onCreateNewFolder(@NonNull ProjectItem parent) {
-    String name = WidgetFactory.showInputDialog(getStage(), "New Folder", "New Folder", null, null, null);
+    String title = StudioBundle.get("new_folder_title");
+    String name = WidgetFactory.showInputDialog(getStage(), title, title, null, null, null);
     if (name == null || name.isBlank()) {
       return;
     }
@@ -95,7 +97,7 @@ public class ProjectTreeMenuActions {
       onReload.run();
     }
     catch (IOException e) {
-      showError("Could not create '" + name + "'", e);
+      showError(StudioBundle.get("could_not_create_item", name), e);
     }
   }
 
@@ -117,12 +119,13 @@ public class ProjectTreeMenuActions {
       onOpen.accept(new ProjectItemViewModel(item, Map.of()));
     }
     catch (IOException e) {
-      showError("Could not create '" + name + "'", e);
+      showError(StudioBundle.get("could_not_create_item", name), e);
     }
   }
 
   void onRenameItem(@NonNull ProjectItem item) {
-    String name = WidgetFactory.showInputDialog(getStage(), "Rename", "Rename", null, null, item.getName());
+    String title = StudioBundle.get("rename_title");
+    String name = WidgetFactory.showInputDialog(getStage(), title, title, null, null, item.getName());
     if (name == null || name.isBlank() || name.equals(item.getName())) {
       return;
     }
@@ -134,7 +137,7 @@ public class ProjectTreeMenuActions {
       onReload.run();
     }
     catch (IOException e) {
-      showError("Could not rename to '" + name + "'", e);
+      showError(StudioBundle.get("could_not_rename_to", name), e);
     }
   }
 
@@ -144,13 +147,13 @@ public class ProjectTreeMenuActions {
       onReload.run();
     }
     catch (IOException e) {
-      showError("Could not copy '" + item.getName() + "'", e);
+      showError(StudioBundle.get("could_not_copy_item", item.getName()), e);
     }
   }
 
   void onZipFolder(@NonNull ProjectItem item) {
     StudioFolderChooser chooser = new StudioFolderChooser();
-    chooser.setTitle("Choose Destination Folder");
+    chooser.setTitle(StudioBundle.get("choose_destination_folder"));
     File destinationFolder = chooser.showOpenDialog(getStage());
     if (destinationFolder == null) {
       return;
@@ -163,7 +166,7 @@ public class ProjectTreeMenuActions {
       ZipUtil.zipFolder(item.getFile(), zipFile, (file, path) -> { });
     }
     catch (IOException e) {
-      showError("Could not zip '" + item.getName() + "'", e);
+      showError(StudioBundle.get("could_not_zip_item", item.getName()), e);
     }
   }
 
@@ -187,12 +190,13 @@ public class ProjectTreeMenuActions {
       onReload.run();
     }
     catch (IOException e) {
-      showError("Could not move '" + source.getName() + "' to '" + targetFolder.getName() + "'", e);
+      showError(StudioBundle.get("could_not_move_item", source.getName(), targetFolder.getName()), e);
     }
   }
 
   void onDeleteItem(@NonNull ProjectItem item) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(getStage(), "Delete '" + item.getName() + "'?", null, null, "Delete");
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(getStage(),
+        StudioBundle.get("confirm_delete_item", item.getName()), null, null, StudioBundle.get("delete"));
     if (result.isPresent() && result.get() == ButtonType.OK) {
       try {
         item.delete();
@@ -200,7 +204,7 @@ public class ProjectTreeMenuActions {
         onReload.run();
       }
       catch (IOException e) {
-        showError("Could not delete '" + item.getName() + "'", e);
+        showError(StudioBundle.get("could_not_delete_item", item.getName()), e);
       }
     }
   }

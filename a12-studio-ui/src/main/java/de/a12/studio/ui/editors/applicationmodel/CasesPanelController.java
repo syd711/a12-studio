@@ -135,7 +135,7 @@ public class CasesPanelController {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveCase);
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> onEditCase(caseObj));
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Duplicate", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("duplicate"), () -> {
       scene.getCases().add(index + 1, cloneCase(caseObj));
       rebuildRows();
       onChange.run();

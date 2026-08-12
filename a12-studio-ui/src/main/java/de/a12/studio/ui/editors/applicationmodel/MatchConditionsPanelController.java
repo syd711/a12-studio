@@ -120,7 +120,7 @@ public class MatchConditionsPanelController {
   private HBox createActionsBox(MatchCondition matchCondition, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Duplicate", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("duplicate"), () -> {
       MatchCondition copy = new MatchCondition();
       copy.setKey(matchCondition.getKey());
       copy.setMustEqual(matchCondition.getMustEqual());

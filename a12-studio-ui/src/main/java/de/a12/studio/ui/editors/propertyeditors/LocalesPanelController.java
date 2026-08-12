@@ -10,6 +10,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -110,7 +111,7 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
 
   private HBox createActionsBox(int index) {
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this locale?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_locale"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         model.getLocales().remove(index);
         rebuildRows();

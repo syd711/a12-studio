@@ -11,6 +11,7 @@ import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -129,7 +130,7 @@ public abstract class AbstractRolesPanelController extends AbstractPropertyEdito
     comboBox.setId(idPrefix + index);
     comboBox.setEditable(true);
     comboBox.setMaxWidth(Double.MAX_VALUE);
-    comboBox.setPromptText("Role name");
+    comboBox.setPromptText(StudioBundle.get("role_name"));
     comboBox.getItems().setAll(loadWorkspaceRoleNames());
     comboBox.setValue(roles.get(index));
     comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -146,7 +147,7 @@ public abstract class AbstractRolesPanelController extends AbstractPropertyEdito
 
   protected HBox createActionsBox(int index) {
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this role?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_role"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         roles.remove(index);
         rebuildRows();

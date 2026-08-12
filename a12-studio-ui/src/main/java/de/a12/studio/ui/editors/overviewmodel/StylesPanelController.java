@@ -177,7 +177,7 @@ public class StylesPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       List<String> styles = getStyles();
       styles.add(index + 1, styles.get(index));
       rebuildRows();

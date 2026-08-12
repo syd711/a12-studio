@@ -8,6 +8,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -166,7 +167,7 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(ModelReference reference, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       ModelReference copy = new ModelReference();
       copy.setAlias(reference.getAlias());
       copy.setPurpose(reference.getPurpose());
@@ -179,7 +180,7 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this model reference?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_model_reference"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getModelReferences().remove(reference);
         rebuildRows();

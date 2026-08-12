@@ -7,6 +7,7 @@ import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.StudioFileChooser;
 import de.a12.studio.ui.preferences.dialogs.Dialogs;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -123,7 +124,7 @@ public class AnnotationSetsController implements Initializable {
       return;
     }
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
-        "Delete annotation set \"" + selected.getName() + "\"?", null, null, "Delete");
+        StudioBundle.get("delete_annotation_set", selected.getName()), null, null, "Delete");
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }
@@ -143,7 +144,7 @@ public class AnnotationSetsController implements Initializable {
 
   private void exportToFile(AnnotationDataSet dataSet) {
     StudioFileChooser chooser = new StudioFileChooser();
-    chooser.setTitle("Export Annotation Set");
+    chooser.setTitle(StudioBundle.get("export_annotation_set"));
     chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Annotation Set (*.json)", "*.json"));
     chooser.setInitialFileName(dataSet.getName() + ".json");
     File file = chooser.showSaveDialog(Studio.stage);
@@ -154,14 +155,14 @@ public class AnnotationSetsController implements Initializable {
       Files.writeString(file.toPath(), JsonSettings.objectMapper.writeValueAsString(dataSet), StandardCharsets.UTF_8);
     }
     catch (Exception e) {
-      WidgetFactory.showAlert(Studio.stage, "Could not export annotation set: " + e.getMessage());
+      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("could_not_export_annotation_set", e.getMessage()));
     }
   }
 
   @FXML
   private void onImport() {
     StudioFileChooser chooser = new StudioFileChooser();
-    chooser.setTitle("Import Annotation Sets");
+    chooser.setTitle(StudioBundle.get("import_annotation_sets"));
     chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Annotation Set (*.json)", "*.json"));
     List<File> files = chooser.showOpenMultipleDialog(Studio.stage);
     if (files == null || files.isEmpty()) {
@@ -198,7 +199,8 @@ public class AnnotationSetsController implements Initializable {
       reload();
     }
     if (!failures.isEmpty()) {
-      WidgetFactory.showAlert(Studio.stage, "Could not import " + failures.size() + " file(s):\n" + String.join("\n", failures));
+      WidgetFactory.showAlert(Studio.stage,
+          StudioBundle.get("could_not_import", failures.size(), String.join("\n", failures)));
     }
   }
 

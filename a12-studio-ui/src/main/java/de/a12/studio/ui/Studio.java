@@ -125,7 +125,7 @@ public class Studio extends Application implements StudioEventListener {
     }
 
     Optional<ButtonType> result = WidgetFactory.showConfirmation(stage,
-        "The A12 installation folder is not set.",
+        StudioBundle.get("the_a12_installation_folder_is_not_set"),
         "Some features may not work correctly until it is configured.", null, "Go to Settings");
     if (result.isPresent() && ButtonType.OK.equals(result.get())) {
       StudioEventManager.getInstance().firePreferencesOpenRequestedEvent(PreferencesOpenRequestedEvent.Section.A12_INSTALLATION);
@@ -215,7 +215,7 @@ public class Studio extends Application implements StudioEventListener {
     incompatibleModels.forEach(log::warn);
 
     WidgetFactory.showAlert(stage,
-        "Incompatible model versions found", "Wrong Version: " + incompatibleModels.get(0));
+        StudioBundle.get("incompatible_model_versions_found"), "Wrong Version: " + incompatibleModels.get(0));
     return false;
   }
 

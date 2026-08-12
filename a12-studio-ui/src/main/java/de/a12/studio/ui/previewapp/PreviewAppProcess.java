@@ -3,6 +3,7 @@ package de.a12.studio.ui.previewapp;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.util.OSUtil;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
@@ -140,7 +141,7 @@ public class PreviewAppProcess {
       log.error("Failed to launch Preview App: {}", e.getMessage(), e);
       setState(State.FAILED);
       String message = e.getMessage();
-      runOnFx(() -> WidgetFactory.showAlert(Studio.stage, "Preview App failed to launch", message));
+      runOnFx(() -> WidgetFactory.showAlert(Studio.stage, StudioBundle.get("preview_app_failed_to_launch"), message));
     }
   }
 
@@ -171,7 +172,7 @@ public class PreviewAppProcess {
       String error = matchError(line);
       if (error != null) {
         setState(State.FAILED);
-        runOnFx(() -> WidgetFactory.showAlert(Studio.stage, "Preview App failed to start", error));
+        runOnFx(() -> WidgetFactory.showAlert(Studio.stage, StudioBundle.get("preview_app_failed_to_start"), error));
       }
     }
   }

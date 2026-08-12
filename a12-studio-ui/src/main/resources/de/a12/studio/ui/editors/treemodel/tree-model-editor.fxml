@@ -113,7 +113,7 @@
                                                         <ComboBox fx:id="nodeDocumentModelField" editable="false" maxWidth="Infinity" />
                                                     </children>
                                                 </VBox>
-                                                <CheckBox fx:id="nodeDndField" mnemonicParsing="false" text="Drag &amp; Drop" />
+                                                <CheckBox fx:id="nodeDndField" mnemonicParsing="false" text="%drag_drop" />
                                                 <Separator />
                                                 <VBox spacing="8.0">
                                                     <children>

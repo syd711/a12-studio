@@ -4,6 +4,7 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.EditorFactory;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.projects.Project;
@@ -192,17 +193,17 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   private ContextMenu createTabContextMenu(@NonNull Tab tab) {
-    MenuItem close = new MenuItem("_Close");
+    MenuItem close = new MenuItem(StudioBundle.get("close_tab"));
     close.setOnAction(event -> closeTab(tab));
 
-    MenuItem closeAll = new MenuItem("Close _All");
+    MenuItem closeAll = new MenuItem(StudioBundle.get("close_all"));
     closeAll.setOnAction(event -> {
       for (Tab t : new ArrayList<>(tabPane.getTabs())) {
         closeTab(t);
       }
     });
 
-    MenuItem closeOthers = new MenuItem("Close _Others");
+    MenuItem closeOthers = new MenuItem(StudioBundle.get("close_others"));
     closeOthers.setOnAction(event -> {
       for (Tab t : new ArrayList<>(tabPane.getTabs())) {
         if (t != tab) {

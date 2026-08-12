@@ -5,6 +5,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -41,7 +42,7 @@ public class A12InstallationSettingsController implements Initializable {
   @FXML
   private void onBrowseInstallationPath() {
     StudioFolderChooser chooser = new StudioFolderChooser();
-    chooser.setTitle("Select A12 Installation Folder");
+    chooser.setTitle(StudioBundle.get("select_a12_installation_folder"));
 
     String currentPath = installationPathField.getText();
     if (currentPath != null && !currentPath.isEmpty()) {

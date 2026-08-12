@@ -6,8 +6,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.preferences.AppGeneralSettingsPanelController">
+<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.AppGeneralSettingsPanelController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
@@ -24,7 +23,7 @@
             <children>
                 <Label styleClass="field-label" text="%language" />
                 <ComboBox fx:id="languageCombo" prefWidth="220.0" />
-                <Label styleClass="field-description" text="%restart_required">
+                <Label styleClass="field-label" text="%restart_required">
                     <VBox.margin>
                         <Insets top="2.0" />
                     </VBox.margin>

@@ -153,7 +153,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> editSubregion(subregion));
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       Region copy = new Region();
       copy.setName(subregion.getName());
       copy.setLayout(subregion.getLayout());

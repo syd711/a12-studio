@@ -201,7 +201,7 @@ public class SceneChangePanelController {
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> editDirective(directives, directive));
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Duplicate", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("duplicate"), () -> {
       directives.add(index + 1, cloneDirective(directive));
       rebuildAll();
     });

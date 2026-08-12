@@ -57,7 +57,7 @@ public class NewProjectDialogController implements DialogController {
   @FXML
   private void onBrowseLocation() {
     StudioFolderChooser chooser = new StudioFolderChooser();
-    chooser.setTitle("Select Project Location");
+    chooser.setTitle(StudioBundle.get("select_project_location"));
     File folder = chooser.showOpenDialog(stage);
     if (folder != null) {
       selectedLocation = folder;
@@ -80,17 +80,17 @@ public class NewProjectDialogController implements DialogController {
 
     File targetFolder = new File(selectedLocation, name);
     if (targetFolder.exists()) {
-      WidgetFactory.showAlert(stage, "A folder named \"" + name + "\" already exists at the selected location.");
+      WidgetFactory.showAlert(stage, StudioBundle.get("a_folder_named", name));
       return;
     }
 
     if (!targetFolder.mkdirs()) {
-      WidgetFactory.showAlert(stage, "Failed to create the project folder \"" + targetFolder.getAbsolutePath() + "\".");
+      WidgetFactory.showAlert(stage, StudioBundle.get("failed_to_create_the_project_folder", targetFolder.getAbsolutePath()));
       return;
     }
 
     if (!ProjectTemplates.install(templateName, targetFolder)) {
-      WidgetFactory.showAlert(stage, "Failed to extract the project template \"" + templateName + "\".");
+      WidgetFactory.showAlert(stage, StudioBundle.get("failed_to_extract_the_project_template", templateName));
       return;
     }
 
@@ -102,7 +102,7 @@ public class NewProjectDialogController implements DialogController {
   public static Optional<File> show(Stage owner) {
     FXMLLoader fxmlLoader = new FXMLLoader(NewProjectDialogController.class.getResource("dialog-new-project.fxml"));
 fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, "New Project");
+    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, StudioBundle.get("new_project_title"));
     NewProjectDialogController controller = (NewProjectDialogController) stage.getUserData();
     controller.stage = stage;
     stage.showAndWait();

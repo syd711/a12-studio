@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
@@ -238,7 +239,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(Annotation annotation, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       Annotation copy = new Annotation();
       copy.setName(annotation.getName());
       copy.setValue(annotation.getValue());
@@ -250,7 +251,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this annotation?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_annotation"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getBackingAnnotations().remove(annotation);
         removeSuggestionName(annotation.getName());

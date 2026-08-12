@@ -7,6 +7,7 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.settings.AdvancedSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -40,7 +41,7 @@ public class AdvancedSettingsPanelController implements Initializable {
 
     Stage stage = (Stage) applyBtn.getScene().getWindow();
     Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(stage,
-        "This will rename all model files in this project and add or update the \"applicationGroup\" header annotation. Continue?");
+        StudioBundle.get("this_will_rename_all_model_files_in_this_project_and_add_or_"));
     if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
       return;
     }

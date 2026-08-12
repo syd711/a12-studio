@@ -147,7 +147,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> onEditModule.accept(module));
 
-    Button copyButton = RowFactory.createActionButton(Icons.COPY, "Copy", () -> {
+    Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       Module copy = new Module();
       copy.setName(module.getName());
       copy.setMenu(module.getMenu());

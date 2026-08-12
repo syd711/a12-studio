@@ -7,6 +7,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -138,7 +139,7 @@ public class GeneralLocalesPanelController implements Initializable {
 
   private HBox createActionsBox(int index) {
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, "Delete this locale?", null, null, "Delete");
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_locale"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         generalSettings.getLocales().remove(index);
         rebuildRows();
