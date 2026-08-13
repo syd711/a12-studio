@@ -12,7 +12,5 @@
       }
     ]
   },
-  "previewApp": {},
-  "settingsName": "settings.json",
-  "settingsType": "PROJECT_ROOT"
+  "previewApp": {}
 }

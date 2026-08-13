@@ -35,6 +35,16 @@ public final class OverviewColumnOptions {
     return "(unset)";
   }
 
+  /** Whether {@code column}'s {@code elementRef} is set but doesn't resolve against {@code
+   * documentModelIndex} - a dangling reference, flagged by {@link
+   * de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController}'s own row rendering (bold red
+   * field summary) rather than by a validator, since a column always has *some* row to render even when its
+   * reference is broken. */
+  public static boolean isUnresolvedElementRef(Column column, ElementIndex documentModelIndex) {
+    return column != null && column.getElementRef() != null && !column.getElementRef().isBlank()
+        && !OverviewElementOptions.isResolved(documentModelIndex, column.getElementRef());
+  }
+
   /** A column with no field reference is an expression column, shown as "Expression Column" wherever it's
    * picked from (see {@link de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController}'s
    * epsilon-icon row), never by its own {@link Column#getName()}. */

@@ -25,4 +25,6 @@ public class FilterConfiguration {
   private List<FieldRef> fields = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<FilterSection> sectionData = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private EnumeratedStringFilter enumeratedStringFilter;
 }

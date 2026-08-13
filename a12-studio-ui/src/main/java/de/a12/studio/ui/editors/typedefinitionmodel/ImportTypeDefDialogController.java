@@ -90,12 +90,14 @@ public class ImportTypeDefDialogController implements DialogController {
     return Optional.empty();
   }
 
-  /** Every {@code candidates} entry must already be filtered to what's actually importable (see {@link
+  /**
+   * Every {@code candidates} entry must already be filtered to what's actually importable (see {@link
    * TypeDefinitionTableController#importCandidates()}: eligible Type Definition Models, excluding ones
-   * already imported or that would close an import cycle) - this dialog itself applies no further filtering. */
+   * already imported or that would close an import cycle) - this dialog itself applies no further filtering.
+   */
   public static Optional<String> show(Stage owner, @NonNull List<DocumentModel> candidates) {
     FXMLLoader fxmlLoader = new FXMLLoader(ImportTypeDefDialogController.class.getResource("import-typedef-dialog.fxml"));
-fxmlLoader.setResources(StudioBundle.getBundle());
+    fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("import-typedef-dialog", fxmlLoader, owner, "Import Type Definitions");
     ImportTypeDefDialogController controller = (ImportTypeDefDialogController) stage.getUserData();
     controller.init(stage, candidates);

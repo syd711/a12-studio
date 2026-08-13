@@ -40,10 +40,10 @@ import de.a12.studio.ui.util.StudioBundle;
  * Column}, summarizing its Field (the referenced Document Model element, resolved via {@link
  * OverviewColumnOptions}), Sortable, Width and Pin Direction. Not bound to a single {@link
  * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
- * {@link OverviewFeaturesPanelController}. Clicking a row opens {@link Dialogs#showColumnDialog}, the full column
+ * {@link OverviewSearchAndFiltersPanelController}. Clicking a row opens {@link Dialogs#showColumnDialog}, the full column
  * editor. Also edits
  * {@link OverviewConfiguration} flags displayed alongside the column list: Enable Columns Resize, Show
- * Number Of Entries and Skip Initial Load (moved here from {@link OverviewFeaturesPanelController} since
+ * Number Of Entries and Skip Initial Load (moved here from {@link OverviewSearchAndFiltersPanelController} since
  * all are about how the resulting table of columns is presented).
  */
 public class OverviewColumnsPanelController extends AbstractPropertyEditor implements Initializable {
@@ -199,7 +199,13 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
     String summary = fieldSummary(column);
     Label label = new Label(summary);
     label.setId("overviewColumnField-" + index);
-    label.setTooltip(WidgetFactory.createTooltip(summary));
+    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex)) {
+      label.getStyleClass().add("validation-error");
+      label.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("path_could_not_be_resolved", summary)));
+    }
+    else {
+      label.setTooltip(WidgetFactory.createTooltip(summary));
+    }
 
     HBox cell = new HBox(6.0, label);
     if (OverviewColumnOptions.isExpressionColumn(column)) {

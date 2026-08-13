@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%search_and_filters" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewSearchAndFiltersPanelController">
+    <BorderPane>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+        <center>
+            <VBox spacing="12.0">
+                <children>
+                    <HBox spacing="24.0">
+                        <children>
+                            <CheckBox fx:id="showFullTextSearchField" mnemonicParsing="false" text="%show_full_text_search" />
+                            <CheckBox fx:id="enableFilterField" mnemonicParsing="false" text="%enable_filter" />
+                            <CheckBox fx:id="showFilterBarField" mnemonicParsing="false" text="%show_filter_bar" />
+                            <HBox alignment="CENTER_LEFT" spacing="4.0">
+                                <children>
+                                    <CheckBox fx:id="showFilterButtonField" mnemonicParsing="false" text="%show_filter_button" />
+                                    <Label fx:id="showFilterButtonInfoIcon" />
+                                </children>
+                            </HBox>
+                        </children>
+                    </HBox>
+                    <VBox maxWidth="200.0" spacing="4.0">
+                        <children>
+                            <Label styleClass="field-label" text="%filter_mode" />
+                            <ComboBox fx:id="filterModeField" editable="false" maxWidth="Infinity" />
+                        </children>
+                    </VBox>
+                </children>
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

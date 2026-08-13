@@ -29,11 +29,6 @@
                     <MenuItem mnemonicParsing="true" onAction="#onExit" text="%e_xit" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="true" text="%edit">
-                  <items>
-                    <MenuItem mnemonicParsing="true" text="%delete" />
-                  </items>
-                </Menu>
                 <Menu mnemonicParsing="true" text="%help">
                   <items>
                     <MenuItem mnemonicParsing="true" onAction="#onAbout" text="%about" />

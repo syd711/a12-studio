@@ -40,3 +40,11 @@
     -fx-background-radius: 8 0 0 8;
     -fx-border-radius: 8 0 0 8;
 }
+
+/* Same "value failed to resolve" semantics as the Label/tree-cell ".validation-error" rules elsewhere,
+ * rendered as a red border here since a combo box has no text of its own to redden. */
+.combo-box.validation-error,
+.combo-box-base.validation-error {
+    -fx-border-color: -fx-error-bg;
+    -fx-border-width: 2px;
+}

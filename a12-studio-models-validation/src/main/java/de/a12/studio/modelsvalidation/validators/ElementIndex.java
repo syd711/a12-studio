@@ -124,6 +124,13 @@ public class ElementIndex {
     return resolve(elementId, new HashSet<>(List.of(model.getId()))).orElse(elementId);
   }
 
+  /** Whether {@code elementId} resolves to an actual element, direct or through an Include (see {@link
+   * #resolveDisplayPath}) - i.e. whether the {@code elementId} fallback in that method's result means the
+   * reference is dangling rather than a genuinely resolved path. */
+  public boolean isResolvable(String elementId) {
+    return elementId != null && resolve(elementId, new HashSet<>(List.of(model.getId()))).isPresent();
+  }
+
   private Optional<String> resolve(String elementId, Set<String> visitedModelIds) {
     Optional<Element> direct = findById(elementId);
     if (direct.isPresent()) {

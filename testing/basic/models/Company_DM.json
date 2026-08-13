@@ -27,13 +27,7 @@
         "value": "tester,reviewer"
       }
     ],
-    "modelReferences": [
-      {
-        "purpose": "include",
-        "modelType": "document",
-        "reference": "Person_DM"
-      }
-    ]
+    "modelReferences": []
   },
   "content": {
     "modelInfo": {
@@ -45,16 +39,7 @@
       "decimalSeparator": ".",
       "conditionLanguage": {
         "code": "en_US"
-      },
-      "supportedCharacters": [],
-      "uniquenessCriteria": [
-        {
-          "name": "ssadfdsafsaf",
-          "fields": [
-            "field_6764d"
-          ]
-        }
-      ]
+      }
     },
     "modelRoot": {
       "rootGroups": [
@@ -70,8 +55,7 @@
                 "id": "group_1b51c",
                 "name": "CompanyDetails",
                 "Group": {
-                  "repeatability": 5,
-                  "indexFieldName": "CompanyName",
+                  "repeatability": 1,
                   "elements": [
                     {
                       "type": "Field",
@@ -79,16 +63,13 @@
                       "name": "CompanyName",
                       "annotations": [
                         {
-                          "name": "",
-                          "value": null
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
                         }
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "TypeDefType",
-                          "TypeDefType": {
-                            "typeDefinitionId": "typedef_1eeadc7f-65fb-4802-85a2-c055acfa64cd"
-                          }
+                          "type": "StringType"
                         },
                         "label": [
                           {
@@ -101,10 +82,34 @@
                           }
                         ],
                         "requirednessConfig": {
-                          "mode": "relativeToParent"
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_16af2",
+                      "name": "CompanyID",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
                         },
-                        "global": true,
-                        "transient": true
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Company ID"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Firmen ID"
+                          }
+                        ]
                       }
                     },
                     {
@@ -131,35 +136,6 @@
                             "text": "Steuer ID"
                           }
                         ]
-                      }
-                    },
-                    {
-                      "type": "Field",
-                      "id": "field_16af2",
-                      "name": "CompanyID",
-                      "annotations": [
-                        {
-                          "name": "enable_approximate_match_search",
-                          "value": "true"
-                        }
-                      ],
-                      "Field": {
-                        "fieldType": {
-                          "type": "StringType"
-                        },
-                        "label": [
-                          {
-                            "locale": "en",
-                            "text": "Company ID"
-                          },
-                          {
-                            "locale": "de",
-                            "text": "Firmen ID"
-                          }
-                        ],
-                        "requirednessConfig": {
-                          "mode": "absoluteOrRelativeToNextRepAncestor"
-                        }
                       }
                     },
                     {
@@ -214,7 +190,11 @@
                             ],
                             "Field": {
                               "fieldType": {
-                                "type": "StringType"
+                                "type": "StringType",
+                                "StringType": {
+                                  "lineBreaksPermitted": true,
+                                  "noValueValidation": true
+                                }
                               }
                             }
                           },
@@ -378,65 +358,6 @@
                           }
                         ]
                       }
-                    },
-                    {
-                      "type": "Group",
-                      "id": "include_e823c",
-                      "name": "People",
-                      "Group": {
-                        "repeatability": 22,
-                        "includeConfig": {
-                          "reference": "Invoice_DM",
-                          "excludeRules": true,
-                          "excludeComputations": true
-                        }
-                      }
-                    },
-                    {
-                      "type": "Field",
-                      "id": "field_a5e1d",
-                      "name": "adfsadf",
-                      "Field": {
-                        "fieldType": {
-                          "type": "StringType"
-                        }
-                      }
-                    },
-                    {
-                      "type": "Group",
-                      "id": "multi-select_e50ab",
-                      "name": "MultiSelect",
-                      "Group": {
-                        "repeatability": 999999,
-                        "usageType": "multi-select",
-                        "elements": [
-                          {
-                            "type": "Field",
-                            "id": "multiSelectChild_39463",
-                            "name": "value",
-                            "Field": {
-                              "fieldType": {
-                                "type": "EnumerationType",
-                                "EnumerationType": null
-                              },
-                              "requirednessConfig": {
-                                "mode": "absoluteOrRelativeToNextRepAncestor"
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    },
-                    {
-                      "type": "Field",
-                      "id": "field_87d39",
-                      "name": "enumtest",
-                      "Field": {
-                        "fieldType": {
-                          "type": "EnumerationType",
-                          "EnumerationType": null
-                        }
-                      }
                     }
                   ]
                 }
@@ -545,32 +466,6 @@
                     },
                     {
                       "type": "Field",
-                      "id": "field_c7f7b",
-                      "name": "PostalCode",
-                      "annotations": [
-                        {
-                          "name": "enable_approximate_match_search",
-                          "value": "true"
-                        }
-                      ],
-                      "Field": {
-                        "fieldType": {
-                          "type": "StringType"
-                        },
-                        "label": [
-                          {
-                            "locale": "en",
-                            "text": "Postal Code"
-                          },
-                          {
-                            "locale": "de",
-                            "text": "Postleitzahl"
-                          }
-                        ]
-                      }
-                    },
-                    {
-                      "type": "Field",
                       "id": "field_0a1e7",
                       "name": "Street",
                       "annotations": [
@@ -633,8 +528,7 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType",
-                          "StringType": {}
+                          "type": "StringType"
                         },
                         "label": [
                           {
@@ -644,6 +538,32 @@
                           {
                             "locale": "de",
                             "text": "Land"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_c7f7b",
+                      "name": "PostalCode",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Postal Code"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Postleitzahl"
                           }
                         ]
                       }
@@ -715,33 +635,11 @@
                     }
                   ]
                 }
-              },
-              {
-                "type": "Field",
-                "id": "field_6764d",
-                "name": "uniqueIndicator",
-                "Field": {
-                  "fieldType": {
-                    "type": "StringType"
-                  },
-                  "requirednessConfig": {
-                    "mode": "absoluteOrRelativeToNextRepAncestor"
-                  }
-                }
               }
             ]
           }
         }
       ]
-    },
-    "typeDefinitions": [
-      {
-        "id": "typedef_0f586126-6932-428a-b734-7c72da4fc7da",
-        "name": "abac",
-        "fieldType": {
-          "type": "StringType"
-        }
-      }
-    ]
+    }
   }
 }

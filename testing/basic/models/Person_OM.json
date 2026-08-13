@@ -32,28 +32,29 @@
         "purpose": "document-model-for-overview",
         "modelType": "document",
         "alias": "DM",
-        "reference": "Addresses_DM"
+        "reference": "Person_DM"
       }
     ]
   },
   "content": {
     "columns": [
       {
-        "id": "column-3eb14",
-        "width": 1.5,
-        "fixedWidth": true,
-        "alignment": {
-          "header": {
-            "horizontal": "center",
-            "vertical": "bottom"
+        "id": "column-c3b30",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Profile Picture"
           },
-          "content": {
-            "horizontal": "center",
-            "vertical": "bottom"
+          {
+            "locale": "de",
+            "text": "Profilbild"
           }
-        },
-        "elementRef": "F7",
-        "sortable": false
+        ],
+        "width": 1,
+        "fixedWidth": true,
+        "elementRef": "group_05909",
+        "sortable": false,
+        "attachmentDisplayMode": "preview"
       },
       {
         "id": "column-5bd25",
@@ -92,22 +93,21 @@
         "preferredSorting": "ASC"
       },
       {
-        "id": "column-c3b30",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Profile Picture"
-          },
-          {
-            "locale": "de",
-            "text": "Profilbild"
-          }
-        ],
-        "width": 1.0,
+        "id": "column-3eb14",
+        "width": 1.5,
         "fixedWidth": true,
-        "elementRef": "group_05909",
-        "sortable": false,
-        "attachmentDisplayMode": "preview"
+        "alignment": {
+          "header": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          },
+          "content": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          }
+        },
+        "elementRef": "F7",
+        "sortable": false
       },
       {
         "id": "column-d37d5",
@@ -162,8 +162,35 @@
       ]
     },
     "subHeaderBox": {
-      "leftSlot": [],
-      "rightSlot": []
+      "leftSlot": [
+        {
+          "type": "button",
+          "label": [
+            {
+              "locale": "en",
+              "text": "New"
+            },
+            {
+              "locale": "de",
+              "text": "Neu"
+            }
+          ],
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "filter"
+        },
+        {
+          "type": "search"
+        }
+      ]
     },
     "footerBox": {
       "leftSlot": [],
@@ -333,23 +360,6 @@
             ]
           }
         ]
-      },
-      "multiSelection": {
-        "collapseOption": null,
-        "counterOption": null,
-        "selectionArea": null,
-        "clearConfirmation": {
-          "enabled": true,
-          "confirmation": {}
-        }
-      },
-      "initialSorting": [
-        {
-          "idref": "column-5847d"
-        }
-      ],
-      "screenReaderColumn": {
-        "idref": "column-c3b30"
       }
     }
   }

@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 /**
  * Edits {@link OverviewModel}'s row height and action column width, both living on {@link
  * OverviewConfiguration} rather than a single {@link de.a12.studio.models.documentmodel.Element}, so it
- * follows the model-header pattern used by e.g. {@link OverviewFeaturesPanelController}.
+ * follows the model-header pattern used by e.g. {@link OverviewSearchAndFiltersPanelController}.
  */
 public class RowHeightActionColumnWidthPanelController extends AbstractPropertyEditor implements Initializable {
 

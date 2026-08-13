@@ -52,6 +52,14 @@ public final class OverviewElementOptions {
     return index.resolveDisplayPath(elementId);
   }
 
+  /** {@code false} for a dangling {@code elementId} - i.e. one that {@link #displayPath} can only echo back
+   * as-is rather than resolve to an actual path. {@code true} when {@code index} is {@code null} (nothing to
+   * flag yet, e.g. no Document Model selected), so callers only render the "unresolved" state once there's an
+   * index to have actually failed against. */
+  public static boolean isResolved(ElementIndex index, String elementId) {
+    return index == null || index.isResolvable(elementId);
+  }
+
   /** Renders ids as their display path in a {@code ComboBox<String>} while keeping the id as the stored value. */
   public static void applyElementRefConverter(ComboBox<String> comboBox, ElementIndex index) {
     comboBox.setConverter(new StringConverter<>() {

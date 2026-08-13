@@ -4,6 +4,9 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
 
@@ -19,6 +22,16 @@ public class FormModelEditorController extends AbstractEditorController implemen
 
   private void load(@NonNull FormModel formModel) {
 
+  }
+
+  @FXML
+  private void onRepeatDefaultButtonLabels(ActionEvent event) {
+    Dialogs.openRepeatDefaultButtonLabels((FormModel) projectItem.getModel());
+  }
+
+  @FXML
+  private void onSubheaderAndFooter(ActionEvent event) {
+    Dialogs.openSubheaderAndFooter((FormModel) projectItem.getModel());
   }
 
   @Override

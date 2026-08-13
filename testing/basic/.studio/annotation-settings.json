@@ -1,51 +1,5 @@
 {
-  "dataSets": [
-    {
-      "name": "default_2",
-      "headerSet": {
-        "modelTypes": {
-          "DOCUMENT": {
-            "modelType": "DOCUMENT",
-            "values": {
-              "application": {
-                "count": 2,
-                "value": ""
-              },
-              "bbbb": {
-                "count": 1,
-                "value": null
-              },
-              "comment": {
-                "count": 1,
-                "value": "Standard Training Example"
-              },
-              "roles": {
-                "count": 8,
-                "value": "tester,reviewer"
-              },
-              "tdonly": {
-                "count": 2,
-                "value": "true"
-              }
-            }
-          }
-        }
-      },
-      "fieldSet": {
-        "modelTypes": {
-          "DOCUMENT": {
-            "modelType": "DOCUMENT",
-            "values": {
-              "enable_approximate_match_search": {
-                "count": 66,
-                "value": "true"
-              }
-            }
-          }
-        }
-      }
-    }
-  ],
+  "dataSets": [],
   "settingsType": "ANNOTATION",
   "settingsName": "annotation-settings.json"
 }

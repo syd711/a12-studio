@@ -35,3 +35,13 @@
     -fx-font-size: 14px;
     -fx-padding: 0 0 0 22px;
 }
+
+/**
+ * A value that failed to resolve (e.g. a dangling element reference). Same semantics as the tree view's
+ * ".tree-cell-name-label.validation-error" / ".tree-table-cell.validation-error", but usable on any plain
+ * Label outside a tree cell.
+ */
+.validation-error {
+    -fx-text-fill: -fx-error-bg;
+    -fx-font-weight: bold;
+}

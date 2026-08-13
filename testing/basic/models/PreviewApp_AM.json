@@ -55,12 +55,7 @@
               "name": "WelcomePage"
             },
             "withoutData": true
-          },
-          "children": [
-            {
-              "name": "sdffwe"
-            }
-          ]
+          }
         },
         "flows": [
           {
@@ -101,32 +96,114 @@
               }
             ]
           }
-        ],
-        "orCreateMenu": {
-          "name": "welcome",
+        ]
+      },
+      {
+        "name": "PersonModule",
+        "menu": {
+          "name": "PersonModule",
           "label": [
             {
               "locale": "en",
-              "text": "Welcome"
+              "text": "Persons"
             },
             {
               "locale": "de",
-              "text": "Willkommen"
+              "text": "Personen"
             }
           ],
           "initialActivity": {
             "descriptor": {
-              "engine": "content",
-              "name": "WelcomePage"
-            },
-            "withoutData": true
-          },
-          "children": [
-            {
-              "name": "sdffwe"
+              "module": "PersonModule",
+              "engine": "overview"
             }
-          ]
-        }
+          }
+        },
+        "flows": [
+          {
+            "name": "PersonModuleFlow",
+            "scenes": [
+              {
+                "name": "PersonModuleOverview",
+                "description": "Overview type: overview",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "overview"
+                  },
+                  {
+                    "key": "module",
+                    "mustEqual": "PersonModule"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewEngine",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Person_OM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "PersonModule_Detail_Person_DM",
+                "priorScene": "PersonModuleOverview",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "overview"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "linkForm",
+                    "isSet": false
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Person_DM"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      },
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Person_FM",
+                          "documentModel": "Person_DM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
       {
         "name": "CompanyModule",
@@ -233,26 +310,7 @@
               }
             ]
           }
-        ],
-        "orCreateMenu": {
-          "name": "CompanyModule",
-          "label": [
-            {
-              "locale": "en",
-              "text": "Companies"
-            },
-            {
-              "locale": "de",
-              "text": "Firmen"
-            }
-          ],
-          "initialActivity": {
-            "descriptor": {
-              "module": "CompanyModule",
-              "engine": "overview"
-            }
-          }
-        }
+        ]
       },
       {
         "name": "InvoiceModule",
@@ -360,152 +418,7 @@
               }
             ]
           }
-        ],
-        "orCreateMenu": {
-          "name": "InvoiceModule",
-          "label": [
-            {
-              "locale": "en",
-              "text": "Invoices"
-            },
-            {
-              "locale": "de",
-              "text": "Rechnungen"
-            }
-          ],
-          "initialActivity": {
-            "descriptor": {
-              "module": "InvoiceModule",
-              "engine": "overview"
-            }
-          }
-        }
-      },
-      {
-        "name": "PersonModule",
-        "menu": {
-          "name": "PersonModule",
-          "label": [
-            {
-              "locale": "en",
-              "text": "Persons"
-            },
-            {
-              "locale": "de",
-              "text": "Personen"
-            }
-          ],
-          "initialActivity": {
-            "descriptor": {
-              "module": "PersonModule",
-              "engine": "overview"
-            }
-          }
-        },
-        "flows": [
-          {
-            "name": "PersonModuleFlow",
-            "scenes": [
-              {
-                "name": "PersonModuleOverview",
-                "description": "Overview type: overview",
-                "matchConditions": [
-                  {
-                    "key": "engine",
-                    "mustEqual": "overview"
-                  },
-                  {
-                    "key": "module",
-                    "mustEqual": "PersonModule"
-                  },
-                  {
-                    "key": "instance",
-                    "isSet": false
-                  }
-                ],
-                "sceneChange": {
-                  "onEnter": [
-                    {
-                      "layout": {
-                        "name": "MasterDetail"
-                      },
-                      "type": "REGION_CLEAR"
-                    },
-                    {
-                      "type": "VIEW_ADD",
-                      "name": "OverviewEngine",
-                      "models": [
-                        {
-                          "modelType": "overview",
-                          "name": "Person_OM"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
-                "name": "PersonModule_Detail_Person_DM",
-                "priorScene": "PersonModuleOverview",
-                "matchConditions": [
-                  {
-                    "key": "engine",
-                    "mustEqual": "overview"
-                  },
-                  {
-                    "key": "instance",
-                    "isSet": true
-                  },
-                  {
-                    "key": "linkForm",
-                    "isSet": false
-                  },
-                  {
-                    "key": "model",
-                    "mustEqual": "Person_DM"
-                  }
-                ],
-                "sceneChange": {
-                  "onEnter": [
-                    {
-                      "type": "VIEW_ADD",
-                      "name": "FormEngine",
-                      "constraints": {
-                        "type": "MasterDetail"
-                      },
-                      "models": [
-                        {
-                          "modelType": "form",
-                          "name": "Person_FM",
-                          "documentModel": "Person_DM"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ],
-        "orCreateMenu": {
-          "name": "PersonModule",
-          "label": [
-            {
-              "locale": "en",
-              "text": "Persons"
-            },
-            {
-              "locale": "de",
-              "text": "Personen"
-            }
-          ],
-          "initialActivity": {
-            "descriptor": {
-              "module": "PersonModule",
-              "engine": "overview"
-            }
-          }
-        }
+        ]
       }
     ],
     "region": {

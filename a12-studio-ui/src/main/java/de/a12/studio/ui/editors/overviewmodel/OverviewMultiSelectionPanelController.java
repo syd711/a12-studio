@@ -39,7 +39,7 @@ import de.a12.studio.ui.util.StudioBundle;
  * selection-area options, the clear-selection confirmation, and one draggable, reorderable row per
  * {@link de.a12.studio.models.overviewmodel.Button} action, summarizing its Event, Priority, Destructive and
  * Icon. Not bound to a single {@link de.a12.studio.models.documentmodel.Element}, so it follows the
- * model-header pattern used by e.g. {@link OverviewFeaturesPanelController}. Clicking a row (or its Edit
+ * model-header pattern used by e.g. {@link OverviewSearchAndFiltersPanelController}. Clicking a row (or its Edit
  * button) opens {@link Dialogs#showMultiSelectionActionForEdit}, which is intentionally empty for now (no
  * fields yet) - the full action editor is a follow-up, matching {@link OverviewColumnsPanelController}'s
  * column dialog.

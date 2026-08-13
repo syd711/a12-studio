@@ -103,8 +103,35 @@
       ]
     },
     "subHeaderBox": {
-      "leftSlot": [],
-      "rightSlot": []
+      "leftSlot": [
+        {
+          "type": "button",
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "New"
+            },
+            {
+              "locale": "de",
+              "text": "Neu"
+            }
+          ],
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
     },
     "footerBox": {
       "leftSlot": [],
@@ -115,14 +142,13 @@
       "showFullTextSearch": true,
       "pagingSize": 10,
       "showRowCount": true,
-      "enableColumnsResize": true,
       "filterConfiguration": {
         "showFilterButton": true,
         "showFilterBar": true,
         "filterMode": "custom_list",
         "fields": [
           {
-            "fieldId": "field_67684"
+            "fieldId": "group_1ec00"
           },
           {
             "fieldId": "field_16af2"
@@ -198,16 +224,15 @@
               }
             ]
           }
-        ]
+        ],
+        "enumeratedStringFilter": {
+          "pagingSize": 8
+        }
       },
       "multiSelection": {
-        "collapseOption": null,
-        "counterOption": null,
-        "selectionArea": null,
-        "clearConfirmation": {
-          "enabled": true,
-          "confirmation": {}
-        }
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": null
       }
     }
   }

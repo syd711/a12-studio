@@ -732,6 +732,165 @@
     ],
     "fieldConfiguration": {},
     "groupConfiguration": {},
-    "defaults": {}
+    "defaults": {
+      "buttonLabels": {
+        "ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "dfs"
+            }
+          ]
+        },
+        "COMMIT_ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ]
+        },
+        "APPLY": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ]
+        },
+        "EDIT": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "asdf"
+            }
+          ]
+        },
+        "REMOVE": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ]
+        },
+        "VIEW": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ]
+        },
+        "CANCEL": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "asd"
+            }
+          ]
+        },
+        "CONFIRM": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ]
+        },
+        "RETURN": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sad"
+            }
+          ]
+        },
+        "UP": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "asdf"
+            }
+          ]
+        },
+        "DOWN": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "asdf"
+            }
+          ]
+        },
+        "COPY": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ]
+        },
+        "CLOSE": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ]
+        },
+        "DOWNLOAD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "asdf"
+            }
+          ]
+        },
+        "SKIP": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ]
+        },
+        "REPLACE": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "asdf"
+            }
+          ]
+        },
+        "UPLOAD_AS_COPY": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "asdf"
+            }
+          ]
+        }
+      },
+      "confirmationTexts": {
+        "REMOVE": {
+          "title": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "asdf"
+              }
+            ]
+          },
+          "message": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "asdf"
+              }
+            ]
+          }
+        }
+      }
+    }
   }
 }

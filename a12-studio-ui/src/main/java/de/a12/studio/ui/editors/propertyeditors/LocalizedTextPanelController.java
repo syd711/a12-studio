@@ -9,6 +9,8 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.StringTypeOptions;
+import de.a12.studio.models.formmodel.Defaults;
+import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.Confirmation;
 import de.a12.studio.models.projects.ProjectItem;
@@ -61,6 +63,10 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   private Confirmation confirmation;
 
   private Column column;
+
+  private Defaults defaults;
+
+  private String buttonLabelAction;
 
   // Captured whenever setElement/setModel is called, i.e. whenever this panel is (re)bound to whichever
   // project item is currently selected. Used to tell apart a locales-changed event meant for this panel's own
@@ -127,6 +133,18 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     setSettingsKeySuffix("." + fieldKey);
   }
 
+  /**
+   * Configures this panel to edit a single entry of {@link Defaults#getButtonLabels()} (e.g. {@code "ADD"},
+   * {@code "CANCEL"}) - one of the repeat-widget default button label overrides shown, one action per panel
+   * instance, in {@link de.a12.studio.ui.editors.formmodel.dialogs.RepeatDefaultButtonLabelsDialogController}.
+   */
+  public void configureButtonLabel(@NonNull String action, @NonNull String title) {
+    this.buttonLabelAction = action;
+    this.fieldKey = "buttonLabel-" + action;
+    setTitle(title);
+    setSettingsKeySuffix("." + fieldKey);
+  }
+
   public void configureConfirmationTitle() {
     configureConfirmation(Confirmation::getTitle, "confirmationTitle", "CONFIRMATION TITLE");
   }
@@ -162,6 +180,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.sceneCase = null;
     this.confirmation = null;
     this.column = null;
+    this.defaults = null;
     this.projectItem = Studio.getSelectedProjectItem();
     super.setElement(element);
     buildLocaleFields();
@@ -179,6 +198,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.sceneCase = null;
     this.confirmation = null;
     this.column = null;
+    this.defaults = null;
     this.model = model;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -191,6 +211,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.sceneCase = null;
     this.confirmation = null;
     this.column = null;
+    this.defaults = null;
     this.module = module;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -203,6 +224,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.module = null;
     this.confirmation = null;
     this.column = null;
+    this.defaults = null;
     this.sceneCase = sceneCase;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -215,6 +237,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.module = null;
     this.sceneCase = null;
     this.confirmation = null;
+    this.defaults = null;
     this.column = column;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -227,7 +250,28 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.module = null;
     this.sceneCase = null;
     this.column = null;
+    this.defaults = null;
     this.confirmation = confirmation;
+    this.projectItem = Studio.getSelectedProjectItem();
+    buildLocaleFields();
+    populateLocaleFields();
+  }
+
+  /**
+   * Binds this panel (after {@link #configureButtonLabel}) to the currently selected form model's {@link
+   * Defaults}. Reading tolerates a missing {@link Defaults#getButtonLabels()} entry for this panel's action
+   * (returns an empty list rather than creating one); writing lazily creates that entry - via {@link
+   * #getWriteTexts()} - the first time a locale is actually typed into, so merely opening the dialog doesn't
+   * add empty {@code "ACTION": {"text": []}} noise to the saved model.
+   */
+  public void setDefaults(@NonNull Defaults defaults) {
+    this.element = null;
+    this.model = null;
+    this.module = null;
+    this.sceneCase = null;
+    this.confirmation = null;
+    this.column = null;
+    this.defaults = defaults;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
     populateLocaleFields();
@@ -253,6 +297,10 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     }
     if (column != null) {
       return column.getLabel();
+    }
+    if (defaults != null) {
+      TextContainer container = defaults.getButtonLabels().get(buttonLabelAction);
+      return container != null ? container.getText() : List.of();
     }
     return model != null ? modelTextsAccessor.apply(model) : elementTextsAccessor.apply(element);
   }
@@ -302,6 +350,9 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     }
     if (column != null) {
       return column.getLabel();
+    }
+    if (defaults != null) {
+      return defaults.getButtonLabels().computeIfAbsent(buttonLabelAction, action -> new TextContainer()).getText();
     }
     return model != null ? modelTextsAccessor.apply(model) : elementTextsWriteAccessor.apply(element);
   }

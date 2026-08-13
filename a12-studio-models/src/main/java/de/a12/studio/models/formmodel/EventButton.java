@@ -10,8 +10,6 @@ import lombok.Setter;
 @JsonPropertyOrder({"type", "id", "name", "buttonStyling", "event", "validation", "scope", "enablement"})
 public class EventButton extends Button {
 
-  // Custom event name handled by the application embedding this form.
-  private String event;
   // How the button behaves before any data has changed, e.g. "HIDDEN" or "DISABLED".
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String enablement;

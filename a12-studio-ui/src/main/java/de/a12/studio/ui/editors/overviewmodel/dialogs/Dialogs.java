@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.overviewmodel.dialogs;
 
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.FilterSection;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -9,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class Dialogs {
 
@@ -45,5 +47,29 @@ public class Dialogs {
     controller.initDialog(stage, button);
     stage.showAndWait();
     return controller.isConfirmed();
+  }
+
+  public static Optional<FilterSection> showSectionForAdd(Stage owner) {
+    FilterSection section = new FilterSection();
+    section.setId("section-" + shortId());
+    return showSection(owner, "Add Section", section) ? Optional.of(section) : Optional.empty();
+  }
+
+  public static boolean showSectionForEdit(Stage owner, FilterSection section) {
+    return showSection(owner, "Edit Section", section);
+  }
+
+  private static boolean showSection(Stage owner, String title, FilterSection section) {
+    FXMLLoader fxmlLoader = new FXMLLoader(SectionDataDialogController.class.getResource("overview-section-data-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("overview-section-data-dialog", fxmlLoader, owner, title);
+    SectionDataDialogController controller = (SectionDataDialogController) stage.getUserData();
+    controller.initDialog(stage, section);
+    stage.showAndWait();
+    return controller.isConfirmed();
+  }
+
+  private static String shortId() {
+    return UUID.randomUUID().toString().replace("-", "").substring(0, 5);
   }
 }

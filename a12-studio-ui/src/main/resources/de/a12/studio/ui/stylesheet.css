@@ -90,6 +90,11 @@
     -fx-background-color: #fbfcfd;
 }
 
+.properties-panel-toolbar {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
 /**
  * Modules panel rows: a white draggable card per module, reorderable via the drag handle (see
  * .module-drag-handle) in addition to the existing move up/down buttons.
