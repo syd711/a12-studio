@@ -29,9 +29,9 @@
     ],
     "modelReferences": [
       {
-        "alias": "Invoice_DM",
-        "modelType": "document",
         "purpose": "data binding",
+        "modelType": "document",
+        "alias": "Invoice_DM",
         "reference": "Invoice_DM"
       }
     ]
@@ -238,7 +238,8 @@
                       {
                         "type": "Row",
                         "id": "row_ab734",
-                        "name": "<Row>"
+                        "name": "<Row>",
+                        "cell": []
                       }
                     ],
                     "verticalAlignment": "BOTTOM"

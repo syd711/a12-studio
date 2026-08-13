@@ -24,6 +24,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 /**
@@ -39,6 +40,13 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
 
   private static final List<String> PRIORITIES = List.of("PRIMARY", "SECONDARY");
   private static final String DEFAULT_PRIORITY = "SECONDARY";
+
+  // javafx.scene.input.DataFormat registers its mime type in a process-wide static registry and throws if the
+  // same string is registered twice, with no way to unregister. settingsKeySuffix alone (e.g. ".rowAction") is
+  // not unique across controller instances - it repeats every time an Overview Model editor is opened (new tab
+  // or reopen) - so a counter is appended to keep each instance's format string globally unique for the life of
+  // the process.
+  private static final AtomicLong INSTANCE_COUNTER = new AtomicLong();
 
   @FXML
   private VBox buttonsList;
@@ -68,7 +76,7 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
     this.rows = (List<EventButtonLike>) rows;
     this.newRowFactory = () -> (EventButtonLike) newRowFactory.get();
     if (indexFormat == null) {
-      indexFormat = new DataFormat("application/x-a12-event-button-index" + settingsKeySuffix);
+      indexFormat = new DataFormat("application/x-a12-event-button-index" + settingsKeySuffix + "-" + INSTANCE_COUNTER.incrementAndGet());
     }
     rebuildRows();
   }
