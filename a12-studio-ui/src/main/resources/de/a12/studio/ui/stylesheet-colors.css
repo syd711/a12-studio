@@ -37,6 +37,11 @@
     -fx-border-header: #E5E7EB;
     -fx-border-input: #B7BCC5;
 
+    /* Titled pane card: header background and card/accent-line border - a shade darker than
+       -fx-panel-color / -fx-border-subtle so the card reads distinctly against the page. */
+    -fx-titled-pane-header-bg: #E7E9EE;
+    -fx-titled-pane-border: #D8DBE1;
+
     /* Text */
     -fx-text-secondary: #111111;
     -fx-text-muted: #7A7F89;

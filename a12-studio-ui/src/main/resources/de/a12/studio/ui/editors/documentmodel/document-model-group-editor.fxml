@@ -12,7 +12,6 @@
             <padding>
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0"/>
             </padding>
-            <Label styleClass="editor-type-label" text="%group_editor"/>
 
             <!-- General Information -->
             <fx:include fx:id="generalInformation" source="../propertyeditors/general-information-panel.fxml"/>

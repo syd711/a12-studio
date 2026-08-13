@@ -30,7 +30,7 @@
                             </HBox>
                         </children>
                     </HBox>
-                    <VBox maxWidth="200.0" spacing="4.0">
+                    <VBox maxWidth="400.0" spacing="4.0">
                         <children>
                             <Label styleClass="field-label" text="%filter_mode" />
                             <ComboBox fx:id="filterModeField" editable="false" maxWidth="Infinity" />

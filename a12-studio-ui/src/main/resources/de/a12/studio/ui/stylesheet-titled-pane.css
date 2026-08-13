@@ -1,31 +1,41 @@
 /**
  * Titled Pane
  *
- * No border around the pane or its content, and a header that only
- * shows the expand/collapse arrow and the title (no header bar background).
+ * A top-level property editor panel is shown as a card: a rounded, bordered container with a
+ * shaded header bar (bold uppercase title + expand/collapse arrow) and a white content area.
  */
 .titled-pane {
     -fx-text-fill: -fx-text-color;
+    -fx-background-color: -fx-surface-color;
+    -fx-background-radius: 8px;
+    -fx-border-color: -fx-titled-pane-border;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
 }
 
 .titled-pane > .title,
-.titled-pane:collapsed > .title,
 .titled-pane:focused > .title {
-    -fx-background-color: transparent;
+    -fx-background-color: -fx-titled-pane-header-bg;
     -fx-background-insets: 0;
-    -fx-background-radius: 0;
+    -fx-background-radius: 7px 7px 0 0;
+    -fx-border-color: transparent transparent -fx-titled-pane-border transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 10px 16px;
+}
+
+.titled-pane:collapsed > .title {
+    -fx-background-radius: 7px;
     -fx-border-width: 0;
-    -fx-padding: 6px 0 2px 0;
 }
 
 .titled-pane > .title > .text {
-    -fx-font-size: 16px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-fill: -fx-text-section-header;
 }
 
 .titled-pane .titled-pane > .title > .text {
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
 }
 
 .titled-pane:collapsed > .title > .text {
@@ -34,26 +44,70 @@
 
 .titled-pane > .title > .arrow-button {
     -fx-background-color: transparent;
-    -fx-padding: 4px 4px 4px 0;
+    -fx-padding: 4px 6px 4px 0;
 }
 
 .titled-pane > .title > .arrow-button > .arrow {
-    -fx-background-color: -fx-text-color;
+    -fx-background-color: -fx-text-section-header;
 }
 
 .titled-pane > *.content {
-    -fx-background-color: transparent;
+    -fx-background-color: -fx-surface-color;
     -fx-background-insets: 0;
+    -fx-background-radius: 0 0 7px 7px;
     -fx-border-width: 0;
     -fx-border-insets: 0;
+    -fx-padding: 16px;
 }
 
-/* Nested TitledPane shown as a child inside another TitledPane's content, indented to signal the hierarchy. */
+/*
+ * Nested TitledPane shown as a child inside another TitledPane's content. Rather than repeating
+ * the full card treatment, it's flattened to a plain header with a left accent line running down
+ * through its header and body, signalling "this is a subsection" without nesting another card.
+ */
 .titled-pane-child {
-    -fx-padding: 0 0 0 24px;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent transparent -fx-titled-pane-border;
+    -fx-border-width: 0 0 0 2px;
+    -fx-border-radius: 0;
+    -fx-padding: 0 0 0 14px;
 }
 
-/* TitledPane nested two levels deep, i.e. inside a .titled-pane-child's content. */
+.titled-pane-child > .title,
+.titled-pane-child:focused > .title {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-padding: 4px 0 4px 2px;
+}
+
+.titled-pane-child > *.content {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 4px 0 4px 2px;
+}
+
+/* TitledPane nested two levels deep, i.e. inside a .titled-pane-child's content - same accent-line treatment. */
 .titled-pane-sub-child {
-    -fx-padding: 0 0 0 24px;
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent transparent -fx-titled-pane-border;
+    -fx-border-width: 0 0 0 2px;
+    -fx-border-radius: 0;
+    -fx-padding: 0 0 0 14px;
+}
+
+.titled-pane-sub-child > .title,
+.titled-pane-sub-child:focused > .title {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-padding: 4px 0 4px 2px;
+}
+
+.titled-pane-sub-child > *.content {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 4px 0 4px 2px;
 }
