@@ -3,6 +3,8 @@ package de.a12.studio.ui.editors.dialogs;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.overviewmodel.OverviewConfiguration;
+import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
@@ -48,6 +50,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   private LocalizedTextPanelController labelsController;
 
   @FXML
+  private LocalizedTextPanelController subtitlesController;
+
+  @FXML
   private RolesEditorPanelController rolesController;
 
   @FXML
@@ -82,12 +87,14 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     labelsController.configureModelLabels();
+    subtitlesController.configureCustom("subtitle", "SUBTITLES");
     annotationsController.hideAnnotationDatasetsButton();
 
     modelSettingsNameController.setSaveMode(saveMode);
     supportedCharactersController.setSaveMode(saveMode);
     localesController.setSaveMode(saveMode);
     labelsController.setSaveMode(saveMode);
+    subtitlesController.setSaveMode(saveMode);
     rolesController.setSaveMode(saveMode);
     annotationsController.setSaveMode(saveMode);
     documentUniquenessCriteriaController.setSaveMode(saveMode);
@@ -116,10 +123,25 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         documentUniquenessCriteriaController.setVisible(false);
         timezoneController.setVisible(false);
       }
-      supportedCharactersController.setVisible(!(model instanceof ApplicationModel));
+      if (model instanceof OverviewModel overviewModel) {
+        subtitlesController.setCustom(() -> ensureConfiguration(overviewModel).getSubtitle());
+        subtitlesController.setVisible(true);
+      } else {
+        subtitlesController.setVisible(false);
+      }
+      supportedCharactersController.setVisible(
+          !(model instanceof ApplicationModel) && !(model instanceof OverviewModel));
+      modelReferencesController.setVisible(!(model instanceof OverviewModel));
     }
 
     bindErrorContainer();
+  }
+
+  private OverviewConfiguration ensureConfiguration(OverviewModel overviewModel) {
+    if (overviewModel.getContent().getConfiguration() == null) {
+      overviewModel.getContent().setConfiguration(new OverviewConfiguration());
+    }
+    return overviewModel.getContent().getConfiguration();
   }
 
   /**
@@ -134,6 +156,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         supportedCharactersController,
         localesController,
         labelsController,
+        subtitlesController,
         rolesController,
         annotationsController,
         documentUniquenessCriteriaController,

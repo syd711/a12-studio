@@ -32,7 +32,7 @@
         "purpose": "document-model-for-overview",
         "modelType": "document",
         "alias": "DM",
-        "reference": "Company_DM"
+        "reference": "Invoice_DM"
       }
     ]
   },
@@ -120,7 +120,7 @@
               "text": "Neu"
             }
           ],
-          "destructive": null,
+          "destructive": false,
           "primary": false
         }
       ],
@@ -142,123 +142,59 @@
       "showFullTextSearch": true,
       "pagingSize": 10,
       "showRowCount": true,
-      "filterConfiguration": {
-        "showFilterButton": true,
-        "showFilterBar": true,
-        "filterMode": "all",
-        "fields": [
-          {
-            "fieldId": "group_1ec00"
-          },
-          {
-            "fieldId": "field_16af2"
-          },
-          {
-            "fieldId": "field_94860"
-          },
-          {
-            "fieldId": "field_3fcb8"
-          },
-          {
-            "fieldId": "field_2f4c1"
-          }
-        ],
-        "sectionData": [
-          {
-            "id": "section-e83d1",
-            "label": [
-              {
-                "locale": "en",
-                "text": "Name"
-              },
-              {
-                "locale": "de",
-                "text": "Name"
-              }
-            ],
-            "fields": [
-              {
-                "fieldId": "field_67684"
-              },
-              {
-                "fieldId": "field_16af2"
-              }
-            ]
-          },
-          {
-            "id": "section-c4b02",
-            "label": [
-              {
-                "locale": "en",
-                "text": "Address Type"
-              },
-              {
-                "locale": "de",
-                "text": "Addresstyp"
-              }
-            ],
-            "fields": [
-              {
-                "fieldId": "field_94860"
-              }
-            ]
-          },
-          {
-            "id": "section-bbfef",
-            "label": [
-              {
-                "locale": "en",
-                "text": "Location"
-              },
-              {
-                "locale": "de",
-                "text": "Ort"
-              }
-            ],
-            "fields": [
-              {
-                "fieldId": "field_3fcb8"
-              },
-              {
-                "fieldId": "field_2f4c1"
-              }
-            ]
-          }
-        ],
-        "enumeratedStringFilter": {
-          "pagingSize": 8
-        }
-      },
       "newFilterConfiguration": {
         "filterSelector": {
-          "viewMode": null,
-          "initialVisibility": null,
-          "showSetFiltersOnly": {
-            "enabled": null,
+          "viewMode": "docked",
+          "initialVisibility": "hide",
+          "searchBar": {
+            "enabled": true,
             "value": false
           },
+          "showSetFiltersOnly": {
+            "enabled": true,
+            "value": true
+          },
+          "headerSubtitle": [
+            {
+              "locale": "en",
+              "text": "sadf"
+            }
+          ],
           "trigger": {
-            "enabled": false,
-            "value": {}
+            "enabled": true,
+            "value": {
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "sadfsaf"
+                }
+              ]
+            }
           }
+        },
+        "joinOperator": {
+          "enabled": false,
+          "value": null
+        },
+        "invert": {
+          "enabled": true,
+          "value": false
         }
       },
       "multiSelection": {
-        "collapseOption": "collapsible_collapsed",
-        "counterOption": "simple",
+        "collapseOption": null,
+        "counterOption": null,
         "selectionArea": null
       },
       "initialSorting": [
-        {
-          "idref": "column-4949b"
-        }
+        {}
       ],
-      "screenReaderColumn": {
-        "idref": "column-4949b"
-      }
-    },
-    "defaultRowAction": {
-      "custom": true
+      "subtitle": [
+        {
+          "locale": "en",
+          "text": "sadfadsf"
+        }
+      ]
     }
   }
 }

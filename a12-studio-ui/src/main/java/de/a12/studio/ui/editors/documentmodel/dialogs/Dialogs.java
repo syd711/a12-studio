@@ -24,7 +24,7 @@ public class Dialogs {
     TypeDefinitionSettingsDialog controller = (TypeDefinitionSettingsDialog) stage.getUserData();
     controller.setStage(stage);
 
-    FXResizeHelper.install(stage, 30, 6);
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
     stage.setMinWidth(800);
     stage.setMinHeight(600);
     stage.setOnHidden(event -> controller.destroy());

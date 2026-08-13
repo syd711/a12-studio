@@ -41,4 +41,6 @@ public class OverviewConfiguration {
   private Boolean enableInfiniteScroll;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> rowTitle = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Label> subtitle = new ArrayList<>();
 }

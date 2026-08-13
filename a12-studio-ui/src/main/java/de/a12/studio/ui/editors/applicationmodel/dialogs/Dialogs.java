@@ -34,7 +34,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     ChildMenuDialogController controller = (ChildMenuDialogController) stage.getUserData();
     controller.init(stage, menu, snapshot);
 
-    FXResizeHelper.install(stage, 30, 6);
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
     stage.setMinWidth(800);
     stage.setMinHeight(600);
     stage.setOnHidden(event -> controller.destroy());
@@ -115,7 +115,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     SceneDialogController controller = (SceneDialogController) stage.getUserData();
     controller.init(stage, flow, scene, snapshot);
 
-    FXResizeHelper.install(stage, 30, 6);
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
     stage.setMinWidth(800);
     stage.setMinHeight(600);
 
@@ -140,7 +140,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     CaseDialogController controller = (CaseDialogController) stage.getUserData();
     controller.init(stage, caseObj, snapshot);
 
-    FXResizeHelper.install(stage, 30, 6);
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
     stage.setMinWidth(800);
     stage.setMinHeight(600);
 
@@ -164,7 +164,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     DirectiveDialogController controller = (DirectiveDialogController) stage.getUserData();
     controller.init(stage, existing);
 
-    FXResizeHelper.install(stage, 30, 6);
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
     stage.setMinWidth(800);
     stage.setMinHeight(600);
 

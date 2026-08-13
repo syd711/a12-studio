@@ -26,6 +26,10 @@ public class FXResizeHelper {
   private final Scene SCENE;
   private final int TR;
   private final int TM;
+  // distance (px) between the Scene's edges and the window's actual visible border, e.g. the
+  // padding a dialog reserves around its content for a drop shadow; edge/drag hit-zones below
+  // are measured from the visible border, not the raw Scene edge, so they stay aligned with it
+  private final int MARGIN;
 
   private double mPresSceneX, mPresSceneY;
   private double mPresScreeX, mPresScreeY;
@@ -44,11 +48,20 @@ public class FXResizeHelper {
 
 
   public static void install(Stage stage, int dt, int rt) {
-    new FXResizeHelper(stage, dt, rt, false);
+    new FXResizeHelper(stage, dt, rt, false, 0);
   }
 
   public static void install(Stage stage, int dt, int rt, boolean verticalOnly) {
-    new FXResizeHelper(stage, dt, rt, verticalOnly);
+    new FXResizeHelper(stage, dt, rt, verticalOnly, 0);
+  }
+
+  /**
+   * Same as {@link #install(Stage, int, int)}, but for a Scene whose root reserves {@code margin}
+   * px of padding around the visible window content (e.g. for a drop shadow), so edge/drag
+   * hit-zones are measured from the visible border instead of the raw Scene edge.
+   */
+  public static void install(Stage stage, int dt, int rt, int margin) {
+    new FXResizeHelper(stage, dt, rt, false, margin);
   }
 
   /**
@@ -58,11 +71,13 @@ public class FXResizeHelper {
    * @param stage - The JavaFX Stage.
    * @param dt    - The area (in px) where the user can drag the window.
    * @param rt    - The area (in px) where the user can resize the window.
+   * @param margin - px of padding between the Scene's edges and the visible window border.
    */
-  private FXResizeHelper(Stage stage, int dt, int rt, boolean verticalOnly) {
+  private FXResizeHelper(Stage stage, int dt, int rt, boolean verticalOnly, int margin) {
     this.verticalOnly = verticalOnly;
     this.TR = rt;
     this.TM = dt + rt;
+    this.MARGIN = margin;
     this.STAGE = stage;
     this.SCENE = stage.getScene();
 
@@ -353,10 +368,15 @@ public class FXResizeHelper {
       double sx = event.getSceneX();
       double sy = event.getSceneY();
 
-      boolean l_trigger = sx > 0 && sx < TR;
-      boolean r_trigger = sx < SCENE.getWidth() && sx > SCENE.getWidth() - TR;
-      boolean u_trigger = sy < SCENE.getHeight() && sy > SCENE.getHeight() - TR;
-      boolean d_trigger = sy > 0 && sy < TR;
+      double left = MARGIN;
+      double top = MARGIN;
+      double right = SCENE.getWidth() - MARGIN;
+      double bottom = SCENE.getHeight() - MARGIN;
+
+      boolean l_trigger = sx > left - TR && sx < left + TR;
+      boolean r_trigger = sx < right + TR && sx > right - TR;
+      boolean u_trigger = sy < bottom + TR && sy > bottom - TR;
+      boolean d_trigger = sy > top - TR && sy < top + TR;
 
       if (l_trigger && d_trigger && !verticalOnly) {
         fireAction(Cursor.NW_RESIZE);
@@ -379,7 +399,7 @@ public class FXResizeHelper {
       else if (d_trigger) {
         fireAction(Cursor.N_RESIZE);
       }
-      else if (sy < TM && !u_trigger) {
+      else if (sy < top + TM && !u_trigger) {
         fireAction(Cursor.OPEN_HAND);
       }
       else if (u_trigger) {

@@ -32,7 +32,7 @@
         </ToolBar>
     </right>
     <center>
-        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
                 <Tab text="%columns">
                     <content>

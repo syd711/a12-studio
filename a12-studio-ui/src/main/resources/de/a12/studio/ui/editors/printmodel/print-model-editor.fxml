@@ -89,7 +89,7 @@
                                         <Label fx:id="orientationLabel" text="%portrait" />
                                     </items>
                                 </ToolBar>
-                                <TabPane fx:id="segmentTabs" tabClosingPolicy="UNAVAILABLE" />
+                                <TabPane fx:id="segmentTabs" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" />
                             </children>
                         </VBox>
                     </top>

@@ -93,6 +93,10 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   private final Map<String, TextField> textFieldsByLocale = new LinkedHashMap<>();
 
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
   public void configureInternal() {
     configure(Element::getInternalDescription, "internal", "DESCRIPTION (INTERNAL)");
   }

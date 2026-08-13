@@ -19,7 +19,7 @@ public class Dialogs {
     controller.setStage(stage);
     controller.setModel(model);
 
-    FXResizeHelper.install(stage, 30, 6);
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
     stage.setMinWidth(700);
     stage.setMinHeight(500);
     stage.setOnHidden(event -> controller.destroy());
@@ -35,7 +35,7 @@ public class Dialogs {
     controller.setStage(stage);
     controller.setModel(model);
 
-    FXResizeHelper.install(stage, 30, 6);
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
     stage.setMinWidth(700);
     stage.setMinHeight(500);
 

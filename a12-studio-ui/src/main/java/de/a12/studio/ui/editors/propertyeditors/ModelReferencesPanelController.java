@@ -46,6 +46,10 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
   // Model References panel).
   private boolean applicationModel;
 
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
   public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
     this.applicationModel = model.getModelType() == ModelType.APPLICATION;

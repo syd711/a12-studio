@@ -37,6 +37,9 @@
                           <!-- Labels -->
                           <fx:include fx:id="labels" source="../propertyeditors/localized-text-panel.fxml" />
 
+                          <!-- Subtitles (Overview Model only) -->
+                          <fx:include fx:id="subtitles" source="../propertyeditors/localized-text-panel.fxml" />
+
                           <!-- Roles -->
                           <fx:include fx:id="roles" source="../propertyeditors/roles-panel.fxml" />
 

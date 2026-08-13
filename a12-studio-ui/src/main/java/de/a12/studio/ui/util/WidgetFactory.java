@@ -13,6 +13,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,13 +22,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
@@ -297,6 +302,13 @@ public class WidgetFactory {
   //---------------------------------------------
   // Stage / dialog infrastructure
 
+  private static final int DIALOG_SHADOW_RADIUS = 18;
+  private static final int DIALOG_SHADOW_OFFSET_Y = 6;
+  // must cover the shadow's max extent (radius + offsetY on the bottom side) with room to spare;
+  // public so callers that install FXResizeHelper on a dialog Stage can keep its edge/drag
+  // hit-zones aligned with the visible border instead of this padding (see FXResizeHelper.MARGIN)
+  public static final int DIALOG_SHADOW_MARGIN = 24;
+
   public static Stage createStage() {
     Stage stage = new Stage();
     stage.initStyle(StageStyle.TRANSPARENT);
@@ -329,6 +341,10 @@ fxmlLoader.setResources(StudioBundle.getBundle());
       log.error("Error loading: " + e.getMessage(), e);
     }
 
+    if (root != null) {
+      root.setEffect(new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.35), DIALOG_SHADOW_RADIUS, 0, 0, DIALOG_SHADOW_OFFSET_Y));
+    }
+
     DialogController controller = fxmlLoader.getController();
     final Stage stage = createStage();
 
@@ -344,7 +360,16 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     stage.initOwner(owner);
     stage.initModality(Modality.APPLICATION_MODAL);
 
-    Scene scene = new Scene(root, Color.TRANSPARENT);
+    // The DropShadow effect above is rasterized on top of root's own bounds, so without extra
+    // room around it, the Scene (sized to root's layout bounds) clips it away entirely. Wrapping
+    // root in a padded, transparent StackPane gives the shadow space to render; the wrapper itself
+    // is never targeted by CSS or #header lookups, only root and its subtree are.
+    StackPane shadowWrapper = new StackPane(root);
+    shadowWrapper.setPadding(new Insets(DIALOG_SHADOW_MARGIN));
+    shadowWrapper.setBackground(Background.EMPTY);
+    shadowWrapper.setPickOnBounds(false);
+
+    Scene scene = new Scene(shadowWrapper, Color.TRANSPARENT);
     stage.setScene(scene);
     scene.addEventHandler(KeyEvent.KEY_PRESSED, t -> {
       if (t.getCode() == KeyCode.ESCAPE) {

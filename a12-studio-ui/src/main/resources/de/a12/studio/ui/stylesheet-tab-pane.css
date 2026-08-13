@@ -1,67 +1,107 @@
 /**
  * Tab Pane
  */
+.tab-pane {
+    -fx-tab-min-height: 34px;
+}
+
 .tab-pane .tab-label {
     -fx-font-size: 14px;
 }
 
+/**
+ * First-level tabs: top-level editor tab strip (e.g. the main window's open-model tabs in
+ * scene-tab-pane.fxml). Browser-tab-style chips - white rounded cards with a subtle border,
+ * a small gap between tabs, and a bolder/darker label plus soft shadow on the selected tab.
+ */
 .tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: white;
+    -fx-background-color: -fx-content-bg;
+    -fx-border-color: transparent transparent -fx-border-divider transparent;
+    -fx-border-width: 1px;
 }
 
-.tab-pane {
-    -fx-tab-min-height:30px;
+.tab-pane .tab-header-area {
+    -fx-padding: 8px 8px 0 8px;
 }
 
 .tab-pane .tab {
-    -fx-border-width: 1px 1px 3px 1px;
-    -fx-border-style: solid solid solid solid;
-    -fx-border-radius: 3px 3px 0 0;
-    -fx-border-color: -fx-border-color-theme;
+    -fx-background-color: -fx-content-bg;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-radius: 8px 8px 0 0;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-width: 1px;
+    -fx-background-insets: 0 6 0 0;
+    -fx-border-insets: 0 0 0 0;
+    -fx-padding: 2px 6px 2px 6px;
 }
 
 .tab-pane .tab:selected {
-    -fx-border-style: solid solid solid solid;
-    -fx-border-width: 1px 1px 3px 1px;
-    -fx-border-color: -fx-border-color-theme -fx-border-color-theme -fx-primary-color -fx-border-color-theme;
+    -fx-background-color: -fx-surface-color;
+    -fx-border-color: -fx-border-input;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-radius: 8px 8px 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(44, 47, 54, 0.12), 4, 0, 0, 1);
 }
 
 .tab .tab-label {
     -fx-alignment: CENTER;
-    -fx-text-fill: -fx-text-color;
+    -fx-text-fill: -fx-text-muted;
 }
 
 .tab:selected .tab-label {
     -fx-alignment: CENTER;
+    -fx-text-fill: -fx-text-color;
+    -fx-font-weight: bold;
 }
 
-.tab-pane .sub-tab {
-    -fx-tab-min-height:24px;
+.tab-pane .tab-close-button {
+    -fx-background-color: -fx-text-faint;
 }
 
-.tab-pane .sub-tab .tab {
-    -fx-border-style: solid solid solid solid;
+.tab-pane .tab:selected .tab-close-button {
+    -fx-background-color: -fx-text-muted;
 }
 
 /**
- * Sub-tab-panel: tab headers for a TabPane nested inside another panel (e.g. the
- * Overview Model editor's Overview/Custom Actions tabs), rather than a top-level
- * editor tab strip. Flat, solid tab backgrounds instead of Modena's default
- * gradient, and a shorter header so it reads as a secondary tab strip.
+ * Second-level tabs (sub-tab-panel): segmented/pill tab strip for a TabPane nested inside
+ * another panel (e.g. the Overview Model editor's Übersicht/Suche und Filter/... tabs, the
+ * Tree and Relationship Model editors' tabs, and the Print Model editor's segment tabs)
+ * rather than a top-level editor tab strip. No borders or card background - plain muted
+ * labels in a row, with the selected tab wrapped in a rounded pill using the theme's
+ * selection colors.
  */
 .tab-pane.sub-tab-panel {
     -fx-tab-min-height: 24px;
 }
 
 .tab-pane.sub-tab-panel .tab-header-area .tab-header-background {
-    -fx-background-color: -fx-chrome-bg;
+    -fx-background-color: -fx-content-bg;
+    -fx-border-color: transparent transparent -fx-border-divider transparent;
+    -fx-border-width: 1px;
+}
+
+.tab-pane.sub-tab-panel .tab-header-area {
+    -fx-padding: 8px 20px 8px 20px;
 }
 
 .tab-pane.sub-tab-panel .tab {
-    -fx-background-color: -fx-chrome-bg;
+    -fx-background-color: transparent;
+    -fx-background-radius: 12px;
+    -fx-border-width: 0;
+    -fx-background-insets: 0 6 0 0;
+    -fx-padding: 8px 18px 8px 18px;
 }
 
 .tab-pane.sub-tab-panel .tab:selected {
-    -fx-background-color: -fx-surface-color;
+    -fx-background-color: -fx-selection-bg;
 }
 
+.tab-pane.sub-tab-panel .tab .tab-label {
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-weight: normal;
+}
+
+.tab-pane.sub-tab-panel .tab:selected .tab-label {
+    -fx-text-fill: -fx-selection-text;
+    -fx-font-weight: bold;
+}
