@@ -36,7 +36,8 @@
                               <ListView fx:id="accessRightsList" VBox.vgrow="ALWAYS" />
                               <HBox spacing="8.0">
                                   <children>
-                                      <Button fx:id="addAccessRightButton" mnemonicParsing="false" onAction="#onAddAccessRight" styleClass="secondary-button" text="%add" >
+                                      <Button fx:id="addAccessRightButton" mnemonicParsing="false" onAction="#onAddAccessRight" styleClass="secondary-button" text="%add_access_right" >
+                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_access_right" /></tooltip>
             </Button>
                                       <Button fx:id="removeAccessRightButton" mnemonicParsing="false" onAction="#onRemoveAccessRight" styleClass="secondary-button" text="%remove" >

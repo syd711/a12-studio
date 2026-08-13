@@ -145,7 +145,7 @@
       "filterConfiguration": {
         "showFilterButton": true,
         "showFilterBar": true,
-        "filterMode": "all_with_meta",
+        "filterMode": "all_columns",
         "fields": [
           {
             "fieldId": "group_1ec00"

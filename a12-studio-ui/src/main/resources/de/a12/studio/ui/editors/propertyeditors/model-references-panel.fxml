@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%model_references" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.propertyeditors.ModelReferencesPanelController">
@@ -31,7 +32,8 @@
       <Label styleClass="field-label" text="%model_type" GridPane.columnIndex="2" GridPane.rowIndex="0" />
       <Label styleClass="field-label" text="%reference" GridPane.columnIndex="3" GridPane.rowIndex="0" />
     </GridPane>
-    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_model_reference" >
+                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_model_reference" /></tooltip>
             </Button>
   </VBox>

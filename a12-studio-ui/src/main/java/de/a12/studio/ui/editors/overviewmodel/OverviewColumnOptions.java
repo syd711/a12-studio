@@ -66,9 +66,10 @@ public final class OverviewColumnOptions {
   }
 
   /** Renders column ids as their {@link #describe} summary in a {@code ComboBox<String>} while keeping the id
-   * as the stored value. */
+   * as the stored value, in the same monospace "path" font as every other path picker (see {@link
+   * OverviewElementOptions#applyMonospaceCells}). */
   public static void applyColumnConverter(ComboBox<String> comboBox, List<Column> columns, ElementIndex documentModelIndex) {
-    comboBox.setConverter(new StringConverter<>() {
+    StringConverter<String> converter = new StringConverter<>() {
       @Override
       public String toString(String columnId) {
         return columnId == null ? "" : describeById(columns, columnId, documentModelIndex);
@@ -78,6 +79,8 @@ public final class OverviewColumnOptions {
       public String fromString(String string) {
         return string;
       }
-    });
+    };
+    comboBox.setConverter(converter);
+    OverviewElementOptions.applyMonospaceCells(comboBox, converter);
   }
 }

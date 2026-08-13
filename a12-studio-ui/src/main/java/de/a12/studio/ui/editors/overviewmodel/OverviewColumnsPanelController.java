@@ -199,6 +199,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
     String summary = fieldSummary(column);
     Label label = new Label(summary);
     label.setId("overviewColumnField-" + index);
+    label.getStyleClass().add("path-text");
     if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex)) {
       label.getStyleClass().add("validation-error");
       label.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("path_could_not_be_resolved", summary)));

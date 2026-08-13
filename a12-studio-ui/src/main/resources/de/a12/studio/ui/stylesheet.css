@@ -289,6 +289,25 @@
     -fx-font-size: 14px;
 }
 
+/* Shared "this text is a field/column path" font, used everywhere a path is rendered - plain summary labels,
+ * combo box rows (see OverviewElementOptions#applyMonospaceCells), and as the base for .path-chip below. */
+.path-text {
+    -fx-font-family: monospace;
+    -fx-font-weight: bold;
+}
+
+.path-chip {
+    -fx-font-family: monospace;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+    -fx-background-color: -fx-panel-color;
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 2 8 2 8;
+}
+
 /**
  * Footer status bar
  */

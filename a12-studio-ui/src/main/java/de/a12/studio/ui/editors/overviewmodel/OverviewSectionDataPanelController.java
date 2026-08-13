@@ -141,13 +141,14 @@ public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
 
   /** One left-aligned path per field, stacked vertically, mirroring {@code labelCell}'s click-to-edit. */
   private VBox createFieldsCell(FilterSection section, int index) {
-    VBox fieldsCell = new VBox(2.0);
+    VBox fieldsCell = new VBox(4.0);
     fieldsCell.setId("sectionFields-" + index);
     fieldsCell.setAlignment(Pos.CENTER_LEFT);
     fieldsCell.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(fieldsCell, Priority.ALWAYS);
     for (String path : fieldPaths(section)) {
       Label pathLabel = new Label(path);
+      pathLabel.getStyleClass().add("path-chip");
       pathLabel.setWrapText(true);
       pathLabel.setMaxWidth(Double.MAX_VALUE);
       fieldsCell.getChildren().add(pathLabel);

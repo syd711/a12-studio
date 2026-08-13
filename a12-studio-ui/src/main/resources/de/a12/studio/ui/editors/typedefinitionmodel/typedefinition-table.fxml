@@ -14,11 +14,11 @@
     <top>
         <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
             <items>
-                <Button mnemonicParsing="false" onAction="#onAdd" styleClass="secondary-button" text="%add">
+                <Button mnemonicParsing="false" onAction="#onAdd" styleClass="secondary-button" text="%add_type_definition">
                     <graphic>
-                        <FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus-circle-outline" iconSize="18" />
+                        <FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="18" />
                     </graphic>
-                
+
                     <tooltip><Tooltip text="%add_type_definition" /></tooltip>
                 </Button>
                 <Button layoutX="169.0" layoutY="11.0" mnemonicParsing="false" onAction="#onDelete" styleClass="delete-button">

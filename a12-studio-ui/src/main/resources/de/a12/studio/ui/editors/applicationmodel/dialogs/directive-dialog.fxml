@@ -120,7 +120,8 @@
                         <Label styleClass="field-label" text="%document_model" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                      </GridPane>
                      <Label fx:id="modelsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
-                     <Button mnemonicParsing="false" onAction="#onAddModel" styleClass="primary-button" text="%add" >
+                     <Button mnemonicParsing="false" onAction="#onAddModel" styleClass="primary-button" text="%add_model_reference" >
+                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_model_reference" /></tooltip>
             </Button>
 

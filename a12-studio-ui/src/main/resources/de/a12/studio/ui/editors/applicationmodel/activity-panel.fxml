@@ -31,7 +31,8 @@
       <Label styleClass="field-label" text="%value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
     </GridPane>
     <HBox spacing="8.0">
-      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+      <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_activity" >
+                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_activity" /></tooltip>
             </Button>
     </HBox>

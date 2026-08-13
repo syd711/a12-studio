@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.util.StringConverter;
 
 import java.util.Comparator;
@@ -62,7 +63,7 @@ public final class OverviewElementOptions {
 
   /** Renders ids as their display path in a {@code ComboBox<String>} while keeping the id as the stored value. */
   public static void applyElementRefConverter(ComboBox<String> comboBox, ElementIndex index) {
-    comboBox.setConverter(new StringConverter<>() {
+    StringConverter<String> converter = new StringConverter<>() {
       @Override
       public String toString(String elementId) {
         return elementId == null ? "" : displayPath(index, elementId);
@@ -72,6 +73,31 @@ public final class OverviewElementOptions {
       public String fromString(String string) {
         return string;
       }
-    });
+    };
+    comboBox.setConverter(converter);
+    applyMonospaceCells(comboBox, converter);
+  }
+
+  /** Renders both the combo box's collapsed display and its popup rows in the shared monospace "path" font
+   * (see {@code .path-text} in {@code stylesheet.css}) - the same font used everywhere else a field/column path
+   * is shown, but without {@code .path-chip}'s background/border decoration, which is reserved for the Section
+   * Data panel's field list. Applied on the {@link ListCell}s themselves (not via a CSS descendant selector on
+   * the combo box) because the popup's cells aren't scene-graph descendants of the combo box, so a style class
+   * added only to the combo box wouldn't reach them. Shared by {@link OverviewColumnOptions#applyColumnConverter}. */
+  static void applyMonospaceCells(ComboBox<String> comboBox, StringConverter<String> converter) {
+    comboBox.setCellFactory(listView -> createPathCell(converter));
+    comboBox.setButtonCell(createPathCell(converter));
+  }
+
+  private static ListCell<String> createPathCell(StringConverter<String> converter) {
+    ListCell<String> cell = new ListCell<>() {
+      @Override
+      protected void updateItem(String item, boolean empty) {
+        super.updateItem(item, empty);
+        setText(empty ? null : converter.toString(item));
+      }
+    };
+    cell.getStyleClass().add("path-text");
+    return cell;
   }
 }
