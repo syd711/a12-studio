@@ -19,16 +19,20 @@ import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
- * Edits a single {@link Column}'s {@link Column#getIcon()} name via an editable {@link ComboBox} suggesting
- * every icon name known to the bundled Google "Material Icons" font (see {@link MaterialIcons}, the same
- * names shown at https://fonts.google.com/icons), filtered live as the user types and previewed with the
- * actual glyph rather than a plain name string. A browse button still opens the Google Fonts icon picker
- * directly, for icons outside the bundled classic set. Not bound to a single {@link
- * de.a12.studio.models.documentmodel.Element} (the icon lives on the {@link Column} being edited by {@link
- * de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController}), so it follows the same
- * per-Column pattern as {@link de.a12.studio.ui.editors.overviewmodel.StylesPanelController#setColumn}.
+ * Edits a single owner's {@link Icon} name via an editable {@link ComboBox} suggesting every icon name known
+ * to the bundled Google "Material Icons" font (see {@link MaterialIcons}, the same names shown at
+ * https://fonts.google.com/icons), filtered live as the user types and previewed with the actual glyph rather
+ * than a plain name string. A browse button still opens the Google Fonts icon picker directly, for icons
+ * outside the bundled classic set. Not bound to a single {@link de.a12.studio.models.documentmodel.Element}, so
+ * it follows the same per-owner pattern as {@link LocalizedTextPanelController}: {@link #setColumn} for a
+ * {@link Column} (the icon being edited by {@link
+ * de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController}), or {@link #setCustom} for
+ * any other owner (e.g. the Custom Filter Configuration editor's Filter Button/Filter Group/Filter Item icons)
+ * via a caller-supplied getter/setter pair rather than a dedicated {@code setXxx}.
  */
 public class IconPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -43,8 +47,12 @@ public class IconPanelController extends AbstractPropertyEditor implements Initi
 
   private Column column;
 
-  // Set while setColumn() is repopulating iconCombo from the model, so the listener below doesn't mistake
-  // that programmatic change for a user edit.
+  // Set (instead of column) by setCustom(), for owners other than a Column.
+  private Supplier<Icon> customIconGetter;
+  private Consumer<Icon> customIconSetter;
+
+  // Set while setColumn()/setCustom() is repopulating iconCombo from the model, so the listener below doesn't
+  // mistake that programmatic change for a user edit.
   private boolean updatingFromModel;
 
   @Override
@@ -72,9 +80,29 @@ public class IconPanelController extends AbstractPropertyEditor implements Initi
 
   public void setColumn(@NonNull Column column) {
     this.column = column;
+    this.customIconGetter = null;
+    this.customIconSetter = null;
     updatingFromModel = true;
     try {
       iconCombo.getEditor().setText(column.getIcon() != null ? column.getIcon().getName() : null);
+    }
+    finally {
+      updatingFromModel = false;
+    }
+  }
+
+  /**
+   * Binds this panel to an arbitrary owner's {@link Icon} field via a getter/setter pair, e.g. {@code
+   * filterGroup::getIcon}/{@code filterGroup::setIcon}.
+   */
+  public void setCustom(@NonNull Supplier<Icon> getter, @NonNull Consumer<Icon> setter) {
+    this.column = null;
+    this.customIconGetter = getter;
+    this.customIconSetter = setter;
+    updatingFromModel = true;
+    try {
+      Icon icon = getter.get();
+      iconCombo.getEditor().setText(icon != null ? icon.getName() : null);
     }
     finally {
       updatingFromModel = false;
@@ -109,6 +137,19 @@ public class IconPanelController extends AbstractPropertyEditor implements Initi
   }
 
   private void setIconName(String name) {
+    if (customIconGetter != null) {
+      if (name == null) {
+        customIconSetter.accept(null);
+        return;
+      }
+      Icon icon = customIconGetter.get();
+      if (icon == null) {
+        icon = new Icon();
+        customIconSetter.accept(icon);
+      }
+      icon.setName(name);
+      return;
+    }
     if (name == null) {
       column.setIcon(null);
       return;

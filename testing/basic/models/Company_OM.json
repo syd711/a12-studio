@@ -145,7 +145,7 @@
       "filterConfiguration": {
         "showFilterButton": true,
         "showFilterBar": true,
-        "filterMode": "all_columns",
+        "filterMode": "all_with_meta",
         "fields": [
           {
             "fieldId": "group_1ec00"
@@ -227,6 +227,16 @@
         ],
         "enumeratedStringFilter": {
           "pagingSize": 8
+        }
+      },
+      "newFilterConfiguration": {
+        "filterSelector": {
+          "viewMode": null,
+          "initialVisibility": null,
+          "trigger": {
+            "enabled": null,
+            "value": {}
+          }
         }
       },
       "multiSelection": {

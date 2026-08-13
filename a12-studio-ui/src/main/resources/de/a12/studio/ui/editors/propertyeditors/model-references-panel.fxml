@@ -33,7 +33,7 @@
       <Label styleClass="field-label" text="%reference" GridPane.columnIndex="3" GridPane.rowIndex="0" />
     </GridPane>
     <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_model_reference" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_model_reference" /></tooltip>
             </Button>
   </VBox>

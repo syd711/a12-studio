@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%custom_filter_configuration" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.overviewmodel.CustomFilterConfigurationPanelController">
+    <BorderPane>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+        <center>
+            <VBox spacing="14.0">
+                <children>
+
+                    <!-- Filter Groups -->
+                    <VBox spacing="10.0">
+                        <children>
+                            <Label styleClass="section-header" text="%filter_groups" />
+                            <HBox fx:id="filterGroupColumnHeaders" spacing="10.0">
+                                <children>
+                                    <GridPane hgap="10.0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="33.33" />
+                                            <ColumnConstraints percentWidth="66.67" />
+                                        </columnConstraints>
+                                        <Label styleClass="field-label" text="%name" GridPane.columnIndex="0" />
+                                        <Label styleClass="field-label" text="%filter_items" GridPane.columnIndex="1" />
+                                    </GridPane>
+                                    <Region prefWidth="90.0" minWidth="90.0" maxWidth="90.0" HBox.hgrow="NEVER" />
+                                </children>
+                            </HBox>
+                            <VBox fx:id="filterGroupRows" spacing="8.0" />
+                            <Label fx:id="filterGroupsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+                            <SplitMenuButton fx:id="addFilterGroupButton" mnemonicParsing="false" onAction="#onAddFilterGroup" styleClass="primary-button" text="%add">
+                                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                                <tooltip><Tooltip text="%add_filter_group" /></tooltip>
+                            </SplitMenuButton>
+                        </children>
+                    </VBox>
+
+                    <!-- Filter Result -->
+                    <VBox spacing="10.0">
+                        <children>
+                            <Label styleClass="section-header" text="%filter_result" />
+                            <GridPane hgap="24.0" vgap="10.0">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                </columnConstraints>
+                                <children>
+                                    <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <children>
+                                            <Label styleClass="field-label" text="%match" />
+                                            <HBox spacing="12.0">
+                                                <children>
+                                                    <RadioButton fx:id="matchAllField" mnemonicParsing="false" text="%match_all">
+                                                        <toggleGroup>
+                                                            <ToggleGroup fx:id="matchToggleGroup" />
+                                                        </toggleGroup>
+                                                    </RadioButton>
+                                                    <RadioButton fx:id="matchAnyField" mnemonicParsing="false" text="%match_any" toggleGroup="$matchToggleGroup" />
+                                                </children>
+                                            </HBox>
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <children>
+                                            <Label styleClass="field-label" text="%user_access" />
+                                            <CheckBox fx:id="matchUserAccessField" mnemonicParsing="false" text="%end_users_may_change_this" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <children>
+                                            <CheckBox fx:id="initiallyInvertedField" mnemonicParsing="false" text="%initially_inverted" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <children>
+                                            <Label styleClass="field-label" text="%user_access" />
+                                            <CheckBox fx:id="initiallyInvertedUserAccessField" mnemonicParsing="false" text="%end_users_may_change_this" />
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </GridPane>
+                        </children>
+                    </VBox>
+
+                    <!-- Filter Selector -->
+                    <TitledPane fx:id="filterSelectorPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%filter_selector">
+                        <VBox spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <children>
+                                <GridPane hgap="24.0" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                    </columnConstraints>
+                                    <children>
+                                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <children>
+                                                <Label styleClass="field-label" text="%display_mode" />
+                                                <HBox spacing="12.0">
+                                                    <children>
+                                                        <RadioButton fx:id="displayModeOverlayField" mnemonicParsing="false" text="%display_mode_overlay">
+                                                            <toggleGroup>
+                                                                <ToggleGroup fx:id="displayModeToggleGroup" />
+                                                            </toggleGroup>
+                                                        </RadioButton>
+                                                        <RadioButton fx:id="displayModeDockedField" mnemonicParsing="false" text="%display_mode_docked" toggleGroup="$displayModeToggleGroup" />
+                                                        <RadioButton fx:id="displayModeModalField" mnemonicParsing="false" text="%display_mode_modal" toggleGroup="$displayModeToggleGroup" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <children>
+                                                <Label styleClass="field-label" text="%initially_visible" />
+                                                <HBox spacing="12.0">
+                                                    <children>
+                                                        <RadioButton fx:id="initialVisibilityShowField" mnemonicParsing="false" text="%show">
+                                                            <toggleGroup>
+                                                                <ToggleGroup fx:id="initialVisibilityToggleGroup" />
+                                                            </toggleGroup>
+                                                        </RadioButton>
+                                                        <RadioButton fx:id="initialVisibilityHideField" mnemonicParsing="false" text="%hide" toggleGroup="$initialVisibilityToggleGroup" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                            <children>
+                                                <CheckBox fx:id="showOnlySetFiltersField" mnemonicParsing="false" text="%show_only_set_filters" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <children>
+                                                <Label styleClass="field-label" text="%user_access" />
+                                                <CheckBox fx:id="showOnlySetFiltersUserAccessField" mnemonicParsing="false" text="%end_users_may_change_this" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </TitledPane>
+
+                    <!-- Header Subtitle -->
+                    <TitledPane fx:id="headerSubtitlePane" maxWidth="Infinity" styleClass="titled-pane-child" text="%header_subtitle">
+                        <VBox spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <children>
+                                <fx:include fx:id="headerSubtitleText" source="../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
+                            </children>
+                        </VBox>
+                    </TitledPane>
+
+                    <!-- Search Bar -->
+                    <TitledPane fx:id="searchBarPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%search_bar">
+                        <VBox spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <children>
+                                <GridPane hgap="24.0" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                    </columnConstraints>
+                                    <children>
+                                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <children>
+                                                <CheckBox fx:id="showSearchFieldInitiallyField" mnemonicParsing="false" text="%show_search_field_initially" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <children>
+                                                <Label styleClass="field-label" text="%user_access" />
+                                                <CheckBox fx:id="showSearchFieldInitiallyUserAccessField" mnemonicParsing="false" text="%end_users_may_change_this" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </TitledPane>
+
+                    <!-- Filter Button -->
+                    <TitledPane fx:id="filterButtonPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%filter_button">
+                        <VBox spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <children>
+                                <fx:include fx:id="filterButtonIcon" source="../propertyeditors/icon-panel.fxml" styleClass="titled-pane-sub-child" />
+                                <GridPane hgap="24.0" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                                    </columnConstraints>
+                                    <children>
+                                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <children>
+                                                <Label styleClass="field-label" text="%user_access" />
+                                                <CheckBox fx:id="filterButtonUserAccessField" mnemonicParsing="false" text="%end_users_may_change_this" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <children>
+                                                <CheckBox fx:id="hideFilterButtonLabelField" mnemonicParsing="false" text="%hide_label" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                                <fx:include fx:id="filterButtonLabel" source="../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
+                            </children>
+                        </VBox>
+                    </TitledPane>
+
+                </children>
+                <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                </padding>
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

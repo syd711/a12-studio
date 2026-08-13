@@ -25,9 +25,16 @@
 
 /**
  * Font Icons (org.kordamp.ikonli)
+ *
+ * -fx-fill is set alongside -fx-icon-color because ikonli's FontIcon (a Text subclass)
+ * bidirectionally syncs its iconColor property with the inherited fill property; leaving
+ * -fx-fill unpinned lets it resolve separately (e.g. to Shape's default black) and stomp
+ * -fx-icon-color back via that listener. See stylesheet-buttons.css for the !important variant
+ * needed on buttons whose icon color is overridden.
  */
 .ikonli-font-icon {
     -fx-icon-color: -fx-text-color;
+    -fx-fill: -fx-text-color;
 }
 
 /**

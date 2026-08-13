@@ -26,6 +26,8 @@ public class OverviewConfiguration {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private FilterConfiguration filterConfiguration;
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  private NewFilterConfiguration newFilterConfiguration;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private MultiSelectionConfig multiSelection;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<ColumnRef> initialSorting = new ArrayList<>();

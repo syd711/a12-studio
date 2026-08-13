@@ -121,7 +121,7 @@
                      </GridPane>
                      <Label fx:id="modelsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
                      <Button mnemonicParsing="false" onAction="#onAddModel" styleClass="primary-button" text="%add_model_reference" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_model_reference" /></tooltip>
             </Button>
 

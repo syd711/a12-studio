@@ -21,7 +21,7 @@
     <VBox fx:id="criteriaRows" spacing="8.0" />
     <Label fx:id="criteriaEmptyLabel" styleClass="placeholder-label" text="%no_uniqueness_criteria_defined" />
     <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_uniqueness_criterion" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_uniqueness_criterion" /></tooltip>
             </Button>
   </VBox>

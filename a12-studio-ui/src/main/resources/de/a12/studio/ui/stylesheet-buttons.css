@@ -19,16 +19,17 @@
 }
 
 /*
- * !important is required here: ikonli's FontIcon reports its -fx-icon-color
- * CssMetaData with a hardcoded StyleOrigin, and a plain type selector like
- * "*|FontIcon" contributes nothing to JavaFX's specificity calculation (only
- * id/style-class/pseudo-class counts are weighed - the element name is
- * ignored). That makes this rule tie in specificity with the global
- * ".ikonli-font-icon" / ".toolbar-icon" rules, with the winner decided by
- * arbitrary stylesheet load order. !important removes that ambiguity.
+ * Both -fx-icon-color AND -fx-fill (with !important) are required here: ikonli's FontIcon
+ * extends Text and wires a bidirectional listener between its own iconColor property and the
+ * inherited fill property (see FontIcon's constructor). -fx-icon-color and -fx-fill are two
+ * independent CssMetaData entries, so if only -fx-icon-color is pinned, the CSS engine can still
+ * resolve -fx-fill separately (falling back to Shape's default black when no rule matches it),
+ * which fires the fill->iconColor listener and silently stomps -fx-icon-color back to black -
+ * even a value set with !important. Pinning both properties to the same color closes that loop.
  */
 .default-button *|FontIcon {
     -fx-icon-color: #000000 !important;
+    -fx-fill: #000000 !important;
 }
 
 /**
@@ -223,6 +224,20 @@
 
 .primary-button *|FontIcon {
     -fx-icon-color: -fx-text-color-inverse !important;
+    -fx-fill: -fx-text-color-inverse !important;
+}
+
+/*
+ * Explicit-class fallback for the rule above: "*|FontIcon" is a bare type selector, which - per
+ * the note on .default-button above - does not reliably win against the FontIcon's own
+ * ".ikonli-font-icon" class selector in this JavaFX/ikonli version, !important or not. Icons that
+ * need a guaranteed color should carry styleClass="button-icon" (see e.g. overview-section-data-
+ * panel.fxml's addButton) so this class selector applies instead, matching the same
+ * ".ancestor-class .child-class" pattern already used and proven by .toolbar-icon.
+ */
+.primary-button .button-icon {
+    -fx-icon-color: -fx-text-color-inverse !important;
+    -fx-fill: -fx-text-color-inverse !important;
 }
 
 /**
@@ -286,4 +301,5 @@
 
 .delete-button *|FontIcon {
     -fx-icon-color: #c0392b !important;
+    -fx-fill: #c0392b !important;
 }

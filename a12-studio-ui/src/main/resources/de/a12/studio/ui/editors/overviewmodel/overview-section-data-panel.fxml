@@ -31,7 +31,7 @@
     <VBox fx:id="sectionRows" spacing="8.0" />
     <Label fx:id="sectionsEmptyLabel" styleClass="placeholder-label" text="%no_sections_defined" />
     <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_section" >
-        <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+        <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
         <tooltip><Tooltip text="%add_section" /></tooltip>
     </Button>
   </VBox>

@@ -36,7 +36,7 @@
             </ScrollPane>
             <HBox spacing="8.0">
                <Button fx:id="addItemButton" mnemonicParsing="false" onAction="#onAddItem" styleClass="primary-button" text="%add_suggestion" >
-                  <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                  <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                   <tooltip><Tooltip text="%add_suggestion" /></tooltip>
                </Button>
                <VBox.margin>

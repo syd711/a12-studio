@@ -26,7 +26,7 @@
         <VBox fx:id="onEnterRows" spacing="8.0" />
         <Label fx:id="onEnterEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
         <Button mnemonicParsing="false" onAction="#onAddOnEnter" styleClass="primary-button" text="%add_on_enter_scene_change" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_on_enter_scene_change" /></tooltip>
             </Button>
       </children>
@@ -44,7 +44,7 @@
         <VBox fx:id="onExitRows" spacing="8.0" />
         <Label fx:id="onExitEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
         <Button mnemonicParsing="false" onAction="#onAddOnExit" styleClass="primary-button" text="%add_on_exit_scene_change" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_on_exit_scene_change" /></tooltip>
             </Button>
       </children>

@@ -57,7 +57,7 @@
                   </GridPane>
                   <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
                   <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="secondary-button" text="%add_action" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_context_menu_action" /></tooltip>
             </Button>
                 </children>
@@ -72,7 +72,7 @@
       <HBox spacing="8.0">
         <children>
           <Button fx:id="addGroupButton" mnemonicParsing="false" onAction="#onAddGroup" styleClass="primary-button" text="%add_group" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_group" /></tooltip>
             </Button>
           <Button fx:id="removeGroupButton" mnemonicParsing="false" onAction="#onRemoveGroup" styleClass="secondary-button" text="%remove_group" >

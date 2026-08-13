@@ -1,7 +1,20 @@
 package de.a12.studio.ui.editors.overviewmodel;
 
+import de.a12.studio.models.documentmodel.BooleanFieldType;
+import de.a12.studio.models.documentmodel.ConfirmFieldType;
+import de.a12.studio.models.documentmodel.DateFieldType;
+import de.a12.studio.models.documentmodel.DateFragmentFieldType;
+import de.a12.studio.models.documentmodel.DateRangeFieldType;
+import de.a12.studio.models.documentmodel.DateTimeFieldType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.EnumerationFieldType;
+import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.FieldType;
+import de.a12.studio.models.documentmodel.NumberFieldType;
+import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.models.documentmodel.TimeFieldType;
+import de.a12.studio.models.Label;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
@@ -99,5 +112,69 @@ public final class OverviewElementOptions {
     };
     cell.getStyleClass().add("path-text");
     return cell;
+  }
+
+  /** The {@code fieldId}'s multilingual label, i.e. a {@link de.a12.studio.models.documentmodel.FieldElement}'s
+   * own {@code Field.label} - used by the Custom Filter Configuration editor's "Generate from document fields"
+   * actions to seed a generated {@link de.a12.studio.models.overviewmodel.FilterGroup}'s label. Empty if {@code
+   * index} is {@code null}, {@code fieldId} doesn't resolve, or the resolved element isn't a field. */
+  public static List<Label> fieldLabel(ElementIndex index, String fieldId) {
+    if (index == null || fieldId == null) {
+      return List.of();
+    }
+    return index.allElements().stream()
+        .filter(element -> fieldId.equals(element.getId()) && element instanceof FieldElement fieldElement && fieldElement.getField() != null)
+        .findFirst()
+        .map(element -> ((FieldElement) element).getField().getLabel())
+        .orElse(List.of());
+  }
+
+  /** A short, stable type name derived from {@code fieldId}'s {@link FieldType} (e.g. {@code "string"}, {@code
+   * "number"}), mirroring the field-type groupings the platform docs use for Custom Filter Configuration's
+   * per-field-type Filter Item options ("Filter Items"). {@code null} if {@code index} is {@code null}, {@code
+   * fieldId} doesn't resolve to a field, or the field has no recognized type yet. */
+  public static String filterItemFieldType(ElementIndex index, String fieldId) {
+    if (index == null || fieldId == null) {
+      return null;
+    }
+    return index.allElements().stream()
+        .filter(element -> fieldId.equals(element.getId()) && element instanceof FieldElement fieldElement && fieldElement.getField() != null)
+        .findFirst()
+        .map(element -> filterItemFieldType(((FieldElement) element).getField().getFieldType()))
+        .orElse(null);
+  }
+
+  private static String filterItemFieldType(FieldType fieldType) {
+    if (fieldType instanceof StringFieldType) {
+      return "string";
+    }
+    if (fieldType instanceof NumberFieldType) {
+      return "number";
+    }
+    if (fieldType instanceof BooleanFieldType) {
+      return "boolean";
+    }
+    if (fieldType instanceof ConfirmFieldType) {
+      return "confirm";
+    }
+    if (fieldType instanceof EnumerationFieldType) {
+      return "enumeration";
+    }
+    if (fieldType instanceof DateTimeFieldType) {
+      return "datetime";
+    }
+    if (fieldType instanceof DateRangeFieldType) {
+      return "daterange";
+    }
+    if (fieldType instanceof DateFragmentFieldType) {
+      return "datefragment";
+    }
+    if (fieldType instanceof DateFieldType) {
+      return "date";
+    }
+    if (fieldType instanceof TimeFieldType) {
+      return "time";
+    }
+    return null;
   }
 }

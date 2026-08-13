@@ -32,7 +32,7 @@
     </GridPane>
     <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
     <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_match_condition" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_match_condition" /></tooltip>
             </Button>
   </VBox>

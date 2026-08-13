@@ -26,7 +26,7 @@
       <Label fx:id="categoryRowsEmptyLabel" styleClass="placeholder-label" text="%no_categories_configured" />
       <HBox spacing="8.0">
         <Button fx:id="addCategoryButton" mnemonicParsing="false" onAction="#onAddCategory" styleClass="primary-button" text="%add_category" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_category" /></tooltip>
             </Button>
       </HBox>
@@ -46,7 +46,7 @@
         <Label fx:id="enumerationValuesEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
         <HBox spacing="8.0">
           <Button fx:id="addValueButton" mnemonicParsing="false" onAction="#onAddValue" styleClass="primary-button" text="%add_value" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_value" /></tooltip>
             </Button>
         </HBox>

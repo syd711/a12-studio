@@ -29,7 +29,7 @@
     </GridPane>
     <HBox spacing="8.0">
       <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_module_role" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_module_role" /></tooltip>
             </Button>
       <Button fx:id="editRolesButton" mnemonicParsing="false" onAction="#onEditRoles" styleClass="secondary-button" text="%edit_roles" >

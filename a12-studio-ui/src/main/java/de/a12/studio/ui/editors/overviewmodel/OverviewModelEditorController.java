@@ -43,7 +43,9 @@ import java.util.function.BiConsumer;
  * delegated to {@link OverviewSearchAndFiltersPanelController}), Multi-Selection (delegated to {@link
  * OverviewMultiSelectionPanelController}), Custom Selection Of Fields (delegated to {@link
  * CustomSelectionOfFieldsPanelController}), Section Data (delegated to {@link
- * OverviewSectionDataPanelController}), Filter String Fields with Multi-Select (delegated to {@link
+ * OverviewSectionDataPanelController}), Custom Filter Configuration ({@code content.configuration.
+ * newFilterConfiguration}, the "Custom Filter" filter mode's full filter structure, delegated to {@link
+ * CustomFilterConfigurationPanelController}), Filter String Fields with Multi-Select (delegated to {@link
  * FilterStringFieldsMultiSelectPanelController}), Row Height And Action Column Width (delegated to {@link
  * RowHeightActionColumnWidthPanelController}), Paging Behaviour (delegated to {@link
  * PagingBehaviourPanelController}), Accessibility (delegated to {@link OverviewAccessibilityPanelController})
@@ -81,6 +83,10 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   // Section Data
   @FXML
   private OverviewSectionDataPanelController overviewSectionDataController;
+
+  // Custom Filter Configuration
+  @FXML
+  private CustomFilterConfigurationPanelController customFilterConfigurationController;
 
   // Filter String Fields with Multi-Select
   @FXML
@@ -196,6 +202,8 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       customSelectionOfFieldsController.setModel(model);
 
       overviewSectionDataController.setModel(model);
+
+      customFilterConfigurationController.setModel(model);
 
       filterStringFieldsMultiSelectController.setModel(model);
 
@@ -348,6 +356,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     overviewAccessibilityController.setDocumentModelIndex(documentModelIndex);
     customSelectionOfFieldsController.setDocumentModelIndex(documentModelIndex);
     overviewSectionDataController.setDocumentModelIndex(documentModelIndex);
+    customFilterConfigurationController.setDocumentModelIndex(documentModelIndex);
   }
 
   // ---- Shared helpers ----

@@ -52,21 +52,6 @@
                                        <!-- Sorting -->
                                        <fx:include fx:id="overviewSorting" source="overview-sorting-panel.fxml" />
 
-                                       <!-- Multi-Selection -->
-                                       <fx:include fx:id="overviewMultiSelection" source="overview-multi-selection-panel.fxml" />
-
-                                       <!-- Search and Filters -->
-                                       <fx:include fx:id="overviewSearchAndFilters" source="overview-search-and-filters-panel.fxml" />
-
-                                       <!-- Custom Selection Of Fields -->
-                                       <fx:include fx:id="customSelectionOfFields" source="custom-selection-of-fields-panel.fxml" />
-
-                                       <!-- Section Data -->
-                                       <fx:include fx:id="overviewSectionData" source="overview-section-data-panel.fxml" />
-
-                                       <!-- Filter String Fields with Multi-Select -->
-                                       <fx:include fx:id="filterStringFieldsMultiSelect" source="filter-string-fields-multi-select-panel.fxml" />
-
                                        <!-- Paging Behaviour -->
                                        <fx:include fx:id="overviewPagingBehaviour" source="paging-behaviour-panel.fxml" />
 
@@ -78,6 +63,56 @@
 
                                        <!-- Styles -->
                                        <fx:include fx:id="overviewStyles" source="styles-panel.fxml" />
+
+                                   </children>
+                                   <padding>
+                                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                   </padding>
+                               </VBox>
+                           </content>
+                       </ScrollPane>
+                   </content>
+               </Tab>
+               <Tab text="%search_and_filters">
+                   <content>
+                       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+                           <content>
+                               <VBox spacing="12.0" styleClass="field-editor">
+                                   <children>
+
+                                       <!-- Search and Filters -->
+                                       <fx:include fx:id="overviewSearchAndFilters" source="overview-search-and-filters-panel.fxml" />
+
+                                       <!-- Custom Selection Of Fields -->
+                                       <fx:include fx:id="customSelectionOfFields" source="custom-selection-of-fields-panel.fxml" />
+
+                                       <!-- Section Data -->
+                                       <fx:include fx:id="overviewSectionData" source="overview-section-data-panel.fxml" />
+
+                                       <!-- Custom Filter Configuration -->
+                                       <fx:include fx:id="customFilterConfiguration" source="custom-filter-configuration-panel.fxml" />
+
+                                       <!-- Filter String Fields with Multi-Select -->
+                                       <fx:include fx:id="filterStringFieldsMultiSelect" source="filter-string-fields-multi-select-panel.fxml" />
+
+                                   </children>
+                                   <padding>
+                                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                   </padding>
+                               </VBox>
+                           </content>
+                       </ScrollPane>
+                   </content>
+               </Tab>
+               <Tab text="%multi_selection">
+                   <content>
+                       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+                           <content>
+                               <VBox spacing="12.0" styleClass="field-editor">
+                                   <children>
+
+                                       <!-- Multi-Selection -->
+                                       <fx:include fx:id="overviewMultiSelection" source="overview-multi-selection-panel.fxml" />
 
                                    </children>
                                    <padding>
