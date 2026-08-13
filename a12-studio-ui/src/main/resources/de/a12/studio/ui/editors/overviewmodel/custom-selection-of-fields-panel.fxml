@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%custom_selection_of_fields" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.overviewmodel.CustomSelectionOfFieldsPanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="10.0">
+    <HBox fx:id="fieldColumnHeaders" spacing="10.0">
+      <Label styleClass="field-label" text="" prefWidth="18.0" />
+      <GridPane hgap="10.0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+        <columnConstraints>
+          <ColumnConstraints percentWidth="33.33" />
+          <ColumnConstraints percentWidth="66.67" />
+        </columnConstraints>
+        <HBox alignment="CENTER_LEFT" spacing="4.0" GridPane.columnIndex="0">
+          <Label styleClass="field-label" text="%subtype" />
+          <Label fx:id="subtypeInfoIcon" />
+        </HBox>
+        <Label styleClass="field-label" text="%field" GridPane.columnIndex="1" />
+      </GridPane>
+      <Region prefWidth="70.0" minWidth="70.0" maxWidth="70.0" HBox.hgrow="NEVER" />
+    </HBox>
+    <VBox fx:id="fieldRows" spacing="8.0" />
+    <Label fx:id="fieldsEmptyLabel" styleClass="placeholder-label" text="%no_custom_fields_defined" />
+    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add" >
+        <tooltip><Tooltip text="%add_custom_field" /></tooltip>
+    </Button>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>
