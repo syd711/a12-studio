@@ -11,38 +11,45 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%major" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%major"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.SubheaderSlotPanelController">
- <BorderPane>
- <center>
-  <VBox spacing="10.0">
-    <GridPane fx:id="rowsGrid" hgap="10.0" vgap="6.0">
-      <columnConstraints>
-        <ColumnConstraints hgrow="NEVER" minWidth="140.0" prefWidth="140.0" />
-        <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
-        <ColumnConstraints hgrow="NEVER" minWidth="120.0" prefWidth="120.0" />
-        <ColumnConstraints hgrow="NEVER" minWidth="90.0" prefWidth="90.0" />
-        <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0" />
-        <ColumnConstraints hgrow="NEVER" minWidth="90.0" prefWidth="90.0" />
-      </columnConstraints>
-      <rowConstraints>
-        <RowConstraints />
-      </rowConstraints>
-      <Label styleClass="field-label" text="%action_type" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="%event" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="%priority" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="%destructive" GridPane.columnIndex="3" GridPane.rowIndex="0" />
-      <Label styleClass="field-label" text="%icon" GridPane.columnIndex="4" GridPane.rowIndex="0" />
-    </GridPane>
-    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
-    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="secondary-button" text="%add_slot" >
-                <graphic><FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
-                <tooltip><Tooltip text="%add_slot" /></tooltip>
-            </Button>
-  </VBox>
- </center>
- <top>
-    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
- </top>
- </BorderPane>
+    <BorderPane>
+        <center>
+            <VBox spacing="10.0">
+                <GridPane fx:id="rowsGrid" hgap="10.0" vgap="6.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="140.0" prefWidth="140.0"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
+                        <ColumnConstraints hgrow="NEVER" minWidth="120.0" prefWidth="120.0"/>
+                        <ColumnConstraints hgrow="NEVER" minWidth="90.0" prefWidth="90.0"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
+                        <ColumnConstraints hgrow="NEVER" minWidth="90.0" prefWidth="90.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints/>
+                    </rowConstraints>
+                    <Label styleClass="field-label" text="%action_type" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <Label styleClass="field-label" text="%event" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Label styleClass="field-label" text="%priority" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <Label styleClass="field-label" text="%destructive" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                    <Label styleClass="field-label" text="%icon" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
+                </GridPane>
+                <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet"/>
+                <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button"
+                        text="%add_slot">
+                    <graphic>
+                        <FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%add_slot"/>
+                    </tooltip>
+                </Button>
+            </VBox>
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../components/error-container.fxml"
+                        BorderPane.alignment="CENTER"/>
+        </top>
+    </BorderPane>
 </TitledPane>

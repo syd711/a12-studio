@@ -142,6 +142,7 @@ public class OverviewReferencePanelController implements Initializable {
     finally {
       updatingFromModel = wasUpdating;
     }
+    validate();
     syncModelReferences();
     onChange.run();
   }

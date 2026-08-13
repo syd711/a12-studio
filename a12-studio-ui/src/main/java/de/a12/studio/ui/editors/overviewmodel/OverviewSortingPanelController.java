@@ -150,6 +150,7 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     finally {
       updatingFromModel = false;
     }
+    updateColumnValidationState(columnField, columnRef);
     columnField.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel) {
         return;
@@ -157,6 +158,7 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
       columnRef.setIdref(newValue);
       commitHeaderChange();
       refreshValidationError();
+      updateColumnValidationState(columnField, columnRef);
     });
 
     HBox row = new HBox(10.0, dragHandle, columnField, createActionsBox(columnRef, index, rowCount));
@@ -164,6 +166,32 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     row.getStyleClass().add("module-row");
     RowFactory.setupRowDragAndDrop(row, dragHandle, SORTING_INDEX, index, this::moveSorting);
     return row;
+  }
+
+  /** Flags {@code columnField} with a red border and an explanatory tooltip when the {@link Column} it
+   * currently points at is itself pointing at a field path that can't be resolved against {@link
+   * #documentModelIndex} - same "unresolved" semantics as {@link
+   * OverviewColumnOptions#isUnresolvedElementRef}, whose {@link OverviewColumnsPanelController} counterpart
+   * flags it on a plain summary {@code Label} instead, since here the column is picked via a combo box rather
+   * than rendered as text. A dangling {@code idref} (no such column at all) is left to {@link
+   * #refreshValidationError}'s panel-level error, since there's no resolved {@link Column} to check a field
+   * path on. */
+  private void updateColumnValidationState(ComboBox<String> columnField, ColumnRef columnRef) {
+    Column column = getColumns().stream()
+        .filter(candidate -> candidate.getId() != null && candidate.getId().equals(columnRef.getIdref()))
+        .findFirst()
+        .orElse(null);
+    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex)) {
+      if (!columnField.getStyleClass().contains("validation-error")) {
+        columnField.getStyleClass().add("validation-error");
+      }
+      columnField.setTooltip(WidgetFactory.createTooltip(
+          StudioBundle.get("path_could_not_be_resolved", column.getElementRef())));
+    }
+    else {
+      columnField.getStyleClass().remove("validation-error");
+      columnField.setTooltip(null);
+    }
   }
 
   private void moveSorting(int fromIndex, int insertBeforeIndex) {

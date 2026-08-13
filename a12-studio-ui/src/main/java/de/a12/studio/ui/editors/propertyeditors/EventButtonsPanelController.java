@@ -14,10 +14,12 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
+import javafx.scene.input.DataFormat;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,13 +41,18 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   private static final String DEFAULT_PRIORITY = "SECONDARY";
 
   @FXML
-  private GridPane buttonsGrid;
+  private VBox buttonsList;
 
   @FXML
   private Label emptyLabel;
 
   private List<EventButtonLike> rows;
   private Supplier<EventButtonLike> newRowFactory;
+
+  // Identifies a row-reorder drag; unique per panel instance (this class is instantiated several times in the
+  // same window, e.g. subheader/footer major/minor buttons), so drags from a sibling instance's row list are
+  // rejected rather than accepted into this one. Created once in configure(), keyed off settingsKeySuffix.
+  private DataFormat indexFormat;
 
   /**
    * Binds this panel to {@code rows}. {@code rows} doesn't need to be declared as {@code List<EventButtonLike>}
@@ -60,6 +67,9 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
     setSettingsKeySuffix(settingsKeySuffix);
     this.rows = (List<EventButtonLike>) rows;
     this.newRowFactory = () -> (EventButtonLike) newRowFactory.get();
+    if (indexFormat == null) {
+      indexFormat = new DataFormat("application/x-a12-event-button-index" + settingsKeySuffix);
+    }
     rebuildRows();
   }
 
@@ -71,48 +81,59 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   }
 
   private void rebuildRows() {
-    buttonsGrid.getChildren().removeIf(node -> {
-      Integer rowIndex = GridPane.getRowIndex(node);
-      return rowIndex != null && rowIndex > 0;
-    });
+    buttonsList.getChildren().clear();
 
     boolean empty = rows.isEmpty();
-    buttonsGrid.setVisible(!empty);
-    buttonsGrid.setManaged(!empty);
     emptyLabel.setVisible(empty);
     emptyLabel.setManaged(empty);
 
     for (int index = 0; index < rows.size(); index++) {
-      addRow(rows.get(index), index, rows.size());
+      buttonsList.getChildren().add(createRow(rows.get(index), index, rows.size()));
     }
   }
 
-  private void addRow(EventButtonLike row, int index, int rowCount) {
+  private HBox createRow(EventButtonLike row, int index, int rowCount) {
+    FontIcon dragHandle = RowFactory.createDragHandle();
+
     TextField eventField = new TextField();
     eventField.setId("eventButtonEvent-" + index);
     eventField.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(eventField, Priority.ALWAYS);
     setFieldValue(eventField, row.getEvent());
     bindTextField(eventField, (el, value) -> row.setEvent(value.isEmpty() ? null : value));
 
     ComboBox<String> priorityField = new ComboBox<>();
     priorityField.setId("eventButtonPriority-" + index);
-    priorityField.setMaxWidth(Double.MAX_VALUE);
+    priorityField.setPrefWidth(140.0);
     priorityField.getItems().setAll(PRIORITIES);
     setFieldValue(priorityField, Boolean.TRUE.equals(row.getPrimary()) ? "PRIMARY" : DEFAULT_PRIORITY);
     bindComboBox(priorityField, (el, value) -> row.setPrimary("PRIMARY".equals(value)));
 
     CheckBox destructiveField = new CheckBox();
     destructiveField.setId("eventButtonDestructive-" + index);
+    destructiveField.setPrefWidth(110.0);
     setFieldValue(destructiveField, Boolean.TRUE.equals(row.getDestructive()));
     bindCheckBox(destructiveField, (el, value) -> row.setDestructive(value ? Boolean.TRUE : null));
 
     TextField iconField = new TextField();
     iconField.setId("eventButtonIcon-" + index);
     iconField.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(iconField, Priority.ALWAYS);
     setFieldValue(iconField, row.getIconName());
     bindTextField(iconField, (el, value) -> row.setIconName(value.isEmpty() ? null : value));
 
-    buttonsGrid.addRow(index + 1, eventField, priorityField, destructiveField, iconField, createActionsBox(row, index, rowCount));
+    HBox rowBox = new HBox(10.0, dragHandle, eventField, priorityField, destructiveField, iconField, createActionsBox(row, index, rowCount));
+    rowBox.setAlignment(Pos.CENTER_LEFT);
+    rowBox.getStyleClass().add("module-row");
+    RowFactory.setupRowDragAndDrop(rowBox, dragHandle, indexFormat, index, this::moveRowViaDrag);
+    return rowBox;
+  }
+
+  private void moveRowViaDrag(int fromIndex, int insertBeforeIndex) {
+    if (RowFactory.reorder(rows, fromIndex, insertBeforeIndex)) {
+      rebuildRows();
+      commitHeaderChange();
+    }
   }
 
   private HBox createActionsBox(EventButtonLike row, int index, int rowCount) {

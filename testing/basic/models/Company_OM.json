@@ -120,7 +120,7 @@
               "text": "Neu"
             }
           ],
-          "destructive": false,
+          "destructive": null,
           "primary": false
         }
       ],
@@ -145,7 +145,7 @@
       "filterConfiguration": {
         "showFilterButton": true,
         "showFilterBar": true,
-        "filterMode": "all_with_meta",
+        "filterMode": "all",
         "fields": [
           {
             "fieldId": "group_1ec00"
@@ -233,8 +233,12 @@
         "filterSelector": {
           "viewMode": null,
           "initialVisibility": null,
-          "trigger": {
+          "showSetFiltersOnly": {
             "enabled": null,
+            "value": false
+          },
+          "trigger": {
+            "enabled": false,
             "value": {}
           }
         }
@@ -243,7 +247,18 @@
         "collapseOption": "collapsible_collapsed",
         "counterOption": "simple",
         "selectionArea": null
+      },
+      "initialSorting": [
+        {
+          "idref": "column-4949b"
+        }
+      ],
+      "screenReaderColumn": {
+        "idref": "column-4949b"
       }
+    },
+    "defaultRowAction": {
+      "custom": true
     }
   }
 }

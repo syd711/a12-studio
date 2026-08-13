@@ -8,6 +8,7 @@ import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
@@ -58,13 +59,13 @@ public class SubheaderAndFooterDialogController implements Initializable, Dialog
     HeaderFooterBox subHeaderBox = ensureBox(content.getSubHeaderBox(), "subHeaderBox1", content::setSubHeaderBox);
     HeaderFooterBox footerBox = ensureBox(content.getFooterBox(), "footerBox1", content::setFooterBox);
 
-    subheaderMajorButtonsController.configure("SUBHEADER MAJOR BUTTONS", ".subheaderMajor",
+    subheaderMajorButtonsController.configure(StudioBundle.get("subheader_major_buttons"), ".subheaderMajor",
         ensureMajorButtons(subHeaderBox).getButton(), this::newButton);
-    subheaderMinorButtonsController.configure("SUBHEADER MINOR BUTTONS", ".subheaderMinor",
+    subheaderMinorButtonsController.configure(StudioBundle.get("subheader_minor_buttons"), ".subheaderMinor",
         ensureMinorButtons(subHeaderBox).getButton(), this::newButton);
-    footerMajorButtonsController.configure("FOOTER MAJOR BUTTONS", ".footerMajor",
+    footerMajorButtonsController.configure(StudioBundle.get("footer_major_buttons"), ".footerMajor",
         ensureMajorButtons(footerBox).getButton(), this::newButton);
-    footerMinorButtonsController.configure("FOOTER MINOR BUTTONS", ".footerMinor",
+    footerMinorButtonsController.configure(StudioBundle.get("footer_minor_buttons"), ".footerMinor",
         ensureMinorButtons(footerBox).getButton(), this::newButton);
   }
 

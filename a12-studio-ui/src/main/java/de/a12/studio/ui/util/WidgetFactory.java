@@ -74,6 +74,9 @@ public class WidgetFactory {
     tooltip.setWrapText(true);
     tooltip.setMaxWidth(DEFAULT_TOOLTIP_WIDTH);
     tooltip.setShowDuration(Duration.seconds(10));
+    // Tooltips inherit -fx-font from their owner node (e.g. a monospace text area or the
+    // "Impact"-styled window header title), so pin it back to the platform default explicitly.
+    tooltip.setStyle("-fx-font-family: 'System';");
     return tooltip;
   }
 

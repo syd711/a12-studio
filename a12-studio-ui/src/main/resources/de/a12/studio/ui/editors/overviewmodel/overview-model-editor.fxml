@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
@@ -73,7 +67,7 @@
                        </ScrollPane>
                    </content>
                </Tab>
-               <Tab text="%search_and_filters">
+               <Tab text="%search_and_filters_tab">
                    <content>
                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
                            <content>
@@ -104,7 +98,7 @@
                        </ScrollPane>
                    </content>
                </Tab>
-               <Tab text="%multi_selection">
+               <Tab text="%multi_selection_tab">
                    <content>
                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
                            <content>
@@ -131,47 +125,21 @@
                                    <children>
 
                                        <!-- Row Action Group -->
-                                       <Label styleClass="field-label" text="%row_action_group" />
+                                       <Label styleClass="editor-type-label " text="%row_action_group" />
                                        <fx:include fx:id="rowActionButtons" source="../propertyeditors/event-buttons-panel.fxml" />
                                        <fx:include fx:id="contextMenu" source="context-menu-panel.fxml" />
 
                                        <!-- Row Activation -->
-                                       <Label styleClass="field-label" text="%row_activation" />
-                                       <VBox maxWidth="300.0" spacing="4.0">
-                                           <children>
-                                               <Label styleClass="field-label" text="%type" />
-                                               <HBox alignment="CENTER_LEFT" spacing="6.0">
-                                                   <children>
-                                                       <ComboBox fx:id="rowActivationTypeField" editable="false" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
-                                                       <Label fx:id="rowActivationInfoIcon" />
-                                                   </children>
-                                               </HBox>
-                                           </children>
-                                       </VBox>
-                                       <VBox fx:id="rowActivationEventBox" maxWidth="300.0" spacing="4.0">
-                                           <children>
-                                               <Label styleClass="field-label" text="%event" />
-                                               <TextField fx:id="rowActivationEventField" />
-                                           </children>
-                                       </VBox>
-                                       <TitledPane expanded="true" maxWidth="Infinity" text="%title_for_interactive_rows">
-                                           <content>
-                                               <GridPane fx:id="interactiveRowTitleGrid" hgap="10.0" vgap="6.0">
-                                                   <columnConstraints>
-                                                       <ColumnConstraints minWidth="40.0" />
-                                                       <ColumnConstraints hgrow="ALWAYS" />
-                                                   </columnConstraints>
-                                               </GridPane>
-                                           </content>
-                                       </TitledPane>
+                                       <fx:include fx:id="rowActivation" source="row-activation-panel.fxml" />
+                                       <fx:include fx:id="rowTitle" source="../propertyeditors/localized-text-panel.fxml" />
 
                                        <!-- Subheader -->
-                                       <Label styleClass="field-label" text="%subheader" />
+                                       <Label styleClass="editor-type-label " text="%subheader" />
                                        <fx:include fx:id="subheaderMajor" source="subheader-slot-panel.fxml" />
                                        <fx:include fx:id="subheaderMinor" source="subheader-slot-panel.fxml" />
 
                                        <!-- Footer -->
-                                       <Label styleClass="field-label" text="%footer" />
+                                       <Label styleClass="editor-type-label " text="%footer" />
                                        <fx:include fx:id="footerMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
                                        <fx:include fx:id="footerMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
 

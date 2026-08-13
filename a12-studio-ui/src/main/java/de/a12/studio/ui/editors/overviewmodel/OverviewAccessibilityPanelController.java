@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.configuration.screenReaderColumn}: a single combo box
@@ -50,6 +51,7 @@ public class OverviewAccessibilityPanelController extends AbstractPropertyEditor
       }
       setScreenReaderColumnId(newValue);
       commitHeaderChange();
+      updateColumnValidationState();
     });
   }
 
@@ -92,6 +94,30 @@ public class OverviewAccessibilityPanelController extends AbstractPropertyEditor
     }
     finally {
       updatingFromModel = false;
+    }
+    updateColumnValidationState();
+  }
+
+  /** Flags {@link #screenReaderColumnField} with a red border and an explanatory tooltip when the {@link
+   * Column} it currently points at is itself pointing at a field path that can't be resolved against {@link
+   * #documentModelIndex} - same "unresolved" semantics as {@link OverviewColumnOptions#isUnresolvedElementRef}
+   * and its {@link OverviewSortingPanelController} counterpart. */
+  private void updateColumnValidationState() {
+    String columnId = getScreenReaderColumnId();
+    Column column = getColumns().stream()
+        .filter(candidate -> candidate.getId() != null && candidate.getId().equals(columnId))
+        .findFirst()
+        .orElse(null);
+    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex)) {
+      if (!screenReaderColumnField.getStyleClass().contains("validation-error")) {
+        screenReaderColumnField.getStyleClass().add("validation-error");
+      }
+      screenReaderColumnField.setTooltip(WidgetFactory.createTooltip(
+          StudioBundle.get("path_could_not_be_resolved", column.getElementRef())));
+    }
+    else {
+      screenReaderColumnField.getStyleClass().remove("validation-error");
+      screenReaderColumnField.setTooltip(null);
     }
   }
 
