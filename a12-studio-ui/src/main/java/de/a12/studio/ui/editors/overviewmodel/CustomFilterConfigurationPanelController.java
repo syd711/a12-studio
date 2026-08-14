@@ -379,12 +379,15 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     });
   }
 
-  /** "Generate from overview columns": one group (with one field-reference filter item) per {@link Column}. */
+  /** "Generate from overview columns": one group (with one field-reference filter item) per {@link Column}.
+   * Replaces any existing filter groups rather than appending to them, so re-running (or switching to) one of
+   * the "Generate from ..." menu options doesn't pile up duplicates alongside what was there before. */
   private void generateFilterGroupsFromColumns() {
     if (model == null || model.getContent().getColumns() == null) {
       return;
     }
     List<FilterGroup> groups = getFilterGroups();
+    groups.clear();
     for (Column column : model.getContent().getColumns()) {
       if (column.getElementRef() == null) {
         continue;
@@ -405,6 +408,7 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
       return;
     }
     List<FilterGroup> groups = getFilterGroups();
+    groups.clear();
     for (String fieldId : OverviewElementOptions.elementIds(documentModelIndex)) {
       groups.add(newGeneratedFilterGroup(fieldId, OverviewElementOptions.fieldLabel(documentModelIndex, fieldId)));
     }

@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * When the Filter Mode is "custom_list", the field selection must be non-empty, its field ids unique,
  * and each one must resolve against the referenced Document Model - not annotated {@code indexed} =
- * false, and not inside a repeatable group. Mirrors SME's {@code custom_list} filter field rules.
+ * false. Mirrors SME's {@code custom_list} filter field rules.
  */
 public final class OverviewFilterCustomFieldsValidator implements ModelValidator {
 
@@ -76,11 +76,6 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             "The \"indexed\" annotation of field \"" + element.getName()
                 + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
-            Severity.ERROR.name()));
-      }
-      if (OverviewElementResolution.isInRepeatableGroup(index, element)) {
-        errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The reference is invalid. The referenced field \"" + element.getName() + "\" is repeatable.",
             Severity.ERROR.name()));
       }
     }

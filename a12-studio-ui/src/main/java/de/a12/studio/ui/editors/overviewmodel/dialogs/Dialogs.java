@@ -21,17 +21,30 @@ public class Dialogs {
   private Dialogs() {
   }
 
+  public static Optional<Column> showColumnForAdd(Stage owner, ElementIndex documentModelIndex, String documentModelId) {
+    Column column = new Column();
+    column.setId("column-" + shortId());
+    column.setWidth(1.0);
+    return showColumn(owner, StudioBundle.get("add_column_title"), documentModelIndex, documentModelId, column)
+        ? Optional.of(column) : Optional.empty();
+  }
+
+  public static boolean showColumnForEdit(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column) {
+    return showColumn(owner, StudioBundle.get("edit_column_title"), documentModelIndex, documentModelId, column);
+  }
+
   /**
    * Opens the column editor for {@code column}, editing it live so a Cancel can undo the changes.
    */
-  public static void showColumnDialog(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column) {
+  private static boolean showColumn(Stage owner, String title, ElementIndex documentModelIndex, String documentModelId, Column column) {
     FXMLLoader fxmlLoader = new FXMLLoader(OverviewColumnDialogController.class.getResource("overview-column-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, StudioBundle.get("edit_column_title"));
+    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
     OverviewColumnDialogController controller = (OverviewColumnDialogController) stage.getUserData();
     controller.init(stage, documentModelIndex, documentModelId, column);
     stage.setOnHidden(event -> controller.destroy());
     stage.showAndWait();
+    return controller.isConfirmed();
   }
 
   public static Optional<Button> showMultiSelectionActionForAdd(Stage owner) {

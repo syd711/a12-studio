@@ -156,23 +156,27 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       overviewSortingController.refresh();
       overviewAccessibilityController.refresh();
     });
-    overviewSearchAndFiltersController.setOnFilterModeChange(this::updateFilterModeDependentVisibility);
+    overviewSearchAndFiltersController.setOnRelevanceChange(this::updateFilterModeDependentVisibility);
   }
 
   /**
-   * filterMode decides which of the Custom Selection Of Fields/Section Data/Custom Filter Configuration panels
-   * are relevant: Custom Selection Of Fields only for {@link FilterConfiguration#FILTER_MODE_CUSTOM_LIST};
-   * Section Data for every mode except {@link FilterConfiguration#FILTER_MODE_CUSTOM_FILTER}, which models the
-   * same grouping via its own Filter Groups instead; Custom Filter Configuration only for that same {@code
-   * custom_filter} mode. Re-run on every {@link OverviewSearchAndFiltersPanelController#setOnFilterModeChange}
-   * notification, including the initial one fired from its own {@code setModel}.
+   * filterMode and showFilterButton decide which of the Custom Selection Of Fields/Section Data/Custom Filter
+   * Configuration panels are relevant: Custom Selection Of Fields only for {@link
+   * FilterConfiguration#FILTER_MODE_CUSTOM_LIST}; Section Data for every mode except {@link
+   * FilterConfiguration#FILTER_MODE_CUSTOM_FILTER} (which models the same grouping via its own Filter Groups
+   * instead) AND only while the filter button is shown, since Section Data groups the fields shown in that
+   * button's dropdown and is meaningless once the button itself is hidden; Custom Filter Configuration only for
+   * that same {@code custom_filter} mode. Re-run on every {@link
+   * OverviewSearchAndFiltersPanelController#setOnRelevanceChange} notification, including the initial one fired
+   * from its own {@code setModel}.
    */
   private void updateFilterModeDependentVisibility() {
     String filterMode = overviewSearchAndFiltersController.getFilterMode();
     boolean customFilter = FilterConfiguration.FILTER_MODE_CUSTOM_FILTER.equals(filterMode);
+    boolean showFilterButton = overviewSearchAndFiltersController.isShowFilterButtonSelected();
 
     customSelectionOfFieldsController.setVisible(FilterConfiguration.FILTER_MODE_CUSTOM_LIST.equals(filterMode));
-    overviewSectionDataController.setVisible(!customFilter);
+    overviewSectionDataController.setVisible(!customFilter && showFilterButton);
     customFilterConfigurationController.setVisible(customFilter);
   }
 

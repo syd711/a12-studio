@@ -29,9 +29,11 @@ import java.util.ResourceBundle;
  * FilterConfiguration#FILTER_MODE_CUSTOM_FILTER} - the platform docs' fifth option with no SME equivalent, see
  * {@link CustomFilterConfigurationPanelController}) are rendered via their {@code filter_mode_<value>} bundle
  * keys while the raw string is kept as the combo's value, matching {@link OverviewColumnOptions}'s
- * id-vs-display-label pattern. {@code filterMode} also governs which of the sibling Custom Selection Of
- * Fields/Section Data/Custom Filter Configuration panels are relevant, via {@link #setOnFilterModeChange}/{@link
- * #getFilterMode}, driven from {@link OverviewModelEditorController}. Row count lives on the Columns panel
+ * id-vs-display-label pattern. {@code filterMode} and {@code showFilterButton} together govern which of the
+ * sibling Custom Selection Of Fields/Section Data/Custom Filter Configuration panels are relevant - Section
+ * Data groups the fields shown in the filter button's dropdown, so it's irrelevant whenever that button is
+ * hidden, regardless of filterMode - via {@link #setOnRelevanceChange}/{@link #getFilterMode}/{@link
+ * #isShowFilterButtonSelected}, driven from {@link OverviewModelEditorController}. Row count lives on the Columns panel
  * instead ({@link OverviewColumnsPanelController}), next to the column list it's displayed alongside. Paging
  * (Behaviour/Size) is delegated to {@link PagingBehaviourPanelController}.
  */
@@ -61,10 +63,11 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
   // for user edits and don't trigger a save.
   private boolean updatingFromModel;
 
-  // Notified after every change (including the initial setModel()) to filterMode, so the parent editor can
-  // show/hide the sibling Custom Selection Of Fields/Section Data/Custom Filter Configuration panels that
-  // filterMode governs the relevance of. See getFilterMode() for the value it should re-read.
-  private Runnable onFilterModeChange = () -> { };
+  // Notified after every change (including the initial setModel()) to filterMode or showFilterButton, so the
+  // parent editor can show/hide the sibling Custom Selection Of Fields/Section Data/Custom Filter Configuration
+  // panels that those two fields govern the relevance of. See getFilterMode()/isShowFilterButtonSelected() for
+  // the values it should re-read.
+  private Runnable onRelevanceChange = () -> { };
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -117,6 +120,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       }
       ensureFilterConfiguration().setShowFilterButton(newValue);
       commitHeaderChange();
+      onRelevanceChange.run();
     });
 
     filterModeField.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -125,15 +129,15 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       }
       ensureFilterConfiguration().setFilterMode(newValue);
       commitHeaderChange();
-      onFilterModeChange.run();
+      onRelevanceChange.run();
     });
   }
 
   /**
-   * @see #onFilterModeChange
+   * @see #onRelevanceChange
    */
-  public void setOnFilterModeChange(@NonNull Runnable onFilterModeChange) {
-    this.onFilterModeChange = onFilterModeChange;
+  public void setOnRelevanceChange(@NonNull Runnable onRelevanceChange) {
+    this.onRelevanceChange = onRelevanceChange;
   }
 
   /**
@@ -142,6 +146,14 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
    */
   public String getFilterMode() {
     return filterModeField.getValue();
+  }
+
+  /**
+   * Whether the "show filter button" checkbox is currently checked - Section Data (the filter button's dropdown
+   * grouping) is irrelevant whenever it's unchecked, regardless of {@link #getFilterMode}.
+   */
+  public boolean isShowFilterButtonSelected() {
+    return showFilterButtonField.isSelected();
   }
 
   public void setModel(@NonNull OverviewModel model) {
@@ -165,7 +177,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
     finally {
       updatingFromModel = false;
     }
-    onFilterModeChange.run();
+    onRelevanceChange.run();
   }
 
   private OverviewConfiguration ensureConfiguration() {

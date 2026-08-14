@@ -18,6 +18,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -28,14 +29,16 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Modal dialog for editing a single {@link Column}, opened from {@link
- * de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController} by clicking a column row. Edits the
- * real, already-attached {@link Column} live (there's no "add" mode - {@code OverviewColumnsPanelController}
- * attaches a new column directly, without going through this dialog), so a {@link ColumnSnapshot} taken before
- * showing the dialog can undo those edits on Cancel, mirroring {@link
+ * Add/edit dialog for a single {@link Column}, opened from {@link
+ * de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController} by clicking a column row or its Add
+ * button. Edits the real {@link Column} live (there's no "add" mode of its own - {@code
+ * Dialogs#showColumnForAdd} constructs a new, unattached column before opening this dialog, and the caller
+ * only adds it to {@code content.columns} once {@link #isConfirmed()} is true), so a {@link ColumnSnapshot}
+ * taken before showing the dialog can undo those edits on Cancel, mirroring {@link
  * de.a12.studio.ui.editors.applicationmodel.dialogs.CaseDialogController}.
  */
 public class OverviewColumnDialogController implements DialogController {
@@ -116,6 +119,8 @@ public class OverviewColumnDialogController implements DialogController {
   private Column column;
 
   private ColumnSnapshot snapshot;
+
+  private Optional<ButtonType> result = Optional.of(ButtonType.CANCEL);
 
   // Set while fields are being repopulated from the model (initial load, or a field whose visibility toggle
   // shouldn't itself count as an edit), so those programmatic updates aren't mistaken for user edits.
@@ -297,7 +302,12 @@ public class OverviewColumnDialogController implements DialogController {
       projectItem.save();
       StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
     }
+    result = Optional.of(ButtonType.OK);
     stage.close();
+  }
+
+  boolean isConfirmed() {
+    return result.isPresent() && result.get() == ButtonType.OK;
   }
 
   private void updateTypeVisibility() {

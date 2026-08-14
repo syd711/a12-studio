@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
@@ -40,8 +39,9 @@ import de.a12.studio.ui.util.StudioBundle;
  * Column}, summarizing its Field (the referenced Document Model element, resolved via {@link
  * OverviewColumnOptions}), Sortable, Width and Pin Direction. Not bound to a single {@link
  * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
- * {@link OverviewSearchAndFiltersPanelController}. Clicking a row opens {@link Dialogs#showColumnDialog}, the full column
- * editor. Also edits
+ * {@link OverviewSearchAndFiltersPanelController}. Clicking a row opens {@link Dialogs#showColumnForEdit}, the
+ * full column editor; the Add button opens the same editor via {@link Dialogs#showColumnForAdd}, only adding
+ * the new column to {@code content.columns} once it's confirmed. Also edits
  * {@link OverviewConfiguration} flags displayed alongside the column list: Enable Columns Resize, Show
  * Number Of Entries and Skip Initial Load (moved here from {@link OverviewSearchAndFiltersPanelController} since
  * all are about how the resulting table of columns is presented).
@@ -147,12 +147,11 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
 
   @FXML
   private void onAdd() {
-    Column column = new Column();
-    column.setId("column-" + shortId());
-    column.setWidth(1.0);
-    getColumns().add(column);
-    rebuildRows();
-    notifyChanged();
+    Dialogs.showColumnForAdd(Studio.stage, documentModelIndex, documentModelId).ifPresent(column -> {
+      getColumns().add(column);
+      rebuildRows();
+      notifyChanged();
+    });
   }
 
   private List<Column> getColumns() {
@@ -244,7 +243,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   }
 
   private void openEditDialog(Column column) {
-    Dialogs.showColumnDialog(Studio.stage, documentModelIndex, documentModelId, column);
+    Dialogs.showColumnForEdit(Studio.stage, documentModelIndex, documentModelId, column);
     rebuildRows();
   }
 
@@ -283,9 +282,5 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   private void notifyChanged() {
     commitHeaderChange();
     onChange.run();
-  }
-
-  private static String shortId() {
-    return UUID.randomUUID().toString().replace("-", "").substring(0, 5);
   }
 }
