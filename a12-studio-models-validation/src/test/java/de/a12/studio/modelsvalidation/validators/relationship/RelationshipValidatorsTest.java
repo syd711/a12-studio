@@ -67,6 +67,18 @@ class RelationshipValidatorsTest {
   }
 
   @Test
+  void linkDocumentModelValidatorWarnsWhenOnlyOneEntityConfigured() {
+    // A single to-many entity isn't enough: SME's commonPrecondition requires both related entities'
+    // multiplicity groups to be filled before it considers the relationship many-to-many, so a lone entity
+    // (even one that is itself to-many) still triggers the warning.
+    RelationshipModel model = load("RelationshipLinkDocumentModelValidator_singleEntity");
+    List<ModelValidationError> errors = new RelationshipLinkDocumentModelValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals(Severity.WARNING.name(), errors.get(0).severity());
+  }
+
+  @Test
   void generatedDmNameLengthValidatorReportsTooLongName() {
     RelationshipModel model = load("RelationshipGeneratedDmNameLengthValidator_invalid");
     List<ModelValidationError> errors = new RelationshipGeneratedDmNameLengthValidator().validate(model, TestModels.context(model));

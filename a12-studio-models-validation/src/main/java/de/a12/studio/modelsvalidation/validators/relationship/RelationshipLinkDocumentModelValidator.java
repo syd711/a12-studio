@@ -26,8 +26,11 @@ public final class RelationshipLinkDocumentModelValidator implements ModelValida
       return List.of();
     }
 
-    boolean manyToMany = relationshipModel.getContent().getEntityCharacteristics().stream()
-        .allMatch(RelationshipLinkDocumentModelValidator::isToMany);
+    List<EntityCharacteristic> entities = relationshipModel.getContent().getEntityCharacteristics();
+    // SME only considers the link document/duplicates allowed once both related entities are
+    // present and configured as to-many; fewer/more than two entities never counts as many-to-many,
+    // matching SME's commonPrecondition "NumberOfFilledGroups(...) == 2".
+    boolean manyToMany = entities.size() == 2 && entities.stream().allMatch(RelationshipLinkDocumentModelValidator::isToMany);
     if (manyToMany) {
       return List.of();
     }

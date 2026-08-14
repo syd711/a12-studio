@@ -33,8 +33,8 @@
                            <items>
                                <VBox>
                                    <children>
-                                       <TitledPane animated="false" expanded="false" text="%relationships" VBox.vgrow="NEVER" />
-                                       <TitledPane animated="false" expanded="true" maxHeight="Infinity" text="%document_model" VBox.vgrow="ALWAYS">
+                                       <TitledPane animated="false" expanded="false" styleClass="titled-pane-embedded" text="%relationships" VBox.vgrow="NEVER" />
+                                       <TitledPane animated="false" expanded="true" maxHeight="Infinity" styleClass="titled-pane-embedded" text="%document_model" VBox.vgrow="ALWAYS">
                                            <content>
                                                <fx:include fx:id="documentSourceTree" source="document-source-tree-panel.fxml" />
                                            </content>

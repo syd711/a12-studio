@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%link_document_model" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.relationshipmodel.LinkDocumentModelPanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="14.0">
+    <children>
+      <ComboBox fx:id="linkDocumentModelField" editable="false" maxWidth="Infinity" />
+      <HBox alignment="CENTER_LEFT" spacing="6.0">
+        <children>
+          <CheckBox fx:id="duplicatesAllowedField" mnemonicParsing="false" text="%duplicates_allowed" />
+          <Label fx:id="duplicatesAllowedInfoIcon" />
+        </children>
+      </HBox>
+    </children>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

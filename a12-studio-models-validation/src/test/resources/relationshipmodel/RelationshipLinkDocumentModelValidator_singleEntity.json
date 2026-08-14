@@ -1,0 +1,31 @@
+{
+  "header": {
+    "id": "RelationshipLinkDocumentModelValidator_singleEntity",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "linkDocumentModel": "SomeLink_DM",
+    "labels": [],
+    "entityCharacteristics": [
+      {
+        "role": "First",
+        "documentModel": "First_DM",
+        "ordered": false,
+        "labels": [],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 999
+          }
+        }
+      }
+    ]
+  }
+}

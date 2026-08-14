@@ -88,6 +88,30 @@
     -fx-padding: 4px 0 4px 2px;
 }
 
+/*
+ * TitledPane embedded directly into a surrounding layout rather than shown as its own card -
+ * keeps the card's background/border color and header treatment but drops the rounded corners
+ * and content padding so it sits flush with its container.
+ */
+.titled-pane-embedded {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.titled-pane-embedded > .title,
+.titled-pane-embedded:focused > .title {
+    -fx-background-radius: 0;
+}
+
+.titled-pane-embedded:collapsed > .title {
+    -fx-background-radius: 0;
+}
+
+.titled-pane-embedded > *.content {
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+}
+
 /* TitledPane nested two levels deep, i.e. inside a .titled-pane-child's content - same accent-line treatment. */
 .titled-pane-sub-child {
     -fx-background-color: transparent;

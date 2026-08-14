@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
@@ -21,13 +22,24 @@
     <center>
         <VBox spacing="12.0" BorderPane.alignment="TOP_LEFT">
             <children>
-                <Label styleClass="field-label" text="%language" />
-                <ComboBox fx:id="languageCombo" prefWidth="220.0" />
                 <Label styleClass="field-label" text="%restart_required">
                     <VBox.margin>
-                        <Insets top="2.0" />
+                        <Insets bottom="2.0" />
                     </VBox.margin>
                 </Label>
+                <Label styleClass="field-label" text="%language" />
+                <ComboBox fx:id="languageCombo" prefWidth="220.0" />
+
+                <VBox spacing="6.0">
+                    <VBox.margin>
+                        <Insets top="16.0" />
+                    </VBox.margin>
+                    <children>
+                        <Label styleClass="section-header" text="%dialogs" />
+                        <Button fx:id="resetDialogsButton" styleClass="primary-button" mnemonicParsing="false" onAction="#onResetDialogs" text="%reset_dialogs" />
+                        <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%this_resets_all_dialog_states_including_the_sizes_and_positi" />
+                    </children>
+                </VBox>
             </children>
             <padding>
                 <Insets left="12.0" right="12.0" top="8.0" />

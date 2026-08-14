@@ -6,6 +6,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
@@ -175,7 +176,8 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         subtitleController.setVisible(false);
       }
       supportedCharactersController.setVisible(
-          !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel));
+          !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel)
+              && !(model instanceof RelationshipModel));
       modelReferencesController.setVisible(!(model instanceof OverviewModel) && !(model instanceof FormModel));
     }
 

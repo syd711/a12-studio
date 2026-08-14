@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.Spinner?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController">
@@ -28,125 +18,18 @@
         </ToolBar>
     </right>
     <center>
-        <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-            <tabs>
-                <Tab text="%relationship">
-                    <content>
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
-                            <content>
-                                <VBox spacing="16.0" styleClass="field-editor">
-                                    <children>
-                                        <HBox spacing="24.0">
-                                            <children>
-                                                <CheckBox fx:id="duplicatesAllowedField" mnemonicParsing="false" text="%duplicates_allowed" />
-                                            </children>
-                                        </HBox>
-                                        <VBox spacing="4.0">
-                                            <children>
-                                                <Label styleClass="field-label" text="%link_document_model" />
-                                                <ComboBox fx:id="linkDocumentModelField" editable="false" maxWidth="Infinity" />
-                                            </children>
-                                        </VBox>
-                                        <Separator />
-                                        <Label styleClass="section-label" text="%related_entity_1" />
-                                        <GridPane hgap="10.0" vgap="8.0">
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                                            </columnConstraints>
-                                            <children>
-                                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                                    <children>
-                                                        <Label styleClass="field-label" text="%document_model" />
-                                                        <ComboBox fx:id="entity1DocumentModelField" editable="false" maxWidth="Infinity" />
-                                                    </children>
-                                                </VBox>
-                                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                                    <children>
-                                                        <Label styleClass="field-label" text="%role" />
-                                                        <TextField fx:id="entity1RoleField" />
-                                                    </children>
-                                                </VBox>
-                                                <HBox alignment="CENTER_LEFT" spacing="24.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                                    <children>
-                                                        <CheckBox fx:id="entity1OrderedField" mnemonicParsing="false" text="%ordered" />
-                                                        <CheckBox fx:id="entity1UnboundedField" mnemonicParsing="false" text="%unbounded" />
-                                                    </children>
-                                                </HBox>
-                                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                                    <children>
-                                                        <Label styleClass="field-label" text="%upper_limit" />
-                                                        <Spinner fx:id="entity1UpperLimitField" editable="true" />
-                                                    </children>
-                                                </VBox>
-                                            </children>
-                                        </GridPane>
-                                        <VBox spacing="4.0">
-                                            <children>
-                                                <Label styleClass="field-label" text="%labels" />
-                                                <GridPane fx:id="entity1LabelsGrid" hgap="10.0" vgap="6.0">
-                                                    <columnConstraints>
-                                                        <ColumnConstraints minWidth="40.0" />
-                                                        <ColumnConstraints hgrow="ALWAYS" />
-                                                    </columnConstraints>
-                                                </GridPane>
-                                            </children>
-                                        </VBox>
-                                        <Separator />
-                                        <Label styleClass="section-label" text="%related_entity_2" />
-                                        <GridPane hgap="10.0" vgap="8.0">
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                                            </columnConstraints>
-                                            <children>
-                                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                                    <children>
-                                                        <Label styleClass="field-label" text="%document_model" />
-                                                        <ComboBox fx:id="entity2DocumentModelField" editable="false" maxWidth="Infinity" />
-                                                    </children>
-                                                </VBox>
-                                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                                    <children>
-                                                        <Label styleClass="field-label" text="%role" />
-                                                        <TextField fx:id="entity2RoleField" />
-                                                    </children>
-                                                </VBox>
-                                                <HBox alignment="CENTER_LEFT" spacing="24.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                                    <children>
-                                                        <CheckBox fx:id="entity2OrderedField" mnemonicParsing="false" text="%ordered" />
-                                                        <CheckBox fx:id="entity2UnboundedField" mnemonicParsing="false" text="%unbounded" />
-                                                    </children>
-                                                </HBox>
-                                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                                    <children>
-                                                        <Label styleClass="field-label" text="%upper_limit" />
-                                                        <Spinner fx:id="entity2UpperLimitField" editable="true" />
-                                                    </children>
-                                                </VBox>
-                                            </children>
-                                        </GridPane>
-                                        <VBox spacing="4.0">
-                                            <children>
-                                                <Label styleClass="field-label" text="%labels" />
-                                                <GridPane fx:id="entity2LabelsGrid" hgap="10.0" vgap="6.0">
-                                                    <columnConstraints>
-                                                        <ColumnConstraints minWidth="40.0" />
-                                                        <ColumnConstraints hgrow="ALWAYS" />
-                                                    </columnConstraints>
-                                                </GridPane>
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                    </padding>
-                                </VBox>
-                            </content>
-                        </ScrollPane>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+            <content>
+                <VBox spacing="16.0" styleClass="field-editor">
+                    <children>
+                        <fx:include fx:id="relatedEntities" source="related-entities-panel.fxml" />
+                        <fx:include fx:id="linkDocumentModel" source="link-document-model-panel.fxml" />
+                    </children>
+                    <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                    </padding>
+                </VBox>
+            </content>
+        </ScrollPane>
     </center>
 </BorderPane>

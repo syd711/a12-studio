@@ -339,3 +339,23 @@
     -fx-background-color: -fx-selection-bar-soft;
     -fx-text-fill: -fx-text-color-inverse;
 }
+
+/*
+ * ID-scoped overrides for the Form Model editor's Overview tab trees (fx:id="tree" in both
+ * DocumentSourceTreeController and FormModelTreeController - FXMLLoader copies fx:id to the
+ * node's id, so one selector covers both), mirroring #projectTree above so both trees use the
+ * same softer, muted-blue selection color instead of the vivid accent color.
+ */
+#tree .tree-cell:filled:selected,
+#tree .tree-cell:filled:selected:focused,
+#tree .tree-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+#tree .tree-cell:filled:selected .tree-icon,
+#tree .tree-cell:filled:selected:focused .tree-icon,
+#tree .tree-cell:filled:selected:hover .tree-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}
