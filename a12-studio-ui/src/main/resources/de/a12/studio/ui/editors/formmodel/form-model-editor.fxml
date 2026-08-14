@@ -18,7 +18,7 @@
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
                 <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
-                <Button mnemonicParsing="false" onAction="#onRepeatDefaultButtonLabels" styleClass="default-button">
+                <Button mnemonicParsing="false" onAction="#onRepeatDefaultButtonLabels" styleClass="action-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2r-repeat" iconSize="18" />
                     </graphic>
@@ -26,7 +26,7 @@
                         <Tooltip text="%repeat_default_button_labels" />
                     </tooltip>
                 </Button>
-                <Button mnemonicParsing="false" onAction="#onSubheaderAndFooter" styleClass="default-button">
+                <Button mnemonicParsing="false" onAction="#onSubheaderAndFooter" styleClass="action-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2p-page-layout-header-footer" iconSize="18" />
                     </graphic>

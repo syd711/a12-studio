@@ -25,11 +25,15 @@ import java.util.ResourceBundle;
  * {@code showFilterBar}/{@code showFilterButton}/{@code filterMode} live one level deeper, on {@link
  * FilterConfiguration} (matching SME's {@code omDocument.FilterConfiguration}), same nesting {@link
  * CustomSelectionOfFieldsPanelController} and {@link OverviewSectionDataPanelController} already edit. {@code
- * filterMode}'s four values (SME's {@code FilterMode} enum) are rendered via their {@code filter_mode_<value>}
- * bundle keys while the raw string is kept as the combo's value, matching {@link OverviewColumnOptions}'s
- * id-vs-display-label pattern. Row count lives on the Columns panel instead ({@link
- * OverviewColumnsPanelController}), next to the column list it's displayed alongside. Paging (Behaviour/Size) is
- * delegated to {@link PagingBehaviourPanelController}.
+ * filterMode}'s five values (SME's {@code FilterMode} enum, plus {@link
+ * FilterConfiguration#FILTER_MODE_CUSTOM_FILTER} - the platform docs' fifth option with no SME equivalent, see
+ * {@link CustomFilterConfigurationPanelController}) are rendered via their {@code filter_mode_<value>} bundle
+ * keys while the raw string is kept as the combo's value, matching {@link OverviewColumnOptions}'s
+ * id-vs-display-label pattern. {@code filterMode} also governs which of the sibling Custom Selection Of
+ * Fields/Section Data/Custom Filter Configuration panels are relevant, via {@link #setOnFilterModeChange}/{@link
+ * #getFilterMode}, driven from {@link OverviewModelEditorController}. Row count lives on the Columns panel
+ * instead ({@link OverviewColumnsPanelController}), next to the column list it's displayed alongside. Paging
+ * (Behaviour/Size) is delegated to {@link PagingBehaviourPanelController}.
  */
 public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -57,6 +61,11 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
   // for user edits and don't trigger a save.
   private boolean updatingFromModel;
 
+  // Notified after every change (including the initial setModel()) to filterMode, so the parent editor can
+  // show/hide the sibling Custom Selection Of Fields/Section Data/Custom Filter Configuration panels that
+  // filterMode governs the relevance of. See getFilterMode() for the value it should re-read.
+  private Runnable onFilterModeChange = () -> { };
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
@@ -65,7 +74,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
         StudioBundle.get("choosing_to_hide_this_button_only_applies_to_desktop_mode_the"));
 
     filterModeField.getItems().setAll(List.of(FilterConfiguration.FILTER_MODE_ALL_COLUMNS, FilterConfiguration.FILTER_MODE_ALL,
-        FilterConfiguration.FILTER_MODE_ALL_WITH_META, FilterConfiguration.FILTER_MODE_CUSTOM_LIST));
+        FilterConfiguration.FILTER_MODE_ALL_WITH_META, FilterConfiguration.FILTER_MODE_CUSTOM_LIST, FilterConfiguration.FILTER_MODE_CUSTOM_FILTER));
     filterModeField.setConverter(new StringConverter<>() {
       @Override
       public String toString(String filterMode) {
@@ -116,7 +125,23 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       }
       ensureFilterConfiguration().setFilterMode(newValue);
       commitHeaderChange();
+      onFilterModeChange.run();
     });
+  }
+
+  /**
+   * @see #onFilterModeChange
+   */
+  public void setOnFilterModeChange(@NonNull Runnable onFilterModeChange) {
+    this.onFilterModeChange = onFilterModeChange;
+  }
+
+  /**
+   * The currently selected filter mode, defaulted to {@link FilterConfiguration#FILTER_MODE_ALL_COLUMNS} (the
+   * combo's first entry) whenever the model has none set yet - see {@link #setModel}.
+   */
+  public String getFilterMode() {
+    return filterModeField.getValue();
   }
 
   public void setModel(@NonNull OverviewModel model) {
@@ -131,11 +156,16 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       FilterConfiguration filterConfiguration = configuration != null ? configuration.getFilterConfiguration() : null;
       showFilterBarField.setSelected(filterConfiguration != null && Boolean.TRUE.equals(filterConfiguration.getShowFilterBar()));
       showFilterButtonField.setSelected(filterConfiguration != null && Boolean.TRUE.equals(filterConfiguration.getShowFilterButton()));
-      filterModeField.setValue(filterConfiguration != null ? filterConfiguration.getFilterMode() : null);
+      String filterMode = filterConfiguration != null ? filterConfiguration.getFilterMode() : null;
+      // Defaults the combo to its first entry when the model has no filterMode set yet, without writing that
+      // default back until the user actually changes something themselves (updatingFromModel suppresses the
+      // valueProperty listener above).
+      filterModeField.setValue(filterMode != null ? filterMode : FilterConfiguration.FILTER_MODE_ALL_COLUMNS);
     }
     finally {
       updatingFromModel = false;
     }
+    onFilterModeChange.run();
   }
 
   private OverviewConfiguration ensureConfiguration() {

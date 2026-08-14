@@ -6,6 +6,7 @@ import de.a12.studio.models.overviewmodel.FilterGroup;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterSection;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -52,22 +53,29 @@ public class Dialogs {
     return controller.isConfirmed();
   }
 
-  public static Optional<FilterSection> showSectionForAdd(Stage owner) {
+  public static Optional<FilterSection> showSectionForAdd(Stage owner, ElementIndex documentModelIndex) {
     FilterSection section = new FilterSection();
     section.setId("section-" + shortId());
-    return showSection(owner, StudioBundle.get("add_section_title"), section) ? Optional.of(section) : Optional.empty();
+    return showSection(owner, StudioBundle.get("add_section_title"), documentModelIndex, section) ? Optional.of(section) : Optional.empty();
   }
 
-  public static boolean showSectionForEdit(Stage owner, FilterSection section) {
-    return showSection(owner, StudioBundle.get("edit_section_title"), section);
+  public static boolean showSectionForEdit(Stage owner, ElementIndex documentModelIndex, FilterSection section) {
+    return showSection(owner, StudioBundle.get("edit_section_title"), documentModelIndex, section);
   }
 
-  private static boolean showSection(Stage owner, String title, FilterSection section) {
+  private static boolean showSection(Stage owner, String title, ElementIndex documentModelIndex, FilterSection section) {
     FXMLLoader fxmlLoader = new FXMLLoader(SectionDataDialogController.class.getResource("overview-section-data-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage("overview-section-data-dialog", fxmlLoader, owner, title);
+    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
     SectionDataDialogController controller = (SectionDataDialogController) stage.getUserData();
-    controller.initDialog(stage, section);
+    controller.initDialog(stage, documentModelIndex, section);
+    stage.setOnHidden(event -> controller.destroy());
+
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
+    stage.setMinWidth(800);
+    stage.setMinHeight(600);
+    stage.setOnHidden(event -> controller.destroy());
+
     stage.showAndWait();
     return controller.isConfirmed();
   }

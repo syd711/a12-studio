@@ -6,7 +6,7 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox fx:id="root" spacing="6.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.EditorFileToolbarButtonsController">
-    <Button mnemonicParsing="false" onAction="#onFileEdit" styleClass="default-button">
+    <Button mnemonicParsing="false" onAction="#onFileEdit" styleClass="action-button">
         <graphic>
             <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
         </graphic>
@@ -14,7 +14,7 @@
             <Tooltip text="%edit_file" />
         </tooltip>
     </Button>
-    <Button mnemonicParsing="false" onAction="#onFileOpen" styleClass="default-button">
+    <Button mnemonicParsing="false" onAction="#onFileOpen" styleClass="action-button">
         <graphic>
             <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="18" />
         </graphic>

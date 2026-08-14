@@ -20,7 +20,7 @@
             <items>
                 <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
                 <Separator prefHeight="0.0" prefWidth="0.0" />
-                <Button mnemonicParsing="false" onAction="#onPreview" styleClass="default-button">
+                <Button mnemonicParsing="false" onAction="#onPreview" styleClass="action-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2e-eye-outline" iconSize="18" />
                     </graphic>

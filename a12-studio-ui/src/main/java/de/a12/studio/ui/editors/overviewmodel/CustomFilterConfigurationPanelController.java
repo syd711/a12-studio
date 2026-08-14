@@ -4,6 +4,7 @@ import de.a12.studio.models.Label;
 import de.a12.studio.models.overviewmodel.BooleanUserAccessOption;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.FieldRef;
+import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.FilterGroup;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterSelectorConfig;
@@ -120,6 +121,12 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     initSearchBar();
     initFilterButton();
     buildAddFilterGroupMenu();
+  }
+
+  /** Only relevant for {@link FilterConfiguration#FILTER_MODE_CUSTOM_FILTER} - hidden for every other filter
+   * mode, see {@link OverviewModelEditorController}. */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
   }
 
   public void setModel(@NonNull OverviewModel model) {

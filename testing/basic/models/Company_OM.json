@@ -32,7 +32,7 @@
         "purpose": "document-model-for-overview",
         "modelType": "document",
         "alias": "DM",
-        "reference": "Invoice_DM"
+        "reference": "Company_DM"
       }
     ]
   },
@@ -97,7 +97,7 @@
           "icon": {
             "name": "delete"
           },
-          "destructive": false,
+          "destructive": null,
           "primary": false
         }
       ]
@@ -142,6 +142,16 @@
       "showFullTextSearch": true,
       "pagingSize": 10,
       "showRowCount": true,
+      "filterConfiguration": {
+        "showFilterButton": null,
+        "showFilterBar": null,
+        "filterMode": "custom_list",
+        "fields": [
+          {
+            "fieldId": null
+          }
+        ]
+      },
       "newFilterConfiguration": {
         "filterSelector": {
           "viewMode": "docked",
@@ -157,7 +167,7 @@
           "headerSubtitle": [
             {
               "locale": "en",
-              "text": "sadf"
+              "text": ""
             }
           ],
           "trigger": {
@@ -166,7 +176,7 @@
               "label": [
                 {
                   "locale": "en",
-                  "text": "sadfsaf"
+                  "text": ""
                 }
               ]
             }
@@ -174,25 +184,96 @@
         },
         "joinOperator": {
           "enabled": false,
-          "value": null
+          "value": "all"
         },
         "invert": {
           "enabled": true,
           "value": false
-        }
+        },
+        "filterGroups": [
+          {
+            "id": "filter-group-e004b",
+            "name": "group_8e00a",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Logo"
+              },
+              {
+                "locale": "de",
+                "text": "Logo"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-0f496",
+                "type": null,
+                "fieldRef": {
+                  "fieldId": "group_8e00a"
+                }
+              }
+            ]
+          },
+          {
+            "id": "filter-group-e5c2b",
+            "name": "field_67684",
+            "filterItems": [
+              {
+                "id": "filter-item-b5f8d",
+                "type": "string",
+                "fieldRef": {
+                  "fieldId": "field_67684"
+                }
+              }
+            ]
+          },
+          {
+            "id": "filter-group-cde8c",
+            "name": "field_16af2",
+            "filterItems": [
+              {
+                "id": "filter-item-fb0e6",
+                "type": "string",
+                "fieldRef": {
+                  "fieldId": "field_16af2"
+                }
+              }
+            ]
+          }
+        ]
       },
       "multiSelection": {
         "collapseOption": null,
         "counterOption": null,
-        "selectionArea": null
+        "selectionArea": null,
+        "clearConfirmation": {
+          "enabled": true,
+          "confirmation": {}
+        }
       },
       "initialSorting": [
-        {}
+        {
+          "idref": "column-4949b"
+        }
       ],
       "subtitle": [
         {
           "locale": "en",
           "text": "sadfadsf"
+        }
+      ]
+    },
+    "contextMenu": {
+      "groups": [
+        {
+          "name": "group-8d11c",
+          "actions": [
+            {
+              "event": null,
+              "destructive": null,
+              "primary": null
+            }
+          ]
         }
       ]
     }

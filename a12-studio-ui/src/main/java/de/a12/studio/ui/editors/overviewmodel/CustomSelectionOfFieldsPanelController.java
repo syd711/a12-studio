@@ -59,6 +59,9 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
   private Label subtypeInfoIcon;
 
   @FXML
+  private HBox fieldColumnHeaders;
+
+  @FXML
   private VBox fieldRows;
 
   @FXML
@@ -80,6 +83,12 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
   public void setModel(@NonNull OverviewModel model) {
     this.model = model;
     rebuildRows();
+  }
+
+  /** Only relevant for {@link FilterConfiguration#FILTER_MODE_CUSTOM_LIST} - hidden for every other filter
+   * mode, see {@link OverviewModelEditorController}. */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
   }
 
   /** Re-points every row's field picker at the currently referenced Document Model. */
@@ -109,6 +118,8 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
     boolean empty = fields.isEmpty();
     fieldsEmptyLabel.setVisible(empty);
     fieldsEmptyLabel.setManaged(empty);
+    fieldColumnHeaders.setVisible(!empty);
+    fieldColumnHeaders.setManaged(!empty);
 
     for (int index = 0; index < fields.size(); index++) {
       fieldRows.getChildren().add(createRow(fields.get(index), index, fields.size()));

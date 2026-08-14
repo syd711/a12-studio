@@ -27,7 +27,7 @@
  * which fires the fill->iconColor listener and silently stomps -fx-icon-color back to black -
  * even a value set with !important. Pinning both properties to the same color closes that loop.
  */
-.default-button *|FontIcon {
+.default-button *|FontIcon, .action-button *|FontIcon {
     -fx-icon-color: #000000 !important;
     -fx-fill: #000000 !important;
 }
@@ -35,7 +35,7 @@
 /**
  * Toolbar icon buttons (secondary / neutral)
  */
-.default-button {
+.default-button, .action-button {
     -fx-background-color: -fx-panel-color;
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
@@ -48,11 +48,11 @@
     -fx-cursor: hand;
 }
 
-.default-button:hover {
+.default-button:hover, .action-button:hover {
     -fx-background-color: derive(-fx-panel-color, -6%);
 }
 
-.default-button:focused {
+.default-button:focused, .action-button:focused {
     -fx-border-width: 1;
     -fx-border-color: -fx-accent-color;
 }
@@ -216,6 +216,27 @@
 
 .primary-button .label {
     -fx-text-fill: -fx-text-color-inverse;
+}
+
+/*
+ * SplitMenuButton (e.g. "+ Add" with a dropdown arrow, see CustomFilterConfigurationPanelController)
+ * renders as two separate opaque sub-regions - ".label" (the clickable text part) and ".arrow-button"
+ * (the dropdown-arrow part) - each carrying its own default grey background from modena.css
+ * (.split-menu-button > .label / > .arrow-button). Setting -fx-background-color on .primary-button
+ * itself only paints the root SplitMenuButton, which those two children fully cover, so each needs its
+ * own explicit override to actually turn blue instead of staying modena's default grey.
+ */
+.primary-button > .label,
+.primary-button > .arrow-button {
+    -fx-background-color: -fx-accent-color;
+}
+
+.primary-button > .label:hover,
+.primary-button > .arrow-button:hover,
+.primary-button:armed > .label,
+.primary-button > .arrow-button:pressed,
+.primary-button:showing > .arrow-button {
+    -fx-background-color: derive(-fx-accent-color, -15%);
 }
 
 .primary-button .arrow {

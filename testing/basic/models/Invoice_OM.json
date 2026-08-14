@@ -37,6 +37,97 @@
     ]
   },
   "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "custom_list",
+        "fields": [
+          {}
+        ],
+        "sectionData": [
+          {
+            "id": "section-6e5e0",
+            "label": [
+              {
+                "locale": "en",
+                "text": "asdfsaf"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "include_7c34e_field_d7150"
+              }
+            ]
+          }
+        ]
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "buttons": [
+          {
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Delete Selected"
+                },
+                {
+                  "locale": "de",
+                  "text": "Ausgewählte Löschen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Do you want to delete all selected elements?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Möchten Sie alle ausgewählten Elemente löschen?"
+                }
+              ]
+            },
+            "icon": {
+              "name": "delete_forever",
+              "theme": "rounded"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Delete"
+              },
+              {
+                "locale": "de",
+                "text": "Löschen"
+              }
+            ],
+            "description": [
+              {
+                "locale": "en",
+                "text": "Delete Selected Elements"
+              },
+              {
+                "locale": "de",
+                "text": "Ausgewählte Elemente löschen"
+              }
+            ],
+            "event": "delete_selected",
+            "destructive": true,
+            "primary": false
+          }
+        ],
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "showRowCount": true
+    },
     "columns": [
       {
         "id": "column-7aca2",
@@ -213,77 +304,15 @@
       "leftSlot": [],
       "rightSlot": []
     },
-    "configuration": {
-      "enableFilter": true,
-      "filterConfiguration": {
-        "showFilterButton": true,
-        "showFilterBar": true,
-        "filterMode": "all_columns"
-      },
-      "multiSelection": {
-        "collapseOption": "collapsible_collapsed",
-        "counterOption": "simple",
-        "selectionArea": "checkbox_and_row",
-        "buttons": [
-          {
-            "confirmation": {
-              "title": [
-                {
-                  "locale": "en",
-                  "text": "Delete Selected"
-                },
-                {
-                  "locale": "de",
-                  "text": "Ausgewählte Löschen"
-                }
-              ],
-              "message": [
-                {
-                  "locale": "en",
-                  "text": "Do you want to delete all selected elements?"
-                },
-                {
-                  "locale": "de",
-                  "text": "Möchten Sie alle ausgewählten Elemente löschen?"
-                }
-              ]
-            },
-            "icon": {
-              "name": "delete_forever",
-              "theme": "rounded"
-            },
-            "label": [
-              {
-                "locale": "en",
-                "text": "Delete"
-              },
-              {
-                "locale": "de",
-                "text": "Löschen"
-              }
-            ],
-            "description": [
-              {
-                "locale": "en",
-                "text": "Delete Selected Elements"
-              },
-              {
-                "locale": "de",
-                "text": "Ausgewählte Elemente löschen"
-              }
-            ],
-            "event": "delete_selected",
-            "destructive": true,
-            "primary": false
-          }
-        ],
-        "clearConfirmation": {
-          "enabled": true
+    "contextMenu": {
+      "groups": [
+        {
+          "name": "ölköälklöäk",
+          "actions": [
+            {}
+          ]
         }
-      },
-      "showFullTextSearch": true,
-      "pagingSize": 10,
-      "showRowCount": true
+      ]
     }
   }
 }

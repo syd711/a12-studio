@@ -37,8 +37,7 @@ import java.util.stream.Collectors;
  * (the referenced Document Model elements, resolved via {@link OverviewElementOptions}). Not bound to a single
  * {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
  * {@link OverviewMultiSelectionPanelController}. Clicking a row (or its Edit button) opens {@link
- * Dialogs#showSectionForEdit}, which is intentionally empty for now (no fields yet) - the full section editor
- * is a follow-up, matching {@link OverviewMultiSelectionPanelController}'s action dialog.
+ * Dialogs#showSectionForEdit}, which edits the section's Label and Fields.
  */
 public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
 
@@ -64,6 +63,12 @@ public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
     rebuildRows();
   }
 
+  /** Irrelevant for {@link FilterConfiguration#FILTER_MODE_CUSTOM_FILTER}, which uses Filter Groups instead -
+   * hidden only for that filter mode, see {@link OverviewModelEditorController}. */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
   /** Re-points every row's Fields summary at the currently referenced Document Model. */
   public void setDocumentModelIndex(ElementIndex documentModelIndex) {
     this.documentModelIndex = documentModelIndex;
@@ -72,7 +77,7 @@ public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    Dialogs.showSectionForAdd(Studio.stage).ifPresent(section -> {
+    Dialogs.showSectionForAdd(Studio.stage, documentModelIndex).ifPresent(section -> {
       getSections().add(section);
       rebuildRows();
       commitHeaderChange();
@@ -186,7 +191,7 @@ public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
   }
 
   private void openEditDialog(FilterSection section) {
-    if (Dialogs.showSectionForEdit(Studio.stage, section)) {
+    if (Dialogs.showSectionForEdit(Studio.stage, documentModelIndex, section)) {
       rebuildRows();
       commitHeaderChange();
     }

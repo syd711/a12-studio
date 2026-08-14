@@ -2,41 +2,55 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="360.0" minWidth="480.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="root" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.SectionDataDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" stylesheets="@../../../stylesheet.css" BorderPane.alignment="CENTER">
          <content>
-            <!-- Intentionally empty for now; the section's Label/Fields controls are added here in a follow-up. -->
-            <VBox spacing="14.0">
+            <VBox spacing="14.0" styleClass="field-editor">
                <padding>
                   <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </padding>
+
+               <!-- Section ID -->
+               <VBox spacing="2.0">
+                  <children>
+                     <Label styleClass="field-label" text="%section_id" />
+                     <TextField fx:id="idField" disable="true" editable="false" focusTraversable="false" />
+                  </children>
+               </VBox>
+
+               <!-- Label -->
+               <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
+
+               <!-- Fields -->
+               <fx:include fx:id="fields" source="../field-references-panel.fxml" />
             </VBox>
          </content>
+         <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+         </padding>
       </ScrollPane>
    </center>
    <bottom>
-      <HBox alignment="CENTER_RIGHT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
-         <children>
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel">
-               <HBox.margin>
-                  <Insets right="12.0" />
-               </HBox.margin>
-            </Button>
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <items>
             <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
-         </children>
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
+         </items>
          <padding>
-            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+            <Insets bottom="8.0" right="8.0" />
          </padding>
-      </HBox>
+      </ToolBar>
    </bottom>
 </BorderPane>

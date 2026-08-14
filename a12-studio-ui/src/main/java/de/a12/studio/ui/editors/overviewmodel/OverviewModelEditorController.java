@@ -8,6 +8,7 @@ import de.a12.studio.models.overviewmodel.BoxElement;
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.ButtonElement;
 import de.a12.studio.models.overviewmodel.ElementBox;
+import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.overviewmodel.RowActionGroup;
@@ -155,6 +156,24 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       overviewSortingController.refresh();
       overviewAccessibilityController.refresh();
     });
+    overviewSearchAndFiltersController.setOnFilterModeChange(this::updateFilterModeDependentVisibility);
+  }
+
+  /**
+   * filterMode decides which of the Custom Selection Of Fields/Section Data/Custom Filter Configuration panels
+   * are relevant: Custom Selection Of Fields only for {@link FilterConfiguration#FILTER_MODE_CUSTOM_LIST};
+   * Section Data for every mode except {@link FilterConfiguration#FILTER_MODE_CUSTOM_FILTER}, which models the
+   * same grouping via its own Filter Groups instead; Custom Filter Configuration only for that same {@code
+   * custom_filter} mode. Re-run on every {@link OverviewSearchAndFiltersPanelController#setOnFilterModeChange}
+   * notification, including the initial one fired from its own {@code setModel}.
+   */
+  private void updateFilterModeDependentVisibility() {
+    String filterMode = overviewSearchAndFiltersController.getFilterMode();
+    boolean customFilter = FilterConfiguration.FILTER_MODE_CUSTOM_FILTER.equals(filterMode);
+
+    customSelectionOfFieldsController.setVisible(FilterConfiguration.FILTER_MODE_CUSTOM_LIST.equals(filterMode));
+    overviewSectionDataController.setVisible(!customFilter);
+    customFilterConfigurationController.setVisible(customFilter);
   }
 
   @Override

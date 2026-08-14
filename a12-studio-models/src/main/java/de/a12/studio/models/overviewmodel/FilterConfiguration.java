@@ -17,6 +17,7 @@ public class FilterConfiguration {
   public static final String FILTER_MODE_ALL_WITH_META = "all_with_meta";
   public static final String FILTER_MODE_ALL_COLUMNS = "all_columns";
   public static final String FILTER_MODE_CUSTOM_LIST = "custom_list";
+  public static final String FILTER_MODE_CUSTOM_FILTER = "custom_filter";
 
   private Boolean showFilterButton;
   private Boolean showFilterBar;

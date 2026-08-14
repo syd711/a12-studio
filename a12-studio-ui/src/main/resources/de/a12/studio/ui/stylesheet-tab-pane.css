@@ -29,7 +29,7 @@
     -fx-border-radius: 8px 8px 0 0;
     -fx-border-color: -fx-border-subtle;
     -fx-border-width: 1px 1px 0 1px;
-    -fx-background-insets: 0 6 0 0;
+    -fx-background-insets: 0 0 0 0;
     -fx-border-insets: 0 0 0 0;
     -fx-padding: 2px 12px 2px 12px;
 }
@@ -39,6 +39,7 @@
     -fx-border-color: -fx-accent-color;
     -fx-background-radius: 8px 8px 0 0;
     -fx-border-radius: 8px 8px 0 0;
+    -fx-border-width: 1px 1px 2px 1px;
 }
 
 .tab-pane .tab .focus-indicator {
@@ -46,12 +47,12 @@
 }
 
 .tab .tab-label {
-    -fx-alignment: LEFT;
+    -fx-alignment: CENTER_LEFT;
     -fx-text-fill: -fx-text-muted;
 }
 
 .tab:selected .tab-label {
-    -fx-alignment: LEFT;
+    -fx-alignment: CENTER_LEFT;
     -fx-text-fill: -fx-text-color;
     -fx-font-weight: normal;
 }

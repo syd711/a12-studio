@@ -342,6 +342,11 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     }
 
     if (root != null) {
+      // Scene auto-adds the "root" style class (see stylesheet.css's ".root" rule, which supplies
+      // -fx-background-color) to whatever node is the actual Scene root. Since shadowWrapper below
+      // takes that spot now, root no longer gets it implicitly and must claim it explicitly, or its
+      // background/border disappear.
+      root.getStyleClass().add("root");
       root.setEffect(new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.35), DIALOG_SHADOW_RADIUS, 0, 0, DIALOG_SHADOW_OFFSET_Y));
     }
 

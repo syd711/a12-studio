@@ -13,7 +13,7 @@
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
                 <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
-                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTypeDefinitions" styleClass="default-button">
+                <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTypeDefinitions" styleClass="action-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2p-puzzle" iconSize="18" />
                     </graphic>
