@@ -23,8 +23,12 @@ import java.util.ResourceBundle;
 public class GeneralInlineRepeatSettingsPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final Map<String, String> LABELS = new LinkedHashMap<>();
+
+  /** Default {@link FormModelContent#getInlineRepeatReadonlyPresentation()} behavior when the field is unset. */
+  private static final String READONLY_PRESENTATION_DEFAULT = "INPUT";
+
   static {
-    LABELS.put("INPUT", "input");
+    LABELS.put(READONLY_PRESENTATION_DEFAULT, "input");
     LABELS.put("TEXT", "text output");
   }
 
@@ -64,7 +68,9 @@ public class GeneralInlineRepeatSettingsPanelController extends AbstractProperty
 
   public void setModel(@NonNull FormModel model) {
     this.model = model;
-    setFieldValue(readonlyPresentationCombo, getContent().getInlineRepeatReadonlyPresentation());
+    String readonlyPresentation = getContent().getInlineRepeatReadonlyPresentation();
+    setFieldValue(readonlyPresentationCombo,
+        readonlyPresentation == null ? READONLY_PRESENTATION_DEFAULT : readonlyPresentation);
   }
 
   private FormModelContent getContent() {

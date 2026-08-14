@@ -226,6 +226,26 @@
 }
 
 /*
+ * Same drop indicators as above, generalized to plain TreeCell rows (a TreeView has no separate
+ * "row" element - the TreeCell itself spans the full row) - used by the Form Model Overview tab's
+ * Document Model source tree and Form Model structural tree (FormModelTreeController).
+ */
+.tree-cell.tree-row-drop-above {
+    -fx-border-color: -fx-accent-color transparent transparent transparent;
+    -fx-border-width: 2px 0 0 0;
+}
+
+.tree-cell.tree-row-drop-below {
+    -fx-border-color: transparent transparent -fx-accent-color transparent;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.tree-cell.tree-row-drop-into {
+    -fx-border-color: -fx-accent-color;
+    -fx-border-width: 2px;
+}
+
+/*
  * Leaf elements (fields/rules) inside attachment/multi-select groups have a fixed
  * structure - they can't be added to or removed independently. A soft tint marks
  * them as behaving differently from regular, freely editable elements.

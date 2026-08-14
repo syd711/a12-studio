@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.DocumentSourceTreeController">
+    <top>
+        <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
+            <items>
+                <fx:include fx:id="search" source="../../components/search-field.fxml" />
+            </items>
+        </ToolBar>
+    </top>
+    <center>
+        <StackPane fx:id="treeContainer" BorderPane.alignment="CENTER">
+            <children>
+                <TreeView fx:id="tree" />
+            </children>
+        </StackPane>
+    </center>
+</BorderPane>

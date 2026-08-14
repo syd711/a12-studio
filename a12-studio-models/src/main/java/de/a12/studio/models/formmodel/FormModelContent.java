@@ -18,6 +18,8 @@ public class FormModelContent {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Style> styles = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  private LocalizedText subtitle;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private HeaderFooterBox subHeaderBox;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private HeaderFooterBox footerBox;

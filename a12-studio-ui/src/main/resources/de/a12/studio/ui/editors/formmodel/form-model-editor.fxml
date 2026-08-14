@@ -3,8 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
@@ -27,17 +29,21 @@
            <tabs>
                <Tab text="%overview">
                    <content>
-                       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
-                           <content>
-                               <VBox spacing="12.0" styleClass="field-editor">
+                       <SplitPane dividerPositions="0.32" BorderPane.alignment="CENTER">
+                           <items>
+                               <VBox>
                                    <children>
+                                       <TitledPane animated="false" expanded="false" text="%relationships" VBox.vgrow="NEVER" />
+                                       <TitledPane animated="false" expanded="true" maxHeight="Infinity" text="%document_model" VBox.vgrow="ALWAYS">
+                                           <content>
+                                               <fx:include fx:id="documentSourceTree" source="document-source-tree-panel.fxml" />
+                                           </content>
+                                       </TitledPane>
                                    </children>
-                                   <padding>
-                                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                   </padding>
                                </VBox>
-                           </content>
-                       </ScrollPane>
+                               <fx:include fx:id="formModelTree" source="form-model-tree-panel.fxml" />
+                           </items>
+                       </SplitPane>
                    </content>
                </Tab>
                <Tab text="%repeat_default_button_labels">

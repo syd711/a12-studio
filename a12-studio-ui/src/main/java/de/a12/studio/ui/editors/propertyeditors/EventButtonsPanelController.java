@@ -49,6 +49,9 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   private static final AtomicLong INSTANCE_COUNTER = new AtomicLong();
 
   @FXML
+  private HBox buttonsHeader;
+
+  @FXML
   private VBox buttonsList;
 
   @FXML
@@ -94,6 +97,8 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
     boolean empty = rows.isEmpty();
     emptyLabel.setVisible(empty);
     emptyLabel.setManaged(empty);
+    buttonsHeader.setVisible(!empty);
+    buttonsHeader.setManaged(!empty);
 
     for (int index = 0; index < rows.size(); index++) {
       buttonsList.getChildren().add(createRow(rows.get(index), index, rows.size()));

@@ -61,7 +61,12 @@ public class NewModelFactory {
   private static final String TD_ONLY_ANNOTATION = "tdonly";
 
   public static ProjectItem createModel(@NonNull ProjectItem parent, @NonNull ModelType modelType, @NonNull String name) throws IOException {
-    A12Model<?> model = buildModel(modelType, name, resolveDefaultLocales(parent));
+    return createModel(parent, modelType, name, null);
+  }
+
+  public static ProjectItem createModel(@NonNull ProjectItem parent, @NonNull ModelType modelType, @NonNull String name,
+      String documentModelId) throws IOException {
+    A12Model<?> model = buildModel(modelType, name, resolveDefaultLocales(parent), documentModelId);
 
     ProjectItem item = parent.createChildModel(name);
     // Type Definition Models are persisted with header modelType "document" (see TD_ONLY_ANNOTATION
@@ -76,12 +81,12 @@ public class NewModelFactory {
     return item;
   }
 
-  private static A12Model<?> buildModel(ModelType modelType, String name, List<Locale> locales) throws IOException {
+  private static A12Model<?> buildModel(ModelType modelType, String name, List<Locale> locales, String documentModelId) throws IOException {
     return switch (modelType) {
       case DOCUMENT -> buildDocumentModel(new DocumentModel(), name, locales);
       case TYPEDEFINITION -> buildTypeDefinitionModel(name, locales);
-      case FORM -> buildFormModel();
-      case OVERVIEW -> buildOverviewModel();
+      case FORM -> buildFormModel(documentModelId);
+      case OVERVIEW -> buildOverviewModel(documentModelId);
       case APPLICATION -> buildApplicationModel();
       case MASTERDETAIL -> buildMasterDetailModel();
       case RELATIONSHIP -> buildRelationshipModel(locales);
@@ -159,16 +164,35 @@ public class NewModelFactory {
     return model;
   }
 
-  private static FormModel buildFormModel() {
+  // alias equal to reference, matching the shape of an existing FM's data-binding reference (see e.g.
+  // Invoice_FM.json / GeneralSettingsPanelController#applyDocumentModelReference).
+  private static FormModel buildFormModel(String documentModelId) {
     FormModel model = new FormModel();
     model.setContent(new FormModelContent());
+    if (documentModelId != null && !documentModelId.isBlank()) {
+      model.getModelReferences().add(documentModelReference(ModelReference.PURPOSE_DATA_BINDING, documentModelId, documentModelId));
+    }
     return model;
   }
 
-  private static OverviewModel buildOverviewModel() {
+  // alias fixed to "DM", matching the shape of an existing OM's document-model-for-overview reference
+  // (see e.g. Company_OM.json / OverviewReferencePanelController#syncModelReferences).
+  private static OverviewModel buildOverviewModel(String documentModelId) {
     OverviewModel model = new OverviewModel();
     model.setContent(new OverviewModelContent());
+    if (documentModelId != null && !documentModelId.isBlank()) {
+      model.getModelReferences().add(documentModelReference(ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW, "DM", documentModelId));
+    }
     return model;
+  }
+
+  private static ModelReference documentModelReference(String purpose, String alias, String documentModelId) {
+    ModelReference reference = new ModelReference();
+    reference.setModelType(ModelType.DOCUMENT);
+    reference.setPurpose(purpose);
+    reference.setAlias(alias);
+    reference.setReference(documentModelId);
+    return reference;
   }
 
   private static ApplicationModel buildApplicationModel() {

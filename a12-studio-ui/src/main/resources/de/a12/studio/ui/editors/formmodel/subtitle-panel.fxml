@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css"
+            text="%subtitle" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.SubtitlePanelController">
+    <BorderPane>
+        <center>
+            <VBox spacing="10.0">
+                <children>
+                    <Label styleClass="field-label" text="%type"/>
+                    <ComboBox fx:id="typeCombo" maxWidth="Infinity"/>
+                    <fx:include fx:id="subtitleText" source="../propertyeditors/localized-text-panel.fxml"
+                                styleClass="titled-pane-sub-child"/>
+                </children>
+            </VBox>
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../components/error-container.fxml"
+                        BorderPane.alignment="CENTER"/>
+        </top>
+    </BorderPane>
+</TitledPane>

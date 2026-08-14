@@ -16,6 +16,7 @@ import de.a12.studio.ui.editors.formmodel.GeneralDetachedRepeatSettingsPanelCont
 import de.a12.studio.ui.editors.formmodel.GeneralInlineRepeatSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.GeneralSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.RuleConfirmationSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.SubtitlePanelController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DocumentUniquenessCriteriaPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
@@ -57,6 +58,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @FXML
   private RuleConfirmationSettingsPanelController ruleConfirmationSettingsController;
+
+  @FXML
+  private SubtitlePanelController subtitleController;
 
   @FXML
   private SupportedCharactersPanelController supportedCharactersController;
@@ -113,6 +117,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     generalDetachedRepeatSettingsController.setSaveMode(saveMode);
     generalInlineRepeatSettingsController.setSaveMode(saveMode);
     ruleConfirmationSettingsController.setSaveMode(saveMode);
+    subtitleController.setSaveMode(saveMode);
     supportedCharactersController.setSaveMode(saveMode);
     localesController.setSaveMode(saveMode);
     labelsController.setSaveMode(saveMode);
@@ -160,11 +165,14 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         generalInlineRepeatSettingsController.setVisible(true);
         ruleConfirmationSettingsController.setModel(formModel);
         ruleConfirmationSettingsController.setVisible(true);
+        subtitleController.setModel(formModel);
+        subtitleController.setVisible(true);
       } else {
         generalSettingsController.setVisible(false);
         generalDetachedRepeatSettingsController.setVisible(false);
         generalInlineRepeatSettingsController.setVisible(false);
         ruleConfirmationSettingsController.setVisible(false);
+        subtitleController.setVisible(false);
       }
       supportedCharactersController.setVisible(
           !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel));
@@ -194,6 +202,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         generalDetachedRepeatSettingsController,
         generalInlineRepeatSettingsController,
         ruleConfirmationSettingsController,
+        subtitleController,
         supportedCharactersController,
         localesController,
         labelsController,

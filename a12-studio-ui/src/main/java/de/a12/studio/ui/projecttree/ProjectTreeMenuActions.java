@@ -68,8 +68,9 @@ public class ProjectTreeMenuActions {
 
     ModelType modelType = input.get().modelType();
     String name = input.get().name();
+    String documentModelId = input.get().documentModelId();
     try {
-      ProjectItem item = NewModelFactory.createModel(parent, modelType, name);
+      ProjectItem item = NewModelFactory.createModel(parent, modelType, name, documentModelId);
       onReload.run();
       onOpen.accept(new ProjectItemViewModel(item, Map.of()));
     }

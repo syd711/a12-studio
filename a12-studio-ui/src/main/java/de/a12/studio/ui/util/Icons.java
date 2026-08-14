@@ -75,6 +75,20 @@ public interface Icons {
   String ELEMENT_VALIDATION_RULE = "mdi2a-alpha-v-circle";
   String ELEMENT_EXPRESSION = "mdi2e-epsilon";
 
+  // Form Model structural tree node types (formmodel.FormModelTreeController/FormElementViewModel).
+  String FORM_SCREEN = "mdi2m-monitor-dashboard";
+  String FORM_SECTION = "mdi2v-view-agenda-outline";
+  String FORM_MULTI_COLUMN_SECTION = "mdi2v-view-column-outline";
+  String FORM_CONTROL_GRID = "mdi2v-view-grid-outline";
+  String FORM_ROW = "mdi2t-table-row";
+  String FORM_CONTROL = "mdi2f-form-textbox";
+  String FORM_TEXT_CELL = "mdi2f-format-text";
+  String FORM_EXPRESSION_CELL = "mdi2e-epsilon";
+  String FORM_INLINE_REPEAT = "mdi2r-repeat";
+  String FORM_EMBEDDED_REPEAT = "mdi2r-repeat-once";
+  String FORM_DETACHED_REPEAT = "mdi2r-repeat-variant";
+  String FORM_CUSTOM_SCREEN_ELEMENT = "mdi2p-puzzle-outline";
+
   static String forModelType(ModelType modelType) {
     if (modelType == null) {
       return null;

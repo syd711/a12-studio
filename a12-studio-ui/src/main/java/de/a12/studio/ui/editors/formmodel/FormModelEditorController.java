@@ -1,7 +1,9 @@
 package de.a12.studio.ui.editors.formmodel;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.ButtonGroup;
 import de.a12.studio.models.formmodel.Defaults;
@@ -12,13 +14,16 @@ import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -87,14 +92,59 @@ public class FormModelEditorController extends AbstractEditorController implemen
   @FXML
   private EventButtonsPanelController footerMinorButtonsController;
 
+  @FXML
+  private DocumentSourceTreeController documentSourceTreeController;
+  @FXML
+  private FormModelTreeController formModelTreeController;
+
   public void loadModel(@NonNull A12Model<?> model) {
     load((FormModel) model);
     updateSettingsErrorBadge();
   }
 
   private void load(@NonNull FormModel formModel) {
+    loadOverview(formModel);
     loadRepeatDefaultButtonLabels(formModel);
     loadSubheaderAndFooter(formModel);
+  }
+
+  // ---- Overview ----
+
+  /**
+   * Wires the Overview tab's split view: the left Document Model tree shows whatever Document Model is linked
+   * via the header's {@link ModelReference#PURPOSE_DATA_BINDING} reference (see {@code
+   * GeneralSettingsPanelController#currentDocumentModelId}, the same lookup this mirrors), and the right Form
+   * Model tree edits {@code formModel}'s own {@code screens} structure, using that same Document Model to
+   * resolve fields/groups dropped in from the left.
+   */
+  private void loadOverview(@NonNull FormModel formModel) {
+    DocumentModel documentModel = resolveDataBindingDocumentModel(formModel);
+    documentSourceTreeController.load(documentModel);
+    formModelTreeController.setModel(formModel, documentModel, projectItem);
+  }
+
+  private @Nullable DocumentModel resolveDataBindingDocumentModel(@NonNull FormModel formModel) {
+    String documentModelId = currentDocumentModelId(formModel);
+    if (documentModelId == null) {
+      return null;
+    }
+    List<DocumentModel> documentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    return documentModels.stream().filter(candidate -> documentModelId.equals(candidate.getId())).findFirst().orElse(null);
+  }
+
+  private @Nullable String currentDocumentModelId(@NonNull FormModel formModel) {
+    if (formModel.getModelReferences() == null) {
+      return null;
+    }
+    return formModel.getModelReferences().stream()
+        .filter(FormModelEditorController::isDataBindingReference)
+        .map(ModelReference::getReference)
+        .findFirst()
+        .orElse(null);
+  }
+
+  private static boolean isDataBindingReference(@NonNull ModelReference reference) {
+    return reference.getModelType() == ModelType.DOCUMENT && ModelReference.PURPOSE_DATA_BINDING.equals(reference.getPurpose());
   }
 
   // ---- Repeat Default Button Labels ----

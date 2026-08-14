@@ -40,6 +40,9 @@
                           <!-- Form Model only: Rule Confirmation Settings -->
                           <fx:include fx:id="ruleConfirmationSettings" source="../formmodel/rule-confirmation-settings-panel.fxml" />
 
+                          <!-- Form Model only: Subtitle -->
+                          <fx:include fx:id="subtitle" source="../formmodel/subtitle-panel.fxml" />
+
                           <!-- Supported Characters -->
                           <fx:include fx:id="supportedCharacters" source="../propertyeditors/supported-characters-panel.fxml" />
 
