@@ -96,6 +96,9 @@
                 <tooltip>
                     <Tooltip text="%search_files" />
                 </tooltip>
+               <HBox.margin>
+                  <Insets left="12.0" />
+               </HBox.margin>
             </Button>
             <Button fx:id="claudeConsoleBtn" accessibleText="%claude_console" mnemonicParsing="false" onAction="#onOpenClaudeConsole" styleClass="menu-bar-button">
                 <graphic>
@@ -108,6 +111,9 @@
                 <tooltip>
                     <Tooltip text="%open_claude_console" />
                 </tooltip>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
             </Button>
             <Button accessibleText="%preferences" mnemonicParsing="false" onAction="#onPreferences" styleClass="menu-bar-button">
                 <graphic>

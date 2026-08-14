@@ -1,3 +1,49 @@
+plugins {
+    id 'com.github.jk1.dependency-license-report' version '3.1.4'
+}
+
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
+import com.github.jk1.license.render.CsvReportRenderer
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import groovy.io.FileType
+
+licenseReport {
+    outputDir = "$rootDir/documentation/third-party-licenses"
+    projects = [project] + subprojects
+    configurations = ['runtimeClasspath']
+    renderers = [
+        new InventoryHtmlReportRenderer('index.html', 'a12-studio Third-Party Licenses'),
+        new CsvReportRenderer('licenses.csv')
+    ]
+    filters = [new LicenseBundleNormalizer()]
+}
+
+tasks.register('generateLicenses') {
+    group = 'documentation'
+    description = 'Aggregates third-party dependency license information for all modules (Gradle equivalent of vpin-studio\'s "mvn license:aggregate-download-licenses").'
+    dependsOn 'generateLicenseReport'
+    doLast {
+        // gradle-license-report extracts embedded license files (LICENSE, NOTICE, ...) from each
+        // jar into "<outputDir>/<jarFileName>/<zip entry path>". Flatten those into plain .txt
+        // files directly under outputDir instead of leaving one subfolder per jar around.
+        def outDir = file(licenseReport.outputDir)
+        outDir.listFiles({ f -> f.isDirectory() } as FileFilter)?.each { artifactDir ->
+            def artifactName = artifactDir.name.replaceFirst(/\.jar$/, '')
+            artifactDir.eachFileRecurse(FileType.FILES) { licenseFile ->
+                def baseName = licenseFile.name.contains('.') ?
+                        licenseFile.name.substring(0, licenseFile.name.lastIndexOf('.')) : licenseFile.name
+                def target = new File(outDir, "${artifactName}-${baseName}.txt")
+                int suffix = 1
+                while (target.exists()) {
+                    target = new File(outDir, "${artifactName}-${baseName}-${suffix++}.txt")
+                }
+                target.bytes = licenseFile.bytes
+            }
+            artifactDir.deleteDir()
+        }
+    }
+}
+
 subprojects {
     apply plugin: 'java'
 

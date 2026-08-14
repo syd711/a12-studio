@@ -80,6 +80,7 @@ Name: "{app}"; Permissions: users-full
 Source: "..\..\..\Output\A12-Studio\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "..\..\..\Output\A12-Studio\a12-studio-ui.jar"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "..\..\..\Output\A12-Studio\a12-studio-server.jar"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
+Source: "..\..\..\documentation\third-party-licenses\*"; DestDir: "{app}\third-party-licenses"; Flags: ignoreversion recursesubdirs createallsubdirdirs; Permissions: everyone-full
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

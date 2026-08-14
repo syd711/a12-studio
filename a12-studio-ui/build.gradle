@@ -87,7 +87,7 @@ tasks.register('prepareInstallerScript', Copy) {
 }
 
 tasks.register('buildInstaller', Exec) {
-    dependsOn prepareInstallerScript, copyToOutput, ':a12-studio-server:copyToOutput'
+    dependsOn prepareInstallerScript, copyToOutput, ':a12-studio-server:copyToOutput', ':generateLicenses'
     onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows() }
     commandLine 'ISCC.exe', layout.buildDirectory.file('installer/inno-installer-a12-studio-full.iss').get().asFile
 }
