@@ -86,6 +86,12 @@ public class FilterStringFieldsMultiSelectPanelController extends AbstractProper
     });
   }
 
+  /** Irrelevant for {@link FilterConfiguration#FILTER_MODE_CUSTOM_FILTER} - hidden for that filter mode, see
+   * {@link OverviewModelEditorController}. */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
   public void setModel(@NonNull OverviewModel model) {
     this.model = model;
 

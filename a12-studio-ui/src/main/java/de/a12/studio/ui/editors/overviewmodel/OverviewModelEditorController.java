@@ -166,7 +166,8 @@ public class OverviewModelEditorController extends AbstractEditorController impl
    * FilterConfiguration#FILTER_MODE_CUSTOM_FILTER} (which models the same grouping via its own Filter Groups
    * instead) AND only while the filter button is shown, since Section Data groups the fields shown in that
    * button's dropdown and is meaningless once the button itself is hidden; Custom Filter Configuration only for
-   * that same {@code custom_filter} mode. Re-run on every {@link
+   * that same {@code custom_filter} mode; Filter String Fields with Multi-Select for every mode except {@code
+   * custom_filter}, which it does not apply to. Re-run on every {@link
    * OverviewSearchAndFiltersPanelController#setOnRelevanceChange} notification, including the initial one fired
    * from its own {@code setModel}.
    */
@@ -178,6 +179,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     customSelectionOfFieldsController.setVisible(FilterConfiguration.FILTER_MODE_CUSTOM_LIST.equals(filterMode));
     overviewSectionDataController.setVisible(!customFilter && showFilterButton);
     customFilterConfigurationController.setVisible(customFilter);
+    filterStringFieldsMultiSelectController.setVisible(!customFilter);
   }
 
   @Override

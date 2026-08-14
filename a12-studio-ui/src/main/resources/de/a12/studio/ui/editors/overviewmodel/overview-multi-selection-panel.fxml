@@ -23,76 +23,85 @@
         <center>
             <VBox spacing="10.0">
                 <children>
-                    <GridPane hgap="10.0" vgap="8.0">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
-                            <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
-                            <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
-                        </columnConstraints>
+                    <CheckBox fx:id="multiSelectionEnabledField" mnemonicParsing="false" text="%enable_multi_selection" />
+                    <VBox fx:id="multiSelectionContent" spacing="10.0">
                         <children>
-                            <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <GridPane hgap="10.0" vgap="8.0">
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                                    <ColumnConstraints hgrow="ALWAYS" percentWidth="33.3" />
+                                </columnConstraints>
                                 <children>
-                                    <Label styleClass="field-label" text="%collapse_option" />
-                                    <ComboBox fx:id="collapseOptionField" editable="false" maxWidth="Infinity" />
+                                    <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <children>
+                                            <Label styleClass="field-label" text="%collapse_option" />
+                                            <ComboBox fx:id="collapseOptionField" editable="false" maxWidth="Infinity" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <children>
+                                            <Label styleClass="field-label" text="%counter_option" />
+                                            <ComboBox fx:id="counterOptionField" editable="false" maxWidth="Infinity" />
+                                        </children>
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                        <children>
+                                            <Label styleClass="field-label" text="%selection_area" />
+                                            <ComboBox fx:id="selectionAreaField" editable="false" maxWidth="Infinity" />
+                                        </children>
+                                    </VBox>
                                 </children>
-                            </VBox>
-                            <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                <children>
-                                    <Label styleClass="field-label" text="%counter_option" />
-                                    <ComboBox fx:id="counterOptionField" editable="false" maxWidth="Infinity" />
-                                </children>
-                            </VBox>
-                            <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                                <children>
-                                    <Label styleClass="field-label" text="%selection_area" />
-                                    <ComboBox fx:id="selectionAreaField" editable="false" maxWidth="Infinity" />
-                                </children>
-                            </VBox>
-                        </children>
-                    </GridPane>
+                            </GridPane>
 
-                    <TitledPane fx:id="clearConfirmationPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%clear_selection_confirmation">
-                        <VBox spacing="10.0">
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                            <children>
-                                <CheckBox fx:id="clearConfirmationField" mnemonicParsing="false" text="%display_confirmation_before_clearing_selected_rows" />
-                                <VBox fx:id="clearConfirmationDetails" spacing="10.0">
+                            <TitledPane fx:id="clearConfirmationPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%clear_selection_confirmation">
+                                <VBox spacing="10.0">
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </padding>
                                     <children>
-                                        <fx:include fx:id="clearConfirmationTitle" source="../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
-                                        <fx:include fx:id="clearConfirmationMessage" source="../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
+                                        <CheckBox fx:id="clearConfirmationField" mnemonicParsing="false" text="%display_confirmation_before_clearing_selected_rows" />
+                                        <VBox fx:id="clearConfirmationDetails" spacing="10.0">
+                                            <children>
+                                                <fx:include fx:id="clearConfirmationTitle" source="../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
+                                                <fx:include fx:id="clearConfirmationMessage" source="../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
+                                            </children>
+                                        </VBox>
                                     </children>
                                 </VBox>
-                            </children>
-                        </VBox>
-                    </TitledPane>
+                            </TitledPane>
 
-                    <TitledPane fx:id="actionsPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%actions_for_multi_selection">
-                        <VBox spacing="10.0">
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                            <children>
-                                <HBox fx:id="actionColumnHeaders" spacing="10.0">
+                            <TitledPane fx:id="actionsPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%actions_for_multi_selection">
+                                <VBox spacing="10.0">
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </padding>
                                     <children>
-                                        <Label prefWidth="18.0" text="" />
-                                        <Label styleClass="field-label" prefWidth="160.0" text="%event" />
-                                        <Label styleClass="field-label" prefWidth="90.0" text="%priority" />
-                                        <Label styleClass="field-label" prefWidth="90.0" text="%destructive" />
-                                        <Label styleClass="field-label" prefWidth="120.0" text="%icon" />
+                                        <HBox fx:id="actionColumnHeaders" spacing="10.0">
+                                            <children>
+                                                <Label prefWidth="18.0" text="" />
+                                                <Label styleClass="field-label" prefWidth="160.0" text="%event" />
+                                                <Label styleClass="field-label" prefWidth="90.0" text="%priority" />
+                                                <Label styleClass="field-label" prefWidth="90.0" text="%destructive" />
+                                                <Label styleClass="field-label" prefWidth="120.0" text="%icon" />
+                                            </children>
+                                        </HBox>
+                                        <VBox fx:id="actionRows" spacing="8.0" />
+                                        <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="%no_actions_defined" />
+                                        <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="primary-button" text="%add_action" >
+                        <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                        <tooltip><Tooltip text="%add_action" /></tooltip>
+                    </Button>
                                     </children>
-                                </HBox>
-                                <VBox fx:id="actionRows" spacing="8.0" />
-                                <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="%no_actions_defined" />
-                                <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="primary-button" text="%add_action" >
-                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
-                <tooltip><Tooltip text="%add_action" /></tooltip>
-            </Button>
-                            </children>
-                        </VBox>
-                    </TitledPane>
+                                </VBox>
+                            </TitledPane>
+                        </children>
+                    </VBox>
                 </children>
+
+                <padding>
+                    <Insets bottom="5.0" left="0" right="0" top="0" />
+                </padding>
             </VBox>
         </center>
     </BorderPane>

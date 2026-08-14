@@ -58,6 +58,10 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
       MultiSelectionConfig.SELECTION_AREA_CHECKBOX, MultiSelectionConfig.SELECTION_AREA_CHECKBOX_AND_ROW);
 
   @FXML
+  private CheckBox multiSelectionEnabledField;
+  @FXML
+  private VBox multiSelectionContent;
+  @FXML
   private ComboBox<String> collapseOptionField;
   @FXML
   private ComboBox<String> counterOptionField;
@@ -87,6 +91,21 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
+
+    multiSelectionContent.visibleProperty().bind(multiSelectionEnabledField.selectedProperty());
+    multiSelectionContent.managedProperty().bind(multiSelectionContent.visibleProperty());
+    multiSelectionEnabledField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel || model == null) {
+        return;
+      }
+      if (newValue) {
+        ensureMultiSelectionConfig();
+      }
+      else {
+        ensureConfiguration().setMultiSelection(null);
+      }
+      commitHeaderChange();
+    });
 
     collapseOptionField.getItems().setAll(COLLAPSE_OPTIONS);
     collapseOptionField.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -148,6 +167,7 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
     updatingFromModel = true;
     try {
       MultiSelectionConfig config = currentMultiSelectionConfig();
+      multiSelectionEnabledField.setSelected(config != null);
       collapseOptionField.setValue(config != null ? orEmpty(config.getCollapseOption()) : "");
       counterOptionField.setValue(config != null ? orEmpty(config.getCounterOption()) : "");
       selectionAreaField.setValue(config != null ? orEmpty(config.getSelectionArea()) : "");

@@ -42,6 +42,11 @@
       "showFullTextSearch": true,
       "pagingSize": 10,
       "showRowCount": true,
+      "filterConfiguration": {
+        "showFilterButton": null,
+        "showFilterBar": null,
+        "filterMode": "custom_filter"
+      },
       "newFilterConfiguration": {
         "filterSelector": {
           "viewMode": "overlay",
@@ -93,6 +98,11 @@
             ]
           }
         ]
+      },
+      "multiSelection": {
+        "collapseOption": null,
+        "counterOption": null,
+        "selectionArea": null
       }
     },
     "columns": [
