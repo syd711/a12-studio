@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.dialogs;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.ui.components.DialogController;
@@ -11,6 +12,10 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
+import de.a12.studio.ui.editors.formmodel.GeneralDetachedRepeatSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.GeneralInlineRepeatSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.GeneralSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.RuleConfirmationSettingsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DocumentUniquenessCriteriaPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
@@ -21,6 +26,7 @@ import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SupportedCharactersPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TimezonePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
@@ -39,6 +45,18 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @FXML
   private ModelSettingsNamePanelController modelSettingsNameController;
+
+  @FXML
+  private GeneralSettingsPanelController generalSettingsController;
+
+  @FXML
+  private GeneralDetachedRepeatSettingsPanelController generalDetachedRepeatSettingsController;
+
+  @FXML
+  private GeneralInlineRepeatSettingsPanelController generalInlineRepeatSettingsController;
+
+  @FXML
+  private RuleConfirmationSettingsPanelController ruleConfirmationSettingsController;
 
   @FXML
   private SupportedCharactersPanelController supportedCharactersController;
@@ -91,6 +109,10 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     annotationsController.hideAnnotationDatasetsButton();
 
     modelSettingsNameController.setSaveMode(saveMode);
+    generalSettingsController.setSaveMode(saveMode);
+    generalDetachedRepeatSettingsController.setSaveMode(saveMode);
+    generalInlineRepeatSettingsController.setSaveMode(saveMode);
+    ruleConfirmationSettingsController.setSaveMode(saveMode);
     supportedCharactersController.setSaveMode(saveMode);
     localesController.setSaveMode(saveMode);
     labelsController.setSaveMode(saveMode);
@@ -129,9 +151,24 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       } else {
         subtitlesController.setVisible(false);
       }
+      if (model instanceof FormModel formModel) {
+        generalSettingsController.setModel(formModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
+        generalSettingsController.setVisible(true);
+        generalDetachedRepeatSettingsController.setModel(formModel);
+        generalDetachedRepeatSettingsController.setVisible(true);
+        generalInlineRepeatSettingsController.setModel(formModel);
+        generalInlineRepeatSettingsController.setVisible(true);
+        ruleConfirmationSettingsController.setModel(formModel);
+        ruleConfirmationSettingsController.setVisible(true);
+      } else {
+        generalSettingsController.setVisible(false);
+        generalDetachedRepeatSettingsController.setVisible(false);
+        generalInlineRepeatSettingsController.setVisible(false);
+        ruleConfirmationSettingsController.setVisible(false);
+      }
       supportedCharactersController.setVisible(
-          !(model instanceof ApplicationModel) && !(model instanceof OverviewModel));
-      modelReferencesController.setVisible(!(model instanceof OverviewModel));
+          !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel));
+      modelReferencesController.setVisible(!(model instanceof OverviewModel) && !(model instanceof FormModel));
     }
 
     bindErrorContainer();
@@ -153,6 +190,10 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   private void bindErrorContainer() {
     List<AbstractPropertyEditor> panels = List.of(
         modelSettingsNameController,
+        generalSettingsController,
+        generalDetachedRepeatSettingsController,
+        generalInlineRepeatSettingsController,
+        ruleConfirmationSettingsController,
         supportedCharactersController,
         localesController,
         labelsController,

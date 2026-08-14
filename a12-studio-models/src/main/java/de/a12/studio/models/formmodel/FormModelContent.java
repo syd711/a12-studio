@@ -27,4 +27,14 @@ public class FormModelContent {
   private Defaults defaults;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String readonlyPresentation;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String inlineRepeatReadonlyPresentation;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String markingOfRequiredFields;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String detachedRepeatCommitButtonEnablement;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String disableRuleConfirmation;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean hideConfirmationSummary;
 }

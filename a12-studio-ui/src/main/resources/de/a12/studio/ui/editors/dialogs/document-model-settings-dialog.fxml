@@ -28,6 +28,18 @@
                           <!-- Name / Version / Description -->
                           <fx:include fx:id="modelSettingsName" source="../propertyeditors/model-settings-name-panel.fxml" />
 
+                          <!-- Form Model only: General Settings -->
+                          <fx:include fx:id="generalSettings" source="../formmodel/general-settings-panel.fxml" />
+
+                          <!-- Form Model only: General Detached Repeat Settings -->
+                          <fx:include fx:id="generalDetachedRepeatSettings" source="../formmodel/general-detached-repeat-settings-panel.fxml" />
+
+                          <!-- Form Model only: General Inline Repeat Settings -->
+                          <fx:include fx:id="generalInlineRepeatSettings" source="../formmodel/general-inline-repeat-settings-panel.fxml" />
+
+                          <!-- Form Model only: Rule Confirmation Settings -->
+                          <fx:include fx:id="ruleConfirmationSettings" source="../formmodel/rule-confirmation-settings-panel.fxml" />
+
                           <!-- Supported Characters -->
                           <fx:include fx:id="supportedCharacters" source="../propertyeditors/supported-characters-panel.fxml" />
 

@@ -21,6 +21,9 @@ public class ModelReference {
   // "import every type definition owned by the referenced Type Definition Model", as opposed to an "include"
   // reference (which inlines a whole other document model's element tree via a Group's includeConfig).
   public static final String PURPOSE_TYPE_DEFINITIONS = "typeDefinitions";
+  // A Form Model's reference to the Document Model it binds its Controls' data to, matching SME's
+  // FormModelFrame convention (see e.g. Invoice_FM.json's modelReferences entry).
+  public static final String PURPOSE_DATA_BINDING = "data binding";
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String alias;

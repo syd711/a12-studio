@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%rule_confirmation_settings" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.RuleConfirmationSettingsPanelController">
+ <BorderPane>
+ <center>
+  <GridPane hgap="16.0" vgap="10.0">
+    <columnConstraints>
+      <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+      <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+    </columnConstraints>
+    <rowConstraints>
+      <RowConstraints />
+    </rowConstraints>
+
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+      <children>
+        <Label styleClass="field-label" text="%disable_rule_confirmation_dialog" />
+        <ComboBox fx:id="disableRuleConfirmationCombo" maxWidth="Infinity" />
+      </children>
+    </VBox>
+
+    <VBox alignment="BOTTOM_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="0">
+      <children>
+        <CheckBox fx:id="showConfirmationSummaryCheckBox" mnemonicParsing="false" text="%show_confirmation_summary" />
+      </children>
+    </VBox>
+  </GridPane>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

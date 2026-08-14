@@ -44,6 +44,9 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   // Managed separately by RoleEditorPanelController; hidden here so it isn't shown/edited twice.
   private static final String ROLES_ANNOTATION_NAME = "roles";
 
+  // Internal form-engine bookkeeping annotation, not meant to be user-editable; never shown here.
+  private static final String BINDING_CONFIGURATION_ANNOTATION_NAME = "bindingConfiguration";
+
   @FXML
   private GridPane annotationsGrid;
 
@@ -107,17 +110,20 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     return model != null ? model.getAnnotations() : element.getAnnotations();
   }
 
-  // Excludes the "roles" annotation in header mode; it is edited via RoleEditorPanelController instead.
+  // Excludes "bindingConfiguration" always, and "roles" in header mode; "roles" is edited via
+  // RoleEditorPanelController instead.
   private List<Annotation> getAnnotations() {
     List<Annotation> backing = getBackingAnnotations();
-    if (model == null) {
-      return backing;
-    }
     List<Annotation> visible = new ArrayList<>();
     for (Annotation annotation : backing) {
-      if (!ROLES_ANNOTATION_NAME.equals(annotation.getName())) {
-        visible.add(annotation);
+      String name = annotation.getName();
+      if (BINDING_CONFIGURATION_ANNOTATION_NAME.equals(name)) {
+        continue;
       }
+      if (model != null && ROLES_ANNOTATION_NAME.equals(name)) {
+        continue;
+      }
+      visible.add(annotation);
     }
     return visible;
   }
