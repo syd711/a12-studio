@@ -14,6 +14,7 @@ import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.events.LocalesChangedEvent;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -147,7 +148,7 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
   }
 
   private void openSuggestionsDialog(Locale locale) {
-    Dialogs.showSuggestions(Studio.stage, "Suggestions for Locale " + locale.getCode(), getSuggestionValues(locale.getCode()))
+    Dialogs.showSuggestions(Studio.stage, StudioBundle.get("suggestions_for_locale", locale.getCode()), getSuggestionValues(locale.getCode()))
         .ifPresent(newValues -> {
           withStringTypeOptions(element, options -> setSuggestionValues(options, locale.getCode(), newValues));
           rebuildSuggestionsRows();

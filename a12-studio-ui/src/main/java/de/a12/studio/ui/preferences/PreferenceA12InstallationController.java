@@ -15,7 +15,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class A12InstallationSettingsController implements Initializable {
+public class PreferenceA12InstallationController implements Initializable {
 
   @FXML
   private TextField installationPathField;

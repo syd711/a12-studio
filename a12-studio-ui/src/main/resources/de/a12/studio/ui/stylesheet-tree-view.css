@@ -194,6 +194,17 @@
 }
 
 /*
+ * #flowsTree sits directly below a floating toolbar in the panel's content area, so it draws
+ * its own left/right/bottom border in the same color as the enclosing TitledPane's border (top
+ * is left open since the toolbar sits right above it) to visually frame the tree like a card.
+ */
+#flowsTree {
+    -fx-border-color: transparent -fx-titled-pane-border -fx-titled-pane-border -fx-titled-pane-border;
+    -fx-border-width: 0 1px 1px 1px;
+    -fx-border-radius: 0 0 6px 6px;
+}
+
+/*
  * Drop indicators shown on a row of #elementsTreeTable while another row is dragged over it (see
  * DocumentModelElementsTreeController#showDropIndicator): an accent-colored line on the row's top or
  * bottom edge for a sibling reorder (mirrors .module-row-drop-above/-below), or a full accent border

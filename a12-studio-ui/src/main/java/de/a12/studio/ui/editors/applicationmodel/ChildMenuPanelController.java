@@ -36,6 +36,9 @@ import de.a12.studio.ui.util.StudioBundle;
 public class ChildMenuPanelController extends AbstractPropertyEditor {
 
   @FXML
+  private Label nameHeaderLabel;
+
+  @FXML
   private VBox childMenuList;
 
   private Module module;
@@ -62,6 +65,8 @@ public class ChildMenuPanelController extends AbstractPropertyEditor {
     childMenuList.getChildren().clear();
 
     List<Menu> children = module.getMenu() != null ? module.getMenu().getChildren() : List.of();
+    nameHeaderLabel.setVisible(!children.isEmpty());
+    nameHeaderLabel.setManaged(!children.isEmpty());
     if (children.isEmpty()) {
       Label emptyLabel = new Label("No child menus found.");
       emptyLabel.getStyleClass().add("placeholder-label");

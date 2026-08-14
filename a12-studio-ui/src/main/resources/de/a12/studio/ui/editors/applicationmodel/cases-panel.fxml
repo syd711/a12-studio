@@ -14,7 +14,7 @@
  <BorderPane>
  <center>
   <VBox spacing="8.0">
-    <HBox spacing="10.0">
+    <HBox fx:id="headerRow" spacing="10.0">
       <Label styleClass="field-label" text="%name" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
     </HBox>
     <VBox fx:id="rows" spacing="8.0" />

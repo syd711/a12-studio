@@ -8,7 +8,7 @@ import de.a12.studio.models.util.JsonSettings;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Helpers around {@link AnnotationDataSet} used by {@link AnnotationSetsController} and the annotation set
+ * Helpers around {@link AnnotationDataSet} used by {@link PreferenceAnnotationSetsController} and the annotation set
  * dialogs: building the live "default" set from a project's annotation registries, counting table column
  * values, and cloning a set so tree pruning in a dialog never mutates the persisted/live source.
  */

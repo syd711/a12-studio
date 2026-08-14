@@ -48,7 +48,7 @@
 
 .tab .tab-label {
     -fx-alignment: CENTER_LEFT;
-    -fx-text-fill: -fx-text-muted;
+    -fx-text-fill: -fx-text-color;
 }
 
 .tab:selected .tab-label {
@@ -108,7 +108,7 @@
 }
 
 .tab-pane.sub-tab-panel .tab .tab-label {
-    -fx-text-fill: -fx-text-muted;
+    -fx-text-fill: -fx-text-color;
     -fx-font-weight: normal;
 }
 

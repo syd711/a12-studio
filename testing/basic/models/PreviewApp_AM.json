@@ -496,6 +496,26 @@
             }
           }
         }
+      },
+      {
+        "name": "asdf",
+        "menu": {
+          "name": "asdf",
+          "initialActivity": {
+            "descriptor": {
+              "": ""
+            }
+          }
+        },
+        "flows": [],
+        "orCreateMenu": {
+          "name": "asdf",
+          "initialActivity": {
+            "descriptor": {
+              "": ""
+            }
+          }
+        }
       }
     ],
     "region": {

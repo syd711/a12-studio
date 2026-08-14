@@ -14,11 +14,11 @@ public class Dialogs {
 
   public static Optional<Role> showRoleForAdd(Stage owner) {
     Role role = new Role();
-    return showRole(owner, "Add Role", role) ? Optional.of(role) : Optional.empty();
+    return showRole(owner, StudioBundle.get("add_role"), role) ? Optional.of(role) : Optional.empty();
   }
 
   public static boolean showRoleForEdit(Stage owner, Role role) {
-    return showRole(owner, "Edit Role", role);
+    return showRole(owner, StudioBundle.get("edit_role"), role);
   }
 
   private static boolean showRole(Stage owner, String title, Role role) {
@@ -33,11 +33,11 @@ fxmlLoader.setResources(StudioBundle.getBundle());
 
   public static Optional<User> showUserForAdd(Stage owner) {
     User user = new User();
-    return showUser(owner, "Add User", user) ? Optional.of(user) : Optional.empty();
+    return showUser(owner, StudioBundle.get("add_user"), user) ? Optional.of(user) : Optional.empty();
   }
 
   public static boolean showUserForEdit(Stage owner, User user) {
-    return showUser(owner, "Edit User", user);
+    return showUser(owner, StudioBundle.get("edit_user"), user);
   }
 
   private static boolean showUser(Stage owner, String title, User user) {

@@ -21,7 +21,7 @@ public class Dialogs {
     AnnotationDataSet workingCopy = AnnotationDataSetSupport.deepCopy(original);
     FXMLLoader fxmlLoader = new FXMLLoader(AnnotationDataSetTreeDialogController.class.getResource("annotation-dataset-tree-dialog.fxml"));
 fxmlLoader.setResources(StudioBundle.getBundle());
-    String title = editable ? "Edit Annotation Set" : "Export Annotation Set";
+    String title = editable ? StudioBundle.get("edit_annotation_set") : StudioBundle.get("export_annotation_set");
     Stage stage = WidgetFactory.createDialogStage("dialog-annotation-dataset-editor", fxmlLoader, owner, title);
     AnnotationDataSetTreeDialogController controller = (AnnotationDataSetTreeDialogController) stage.getUserData();
     controller.init(stage, editable, workingCopy);

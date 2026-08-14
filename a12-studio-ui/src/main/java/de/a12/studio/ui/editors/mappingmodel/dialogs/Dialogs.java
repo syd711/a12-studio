@@ -19,7 +19,7 @@ public class Dialogs {
    */
   public static Optional<MappingSource> showSourceModelForAdd(Stage owner) {
     MappingSource sourceModel = new MappingSource();
-    return showSourceModel(owner, "Add Source Model", sourceModel) ? Optional.of(sourceModel) : Optional.empty();
+    return showSourceModel(owner, StudioBundle.get("add_source_model_title"), sourceModel) ? Optional.of(sourceModel) : Optional.empty();
   }
 
   /**
@@ -28,7 +28,7 @@ public class Dialogs {
    * Cancel leaves it untouched.
    */
   public static boolean showSourceModelForEdit(Stage owner, MappingSource sourceModel) {
-    return showSourceModel(owner, "Edit Source Model", sourceModel);
+    return showSourceModel(owner, StudioBundle.get("edit_source_model_title"), sourceModel);
   }
 
   private static boolean showSourceModel(Stage owner, String title, MappingSource sourceModel) {

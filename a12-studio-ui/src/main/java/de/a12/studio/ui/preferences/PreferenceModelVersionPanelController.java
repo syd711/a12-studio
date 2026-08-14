@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
-public class ModelVersionSettingsPanelController implements Initializable {
+public class PreferenceModelVersionPanelController implements Initializable {
 
   @FXML
   private TableView<ModelType> modelVersionTable;

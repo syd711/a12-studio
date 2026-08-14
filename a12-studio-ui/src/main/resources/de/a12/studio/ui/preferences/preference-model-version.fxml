@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.preferences.ModelVersionSettingsPanelController">
+            fx:controller="de.a12.studio.ui.preferences.PreferenceModelVersionPanelController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>

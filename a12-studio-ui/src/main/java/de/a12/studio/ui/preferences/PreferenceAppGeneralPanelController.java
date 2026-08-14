@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class AppGeneralSettingsPanelController implements Initializable {
+public class PreferenceAppGeneralPanelController implements Initializable {
 
   /** BCP-47 tag → display name. Ordered: system default first, then explicit locales. */
   private static final Map<String, String> SUPPORTED_LANGUAGES = new LinkedHashMap<>();

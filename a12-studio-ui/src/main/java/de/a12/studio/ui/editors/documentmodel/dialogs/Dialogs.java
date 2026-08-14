@@ -43,7 +43,7 @@ public class Dialogs {
   public static Optional<IncludeInput> showInclude(Stage owner, @NonNull Project project, DocumentModel excludedModel, String defaultName) {
     FXMLLoader fxmlLoader = new FXMLLoader(IncludeDialogController.class.getResource("include-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage("include-dialog", fxmlLoader, owner, "New Include");
+    Stage stage = WidgetFactory.createDialogStage("include-dialog", fxmlLoader, owner, StudioBundle.get("new_include"));
     IncludeDialogController controller = (IncludeDialogController) stage.getUserData();
     controller.init(stage, project, excludedModel, defaultName);
     stage.showAndWait();

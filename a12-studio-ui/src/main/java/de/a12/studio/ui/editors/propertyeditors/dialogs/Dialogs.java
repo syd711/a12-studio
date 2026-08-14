@@ -59,7 +59,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
                                                                                 DocumentUniquenessCriterion criterion, Set<String> usedNames) {
     FXMLLoader fxmlLoader = new FXMLLoader(DocumentUniquenessCriterionDialogController.class.getResource("document-uniqueness-criterion-dialog.fxml"));
 fxmlLoader.setResources(StudioBundle.getBundle());
-    String title = criterion == null ? "New Uniqueness Criterion" : "Edit Uniqueness Criterion";
+    String title = criterion == null ? StudioBundle.get("new_uniqueness_criterion") : StudioBundle.get("edit_uniqueness_criterion");
     Stage stage = WidgetFactory.createDialogStage("uniqueness-criterion-dialog", fxmlLoader, owner, title);
     DocumentUniquenessCriterionDialogController controller = (DocumentUniquenessCriterionDialogController) stage.getUserData();
     controller.initDialog(stage, model, criterion, usedNames);

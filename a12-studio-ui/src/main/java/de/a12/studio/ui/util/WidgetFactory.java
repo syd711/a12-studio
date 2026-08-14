@@ -448,7 +448,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static Optional<ButtonType> showConfirmationWithOption(Stage owner, String text, String help1, String help2, String btnText, String optionText) {
-    Stage stage = createDialogStage("dialog-confirmation-with-option", ConfirmationDialogWithOptionController.class, owner, "Confirmation", "dialog-confirmation-with-option.fxml");
+    Stage stage = createDialogStage(null, ConfirmationDialogWithOptionController.class, owner, "Confirmation", "dialog-confirmation-with-option.fxml");
     ConfirmationDialogWithOptionController controller = (ConfirmationDialogWithOptionController) stage.getUserData();
     controller.initDialog(stage, optionText, btnText, text, help1, help2);
     stage.showAndWait();
@@ -456,7 +456,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static Optional<ButtonType> showConfirmation(Stage owner, String text, String help1, String help2, String btnText) {
-    Stage stage = createDialogStage("dialogconfirmation", ConfirmationDialogController.class, owner, "Confirmation", "dialog-confirmation.fxml");
+    Stage stage = createDialogStage(null, ConfirmationDialogController.class, owner, "Confirmation", "dialog-confirmation.fxml");
     ConfirmationDialogController controller = (ConfirmationDialogController) stage.getUserData();
     controller.initDialog(stage, null, btnText, text, help1, help2);
     stage.showAndWait();
@@ -485,7 +485,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static Optional<ButtonType> showInformation(Stage owner, String text, String help1, String help2) {
-    Stage stage = createDialogStage("dialog-confirmation", ConfirmationDialogController.class, owner, "Information", "dialog-confirmation.fxml");
+    Stage stage = createDialogStage(null, ConfirmationDialogController.class, owner, "Information", "dialog-confirmation.fxml");
     ConfirmationDialogController controller = (ConfirmationDialogController) stage.getUserData();
     controller.hideCancel();
     controller.initDialog(stage, text, help1, help2);
@@ -502,7 +502,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static void showAlert(Stage owner, String msg, String help1, String help2) {
-    Stage stage = createDialogStage("dialog-alert", ConfirmationDialogController.class, owner, "Information", "dialog-alert.fxml");
+    Stage stage = createDialogStage(null, ConfirmationDialogController.class, owner, "Information", "dialog-alert.fxml");
     ConfirmationDialogController controller = (ConfirmationDialogController) stage.getUserData();
     controller.hideCancel();
     controller.initDialog(stage, msg, help1, help2);
@@ -510,7 +510,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static Optional<ButtonType> showAlertOption(Stage owner, String msg, String altOptionText, String okText, String help1, String help2) {
-    Stage stage = createDialogStage("dialog-alert-option", ConfirmationDialogController.class, owner, "Information", "dialog-alert-option.fxml");
+    Stage stage = createDialogStage(null, ConfirmationDialogController.class, owner, "Information", "dialog-alert-option.fxml");
     ConfirmationDialogController controller = (ConfirmationDialogController) stage.getUserData();
     controller.hideCancel();
     controller.initDialog(stage, altOptionText, okText, msg, help1, help2);
@@ -523,7 +523,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static ConfirmationResult showAlertOptionWithCheckbox(Stage owner, String msg, String altOptionText, String okText, String help1, String help2, String checkBoxText, boolean checked) {
-    Stage stage = createDialogStage("dialog-alert-option-with-checkbox", ConfirmationDialogWithCheckboxController.class, owner, "Information", "dialog-alert-option-with-checkbox.fxml");
+    Stage stage = createDialogStage(null, ConfirmationDialogWithCheckboxController.class, owner, "Information", "dialog-alert-option-with-checkbox.fxml");
     ConfirmationDialogWithCheckboxController controller = (ConfirmationDialogWithCheckboxController) stage.getUserData();
     controller.hideCancel();
     controller.initDialog(stage, altOptionText, okText, msg, help1, help2, checkBoxText);
@@ -533,7 +533,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static ConfirmationResult showConfirmationWithCheckbox(Stage owner, String msg, String okText, String help1, String help2, String checkBoxText, boolean checked) {
-    Stage stage = createDialogStage("dialog-confirmation-with-checkbox", ConfirmationDialogWithCheckboxController.class, owner, "Information", "dialog-confirmation-with-checkbox.fxml");
+    Stage stage = createDialogStage(null, ConfirmationDialogWithCheckboxController.class, owner, "Information", "dialog-confirmation-with-checkbox.fxml");
     ConfirmationDialogWithCheckboxController controller = (ConfirmationDialogWithCheckboxController) stage.getUserData();
     controller.hideCancel();
     controller.initDialog(stage, null, okText, msg, help1, help2, checkBoxText);
@@ -543,7 +543,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static ConfirmationResult showConfirmationWithCheckbox(Stage owner, String msg, String okText, String altText, String help1, String help2, String checkBoxText, boolean checked) {
-    Stage stage = createDialogStage("dialog-confirmation-with-checkbox", ConfirmationDialogWithCheckboxController.class, owner, "Information", "dialog-confirmation-with-checkbox.fxml");
+    Stage stage = createDialogStage(null, ConfirmationDialogWithCheckboxController.class, owner, "Information", "dialog-confirmation-with-checkbox.fxml");
     ConfirmationDialogWithCheckboxController controller = (ConfirmationDialogWithCheckboxController) stage.getUserData();
     controller.hideCancel();
     controller.initDialog(stage, altText, okText, msg, help1, help2, checkBoxText);
@@ -567,7 +567,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static String showInputDialog(Stage owner, String dialogTitle, String innerTitle, String description, String helpText, String defaultValue, String fieldTooltip) {
-    Stage stage = createDialogStage("dialog-input", InputDialogController.class, owner, dialogTitle, "dialog-input.fxml");
+    Stage stage = createDialogStage(null, InputDialogController.class, owner, dialogTitle, "dialog-input.fxml");
     InputDialogController controller = (InputDialogController) stage.getUserData();
     controller.initDialog(stage, innerTitle, description, helpText, defaultValue, fieldTooltip);
     stage.showAndWait();
@@ -580,7 +580,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   }
 
   public static void showOutputDialog(Stage owner, String dialogTitle, String innerTitle, String description, String defaultValue) {
-    Stage stage = createDialogStage("dialog-output", OutputDialogController.class, owner, dialogTitle, "dialog-output.fxml");
+    Stage stage = createDialogStage(null, OutputDialogController.class, owner, dialogTitle, "dialog-output.fxml");
     OutputDialogController controller = (OutputDialogController) stage.getUserData();
     controller.initDialog(stage, innerTitle, description, defaultValue);
     stage.showAndWait();

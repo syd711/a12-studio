@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-public class AnnotationSetsController implements Initializable {
+public class PreferenceAnnotationSetsController implements Initializable {
 
   @FXML
   private TableView<AnnotationDataSet> table;

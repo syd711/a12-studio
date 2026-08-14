@@ -14,11 +14,13 @@ import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 /**
- * Inline editor for a single {@link Module}, meant to be displayed in an editor container (e.g. the
- * application model editor's {@code editorContainer}) once a module is selected. Edits the module's required
- * name plus its menu's name, label, activity descriptor, roles, child menus and flows.
+ * Inline editor for a single {@link Module}, meant to be displayed as a tab (see
+ * {@link de.a12.studio.ui.editors.applicationmodel.ApplicationModelEditorController}) once a module is
+ * selected. Edits the module's required name plus its menu's name, label, activity descriptor, roles, child
+ * menus and flows.
  */
 public class ModuleEditorController implements Initializable {
 
@@ -53,19 +55,12 @@ public class ModuleEditorController implements Initializable {
   // mistaken for a user edit and doesn't trigger a save.
   private boolean updatingFromModel;
 
-  // Notified when the close button is pressed, e.g. by ApplicationModelEditorController to remove this panel
-  // from its editorContainer. Set via setOnCloseRequested once this panel is loaded from FXML.
-  private Runnable onCloseRequested;
+  // Notified with the module's new name as the user types, e.g. by ApplicationModelEditorController to keep
+  // this module's tab title in sync. Set via setOnNameChanged once this panel is loaded from FXML.
+  private Consumer<String> onNameChanged;
 
-  public void setOnCloseRequested(@NonNull Runnable onCloseRequested) {
-    this.onCloseRequested = onCloseRequested;
-  }
-
-  @FXML
-  private void onClose() {
-    if (onCloseRequested != null) {
-      onCloseRequested.run();
-    }
+  public void setOnNameChanged(@NonNull Consumer<String> onNameChanged) {
+    this.onNameChanged = onNameChanged;
   }
 
   @Override
@@ -76,6 +71,9 @@ public class ModuleEditorController implements Initializable {
         return;
       }
       module.setName(newValue);
+      if (onNameChanged != null) {
+        onNameChanged.accept(newValue);
+      }
       debouncer.debounce("module-name", this::commitNameChange, COMMIT_DEBOUNCE_MS, true);
     });
     menuNameField.textProperty().addListener((observable, oldValue, newValue) -> {

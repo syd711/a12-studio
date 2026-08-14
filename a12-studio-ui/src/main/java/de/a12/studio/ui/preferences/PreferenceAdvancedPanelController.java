@@ -21,7 +21,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class AdvancedSettingsPanelController implements Initializable {
+public class PreferenceAdvancedPanelController implements Initializable {
 
   @FXML
   private CheckBox useApplicationGroupsCheckBox;

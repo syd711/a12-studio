@@ -14,7 +14,7 @@
  <BorderPane>
  <center>
   <VBox spacing="10.0">
-    <Label styleClass="field-label" text="%name" />
+    <Label fx:id="nameHeaderLabel" styleClass="field-label" text="%name" />
     <VBox fx:id="childMenuList" spacing="8.0" />
     <HBox spacing="8.0">
       <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_child_menu_item" >

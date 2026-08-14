@@ -11,7 +11,7 @@ import javafx.util.StringConverter;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class PreviewSettingsController implements Initializable {
+public class PreferencePreviewController implements Initializable {
 
   @FXML
   private ComboBox<PreviewSettings.BrowserType> browserTypeCombo;

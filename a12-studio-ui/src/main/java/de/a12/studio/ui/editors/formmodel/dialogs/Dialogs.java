@@ -14,7 +14,7 @@ public class Dialogs {
   public static void openRepeatDefaultButtonLabels(@NonNull FormModel model) {
     FXMLLoader fxmlLoader = new FXMLLoader(RepeatDefaultButtonLabelsDialogController.class.getResource("repeat-default-button-labels-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage("repeat-default-button-labels", fxmlLoader, Studio.stage, "Repeat Default Button Labels");
+    Stage stage = WidgetFactory.createDialogStage("repeat-default-button-labels", fxmlLoader, Studio.stage, StudioBundle.get("repeat_default_button_labels"));
     RepeatDefaultButtonLabelsDialogController controller = (RepeatDefaultButtonLabelsDialogController) stage.getUserData();
     controller.setStage(stage);
     controller.setModel(model);
@@ -30,7 +30,7 @@ public class Dialogs {
   public static void openSubheaderAndFooter(@NonNull FormModel model) {
     FXMLLoader fxmlLoader = new FXMLLoader(SubheaderAndFooterDialogController.class.getResource("subheader-and-footer-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage("subheader-and-footer", fxmlLoader, Studio.stage, "Subheader and Footer");
+    Stage stage = WidgetFactory.createDialogStage("subheader-and-footer", fxmlLoader, Studio.stage, StudioBundle.get("subheader_and_footer"));
     SubheaderAndFooterDialogController controller = (SubheaderAndFooterDialogController) stage.getUserData();
     controller.setStage(stage);
     controller.setModel(model);

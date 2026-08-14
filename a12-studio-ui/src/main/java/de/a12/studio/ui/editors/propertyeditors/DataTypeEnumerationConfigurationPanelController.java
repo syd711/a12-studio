@@ -172,7 +172,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
    * the category being edited in place.
    */
   private void openCategoryDialog(Category existing) {
-    String title = existing == null ? "Add Category" : "Edit Category";
+    String title = existing == null ? StudioBundle.get("add_category_title") : StudioBundle.get("edit_category_title");
     Dialogs.showCategory(Studio.stage, title, existing == null ? null : existing.getName(), existing == null ? null : existing.getDescription())
         .ifPresent(input -> {
           if (existing == null) {

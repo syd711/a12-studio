@@ -41,6 +41,9 @@ import de.a12.studio.ui.util.StudioBundle;
 public class CasesPanelController {
 
   @FXML
+  private HBox headerRow;
+
+  @FXML
   private VBox rows;
 
   @FXML
@@ -84,6 +87,8 @@ public class CasesPanelController {
     boolean empty = cases.isEmpty();
     emptyLabel.setVisible(empty);
     emptyLabel.setManaged(empty);
+    headerRow.setVisible(!empty);
+    headerRow.setManaged(!empty);
 
     for (int index = 0; index < cases.size(); index++) {
       rows.getChildren().add(createRow(cases.get(index), index, cases.size()));

@@ -69,7 +69,7 @@ public class PreferencesController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    showPage(appGeneralSettingsBtn, "app-general-settings.fxml");
+    showPage(appGeneralSettingsBtn, "preference-app-general.fxml");
   }
 
   public void showSection(PreferencesOpenRequestedEvent.@NonNull Section section) {
@@ -83,47 +83,47 @@ public class PreferencesController implements Initializable {
 
   @FXML
   private void onAppGeneralSettings() {
-    showPage(appGeneralSettingsBtn, "app-general-settings.fxml");
+    showPage(appGeneralSettingsBtn, "preference-app-general.fxml");
   }
 
   @FXML
   private void onGeneralSettings() {
-    showPage(generalSettingsBtn, "general-settings.fxml");
+    showPage(generalSettingsBtn, "preference-general.fxml");
   }
 
   @FXML
   private void onAdvancedSettings() {
-    showPage(advancedSettingsBtn, "advanced-settings.fxml");
+    showPage(advancedSettingsBtn, "preference-advanced.fxml");
   }
 
   @FXML
   private void onAiSettings() {
-    showPage(aiSettingsBtn, "ai-settings.fxml");
+    showPage(aiSettingsBtn, "preference-ai.fxml");
   }
 
   @FXML
   private void onAnnotationSets() {
-    showPage(annotationSetsBtn, "annotation-sets.fxml");
+    showPage(annotationSetsBtn, "preference-annotation-sets.fxml");
   }
 
   @FXML
   private void onModelVersion() {
-    showPage(modelVersionBtn, "model-version-settings.fxml");
+    showPage(modelVersionBtn, "preference-model-version.fxml");
   }
 
   @FXML
   private void onA12Installation() {
-    showPage(a12InstallationBtn, "a12-installation-settings.fxml");
+    showPage(a12InstallationBtn, "preference-a12-installation.fxml");
   }
 
   @FXML
   private void onPreviewSettings() {
-    showPage(previewSettingsBtn, "preview-settings.fxml");
+    showPage(previewSettingsBtn, "preference-preview.fxml");
   }
 
   @FXML
   private void onShortcuts() {
-    showPage(shortcutsBtn, "shortcuts-settings.fxml");
+    showPage(shortcutsBtn, "preference-shortcuts.fxml");
   }
 
   private void showPage(Button button, String fxml) {

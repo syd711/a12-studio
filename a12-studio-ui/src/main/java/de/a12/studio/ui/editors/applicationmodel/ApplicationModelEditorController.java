@@ -15,15 +15,17 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.SplitPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ApplicationModelEditorController extends AbstractEditorController implements Initializable {
@@ -46,12 +48,13 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   private SubregionsPanelController subregionsController;
 
   @FXML
-  private SplitPane splitPane;
+  private TabPane tabPane;
 
-  @FXML
-  private VBox editorContainer;
+  private ApplicationModel model;
 
-  private ModuleEditorController currentModuleEditorController;
+  // Tracks which modules currently have an open tab. A module missing from this map has no tab, either
+  // because it was just added (before its tab is created) or because the user closed its tab manually.
+  private final Map<Module, Tab> moduleTabs = new LinkedHashMap<>();
 
   @FXML
   public void onPreview(ActionEvent e) {
@@ -63,49 +66,86 @@ public class ApplicationModelEditorController extends AbstractEditorController i
     updateSettingsErrorBadge();
   }
 
-  private void load(@NonNull ApplicationModel documentModel) {
-    modulesController.setModel(documentModel);
-    activityController.setModel(documentModel);
-    layoutController.setModel(documentModel);
-    regionController.setModel(documentModel);
-    subregionsController.setModel(documentModel);
+  private void load(@NonNull ApplicationModel applicationModel) {
+    this.model = applicationModel;
+    modulesController.setModel(applicationModel);
+    activityController.setModel(applicationModel);
+    layoutController.setModel(applicationModel);
+    regionController.setModel(applicationModel);
+    subregionsController.setModel(applicationModel);
+
+    for (Module module : applicationModel.getContent().getModules()) {
+      addModuleTab(module);
+    }
   }
 
-  private void openModuleEditor(@NonNull Module module) {
-    closeModuleEditor();
+  /** Selects the given module's tab, (re)creating it first if the user had previously closed it. */
+  private void openModuleTab(@NonNull Module module) {
+    Tab tab = moduleTabs.get(module);
+    if (tab == null) {
+      addModuleTab(module);
+      tab = moduleTabs.get(module);
+    }
+    tabPane.getSelectionModel().select(tab);
+  }
 
+  private void addModuleTab(@NonNull Module module) {
+    Tab tab = createModuleTab(module);
+    moduleTabs.put(module, tab);
+    tabPane.getTabs().add(tab);
+    reorderModuleTabs();
+  }
+
+  private void removeModuleTab(@NonNull Module module) {
+    Tab tab = moduleTabs.get(module);
+    if (tab != null) {
+      // Removing the tab fires its onClosed handler, which tears down the controller and drops the map entry.
+      tabPane.getTabs().remove(tab);
+    }
+  }
+
+  /** Reorders the tabs currently open to match the model's module order (the Overview tab always stays first). */
+  private void reorderModuleTabs() {
+    List<Tab> ordered = new ArrayList<>();
+    ordered.add(tabPane.getTabs().get(0));
+    for (Module module : model.getContent().getModules()) {
+      Tab tab = moduleTabs.get(module);
+      if (tab != null) {
+        ordered.add(tab);
+      }
+    }
+    tabPane.getTabs().setAll(ordered);
+  }
+
+  private Tab createModuleTab(@NonNull Module module) {
+    Tab tab = new Tab(module.getName());
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(MODULE_EDITOR_FXML));
-loader.setResources(StudioBundle.getBundle());
+      loader.setResources(StudioBundle.getBundle());
       Node node = loader.load();
-      VBox.setVgrow(node, Priority.ALWAYS);
-      currentModuleEditorController = loader.getController();
-      currentModuleEditorController.setModule(module);
-      currentModuleEditorController.setOnCloseRequested(this::closeModuleEditor);
-      editorContainer.getChildren().setAll(node);
-      if (!splitPane.getItems().contains(editorContainer)) {
-        splitPane.getItems().add(editorContainer);
-        splitPane.setDividerPositions(0.5);
-      }
+      ModuleEditorController controller = loader.getController();
+      controller.setOnNameChanged(tab::setText);
+      controller.setModule(module);
+      tab.setContent(node);
+      tab.setUserData(controller);
+      tab.setOnClosed(event -> {
+        controller.destroy();
+        moduleTabs.remove(module);
+      });
     }
     catch (IOException e) {
       throw new UncheckedIOException(e);
     }
-  }
-
-  private void closeModuleEditor() {
-    if (currentModuleEditorController != null) {
-      currentModuleEditorController.destroy();
-      currentModuleEditorController = null;
-    }
-    editorContainer.getChildren().clear();
-    splitPane.getItems().remove(editorContainer);
+    return tab;
   }
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     BaseTableSettings tableSettings = getBaseTableSettings();
-    modulesController.setOnEditModule(this::openModuleEditor);
+    modulesController.setOnEditModule(this::openModuleTab);
+    modulesController.setOnModuleAdded(this::openModuleTab);
+    modulesController.setOnModuleRemoved(this::removeModuleTab);
+    modulesController.setOnModulesReordered(this::reorderModuleTabs);
   }
 
   @Override
@@ -115,15 +155,16 @@ loader.setResources(StudioBundle.getBundle());
 
   /**
    * In addition to unregistering this editor itself (see {@link AbstractEditorController#modelClosed}), tears
-   * down whichever module editor panel is currently displayed in {@code editorContainer}, since it isn't
-   * otherwise reached once the tab is gone.
+   * down every module editor currently open in a tab, since it isn't otherwise reached once the tab is gone.
    */
   @Override
   public void modelClosed(@NonNull ModelClosedEvent event) {
     super.modelClosed(event);
-    if (currentModuleEditorController != null && event.getItem().equals(projectItem)) {
-      currentModuleEditorController.destroy();
-      currentModuleEditorController = null;
+    if (event.getItem().equals(projectItem)) {
+      for (Tab tab : moduleTabs.values()) {
+        ((ModuleEditorController) tab.getUserData()).destroy();
+      }
+      moduleTabs.clear();
     }
   }
 }

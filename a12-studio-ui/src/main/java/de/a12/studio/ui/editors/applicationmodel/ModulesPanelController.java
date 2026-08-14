@@ -33,10 +33,11 @@ import de.a12.studio.ui.util.StudioBundle;
 
 /**
  * Edits {@link ApplicationModelContent#getModules()}: a list of module names, each reorderable (move up/down),
- * copyable and deletable, with a full editor (name, menu label, roles) opened inline via {@link #onEditModule}
- * (see {@link #setOnEditModule}) when a row's "Edit" button is pressed or a row is double-clicked. Not bound to
- * a single Element (modules live on the model's content), so it follows the model-header pattern used by e.g.
- * {@link ActivityPanelController}.
+ * copyable and deletable, with a full editor (name, menu label, roles) opened as its own tab via
+ * {@link #onEditModule} (see {@link #setOnEditModule}) when a row's "Edit" button is pressed or a row is
+ * double-clicked; {@link #onModuleAdded}, {@link #onModuleRemoved} and {@link #onModulesReordered} keep those
+ * tabs in sync as the list changes. Not bound to a single Element (modules live on the model's content), so it
+ * follows the model-header pattern used by e.g. {@link ActivityPanelController}.
  */
 public class ModulesPanelController extends AbstractPropertyEditor {
 
@@ -48,9 +49,18 @@ public class ModulesPanelController extends AbstractPropertyEditor {
 
   private ApplicationModel model;
 
-  // Notified with the module to open in the inline editor, e.g. by ApplicationModelEditorController to show
-  // it in its editorContainer. Set via setOnEditModule once this panel is loaded from FXML.
+  // Notified with the module to open/select in its tab, e.g. by ApplicationModelEditorController. Set via
+  // setOnEditModule once this panel is loaded from FXML.
   private Consumer<Module> onEditModule;
+
+  // Notified with a newly added (or copied) module, so a tab can be created for it.
+  private Consumer<Module> onModuleAdded;
+
+  // Notified with a module right after it was removed, so its tab can be closed.
+  private Consumer<Module> onModuleRemoved;
+
+  // Notified after the module list was reordered (drag or move-up/down), so tab order can be resynced.
+  private Runnable onModulesReordered;
 
   public void setModel(@NonNull ApplicationModel model) {
     this.model = model;
@@ -61,6 +71,18 @@ public class ModulesPanelController extends AbstractPropertyEditor {
     this.onEditModule = onEditModule;
   }
 
+  public void setOnModuleAdded(@NonNull Consumer<Module> onModuleAdded) {
+    this.onModuleAdded = onModuleAdded;
+  }
+
+  public void setOnModuleRemoved(@NonNull Consumer<Module> onModuleRemoved) {
+    this.onModuleRemoved = onModuleRemoved;
+  }
+
+  public void setOnModulesReordered(@NonNull Runnable onModulesReordered) {
+    this.onModulesReordered = onModulesReordered;
+  }
+
   @FXML
   private void onAdd() {
     Dialogs.showModuleForAdd(Studio.stage).ifPresent(name -> {
@@ -69,6 +91,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
       getModules().add(module);
       rebuildRows();
       commitChange();
+      onModuleAdded.accept(module);
     });
   }
 
@@ -139,6 +162,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
     if (RowFactory.reorder(getModules(), fromIndex, insertBeforeIndex)) {
       rebuildRows();
       commitChange();
+      onModulesReordered.run();
     }
   }
 
@@ -155,6 +179,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
       getModules().add(getModules().indexOf(module) + 1, copy);
       rebuildRows();
       commitChange();
+      onModuleAdded.accept(copy);
     });
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
@@ -163,6 +188,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
         getModules().remove(module);
         rebuildRows();
         commitChange();
+        onModuleRemoved.accept(module);
       }
     });
 
@@ -175,5 +201,6 @@ public class ModulesPanelController extends AbstractPropertyEditor {
     Collections.swap(getModules(), fromIndex, toIndex);
     rebuildRows();
     commitChange();
+    onModulesReordered.run();
   }
 }

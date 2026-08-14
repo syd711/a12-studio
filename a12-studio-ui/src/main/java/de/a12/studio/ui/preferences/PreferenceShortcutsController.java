@@ -9,7 +9,7 @@ import javafx.scene.layout.GridPane;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ShortcutsSettingsController implements Initializable {
+public class PreferenceShortcutsController implements Initializable {
 
   @FXML
   private GridPane shortcutsGrid;
