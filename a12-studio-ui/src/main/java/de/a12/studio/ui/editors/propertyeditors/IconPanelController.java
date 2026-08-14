@@ -15,6 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -69,6 +70,9 @@ public class IconPanelController extends AbstractPropertyEditor implements Initi
 
     iconCombo.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
       updatePreview(newValue);
+      if (StringUtils.isEmpty(oldValue) && StringUtils.isEmpty(newValue)) {
+        return;
+      }
       if (updatingFromModel) {
         return;
       }

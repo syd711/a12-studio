@@ -23,9 +23,9 @@ public class ModelReference {
   public static final String PURPOSE_TYPE_DEFINITIONS = "typeDefinitions";
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String purpose;
+  private String alias;
   private ModelType modelType;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String alias;
+  private String purpose;
   private String reference;
 }

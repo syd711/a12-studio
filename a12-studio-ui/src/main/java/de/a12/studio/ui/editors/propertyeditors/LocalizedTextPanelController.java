@@ -69,8 +69,14 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   // Generic escape hatch for owners that don't warrant their own dedicated field/setXxx pair below (see
   // configureCustom/setCustom): a plain List<Label> living somewhere on an arbitrary POJO, read and written via
-  // a caller-supplied Supplier rather than a typed accessor function.
+  // a caller-supplied Supplier rather than a typed accessor function. customTextsSupplier must be side-effect-free
+  // (used to repopulate the fields on every setCustom/localesChanged, including when nothing has actually been
+  // typed yet); customTextsWriteSupplier is only ever invoked once the user actually edits a field, so it's the
+  // one allowed to lazily materialize a parent object the read path found absent. Both point at the same supplier
+  // when the caller passes a single one (the common case: an owner, e.g. a FilterGroup, that already exists and
+  // whose List<Label> field is safe to read without creating anything).
   private Supplier<List<Label>> customTextsSupplier;
+  private Supplier<List<Label>> customTextsWriteSupplier;
 
   private String buttonLabelAction;
 
@@ -203,6 +209,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.column = null;
     this.defaults = null;
     this.customTextsSupplier = null;
+    this.customTextsWriteSupplier = null;
     this.projectItem = Studio.getSelectedProjectItem();
     super.setElement(element);
     buildLocaleFields();
@@ -222,6 +229,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.column = null;
     this.defaults = null;
     this.customTextsSupplier = null;
+    this.customTextsWriteSupplier = null;
     this.model = model;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -236,6 +244,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.column = null;
     this.defaults = null;
     this.customTextsSupplier = null;
+    this.customTextsWriteSupplier = null;
     this.module = module;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -250,6 +259,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.column = null;
     this.defaults = null;
     this.customTextsSupplier = null;
+    this.customTextsWriteSupplier = null;
     this.sceneCase = sceneCase;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -264,6 +274,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.confirmation = null;
     this.defaults = null;
     this.customTextsSupplier = null;
+    this.customTextsWriteSupplier = null;
     this.column = column;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -278,6 +289,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.column = null;
     this.defaults = null;
     this.customTextsSupplier = null;
+    this.customTextsWriteSupplier = null;
     this.confirmation = confirmation;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -287,11 +299,30 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   /**
    * Binds this panel (after {@link #configureCustom}) directly to a caller-supplied {@code List<Label>}, e.g.
    * {@code filterGroup::getLabel}. Used for owners not otherwise represented above (see {@link
-   * de.a12.studio.models.overviewmodel.FilterGroup}, {@link de.a12.studio.models.overviewmodel.FilterItem},
-   * {@link de.a12.studio.models.overviewmodel.FilterSelectorConfig}, {@link
-   * de.a12.studio.models.overviewmodel.FilterTriggerValue}).
+   * de.a12.studio.models.overviewmodel.FilterGroup}, {@link de.a12.studio.models.overviewmodel.FilterItem}).
+   * {@code textsSupplier} is used for both reading (to repopulate the fields, including right away as this
+   * method runs) and writing, so it must be safe to call before the user has typed anything - i.e. the owner
+   * (e.g. the {@code FilterGroup}) must already exist. For an owner whose parent container may not exist yet
+   * and would otherwise have to be lazily created just to answer a read, use {@link #setCustom(Supplier,
+   * Supplier)} instead.
    */
   public void setCustom(@NonNull Supplier<List<Label>> textsSupplier) {
+    setCustom(textsSupplier, textsSupplier);
+  }
+
+  /**
+   * Same as {@link #setCustom(Supplier)}, but for an owner whose parent container may not exist yet on the
+   * model (e.g. {@link de.a12.studio.models.overviewmodel.FilterSelectorConfig#getHeaderSubtitle()}, {@link
+   * de.a12.studio.models.overviewmodel.FilterTriggerValue#getLabel()} - both nested under {@code
+   * newFilterConfiguration}, which a model with no custom filter configured at all may never have). {@code
+   * reader} must be side-effect-free - it's called to repopulate the fields on every {@link #setCustom}/{@link
+   * #localesChanged}, including merely opening the panel, so it must tolerate a missing parent by returning
+   * {@link List#of()} rather than creating one. {@code writer} is only ever invoked once the user actually
+   * types into a locale field (see {@link #setLocaleText}), so it's the one allowed to lazily materialize
+   * whatever parent chain is missing - mirrors {@link #setDefaults}'s {@code getWriteTexts()} handling of a
+   * missing {@link Defaults#getButtonLabels()} entry.
+   */
+  public void setCustom(@NonNull Supplier<List<Label>> reader, @NonNull Supplier<List<Label>> writer) {
     this.element = null;
     this.model = null;
     this.module = null;
@@ -299,7 +330,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.column = null;
     this.confirmation = null;
     this.defaults = null;
-    this.customTextsSupplier = textsSupplier;
+    this.customTextsSupplier = reader;
+    this.customTextsWriteSupplier = writer;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
     populateLocaleFields();
@@ -320,6 +352,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     this.confirmation = null;
     this.column = null;
     this.customTextsSupplier = null;
+    this.customTextsWriteSupplier = null;
     this.defaults = defaults;
     this.projectItem = Studio.getSelectedProjectItem();
     buildLocaleFields();
@@ -391,8 +424,8 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   private List<Label> getWriteTexts() {
-    if (customTextsSupplier != null) {
-      return customTextsSupplier.get();
+    if (customTextsWriteSupplier != null) {
+      return customTextsWriteSupplier.get();
     }
     if (confirmation != null) {
       return confirmationTextsAccessor.apply(confirmation);

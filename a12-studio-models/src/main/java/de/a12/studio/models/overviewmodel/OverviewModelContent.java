@@ -13,12 +13,12 @@ import java.util.List;
 @Setter
 public class OverviewModelContent {
 
+  private OverviewConfiguration configuration;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Column> columns = new ArrayList<>();
   private RowActionGroup rowActionGroup;
   private ElementBox subHeaderBox;
   private ElementBox footerBox;
-  private OverviewConfiguration configuration;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private RowAction defaultRowAction;
   @JsonInclude(JsonInclude.Include.NON_NULL)

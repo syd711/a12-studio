@@ -290,10 +290,16 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     showOnlySetFiltersField.setSelected(showOnlySetFilters != null && Boolean.TRUE.equals(showOnlySetFilters.getValue()));
     showOnlySetFiltersUserAccessField.setSelected(showOnlySetFilters != null && Boolean.TRUE.equals(showOnlySetFilters.getEnabled()));
 
-    // ensureFilterSelector() eagerly materializes newFilterConfiguration.filterSelector so the panel below has
-    // a stable, live List<Label> to bind to - mirrors OverviewModelEditorController#loadCustomActions()
-    // eagerly ensuring subHeaderBox/footerBox at load time.
-    headerSubtitleTextController.setCustom(() -> ensureFilterSelector().getHeaderSubtitle());
+    // Read via currentFilterSelector() (non-mutating) rather than ensureFilterSelector(): merely opening this
+    // panel must not materialize newFilterConfiguration.filterSelector on a model that has none, since nothing
+    // was actually edited yet. ensureFilterSelector() is still used for the write side, so a parent chain
+    // missing on read is only created once the user actually types into a locale field.
+    headerSubtitleTextController.setCustom(this::currentHeaderSubtitle, () -> ensureFilterSelector().getHeaderSubtitle());
+  }
+
+  private List<Label> currentHeaderSubtitle() {
+    FilterSelectorConfig selector = currentFilterSelector();
+    return selector != null ? selector.getHeaderSubtitle() : List.of();
   }
 
   // ---- Search Bar ----
@@ -351,8 +357,26 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     FilterTriggerValue triggerValue = trigger != null ? trigger.getValue() : null;
     hideFilterButtonLabelField.setSelected(triggerValue != null && Boolean.TRUE.equals(triggerValue.getHideLabel()));
 
-    filterButtonIconController.setCustom(() -> ensureTriggerValue().getIcon(), icon -> ensureTriggerValue().setIcon(icon));
-    filterButtonLabelController.setCustom(() -> ensureTriggerValue().getLabel());
+    // Read via currentTriggerValue() (non-mutating) rather than ensureTriggerValue(): same reasoning as
+    // currentHeaderSubtitle() above - opening this panel must not materialize newFilterConfiguration.
+    // filterSelector.trigger.value on a model that has none. The setter/write side still goes through
+    // ensureTriggerValue(), so the parent chain is only created once the user actually edits the icon/label.
+    filterButtonIconController.setCustom(() -> {
+      FilterTriggerValue value = currentTriggerValue();
+      return value != null ? value.getIcon() : null;
+    }, icon -> ensureTriggerValue().setIcon(icon));
+    filterButtonLabelController.setCustom(this::currentFilterButtonLabel, () -> ensureTriggerValue().getLabel());
+  }
+
+  private FilterTriggerValue currentTriggerValue() {
+    FilterSelectorConfig selector = currentFilterSelector();
+    FilterTriggerConfig trigger = selector != null ? selector.getTrigger() : null;
+    return trigger != null ? trigger.getValue() : null;
+  }
+
+  private List<Label> currentFilterButtonLabel() {
+    FilterTriggerValue value = currentTriggerValue();
+    return value != null ? value.getLabel() : List.of();
   }
 
   // ---- Filter Groups ----

@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.overviewmodel;
 
 import de.a12.studio.models.overviewmodel.FilterConfiguration;
+import de.a12.studio.models.overviewmodel.NewFilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -169,6 +170,13 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       showFilterBarField.setSelected(filterConfiguration != null && Boolean.TRUE.equals(filterConfiguration.getShowFilterBar()));
       showFilterButtonField.setSelected(filterConfiguration != null && Boolean.TRUE.equals(filterConfiguration.getShowFilterButton()));
       String filterMode = filterConfiguration != null ? filterConfiguration.getFilterMode() : null;
+      // SME has no filterMode-equivalent field for the "Custom Filter" mode at all (see NewFilterConfiguration's
+      // javadoc) - it's represented purely by newFilterConfiguration being populated, with no sibling
+      // filterConfiguration.filterMode alongside it. So a model with newFilterConfiguration content but no
+      // filterMode is a custom filter model imported/authored that way, not one that's merely unset yet.
+      if (filterMode == null && hasCustomFilterContent(configuration)) {
+        filterMode = FilterConfiguration.FILTER_MODE_CUSTOM_FILTER;
+      }
       // Defaults the combo to its first entry when the model has no filterMode set yet, without writing that
       // default back until the user actually changes something themselves (updatingFromModel suppresses the
       // valueProperty listener above).
@@ -193,5 +201,22 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       configuration.setFilterConfiguration(new FilterConfiguration());
     }
     return configuration.getFilterConfiguration();
+  }
+
+  /**
+   * Whether {@code configuration.newFilterConfiguration} actually holds custom-filter data, as opposed to
+   * merely existing as an empty shell. Checked field by field rather than via {@code equals}/reflection so an
+   * object that's present but genuinely empty (e.g. freshly, lazily materialized by a sibling panel reading a
+   * value for display) doesn't get misread as "this model has a custom filter configured".
+   */
+  private static boolean hasCustomFilterContent(OverviewConfiguration configuration) {
+    NewFilterConfiguration newFilterConfiguration = configuration != null ? configuration.getNewFilterConfiguration() : null;
+    if (newFilterConfiguration == null) {
+      return false;
+    }
+    return newFilterConfiguration.getFilterSelector() != null
+        || newFilterConfiguration.getJoinOperator() != null
+        || newFilterConfiguration.getInvert() != null
+        || !newFilterConfiguration.getFilterGroups().isEmpty();
   }
 }
