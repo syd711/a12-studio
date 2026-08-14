@@ -10,13 +10,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController.NewModelInput;
-import de.a12.studio.ui.util.Icons;
-import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 
@@ -42,47 +36,8 @@ public class ProjectTreeMenuActions {
     this.onOpen = onOpen;
   }
 
-  public ContextMenu createTreeItemContextMenu(@NonNull ProjectItemViewModel viewModel) {
-    ProjectItem projectItem = viewModel.getProjectItem();
-
-    Menu newMenu = new Menu(StudioBundle.get("new"));
-    MenuItem newFolder = new MenuItem(StudioBundle.get("new_folder"));
-    newFolder.setOnAction(event -> onCreateNewFolder(projectItem));
-    newFolder.setGraphic(withMenuIconStyle(WidgetFactory.createIcon("mdi2f-folder-plus-outline")));
-    MenuItem newModel = new MenuItem(StudioBundle.get("new_model"));
-    newModel.setOnAction(event -> onCreateNewModel(projectItem));
-    newModel.setGraphic(withMenuIconStyle(WidgetFactory.createIcon("mdi2f-file-document-plus-outline")));
-    newMenu.getItems().addAll(newFolder, newModel);
-
-    MenuItem open = new MenuItem(StudioBundle.get("open"));
-    open.setDisable(viewModel.isFolder());
-    open.setOnAction(event -> onOpen.accept(viewModel));
-
-    MenuItem rename = new MenuItem(StudioBundle.get("rename"));
-    rename.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
-    rename.setOnAction(event -> onRenameItem(projectItem));
-
-    MenuItem createCopy = new MenuItem(StudioBundle.get("create_copy"));
-    createCopy.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.COPY)));
-    createCopy.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
-    createCopy.setOnAction(event -> onCreateCopy(projectItem));
-
-    MenuItem zipFolder = new MenuItem(StudioBundle.get("zip_folder"));
-    zipFolder.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.ZIP)));
-    zipFolder.setVisible(projectItem.isRoot());
-    zipFolder.setOnAction(event -> onZipFolder(projectItem));
-
-    MenuItem delete = new MenuItem(StudioBundle.get("delete"));
-    delete.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.TRASH)));
-    delete.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
-    delete.setOnAction(event -> onDeleteItem(projectItem));
-
-    return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
-  }
-
-  private static Node withMenuIconStyle(@NonNull Node icon) {
-    icon.getStyleClass().add("menu-icon");
-    return icon;
+  void onOpenItem(@NonNull ProjectItemViewModel item) {
+    onOpen.accept(item);
   }
 
   void onCreateNewFolder(@NonNull ProjectItem parent) {

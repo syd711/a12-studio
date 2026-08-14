@@ -28,6 +28,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
 
   private final Consumer<ProjectItemViewModel> onOpen;
   private final ProjectTreeMenuActions menuFactory;
+  private final ProjectTreeContextMenu contextMenuFactory;
   private final AtomicReference<ProjectItemViewModel> dragSource;
 
   private final FontIcon icon = new FontIcon();
@@ -43,9 +44,11 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
   private TreeItem<ProjectItemViewModel> boundTreeItem;
 
   ProjectTreeCell(@NonNull Consumer<ProjectItemViewModel> onOpen, @NonNull ProjectTreeMenuActions menuFactory,
+                  @NonNull ProjectTreeContextMenu contextMenuFactory,
                   @NonNull AtomicReference<ProjectItemViewModel> dragSource) {
     this.onOpen = onOpen;
     this.menuFactory = menuFactory;
+    this.contextMenuFactory = contextMenuFactory;
     this.dragSource = dragSource;
 
     icon.getStyleClass().add("tree-icon");
@@ -125,7 +128,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     setText(item.getDisplayName());
     boolean locked = isLockedFolder(item);
     boolean missingModel = !item.isFolder() && !item.hasModel() && !item.isSettings() && !item.isAuthFile();
-    setContextMenu(missingModel ? null : menuFactory.createTreeItemContextMenu(item));
+    setContextMenu(missingModel ? null : contextMenuFactory.create(item));
     if (missingModel || locked) {
       if (!getStyleClass().contains("model-missing")) {
         getStyleClass().add("model-missing");

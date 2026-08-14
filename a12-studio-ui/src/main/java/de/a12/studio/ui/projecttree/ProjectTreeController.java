@@ -308,6 +308,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem);
+    ProjectTreeContextMenu contextMenuFactory = new ProjectTreeContextMenu(menuFactory);
     for (ModelType modelType : ModelType.values()) {
       MenuItem modelItem = new MenuItem(modelType.getDisplayName());
       modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
@@ -343,6 +344,6 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       }
     });
     AtomicReference<ProjectItemViewModel> dragSource = new AtomicReference<>();
-    projectTree.setCellFactory(treeView -> new ProjectTreeCell(this::openItem, menuFactory, dragSource));
+    projectTree.setCellFactory(treeView -> new ProjectTreeCell(this::openItem, menuFactory, contextMenuFactory, dragSource));
   }
 }

@@ -116,12 +116,16 @@ public class TabPaneController implements Initializable, StudioEventListener {
     ProjectItem item = event.getItem();
     StudioEventManager.getInstance().fireModelClosedEvent(item);
 
+    // Set before EditorFactory.create() (not after): same reasoning as open() below - if this is the selected
+    // tab, panels populated synchronously while the new controller's load() runs resolve their model via
+    // Studio.getSelectedProjectItem(), which reads this tab's user data.
+    tab.setText(item.getDisplayName());
+    tab.setUserData(item);
+
     Parent content = EditorFactory.create(item);
     if (content != null) {
       tab.setContent(content);
     }
-    tab.setText(item.getDisplayName());
-    tab.setUserData(item);
 
     if (project != null) {
       project.getSettings().getUISettings().removeOpenedFile(event.getOldPath());
@@ -138,12 +142,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   private void open(@NonNull ProjectItem item) {
-    Parent content = EditorFactory.create(item);
-    if (content == null) {
-      return;
-    }
-
-    Tab tab = new Tab(item.getDisplayName(), content);
+    Tab tab = new Tab(item.getDisplayName());
     tab.setUserData(item);
     tab.setClosable(true);
 
@@ -162,8 +161,26 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
     tab.setContextMenu(createTabContextMenu(tab));
     tab.setOnClosed(closeEvent -> onTabClosed(tab));
+
+    // Added and selected before the editor content is built (and only then handed its content below): several
+    // property editor panels populate themselves synchronously while EditorFactory.create() -> controller.load()
+    // runs, and resolve the model they should bind to via Studio.getSelectedProjectItem() (e.g.
+    // LocalizedTextPanelController.buildLocaleFields(), used for model-header fields like
+    // CustomFilterConfigurationPanelController's Header Subtitle/Filter Button Label). If this tab weren't
+    // already selected by then, that lookup would still resolve to whichever tab was selected before, not `item`.
+    Tab previousSelection = tabPane.getSelectionModel().getSelectedItem();
     tabPane.getTabs().add(tab);
     tabPane.getSelectionModel().select(tab);
+
+    Parent content = EditorFactory.create(item);
+    if (content == null) {
+      tabPane.getTabs().remove(tab);
+      if (previousSelection != null) {
+        tabPane.getSelectionModel().select(previousSelection);
+      }
+      return;
+    }
+    tab.setContent(content);
     installDoubleClickHandler(tab);
   }
 
