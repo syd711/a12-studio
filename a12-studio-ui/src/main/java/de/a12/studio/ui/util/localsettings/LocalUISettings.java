@@ -230,6 +230,27 @@ public class LocalUISettings {
     return !stateId.equalsIgnoreCase("dialog-table-data");
   }
 
+  /** Suffixes used by {@link #saveLocation(String, int, int, int, int)} and {@link #setModal(String, boolean)}
+   *  to key a dialog's stateId into the properties store. */
+  private static final String[] DIALOG_STATE_SUFFIXES = {".x", ".y", ".width", ".height", "_modality"};
+
+  /** Clears the saved position/size/modality of every dialog stateId, so each dialog reopens at its default
+   *  layout. Does not touch the main window's own (unprefixed) x/y/width/height keys. */
+  public static void resetAllDialogStates() {
+    List<String> keysToRemove = new ArrayList<>();
+    for (Object keyObj : store.getProperties().keySet()) {
+      String key = (String) keyObj;
+      for (String suffix : DIALOG_STATE_SUFFIXES) {
+        if (key.endsWith(suffix) && key.length() > suffix.length()) {
+          keysToRemove.add(key);
+          break;
+        }
+      }
+    }
+    store.removeAll(keysToRemove);
+    log.info("Reset {} dialog state entries.", keysToRemove.size());
+  }
+
   public static void reset() {
     store.getProperties().clear();
     if (!propertiesFile.delete()) {

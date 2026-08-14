@@ -5,13 +5,19 @@ import de.a12.studio.models.projects.settings.GeneralSettings;
 import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class PreferenceGeneralPanelController implements Initializable {
@@ -24,6 +30,21 @@ public class PreferenceGeneralPanelController implements Initializable {
 
   @FXML
   private GeneralLocalesPanelController localesController;
+
+  @FXML
+  private Button resetDialogsButton;
+
+  @FXML
+  private void onResetDialogs() {
+    Stage stage = (Stage) resetDialogsButton.getScene().getWindow();
+    Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(stage, StudioBundle.get("reset_all_dialog_states"));
+    if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
+      return;
+    }
+
+    LocalUISettings.resetAllDialogStates();
+    WidgetFactory.showInformation(stage, StudioBundle.get("all_dialog_states_have_been_reset"), null);
+  }
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
