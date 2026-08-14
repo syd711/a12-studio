@@ -1,0 +1,71 @@
+{
+  "header": {
+    "id": "PersonCompany_Person_SelectedItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Additional Information"
+      },
+      {
+        "locale": "de",
+        "text": "Zusätzliche Information"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "PersonCompany_Person____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-10d42",
+        "width": 1,
+        "elementRef": "I4_F4",
+        "sortable": false
+      },
+      {
+        "id": "column-9d5eb",
+        "width": 1,
+        "elementRef": "I4_F3",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {
+      "actions": []
+    },
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 10
+    }
+  }
+}

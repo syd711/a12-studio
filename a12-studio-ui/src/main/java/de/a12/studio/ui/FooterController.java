@@ -5,6 +5,7 @@ import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.models.projects.settings.JsonSettings;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
+import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -69,6 +70,8 @@ public class FooterController implements Initializable, StudioEventListener {
 
   private ProjectItem currentItem;
 
+  private boolean projectOpen;
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
@@ -90,7 +93,8 @@ public class FooterController implements Initializable, StudioEventListener {
 
   private void refreshPreviewAppStatusVisibility() {
     String installationPath = A12Settings.load().getInstallationPath();
-    boolean visible = installationPath != null && A12Settings.isValidInstallationFolder(new File(installationPath));
+    boolean visible = projectOpen && installationPath != null
+        && A12Settings.isValidInstallationFolder(new File(installationPath));
     previewAppStatus.setVisible(visible);
     previewAppStatus.setManaged(visible);
   }
@@ -132,7 +136,15 @@ public class FooterController implements Initializable, StudioEventListener {
   }
 
   @Override
+  public void projectOpened(@NonNull ProjectOpenedEvent event) {
+    projectOpen = true;
+    refreshPreviewAppStatusVisibility();
+  }
+
+  @Override
   public void projectClosed(@NonNull ProjectClosedEvent event) {
+    projectOpen = false;
+    refreshPreviewAppStatusVisibility();
     showItem(null);
   }
 

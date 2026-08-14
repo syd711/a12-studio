@@ -24,7 +24,7 @@
                               <Label text="%open_project_from_the_menu" BorderPane.alignment="CENTER" />
                            </center>
                         </BorderPane>
-                        <SplitPane fx:id="mainSplitPane" dividerPositions="0.3">
+                        <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" visible="false" managed="false">
                            <items>
                               <fx:include fx:id="projectTree" source="projecttree/scene-project-tree.fxml" />
                               <fx:include fx:id="tabPane" source="tabs/scene-tab-pane.fxml" />

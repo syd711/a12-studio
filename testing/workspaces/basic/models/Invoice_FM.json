@@ -1,0 +1,2096 @@
+{
+  "header": {
+    "id": "Invoice_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Invoice"
+      },
+      {
+        "locale": "de",
+        "text": "Rechnung"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Invoice_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Invoice_DM"
+      }
+    ]
+  },
+  "content": {
+    "amountSuffix": {
+      "type": "static",
+      "value": "€"
+    },
+    "styles": [
+      {
+        "name": "h_rightAlign"
+      }
+    ],
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1"
+    },
+    "screens": [
+      {
+        "id": "screen-9ecf7",
+        "name": "Invoice",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Invoice"
+              },
+              {
+                "locale": "de",
+                "text": "Rechnung"
+              }
+            ]
+          }
+        },
+        "footerBox": {
+          "id": "headerfooter-e4974",
+          "minorButtons": {
+            "button": [
+              {
+                "type": "EVENT",
+                "id": "button-48019",
+                "name": "Cancel",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Cancel"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Abbrechen"
+                        }
+                      ]
+                    }
+                  },
+                  "priority": "SECONDARY",
+                  "destructive": true
+                },
+                "event": "event_cancel",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          },
+          "majorButtons": {
+            "button": [
+              {
+                "type": "NAVIGATION",
+                "id": "button-12dd9",
+                "name": "Summary",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Order Summary"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bestellübersicht"
+                        }
+                      ]
+                    }
+                  },
+                  "icon": {
+                    "name": "list"
+                  },
+                  "priority": "SECONDARY"
+                },
+                "target": "screen-14588",
+                "validation": "partial",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-fc573",
+            "name": "Addresses",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Addresses"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Adressen"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "Section",
+                "id": "section-2013b",
+                "name": "BillingAddress",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Billing Address"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Rechnungsadresse"
+                      }
+                    ]
+                  }
+                },
+                "screenElements": [
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-95f39",
+                    "name": "BillingAddressControls",
+                    "layout": {
+                      "lg": "6-6",
+                      "md": "12-12"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-b249f",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_c0a67",
+                            "elementRef": "include_7c34e_field_fbf75"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_89f6d",
+                            "elementRef": "include_7c34e_group_8bd8d"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-0e6fb",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_9d7cd",
+                            "elementRef": "include_7c34e_field_126a1"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_a56ef",
+                            "elementRef": "include_7c34e_field_7a0f2"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-b6feb",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_bb5f6",
+                            "elementRef": "include_7c34e_field_d7150"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_ca093",
+                            "elementRef": "include_7c34e_field_0b84d"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row_ab734",
+                        "name": "<Row>"
+                      }
+                    ],
+                    "verticalAlignment": "BOTTOM"
+                  },
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-5fd08",
+                    "name": "Address",
+                    "layout": {
+                      "lg": "4-2-2-4",
+                      "md": "8-4-4-8",
+                      "sm": "12-12-12-12"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-18cfa",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_5a736",
+                            "elementRef": "include_7c34e_field_a9bf7"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_0ea25",
+                            "elementRef": "include_7c34e_field_433e6"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_2bfd8",
+                            "elementRef": "include_7c34e_field_72ca0"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_3a4c9",
+                            "elementRef": "include_7c34e_field_229c9"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "TOP"
+                  }
+                ]
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-b7355",
+                "name": "AddressesControls",
+                "layout": {
+                  "lg": "12"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-279ca",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_1089b",
+                        "elementRef": "include_7c34e_field_9b3e4"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "BOTTOM"
+              },
+              {
+                "type": "Section",
+                "id": "section-6794b",
+                "name": "ShippingAddress",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Shipping Address"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Lieferanschrift"
+                      }
+                    ]
+                  }
+                },
+                "screenElements": [
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-e3104",
+                    "name": "ShippingAddressControls",
+                    "layout": {
+                      "lg": "6-6",
+                      "md": "12-12"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-2288e",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_04007",
+                            "elementRef": "include_7c34e_field_9f1e2"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_41001",
+                            "elementRef": "include_7c34e_multi-select_00f5e"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-28017",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_94a10",
+                            "elementRef": "include_7c34e_field_c7498"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_da5ad",
+                            "elementRef": "include_7c34e_field_fb9fa"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-452d5",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_49148",
+                            "span": {
+                              "lg": 2
+                            },
+                            "elementRef": "include_7c34e_field_184df"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "BOTTOM"
+                  },
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-3868e",
+                    "name": "Address",
+                    "layout": {
+                      "lg": "4-2-2-4",
+                      "md": "8-4-4-8",
+                      "sm": "12-12-12-12"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-ead45",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_150ec",
+                            "elementRef": "include_7c34e_field_14918"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_740bc",
+                            "elementRef": "include_7c34e_field_70555"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_42387",
+                            "elementRef": "include_7c34e_field_dc3fd"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_c3fb1",
+                            "elementRef": "include_7c34e_field_384bd"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "TOP"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section-d0ccd",
+            "name": "Order",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Order"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Bestellung"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-f9f4a",
+                "name": "OrderControls",
+                "layout": {
+                  "lg": "6-6",
+                  "md": "12-12"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-a1516",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_c0307",
+                        "elementRef": "include_d7e3e_field_e0d50"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_11b4e",
+                        "elementRef": "include_d7e3e_field_5ac86"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-a3b61",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_f8f62",
+                        "elementRef": "include_d7e3e_field_3f37b"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "BOTTOM"
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-e5b70",
+                "name": "DeliveryOptions",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Delivery options"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Lieferoptionen"
+                      }
+                    ]
+                  }
+                },
+                "layout": {
+                  "lg": "11-1"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-cf0ce",
+                    "title": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Preferred delivery day"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bevorzugter Liefertag"
+                          }
+                        ]
+                      }
+                    },
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_1d563",
+                        "messageExposition": "TOOLTIP",
+                        "elementRef": "include_d7e3e_field_4f3b8",
+                        "tooltipsOnTop": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-49d53",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_f1a79",
+                        "messageExposition": "TOOLTIP",
+                        "elementRef": "include_d7e3e_field_5a5b4",
+                        "tooltipsOnTop": true
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "TOP"
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-c0d5a",
+                "name": "DeliveryOptions2",
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-be778",
+                    "name": "<Row>",
+                    "title": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Preferred delivery time"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bevorzugte Lieferzeit"
+                          }
+                        ]
+                      }
+                    },
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_7bcfd",
+                        "messageExposition": "TOOLTIP",
+                        "elementRef": "include_d7e3e_field_d814e"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-b49a6",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_bad20",
+                        "elementRef": "include_d7e3e_field_3fd36"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_6652b",
+                        "elementRef": "include_d7e3e_field_b79bb"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "TOP"
+              },
+              {
+                "type": "InlineRepeat",
+                "id": "inlinerepeat_3defc",
+                "name": "RepeatOrderInformation",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Products"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Produkte"
+                      }
+                    ]
+                  }
+                },
+                "repeatOverviewColumn": [
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_a4bb3",
+                    "width": 1,
+                    "messageExposition": "TOOLTIP",
+                    "elementRef": "include_d7e3e_field_e1861"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_d2aca",
+                    "width": 1,
+                    "preferredSorting": "ASC",
+                    "elementRef": "include_d7e3e_field_f4356"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_92401",
+                    "width": 1,
+                    "preferredSorting": "ASC",
+                    "messageExposition": "TOOLTIP",
+                    "elementRef": "include_d7e3e_field_d5892"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_5e4f1",
+                    "width": 1,
+                    "preferredSorting": "ASC",
+                    "messageExposition": "TOOLTIP",
+                    "elementRef": "include_d7e3e_field_d5ba0"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_c0d21",
+                    "width": 1,
+                    "preferredSorting": "ASC",
+                    "messageExposition": "TOOLTIP",
+                    "elementRef": "include_d7e3e_field_3e51b"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_f49d5",
+                    "width": 1,
+                    "preferredSorting": "ASC",
+                    "readonly": true,
+                    "messageExposition": "TOOLTIP",
+                    "elementRef": "include_d7e3e_field_cd8e2"
+                  }
+                ],
+                "groupRef": "include_d7e3e_group_ad39a",
+                "enableAdd": true,
+                "enableRemove": true,
+                "enableReorder": true,
+                "enableCopy": true,
+                "enableColumnsResize": true
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-b9ab1",
+                "name": "OrderControls2",
+                "layout": {
+                  "lg": "6-6",
+                  "sm": "12-12"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-67416",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_ce38a",
+                        "offset": {
+                          "lg": 1
+                        },
+                        "readonly": true,
+                        "elementRef": "include_d7e3e_field_cf1d2"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-1d521",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_b5684",
+                        "offset": {
+                          "lg": 1
+                        },
+                        "readonly": true,
+                        "elementRef": "include_d7e3e_field_0ac12"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-2d961",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_903a2",
+                        "offset": {
+                          "lg": 1
+                        },
+                        "readonly": true,
+                        "elementRef": "include_d7e3e_field_1db4f"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-a91f3",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_5e876",
+                        "elementRef": "include_d7e3e_field_82730"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_96a35",
+                        "readonly": true,
+                        "elementRef": "include_d7e3e_field_0680a"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "BOTTOM"
+              },
+              {
+                "type": "Section",
+                "id": "section-4c787",
+                "name": "Validations",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Validations and calculations"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Validierung und Berechnung"
+                      }
+                    ]
+                  }
+                },
+                "collapsible": true,
+                "initiallyCollapsed": true,
+                "screenElements": [
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-06c66",
+                    "name": "ValidationsControl",
+                    "layout": {
+                      "lg": "3-3-3-3",
+                      "md": "6-6-6-6",
+                      "sm": "12-12-12-12"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-d9448",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_db589",
+                            "elementRef": "include_d7e3e_field_e8ec9"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-3d62f",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_a8deb",
+                            "elementRef": "include_d7e3e_field_c54b5"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_bedfc",
+                            "elementRef": "include_d7e3e_field_0ff83"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_c3b67",
+                            "elementRef": "include_d7e3e_field_32241"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_f906d",
+                            "elementRef": "include_d7e3e_field_4e5dd"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-a8257",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_62a22",
+                            "elementRef": "include_d7e3e_field_80b9f"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_4fdbc",
+                            "elementRef": "include_d7e3e_field_364c4"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "BOTTOM"
+                  },
+                  {
+                    "type": "Section",
+                    "id": "section-99b7b",
+                    "name": "NewFeaturesAndTest",
+                    "title": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Business Prices"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Geschäftskundenpreise"
+                          }
+                        ]
+                      }
+                    },
+                    "screenElements": [
+                      {
+                        "type": "DetachedRepeat",
+                        "id": "detachedrepeat_72451",
+                        "name": "RepeatOrderInformationBusiness",
+                        "repeatOverviewColumn": [
+                          {
+                            "type": "FieldBasedRepeatOverviewColumn",
+                            "id": "fieldbasedrepeatoverviewcolumn_30449",
+                            "elementRef": "include_d7e3e_field_2b543"
+                          },
+                          {
+                            "type": "FieldBasedRepeatOverviewColumn",
+                            "id": "fieldbasedrepeatoverviewcolumn_97c65",
+                            "elementRef": "include_d7e3e_field_a3829"
+                          },
+                          {
+                            "type": "FieldBasedRepeatOverviewColumn",
+                            "id": "fieldbasedrepeatoverviewcolumn_d8719",
+                            "elementRef": "include_d7e3e_field_b7bc1"
+                          },
+                          {
+                            "type": "FieldBasedRepeatOverviewColumn",
+                            "id": "fieldbasedrepeatoverviewcolumn_fbf9d",
+                            "elementRef": "include_d7e3e_field_15d5a"
+                          },
+                          {
+                            "type": "FieldBasedRepeatOverviewColumn",
+                            "id": "fieldbasedrepeatoverviewcolumn_fa271",
+                            "elementRef": "include_d7e3e_field_34c15"
+                          },
+                          {
+                            "type": "FieldBasedRepeatOverviewColumn",
+                            "id": "fieldbasedrepeatoverviewcolumn_bcd08",
+                            "elementRef": "include_d7e3e_field_20913"
+                          }
+                        ],
+                        "groupRef": "include_d7e3e_group_00cc7",
+                        "enableAdd": true,
+                        "enableRemove": true,
+                        "detailScreen": {
+                          "id": "screen_84497",
+                          "name": "RepeatOrderInformationBusinessDetailScreen",
+                          "screenElements": [
+                            {
+                              "type": "ControlGrid",
+                              "id": "controlgrid_75461",
+                              "name": "CG",
+                              "layout": {
+                                "lg": "3-3-3-3"
+                              },
+                              "row": [
+                                {
+                                  "type": "Row",
+                                  "id": "row_87ab2",
+                                  "cell": [
+                                    {
+                                      "type": "Control",
+                                      "id": "control_dd2b7",
+                                      "elementRef": "include_d7e3e_field_2b543"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Row",
+                                  "id": "row_7db12",
+                                  "cell": [
+                                    {
+                                      "type": "Control",
+                                      "id": "control_816f5",
+                                      "elementRef": "include_d7e3e_field_a3829"
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "id": "control_a9d2d",
+                                      "elementRef": "include_d7e3e_field_b7bc1"
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "id": "control_fa9a1",
+                                      "elementRef": "include_d7e3e_field_15d5a"
+                                    },
+                                    {
+                                      "type": "Control",
+                                      "id": "control_7046d",
+                                      "elementRef": "include_d7e3e_field_34c15"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Row",
+                                  "id": "row_e3462",
+                                  "cell": [
+                                    {
+                                      "type": "Control",
+                                      "id": "control_99ccd",
+                                      "elementRef": "include_d7e3e_field_20913"
+                                    }
+                                  ]
+                                }
+                              ],
+                              "verticalAlignment": "TOP"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "type": "ControlGrid",
+                        "id": "controlgrid-4cae3",
+                        "name": "Indexing",
+                        "layout": {
+                          "lg": "2-2-2-2-2-2",
+                          "md": "6-6-6-6-6-6"
+                        },
+                        "row": [
+                          {
+                            "type": "Row",
+                            "id": "row-0d891",
+                            "cell": [
+                              {
+                                "type": "Control",
+                                "id": "control_6a3ef",
+                                "span": {
+                                  "lg": 2
+                                },
+                                "elementRef": "include_d7e3e_field_5ca29"
+                              },
+                              {
+                                "type": "Control",
+                                "id": "control_0662b",
+                                "span": {
+                                  "lg": 2
+                                },
+                                "readonly": true,
+                                "elementRef": "include_d7e3e_field_5c861"
+                              },
+                              {
+                                "type": "Control",
+                                "id": "control_a09b7",
+                                "span": {
+                                  "lg": 2
+                                },
+                                "readonly": true,
+                                "elementRef": "include_d7e3e_field_b694a"
+                              }
+                            ]
+                          }
+                        ],
+                        "verticalAlignment": "TOP"
+                      },
+                      {
+                        "type": "ControlGrid",
+                        "id": "controlgrid-1c084",
+                        "name": "IndexingRo",
+                        "readonly": true,
+                        "layout": {
+                          "lg": "2-2-2-2-2-2",
+                          "md": "6-6-6-6-6-6"
+                        },
+                        "row": [
+                          {
+                            "type": "Row",
+                            "id": "row-52df9",
+                            "cell": [
+                              {
+                                "type": "Control",
+                                "id": "control_689aa",
+                                "span": {
+                                  "lg": 2
+                                },
+                                "readonly": true,
+                                "elementRef": "include_d7e3e_field_df515"
+                              },
+                              {
+                                "type": "Control",
+                                "id": "control_e21df",
+                                "span": {
+                                  "lg": 2
+                                },
+                                "readonly": true,
+                                "elementRef": "include_d7e3e_field_c1864"
+                              },
+                              {
+                                "type": "Control",
+                                "id": "control_ef516",
+                                "span": {
+                                  "lg": 2
+                                },
+                                "readonly": true,
+                                "elementRef": "include_d7e3e_field_f5fb5"
+                              }
+                            ]
+                          }
+                        ],
+                        "verticalAlignment": "BOTTOM"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section-73840",
+            "name": "PaymentInfo",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Payment Information"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Zahlungsinformationen"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-8cc04",
+                "name": "PaymentInfo Controls",
+                "layout": {
+                  "lg": "12"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-b121d",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_d1006",
+                        "elementRef": "include_591ce_field_dda25"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "BOTTOM"
+              },
+              {
+                "type": "Section",
+                "id": "section-723a4",
+                "name": "CreditCard",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Credit Card"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Kreditkarte"
+                      }
+                    ]
+                  }
+                },
+                "screenElements": [
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-96670",
+                    "name": "CreditCardControls",
+                    "layout": {
+                      "lg": "6-3-3",
+                      "md": "12-6-6",
+                      "sm": "12-12-12"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-632ff",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_b3875",
+                            "elementRef": "include_591ce_field_9a37a"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_a4b5b",
+                            "elementRef": "include_591ce_field_d5e7f"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_e1889",
+                            "elementRef": "include_591ce_field_238df"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-f8d59",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_7711b",
+                            "span": {
+                              "lg": 3
+                            },
+                            "elementRef": "include_591ce_field_a103b"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "BOTTOM"
+                  }
+                ]
+              },
+              {
+                "type": "Section",
+                "id": "section-7da34",
+                "name": "Invoice",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Invoice"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Rechnung"
+                      }
+                    ]
+                  }
+                },
+                "screenElements": [
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-d97d4",
+                    "name": "InvoiceControl",
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-4b130",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control-f81b4",
+                            "readonly": true,
+                            "elementRef": "F107"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "BOTTOM"
+                  }
+                ]
+              },
+              {
+                "type": "Section",
+                "id": "section-5b400",
+                "name": "DirectDebit",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Direct Debit"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Lastschriftverfahren"
+                      }
+                    ]
+                  }
+                },
+                "screenElements": [
+                  {
+                    "type": "ControlGrid",
+                    "id": "controlgrid-49690",
+                    "name": "DirectDebitControls",
+                    "layout": {
+                      "lg": "6-6",
+                      "sm": "12-12"
+                    },
+                    "row": [
+                      {
+                        "type": "Row",
+                        "id": "row-40983",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_2f4f4",
+                            "elementRef": "include_591ce_field_46539"
+                          },
+                          {
+                            "type": "Control",
+                            "id": "control_073a4",
+                            "elementRef": "include_591ce_field_4e717"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "Row",
+                        "id": "row-bf9d1",
+                        "cell": [
+                          {
+                            "type": "Control",
+                            "id": "control_5cc74",
+                            "span": {
+                              "lg": 2
+                            },
+                            "elementRef": "include_591ce_field_6047c"
+                          }
+                        ]
+                      }
+                    ],
+                    "verticalAlignment": "BOTTOM"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "screen-14588",
+        "name": "OverallOrder",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Order Summary"
+              },
+              {
+                "locale": "de",
+                "text": "Bestellübersicht"
+              }
+            ]
+          }
+        },
+        "footerBox": {
+          "id": "headerfooter-cf96f",
+          "minorButtons": {
+            "button": [
+              {
+                "type": "NAVIGATION",
+                "id": "button-2924b",
+                "name": "Back",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Back"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Zurück"
+                        }
+                      ]
+                    }
+                  },
+                  "icon": {
+                    "name": "arrow_back"
+                  },
+                  "priority": "SECONDARY"
+                },
+                "target": "#previous",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          },
+          "majorButtons": {
+            "button": [
+              {
+                "type": "EVENT",
+                "id": "button-d2090",
+                "name": "Save",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Place Order"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bestellung Absenden"
+                        }
+                      ]
+                    }
+                  },
+                  "icon": {
+                    "name": "shopping_cart"
+                  },
+                  "priority": "PRIMARY"
+                },
+                "event": "event_submit",
+                "validation": "partial",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-02322",
+            "name": "BillingAddress",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Billing Address"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Rechnungsadresse"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-3c244",
+                "name": "BillingAddressControls",
+                "readonly": true,
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-342fc",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_244bb",
+                        "elementRef": "include_7c34e_field_fbf75"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-9b94a",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_558bf",
+                        "elementRef": "include_7c34e_field_126a1"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_4d8c9",
+                        "elementRef": "include_7c34e_field_7a0f2"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-d40c8",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_43784",
+                        "elementRef": "include_7c34e_field_d7150"
+                      }
+                    ]
+                  }
+                ],
+                "readonlyPresentation": "TEXT",
+                "verticalAlignment": "BOTTOM"
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-e9b63",
+                "name": "Address",
+                "readonly": true,
+                "layout": {
+                  "lg": "4-2-2-4"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-65725",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_940a3",
+                        "elementRef": "include_7c34e_field_a9bf7"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_25c4b",
+                        "elementRef": "include_7c34e_field_433e6"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_abd2f",
+                        "elementRef": "include_7c34e_field_72ca0"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_12f53",
+                        "elementRef": "include_7c34e_field_229c9"
+                      }
+                    ]
+                  }
+                ],
+                "readonlyPresentation": "TEXT",
+                "verticalAlignment": "TOP"
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-bd65b",
+                "name": "DeliveryOptions",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Delivery Options"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Bestelloptionen"
+                      }
+                    ]
+                  }
+                },
+                "readonly": true,
+                "layout": {
+                  "lg": "3-3-3-3"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-b927d",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_d3493",
+                        "elementRef": "include_d7e3e_field_5a5b4"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_99761",
+                        "elementRef": "include_d7e3e_field_3fd36"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_4fac6",
+                        "elementRef": "include_d7e3e_field_b79bb"
+                      }
+                    ]
+                  }
+                ],
+                "readonlyPresentation": "TEXT",
+                "verticalAlignment": "TOP"
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section-35f5a",
+            "name": "OrderedProducts",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Ordered Products"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Bestellte Produkte"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "InlineRepeat",
+                "id": "inlinerepeat_028f3",
+                "name": "RepeatOrderInformation",
+                "readonly": true,
+                "repeatOverviewColumn": [
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_e28f4",
+                    "elementRef": "include_d7e3e_field_f4356"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_640a0",
+                    "elementRef": "include_d7e3e_field_d5ba0"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_d68a6",
+                    "elementRef": "include_d7e3e_field_3e51b"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn_136b3",
+                    "elementRef": "include_d7e3e_field_cd8e2"
+                  }
+                ],
+                "groupRef": "include_d7e3e_group_ad39a",
+                "enableAdd": false,
+                "enableRemove": true,
+                "readonlyPresentation": "TEXT"
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section-f4945",
+            "name": "OrderPrices",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Prices"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Preise"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-100d9",
+                "name": "OrderPrices",
+                "readonly": true,
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-aeda9",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_ad9c6",
+                        "offset": {
+                          "lg": 1
+                        },
+                        "readonly": true,
+                        "elementRef": "include_d7e3e_field_cf1d2"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-b4370",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_2ef9b",
+                        "offset": {
+                          "lg": 1
+                        },
+                        "readonly": true,
+                        "elementRef": "include_d7e3e_field_0ac12"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-72c92",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_00292",
+                        "offset": {
+                          "lg": 1
+                        },
+                        "readonly": true,
+                        "elementRef": "include_d7e3e_field_1db4f"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-32d4b",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_4c2d0",
+                        "elementRef": "include_d7e3e_field_82730"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_968e5",
+                        "readonly": true,
+                        "elementRef": "include_d7e3e_field_0680a"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "BOTTOM"
+              }
+            ]
+          },
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_ef384",
+            "name": "ProductsExpression",
+            "title": {
+              "type": "Expression",
+              "expressionText": "kontext(Invoice){\n    kontext(Order){\n        (en: \"**Total Price of the Order** *\", de: \"**Produkte mit einem Gesamtpreis von** *\")\n        [TotalPriceWithDiscount]\n        (en:\"*\", de:\"*\")\n    }\n}"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_4fad2",
+                "name": "AllProducts",
+                "cell": [
+                  {
+                    "type": "ExpressionCell",
+                    "id": "expressioncell_4d519",
+                    "name": "AllProductsExpression",
+                    "expression": "kontext(Invoice){\n    kontext(Order){\n        kontext(OrderInformation, delimiter = \", \"){\n            case [Quantity] != \"1\" {\n            [Quantity] \" \" (en: \"\", de:\"mal\") \" \" [Product] (en: \"s\", de:\"\")\n            }\n            case [Quantity] = \"1\" {\n            [Quantity] \" \" [Product]\n            } \n        }\n        case [TotalPrice] != \"\" {\n    \n        \"* * *\"\n    \n        (en: \"Total Price of ordered products: \", de: \"Gesamtpreis der bestellten Produkte: \") [TotalPrice]\n\n\n        case [ShippingCosts] != \"0.00\" {\n        (en: \"Total Price with shipping costs: \", de: \"Gesamtpreis mit Versandkosten: \") [TotalPriceWithShippingCosts]\n        }\n\n\ncase [SpecialOfferProduct] != \"\" {\n        (en: \"Granted discount: \", de: \"Gewährter Rabatt: \") [AmountOfGivenDiscount]\n        }\n\n\n        case [SpecialOfferProduct] != \"\" {\n        (en: \"Total Price with discount: \", de: \"Gesamtpreis mit Rabatt: \") [TotalPriceWithDiscount]\n        }\n\n        \"* * *\"\n    \n        }\n        kontext(OrderInformation){\n            case [Product] != \"\" {\n        \n            \"* \" [Product] \": \" [TotalPriceProduct]\n            \"  \"\n            }\n        }    \n        case [TotalPrice] != \"\" {\n    \n    \n        \"* * *\"\n    \n        (en:\"Ordered by Product Type\", de:\"Nach Produktart sortiert\")\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"BB\" {\"1. \" [ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"Deko\" {\"1. \" [ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"Troso\" {\"1. \"[ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"FF\" {\"1. \" [ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"Geschirr\" {\"1. \" [ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"HiFi\" {\"1. \" [ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"Mopro\" {\"1. \" [ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"ObstGemuese\" {\"1. \" [ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n        kontext(OrderInformation){\n\n            case [ProductType] = \"Tiko\" {\"1. \" [ProductType] \" - \" [Product] \": \" [TotalPriceProduct]}\n        }\n    }\n}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid-6e730",
+            "name": "TermsAndConditions",
+            "layout": {
+              "lg": "1-1-1-1-1-1-1-1-1-1-1-1",
+              "md": "1-1-1-1-1-1-1-1-1-1-1-1",
+              "sm": "1-1-1-1-1-1-1-1-1-1-1-1"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_51300",
+                "name": "<Row>",
+                "cell": [
+                  {
+                    "type": "TextCell",
+                    "id": "textcell_59810",
+                    "span": {
+                      "lg": 6,
+                      "md": 6,
+                      "sm": 6
+                    },
+                    "name": "ConfirmText",
+                    "decoration": "INFO",
+                    "content": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "<b>Please confirm that you have read and understood the terms and conditions. <sup>1\n\n<small><sup>1 </sup>This also confirms that your order is complete."
+                        },
+                        {
+                          "locale": "de",
+                          "text": "<b>Bitte bestätigen Sie, dass Sie die Allgemeinen Geschäftsbedingungen gelesen und verstanden haben.<sup>1\n\n<small> <sup>1 </sup>Damit bestätigen Sie auch die Vollständigkeit Ihrer Bestellung."
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_1be37",
+                    "offset": {
+                      "lg": 3
+                    },
+                    "span": {
+                      "lg": 3,
+                      "md": 5,
+                      "sm": 6
+                    },
+                    "style": [
+                      {
+                        "name": "h_rightAlign"
+                      }
+                    ],
+                    "elementRef": "include_d7e3e_field_10949"
+                  }
+                ]
+              }
+            ],
+            "verticalAlignment": "BOTTOM"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "readonly": true,
+          "dependentField": {
+            "masterField": "include_591ce_field_dda25",
+            "case": [
+              {
+                "masterValue": null,
+                "notRelevant": true
+              },
+              {
+                "masterValue": "credit",
+                "notRelevant": true
+              },
+              {
+                "masterValue": "debit",
+                "notRelevant": true
+              },
+              {
+                "masterValue": "invoice",
+                "readonly": true
+              }
+            ]
+          },
+          "elementRef": "F107"
+        },
+        {
+          "hint": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Specify your prefered delivery day and/or delivery time for your order."
+              },
+              {
+                "locale": "de",
+                "text": "Geben Sie den bevorzugten Liefertag und/oder Lieferzeit für Ihre Bestellung an."
+              }
+            ]
+          },
+          "initialValue": "false",
+          "exposition": "SWITCH_WITH_VALUES",
+          "elementRef": "include_d7e3e_field_3f37b"
+        },
+        {
+          "hint": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Select your prefered delivery day."
+              },
+              {
+                "locale": "de",
+                "text": "Wählen Sie Ihren bevorzugten Liefertag aus."
+              }
+            ]
+          },
+          "initialValue": "false",
+          "exposition": "SWITCH",
+          "elementRef": "include_d7e3e_field_4f3b8"
+        },
+        {
+          "exposition": "INLINE",
+          "dependentField": {
+            "masterField": "include_d7e3e_field_4f3b8",
+            "case": [
+              {
+                "masterValue": "false",
+                "notRelevant": true
+              }
+            ]
+          },
+          "elementRef": "include_d7e3e_field_5a5b4"
+        },
+        {
+          "hint": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Select your prefered delivery time intervall."
+              },
+              {
+                "locale": "de",
+                "text": "Geben Sie Ihr beevorzugtes Zeitfenster für die Lieferung an."
+              }
+            ]
+          },
+          "initialValue": "false",
+          "exposition": "SWITCH",
+          "elementRef": "include_d7e3e_field_d814e"
+        },
+        {
+          "dependentField": {
+            "masterField": "include_d7e3e_field_d814e",
+            "case": [
+              {
+                "masterValue": "false",
+                "notRelevant": true
+              }
+            ]
+          },
+          "elementRef": "include_d7e3e_field_3fd36"
+        },
+        {
+          "dependentField": {
+            "masterField": "include_d7e3e_field_d814e",
+            "case": [
+              {
+                "masterValue": "false",
+                "notRelevant": true
+              }
+            ]
+          },
+          "elementRef": "include_d7e3e_field_b79bb"
+        },
+        {
+          "placeholder": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "enter product here"
+              },
+              {
+                "locale": "de",
+                "text": "hier das Produkt angeben"
+              }
+            ]
+          },
+          "elementRef": "include_d7e3e_field_82730"
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "€"
+              },
+              {
+                "locale": "de",
+                "text": "€"
+              }
+            ]
+          },
+          "elementRef": "include_d7e3e_field_c54b5"
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "€"
+              },
+              {
+                "locale": "de",
+                "text": "€"
+              }
+            ]
+          },
+          "elementRef": "include_d7e3e_field_0ff83"
+        },
+        {
+          "hint": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Enter an order number to use it as semantic index and identify a product repetition. If the value is not used as order number within the repeatable group no results will be found."
+              }
+            ]
+          },
+          "elementRef": "include_d7e3e_field_5ca29"
+        },
+        {
+          "label": {
+            "type": "Expression",
+            "expressionText": "kontext(Invoice){\n    kontext(Order){\n        (en: \"**I agree to the terms and conditions.** \", de: \"**Ich akzeptiere die Allgemeinen Geschäftsbedingungen.** \")\n\n    }\n}\n"
+          },
+          "elementRef": "include_d7e3e_field_10949"
+        },
+        {
+          "initialValue": "false",
+          "exposition": "CHECKBOX",
+          "elementRef": "include_7c34e_field_9b3e4"
+        }
+      ]
+    },
+    "groupConfiguration": {
+      "group": [
+        {
+          "dependentGroup": {
+            "masterField": "include_591ce_field_dda25",
+            "case": [
+              {
+                "masterValue": null,
+                "notRelevant": true
+              },
+              {
+                "masterValue": "debit",
+                "notRelevant": true
+              },
+              {
+                "masterValue": "invoice",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "include_591ce_group_ce8ea"
+        },
+        {
+          "dependentGroup": {
+            "masterField": "include_591ce_field_dda25",
+            "case": [
+              {
+                "masterValue": null,
+                "notRelevant": true
+              },
+              {
+                "masterValue": "credit",
+                "notRelevant": true
+              },
+              {
+                "masterValue": "invoice",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "include_591ce_group_81dc9"
+        },
+        {
+          "dependentGroup": {
+            "masterField": "include_7c34e_field_9b3e4",
+            "case": [
+              {
+                "masterValue": "false",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "include_7c34e_group_a3345"
+        },
+        {
+          "dependentGroup": {
+            "masterField": "include_d7e3e_field_3f37b",
+            "case": [
+              {
+                "masterValue": "false",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "include_d7e3e_group_59711"
+        },
+        {
+          "groupRef": "include_d7e3e_group_ad39a",
+          "numberOfInitialRows": 1
+        }
+      ]
+    },
+    "defaults": {
+      "buttonLabels": {
+        "ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "add"
+            },
+            {
+              "locale": "de",
+              "text": "hinzufügen"
+            }
+          ]
+        },
+        "COMMIT_ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "commit"
+            },
+            {
+              "locale": "de",
+              "text": "hinzufügen"
+            }
+          ]
+        },
+        "APPLY": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "commit change"
+            },
+            {
+              "locale": "de",
+              "text": "Änderung hinzufügen"
+            }
+          ]
+        }
+      },
+      "confirmationTexts": {
+        "REMOVE": {
+          "title": {
+            "text": [
+              {
+                "locale": "de",
+                "text": "Löschen bestätigen"
+              }
+            ]
+          },
+          "message": {
+            "text": [
+              {
+                "locale": "de",
+                "text": "Wollen Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "readonlyPresentation": "INPUT"
+  }
+}

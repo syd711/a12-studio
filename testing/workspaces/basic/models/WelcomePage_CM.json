@@ -1,0 +1,1069 @@
+{
+  "header": {
+    "id": "WelcomePage_CM",
+    "modelType": "content",
+    "modelVersion": "0.8.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Content"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "configuration": {
+      "namespaceVersions": {
+        "com.mgmtp.a12.contentengine": "0.9.0"
+      }
+    },
+    "root": {
+      "id": "7083ee19",
+      "type": "Box",
+      "namespace": "com.mgmtp.a12.contentengine",
+      "props": {
+        "style": {
+          "display": "flex",
+          "width": "1000px",
+          "height": "fit-content",
+          "flexDirection": "column",
+          "padding": "8px",
+          "margin": "0px",
+          "gap": "8px",
+          "backgroundRepeat": "no-repeat"
+        }
+      },
+      "children": [
+        {
+          "id": "812e46f9",
+          "type": "Box",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "props": {
+            "style": {
+              "display": "flex",
+              "width": "100%",
+              "height": "fit-content",
+              "flexDirection": "column",
+              "padding": "8px",
+              "margin": "0px",
+              "gap": "8px",
+              "backgroundRepeat": "no-repeat"
+            }
+          },
+          "children": [
+            {
+              "id": "1c69ab9c",
+              "type": "Grid",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "props": {
+                "noGutter": true
+              },
+              "children": [
+                {
+                  "id": "627a5cdf",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          7,
+                          3
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "e025f13c",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    },
+                    {
+                      "id": "23111743",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {
+                        "style": {
+                          "padding": "0px 0px 0px 0px"
+                        }
+                      },
+                      "children": [
+                        {
+                          "id": "a3ce9cc2",
+                          "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%",
+                              "padding": "20px 0px 0px 0px"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                        "text": "A12 Preview App",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">A12 Preview App</span></p>"
+                          }
+                        },
+                        {
+                          "id": "6cc109d8",
+                          "type": "Heading",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 24px;font-weight: 900;",
+                                        "text": "Basic Workspace",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "heading",
+                                    "version": 1,
+                                    "tag": "h1"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<h1 class=\"editor-heading-h1\" dir=\"ltr\"><span style=\"font-size: 24px; font-weight: 900; white-space: pre-wrap;\">Basic Workspace</span></h1>"
+                          }
+                        },
+                        {
+                          "id": "28fa2bd0",
+                          "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 18px;font-weight: 600;",
+                                        "text": "This is an example workspace",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textStyle": ""
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 18px; font-weight: 600; white-space: pre-wrap;\">This is an example workspace</span></p>"
+                          }
+                        },
+                        {
+                          "id": "5eb2de35",
+                          "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%",
+                              "padding": "20px 0px 10px 0px"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 14px;",
+                                        "text": "The Basic Workspace serves as a showcase for basic A12 modeling features. Modelers can explore examples of many of the features of A12 in this workspace:",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "justify",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 0,
+                                    "textStyle": "font-size: 14px;"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: justify;\"><span style=\"font-size: 14px; white-space: pre-wrap;\">The Basic Workspace serves as a showcase for basic A12 modeling features. Modelers can explore examples of many of the features of A12 in this workspace:</span></p>"
+                          }
+                        },
+                        {
+                          "id": "6833a03d",
+                          "type": "UnorderedList",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%",
+                              "borderStyle": "none",
+                              "borderColor": "#333333",
+                              "borderWidth": "1px",
+                              "padding": "0px 0px 0px 15px",
+                              "margin": "0px"
+                            }
+                          },
+                          "children": [
+                            {
+                              "id": "97d8b543",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 10px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "4e156964",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                                "text": "It has two rather simple document types, Person and Company, that can be linked by a 1:n relationship. The UI elements to maintain these links are different on both sides. A Table List and a Dual Pane are used on the Company side, while a Drop Down Selection is used on the Person side.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">It has two rather simple document types, Person and Company, that can be linked by a 1:n relationship. The UI elements to maintain these links are different on both sides. A Table List and a Dual Pane are used on the Company side, while a Drop Down Selection is used on the Person side.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "49a0bb21",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 10px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "182d2c3f",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                                "text": "The module \"Invoice\" features a more complex Document Model with Computation and Validation Rules. It models an invoice with a billing and a shipping address, order and delivery dates, a product list and payment information. Some parts are included to show a certain feature, and do not claim to be meaningful.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">The module \"Invoice\" features a more complex Document Model with Computation and Validation Rules. It models an invoice with a billing and a shipping address, order and delivery dates, a product list and payment information. Some parts are included to show a certain feature, and do not claim to be meaningful.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "ba27dbd7",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 10px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "d72af4ea",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "This workspace uses ",
+                                                "type": "text",
+                                                "version": 1
+                                              },
+                                              {
+                                                "detail": 0,
+                                                "format": 1,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;",
+                                                "text": "Role Based Access Control (RBAC)",
+                                                "type": "text",
+                                                "version": 1
+                                              },
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;",
+                                                "text": ". U",
+                                                "type": "text",
+                                                "version": 1
+                                              },
+                                              {
+                                                "detail": 0,
+                                                "format": 1,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;",
+                                                "text": "sers, Roles",
+                                                "type": "text",
+                                                "version": 1
+                                              },
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;",
+                                                "text": " and Access Rights are defined by the files inside the \"auth\" folder. These ",
+                                                "type": "text",
+                                                "version": 1
+                                              },
+                                              {
+                                                "detail": 0,
+                                                "format": 1,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;",
+                                                "text": "Access Rights",
+                                                "type": "text",
+                                                "version": 1
+                                              },
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;",
+                                                "text": " ultimatel",
+                                                "type": "text",
+                                                "version": 1
+                                              },
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "y determine which operations the User can do.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">This workspace uses </span><b><strong class=\"editor-text-bold\" style=\"font-size: 14px; font-weight: 400; white-space: pre-wrap;\">Role Based Access Control (RBAC)</strong></b><span style=\"font-size: 14px; font-weight: 400; white-space: pre-wrap;\">. U</span><b><strong class=\"editor-text-bold\" style=\"font-size: 14px; font-weight: 400; white-space: pre-wrap;\">sers, Roles</strong></b><span style=\"font-size: 14px; font-weight: 400; white-space: pre-wrap;\"> and Access Rights are defined by the files inside the \"auth\" folder. These </span><b><strong class=\"editor-text-bold\" style=\"font-size: 14px; font-weight: 400; white-space: pre-wrap;\">Access Rights</strong></b><span style=\"font-size: 14px; font-weight: 400; white-space: pre-wrap;\"> ultimatel</span><span style=\"font-size: 14px; white-space: pre-wrap;\">y determine which operations the User can do.</span></p>"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "3e0892a6",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "ae8218c9",
+              "type": "Grid",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "props": {
+                "noGutter": true,
+                "style": {
+                  "margin": "auto",
+                  "padding": "10px 0px 0px 0px"
+                }
+              },
+              "children": [
+                {
+                  "id": "d0483473",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    },
+                    "style": {
+                      "padding": "0px 0px 10px 0px"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "c805db6e",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    },
+                    {
+                      "id": "d229c395",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "b8563345",
+                          "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%",
+                              "padding": "0px"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 14px;font-weight: 500;color: inherit;background-color: transparent;",
+                                        "text": "The following Users and Roles are available in all workspaces that are created with the Preview App Control:",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 0,
+                                    "textStyle": "font-size: 14px;font-weight: 500;color: inherit;background-color: transparent;"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 500; color: inherit; background-color: transparent; white-space: pre-wrap;\">The following Users and Roles are available in all workspaces that are created with the Preview App Control:</span></p>"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "8774b5da",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                },
+                {
+                  "id": "79a7d28d",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    },
+                    "style": {
+                      "padding": "0px 0px 10px 0px"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "51f11f8",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    },
+                    {
+                      "id": "3f62d488",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "4a2f72e1",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "Table",
+                          "props": {
+                            "columns": [
+                              {
+                                "id": "9ccc6e4",
+                                "pinning": "left",
+                                "label": "User",
+                                "width": 1.5
+                              },
+                              {
+                                "id": "bcdfe948",
+                                "width": 1
+                              },
+                              {
+                                "id": "9d22b050",
+                                "width": 2
+                              }
+                            ],
+                            "enableColumnsResizing": false,
+                            "style": {
+                              "width": "100%",
+                              "padding": "0px"
+                            }
+                          },
+                          "children": [
+                            {
+                              "id": "cd28d6bc",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableHead",
+                              "props": {},
+                              "children": [
+                                {
+                                  "id": "63809b0b",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableHeadRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "6df81987",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableHeadCell",
+                                      "props": {
+                                        "content": "User"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "5f90c8a4",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableHeadCell",
+                                      "props": {
+                                        "content": "Role"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "5cdc5edd",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableHeadCell",
+                                      "props": {
+                                        "content": "Is authorized to..."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "id": "187db436",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableBody",
+                              "props": {},
+                              "children": [
+                                {
+                                  "id": "1394d284",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "c7401c1c",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "enduser"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "c5aea823",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "tester"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "e76045cb",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "access the end user application modules to create, edit and delete Documents."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "e6b12589",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "8a330918",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "reader"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "49bdf44a",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "reviewer"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "49dd4715",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "access the end user application modules to read existing Documents."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "c4fd7189",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "ac680843",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "ba"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "3ea09cac",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "modeler"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "811d8628",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "create, edit and deploy models from SME to the Preview App and test them end-to-end."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "91b9e25c",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "c934afb3",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "admin"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "5f0bf60f",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "systemAdmin"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "351c9546",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "access the end user application modules to create, edit and delete Documents as well as create, edit and deploy models from SME to the Preview App Server. In addition, the administrator can perform workflow actions."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "id": "de184768",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableFoot",
+                              "props": {},
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "4b111f40",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                },
+                {
+                  "id": "f313734",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    },
+                    "style": {
+                      "padding": "10px 0px 10px 0px"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "5e316834",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    },
+                    {
+                      "id": "9cf78b2",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "c03c6730",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "MessageBox",
+                          "props": {
+                            "label": "There is a special Access Right \"MODEL_MANAGE\", that allows a Role to add, change or read models even if the Role is not listed in the model. \nThis Access Right is assigned to the Roles \"modeler\" and \"systemAdmin\". Hence, these Roles (and the Users \"ba\" and \"admin\") can work with the models although they are not  listed in the model files.",
+                            "focusOnMessage": false,
+                            "variant": "info",
+                            "style": {
+                              "padding": "0px 0px 0px 0px",
+                              "margin": "0px 0px 0px 0px"
+                            }
+                          },
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "5d4b3129",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                },
+                {
+                  "id": "8b64822c",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          6,
+                          5
+                        ]
+                      }
+                    },
+                    "style": {
+                      "padding": "20px 0px 0px 0px"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "9ce55496",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": []
+                    },
+                    {
+                      "id": "2cadb676",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "e0ed18a1",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "Paragraph",
+                          "props": {
+                            "style": {
+                              "width": "100%"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 2,
+                                        "mode": "normal",
+                                        "style": "font-size: 12px;",
+                                        "text": "The Welcome Page is currently only provided in English.",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 2,
+                                    "textStyle": "font-size: 12px;"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><i><em class=\"editor-text-italic\" style=\"font-size: 12px; white-space: pre-wrap;\">The Welcome Page is currently only provided in English.</em></i></p>"
+                          },
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "6a82914e",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

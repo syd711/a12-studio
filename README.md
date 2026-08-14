@@ -2,22 +2,23 @@
 
 This project is an alternative editor for A12 models (https://geta12.com/#/getting-started).
 
-> The project has an alpha status and is not intendet for production use!!!**
+> The project has an alpha status and is not intendet for production use!!!
 > 
 > The project only supports A12 with version 2026.06.
 
 ### What is offers
 
 - Full accessibility (key navigation, shortcuts, screen-reader support, ...)
-- Localization for the languages: English, German, French
+- Localization for the languages: English, German
 - Integrated preview app control
 - Advanced editing options:
+  - DocumentModel creation wizards 
   - Annotation dataset import and export
   - Application Group support for multi A12 application projects
   - Auto packaging of models
-  - 
+  - ...
 
-### What is does not offer
+### What is does NOT offer
 
 - Migration support
 - Runtime model export
@@ -29,24 +30,22 @@ This project is an alternative editor for A12 models (https://geta12.com/#/getti
 This project is under development.
 You find an up-to-date overview about all supported model type and their status below.
 
-### Model Types Overview
-
-| Model Type | Status |
-| --- | --- |
-| Application Model | |
-| Combination Model | |
-| Content Model | |
-| Document Model | |
-| Form Model | |
-| Mapping Model | |
-| Master-Detail Model | |
-| Overview Model | |
+| Model Type | Status            |
+| --- |-------------------|
+| Application Model |    [x]               |
+| Combination Model | Not supported yet |
+| Content Model | Not supported yet |
+| Document Model |     [x]              |
+| Form Model |       [x]            |
+| Mapping Model | Not supported yet |
+| Master-Detail Model |    [x]               |
+| Overview Model |      [x]             |
 | Print Model | Not supported yet |
-| Query Model | |
-| Relationship Model | |
-| Structural Mapping Model | |
-| Tree Model | |
-| Type Definition Model | |
+| Query Model |   [x]                |
+| Relationship Model |   [x]               |
+| Structural Mapping Model | Not supported yet |
+| Tree Model | Not supported yet |
+| Type Definition Model | [x]               |
 
 
 ## Q&A

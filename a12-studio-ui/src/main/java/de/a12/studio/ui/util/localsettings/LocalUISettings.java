@@ -164,6 +164,22 @@ public class LocalUISettings {
     saveJsonProperty(RECENT_PROJECTS, recentProjects);
   }
 
+  /** Drops recent-project entries whose folder no longer exists on disk, persisting the result. */
+  @NonNull
+  public static List<String> pruneMissingRecentProjects() {
+    List<String> recentProjects = getRecentProjects();
+    List<String> existing = new ArrayList<>();
+    for (String path : recentProjects) {
+      if (new File(path).isDirectory()) {
+        existing.add(path);
+      }
+    }
+    if (existing.size() != recentProjects.size()) {
+      saveJsonProperty(RECENT_PROJECTS, existing);
+    }
+    return existing;
+  }
+
   public static void clearRecentProjects() {
     saveJsonProperty(RECENT_PROJECTS, new ArrayList<>());
   }

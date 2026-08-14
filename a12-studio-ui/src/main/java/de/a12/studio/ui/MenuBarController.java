@@ -73,6 +73,9 @@ public class MenuBarController implements Initializable, StudioEventListener {
   private Button previewAppLogBtn;
 
   @FXML
+  private Button searchBtn;
+
+  @FXML
   private Menu recentProjectsMenu;
 
   @FXML
@@ -113,6 +116,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
     StudioEventManager.getInstance().fireProjectOpenEvent(project);
 
     refreshRecentProjectsMenu();
+    refreshProjectDependentButtons();
   }
 
   /**
@@ -258,6 +262,8 @@ public class MenuBarController implements Initializable, StudioEventListener {
   private void onCloseProject() {
     PreviewAppProcess.getInstance().stop();
     StudioEventManager.getInstance().fireProjectClosedEvent(project);
+    project = null;
+    refreshProjectDependentButtons();
   }
 
   @FXML
@@ -312,9 +318,21 @@ public class MenuBarController implements Initializable, StudioEventListener {
     PreviewAppLogWindow.show(Studio.stage);
   }
 
+  /** Re-applies the visibility of every menu-bar button that only makes sense while a project is open
+   *  (preview app start/stop/console, search, AI console). Call whenever the open project changes or
+   *  the settings the individual buttons also depend on change. */
+  private void refreshProjectDependentButtons() {
+    refreshPreviewAppButtonsVisibility();
+    refreshClaudeConsoleButton(JsonSettings.load());
+    boolean visible = project != null;
+    searchBtn.setVisible(visible);
+    searchBtn.setManaged(visible);
+  }
+
   private void refreshPreviewAppButtonsVisibility() {
     String installationPath = A12Settings.load().getInstallationPath();
-    boolean visible = installationPath != null && A12Settings.isValidInstallationFolder(new File(installationPath));
+    boolean visible = project != null && installationPath != null
+        && A12Settings.isValidInstallationFolder(new File(installationPath));
     launchPreviewAppBtn.setVisible(visible);
     launchPreviewAppBtn.setManaged(visible);
     stopPreviewAppBtn.setVisible(visible);
@@ -341,7 +359,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
   }
 
   private void refreshClaudeConsoleButton(JsonSettings settings) {
-    boolean visible = settings.isAddClaudeConsoleButton();
+    boolean visible = project != null && settings.isAddClaudeConsoleButton();
     claudeConsoleBtn.setVisible(visible);
     claudeConsoleBtn.setManaged(visible);
   }
@@ -361,14 +379,14 @@ public class MenuBarController implements Initializable, StudioEventListener {
     newMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
     openMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 
+    LocalUISettings.pruneMissingRecentProjects();
     refreshRecentProjectsMenu();
     updateBtn.managedProperty().bind(updateBtn.visibleProperty());
     runUpdateCheck();
 
     StudioEventManager.getInstance().addListener(this);
-    refreshClaudeConsoleButton(JsonSettings.load());
+    refreshProjectDependentButtons();
 
-    refreshPreviewAppButtonsVisibility();
     refreshPreviewAppButtonsState(PreviewAppProcess.getInstance().getState());
     PreviewAppProcess.getInstance().stateProperty().addListener(
         (observable, oldState, newState) -> refreshPreviewAppButtonsState(newState));
@@ -376,10 +394,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
     Platform.runLater(() -> {
       List<String> recentProjects = LocalUISettings.getRecentProjects();
       if (!recentProjects.isEmpty()) {
-        File file = new File(recentProjects.get(0));
-        if (file.exists()) {
-          openProject(file);
-        }
+        openProject(new File(recentProjects.get(0)));
       }
     });
   }
