@@ -157,7 +157,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   /**
    * Configures this panel to edit a single entry of {@link Defaults#getButtonLabels()} (e.g. {@code "ADD"},
    * {@code "CANCEL"}) - one of the repeat-widget default button label overrides shown, one action per panel
-   * instance, in {@link de.a12.studio.ui.editors.formmodel.dialogs.RepeatDefaultButtonLabelsDialogController}.
+   * instance, in {@link de.a12.studio.ui.editors.formmodel.FormModelEditorController}.
    */
   public void configureButtonLabel(@NonNull String action, @NonNull String title) {
     this.buttonLabelAction = action;

@@ -1,39 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.formmodel.FormModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
                 <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
-                <Button mnemonicParsing="false" onAction="#onRepeatDefaultButtonLabels" styleClass="action-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2r-repeat" iconSize="18" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="%repeat_default_button_labels" />
-                    </tooltip>
-                </Button>
-                <Button mnemonicParsing="false" onAction="#onSubheaderAndFooter" styleClass="action-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2p-page-layout-header-footer" iconSize="18" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="%subheader_and_footer" />
-                    </tooltip>
-                </Button>
                 <Separator prefHeight="0.0" prefWidth="0.0" />
                 <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
             </items>
@@ -43,16 +23,75 @@
         </ToolBar>
     </right>
    <center>
-       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
-           <content>
-               <VBox spacing="12.0" styleClass="field-editor">
-                   <children>
-                   </children>
-                   <padding>
-                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                   </padding>
-               </VBox>
-           </content>
-       </ScrollPane>
+       <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+           <tabs>
+               <Tab text="%overview">
+                   <content>
+                       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+                           <content>
+                               <VBox spacing="12.0" styleClass="field-editor">
+                                   <children>
+                                   </children>
+                                   <padding>
+                                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                   </padding>
+                               </VBox>
+                           </content>
+                       </ScrollPane>
+                   </content>
+               </Tab>
+               <Tab text="%repeat_default_button_labels">
+                   <content>
+                       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+                           <content>
+                               <VBox spacing="12.0" styleClass="field-editor">
+                                   <children>
+                                       <fx:include fx:id="addLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="commitAddLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="applyLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="editLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="removeLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="viewLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="cancelLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="confirmLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="returnLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="upLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="downLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="copyLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="closeLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="downloadLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="skipLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="replaceLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                       <fx:include fx:id="uploadAsCopyLabel" source="../propertyeditors/localized-text-panel.fxml" />
+                                   </children>
+                                   <padding>
+                                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                   </padding>
+                               </VBox>
+                           </content>
+                       </ScrollPane>
+                   </content>
+               </Tab>
+               <Tab text="%subheader_and_footer">
+                   <content>
+                       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
+                           <content>
+                               <VBox spacing="12.0" styleClass="field-editor">
+                                   <children>
+                                       <fx:include fx:id="subheaderMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                       <fx:include fx:id="subheaderMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                       <fx:include fx:id="footerMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                       <fx:include fx:id="footerMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                   </children>
+                                   <padding>
+                                       <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                   </padding>
+                               </VBox>
+                           </content>
+                       </ScrollPane>
+                   </content>
+               </Tab>
+           </tabs>
+       </TabPane>
    </center>
 </BorderPane>

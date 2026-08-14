@@ -2,18 +2,90 @@ package de.a12.studio.ui.editors.formmodel;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.formmodel.Button;
+import de.a12.studio.models.formmodel.ButtonGroup;
+import de.a12.studio.models.formmodel.Defaults;
+import de.a12.studio.models.formmodel.EventButton;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
-import javafx.event.ActionEvent;
+import de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController;
+import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.security.SecureRandom;
+import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
+/**
+ * Edits an {@link FormModel}'s "Overview", "Repeat Default Button Labels" and "Subheader and Footer" tabs.
+ * <p>
+ * "Repeat Default Button Labels": {@code content.defaults.buttonLabels} - the model-wide overrides for the
+ * built-in repeat-widget button labels (ADD/CANCEL/COMMIT_ADD/...), one {@link LocalizedTextPanelController}
+ * per action, matching the SME reference's {@code I_SectionDefaultRepeatButtonLabels-form.json} order.
+ * <p>
+ * "Subheader and Footer": {@code content.subHeaderBox}/{@code content.footerBox}'s Major/Minor button lists,
+ * one {@link EventButtonsPanelController} per list, matching the SME reference's "Major Buttons"/"Minor
+ * Buttons" tables. Form Model's subHeaderBox and footerBox are both button-only ({@link HeaderFooterBox}), so
+ * all four lists reuse the same simple panel. Rows can be either {@link EventButton} or {@link
+ * de.a12.studio.models.formmodel.NavigationButton} (see Company_FM.json, where subHeaderBox holds navigation
+ * buttons and footerBox holds event buttons) - both satisfy {@link de.a12.studio.models.EventButtonLike} via
+ * the abstract {@link Button} base, so either kind displays correctly here; newly added rows default to
+ * {@link EventButton}, the more common case.
+ */
 public class FormModelEditorController extends AbstractEditorController implements Initializable {
+
+  private static final Random ID_RANDOM = new SecureRandom();
+
+  @FXML
+  private LocalizedTextPanelController addLabelController;
+  @FXML
+  private LocalizedTextPanelController commitAddLabelController;
+  @FXML
+  private LocalizedTextPanelController applyLabelController;
+  @FXML
+  private LocalizedTextPanelController editLabelController;
+  @FXML
+  private LocalizedTextPanelController removeLabelController;
+  @FXML
+  private LocalizedTextPanelController viewLabelController;
+  @FXML
+  private LocalizedTextPanelController cancelLabelController;
+  @FXML
+  private LocalizedTextPanelController confirmLabelController;
+  @FXML
+  private LocalizedTextPanelController returnLabelController;
+  @FXML
+  private LocalizedTextPanelController upLabelController;
+  @FXML
+  private LocalizedTextPanelController downLabelController;
+  @FXML
+  private LocalizedTextPanelController copyLabelController;
+  @FXML
+  private LocalizedTextPanelController closeLabelController;
+  @FXML
+  private LocalizedTextPanelController downloadLabelController;
+  @FXML
+  private LocalizedTextPanelController skipLabelController;
+  @FXML
+  private LocalizedTextPanelController replaceLabelController;
+  @FXML
+  private LocalizedTextPanelController uploadAsCopyLabelController;
+
+  @FXML
+  private EventButtonsPanelController subheaderMajorButtonsController;
+  @FXML
+  private EventButtonsPanelController subheaderMinorButtonsController;
+  @FXML
+  private EventButtonsPanelController footerMajorButtonsController;
+  @FXML
+  private EventButtonsPanelController footerMinorButtonsController;
 
   public void loadModel(@NonNull A12Model<?> model) {
     load((FormModel) model);
@@ -21,17 +93,110 @@ public class FormModelEditorController extends AbstractEditorController implemen
   }
 
   private void load(@NonNull FormModel formModel) {
-
+    loadRepeatDefaultButtonLabels(formModel);
+    loadSubheaderAndFooter(formModel);
   }
 
-  @FXML
-  private void onRepeatDefaultButtonLabels(ActionEvent event) {
-    Dialogs.openRepeatDefaultButtonLabels((FormModel) projectItem.getModel());
+  // ---- Repeat Default Button Labels ----
+
+  private void loadRepeatDefaultButtonLabels(@NonNull FormModel model) {
+    Defaults defaults = ensureDefaults(model);
+
+    addLabelController.configureButtonLabel("ADD", "ADD");
+    addLabelController.setDefaults(defaults);
+    commitAddLabelController.configureButtonLabel("COMMIT_ADD", "COMMIT ADD");
+    commitAddLabelController.setDefaults(defaults);
+    applyLabelController.configureButtonLabel("APPLY", "APPLY");
+    applyLabelController.setDefaults(defaults);
+    editLabelController.configureButtonLabel("EDIT", "EDIT");
+    editLabelController.setDefaults(defaults);
+    removeLabelController.configureButtonLabel("REMOVE", "REMOVE");
+    removeLabelController.setDefaults(defaults);
+    viewLabelController.configureButtonLabel("VIEW", "VIEW");
+    viewLabelController.setDefaults(defaults);
+    cancelLabelController.configureButtonLabel("CANCEL", "CANCEL");
+    cancelLabelController.setDefaults(defaults);
+    confirmLabelController.configureButtonLabel("CONFIRM", "CONFIRM");
+    confirmLabelController.setDefaults(defaults);
+    returnLabelController.configureButtonLabel("RETURN", "RETURN");
+    returnLabelController.setDefaults(defaults);
+    upLabelController.configureButtonLabel("UP", "UP");
+    upLabelController.setDefaults(defaults);
+    downLabelController.configureButtonLabel("DOWN", "DOWN");
+    downLabelController.setDefaults(defaults);
+    copyLabelController.configureButtonLabel("COPY", "COPY");
+    copyLabelController.setDefaults(defaults);
+    closeLabelController.configureButtonLabel("CLOSE", "CLOSE");
+    closeLabelController.setDefaults(defaults);
+    downloadLabelController.configureButtonLabel("DOWNLOAD", "DOWNLOAD");
+    downloadLabelController.setDefaults(defaults);
+    skipLabelController.configureButtonLabel("SKIP", "SKIP");
+    skipLabelController.setDefaults(defaults);
+    replaceLabelController.configureButtonLabel("REPLACE", "REPLACE");
+    replaceLabelController.setDefaults(defaults);
+    uploadAsCopyLabelController.configureButtonLabel("UPLOAD_AS_COPY", "UPLOAD AS COPY");
+    uploadAsCopyLabelController.setDefaults(defaults);
   }
 
-  @FXML
-  private void onSubheaderAndFooter(ActionEvent event) {
-    Dialogs.openSubheaderAndFooter((FormModel) projectItem.getModel());
+  private static Defaults ensureDefaults(FormModel model) {
+    Defaults defaults = model.getContent().getDefaults();
+    if (defaults == null) {
+      defaults = new Defaults();
+      model.getContent().setDefaults(defaults);
+    }
+    return defaults;
+  }
+
+  // ---- Subheader and Footer ----
+
+  private void loadSubheaderAndFooter(@NonNull FormModel model) {
+    FormModelContent content = model.getContent();
+    HeaderFooterBox subHeaderBox = ensureBox(content.getSubHeaderBox(), "subHeaderBox1", content::setSubHeaderBox);
+    HeaderFooterBox footerBox = ensureBox(content.getFooterBox(), "footerBox1", content::setFooterBox);
+
+    subheaderMajorButtonsController.configure(StudioBundle.get("subheader_major_buttons"), ".subheaderMajor",
+        ensureMajorButtons(subHeaderBox).getButton(), this::newButton);
+    subheaderMinorButtonsController.configure(StudioBundle.get("subheader_minor_buttons"), ".subheaderMinor",
+        ensureMinorButtons(subHeaderBox).getButton(), this::newButton);
+    footerMajorButtonsController.configure(StudioBundle.get("footer_major_buttons"), ".footerMajor",
+        ensureMajorButtons(footerBox).getButton(), this::newButton);
+    footerMinorButtonsController.configure(StudioBundle.get("footer_minor_buttons"), ".footerMinor",
+        ensureMinorButtons(footerBox).getButton(), this::newButton);
+  }
+
+  private static HeaderFooterBox ensureBox(HeaderFooterBox box, String id, Consumer<HeaderFooterBox> setter) {
+    if (box != null) {
+      return box;
+    }
+    HeaderFooterBox newBox = new HeaderFooterBox();
+    newBox.setId(id);
+    setter.accept(newBox);
+    return newBox;
+  }
+
+  private static ButtonGroup ensureMajorButtons(HeaderFooterBox box) {
+    if (box.getMajorButtons() == null) {
+      box.setMajorButtons(new ButtonGroup());
+    }
+    return box.getMajorButtons();
+  }
+
+  private static ButtonGroup ensureMinorButtons(HeaderFooterBox box) {
+    if (box.getMinorButtons() == null) {
+      box.setMinorButtons(new ButtonGroup());
+    }
+    return box.getMinorButtons();
+  }
+
+  private Button newButton() {
+    EventButton button = new EventButton();
+    button.setId(generateButtonId());
+    button.setName(button.getId());
+    return button;
+  }
+
+  private static String generateButtonId() {
+    return "button-" + String.format("%05x", ID_RANDOM.nextInt(0x100000));
   }
 
   @Override
