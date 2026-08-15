@@ -10,6 +10,7 @@ import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
+import de.a12.studio.modelsvalidation.validators.form.ControlGridLayoutValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
@@ -30,7 +31,8 @@ public final class FormModelValidationService {
       new FormDocumentModelReferenceValidator(),
       new FormFieldReferenceValidator(),
       new FormLayoutColumnSumValidator(),
-      new FormSiblingNameUniquenessValidator()));
+      new FormSiblingNameUniquenessValidator(),
+      new ControlGridLayoutValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

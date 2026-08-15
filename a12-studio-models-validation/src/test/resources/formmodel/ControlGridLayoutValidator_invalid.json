@@ -1,0 +1,60 @@
+{
+  "header": {
+    "id": "ControlGridLayoutValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "id": "screen_1",
+        "name": "MainScreen",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid-95f39",
+            "name": "BillingAddressControls",
+            "layout": {
+              "lg": "6-6",
+              "md": "12-12"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row-b249f",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_c0a67",
+                    "elementRef": "field_1"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_89f6d",
+                    "elementRef": "field_2"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control-7fc85",
+                    "elementRef": "field_3"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

@@ -46,10 +46,20 @@ public class FormElementViewModel {
   // reference.
   private final @Nullable ElementIndex elementIndex;
 
+  private boolean hasError;
+
   public FormElementViewModel(@NonNull Object node, @Nullable Object parentNode, @Nullable ElementIndex elementIndex) {
     this.node = node;
     this.parentNode = parentNode;
     this.elementIndex = elementIndex;
+  }
+
+  public boolean hasError() {
+    return hasError;
+  }
+
+  public void setHasError(boolean hasError) {
+    this.hasError = hasError;
   }
 
   public Object getNode() {

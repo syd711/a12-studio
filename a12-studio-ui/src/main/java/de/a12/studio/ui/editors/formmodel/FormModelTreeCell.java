@@ -26,6 +26,7 @@ class FormModelTreeCell extends TreeCell<FormElementViewModel> {
       setText(null);
       setGraphic(null);
       setContextMenu(null);
+      getStyleClass().remove("validation-error");
       return;
     }
 
@@ -38,5 +39,15 @@ class FormModelTreeCell extends TreeCell<FormElementViewModel> {
     setText(null);
     setGraphic(graphic);
     setContextMenu(contextMenuFactory.apply(item));
+
+    if (item.hasError()) {
+      if (!getStyleClass().contains("validation-error")) {
+        getStyleClass().add("validation-error");
+      }
+      nameLabel.getStyleClass().add("validation-error");
+    }
+    else {
+      getStyleClass().remove("validation-error");
+    }
   }
 }

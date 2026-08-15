@@ -58,4 +58,40 @@ class FormValidatorsTest {
     // Two screens named "SameScreen" + two sibling sections named "SameSection".
     assertEquals(2, errors.size());
   }
+
+  @Test
+  void controlGridLayoutValidatorReportsWrongColumnCountAndExceedsIndex() {
+    FormModel model = load("ControlGridLayoutValidator_invalid");
+    List<ModelValidationError> errors = new ControlGridLayoutValidator().validate(model, TestModels.context(model));
+
+    // A 2-column ("6-6") grid whose row has 3 cells: one "wrong number of columns" message (lg only) plus
+    // one "exceeds max index" message for the 3rd cell per breakpoint (lg, md - cascaded from layout.md
+    // "12-12" - and sm, cascaded from md since layout.sm is unset) - matches SME's real 4-message output
+    // for this exact case (Invoice_FM.json's "BillingAddressControls").
+    assertEquals(4, errors.size());
+    assertEquals(1, errors.stream().filter(e -> e.message().contains("wrong number of columns")).count());
+    assertEquals(3, errors.stream().filter(e -> e.message().contains("exceeds")).count());
+    assertTrue(errors.get(0).message().contains(
+        "Form model field [BillingAddressControls] contains a wrong number of columns for layout lg. "
+            + "The expected number of columns is 2 but there are 3 defined columns."));
+    assertTrue(errors.stream().anyMatch(e -> e.message().equals(
+        "The element [control-7fc85] exceeds for layout lg with offset [0] the defined maximum index [2] "
+            + "for the control grid [BillingAddressControls].")));
+    assertTrue(errors.stream().anyMatch(e -> e.message().equals(
+        "The element [control-7fc85] exceeds for layout md with offset [0] the defined maximum index [2] "
+            + "for the control grid [BillingAddressControls].")));
+    assertTrue(errors.stream().anyMatch(e -> e.message().equals(
+        "The element [control-7fc85] exceeds for layout sm with offset [0] the defined maximum index [2] "
+            + "for the control grid [BillingAddressControls].")));
+  }
+
+  @Test
+  void controlGridLayoutValidatorAllowsRowsThatUseFewerColumnsThanDefined() {
+    FormModel model = load("ControlGridLayoutValidator_valid");
+    List<ModelValidationError> errors = new ControlGridLayoutValidator().validate(model, TestModels.context(model));
+
+    // A single-cell row in a 2-column grid, and an offset-1 single-cell row in another 2-column grid: both
+    // under-fill (or exactly fill, via offset) the defined columns rather than overflowing them.
+    assertEquals(0, errors.size());
+  }
 }

@@ -15,7 +15,9 @@ import de.a12.studio.models.formmodel.Row;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -28,15 +30,18 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * The right-hand "Form Model" structural tree of the Overview tab ({@link FormModelEditorController#loadOverview}):
@@ -45,6 +50,7 @@ import java.util.ResourceBundle;
  * both reordering/reparenting within this tree, and accepting Fields/Groups dropped from {@link
  * DocumentSourceTreeController}'s tree to create the matching {@link Control}/{@link InlineRepeat}.
  */
+@Slf4j
 public class FormModelTreeController implements Initializable {
 
   // Identifies an in-tree reorder/reparent drag; the dragged node itself is tracked via draggedTreeItem (same
@@ -181,6 +187,46 @@ public class FormModelTreeController implements Initializable {
     }
     tree.setRoot(root);
     setExpandedRecursive(root, true);
+    applyValidationState(root);
+  }
+
+  /**
+   * Marks every tree row whose element has a validation problem (see {@link FormElementViewModel#hasError()} /
+   * {@link FormModelTreeCell}), mirroring {@code DocumentModelElementsTreeController#applyValidationState}.
+   * Re-run on every {@link #applyFilter} call - the tree is always fully rebuilt there (on load and after every
+   * edit via {@link #onModelChanged}), so there's no need for a separate per-edit validation hook here.
+   */
+  private void applyValidationState(@NonNull TreeItem<FormElementViewModel> root) {
+    markErrors(root, erroredElementIds());
+  }
+
+  private Set<String> erroredElementIds() {
+    if (!(projectItem.getModel() instanceof FormModel formModel)) {
+      return Set.of();
+    }
+    try {
+      List<ModelValidationError> errors = Studio.getValidationService().validate(formModel);
+      Set<String> ids = new HashSet<>();
+      for (ModelValidationError error : errors) {
+        if (error.elementId() != null) {
+          ids.add(error.elementId());
+        }
+      }
+      return ids;
+    }
+    catch (Exception e) {
+      log.warn("Failed to validate form model '{}': {}", projectItem.getPath(), e.getMessage(), e);
+      return Set.of();
+    }
+  }
+
+  private void markErrors(@NonNull TreeItem<FormElementViewModel> treeItem, @NonNull Set<String> erroredElementIds) {
+    if (treeItem.getValue() != null) {
+      treeItem.getValue().setHasError(erroredElementIds.contains(treeItem.getValue().getId()));
+    }
+    for (TreeItem<FormElementViewModel> child : treeItem.getChildren()) {
+      markErrors(child, erroredElementIds);
+    }
   }
 
   private TreeItem<FormElementViewModel> toTreeItem(@NonNull FormElementViewModel viewModel) {

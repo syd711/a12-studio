@@ -20,9 +20,10 @@ import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TitledPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -104,7 +105,11 @@ public class FormModelEditorController extends AbstractEditorController implemen
   @FXML
   private SplitPane overviewSplitPane;
   @FXML
-  private TitledPane documentRelationshipModelPane;
+  private StackPane documentRelationshipModelPane;
+  @FXML
+  private Node documentRelationshipModelExpandedPane;
+  @FXML
+  private Node documentRelationshipModelCollapsedStrip;
 
   private static final double DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION = 0.32;
 
@@ -262,20 +267,32 @@ public class FormModelEditorController extends AbstractEditorController implemen
     return Dialogs.showButtonForEdit(Studio.stage, screenIds, button);
   }
 
+  /**
+   * Toggles the "Document/Relationship Model" side panel between its full-width expanded view and
+   * a narrow vertical strip carrying a rotated title (a mobile-style burger-menu sidebar), showing
+   * only whichever of the two is current and clamping {@code documentRelationshipModelPane}'s
+   * maxWidth to that node's own preferred width so the SplitPane hands the freed-up width to the
+   * sibling form model tree, moving the divider along with it. Re-expanding restores maxWidth and
+   * the divider's original position.
+   */
+  @FXML
+  private void onToggleDocumentRelationshipModelCollapsed() {
+    boolean collapsing = documentRelationshipModelExpandedPane.isVisible();
+    documentRelationshipModelExpandedPane.setVisible(!collapsing);
+    documentRelationshipModelExpandedPane.setManaged(!collapsing);
+    documentRelationshipModelCollapsedStrip.setVisible(collapsing);
+    documentRelationshipModelCollapsedStrip.setManaged(collapsing);
+    if (collapsing) {
+      documentRelationshipModelPane.setMaxWidth(Region.USE_PREF_SIZE);
+    }
+    else {
+      documentRelationshipModelPane.setMaxWidth(Double.MAX_VALUE);
+      overviewSplitPane.setDividerPosition(0, DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION);
+    }
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    // Collapsing is horizontal here (unlike a plain TitledPane, which only collapses its content
-    // vertically): clamping maxWidth to the header's own preferred width makes the SplitPane give
-    // the freed-up space to the sibling form model tree, and moves the divider along with it.
-    documentRelationshipModelPane.expandedProperty().addListener((observable, wasExpanded, isExpanded) -> {
-      if (isExpanded) {
-        documentRelationshipModelPane.setMaxWidth(Double.MAX_VALUE);
-        overviewSplitPane.setDividerPosition(0, DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION);
-      }
-      else {
-        documentRelationshipModelPane.setMaxWidth(Region.USE_PREF_SIZE);
-      }
-    });
   }
 
   @Override

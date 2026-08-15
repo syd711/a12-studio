@@ -154,3 +154,64 @@
     -fx-background-radius: 0;
     -fx-padding: 4px 0 4px 2px;
 }
+
+/*
+ * Sidebar Panel
+ *
+ * A horizontally collapsible side panel (see form-model-editor.fxml's "Document/Relationship
+ * Model" panel): expanded, it shows a normal header bar with a collapse button; collapsed, it
+ * shrinks to a narrow vertical strip carrying a rotated title, like a mobile app's burger-menu
+ * sidebar. The controller toggles which of the two is visible/managed and clamps the container's
+ * maxWidth so the SplitPane hands the freed-up width to the sibling panel.
+ */
+.sidebar-panel-header {
+    -fx-background-color: -fx-titled-pane-header-bg;
+    -fx-border-color: transparent transparent -fx-titled-pane-border transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 10px 6px 10px 16px;
+}
+
+.sidebar-panel-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-section-header;
+}
+
+.sidebar-panel-toggle {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4px;
+    -fx-padding: 4px 6px;
+    -fx-cursor: hand;
+}
+
+.sidebar-panel-toggle:hover {
+    -fx-background-color: derive(-fx-titled-pane-header-bg, -10%);
+}
+
+.sidebar-panel-toggle *|FontIcon {
+    -fx-icon-color: -fx-text-section-header !important;
+    -fx-fill: -fx-text-section-header !important;
+}
+
+.sidebar-panel-strip {
+    -fx-background-color: -fx-titled-pane-header-bg;
+    -fx-border-color: transparent -fx-titled-pane-border transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+    -fx-spacing: 10px;
+    -fx-cursor: hand;
+}
+
+.sidebar-panel-strip:hover {
+    -fx-background-color: derive(-fx-titled-pane-header-bg, -6%);
+}
+
+.sidebar-panel-strip-icon {
+    -fx-icon-color: -fx-text-faint !important;
+    -fx-fill: -fx-text-faint !important;
+}
+
+.sidebar-panel-strip-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-section-header;
+}
