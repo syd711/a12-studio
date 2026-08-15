@@ -45,7 +45,9 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
   // same string is registered twice, with no way to unregister. settingsKeySuffix alone (e.g. ".rowAction") is
   // not unique across controller instances - it repeats every time an Overview Model editor is opened (new tab
   // or reopen) - so a counter is appended to keep each instance's format string globally unique for the life of
-  // the process.
+  // the process. EventButtonsPanelController keeps its own separate counter starting from the same 0 and is used
+  // with some of the same suffixes (e.g. ".footerMajor"), so the class's own name is also mixed in below -
+  // otherwise the two classes' counters can land on the same suffix+number and collide in the shared registry.
   private static final AtomicLong INSTANCE_COUNTER = new AtomicLong();
 
   @FXML
@@ -79,7 +81,7 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
     this.rows = (List<EventButtonLike>) rows;
     this.newRowFactory = () -> (EventButtonLike) newRowFactory.get();
     if (indexFormat == null) {
-      indexFormat = new DataFormat("application/x-a12-event-button-index" + settingsKeySuffix + "-" + INSTANCE_COUNTER.incrementAndGet());
+      indexFormat = new DataFormat("application/x-a12-toolbar-button-index" + settingsKeySuffix + "-" + INSTANCE_COUNTER.incrementAndGet());
     }
     rebuildRows();
   }

@@ -45,7 +45,9 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   // same string is registered twice, with no way to unregister. settingsKeySuffix alone (e.g. ".rowAction") is
   // not unique across controller instances - it repeats every time an Overview Model editor is opened (new tab
   // or reopen) - so a counter is appended to keep each instance's format string globally unique for the life of
-  // the process.
+  // the process. ToolbarButtonsPanelController keeps its own separate counter starting from the same 0 and is
+  // used with some of the same suffixes (e.g. ".footerMajor"), so the mime type below is prefixed with this
+  // class's own name ("event-button") rather than something the two classes could share.
   private static final AtomicLong INSTANCE_COUNTER = new AtomicLong();
 
   @FXML
