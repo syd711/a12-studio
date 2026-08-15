@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.models.EventButtonLike;
+import de.a12.studio.models.formmodel.Button;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.Icons;
@@ -8,13 +9,12 @@ import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
+import javafx.scene.Cursor;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -22,34 +22,48 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Edits a list of {@link EventButtonLike} rows (e.g. a footer/subheader box's button entries) as a compact,
- * fully inline-editable table of Event/Priority/Destructive/Icon, matching the SME reference's "Major Buttons"/
- * "Minor Buttons" tables. Reusable for any such list by calling {@link #configure} with the list, a title, a
- * settings-key suffix (so several instances of this panel on the same editor don't collide on the same
- * persisted expanded/collapsed state) and a factory for new rows - the factory returns {@code Optional.empty()}
- * to abandon the add (e.g. {@link de.a12.studio.ui.editors.formmodel.FormModelEditorController}'s factory opens
- * {@link de.a12.studio.ui.editors.formmodel.dialogs.Dialogs#showButtonForAdd} and the user cancels it), in which
- * case no row is added. Not tied to a single {@code de.a12.studio.models.documentmodel.Element}, so it follows
- * the model-header pattern ({@link #commitHeaderChange()}) rather than {@link #commitChange()}.
+ * Edits a list of {@link Button} rows (a footer/subheader box's Major or Minor button list) as a compact,
+ * reorderable table of Name/Type, matching the SME reference's "Major Buttons"/"Minor Buttons" tables. Each
+ * row's Name/Type cells and its Edit button open the full button editor ({@link
+ * de.a12.studio.ui.editors.formmodel.dialogs.Dialogs#showButtonForEdit}, supplied via {@code editRowFunction}
+ * so this shared/propertyeditors-package class doesn't depend on the formmodel-package dialog directly); the
+ * Add button opens the same editor via the caller-supplied {@code newRowFactory} ({@link
+ * de.a12.studio.ui.editors.formmodel.dialogs.Dialogs#showButtonForAdd}), only adding the new row once confirmed.
+ * Copy duplicates a row in place with a fresh id (from {@code idGenerator}) and a disambiguated name.
+ * <p>
+ * Rows can be reordered within one panel instance, and also dragged into a sibling instance (e.g. from
+ * "Subheader Major Buttons" into "Footer Minor Buttons") to move a button between sections - see {@link
+ * de.a12.studio.ui.editors.formmodel.FormModelEditorController}, which configures one instance per
+ * Major/Minor x Subheader/Footer combination, all sharing {@link #DRAG_FORMAT}. Not tied to a single {@link
+ * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern ({@link
+ * #commitHeaderChange()}) rather than {@link #commitChange()}.
  */
 public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
 
-  private static final List<String> PRIORITIES = List.of("PRIMARY", "SECONDARY");
-  private static final String DEFAULT_PRIORITY = "SECONDARY";
+  // Shared by every panel instance (unlike a per-instance DataFormat) so a row dragged out of one panel can be
+  // dropped into a sibling one. The dragged payload is "<instanceId>:<index>", resolved back to its source
+  // panel/list via INSTANCES on drop.
+  private static final DataFormat DRAG_FORMAT = new DataFormat("application/x-a12-toolbar-button-move");
 
-  // javafx.scene.input.DataFormat registers its mime type in a process-wide static registry and throws if the
-  // same string is registered twice, with no way to unregister. settingsKeySuffix alone (e.g. ".rowAction") is
-  // not unique across controller instances - it repeats every time an Overview Model editor is opened (new tab
-  // or reopen) - so a counter is appended to keep each instance's format string globally unique for the life of
-  // the process. EventButtonsPanelController keeps its own separate counter starting from the same 0 and is used
-  // with some of the same suffixes (e.g. ".footerMajor"), so the class's own name is also mixed in below -
-  // otherwise the two classes' counters can land on the same suffix+number and collide in the shared registry.
+  // Every currently configured panel instance, keyed by its instanceId. Intentionally never pruned: editor-tab
+  // panels like this one are never explicitly torn down on tab close (see AbstractPropertyEditor's
+  // StudioEventManager registration, which has the same lifetime), so this mirrors that existing behavior
+  // rather than being a new leak.
+  private static final Map<String, ToolbarButtonsPanelController> INSTANCES = new HashMap<>();
+
+  // settingsKeySuffix alone (e.g. ".footerMajor") repeats every time a Form Model tab is (re)opened, so a
+  // counter is appended to keep each configure() call's instanceId unique for the life of the process.
   private static final AtomicLong INSTANCE_COUNTER = new AtomicLong();
 
   @FXML
@@ -61,31 +75,66 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
   @FXML
   private Label emptyLabel;
 
-  private List<EventButtonLike> rows;
-  private Supplier<Optional<EventButtonLike>> newRowFactory;
+  private List<Button> rows;
+  private Supplier<Optional<Button>> newRowFactory;
+  private Function<Button, Optional<Button>> editRowFunction;
+  private Supplier<String> idGenerator;
 
-  // Identifies a row-reorder drag; unique per panel instance (this class is instantiated several times in the
-  // same window, e.g. subheader/footer major/minor buttons), so drags from a sibling instance's row list are
-  // rejected rather than accepted into this one. Created once in configure(), keyed off settingsKeySuffix.
-  private DataFormat indexFormat;
+  private String instanceId;
 
   /**
-   * Binds this panel to {@code rows}. {@code rows} doesn't need to be declared as {@code List<EventButtonLike>}
-   * itself (e.g. a footer box's {@code List<BoxElement>}, whose entries this panel exclusively populates via
-   * {@code newRowFactory} and therefore knows are always the {@link EventButtonLike}-implementing subtype) -
-   * the erased list reference is shared, so add/remove/move here mutate the caller's real list in place.
+   * Binds this panel to {@code rows} - add/remove/move/edit here mutate the caller's real list in place.
+   * {@code newRowFactory} and {@code editRowFunction} open the caller's Add/Edit dialogs, returning the
+   * resulting button (or empty if cancelled); {@code idGenerator} mints a fresh id for a Copy.
    */
-  @SuppressWarnings("unchecked")
-  public <T> void configure(@NonNull String title, @NonNull String settingsKeySuffix, @NonNull List<T> rows,
-      @NonNull Supplier<Optional<T>> newRowFactory) {
+  public void configure(@NonNull String title, @NonNull String settingsKeySuffix, @NonNull List<Button> rows,
+      @NonNull Supplier<Optional<Button>> newRowFactory, @NonNull Function<Button, Optional<Button>> editRowFunction,
+      @NonNull Supplier<String> idGenerator) {
     setTitle(title);
     setSettingsKeySuffix(settingsKeySuffix);
-    this.rows = (List<EventButtonLike>) rows;
-    this.newRowFactory = () -> newRowFactory.get().map(row -> (EventButtonLike) row);
-    if (indexFormat == null) {
-      indexFormat = new DataFormat("application/x-a12-toolbar-button-index" + settingsKeySuffix + "-" + INSTANCE_COUNTER.incrementAndGet());
+    this.rows = rows;
+    this.newRowFactory = newRowFactory;
+    this.editRowFunction = editRowFunction;
+    this.idGenerator = idGenerator;
+    if (instanceId == null) {
+      instanceId = settingsKeySuffix + "-" + INSTANCE_COUNTER.incrementAndGet();
+      setupEmptyListDropTarget();
     }
+    INSTANCES.put(instanceId, this);
     rebuildRows();
+  }
+
+  /**
+   * A row being dragged into an empty panel has no sibling row to drop onto (see {@link
+   * RowFactory#setupCrossContainerRowDragAndDrop}'s per-row drop targets), so {@code emptyLabel} itself accepts
+   * the drop in that case, appending the moved button at the end. The drop target is {@code emptyLabel} rather
+   * than {@code buttonsList} because the latter has zero size while empty (no children) and would never
+   * receive drag-over events; {@code emptyLabel} also gains an accent-colored dashed border while a compatible
+   * drag hovers over it, so it visibly reads as a drop zone instead of just static placeholder text.
+   */
+  private void setupEmptyListDropTarget() {
+    emptyLabel.setOnDragOver(event -> {
+      if (rows.isEmpty() && event.getDragboard().hasContent(DRAG_FORMAT)) {
+        event.acceptTransferModes(TransferMode.MOVE);
+      }
+      event.consume();
+    });
+    emptyLabel.setOnDragEntered(event -> {
+      if (rows.isEmpty() && event.getDragboard().hasContent(DRAG_FORMAT)) {
+        emptyLabel.getStyleClass().add("toolbar-buttons-empty-drop-target-active");
+      }
+    });
+    emptyLabel.setOnDragExited(event -> emptyLabel.getStyleClass().remove("toolbar-buttons-empty-drop-target-active"));
+    emptyLabel.setOnDragDropped(event -> {
+      Dragboard dragboard = event.getDragboard();
+      boolean success = rows.isEmpty() && dragboard.hasContent(DRAG_FORMAT);
+      if (success) {
+        handleDrop((String) dragboard.getContent(DRAG_FORMAT), 0);
+      }
+      emptyLabel.getStyleClass().remove("toolbar-buttons-empty-drop-target-active");
+      event.setDropCompleted(success);
+      event.consume();
+    });
   }
 
   @FXML
@@ -111,54 +160,86 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
     }
   }
 
-  private HBox createRow(EventButtonLike row, int index, int rowCount) {
+  private HBox createRow(Button row, int index, int rowCount) {
     FontIcon dragHandle = RowFactory.createDragHandle();
 
-    TextField eventField = new TextField();
-    eventField.setId("eventButtonEvent-" + index);
-    eventField.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(eventField, Priority.ALWAYS);
-    setFieldValue(eventField, row.getEvent());
-    bindTextField(eventField, (el, value) -> row.setEvent(value.isEmpty() ? null : value));
+    Label nameLabel = createCell(row.getName() == null ? "" : row.getName(), "toolbarButtonName-" + index, row);
+    nameLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
-    ComboBox<String> priorityField = new ComboBox<>();
-    priorityField.setId("eventButtonPriority-" + index);
-    priorityField.setPrefWidth(140.0);
-    priorityField.getItems().setAll(PRIORITIES);
-    setFieldValue(priorityField, Boolean.TRUE.equals(row.getPrimary()) ? "PRIMARY" : DEFAULT_PRIORITY);
-    bindComboBox(priorityField, (el, value) -> row.setPrimary("PRIMARY".equals(value)));
+    Label typeLabel = createCell(row.getType() != null ? row.getType().getValue() : "", "toolbarButtonType-" + index, row);
+    typeLabel.setPrefWidth(140.0);
 
-    CheckBox destructiveField = new CheckBox();
-    destructiveField.setId("eventButtonDestructive-" + index);
-    destructiveField.setPrefWidth(110.0);
-    setFieldValue(destructiveField, Boolean.TRUE.equals(row.getDestructive()));
-    bindCheckBox(destructiveField, (el, value) -> row.setDestructive(value ? Boolean.TRUE : null));
-
-    TextField iconField = new TextField();
-    iconField.setId("eventButtonIcon-" + index);
-    iconField.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(iconField, Priority.ALWAYS);
-    setFieldValue(iconField, row.getIconName());
-    bindTextField(iconField, (el, value) -> row.setIconName(value.isEmpty() ? null : value));
-
-    HBox rowBox = new HBox(10.0, dragHandle, eventField, priorityField, destructiveField, iconField, createActionsBox(row, index, rowCount));
+    HBox rowBox = new HBox(10.0, dragHandle, nameLabel, typeLabel, createActionsBox(row, index, rowCount));
     rowBox.setAlignment(Pos.CENTER_LEFT);
     rowBox.getStyleClass().add("module-row");
-    RowFactory.setupRowDragAndDrop(rowBox, dragHandle, indexFormat, index, this::moveRowViaDrag);
+    RowFactory.setupCrossContainerRowDragAndDrop(rowBox, dragHandle, DRAG_FORMAT, instanceId + ":" + index, index, this::handleDrop);
     return rowBox;
   }
 
-  private void moveRowViaDrag(int fromIndex, int insertBeforeIndex) {
-    if (RowFactory.reorder(rows, fromIndex, insertBeforeIndex)) {
-      rebuildRows();
-      commitHeaderChange();
-    }
+  private Label createCell(String text, String id, Button row) {
+    Label label = new Label(text);
+    label.setId(id);
+    label.setCursor(Cursor.HAND);
+    label.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        openEditDialog(row);
+      }
+    });
+    return label;
   }
 
-  private HBox createActionsBox(EventButtonLike row, int index, int rowCount) {
+  private void openEditDialog(Button row) {
+    editRowFunction.apply(row).ifPresent(edited -> {
+      int index = rows.indexOf(row);
+      if (index >= 0) {
+        rows.set(index, edited);
+        rebuildRows();
+        commitHeaderChange();
+      }
+    });
+  }
+
+  private void handleDrop(String payload, int insertBeforeIndex) {
+    int separator = payload.lastIndexOf(':');
+    String sourceInstanceId = payload.substring(0, separator);
+    int sourceIndex = Integer.parseInt(payload.substring(separator + 1));
+
+    ToolbarButtonsPanelController source = INSTANCES.get(sourceInstanceId);
+    if (source == null || sourceIndex < 0 || sourceIndex >= source.rows.size()) {
+      return;
+    }
+
+    if (source == this) {
+      if (RowFactory.reorder(rows, sourceIndex, insertBeforeIndex)) {
+        rebuildRows();
+        commitHeaderChange();
+      }
+      return;
+    }
+
+    Button moved = source.rows.remove(sourceIndex);
+    rows.add(Math.min(insertBeforeIndex, rows.size()), moved);
+    source.rebuildRows();
+    rebuildRows();
+    commitHeaderChange();
+  }
+
+  private HBox createActionsBox(Button row, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(row));
+
+    javafx.scene.control.Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
+      Button copy = cloneButton(row);
+      copy.setId(idGenerator.get());
+      copy.setName(uniqueCopyName(row.getName()));
+      rows.add(rows.indexOf(row) + 1, copy);
+      rebuildRows();
+      commitHeaderChange();
+    });
+
+    javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_button"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         rows.remove(row);
@@ -167,7 +248,7 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
       }
     });
 
-    HBox actionsBox = new HBox(4.0, moveButtonsBox, deleteButton);
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, copyButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
   }
@@ -176,5 +257,25 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
     Collections.swap(rows, fromIndex, toIndex);
     rebuildRows();
     commitHeaderChange();
+  }
+
+  private static Button cloneButton(Button original) {
+    String json = JsonSettings.objectMapper.writeValueAsString(original);
+    return JsonSettings.objectMapper.readValue(json, Button.class);
+  }
+
+  private String uniqueCopyName(String baseName) {
+    String base = baseName == null ? "" : baseName;
+    Set<String> usedNames = new HashSet<>();
+    for (Button button : rows) {
+      usedNames.add(button.getName());
+    }
+    String candidate = base + "_copy";
+    int suffix = 2;
+    while (usedNames.contains(candidate)) {
+      candidate = base + "_copy" + suffix;
+      suffix++;
+    }
+    return candidate;
   }
 }

@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.formmodel.dialogs;
 
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.EventButton;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -34,10 +35,21 @@ public class Dialogs {
     EventButton button = new EventButton();
     button.setId(generateButtonId());
     button.setScope(DEFAULT_SCOPE);
-    return showButton(owner, StudioBundle.get("add_button_title"), screenIds, button) ? Optional.of(button) : Optional.empty();
+    return showButton(owner, StudioBundle.get("add_button_title"), screenIds, button);
   }
 
-  private static boolean showButton(Stage owner, String title, List<String> screenIds, Button button) {
+  /**
+   * Opens the Edit Button dialog for a working copy of {@code button}, so a Cancel leaves the real, attached
+   * button untouched - simpler than a field-by-field snapshot/restore (see {@code OverviewColumnDialogController}
+   * for that pattern) given {@link FormButtonDialogController#onTypeChanged} can swap the edited instance to a
+   * different {@link Button} subtype mid-edit, which a field-level restore can't undo. The caller only replaces
+   * the original row with the returned button once present.
+   */
+  public static Optional<Button> showButtonForEdit(Stage owner, List<String> screenIds, Button button) {
+    return showButton(owner, StudioBundle.get("edit_button_title"), screenIds, cloneButton(button));
+  }
+
+  private static Optional<Button> showButton(Stage owner, String title, List<String> screenIds, Button button) {
     FXMLLoader fxmlLoader = new FXMLLoader(FormButtonDialogController.class.getResource("form-button-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("button-dialog", fxmlLoader, owner, title);
@@ -48,13 +60,21 @@ public class Dialogs {
     FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
     stage.setMinWidth(800);
     stage.setMinHeight(600);
-    stage.setOnHidden(event -> controller.destroy());
 
     stage.showAndWait();
-    return controller.isConfirmed();
+    // Reads back controller.getButton() rather than the local `button` above, since onTypeChanged may have
+    // replaced it with a different Button subtype instance since init() was called.
+    return controller.isConfirmed() ? Optional.of(controller.getButton()) : Optional.empty();
   }
 
-  private static String generateButtonId() {
+  private static Button cloneButton(Button button) {
+    String json = JsonSettings.objectMapper.writeValueAsString(button);
+    return JsonSettings.objectMapper.readValue(json, Button.class);
+  }
+
+  /** Also used by {@link de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController}'s Copy button
+   * to id the duplicated row, so both id generation paths stay in sync. */
+  public static String generateButtonId() {
     return "button-" + String.format("%05x", ID_RANDOM.nextInt(0x100000));
   }
 }

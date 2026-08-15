@@ -171,6 +171,12 @@ public class FormButtonDialogController implements DialogController {
     return result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK;
   }
 
+  /** The button currently being edited - may be a different instance than the one passed to {@link #init}
+   * if {@link #onTypeChanged} swapped it for a different {@link Button} subtype since. */
+  Button getButton() {
+    return button;
+  }
+
   private void onTypeChanged(ButtonType newType) {
     this.button = createButtonOfType(newType, button);
     bindPanels();

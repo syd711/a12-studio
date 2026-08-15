@@ -30,7 +30,7 @@
            <tabs>
                <Tab text="%overview">
                    <content>
-                       <SplitPane dividerPositions="0.32" BorderPane.alignment="CENTER">
+                       <SplitPane dividerPositions="0.32" styleClass="properties-panel" BorderPane.alignment="CENTER">
                            <items>
                                <VBox>
                                    <children>

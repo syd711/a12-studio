@@ -1,12 +1,12 @@
 package de.a12.studio.ui.editors.formmodel;
 
 import de.a12.studio.models.formmodel.Button;
+import de.a12.studio.ui.components.IconComboController;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
@@ -36,7 +36,7 @@ public class ButtonVisualSettingsPanelController extends AbstractPropertyEditor 
   private ComboBox<String> priorityCombo;
 
   @FXML
-  private TextField iconField;
+  private IconComboController iconComboController;
 
   @FXML
   private CheckBox destructiveField;
@@ -68,7 +68,10 @@ public class ButtonVisualSettingsPanelController extends AbstractPropertyEditor 
     });
     bindComboBox(priorityCombo, (el, value) -> button.setPrimary("PRIMARY".equals(value)));
 
-    bindTextField(iconField, (el, value) -> button.setIconName(value.isEmpty() ? null : value));
+    iconComboController.setOnChange(name -> {
+      button.setIconName(name);
+      commitHeaderChange();
+    });
     bindCheckBox(destructiveField, (el, value) -> button.setDestructive(value ? Boolean.TRUE : null));
     bindCheckBox(hideLabelField, (el, value) -> button.getOrCreateButtonStyling().setLabelHidden(value ? Boolean.TRUE : null));
   }
@@ -76,7 +79,7 @@ public class ButtonVisualSettingsPanelController extends AbstractPropertyEditor 
   public void setButton(@NonNull Button button) {
     this.button = button;
     setFieldValue(priorityCombo, Boolean.TRUE.equals(button.getPrimary()) ? "PRIMARY" : "SECONDARY");
-    setFieldValue(iconField, button.getIconName());
+    iconComboController.setValue(button.getIconName());
     setFieldValue(destructiveField, Boolean.TRUE.equals(button.getDestructive()));
     setFieldValue(hideLabelField, button.getButtonStyling() != null && Boolean.TRUE.equals(button.getButtonStyling().getLabelHidden()));
   }

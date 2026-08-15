@@ -20,15 +20,13 @@
         <Insets left="12.0" right="12.0" />
       </padding>
       <Label styleClass="field-label" text="" prefWidth="18.0" />
-      <Label styleClass="field-label" text="%event" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-      <Label styleClass="field-label" text="%priority" prefWidth="140.0" />
-      <Label styleClass="field-label" text="%destructive" prefWidth="110.0" />
-      <Label styleClass="field-label" text="%icon" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-      <!-- Placeholder matching the move-up/move-down + delete actions box width (2 * 34px buttons + 4px spacing) at the end of each row. -->
-      <Label styleClass="field-label" text="" prefWidth="72.0" />
+      <Label styleClass="field-label" text="%name" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+      <Label styleClass="field-label" text="%type" prefWidth="140.0" />
+      <!-- Placeholder matching the move-up/move-down + edit + copy + delete actions box width (4 * 34px buttons + 3 * 4px spacing) at the end of each row. -->
+      <Label styleClass="field-label" text="" prefWidth="148.0" />
     </HBox>
     <VBox fx:id="buttonsList" spacing="8.0" />
-    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+    <Label fx:id="emptyLabel" styleClass="placeholder-label, toolbar-buttons-empty-drop-target" text="%there_are_no_entries_yet" maxWidth="Infinity" alignment="CENTER" />
     <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_event_button" >
                 <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_event_button" /></tooltip>

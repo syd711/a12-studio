@@ -40,11 +40,11 @@ import java.util.stream.Collectors;
  * "Subheader and Footer": {@code content.subHeaderBox}/{@code content.footerBox}'s Major/Minor button lists,
  * one {@link ToolbarButtonsPanelController} per list, matching the SME reference's "Major Buttons"/"Minor
  * Buttons" tables. Form Model's subHeaderBox and footerBox are both button-only ({@link HeaderFooterBox}), so
- * all four lists reuse the same simple panel. Rows can be either {@link de.a12.studio.models.formmodel.EventButton}
- * or {@link de.a12.studio.models.formmodel.NavigationButton} (see Company_FM.json, where subHeaderBox holds
- * navigation buttons and footerBox holds event buttons) - both satisfy {@link de.a12.studio.models.EventButtonLike}
- * via the abstract {@link Button} base, so either kind displays correctly here. Each panel's Add button opens
- * {@link Dialogs#showButtonForAdd}, which defaults to a new Event button (the more common case) and lets the
+ * all four lists reuse the same simple panel; rows can be dragged between them to move a button to a different
+ * section. Rows can be either {@link de.a12.studio.models.formmodel.EventButton} or {@link
+ * de.a12.studio.models.formmodel.NavigationButton} (see Company_FM.json, where subHeaderBox holds navigation
+ * buttons and footerBox holds event buttons). Each panel's Add/Edit actions open {@link Dialogs#showButtonForAdd}/
+ * {@link Dialogs#showButtonForEdit}; Add defaults to a new Event button (the more common case) and lets the
  * user switch it to Navigation.
  */
 public class FormModelEditorController extends AbstractEditorController implements Initializable {
@@ -207,13 +207,17 @@ public class FormModelEditorController extends AbstractEditorController implemen
     List<String> screenIds = content.getScreens().stream().map(Screen::getId).collect(Collectors.toList());
 
     subheaderMajorButtonsController.configure(StudioBundle.get("subheader_major_buttons"), ".subheaderMajor",
-        ensureMajorButtons(subHeaderBox).getButton(), () -> newButtonViaDialog(screenIds));
+        ensureMajorButtons(subHeaderBox).getButton(), () -> newButtonViaDialog(screenIds), button -> editButtonViaDialog(screenIds, button),
+        Dialogs::generateButtonId);
     subheaderMinorButtonsController.configure(StudioBundle.get("subheader_minor_buttons"), ".subheaderMinor",
-        ensureMinorButtons(subHeaderBox).getButton(), () -> newButtonViaDialog(screenIds));
+        ensureMinorButtons(subHeaderBox).getButton(), () -> newButtonViaDialog(screenIds), button -> editButtonViaDialog(screenIds, button),
+        Dialogs::generateButtonId);
     footerMajorButtonsController.configure(StudioBundle.get("footer_major_buttons"), ".footerMajor",
-        ensureMajorButtons(footerBox).getButton(), () -> newButtonViaDialog(screenIds));
+        ensureMajorButtons(footerBox).getButton(), () -> newButtonViaDialog(screenIds), button -> editButtonViaDialog(screenIds, button),
+        Dialogs::generateButtonId);
     footerMinorButtonsController.configure(StudioBundle.get("footer_minor_buttons"), ".footerMinor",
-        ensureMinorButtons(footerBox).getButton(), () -> newButtonViaDialog(screenIds));
+        ensureMinorButtons(footerBox).getButton(), () -> newButtonViaDialog(screenIds), button -> editButtonViaDialog(screenIds, button),
+        Dialogs::generateButtonId);
   }
 
   private static HeaderFooterBox ensureBox(HeaderFooterBox box, String id, Consumer<HeaderFooterBox> setter) {
@@ -242,6 +246,10 @@ public class FormModelEditorController extends AbstractEditorController implemen
 
   private Optional<Button> newButtonViaDialog(List<String> screenIds) {
     return Dialogs.showButtonForAdd(Studio.stage, screenIds);
+  }
+
+  private Optional<Button> editButtonViaDialog(List<String> screenIds, Button button) {
+    return Dialogs.showButtonForEdit(Studio.stage, screenIds, button);
   }
 
   @Override

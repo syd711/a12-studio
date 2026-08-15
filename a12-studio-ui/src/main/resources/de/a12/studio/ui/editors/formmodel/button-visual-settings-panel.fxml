@@ -4,7 +4,6 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -39,7 +38,7 @@
           <VBox spacing="2.0" HBox.hgrow="ALWAYS">
             <children>
               <Label styleClass="field-label" text="%icon" />
-              <TextField fx:id="iconField" />
+              <fx:include fx:id="iconCombo" source="../../components/icon-combo.fxml" />
             </children>
           </VBox>
           <VBox alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">

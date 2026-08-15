@@ -8,7 +8,6 @@ import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
@@ -34,6 +33,7 @@ import java.util.function.Consumer;
 public class ButtonFunctionsPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final Map<String, String> TYPE_LABELS = new LinkedHashMap<>();
+  private static final Map<String, String> EVENT_LABELS = new LinkedHashMap<>();
   private static final Map<String, String> VALIDATION_LABELS = new LinkedHashMap<>();
   private static final Map<String, String> SCOPE_LABELS = new LinkedHashMap<>();
   private static final Map<String, String> ENABLEMENT_LABELS = new LinkedHashMap<>();
@@ -41,6 +41,10 @@ public class ButtonFunctionsPanelController extends AbstractPropertyEditor imple
   static {
     TYPE_LABELS.put(ButtonType.EVENT.getValue(), "Event");
     TYPE_LABELS.put(ButtonType.NAVIGATION.getValue(), "Navigation");
+
+    EVENT_LABELS.put("CRUD:SAVE", "Save");
+    EVENT_LABELS.put("event_submit", "Submit");
+    EVENT_LABELS.put("event_cancel", "Cancel");
 
     VALIDATION_LABELS.put(null, "No Validation (default)");
     VALIDATION_LABELS.put("partial", "Partial Validation");
@@ -63,7 +67,7 @@ public class ButtonFunctionsPanelController extends AbstractPropertyEditor imple
   @FXML
   private VBox eventBox;
   @FXML
-  private TextField eventField;
+  private ComboBox<String> eventCombo;
 
   @FXML
   private VBox targetBox;
@@ -102,6 +106,9 @@ public class ButtonFunctionsPanelController extends AbstractPropertyEditor imple
       }
     });
 
+    eventCombo.getItems().addAll(EVENT_LABELS.keySet());
+    eventCombo.setConverter(freeTextDisplayConverter(EVENT_LABELS));
+
     validationCombo.getItems().addAll(VALIDATION_LABELS.keySet());
     validationCombo.setConverter(displayConverter(VALIDATION_LABELS));
     bindComboBox(validationCombo, (el, value) -> button.setValidation(value));
@@ -118,7 +125,7 @@ public class ButtonFunctionsPanelController extends AbstractPropertyEditor imple
       }
     });
 
-    bindTextField(eventField, (el, value) -> button.setEvent(value.isEmpty() ? null : value));
+    bindComboBox(eventCombo, (el, value) -> button.setEvent(value == null || value.isEmpty() ? null : value));
     bindComboBox(targetCombo, (el, value) -> {
       if (button instanceof NavigationButton navigationButton) {
         navigationButton.setTarget(value);
@@ -140,7 +147,7 @@ public class ButtonFunctionsPanelController extends AbstractPropertyEditor imple
     try {
       ButtonType type = button.getType() != null ? button.getType() : ButtonType.EVENT;
       setFieldValue(typeCombo, type.getValue());
-      setFieldValue(eventField, button.getEvent());
+      setFieldValue(eventCombo, button.getEvent());
       setFieldValue(targetCombo, button instanceof NavigationButton navigationButton ? navigationButton.getTarget() : null);
       setFieldValue(scopeCombo, button.getScope());
       setFieldValue(validationCombo, button.getValidation());
@@ -176,6 +183,30 @@ public class ButtonFunctionsPanelController extends AbstractPropertyEditor imple
             .map(Map.Entry::getKey)
             .findFirst()
             .orElse(null);
+      }
+    };
+  }
+
+  /**
+   * Same as {@link #displayConverter} but for editable combo boxes whose value isn't restricted to the
+   * proposed {@code labels} - e.g. {@code eventCombo}, where the proposed events are convenience shortcuts but
+   * any custom event name is a valid value. Unlike {@link #displayConverter}, a typed value that doesn't match
+   * one of the proposed display names is passed through as-is instead of being resolved to {@code null}.
+   */
+  private static StringConverter<String> freeTextDisplayConverter(Map<String, String> labels) {
+    return new StringConverter<>() {
+      @Override
+      public String toString(String value) {
+        return labels.getOrDefault(value, value);
+      }
+
+      @Override
+      public String fromString(String displayName) {
+        return labels.entrySet().stream()
+            .filter(entry -> entry.getValue().equals(displayName))
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(displayName);
       }
     };
   }

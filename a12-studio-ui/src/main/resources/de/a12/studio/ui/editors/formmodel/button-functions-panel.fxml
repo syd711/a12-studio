@@ -3,10 +3,12 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%button_functions" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.formmodel.ButtonFunctionsPanelController">
@@ -22,8 +24,20 @@
       </VBox>
       <VBox fx:id="eventBox" spacing="2.0">
         <children>
-          <Label styleClass="field-label" text="%button_event" />
-          <TextField fx:id="eventField" />
+          <HBox alignment="CENTER_LEFT" spacing="4.0">
+            <children>
+              <Label styleClass="field-label" text="%button_event" />
+              <Label>
+                <tooltip>
+                  <Tooltip prefWidth="300.0" text="%the_proposed_events_are_handled_by_default_as_part_of_the_client_crud_extension" wrapText="true" />
+                </tooltip>
+                <graphic>
+                  <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                </graphic>
+              </Label>
+            </children>
+          </HBox>
+          <ComboBox fx:id="eventCombo" editable="true" maxWidth="Infinity" />
         </children>
       </VBox>
       <VBox fx:id="targetBox" spacing="2.0">

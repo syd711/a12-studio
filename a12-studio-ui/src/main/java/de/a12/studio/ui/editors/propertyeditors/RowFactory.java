@@ -89,6 +89,56 @@ public final class RowFactory {
     });
   }
 
+  /**
+   * Same as {@link #setupRowDragAndDrop}, but for a drag that may be accepted by a different container than
+   * the one it started in - e.g. {@link ToolbarButtonsPanelController} moving a button row between its own
+   * Major/Minor and Subheader/Footer panel instances. {@code format} is shared by every such container
+   * instance (instead of being unique per instance, as {@link #setupRowDragAndDrop}'s {@code indexFormat} is),
+   * so a drop anywhere among them can accept the drag; {@code payload} - opaque to this method - is whatever
+   * the caller needs to resolve the drag back to its source container and row (e.g. {@code sourceId + ":" +
+   * index}). {@code onDrop} receives that payload back together with the insertion index into {@code row}'s
+   * own list, exactly as {@link #reorder} expects; the caller is responsible for parsing the payload to decide
+   * whether the drop is a same-container reorder or a cross-container move.
+   */
+  public static void setupCrossContainerRowDragAndDrop(@NonNull HBox row, @NonNull Node dragHandle, @NonNull DataFormat format,
+      @NonNull String payload, int index, @NonNull BiConsumer<String, Integer> onDrop) {
+    dragHandle.setOnDragDetected(event -> {
+      Dragboard dragboard = dragHandle.startDragAndDrop(TransferMode.MOVE);
+      ClipboardContent content = new ClipboardContent();
+      content.put(format, payload);
+      dragboard.setContent(content);
+
+      SnapshotParameters snapshotParams = new SnapshotParameters();
+      snapshotParams.setFill(Color.TRANSPARENT);
+      Point2D cursorInRow = dragHandle.localToParent(event.getX(), event.getY());
+      dragboard.setDragView(row.snapshot(snapshotParams, null), cursorInRow.getX(), cursorInRow.getY());
+
+      row.getStyleClass().add("module-row-dragging");
+      event.consume();
+    });
+    dragHandle.setOnDragDone(event -> row.getStyleClass().remove("module-row-dragging"));
+
+    row.setOnDragOver(event -> {
+      if (event.getDragboard().hasContent(format)) {
+        event.acceptTransferModes(TransferMode.MOVE);
+        showDropIndicator(row, isAboveMidpoint(row, event.getY()));
+      }
+      event.consume();
+    });
+    row.setOnDragExited(event -> clearDropIndicator(row));
+    row.setOnDragDropped(event -> {
+      Dragboard dragboard = event.getDragboard();
+      boolean success = dragboard.hasContent(format);
+      if (success) {
+        int insertBeforeIndex = isAboveMidpoint(row, event.getY()) ? index : index + 1;
+        onDrop.accept((String) dragboard.getContent(format), insertBeforeIndex);
+      }
+      clearDropIndicator(row);
+      event.setDropCompleted(success);
+      event.consume();
+    });
+  }
+
   private static boolean isAboveMidpoint(HBox row, double dragY) {
     return dragY < row.getHeight() / 2;
   }
