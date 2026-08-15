@@ -12,8 +12,8 @@ import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.ui.editors.AbstractEditorController;
-import de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
@@ -36,7 +36,7 @@ import java.util.function.Consumer;
  * per action, matching the SME reference's {@code I_SectionDefaultRepeatButtonLabels-form.json} order.
  * <p>
  * "Subheader and Footer": {@code content.subHeaderBox}/{@code content.footerBox}'s Major/Minor button lists,
- * one {@link EventButtonsPanelController} per list, matching the SME reference's "Major Buttons"/"Minor
+ * one {@link ToolbarButtonsPanelController} per list, matching the SME reference's "Major Buttons"/"Minor
  * Buttons" tables. Form Model's subHeaderBox and footerBox are both button-only ({@link HeaderFooterBox}), so
  * all four lists reuse the same simple panel. Rows can be either {@link EventButton} or {@link
  * de.a12.studio.models.formmodel.NavigationButton} (see Company_FM.json, where subHeaderBox holds navigation
@@ -84,13 +84,13 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private LocalizedTextPanelController uploadAsCopyLabelController;
 
   @FXML
-  private EventButtonsPanelController subheaderMajorButtonsController;
+  private ToolbarButtonsPanelController subheaderMajorButtonsController;
   @FXML
-  private EventButtonsPanelController subheaderMinorButtonsController;
+  private ToolbarButtonsPanelController subheaderMinorButtonsController;
   @FXML
-  private EventButtonsPanelController footerMajorButtonsController;
+  private ToolbarButtonsPanelController footerMajorButtonsController;
   @FXML
-  private EventButtonsPanelController footerMinorButtonsController;
+  private ToolbarButtonsPanelController footerMinorButtonsController;
 
   @FXML
   private DocumentSourceTreeController documentSourceTreeController;

@@ -84,10 +84,10 @@
                            <content>
                                <VBox spacing="12.0" styleClass="field-editor">
                                    <children>
-                                       <fx:include fx:id="subheaderMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
-                                       <fx:include fx:id="subheaderMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
-                                       <fx:include fx:id="footerMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
-                                       <fx:include fx:id="footerMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                       <fx:include fx:id="subheaderMajorButtons" source="../propertyeditors/toolbar-buttons-panel.fxml" />
+                                       <fx:include fx:id="subheaderMinorButtons" source="../propertyeditors/toolbar-buttons-panel.fxml" />
+                                       <fx:include fx:id="footerMajorButtons" source="../propertyeditors/toolbar-buttons-panel.fxml" />
+                                       <fx:include fx:id="footerMinorButtons" source="../propertyeditors/toolbar-buttons-panel.fxml" />
                                    </children>
                                    <padding>
                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

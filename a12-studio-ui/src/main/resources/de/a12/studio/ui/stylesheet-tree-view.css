@@ -359,3 +359,15 @@
 #tree .tree-cell:filled:selected:hover .tree-icon {
     -fx-icon-color: -fx-text-color-inverse;
 }
+
+/*
+ * The element/document-source name is rendered via a Label set as the cell's graphic
+ * (see FormModelTreeCell / FormSourceElementTreeCell), not as the cell's own text, so
+ * -fx-text-fill on the .tree-cell rule above never reaches it - same situation as
+ * #elementsTreeTable's and #flowsTree's .tree-cell-name-label overrides above.
+ */
+#tree .tree-cell:filled:selected .tree-cell-name-label,
+#tree .tree-cell:filled:selected:focused .tree-cell-name-label,
+#tree .tree-cell:filled:selected:hover .tree-cell-name-label {
+    -fx-text-fill: -fx-text-color-inverse;
+}

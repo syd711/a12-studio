@@ -15,8 +15,10 @@ import de.a12.studio.models.formmodel.Row;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
@@ -64,6 +66,11 @@ public class FormModelTreeController implements Initializable {
 
   private Map<String, Element> documentElementsById = Map.of();
 
+  // Resolves Control/Repeat/Repeat Overview Column display names (see FormElementViewModel#getName), following
+  // includes into other Document Models in the project - unlike documentElementsById above, which only indexes
+  // this Form Model's own linked Document Model and is used purely for local drag-and-drop lookups.
+  private @Nullable ElementIndex elementIndex;
+
   private TreeItem<FormElementViewModel> draggedTreeItem;
 
   private enum DropLocation {ABOVE, BELOW, INTO}
@@ -86,9 +93,16 @@ public class FormModelTreeController implements Initializable {
     this.projectItem = projectItem;
     this.content = ensureContent(model);
     this.documentElementsById = indexDocumentModel(documentModel);
+    this.elementIndex = hasModelRoot(documentModel)
+        ? new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+        : null;
     this.actions = new FormModelActions(content, this::onModelChanged);
     tree.setContextMenu(createContextMenu(null));
     applyFilter(searchController.getText());
+  }
+
+  private static boolean hasModelRoot(@Nullable DocumentModel documentModel) {
+    return documentModel != null && documentModel.getContent() != null && documentModel.getContent().getModelRoot() != null;
   }
 
   private static FormModelContent ensureContent(@NonNull FormModel model) {
@@ -102,7 +116,7 @@ public class FormModelTreeController implements Initializable {
 
   private static Map<String, Element> indexDocumentModel(@Nullable DocumentModel documentModel) {
     Map<String, Element> elementsById = new HashMap<>();
-    if (documentModel != null && documentModel.getContent() != null && documentModel.getContent().getModelRoot() != null) {
+    if (hasModelRoot(documentModel)) {
       for (GroupElement group : documentModel.getContent().getModelRoot().getRootGroups()) {
         indexElement(group, elementsById);
       }
@@ -159,7 +173,7 @@ public class FormModelTreeController implements Initializable {
     String term = filter == null ? "" : filter.trim().toLowerCase();
     TreeItem<FormElementViewModel> root = new TreeItem<>();
     for (Screen screen : content.getScreens()) {
-      FormElementViewModel viewModel = new FormElementViewModel(screen, null);
+      FormElementViewModel viewModel = new FormElementViewModel(screen, null, elementIndex);
       TreeItem<FormElementViewModel> item = term.isEmpty() ? toTreeItem(viewModel) : toFilteredTreeItem(viewModel, term);
       if (item != null) {
         root.getChildren().add(item);

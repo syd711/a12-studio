@@ -9,6 +9,17 @@
     -fx-font-size: 14px;
 }
 
+/*
+ * Modena's default *.tab-content-area carries its own -fx-background-insets/-fx-padding
+ * (roughly 1-2px on each side), which shows up as a stray gap around content that itself
+ * expects to sit flush with the tab strip (e.g. the Form Model editor's overview SplitPane).
+ * Content that wants inner spacing already adds its own padding, so flatten this to 0.
+ */
+.tab-pane > .tab-content-area {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
 /**
  * First-level tabs: top-level editor tab strip (e.g. the main window's open-model tabs in
  * scene-tab-pane.fxml). Browser-tab-style chips - white rounded cards with a subtle border,

@@ -8,13 +8,17 @@ import de.a12.studio.models.formmodel.CustomScreenElement;
 import de.a12.studio.models.formmodel.DetachedRepeat;
 import de.a12.studio.models.formmodel.EmbeddedRepeat;
 import de.a12.studio.models.formmodel.ExpressionCell;
+import de.a12.studio.models.formmodel.FieldBasedRepeatOverviewColumn;
+import de.a12.studio.models.formmodel.GenericRepeatOverviewColumn;
 import de.a12.studio.models.formmodel.InlineRepeat;
 import de.a12.studio.models.formmodel.MultiColumnSection;
+import de.a12.studio.models.formmodel.RepeatOverviewColumn;
 import de.a12.studio.models.formmodel.Row;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.ScreenElement;
 import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.formmodel.TextCell;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -36,9 +40,16 @@ public class FormElementViewModel {
 
   private final Object parentNode;
 
-  public FormElementViewModel(@NonNull Object node, @Nullable Object parentNode) {
+  // Used to resolve the real name of Controls/Repeats/Repeat Overview Columns, which are normally left unnamed
+  // and instead reference their bound Document Model element via elementRef/groupRef - null if the Form Model
+  // has no (resolvable) data-binding Document Model, in which case such nodes fall back to showing the raw
+  // reference.
+  private final @Nullable ElementIndex elementIndex;
+
+  public FormElementViewModel(@NonNull Object node, @Nullable Object parentNode, @Nullable ElementIndex elementIndex) {
     this.node = node;
     this.parentNode = parentNode;
+    this.elementIndex = elementIndex;
   }
 
   public Object getNode() {
@@ -62,6 +73,9 @@ public class FormElementViewModel {
     if (node instanceof Cell cell) {
       return cell.getId();
     }
+    if (node instanceof RepeatOverviewColumn column) {
+      return column.getId();
+    }
     return null;
   }
 
@@ -78,13 +92,18 @@ public class FormElementViewModel {
     if (node instanceof Cell cell) {
       return cell.getName();
     }
+    if (node instanceof GenericRepeatOverviewColumn column && column.getConfig().get("name") instanceof String name) {
+      return name;
+    }
     return null;
   }
 
   /**
-   * The tree label: the node's own {@code name} if set, else - for a {@link Control} or {@link AbstractRepeat},
-   * which are commonly left unnamed since their real identity is the Document Model element they bind to - the
-   * {@code elementRef}/{@code groupRef} they point at, else the node's own {@code id} as a last resort.
+   * The tree label: the node's own {@code name} if set, else - for a {@link Control}, {@link AbstractRepeat} or
+   * {@link FieldBasedRepeatOverviewColumn}, which are commonly left unnamed since their real identity is the
+   * Document Model element they bind to - the name of that element ({@code elementRef}/{@code groupRef}) resolved
+   * against {@link #elementIndex}, falling back to the raw reference if it can't be resolved, else for a
+   * {@link Row} the placeholder {@code "<Row>"}, else the node's own {@code id} as a last resort.
    */
   public String getName() {
     String name = rawName();
@@ -92,13 +111,39 @@ public class FormElementViewModel {
       return name;
     }
     if (node instanceof Control control && control.getElementRef() != null && !control.getElementRef().isBlank()) {
-      return control.getElementRef();
+      return resolveDocumentElementName(control.getElementRef());
     }
     if (node instanceof AbstractRepeat repeat && repeat.getGroupRef() != null && !repeat.getGroupRef().isBlank()) {
-      return repeat.getGroupRef();
+      return resolveDocumentElementName(repeat.getGroupRef());
+    }
+    if (node instanceof FieldBasedRepeatOverviewColumn column
+        && column.getElementRef() != null && !column.getElementRef().isBlank()) {
+      return resolveDocumentElementName(column.getElementRef());
+    }
+    if (node instanceof Row) {
+      return "<Row>";
     }
     String id = getId();
     return id != null ? id : "<" + getTypeLabel() + ">";
+  }
+
+  /**
+   * The referenced Document Model element's own name if it can be resolved - following an Include's compound id
+   * (e.g. {@code include_7c34e_field_0b84d}) into the included model via {@link ElementIndex#resolveDisplayPath},
+   * then taking the last path segment (the element's own name, not its full path) - else the raw reference
+   * itself, unchanged (a dangling reference, or no Document Model to resolve against).
+   */
+  private String resolveDocumentElementName(@NonNull String elementRef) {
+    if (elementIndex == null) {
+      return elementRef;
+    }
+    String path = elementIndex.resolveDisplayPath(elementRef);
+    if (path == null) {
+      return elementRef;
+    }
+    int lastSlash = path.lastIndexOf('/');
+    String name = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
+    return name.isBlank() ? elementRef : name;
   }
 
   public String getTypeLabel() {
@@ -137,6 +182,9 @@ public class FormElementViewModel {
     }
     if (node instanceof ExpressionCell) {
       return "Expression";
+    }
+    if (node instanceof RepeatOverviewColumn) {
+      return "Column";
     }
     return "Element";
   }
@@ -178,6 +226,9 @@ public class FormElementViewModel {
     if (node instanceof ExpressionCell) {
       return Icons.FORM_EXPRESSION_CELL;
     }
+    if (node instanceof RepeatOverviewColumn) {
+      return Icons.FORM_CONTROL;
+    }
     return Icons.ELEMENT_GENERIC;
   }
 
@@ -198,18 +249,23 @@ public class FormElementViewModel {
     else if (node instanceof Row row) {
       childNodes.addAll(row.getCell());
     }
-    else if (node instanceof EmbeddedRepeat repeat && repeat.getControlGrid() != null) {
-      childNodes.add(repeat.getControlGrid());
+    else if (node instanceof AbstractRepeat repeat) {
+      // Rows aren't authored here - they're generated at runtime from the bound group (matches the SME
+      // reference) - but the authored overview columns, and the Embedded/Detached repeat's own detail
+      // widget, are shown as children.
+      childNodes.addAll(repeat.getRepeatOverviewColumn());
+      if (node instanceof EmbeddedRepeat embeddedRepeat && embeddedRepeat.getControlGrid() != null) {
+        childNodes.add(embeddedRepeat.getControlGrid());
+      }
+      else if (node instanceof DetachedRepeat detachedRepeat && detachedRepeat.getDetailScreen() != null) {
+        childNodes.add(detachedRepeat.getDetailScreen());
+      }
     }
-    else if (node instanceof DetachedRepeat repeat && repeat.getDetailScreen() != null) {
-      childNodes.add(repeat.getDetailScreen());
-    }
-    // InlineRepeat, CustomScreenElement, Control, TextCell, ExpressionCell: no children - InlineRepeat's rows
-    // are generated at runtime from the bound group, not authored here (matches the SME reference).
+    // CustomScreenElement, Control, TextCell, ExpressionCell, RepeatOverviewColumn: no children.
 
     List<FormElementViewModel> children = new ArrayList<>();
     for (Object child : childNodes) {
-      children.add(new FormElementViewModel(child, node));
+      children.add(new FormElementViewModel(child, node, elementIndex));
     }
     return children;
   }
