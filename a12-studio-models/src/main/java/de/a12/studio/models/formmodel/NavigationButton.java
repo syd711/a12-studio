@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"type", "id", "name", "buttonStyling", "target", "validation", "scope"})
+@JsonPropertyOrder({"type", "id", "name", "buttonStyling", "target", "validation", "annotations", "scope"})
 public class NavigationButton extends Button {
 
   // Screen to navigate to; can be a Screen id, "#previous"/"#next" or similar special targets.

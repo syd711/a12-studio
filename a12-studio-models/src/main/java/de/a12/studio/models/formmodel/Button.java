@@ -6,9 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import de.a12.studio.models.Annotation;
 import de.a12.studio.models.EventButtonLike;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true, defaultImpl = GenericButton.class)
@@ -39,6 +43,9 @@ public abstract class Button implements EventButtonLike {
   // Visibility/enablement depending on the form's readonly state, e.g. "HIDDEN_IN_READONLY_MODE".
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String scope;
+  // SME's "annotated_mixin" - a plain "annotations" field on the wire, matching documentmodel.Element.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Annotation> annotations = new ArrayList<>();
 
   @Override
   @JsonIgnore
@@ -88,7 +95,7 @@ public abstract class Button implements EventButtonLike {
     icon.setName(name);
   }
 
-  private ButtonStyling getOrCreateButtonStyling() {
+  public ButtonStyling getOrCreateButtonStyling() {
     if (buttonStyling == null) {
       buttonStyling = new ButtonStyling();
     }

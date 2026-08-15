@@ -1,5 +1,7 @@
 package de.a12.studio.ui.preferences;
 
+import de.a12.studio.ui.previewapp.PreviewAppProcess;
+import de.a12.studio.ui.updater.Updater;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
@@ -65,6 +67,14 @@ public class PreferenceAppGeneralPanelController implements Initializable {
     languageCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
       if (newVal != null) {
         LocalUISettings.saveProperty(LocalUISettings.LANGUAGE, newVal);
+        if (oldVal != null && !oldVal.equals(newVal)) {
+          Stage stage = (Stage) languageCombo.getScene().getWindow();
+          Optional<ButtonType> restart = WidgetFactory.showConfirmation(stage, StudioBundle.get("restart_required"), null, null, StudioBundle.get("restart_now"));
+          if (restart.isPresent() && restart.get() == ButtonType.OK) {
+            PreviewAppProcess.getInstance().stop();
+            Updater.restartClient();
+          }
+        }
       }
     });
   }

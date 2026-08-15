@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
@@ -25,7 +26,7 @@
         </ToolBar>
     </right>
    <center>
-       <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+       <TabPane styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
            <tabs>
                <Tab text="%overview">
                    <content>

@@ -7,11 +7,13 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.ButtonGroup;
 import de.a12.studio.models.formmodel.Defaults;
-import de.a12.studio.models.formmodel.EventButton;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
+import de.a12.studio.models.formmodel.Screen;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -22,11 +24,11 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
-import java.security.SecureRandom;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Edits an {@link FormModel}'s "Overview", "Repeat Default Button Labels" and "Subheader and Footer" tabs.
@@ -38,15 +40,14 @@ import java.util.function.Consumer;
  * "Subheader and Footer": {@code content.subHeaderBox}/{@code content.footerBox}'s Major/Minor button lists,
  * one {@link ToolbarButtonsPanelController} per list, matching the SME reference's "Major Buttons"/"Minor
  * Buttons" tables. Form Model's subHeaderBox and footerBox are both button-only ({@link HeaderFooterBox}), so
- * all four lists reuse the same simple panel. Rows can be either {@link EventButton} or {@link
- * de.a12.studio.models.formmodel.NavigationButton} (see Company_FM.json, where subHeaderBox holds navigation
- * buttons and footerBox holds event buttons) - both satisfy {@link de.a12.studio.models.EventButtonLike} via
- * the abstract {@link Button} base, so either kind displays correctly here; newly added rows default to
- * {@link EventButton}, the more common case.
+ * all four lists reuse the same simple panel. Rows can be either {@link de.a12.studio.models.formmodel.EventButton}
+ * or {@link de.a12.studio.models.formmodel.NavigationButton} (see Company_FM.json, where subHeaderBox holds
+ * navigation buttons and footerBox holds event buttons) - both satisfy {@link de.a12.studio.models.EventButtonLike}
+ * via the abstract {@link Button} base, so either kind displays correctly here. Each panel's Add button opens
+ * {@link Dialogs#showButtonForAdd}, which defaults to a new Event button (the more common case) and lets the
+ * user switch it to Navigation.
  */
 public class FormModelEditorController extends AbstractEditorController implements Initializable {
-
-  private static final Random ID_RANDOM = new SecureRandom();
 
   @FXML
   private LocalizedTextPanelController addLabelController;
@@ -203,15 +204,16 @@ public class FormModelEditorController extends AbstractEditorController implemen
     FormModelContent content = model.getContent();
     HeaderFooterBox subHeaderBox = ensureBox(content.getSubHeaderBox(), "subHeaderBox1", content::setSubHeaderBox);
     HeaderFooterBox footerBox = ensureBox(content.getFooterBox(), "footerBox1", content::setFooterBox);
+    List<String> screenIds = content.getScreens().stream().map(Screen::getId).collect(Collectors.toList());
 
     subheaderMajorButtonsController.configure(StudioBundle.get("subheader_major_buttons"), ".subheaderMajor",
-        ensureMajorButtons(subHeaderBox).getButton(), this::newButton);
+        ensureMajorButtons(subHeaderBox).getButton(), () -> newButtonViaDialog(screenIds));
     subheaderMinorButtonsController.configure(StudioBundle.get("subheader_minor_buttons"), ".subheaderMinor",
-        ensureMinorButtons(subHeaderBox).getButton(), this::newButton);
+        ensureMinorButtons(subHeaderBox).getButton(), () -> newButtonViaDialog(screenIds));
     footerMajorButtonsController.configure(StudioBundle.get("footer_major_buttons"), ".footerMajor",
-        ensureMajorButtons(footerBox).getButton(), this::newButton);
+        ensureMajorButtons(footerBox).getButton(), () -> newButtonViaDialog(screenIds));
     footerMinorButtonsController.configure(StudioBundle.get("footer_minor_buttons"), ".footerMinor",
-        ensureMinorButtons(footerBox).getButton(), this::newButton);
+        ensureMinorButtons(footerBox).getButton(), () -> newButtonViaDialog(screenIds));
   }
 
   private static HeaderFooterBox ensureBox(HeaderFooterBox box, String id, Consumer<HeaderFooterBox> setter) {
@@ -238,15 +240,8 @@ public class FormModelEditorController extends AbstractEditorController implemen
     return box.getMinorButtons();
   }
 
-  private Button newButton() {
-    EventButton button = new EventButton();
-    button.setId(generateButtonId());
-    button.setName(button.getId());
-    return button;
-  }
-
-  private static String generateButtonId() {
-    return "button-" + String.format("%05x", ID_RANDOM.nextInt(0x100000));
+  private Optional<Button> newButtonViaDialog(List<String> screenIds) {
+    return Dialogs.showButtonForAdd(Studio.stage, screenIds);
   }
 
   @Override

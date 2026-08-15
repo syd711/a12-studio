@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"type", "id", "name", "buttonStyling", "event", "validation", "scope", "enablement"})
+@JsonPropertyOrder({"type", "id", "name", "buttonStyling", "event", "validation", "annotations", "scope", "enablement"})
 public class EventButton extends Button {
 
   // How the button behaves before any data has changed, e.g. "HIDDEN" or "DISABLED".

@@ -206,6 +206,45 @@ public class Updater {
     executor.executeCommandAsync();
   }
 
+  /**
+   * Relaunches the client binary in place (no download/replace, unlike {@link #installClientUpdate}) and
+   * exits the current process, so preferences that only take effect on startup (e.g. the UI language) can
+   * be applied immediately.
+   */
+  public static void restartClient() {
+    try {
+      if (OSUtil.isWindows()) {
+        List<String> commands = Arrays.asList("cmd", "/c", "start", "A12-Studio.exe");
+        SystemCommandExecutor executor = new SystemCommandExecutor(commands);
+        executor.setDir(getWriteableBaseFolder());
+        executor.executeCommandAsync();
+      }
+      else if (OSUtil.isLinux()) {
+        List<String> commands = List.of("./A12-Studio.sh");
+        SystemCommandExecutor executor = new SystemCommandExecutor(commands, false);
+        executor.setDir(getWriteableBaseFolder());
+        executor.executeCommandAsync();
+      }
+      else if (OSUtil.isMac()) {
+        new ProcessBuilder("open", "-n", System.getProperty("MAC_APP_PATH")).start();
+      }
+    }
+    catch (Exception e) {
+      log.error("Failed to restart client: {}", e.getMessage(), e);
+      return;
+    }
+
+    new Thread(() -> {
+      try {
+        Thread.sleep(1000);
+        System.exit(0);
+      }
+      catch (InterruptedException e) {
+        //ignore
+      }
+    }).start();
+  }
+
   public static String checkForUpdate() {
     try {
       URL obj = URI.create(LATEST_RELEASE_URL).toURL();

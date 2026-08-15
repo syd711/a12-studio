@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%button_visual_settings" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.ButtonVisualSettingsPanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="10.0">
+    <children>
+      <HBox spacing="12.0">
+        <children>
+          <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+            <children>
+              <Label styleClass="field-label" text="%button_priority" />
+              <ComboBox fx:id="priorityCombo" maxWidth="Infinity" />
+            </children>
+          </VBox>
+          <VBox alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
+            <children>
+              <CheckBox fx:id="destructiveField" mnemonicParsing="false" text="%destructive" />
+            </children>
+            <HBox.margin>
+              <Insets bottom="8.0" />
+            </HBox.margin>
+          </VBox>
+        </children>
+      </HBox>
+      <HBox spacing="12.0">
+        <children>
+          <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+            <children>
+              <Label styleClass="field-label" text="%icon" />
+              <TextField fx:id="iconField" />
+            </children>
+          </VBox>
+          <VBox alignment="BOTTOM_LEFT" spacing="2.0" HBox.hgrow="ALWAYS">
+            <children>
+              <CheckBox fx:id="hideLabelField" mnemonicParsing="false" text="%hide_label" />
+            </children>
+            <HBox.margin>
+              <Insets bottom="8.0" />
+            </HBox.margin>
+          </VBox>
+        </children>
+      </HBox>
+    </children>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

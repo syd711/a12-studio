@@ -90,12 +90,13 @@
 
 /*
  * TitledPane embedded directly into a surrounding layout rather than shown as its own card -
- * keeps the card's background/border color and header treatment but drops the rounded corners
- * and content padding so it sits flush with its container.
+ * keeps the card's background color and header treatment but drops the rounded corners, the
+ * outer border and the content padding so it sits fully flush with its container.
  */
 .titled-pane-embedded {
     -fx-background-radius: 0;
     -fx-border-radius: 0;
+    -fx-border-width: 0;
 }
 
 .titled-pane-embedded > .title,

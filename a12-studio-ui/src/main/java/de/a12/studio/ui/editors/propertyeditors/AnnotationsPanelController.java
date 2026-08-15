@@ -31,13 +31,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Edits either a single {@link Element}'s annotations (via {@link #setElement}, suggestions sourced from
- * {@link AnnotationFieldRegistry}) or a model's header annotations (via {@link #setModel}, suggestions sourced
- * from {@link AnnotationHeaderRegistry}). Which mode is active is determined by which of {@code element}
- * (inherited from {@link AbstractPropertyEditor}) / {@link #model} is currently set; the two are mutually
- * exclusive.
+ * {@link AnnotationFieldRegistry}), a model's header annotations (via {@link #setModel}, suggestions sourced
+ * from {@link AnnotationHeaderRegistry}), or an arbitrary owner's annotations list (via {@link #setCustom},
+ * behaving like element mode). Which mode is active is determined by which of {@code element} (inherited from
+ * {@link AbstractPropertyEditor}) / {@link #model} / {@link #customAnnotationsSupplier} is currently set; the
+ * three are mutually exclusive.
  */
 public class AnnotationsPanelController extends AbstractPropertyEditor {
 
@@ -58,6 +60,13 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   private A12Model<?> model;
 
+  // Set (instead of element/model) by setCustom(), for an annotations list living on neither a single
+  // Element nor a whole A12Model's header - e.g. a formmodel.Button's own annotations, edited from a modal
+  // dialog rather than the currently selected project item's own editor. Behaves like element mode (suggestions
+  // sourced from AnnotationFieldRegistry, keyed off the currently selected project item's model type, same as
+  // the plain else-branch below already does).
+  private Supplier<List<Annotation>> customAnnotationsSupplier;
+
   // The model type of the element currently being edited, i.e. the key under which suggested names are
   // looked up in and reported to the AnnotationFieldRegistry / AnnotationHeaderRegistry. Recomputed on every
   // rebuildRows().
@@ -77,13 +86,29 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   @Override
   public void setElement(@NonNull Element element) {
     this.model = null;
+    this.customAnnotationsSupplier = null;
     super.setElement(element);
     rebuildRows();
   }
 
   public void setModel(@NonNull A12Model<?> model) {
     this.element = null;
+    this.customAnnotationsSupplier = null;
     this.model = model;
+    rebuildRows();
+  }
+
+  /**
+   * Binds this panel to an arbitrary owner's {@code List<Annotation>} field via a getter, e.g. {@code
+   * button::getAnnotations} - for an owner that is neither a single {@link Element} nor a whole {@link
+   * A12Model}'s header (see {@link de.a12.studio.ui.editors.formmodel.dialogs.FormButtonDialogController}).
+   * Suggestions are sourced the same way as element mode, keyed off the currently selected project item's
+   * model type.
+   */
+  public void setCustom(@NonNull Supplier<List<Annotation>> annotationsSupplier) {
+    this.element = null;
+    this.model = null;
+    this.customAnnotationsSupplier = annotationsSupplier;
     rebuildRows();
   }
 
@@ -107,6 +132,9 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   }
 
   private List<Annotation> getBackingAnnotations() {
+    if (customAnnotationsSupplier != null) {
+      return customAnnotationsSupplier.get();
+    }
     return model != null ? model.getAnnotations() : element.getAnnotations();
   }
 

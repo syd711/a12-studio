@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%button_general_settings" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.ButtonGeneralPanelController">
+ <BorderPane>
+ <center>
+  <GridPane hgap="16.0" vgap="8.0">
+    <columnConstraints>
+      <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+      <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+    </columnConstraints>
+    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+      <children>
+        <Label styleClass="field-label" text="%button_name" />
+        <TextField fx:id="nameField" />
+      </children>
+    </VBox>
+    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+      <children>
+        <Label styleClass="field-label" text="%id" />
+        <TextField fx:id="idField" editable="false" focusTraversable="false" styleClass="readonly-field" />
+      </children>
+    </VBox>
+  </GridPane>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

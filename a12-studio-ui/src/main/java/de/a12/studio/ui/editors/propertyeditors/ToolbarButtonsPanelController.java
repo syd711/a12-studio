@@ -28,13 +28,15 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 /**
- * Edits a list of {@link EventButtonLike} rows (e.g. {@code content.rowActionGroup.actions} or a footer/
- * subheader box's button entries) as a compact, fully inline-editable table of Event/Priority/Destructive/Icon,
- * matching the SME reference's "Row Action"/"Major Buttons"/"Minor Buttons" tables. Reusable for any such list
- * by calling {@link #configure} with the list, a title, a settings-key suffix (so several instances of this
- * panel on the same editor don't collide on the same persisted expanded/collapsed state) and a factory for new
- * rows. Not tied to a single {@code de.a12.studio.models.documentmodel.Element}, so it follows the
- * model-header pattern ({@link #commitHeaderChange()}) rather than {@link #commitChange()}.
+ * Edits a list of {@link EventButtonLike} rows (e.g. a footer/subheader box's button entries) as a compact,
+ * fully inline-editable table of Event/Priority/Destructive/Icon, matching the SME reference's "Major Buttons"/
+ * "Minor Buttons" tables. Reusable for any such list by calling {@link #configure} with the list, a title, a
+ * settings-key suffix (so several instances of this panel on the same editor don't collide on the same
+ * persisted expanded/collapsed state) and a factory for new rows - the factory returns {@code Optional.empty()}
+ * to abandon the add (e.g. {@link de.a12.studio.ui.editors.formmodel.FormModelEditorController}'s factory opens
+ * {@link de.a12.studio.ui.editors.formmodel.dialogs.Dialogs#showButtonForAdd} and the user cancels it), in which
+ * case no row is added. Not tied to a single {@code de.a12.studio.models.documentmodel.Element}, so it follows
+ * the model-header pattern ({@link #commitHeaderChange()}) rather than {@link #commitChange()}.
  */
 public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
 
@@ -60,7 +62,7 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
   private Label emptyLabel;
 
   private List<EventButtonLike> rows;
-  private Supplier<EventButtonLike> newRowFactory;
+  private Supplier<Optional<EventButtonLike>> newRowFactory;
 
   // Identifies a row-reorder drag; unique per panel instance (this class is instantiated several times in the
   // same window, e.g. subheader/footer major/minor buttons), so drags from a sibling instance's row list are
@@ -75,11 +77,11 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
    */
   @SuppressWarnings("unchecked")
   public <T> void configure(@NonNull String title, @NonNull String settingsKeySuffix, @NonNull List<T> rows,
-      @NonNull Supplier<T> newRowFactory) {
+      @NonNull Supplier<Optional<T>> newRowFactory) {
     setTitle(title);
     setSettingsKeySuffix(settingsKeySuffix);
     this.rows = (List<EventButtonLike>) rows;
-    this.newRowFactory = () -> (EventButtonLike) newRowFactory.get();
+    this.newRowFactory = () -> newRowFactory.get().map(row -> (EventButtonLike) row);
     if (indexFormat == null) {
       indexFormat = new DataFormat("application/x-a12-toolbar-button-index" + settingsKeySuffix + "-" + INSTANCE_COUNTER.incrementAndGet());
     }
@@ -88,9 +90,11 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    rows.add(newRowFactory.get());
-    rebuildRows();
-    commitHeaderChange();
+    newRowFactory.get().ifPresent(row -> {
+      rows.add(row);
+      rebuildRows();
+      commitHeaderChange();
+    });
   }
 
   private void rebuildRows() {

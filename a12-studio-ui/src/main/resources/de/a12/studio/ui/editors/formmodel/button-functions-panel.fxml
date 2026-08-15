@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%button_functions" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.ButtonFunctionsPanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="10.0">
+    <children>
+      <VBox spacing="2.0">
+        <children>
+          <Label styleClass="field-label" text="%type" />
+          <ComboBox fx:id="typeCombo" maxWidth="Infinity" />
+        </children>
+      </VBox>
+      <VBox fx:id="eventBox" spacing="2.0">
+        <children>
+          <Label styleClass="field-label" text="%button_event" />
+          <TextField fx:id="eventField" />
+        </children>
+      </VBox>
+      <VBox fx:id="targetBox" spacing="2.0">
+        <children>
+          <Label styleClass="field-label" text="%screen" />
+          <ComboBox fx:id="targetCombo" maxWidth="Infinity" />
+        </children>
+      </VBox>
+      <VBox spacing="2.0">
+        <children>
+          <Label styleClass="field-label" text="%validation_mode" />
+          <ComboBox fx:id="validationCombo" maxWidth="Infinity" />
+        </children>
+      </VBox>
+      <VBox spacing="2.0">
+        <children>
+          <Label styleClass="field-label" text="%scope" />
+          <ComboBox fx:id="scopeCombo" maxWidth="Infinity" />
+        </children>
+      </VBox>
+      <VBox fx:id="enablementBox" spacing="2.0">
+        <children>
+          <Label styleClass="field-label" text="%no_data_change" />
+          <ComboBox fx:id="enablementCombo" maxWidth="Infinity" />
+        </children>
+      </VBox>
+    </children>
+    <padding>
+      <Insets bottom="4.0" />
+    </padding>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

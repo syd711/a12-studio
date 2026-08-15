@@ -109,7 +109,17 @@ public class DocumentSourceTreeController implements Initializable {
       }
     }
     tree.setRoot(root);
-    expandAll(root);
+    setExpandedRecursive(root, true);
+  }
+
+  @FXML
+  private void onExpandAll() {
+    setExpandedRecursive(tree.getRoot(), true);
+  }
+
+  @FXML
+  private void onCollapseAll() {
+    setExpandedRecursive(tree.getRoot(), false);
   }
 
   private TreeItem<ElementViewModel> toTreeItem(@NonNull Element element) {
@@ -139,10 +149,13 @@ public class DocumentSourceTreeController implements Initializable {
     return item;
   }
 
-  private void expandAll(@NonNull TreeItem<ElementViewModel> item) {
-    item.setExpanded(true);
+  private void setExpandedRecursive(@Nullable TreeItem<ElementViewModel> item, boolean expanded) {
+    if (item == null) {
+      return;
+    }
+    item.setExpanded(expanded);
     for (TreeItem<ElementViewModel> child : item.getChildren()) {
-      expandAll(child);
+      setExpandedRecursive(child, expanded);
     }
   }
 
