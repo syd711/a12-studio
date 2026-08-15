@@ -22,6 +22,7 @@ import de.a12.studio.ui.editors.formmodel.ButtonVisualSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -61,6 +62,8 @@ public class FormButtonDialogController implements DialogController {
   private ComboBox<String> labelTypeCombo;
   @FXML
   private LocalizedTextPanelController labelController;
+  @FXML
+  private RichtextEditorController labelExpressionController;
 
   @FXML
   private LocalizedTextPanelController descriptionController;
@@ -98,11 +101,13 @@ public class FormButtonDialogController implements DialogController {
     functionsController.setSaveMode(saveMode);
     visualController.setSaveMode(saveMode);
     labelController.setSaveMode(saveMode);
+    labelExpressionController.setSaveMode(saveMode);
     descriptionController.setSaveMode(saveMode);
     stylesController.setSaveMode(saveMode);
     annotationsController.setSaveMode(saveMode);
 
     labelController.configureCustom("label", "LABEL");
+    labelExpressionController.configureCustom("label", "LABEL");
     descriptionController.configureCustom("description", "DESCRIPTION");
     annotationsController.hideAnnotationDatasetsButton();
 
@@ -146,6 +151,7 @@ public class FormButtonDialogController implements DialogController {
     functionsController.destroy();
     visualController.destroy();
     labelController.destroy();
+    labelExpressionController.destroy();
     descriptionController.destroy();
     stylesController.destroy();
     annotationsController.destroy();
@@ -207,6 +213,7 @@ public class FormButtonDialogController implements DialogController {
       updatingFromModel = false;
     }
     labelController.setCustom(this::currentLabelTexts, this::writeLabelTexts);
+    labelExpressionController.setCustom(this::currentLabelExpression, this::writeLabelExpression);
     updateLabelVisibility(expression);
 
     descriptionController.setCustom(this::currentDescriptionTexts, this::writeDescriptionTexts);
@@ -238,6 +245,7 @@ public class FormButtonDialogController implements DialogController {
 
   private void updateLabelVisibility(boolean expression) {
     labelController.setVisible(!expression);
+    labelExpressionController.setVisible(expression);
   }
 
   private ButtonStyling getButtonStyling() {
@@ -255,6 +263,25 @@ public class FormButtonDialogController implements DialogController {
 
   private List<Label> writeLabelTexts() {
     return getOrCreateMultilingualLabel().getMultilingualText().getText();
+  }
+
+  private String currentLabelExpression() {
+    ButtonStyling styling = getButtonStyling();
+    return styling != null && styling.getLabel() instanceof ExpressionText expressionText ? expressionText.getExpressionText() : null;
+  }
+
+  private void writeLabelExpression(String value) {
+    ButtonStyling styling = button.getOrCreateButtonStyling();
+    LocalizedText label = styling.getLabel();
+    ExpressionText expressionText;
+    if (label instanceof ExpressionText existing) {
+      expressionText = existing;
+    }
+    else {
+      expressionText = new ExpressionText();
+      styling.setLabel(expressionText);
+    }
+    expressionText.setExpressionText(value);
   }
 
   private MultilingualText getOrCreateMultilingualLabel() {

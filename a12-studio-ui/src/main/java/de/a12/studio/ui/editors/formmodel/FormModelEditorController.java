@@ -20,6 +20,9 @@ import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.Region;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -97,6 +100,13 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private DocumentSourceTreeController documentSourceTreeController;
   @FXML
   private FormModelTreeController formModelTreeController;
+
+  @FXML
+  private SplitPane overviewSplitPane;
+  @FXML
+  private TitledPane documentRelationshipModelPane;
+
+  private static final double DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION = 0.32;
 
   public void loadModel(@NonNull A12Model<?> model) {
     load((FormModel) model);
@@ -254,6 +264,18 @@ public class FormModelEditorController extends AbstractEditorController implemen
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    // Collapsing is horizontal here (unlike a plain TitledPane, which only collapses its content
+    // vertically): clamping maxWidth to the header's own preferred width makes the SplitPane give
+    // the freed-up space to the sibling form model tree, and moves the divider along with it.
+    documentRelationshipModelPane.expandedProperty().addListener((observable, wasExpanded, isExpanded) -> {
+      if (isExpanded) {
+        documentRelationshipModelPane.setMaxWidth(Double.MAX_VALUE);
+        overviewSplitPane.setDividerPosition(0, DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION);
+      }
+      else {
+        documentRelationshipModelPane.setMaxWidth(Region.USE_PREF_SIZE);
+      }
+    });
   }
 
   @Override

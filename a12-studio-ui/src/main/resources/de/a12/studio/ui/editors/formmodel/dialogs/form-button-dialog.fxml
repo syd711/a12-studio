@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="720" maxWidth="Infinity" minHeight="700.0" minWidth="640.0" styleClass="navigation-panel"
+<BorderPane fx:id="root" maxWidth="Infinity" minHeight="700.0" minWidth="640.0" styleClass="navigation-panel"
             stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.formmodel.dialogs.FormButtonDialogController">
    <top>
@@ -33,6 +33,7 @@
                      <Label styleClass="field-label" text="%type" />
                      <ComboBox fx:id="labelTypeCombo" maxWidth="Infinity" />
                      <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
+                     <fx:include fx:id="labelExpression" source="../../propertyeditors/richtext-editor.fxml" styleClass="titled-pane-sub-child" />
                   </children>
                </VBox>
 

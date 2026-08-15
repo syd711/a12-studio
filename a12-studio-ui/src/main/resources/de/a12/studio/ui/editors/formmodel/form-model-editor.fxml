@@ -30,18 +30,22 @@
            <tabs>
                <Tab text="%overview">
                    <content>
-                       <SplitPane dividerPositions="0.32" styleClass="properties-panel" BorderPane.alignment="CENTER">
+                       <SplitPane fx:id="overviewSplitPane" dividerPositions="0.32" styleClass="properties-panel" BorderPane.alignment="CENTER">
                            <items>
-                               <VBox>
-                                   <children>
-                                       <TitledPane animated="false" expanded="false" styleClass="titled-pane-embedded" text="%relationships" VBox.vgrow="NEVER" />
-                                       <TitledPane animated="false" expanded="true" maxHeight="Infinity" styleClass="titled-pane-embedded" text="%document_model" VBox.vgrow="ALWAYS">
-                                           <content>
-                                               <fx:include fx:id="documentSourceTree" source="document-source-tree-panel.fxml" />
-                                           </content>
-                                       </TitledPane>
-                                   </children>
-                               </VBox>
+                               <TitledPane fx:id="documentRelationshipModelPane" animated="false" expanded="true" maxHeight="Infinity" styleClass="titled-pane-embedded" text="%document_relationship_model">
+                                   <content>
+                                       <VBox>
+                                           <children>
+                                               <TitledPane animated="false" expanded="false" styleClass="titled-pane-embedded" text="%relationships" VBox.vgrow="NEVER" />
+                                               <TitledPane animated="false" expanded="true" maxHeight="Infinity" styleClass="titled-pane-embedded" text="%document_model" VBox.vgrow="ALWAYS">
+                                                   <content>
+                                                       <fx:include fx:id="documentSourceTree" source="document-source-tree-panel.fxml" />
+                                                   </content>
+                                               </TitledPane>
+                                           </children>
+                                       </VBox>
+                                   </content>
+                               </TitledPane>
                                <fx:include fx:id="formModelTree" source="form-model-tree-panel.fxml" />
                            </items>
                        </SplitPane>

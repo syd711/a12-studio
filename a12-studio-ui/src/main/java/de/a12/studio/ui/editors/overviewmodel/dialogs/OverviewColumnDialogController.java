@@ -9,10 +9,10 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
-import de.a12.studio.ui.editors.overviewmodel.RichtextEditorController;
 import de.a12.studio.ui.editors.overviewmodel.StylesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.collections.FXCollections;
@@ -273,7 +273,7 @@ public class OverviewColumnDialogController implements DialogController {
     stylesHeaderController.setColumn(column);
     stylesContentController.setColumn(column);
     iconPanelController.setColumn(column);
-    expressionPanelController.setColumn(column);
+    expressionPanelController.setCustom(column::getExpression, column::setExpression);
 
     validate();
   }

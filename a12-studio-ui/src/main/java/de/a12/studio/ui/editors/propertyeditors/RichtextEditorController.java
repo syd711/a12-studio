@@ -1,6 +1,5 @@
-package de.a12.studio.ui.editors.overviewmodel;
+package de.a12.studio.ui.editors.propertyeditors;
 
-import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,15 +14,20 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Edits a single {@link Column}'s {@link Column#getExpression()} via a {@link CodeArea} (RichTextFX), giving
- * expression text a monospaced editor instead of a plain {@link javafx.scene.control.TextArea}. Not bound to a
- * single {@link de.a12.studio.models.documentmodel.Element} (the expression lives on the {@link Column} being
- * edited by {@link de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController}), so it
- * follows the same per-Column pattern as {@link de.a12.studio.ui.editors.propertyeditors.IconPanelController#setColumn}.
+ * Edits a single expression string via a {@link CodeArea} (RichTextFX), giving expression text a monospaced
+ * editor instead of a plain {@link javafx.scene.control.TextArea}. Not bound to a single {@link
+ * de.a12.studio.models.documentmodel.Element} - the expression is read/written via a caller-supplied {@code
+ * Supplier}/{@code Consumer} pair (see {@link #setCustom}), e.g. {@link
+ * de.a12.studio.models.overviewmodel.Column#getExpression()} (used by {@link
+ * de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController}) or {@link
+ * de.a12.studio.models.formmodel.ExpressionText#getExpressionText()} (used by {@link
+ * de.a12.studio.ui.editors.formmodel.dialogs.FormButtonDialogController} for a button's expression-typed label).
  */
 public class RichtextEditorController extends AbstractPropertyEditor implements Initializable {
 
@@ -35,9 +39,9 @@ public class RichtextEditorController extends AbstractPropertyEditor implements 
 
   private final CodeArea codeArea = new CodeArea();
 
-  private Column column;
+  private Consumer<String> writer;
 
-  // Set while setColumn() is repopulating codeArea from the model, so the listener below doesn't mistake that
+  // Set while setCustom() is repopulating codeArea from the model, so the listener below doesn't mistake that
   // programmatic change for a user edit.
   private boolean updatingFromModel;
 
@@ -53,11 +57,28 @@ public class RichtextEditorController extends AbstractPropertyEditor implements 
       if (updatingFromModel) {
         return;
       }
-      column.setExpression(blankToNull(newValue));
+      writer.accept(blankToNull(newValue));
       commitChange();
     });
     codeArea.textProperty().addListener((observable, oldValue, newValue) ->
         codeArea.setStyleSpans(0, computeHighlighting(newValue)));
+  }
+
+  /**
+   * Overrides this panel's title and expanded-state settings key, for a reuse other than the default
+   * "%expression" (see {@link de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController#configureCustom}
+   * for the same pattern).
+   */
+  public void configureCustom(@NonNull String fieldKey, @NonNull String title) {
+    setTitle(title);
+    setSettingsKeySuffix("." + fieldKey);
+  }
+
+  /** Shows or hides this whole panel, e.g. when it's an alternate editor for a field shown only for one of
+   * several types the owner can switch between (see {@link
+   * de.a12.studio.ui.editors.formmodel.dialogs.FormButtonDialogController}'s label Type combo). */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
   }
 
   private static StyleSpans<Collection<String>> computeHighlighting(String text) {
@@ -73,11 +94,18 @@ public class RichtextEditorController extends AbstractPropertyEditor implements 
     return builder.create();
   }
 
-  public void setColumn(@NonNull Column column) {
-    this.column = column;
+  /**
+   * Binds this panel directly to a caller-supplied expression string, read/written via {@code reader}/{@code
+   * writer} (e.g. {@code column::getExpression}/{@code column::setExpression}). {@code reader} repopulates the
+   * editor, including right away as this method runs, so it must be safe to call before the user has typed
+   * anything.
+   */
+  public void setCustom(@NonNull Supplier<String> reader, @NonNull Consumer<String> writer) {
+    this.writer = writer;
     updatingFromModel = true;
     try {
-      codeArea.replaceText(column.getExpression() != null ? column.getExpression() : "");
+      String value = reader.get();
+      codeArea.replaceText(value != null ? value : "");
     }
     finally {
       updatingFromModel = false;

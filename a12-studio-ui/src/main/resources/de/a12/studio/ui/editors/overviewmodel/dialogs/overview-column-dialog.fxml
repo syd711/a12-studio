@@ -81,7 +81,7 @@
                            <TextField fx:id="nameField" promptText="%distinguishes_this_column_from_others_e_g_fullname" />
                         </children>
                      </VBox>
-                     <fx:include fx:id="expressionPanel" source="../richtext-editor.fxml" />
+                     <fx:include fx:id="expressionPanel" source="../../propertyeditors/richtext-editor.fxml" />
                   </children>
                </VBox>
 
