@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.formmodel.dialogs;
 
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.EventButton;
+import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -39,10 +40,16 @@ public class Dialogs {
   private static boolean showButton(Stage owner, String title, List<String> screenIds, Button button) {
     FXMLLoader fxmlLoader = new FXMLLoader(FormButtonDialogController.class.getResource("form-button-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
+    Stage stage = WidgetFactory.createDialogStage("button-dialog", fxmlLoader, owner, title);
     FormButtonDialogController controller = (FormButtonDialogController) stage.getUserData();
     controller.init(stage, screenIds, button);
     stage.setOnHidden(event -> controller.destroy());
+
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
+    stage.setMinWidth(800);
+    stage.setMinHeight(600);
+    stage.setOnHidden(event -> controller.destroy());
+
     stage.showAndWait();
     return controller.isConfirmed();
   }

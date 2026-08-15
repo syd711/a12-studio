@@ -113,6 +113,24 @@
     -fx-padding: 0;
 }
 
+/*
+ * Modena (.titled-pane > .content > BorderPane, etc. in modena.css) puts ~0.8em padding directly
+ * on the content root itself whenever it's one of these layout container types - not on the
+ * .content wrapper above, which is why zeroing that wrapper's padding alone isn't enough to make
+ * an embedded panel's own root (e.g. a BorderPane holding a toolbar + tree) sit flush.
+ */
+.titled-pane-embedded > .content > AnchorPane,
+.titled-pane-embedded > .content > BorderPane,
+.titled-pane-embedded > .content > FlowPane,
+.titled-pane-embedded > .content > GridPane,
+.titled-pane-embedded > .content > HBox,
+.titled-pane-embedded > .content > Pane,
+.titled-pane-embedded > .content > StackPane,
+.titled-pane-embedded > .content > TilePane,
+.titled-pane-embedded > .content > VBox {
+    -fx-padding: 0;
+}
+
 /* TitledPane nested two levels deep, i.e. inside a .titled-pane-child's content - same accent-line treatment. */
 .titled-pane-sub-child {
     -fx-background-color: transparent;
