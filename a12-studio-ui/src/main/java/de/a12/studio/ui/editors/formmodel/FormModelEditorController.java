@@ -283,7 +283,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
     documentRelationshipModelCollapsedStrip.setVisible(collapsing);
     documentRelationshipModelCollapsedStrip.setManaged(collapsing);
     if (collapsing) {
-      documentRelationshipModelPane.setMaxWidth(Region.USE_PREF_SIZE);
+      documentRelationshipModelPane.setMaxWidth(50);
     }
     else {
       documentRelationshipModelPane.setMaxWidth(Double.MAX_VALUE);
