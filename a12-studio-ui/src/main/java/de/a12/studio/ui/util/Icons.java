@@ -68,7 +68,7 @@ public interface Icons {
   String ELEMENT_GENERIC = "mdi2s-shape-outline";
   String ELEMENT_FIELD = "mdi2a-alpha-f-box";
   String ELEMENT_COMPUTATION = "mdi2a-alpha-c-circle";
-  String ELEMENT_ATTACHMENT = "mdi2d-database-plus-outline";
+  String ELEMENT_ATTACHMENT = "mdi2a-attachment";
   String ELEMENT_ANNOTATION = "mdi2a-alpha-a-box-outline";
   String ELEMENT_REQUIRED = "mdi2a-asterisk-circle-outline";
 

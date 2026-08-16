@@ -1,20 +1,16 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
-import de.a12.studio.models.Label;
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.ButtonGroup;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
-import de.a12.studio.models.formmodel.LocalizedText;
-import de.a12.studio.models.formmodel.MultilingualText;
 import de.a12.studio.models.formmodel.Screen;
-import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
 import de.a12.studio.ui.editors.formmodel.NamePanelController;
 import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
-import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
 import de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
@@ -36,7 +32,7 @@ public class FormNodeEditorScreenPanelController {
   @FXML
   private NamePanelController nameController;
   @FXML
-  private LocalizedTextPanelController labelController;
+  private LocalizedTextTypePanelController labelController;
   @FXML
   private AnnotationsPanelController annotationsController;
 
@@ -53,13 +49,13 @@ public class FormNodeEditorScreenPanelController {
 
   @FXML
   private void initialize() {
-    labelController.configureCustom("label", "LABEL");
+    labelController.configureCustom("label", "Label");
   }
 
   public void setScreen(@NonNull Screen screen, @NonNull List<String> screenIds) {
     this.screen = screen;
     nameController.setCustom(screen::getName, screen::setName);
-    labelController.setCustom(this::currentLabelTexts, this::writeLabelTexts);
+    labelController.setCustom(screen::getTitle, screen::setTitle);
     annotationsController.setCustom(screen::getAnnotations);
 
     HeaderFooterBox subHeaderBox = ensureBox(screen.getSubHeaderBox(), screen.getId() + "-subHeaderBox", screen::setSubHeaderBox);
@@ -109,32 +105,5 @@ public class FormNodeEditorScreenPanelController {
 
   private Optional<Button> editButtonViaDialog(List<String> screenIds, Button button) {
     return Dialogs.showButtonForEdit(Studio.stage, screenIds, button);
-  }
-
-  private List<Label> currentLabelTexts() {
-    LocalizedText title = screen.getTitle();
-    if (title instanceof MultilingualText multilingualText && multilingualText.getMultilingualText() != null) {
-      return multilingualText.getMultilingualText().getText();
-    }
-    return List.of();
-  }
-
-  private List<Label> writeLabelTexts() {
-    return getOrCreateMultilingualTitle().getMultilingualText().getText();
-  }
-
-  private MultilingualText getOrCreateMultilingualTitle() {
-    LocalizedText title = screen.getTitle();
-    MultilingualText multilingualText;
-    if (title instanceof MultilingualText existing) {
-      multilingualText = existing;
-    } else {
-      multilingualText = new MultilingualText();
-      screen.setTitle(multilingualText);
-    }
-    if (multilingualText.getMultilingualText() == null) {
-      multilingualText.setMultilingualText(new TextContainer());
-    }
-    return multilingualText;
   }
 }

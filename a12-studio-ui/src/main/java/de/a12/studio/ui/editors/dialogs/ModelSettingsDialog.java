@@ -6,6 +6,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.models.projects.ProjectItem;
@@ -13,11 +14,11 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
-import de.a12.studio.ui.editors.formmodel.GeneralDetachedRepeatSettingsPanelController;
-import de.a12.studio.ui.editors.formmodel.GeneralInlineRepeatSettingsPanelController;
-import de.a12.studio.ui.editors.formmodel.GeneralSettingsPanelController;
-import de.a12.studio.ui.editors.formmodel.RuleConfirmationSettingsPanelController;
-import de.a12.studio.ui.editors.formmodel.SubtitlePanelController;
+import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralDetachedRepeatSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralInlineRepeatSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.modelsettings.RuleConfirmationSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.modelsettings.SubtitlePanelController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DocumentUniquenessCriteriaPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
@@ -177,8 +178,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       }
       supportedCharactersController.setVisible(
           !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel)
-              && !(model instanceof RelationshipModel));
-      modelReferencesController.setVisible(!(model instanceof OverviewModel) && !(model instanceof FormModel));
+              && !(model instanceof RelationshipModel) && !(model instanceof QueryModel));
+      modelReferencesController.setVisible(
+          !(model instanceof OverviewModel) && !(model instanceof FormModel) && !(model instanceof QueryModel));
     }
 
     bindErrorContainer();

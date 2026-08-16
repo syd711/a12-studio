@@ -1,22 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.querymodel.QueryModelTreeController">
     <top>
         <VBox>
             <children>
-                <fx:include fx:id="targetModelPanel" source="../propertyeditors/target-model-panel.fxml" />
                 <ToolBar styleClass="panel-toolbar">
                     <items>
                         <Separator prefHeight="0.0" prefWidth="0.0" />
                         <fx:include fx:id="search" source="../../components/search-field.fxml" />
+                        <Separator orientation="VERTICAL" />
+                        <Button fx:id="expandAllButton" accessibleText="%expand_all" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2a-arrow-expand-vertical" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%expand_all" />
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="collapseAllButton" accessibleText="%collapse_all" mnemonicParsing="false" onAction="#onCollapseAll" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2a-arrow-collapse-vertical" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%collapse_all" />
+                            </tooltip>
+                        </Button>
                     </items>
                 </ToolBar>
             </children>
@@ -26,7 +46,18 @@
         <TreeTableView fx:id="elementsTreeTable" BorderPane.alignment="CENTER">
             <columns>
                 <TreeTableColumn fx:id="nameColumn" prefWidth="350.0" text="%name" />
-                <TreeTableColumn fx:id="inResultColumn" prefWidth="90.0" text="%in_result" />
+                <TreeTableColumn fx:id="inResultColumn" prefWidth="90.0" text="%in_result">
+                    <graphic>
+                        <Label prefHeight="9.0" prefWidth="7.0">
+                            <tooltip>
+                                <Tooltip prefWidth="300.0" text="%it_can_be_selected_whether_the_data_for_the_respective_field" wrapText="true" />
+                            </tooltip>
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                            </graphic>
+                        </Label>
+                    </graphic>
+                </TreeTableColumn>
                 <TreeTableColumn fx:id="filterDefinitionColumn" prefWidth="400.0" text="%filter_definition" />
             </columns>
         </TreeTableView>

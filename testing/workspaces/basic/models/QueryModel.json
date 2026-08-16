@@ -11,6 +11,7 @@
         "code": "de"
       }
     ],
+    "labels": [],
     "annotations": [
       {
         "name": "roles",
@@ -19,8 +20,8 @@
     ],
     "modelReferences": [
       {
-        "modelType": "document",
         "alias": "DM",
+        "modelType": "document",
         "purpose": "document-model-for-query",
         "reference": "Person_DM"
       }
@@ -33,12 +34,10 @@
       "/People/Addresses/Street",
       "/People/Addresses/City",
       "/People/Addresses/Country",
-      "/People/Addresses/PostalCode"
+      "/People/Addresses/PostalCode",
+      "/People/FirstName",
+      "/People/LastName"
     ],
-    "paging": {
-      "pageSize": 10,
-      "pageNumber": 1
-    },
     "sort": [
       {
         "relationshipModel": "PersonCompany",
@@ -50,6 +49,10 @@
           "ignoreCase": false
         }
       }
-    ]
+    ],
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 1
+    }
   }
 }

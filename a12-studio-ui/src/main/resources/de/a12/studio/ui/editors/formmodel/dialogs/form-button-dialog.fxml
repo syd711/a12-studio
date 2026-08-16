@@ -2,8 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
@@ -27,15 +25,7 @@
                <fx:include fx:id="functions" source="../button-functions-panel.fxml" />
                <fx:include fx:id="visual" source="../button-visual-settings-panel.fxml" />
 
-               <!-- Label -->
-               <VBox spacing="10.0">
-                  <children>
-                     <Label styleClass="field-label" text="%type" />
-                     <ComboBox fx:id="labelTypeCombo" maxWidth="Infinity" />
-                     <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
-                     <fx:include fx:id="labelExpression" source="../../propertyeditors/richtext-editor.fxml" styleClass="titled-pane-sub-child" />
-                  </children>
-               </VBox>
+               <fx:include fx:id="label" source="../../propertyeditors/localized-text-type-panel.fxml" />
 
                <!-- Description -->
                <fx:include fx:id="description" source="../../propertyeditors/localized-text-panel.fxml" />

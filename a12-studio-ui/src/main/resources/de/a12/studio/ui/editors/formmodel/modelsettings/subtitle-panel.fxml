@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../../stylesheet.css"
+            text="%subtitle" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.modelsettings.SubtitlePanelController">
+    <BorderPane>
+        <center>
+            <fx:include fx:id="subtitleText" source="../../propertyeditors/localized-text-type-panel.fxml"/>
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../../components/error-container.fxml"
+                        BorderPane.alignment="CENTER"/>
+        </top>
+    </BorderPane>
+</TitledPane>

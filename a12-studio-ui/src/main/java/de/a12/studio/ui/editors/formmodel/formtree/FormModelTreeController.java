@@ -21,8 +21,10 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelController;
 import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorScreenPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSectionPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
@@ -87,6 +89,14 @@ public class FormModelTreeController implements Initializable {
   private Node screenEditor;
   @FXML
   private FormNodeEditorScreenPanelController screenEditorController;
+  @FXML
+  private Node sectionEditor;
+  @FXML
+  private FormNodeEditorSectionPanelController sectionEditorController;
+  @FXML
+  private Node controlGridEditor;
+  @FXML
+  private FormNodeEditorControlGridPanelController controlGridEditorController;
 
   private ProjectItem projectItem;
   private FormModelContent content;
@@ -121,9 +131,11 @@ public class FormModelTreeController implements Initializable {
 
   /**
    * Shows/populates the right-hand editor pane for whichever node is currently selected in the tree - a
-   * {@link Row}, {@link MultiColumnSection} or {@link Screen} each get their own dedicated editor pane
-   * ({@link FormNodeEditorRowPanelController}/{@link MultiColumnSectionEditorPanelController}/{@link
-   * FormNodeEditorScreenPanelController}); any other node type (or no selection) falls back to {@link #noSelectionLabel}.
+   * {@link Row}, {@link MultiColumnSection}, {@link Screen}, {@link Section} or {@link ControlGrid} each get
+   * their own dedicated editor pane ({@link FormNodeEditorRowPanelController}/{@link
+   * MultiColumnSectionEditorPanelController}/{@link FormNodeEditorScreenPanelController}/{@link
+   * FormNodeEditorSectionPanelController}/{@link FormNodeEditorControlGridPanelController}); any other node type
+   * (or no selection) falls back to {@link #noSelectionLabel}.
    */
   private void updateEditorPane(@Nullable TreeItem<FormElementViewModel> selectedItem) {
     Object node = selectedItem != null && selectedItem.getValue() != null ? selectedItem.getValue().getNode() : null;
@@ -131,11 +143,15 @@ public class FormModelTreeController implements Initializable {
     boolean isRow = node instanceof Row;
     boolean isMultiColumnSection = node instanceof MultiColumnSection;
     boolean isScreen = node instanceof Screen;
+    boolean isSection = node instanceof Section;
+    boolean isControlGrid = node instanceof ControlGrid;
 
     setVisible(rowEditor, isRow);
     setVisible(multiColumnSectionEditor, isMultiColumnSection);
     setVisible(screenEditor, isScreen);
-    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen));
+    setVisible(sectionEditor, isSection);
+    setVisible(controlGridEditor, isControlGrid);
+    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection || isControlGrid));
 
     if (isRow) {
       rowEditorController.setRow((Row) node);
@@ -145,6 +161,12 @@ public class FormModelTreeController implements Initializable {
     }
     else if (isScreen) {
       screenEditorController.setScreen((Screen) node, screenIds());
+    }
+    else if (isSection) {
+      sectionEditorController.setSection((Section) node);
+    }
+    else if (isControlGrid) {
+      controlGridEditorController.setControlGrid((ControlGrid) node);
     }
   }
 
@@ -222,7 +244,16 @@ public class FormModelTreeController implements Initializable {
 
   @FXML
   private void onCollapseAll() {
-    setExpandedRecursive(tree.getRoot(), false);
+    TreeItem<FormElementViewModel> root = tree.getRoot();
+    if (root == null) {
+      return;
+    }
+    // Root is hidden (showRoot=false) but must stay expanded, otherwise its
+    // top-level children would be hidden along with it.
+    root.setExpanded(true);
+    for (TreeItem<FormElementViewModel> child : root.getChildren()) {
+      setExpandedRecursive(child, false);
+    }
   }
 
   private void setExpandedRecursive(TreeItem<FormElementViewModel> item, boolean expanded) {

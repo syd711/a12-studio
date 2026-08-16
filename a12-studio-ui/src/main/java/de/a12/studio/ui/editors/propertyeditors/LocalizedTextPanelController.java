@@ -19,7 +19,9 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.LocalesChangedEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.GridPane;
 import org.jspecify.annotations.NonNull;
 
@@ -27,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -44,6 +47,10 @@ import java.util.function.Supplier;
  * after this controller is loaded from FXML, before setElement/setModel/setModule/setCase/setConfirmation/setColumn;
  * {@code element}, {@link #model}, {@link #module}, {@link #sceneCase}, {@link #confirmation} and {@link
  * #column} are mutually exclusive.
+ *
+ * <p>{@link LocalizedTextAreaPanelController} subclasses this to edit the same per-locale texts with a {@link
+ * javafx.scene.control.TextArea} per locale instead of a {@link javafx.scene.control.TextField}, overriding
+ * only {@link #createLocaleField}.
  */
 public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
@@ -97,7 +104,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   private String fieldKey = "external";
 
-  private final Map<String, TextField> textFieldsByLocale = new LinkedHashMap<>();
+  private final Map<String, TextInputControl> textFieldsByLocale = new LinkedHashMap<>();
 
   public void setVisible(boolean visible) {
     setEditorVisible(visible);
@@ -400,27 +407,60 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
     int row = 1;
     for (Locale locale : getModelLocales()) {
       javafx.scene.control.Label localeLabel = new javafx.scene.control.Label(locale.getCode());
-      TextField textField = new TextField();
-      textField.setId(fieldKey + "-" + locale.getCode());
-      textField.setMaxWidth(Double.MAX_VALUE);
-      bindTextField(textField, (el, value) -> setLocaleText(locale.getCode(), value));
+      TextInputControl field = createLocaleField(fieldKey + "-" + locale.getCode());
+      field.setMaxWidth(Double.MAX_VALUE);
+      bindLocaleField(field, (el, value) -> setLocaleText(locale.getCode(), value));
 
-      localesGrid.addRow(row, localeLabel, textField);
-      textFieldsByLocale.put(locale.getCode(), textField);
+      localesGrid.addRow(row, localeLabel, field);
+      textFieldsByLocale.put(locale.getCode(), field);
       row++;
+    }
+  }
+
+  /**
+   * Creates the control used for a single locale's row. Overridden by {@link LocalizedTextAreaPanelController}
+   * to use a {@link TextArea} instead of a {@link TextField}.
+   */
+  protected TextInputControl createLocaleField(@NonNull String id) {
+    TextField textField = new TextField();
+    textField.setId(id);
+    return textField;
+  }
+
+  /**
+   * Wires {@code field} (as created by {@link #createLocaleField}) up to {@code setter} via {@link
+   * #bindTextField}/{@link #bindTextArea}, whichever matches its actual type.
+   */
+  private void bindLocaleField(@NonNull TextInputControl field, @NonNull BiConsumer<Element, String> setter) {
+    if (field instanceof TextArea textArea) {
+      bindTextArea(textArea, setter);
+    } else if (field instanceof TextField textField) {
+      bindTextField(textField, setter);
     }
   }
 
   private void populateLocaleFields() {
     List<Label> texts = getTexts();
-    textFieldsByLocale.forEach((localeCode, textField) -> {
+    textFieldsByLocale.forEach((localeCode, field) -> {
       String text = texts.stream()
           .filter(label -> localeCode.equals(label.getLocale()))
           .findFirst()
           .map(Label::getText)
           .orElse("");
-      setFieldValue(textField, text);
+      setLocaleFieldValue(field, text);
     });
+  }
+
+  /**
+   * Sets {@code field}'s value without triggering the save/validation cycle, dispatching to whichever of
+   * {@link #setFieldValue(TextField, String)}/{@link #setFieldValue(TextArea, String)} matches its actual type.
+   */
+  private void setLocaleFieldValue(@NonNull TextInputControl field, String value) {
+    if (field instanceof TextArea textArea) {
+      setFieldValue(textArea, value);
+    } else if (field instanceof TextField textField) {
+      setFieldValue(textField, value);
+    }
   }
 
   private List<Label> getWriteTexts() {

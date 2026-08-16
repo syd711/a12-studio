@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../../../stylesheet.css" text="%name" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.SectionNamePanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="8.0">
+    <children>
+      <Label styleClass="field-label" text="%section_name" />
+      <TextField fx:id="nameField" />
+      <CheckBox fx:id="collapsibleField" text="%collapsible" />
+    </children>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

@@ -121,7 +121,16 @@ public class DocumentSourceTreeController implements Initializable {
 
   @FXML
   private void onCollapseAll() {
-    setExpandedRecursive(tree.getRoot(), false);
+    TreeItem<ElementViewModel> root = tree.getRoot();
+    if (root == null) {
+      return;
+    }
+    // Root is hidden (showRoot=false) but must stay expanded, otherwise its
+    // top-level children would be hidden along with it.
+    root.setExpanded(true);
+    for (TreeItem<ElementViewModel> child : root.getChildren()) {
+      setExpandedRecursive(child, false);
+    }
   }
 
   private TreeItem<ElementViewModel> toTreeItem(@NonNull Element element) {

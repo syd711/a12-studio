@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../stylesheet.css" text="%layout" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.ColumnLayoutPanelController">
+ <BorderPane>
+ <center>
+  <HBox alignment="CENTER_LEFT" spacing="6.0">
+    <children>
+      <TextField fx:id="layoutField" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+      <Label fx:id="layoutInfoIcon" />
+    </children>
+  </HBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="../../components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

@@ -1,4 +1,4 @@
-package de.a12.studio.ui.editors.formmodel;
+package de.a12.studio.ui.editors.formmodel.modelsettings;
 
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;

@@ -1,7 +1,5 @@
 package de.a12.studio.ui.editors.querymodel;
 
-import de.a12.studio.models.ModelReference;
-import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
@@ -12,7 +10,6 @@ import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
-import de.a12.studio.ui.editors.propertyeditors.TargetModelPanelController;
 import de.a12.studio.ui.editors.querymodel.dialogs.Dialogs;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -31,7 +28,6 @@ import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -43,9 +39,6 @@ import java.util.ResourceBundle;
  * Document Model rather than one per graph node; see {@link QueryTreeRow#hasFilterDefinition()}.
  */
 public class QueryModelTreeController implements Initializable {
-
-  @FXML
-  private TargetModelPanelController targetModelPanelController;
 
   @FXML
   private SearchFieldController searchController;
@@ -79,14 +72,12 @@ public class QueryModelTreeController implements Initializable {
     filterDefinitionColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue()));
     filterDefinitionColumn.setCellFactory(column -> new FilterDefinitionCell());
 
-    targetModelPanelController.setOnChange(this::onTargetModelChanged);
     searchController.setOnSearch(term -> rebuildTree());
   }
 
   public void load(@NonNull ProjectItem projectItem, @NonNull QueryModel model) {
     this.projectItem = projectItem;
     this.model = model;
-    targetModelPanelController.load(ProjectDocumentModels.getOtherDocumentModels(projectItem), content().getTargetDocumentModel());
     resolveTargetDocumentModel();
     rebuildTree();
   }
@@ -102,39 +93,6 @@ public class QueryModelTreeController implements Initializable {
         .findFirst()
         .orElse(null);
     elementIndex = targetDocumentModel != null ? new ElementIndex(targetDocumentModel) : null;
-  }
-
-  private void onTargetModelChanged() {
-    String newTargetId = targetModelPanelController.getValue();
-    if (!Objects.equals(newTargetId, content().getTargetDocumentModel())) {
-      content().setTargetDocumentModel(newTargetId);
-      // Field paths and the filter expression are only meaningful against the Document Model they were
-      // picked/written against; switching target drops both rather than silently keeping stale references.
-      content().getFields().clear();
-      content().setFilterDefinition(null);
-      syncTargetModelReference(newTargetId);
-      resolveTargetDocumentModel();
-      rebuildTree();
-      commitChange();
-    }
-  }
-
-  /**
-   * Mirrors {@code MappingModelEditorController#syncModelReferences} for a single reference instead of a list:
-   * replaces whatever {@link ModelReference#PURPOSE_DOCUMENT_MODEL_FOR_QUERY} reference the header carries with
-   * one pointing at {@code targetId} (or drops it entirely once {@code targetId} is {@code null}).
-   */
-  private void syncTargetModelReference(String targetId) {
-    List<ModelReference> references = model.getModelReferences();
-    references.removeIf(reference -> reference.getModelType() == ModelType.DOCUMENT
-        && ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_QUERY.equals(reference.getPurpose()));
-    if (targetId != null) {
-      ModelReference reference = new ModelReference();
-      reference.setModelType(ModelType.DOCUMENT);
-      reference.setPurpose(ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_QUERY);
-      reference.setReference(targetId);
-      references.add(reference);
-    }
   }
 
   private void rebuildTree() {
@@ -243,6 +201,26 @@ public class QueryModelTreeController implements Initializable {
     }
     commitChange();
     elementsTreeTable.refresh();
+  }
+
+  @FXML
+  private void onExpandAll() {
+    setExpandedRecursive(elementsTreeTable.getRoot(), true);
+  }
+
+  @FXML
+  private void onCollapseAll() {
+    setExpandedRecursive(elementsTreeTable.getRoot(), false);
+  }
+
+  private void setExpandedRecursive(TreeItem<QueryTreeRow> item, boolean expanded) {
+    if (item == null) {
+      return;
+    }
+    item.setExpanded(expanded);
+    for (TreeItem<QueryTreeRow> child : item.getChildren()) {
+      setExpandedRecursive(child, expanded);
+    }
   }
 
   private void onEditFilterDefinition() {

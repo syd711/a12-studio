@@ -1,7 +1,6 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
-import de.a12.studio.models.formmodel.Row;
-import de.a12.studio.ui.editors.formmodel.NamePanelController;
+import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
@@ -10,14 +9,14 @@ import javafx.fxml.FXML;
 import org.jspecify.annotations.NonNull;
 
 /**
- * The Form Model tree's right-hand editor pane for a selected {@link Row} node ({@link
- * FormModelTreeController}): Name, Label (per-locale text or expression, bound to {@link Row#getTitle()}),
- * Styles and Annotations.
+ * The Form Model tree's right-hand editor pane for a selected {@link Section} node ({@link
+ * FormModelTreeController}): Name/Collapsible ({@link SectionNamePanelController}), Label (per-locale text or
+ * expression, bound to {@link Section#getTitle()}), Styles and Annotations.
  */
-public class FormNodeEditorRowPanelController {
+public class FormNodeEditorSectionPanelController {
 
   @FXML
-  private NamePanelController nameController;
+  private SectionNamePanelController nameController;
   @FXML
   private LocalizedTextTypePanelController labelController;
   @FXML
@@ -30,10 +29,10 @@ public class FormNodeEditorRowPanelController {
     labelController.configureCustom("label", "Label");
   }
 
-  public void setRow(@NonNull Row row) {
-    nameController.setCustom(row::getName, row::setName);
-    labelController.setCustom(row::getTitle, row::setTitle);
-    stylesController.setCustom(row::getStyle, row::getStyle);
-    annotationsController.setCustom(row::getAnnotations);
+  public void setSection(@NonNull Section section) {
+    nameController.setSection(section);
+    labelController.setCustom(section::getTitle, section::setTitle);
+    stylesController.setCustom(section::getStyle, section::getStyle);
+    annotationsController.setCustom(section::getAnnotations);
   }
 }

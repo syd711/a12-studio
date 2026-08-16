@@ -47,6 +47,8 @@
                         <fx:include fx:id="rowEditor" source="nodeeditors/formnode-editor-row-panel.fxml" />
                         <fx:include fx:id="multiColumnSectionEditor" source="../multi-column-section-editor-panel.fxml" />
                         <fx:include fx:id="screenEditor" source="nodeeditors/formnode-editor-screen-panel.fxml" />
+                        <fx:include fx:id="sectionEditor" source="nodeeditors/formnode-editor-section-panel.fxml" />
+                        <fx:include fx:id="controlGridEditor" source="nodeeditors/formnode-editor-control-grid-panel.fxml" />
                     </children>
                 </StackPane>
             </items>

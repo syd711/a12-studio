@@ -5,9 +5,7 @@ import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.ButtonStyling;
 import de.a12.studio.models.formmodel.ButtonType;
 import de.a12.studio.models.formmodel.EventButton;
-import de.a12.studio.models.formmodel.ExpressionText;
 import de.a12.studio.models.formmodel.LocalizedText;
-import de.a12.studio.models.formmodel.LocalizedTextType;
 import de.a12.studio.models.formmodel.MultilingualText;
 import de.a12.studio.models.formmodel.NavigationButton;
 import de.a12.studio.models.formmodel.Style;
@@ -22,13 +20,10 @@ import de.a12.studio.ui.editors.formmodel.ButtonVisualSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
-import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -39,8 +34,9 @@ import java.util.Optional;
  * opened from {@link de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController}'s Add button (see
  * {@link Dialogs#showButtonForAdd}). SME's {@code I_Button-form.json}: General Settings ({@link
  * ButtonGeneralPanelController}), Button Functions ({@link ButtonFunctionsPanelController}), Visual Settings
- * ({@link ButtonVisualSettingsPanelController}), Label/Description ({@link LocalizedTextPanelController}, twice),
- * Styles ({@link StylesPanelController}) and Annotations ({@link AnnotationsPanelController}).
+ * ({@link ButtonVisualSettingsPanelController}), Label ({@link LocalizedTextTypePanelController}), Description
+ * ({@link LocalizedTextPanelController}), Styles ({@link StylesPanelController}) and Annotations ({@link
+ * AnnotationsPanelController}).
  * <p>
  * {@code button} starts out unattached (not yet added to its owning list - the caller only does that once
  * {@link #isConfirmed()} is true), so unlike {@link
@@ -59,11 +55,7 @@ public class FormButtonDialogController implements DialogController {
   private ButtonVisualSettingsPanelController visualController;
 
   @FXML
-  private ComboBox<String> labelTypeCombo;
-  @FXML
-  private LocalizedTextPanelController labelController;
-  @FXML
-  private RichtextEditorController labelExpressionController;
+  private LocalizedTextTypePanelController labelController;
 
   @FXML
   private LocalizedTextPanelController descriptionController;
@@ -90,47 +82,21 @@ public class FormButtonDialogController implements DialogController {
 
   private Optional<javafx.scene.control.ButtonType> result = Optional.of(javafx.scene.control.ButtonType.CANCEL);
 
-  // Set while labelTypeCombo is being repopulated from the model (bindPanels(), on every setButton()/type
-  // swap), so that programmatic set doesn't get mistaken for a user edit and eagerly create an empty
-  // buttonStyling.label the user never actually touched.
-  private boolean updatingFromModel;
-
   @FXML
   private void initialize() {
     generalController.setSaveMode(saveMode);
     functionsController.setSaveMode(saveMode);
     visualController.setSaveMode(saveMode);
     labelController.setSaveMode(saveMode);
-    labelExpressionController.setSaveMode(saveMode);
     descriptionController.setSaveMode(saveMode);
     stylesController.setSaveMode(saveMode);
     annotationsController.setSaveMode(saveMode);
 
-    labelController.configureCustom("label", "LABEL");
-    labelExpressionController.configureCustom("label", "LABEL");
+    labelController.configureCustom("label", "Label");
     descriptionController.configureCustom("description", "DESCRIPTION");
     annotationsController.hideAnnotationDatasetsButton();
 
     functionsController.setOnTypeChanged(this::onTypeChanged);
-
-    labelTypeCombo.setItems(FXCollections.observableArrayList(
-        LocalizedTextType.MULTILINGUAL.getValue(), LocalizedTextType.EXPRESSION.getValue()));
-    labelTypeCombo.setConverter(new StringConverter<>() {
-      @Override
-      public String toString(String value) {
-        return LocalizedTextType.EXPRESSION.getValue().equals(value) ? "Expression" : "Text";
-      }
-
-      @Override
-      public String fromString(String displayName) {
-        return "Expression".equals(displayName) ? LocalizedTextType.EXPRESSION.getValue() : LocalizedTextType.MULTILINGUAL.getValue();
-      }
-    });
-    labelTypeCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (!updatingFromModel) {
-        applyLabelType(newValue);
-      }
-    });
 
     generalController.nameProperty().addListener((observable, oldValue, newValue) -> validate());
   }
@@ -151,7 +117,6 @@ public class FormButtonDialogController implements DialogController {
     functionsController.destroy();
     visualController.destroy();
     labelController.destroy();
-    labelExpressionController.destroy();
     descriptionController.destroy();
     stylesController.destroy();
     annotationsController.destroy();
@@ -204,17 +169,7 @@ public class FormButtonDialogController implements DialogController {
     functionsController.setButton(button);
     visualController.setButton(button);
 
-    boolean expression = getButtonStyling() != null && getButtonStyling().getLabel() instanceof ExpressionText;
-    updatingFromModel = true;
-    try {
-      labelTypeCombo.setValue(expression ? LocalizedTextType.EXPRESSION.getValue() : LocalizedTextType.MULTILINGUAL.getValue());
-    }
-    finally {
-      updatingFromModel = false;
-    }
-    labelController.setCustom(this::currentLabelTexts, this::writeLabelTexts);
-    labelExpressionController.setCustom(this::currentLabelExpression, this::writeLabelExpression);
-    updateLabelVisibility(expression);
+    labelController.setCustom(this::currentLabel, this::writeLabel);
 
     descriptionController.setCustom(this::currentDescriptionTexts, this::writeDescriptionTexts);
 
@@ -229,76 +184,17 @@ public class FormButtonDialogController implements DialogController {
     okButton.setDisable(name == null || name.isBlank());
   }
 
-  private void applyLabelType(String value) {
-    boolean expression = LocalizedTextType.EXPRESSION.getValue().equals(value);
-    ButtonStyling styling = button.getOrCreateButtonStyling();
-    if (expression) {
-      if (!(styling.getLabel() instanceof ExpressionText)) {
-        styling.setLabel(new ExpressionText());
-      }
-    }
-    else {
-      getOrCreateMultilingualLabel();
-    }
-    updateLabelVisibility(expression);
-  }
-
-  private void updateLabelVisibility(boolean expression) {
-    labelController.setVisible(!expression);
-    labelExpressionController.setVisible(expression);
-  }
-
   private ButtonStyling getButtonStyling() {
     return button.getButtonStyling();
   }
 
-  private List<Label> currentLabelTexts() {
+  private LocalizedText currentLabel() {
     ButtonStyling styling = getButtonStyling();
-    LocalizedText label = styling != null ? styling.getLabel() : null;
-    if (label instanceof MultilingualText multilingualText && multilingualText.getMultilingualText() != null) {
-      return multilingualText.getMultilingualText().getText();
-    }
-    return List.of();
+    return styling != null ? styling.getLabel() : null;
   }
 
-  private List<Label> writeLabelTexts() {
-    return getOrCreateMultilingualLabel().getMultilingualText().getText();
-  }
-
-  private String currentLabelExpression() {
-    ButtonStyling styling = getButtonStyling();
-    return styling != null && styling.getLabel() instanceof ExpressionText expressionText ? expressionText.getExpressionText() : null;
-  }
-
-  private void writeLabelExpression(String value) {
-    ButtonStyling styling = button.getOrCreateButtonStyling();
-    LocalizedText label = styling.getLabel();
-    ExpressionText expressionText;
-    if (label instanceof ExpressionText existing) {
-      expressionText = existing;
-    }
-    else {
-      expressionText = new ExpressionText();
-      styling.setLabel(expressionText);
-    }
-    expressionText.setExpressionText(value);
-  }
-
-  private MultilingualText getOrCreateMultilingualLabel() {
-    ButtonStyling styling = button.getOrCreateButtonStyling();
-    LocalizedText label = styling.getLabel();
-    MultilingualText multilingualText;
-    if (label instanceof MultilingualText existing) {
-      multilingualText = existing;
-    }
-    else {
-      multilingualText = new MultilingualText();
-      styling.setLabel(multilingualText);
-    }
-    if (multilingualText.getMultilingualText() == null) {
-      multilingualText.setMultilingualText(new TextContainer());
-    }
-    return multilingualText;
+  private void writeLabel(LocalizedText value) {
+    button.getOrCreateButtonStyling().setLabel(value);
   }
 
   private List<Label> currentDescriptionTexts() {
