@@ -1,0 +1,42 @@
+{
+  "header": {
+    "id": "MainDetailModuleModel",
+    "modelType": "module-masterdetail",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "de",
+        "text": "abc"
+      },
+      {
+        "locale": "en",
+        "text": "def"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "modeler,tester,systemAdmin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "type": "overview",
+    "formMapping": [
+      {
+        "documentModel": "Company_DM",
+        "formModel": "Company_FM"
+      }
+    ],
+    "overviewModel": "Company_OM"
+  }
+}

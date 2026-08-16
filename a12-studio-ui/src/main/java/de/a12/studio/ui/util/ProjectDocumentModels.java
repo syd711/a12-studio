@@ -114,7 +114,7 @@ public final class ProjectDocumentModels {
    * Opens the model referenced by {@code modelId} in an editor tab, selecting its tab instead if it's already
    * open (see {@code TabPaneController#modelOpened}). Does nothing if no model with that id exists in the
    * current project. Shared by every "edit reference" button across the property editors (e.g. {@link
-   * de.a12.studio.ui.editors.mappingmodel.TargetModelPanelController}, {@link
+   * de.a12.studio.ui.editors.propertyeditors.TargetModelPanelController}, {@link
    * de.a12.studio.ui.editors.maindetailmodel.MainModelReferencePanelController}, {@link
    * de.a12.studio.ui.editors.documentmodel.IncludePropertiesPanelController}, {@link
    * de.a12.studio.ui.editors.overviewmodel.OverviewReferencePanelController}).

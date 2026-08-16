@@ -35,7 +35,7 @@
             <content>
                 <VBox spacing="16.0" styleClass="field-editor">
                     <children>
-                        <fx:include fx:id="targetModelPanel" source="target-model-panel.fxml"/>
+                        <fx:include fx:id="targetModelPanel" source="../propertyeditors/target-model-panel.fxml"/>
                         <fx:include fx:id="sourceModelsPanel" source="source-models-panel.fxml"/>
                     </children>
                     <padding>

@@ -10,11 +10,11 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.formmodel.DocumentSourceTreeController">
+            fx:controller="de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController">
     <top>
         <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
             <items>
-                <fx:include fx:id="search" source="../../components/search-field.fxml" />
+                <fx:include fx:id="search" source="../../../components/search-field.fxml" />
                 <Separator orientation="VERTICAL" />
                 <Button fx:id="expandAllButton" accessibleText="%expand_all" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
                     <graphic>

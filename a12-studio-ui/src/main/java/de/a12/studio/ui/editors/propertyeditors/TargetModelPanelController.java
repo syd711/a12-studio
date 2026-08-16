@@ -1,4 +1,4 @@
-package de.a12.studio.ui.editors.mappingmodel;
+package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.ui.components.ErrorContainerController;
@@ -17,12 +17,14 @@ import java.util.ResourceBundle;
 
 /**
  * Edits a single Document Model reference via a plain combo box (e.g. a {@link
- * de.a12.studio.models.mappingmodel.MappingModel}'s {@code content.Target.dmId}). Isn't wired through {@link
- * de.a12.studio.ui.editors.AbstractPropertyEditor} for the same reason as {@link
+ * de.a12.studio.models.mappingmodel.MappingModel}'s {@code content.Target.dmId}, or a {@link
+ * de.a12.studio.models.querymodel.QueryModel}'s {@code content.targetDocumentModel}). Isn't wired through
+ * {@link de.a12.studio.ui.editors.AbstractPropertyEditor} for the same reason as {@link
  * de.a12.studio.ui.editors.maindetailmodel.MainModelReferencePanelController}: it edits a content field and a header {@link
  * de.a12.studio.models.ModelReference} directly, not a document-model {@link
  * de.a12.studio.models.documentmodel.Element}, and its owning editor already has its own
- * updatingFromModel/commitChange save cycle to fold this into.
+ * updatingFromModel/commitChange save cycle to fold this into. Lives in the shared {@code propertyeditors}
+ * package (per this repo's "extract property editors" convention) since it now has two consumers.
  */
 public class TargetModelPanelController implements Initializable {
 

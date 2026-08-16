@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 
@@ -16,6 +17,19 @@
         </ToolBar>
     </right>
     <center>
-        <Label styleClass="section-label" text="%query_model_editing_is_not_implemented_yet" BorderPane.alignment="CENTER" />
+        <TabPane styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="%model_tree">
+                    <content>
+                        <fx:include fx:id="queryModelTree" source="query-model-tree.fxml" />
+                    </content>
+                </Tab>
+                <Tab text="%post_processing">
+                    <content>
+                        <fx:include fx:id="postProcessingPanel" source="post-processing-panel.fxml" />
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
     </center>
 </BorderPane>

@@ -5,8 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import de.a12.studio.models.Annotation;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", visible = true, defaultImpl = GenericScreenElement.class)
@@ -32,4 +36,9 @@ public abstract class ScreenElement {
   private String name;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText title;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Style> style = new ArrayList<>();
+  // SME's "annotated_mixin" - a plain "annotations" field on the wire, matching documentmodel.Element.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Annotation> annotations = new ArrayList<>();
 }

@@ -24,6 +24,9 @@ public class ModelReference {
   // A Form Model's reference to the Document Model it binds its Controls' data to, matching SME's
   // FormModelFrame convention (see e.g. Invoice_FM.json's modelReferences entry).
   public static final String PURPOSE_DATA_BINDING = "data binding";
+  // A Query Model's reference to the Document Model it projects fields from, matching QueryModel.json's
+  // modelReferences entry.
+  public static final String PURPOSE_DOCUMENT_MODEL_FOR_QUERY = "document-model-for-query";
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String alias;

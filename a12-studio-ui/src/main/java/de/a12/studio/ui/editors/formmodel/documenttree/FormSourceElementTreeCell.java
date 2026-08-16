@@ -1,4 +1,4 @@
-package de.a12.studio.ui.editors.formmodel;
+package de.a12.studio.ui.editors.formmodel.documenttree;
 
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
 import de.a12.studio.ui.util.WidgetFactory;

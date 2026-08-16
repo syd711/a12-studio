@@ -14,8 +14,11 @@ import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
+import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
+import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController;
+import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
@@ -283,7 +286,11 @@ public class FormModelEditorController extends AbstractEditorController implemen
     documentRelationshipModelCollapsedStrip.setVisible(collapsing);
     documentRelationshipModelCollapsedStrip.setManaged(collapsing);
     if (collapsing) {
-      documentRelationshipModelPane.setMaxWidth(50);
+      documentRelationshipModelPane.setMaxWidth(44);
+      double totalWidth = overviewSplitPane.getWidth();
+      if (totalWidth > 0) {
+        overviewSplitPane.setDividerPosition(0, 44 / totalWidth);
+      }
     }
     else {
       documentRelationshipModelPane.setMaxWidth(Double.MAX_VALUE);
@@ -293,6 +300,19 @@ public class FormModelEditorController extends AbstractEditorController implemen
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+  }
+
+  /**
+   * Refreshes the Form Model tree's cell labels whenever anything belonging to this model is saved, so a
+   * Name/Label edit made in the tree's own right-hand editor pane ({@link FormModelTreeController}) - which
+   * commits directly rather than going through {@code formtree.FormModelActions}' tree-rebuilding {@code
+   * onModelChanged} - is still reflected in the tree immediately.
+   */
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    if (event.getItem().equals(projectItem)) {
+      formModelTreeController.refreshTreeLabels();
+    }
   }
 
   @Override

@@ -1,0 +1,55 @@
+{
+  "header": {
+    "id": "QueryModel",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Person_DM"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Person_DM",
+    "fields": [
+      "/People/Addresses/Street",
+      "/People/Addresses/City",
+      "/People/Addresses/Country",
+      "/People/Addresses/PostalCode"
+    ],
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 1
+    },
+    "sort": [
+      {
+        "relationshipModel": "PersonCompany",
+        "targetRole": "Company",
+        "sortBy": {
+          "field": "/Company/CompanyDetails/CompanyLogo/original_filename",
+          "direction": "ASC",
+          "nullHandling": "NULLS_FIRST",
+          "ignoreCase": false
+        }
+      }
+    ]
+  }
+}

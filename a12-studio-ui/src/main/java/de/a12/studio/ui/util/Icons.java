@@ -75,7 +75,7 @@ public interface Icons {
   String ELEMENT_VALIDATION_RULE = "mdi2a-alpha-v-circle";
   String ELEMENT_EXPRESSION = "mdi2e-epsilon";
 
-  // Form Model structural tree node types (formmodel.FormModelTreeController/FormElementViewModel).
+  // Form Model structural tree node types (formmodel.formtree.FormModelTreeController/FormElementViewModel).
   String FORM_SCREEN = "mdi2m-monitor-dashboard";
   String FORM_SECTION = "mdi2v-view-agenda-outline";
   String FORM_MULTI_COLUMN_SECTION = "mdi2v-view-column-outline";

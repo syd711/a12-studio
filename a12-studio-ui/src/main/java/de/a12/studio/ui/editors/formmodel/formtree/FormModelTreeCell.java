@@ -1,4 +1,4 @@
-package de.a12.studio.ui.editors.formmodel;
+package de.a12.studio.ui.editors.formmodel.formtree;
 
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.geometry.Pos;

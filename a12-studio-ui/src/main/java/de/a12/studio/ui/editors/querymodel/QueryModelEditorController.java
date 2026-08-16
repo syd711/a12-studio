@@ -4,16 +4,22 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import javafx.fxml.FXML;
 import org.jspecify.annotations.NonNull;
 
-/**
- * Placeholder editor for {@link QueryModel}: opens the model in an otherwise empty tab. Field editing
- * and validation are added later.
- */
 public class QueryModelEditorController extends AbstractEditorController {
+
+  @FXML
+  private QueryModelTreeController queryModelTreeController;
+
+  @FXML
+  private PostProcessingPanelController postProcessingPanelController;
 
   @Override
   public void loadModel(@NonNull A12Model<?> model) {
+    QueryModel queryModel = (QueryModel) model;
+    queryModelTreeController.load(projectItem, queryModel);
+    postProcessingPanelController.load(projectItem, queryModel);
     updateSettingsErrorBadge();
   }
 

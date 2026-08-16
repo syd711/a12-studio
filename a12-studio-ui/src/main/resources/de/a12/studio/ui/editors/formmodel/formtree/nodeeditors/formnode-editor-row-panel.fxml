@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" stylesheets="@../../../../stylesheet.css" styleClass="properties-panel" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController">
+    <content>
+        <VBox spacing="12.0" styleClass="field-editor">
+            <children>
+                <fx:include fx:id="name" source="../../name-panel.fxml" />
+                <fx:include fx:id="label" source="../../../propertyeditors/localized-text-panel.fxml" />
+                <fx:include fx:id="styles" source="../../styles-panel.fxml" />
+                <fx:include fx:id="annotations" source="../../../propertyeditors/annotations-panel.fxml" />
+            </children>
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+        </VBox>
+    </content>
+</ScrollPane>

@@ -62,7 +62,7 @@
                                                        <TitledPane animated="false" expanded="false" styleClass="titled-pane-embedded" text="%relationships" VBox.vgrow="NEVER" />
                                                        <TitledPane animated="false" expanded="true" maxHeight="Infinity" styleClass="titled-pane-embedded" text="%document_model" VBox.vgrow="ALWAYS">
                                                            <content>
-                                                               <fx:include fx:id="documentSourceTree" source="document-source-tree-panel.fxml" />
+                                                               <fx:include fx:id="documentSourceTree" source="documenttree/document-source-tree-panel.fxml" />
                                                            </content>
                                                        </TitledPane>
                                                    </children>
@@ -82,7 +82,7 @@
                                        </VBox>
                                    </children>
                                </StackPane>
-                               <fx:include fx:id="formModelTree" source="form-model-tree-panel.fxml" />
+                               <fx:include fx:id="formModelTree" source="formtree/form-model-tree-panel.fxml" />
                            </items>
                        </SplitPane>
                    </content>

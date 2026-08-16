@@ -1,4 +1,4 @@
-package de.a12.studio.ui.editors.formmodel;
+package de.a12.studio.ui.editors.formmodel.documenttree;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -7,6 +7,8 @@ import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
+import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
+import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -39,7 +41,7 @@ public class DocumentSourceTreeController implements Initializable {
   // Carries the dragged Element's id; FormModelTreeController resolves it back to an Element using its own
   // index over the same DocumentModel (both controllers are handed the same instance, see
   // FormModelEditorController#loadOverview) - no need to serialize more than the id onto the dragboard.
-  static final DataFormat SOURCE_ELEMENT_DRAG_FORMAT = new DataFormat("application/x-a12-form-model-source-element");
+  public static final DataFormat SOURCE_ELEMENT_DRAG_FORMAT = new DataFormat("application/x-a12-form-model-source-element");
 
   @FXML
   private SearchFieldController searchController;

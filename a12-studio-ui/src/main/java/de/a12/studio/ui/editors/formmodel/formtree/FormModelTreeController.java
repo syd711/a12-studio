@@ -1,4 +1,4 @@
-package de.a12.studio.ui.editors.formmodel;
+package de.a12.studio.ui.editors.formmodel.formtree;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -19,11 +19,17 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
+import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelController;
+import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorScreenPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.ClipboardContent;
@@ -42,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The right-hand "Form Model" structural tree of the Overview tab ({@link FormModelEditorController#loadOverview}):
@@ -65,6 +72,21 @@ public class FormModelTreeController implements Initializable {
 
   @FXML
   private TreeView<FormElementViewModel> tree;
+
+  @FXML
+  private Label noSelectionLabel;
+  @FXML
+  private Node rowEditor;
+  @FXML
+  private FormNodeEditorRowPanelController rowEditorController;
+  @FXML
+  private Node multiColumnSectionEditor;
+  @FXML
+  private MultiColumnSectionEditorPanelController multiColumnSectionEditorController;
+  @FXML
+  private Node screenEditor;
+  @FXML
+  private FormNodeEditorScreenPanelController screenEditorController;
 
   private ProjectItem projectItem;
   private FormModelContent content;
@@ -93,6 +115,56 @@ public class FormModelTreeController implements Initializable {
       setupCellDragAndDrop(cell);
       return cell;
     });
+    tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> updateEditorPane(newValue));
+    updateEditorPane(null);
+  }
+
+  /**
+   * Shows/populates the right-hand editor pane for whichever node is currently selected in the tree - a
+   * {@link Row}, {@link MultiColumnSection} or {@link Screen} each get their own dedicated editor pane
+   * ({@link FormNodeEditorRowPanelController}/{@link MultiColumnSectionEditorPanelController}/{@link
+   * FormNodeEditorScreenPanelController}); any other node type (or no selection) falls back to {@link #noSelectionLabel}.
+   */
+  private void updateEditorPane(@Nullable TreeItem<FormElementViewModel> selectedItem) {
+    Object node = selectedItem != null && selectedItem.getValue() != null ? selectedItem.getValue().getNode() : null;
+
+    boolean isRow = node instanceof Row;
+    boolean isMultiColumnSection = node instanceof MultiColumnSection;
+    boolean isScreen = node instanceof Screen;
+
+    setVisible(rowEditor, isRow);
+    setVisible(multiColumnSectionEditor, isMultiColumnSection);
+    setVisible(screenEditor, isScreen);
+    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen));
+
+    if (isRow) {
+      rowEditorController.setRow((Row) node);
+    }
+    else if (isMultiColumnSection) {
+      multiColumnSectionEditorController.setSection((MultiColumnSection) node);
+    }
+    else if (isScreen) {
+      screenEditorController.setScreen((Screen) node, screenIds());
+    }
+  }
+
+  private static void setVisible(@NonNull Node node, boolean visible) {
+    node.setVisible(visible);
+    node.setManaged(visible);
+  }
+
+  private List<String> screenIds() {
+    return content.getScreens().stream().map(Screen::getId).collect(Collectors.toList());
+  }
+
+  /**
+   * Refreshes every visible tree cell's displayed label without rebuilding the tree structure - called by
+   * {@link FormModelEditorController#modelSaved} whenever any property editor (including the right-hand editor
+   * panes wired above) saves a change, so a Name/Label edit is reflected in the tree immediately even though
+   * those panes commit directly rather than going through {@link FormModelActions}' {@code onModelChanged}.
+   */
+  public void refreshTreeLabels() {
+    tree.refresh();
   }
 
   public void setModel(@NonNull FormModel model, @Nullable DocumentModel documentModel, @NonNull ProjectItem projectItem) {
