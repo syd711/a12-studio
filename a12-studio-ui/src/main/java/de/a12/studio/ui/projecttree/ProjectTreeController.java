@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.AdvancedSettings;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.Studio;
@@ -64,7 +65,8 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   public void load(@NonNull Project project) {
     this.project = project;
     this.validationErrorsByPath = validateAllModels(project);
-    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
+    String applicationGroupName = resolveApplicationGroupName(project);
+    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath, applicationGroupName);
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
     rootTreeItem.setExpanded(true);
     projectTree.setRoot(rootTreeItem);
@@ -153,6 +155,21 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     else if (item.getModel() != null) {
       result.add(item);
     }
+  }
+
+  /**
+   * Returns the configured application group name when application groups are enabled and the name
+   * is non-blank, or {@code null} otherwise. Used to annotate the project root node in the tree.
+   */
+  private String resolveApplicationGroupName(@NonNull Project project) {
+    AdvancedSettings advanced = project.getSettings().getAdvancedSettings();
+    if (advanced.isUseApplicationGroups()) {
+      String name = advanced.getApplicationGroupName();
+      if (name != null && !name.isBlank()) {
+        return name;
+      }
+    }
+    return null;
   }
 
   private void onNewModel(@NonNull ModelType modelType) {
