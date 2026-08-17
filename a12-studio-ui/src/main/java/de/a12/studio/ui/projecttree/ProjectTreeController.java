@@ -16,6 +16,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -327,10 +328,39 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem);
     ProjectTreeContextMenu contextMenuFactory = new ProjectTreeContextMenu(menuFactory);
     for (ModelType modelType : ModelType.values()) {
-      MenuItem modelItem = new MenuItem(modelType.getDisplayName());
-      modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
-      modelItem.setOnAction(event -> onNewModel(modelType));
-      newButton.getItems().add(modelItem);
+      if (modelType == ModelType.DOCUMENT) {
+        // Document Model gets a submenu with import options.
+        Menu documentMenu = new Menu(modelType.getDisplayName());
+        documentMenu.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+
+        MenuItem createBlank = new MenuItem(StudioBundle.get("new_document_model.create_blank"));
+        createBlank.setOnAction(event -> onNewModel(ModelType.DOCUMENT));
+        documentMenu.getItems().add(createBlank);
+
+        documentMenu.getItems().add(new SeparatorMenuItem());
+
+        MenuItem fromAccess = new MenuItem(StudioBundle.get("new_document_model.from_access"));
+        FontIcon accessIcon = WidgetFactory.createIcon("mdi2d-database-import-outline");
+        accessIcon.getStyleClass().add("menu-icon");
+        fromAccess.setGraphic(accessIcon);
+        fromAccess.setOnAction(event -> menuFactory.onImportFromAccessDatabase(resolveTargetFolder()));
+        documentMenu.getItems().add(fromAccess);
+
+        MenuItem fromExcel = new MenuItem(StudioBundle.get("new_document_model.from_excel"));
+        FontIcon excelIcon = WidgetFactory.createIcon(Icons.FILE_TABLE_OUTLINE);
+        excelIcon.getStyleClass().add("menu-icon");
+        fromExcel.setGraphic(excelIcon);
+        fromExcel.setOnAction(event -> menuFactory.onImportFromExcel(resolveTargetFolder()));
+        documentMenu.getItems().add(fromExcel);
+
+        newButton.getItems().add(documentMenu);
+      }
+      else {
+        MenuItem modelItem = new MenuItem(modelType.getDisplayName());
+        modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+        modelItem.setOnAction(event -> onNewModel(modelType));
+        newButton.getItems().add(modelItem);
+      }
     }
     newButton.getItems().add(new SeparatorMenuItem());
     MenuItem folderItem = new MenuItem(StudioBundle.get("folder"));
