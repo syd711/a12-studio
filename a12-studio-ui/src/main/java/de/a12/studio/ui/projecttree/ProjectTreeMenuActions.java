@@ -111,19 +111,19 @@ public class ProjectTreeMenuActions {
     }
 
     ExcelImportInput data = input.get();
-    // ExcelImportService.ColumnInfo and AccessImportService.ColumnInfo share the same ColumnFieldType
-    // enum, so we convert to the shared type for the common builder method.
+    // ExcelImportService.ColumnInfo uses AccessImportService.ColumnFieldType, so we map to
+    // the shared ColumnInfo type used by the common builder method.
     List<ColumnInfo> columns = data.columns().stream()
         .map(c -> new ColumnInfo(c.name(), c.fieldType()))
         .toList();
     try {
-      DocumentModel model = buildDocumentModelFromColumns(parent, data.modelName(), data.sheetName(), columns);
+      DocumentModel model = buildDocumentModelFromColumns(parent, data.modelName(), data.modelName(), columns);
       ProjectItem item = NewModelFactory.createModelFromExisting(parent, model, data.modelName());
       onReload.run();
       onOpen.accept(new ProjectItemViewModel(item, Map.of()));
     }
     catch (IOException e) {
-      log.error("Failed to create document model from Excel sheet '{}': {}", data.sheetName(), e.getMessage(), e);
+      log.error("Failed to create document model from Excel file '{}': {}", data.excelFile().getName(), e.getMessage(), e);
       showError(StudioBundle.get("could_not_create_item", data.modelName()), e);
     }
   }

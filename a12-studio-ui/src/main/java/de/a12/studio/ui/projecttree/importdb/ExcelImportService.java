@@ -44,6 +44,24 @@ public class ExcelImportService {
   }
 
   /**
+   * Reads the columns of the <em>first</em> sheet in the workbook. This is the entry point used
+   * by the import dialog, which does not ask the user to select a sheet.
+   *
+   * @param excelFile an {@code .xlsx} or {@code .xls} file
+   * @return ordered list of column infos; empty if the first sheet has no header row
+   * @throws IOException if the file cannot be opened or contains no sheets
+   */
+  public List<ColumnInfo> readFirstSheetColumns(@NonNull File excelFile) throws IOException {
+    try (Workbook wb = WorkbookFactory.create(excelFile, null, true)) {
+      if (wb.getNumberOfSheets() == 0) {
+        throw new IOException("The workbook contains no sheets.");
+      }
+      Sheet sheet = wb.getSheetAt(0);
+      return readColumnsFromSheet(sheet);
+    }
+  }
+
+  /**
    * Returns the names of all sheets in the workbook, in their natural order.
    *
    * @param excelFile an {@code .xlsx} or {@code .xls} file
@@ -75,56 +93,63 @@ public class ExcelImportService {
       if (sheet == null) {
         throw new IOException("Sheet not found: " + sheetName);
       }
-
-      // Locate the first non-empty row (the header).
-      Row headerRow = findHeaderRow(sheet);
-      if (headerRow == null) {
-        return List.of();
-      }
-
-      int firstCol = headerRow.getFirstCellNum();
-      int lastCol = headerRow.getLastCellNum(); // exclusive
-
-      // Collect header names and initialise inferred type tracking per column.
-      List<String> headers = new ArrayList<>();
-      for (int c = firstCol; c < lastCol; c++) {
-        Cell cell = headerRow.getCell(c);
-        String name = cell != null ? cell.toString().trim() : "";
-        headers.add(name.isBlank() ? "Column" + (c + 1) : name);
-      }
-
-      // Infer column types from subsequent data rows.
-      AccessImportService.ColumnFieldType[] inferred =
-          new AccessImportService.ColumnFieldType[headers.size()];
-      int headerRowIdx = headerRow.getRowNum();
-      int sampledRows = 0;
-      for (int r = headerRowIdx + 1;
-           r <= sheet.getLastRowNum() && sampledRows < MAX_SAMPLE_ROWS; r++) {
-        Row row = sheet.getRow(r);
-        if (row == null) {
-          continue;
-        }
-        sampledRows++;
-        for (int c = firstCol; c < lastCol; c++) {
-          int idx = c - firstCol;
-          if (inferred[idx] == AccessImportService.ColumnFieldType.STRING) {
-            continue; // already fallen back to STRING – no point scanning further
-          }
-          Cell cell = row.getCell(c);
-          AccessImportService.ColumnFieldType cellType = inferCellType(cell);
-          inferred[idx] = mergeTypes(inferred[idx], cellType);
-        }
-      }
-
-      // Build results – default to STRING for columns that had no data.
-      List<ColumnInfo> result = new ArrayList<>(headers.size());
-      for (int i = 0; i < headers.size(); i++) {
-        AccessImportService.ColumnFieldType type =
-            inferred[i] != null ? inferred[i] : AccessImportService.ColumnFieldType.STRING;
-        result.add(new ColumnInfo(headers.get(i), type));
-      }
-      return result;
+      return readColumnsFromSheet(sheet);
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // Shared column-reading logic
+  // -------------------------------------------------------------------------
+
+  private List<ColumnInfo> readColumnsFromSheet(@NonNull Sheet sheet) {
+    // Locate the first non-empty row (the header).
+    Row headerRow = findHeaderRow(sheet);
+    if (headerRow == null) {
+      return List.of();
+    }
+
+    int firstCol = headerRow.getFirstCellNum();
+    int lastCol = headerRow.getLastCellNum(); // exclusive
+
+    // Collect header names and initialise inferred type tracking per column.
+    List<String> headers = new ArrayList<>();
+    for (int c = firstCol; c < lastCol; c++) {
+      Cell cell = headerRow.getCell(c);
+      String name = cell != null ? cell.toString().trim() : "";
+      headers.add(name.isBlank() ? "Column" + (c + 1) : name);
+    }
+
+    // Infer column types from subsequent data rows.
+    AccessImportService.ColumnFieldType[] inferred =
+        new AccessImportService.ColumnFieldType[headers.size()];
+    int headerRowIdx = headerRow.getRowNum();
+    int sampledRows = 0;
+    for (int r = headerRowIdx + 1;
+         r <= sheet.getLastRowNum() && sampledRows < MAX_SAMPLE_ROWS; r++) {
+      Row row = sheet.getRow(r);
+      if (row == null) {
+        continue;
+      }
+      sampledRows++;
+      for (int c = firstCol; c < lastCol; c++) {
+        int idx = c - firstCol;
+        if (inferred[idx] == AccessImportService.ColumnFieldType.STRING) {
+          continue; // already fallen back to STRING – no point scanning further
+        }
+        Cell cell = row.getCell(c);
+        AccessImportService.ColumnFieldType cellType = inferCellType(cell);
+        inferred[idx] = mergeTypes(inferred[idx], cellType);
+      }
+    }
+
+    // Build results – default to STRING for columns that had no data.
+    List<ColumnInfo> result = new ArrayList<>(headers.size());
+    for (int i = 0; i < headers.size(); i++) {
+      AccessImportService.ColumnFieldType type =
+          inferred[i] != null ? inferred[i] : AccessImportService.ColumnFieldType.STRING;
+      result.add(new ColumnInfo(headers.get(i), type));
+    }
+    return result;
   }
 
   // -------------------------------------------------------------------------
