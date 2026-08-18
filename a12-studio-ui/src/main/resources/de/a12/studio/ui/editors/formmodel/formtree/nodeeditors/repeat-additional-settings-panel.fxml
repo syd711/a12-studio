@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../../../stylesheet.css"
+            text="%additional_settings" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.RepeatAdditionalSettingsPanelController">
+    <BorderPane>
+        <center>
+            <GridPane hgap="10.0" vgap="8.0">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="160.0" prefWidth="180.0" />
+                    <ColumnConstraints hgrow="ALWAYS" />
+                </columnConstraints>
+                <Label styleClass="field-label" text="%readonly" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <CheckBox fx:id="readonlyCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label styleClass="field-label" text="%enable_add" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <CheckBox fx:id="enableAddCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label styleClass="field-label" text="%enable_remove" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <CheckBox fx:id="enableRemoveCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label styleClass="field-label" text="%enable_reorder" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <CheckBox fx:id="enableReorderCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <Label styleClass="field-label" text="%enable_copy" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <CheckBox fx:id="enableCopyCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label styleClass="field-label" text="%enable_columns_resize" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <CheckBox fx:id="enableColumnsResizeCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <Label styleClass="field-label" text="%infinite_scrolling" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                <CheckBox fx:id="infiniteScrollingCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                <Label styleClass="field-label" text="%readonly_presentation" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                <ComboBox fx:id="readonlyPresentationCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                <padding>
+                    <Insets bottom="4.0" top="4.0" />
+                </padding>
+            </GridPane>
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../../../components/error-container.fxml"
+                        BorderPane.alignment="CENTER" />
+        </top>
+    </BorderPane>
+</TitledPane>

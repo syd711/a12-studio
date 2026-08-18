@@ -50,6 +50,7 @@
                         <fx:include fx:id="sectionEditor" source="nodeeditors/formnode-editor-section-panel.fxml" />
                         <fx:include fx:id="controlGridEditor" source="nodeeditors/formnode-editor-control-grid-panel.fxml" />
                         <fx:include fx:id="controlEditor" source="nodeeditors/formnode-editor-control-panel.fxml" />
+                        <fx:include fx:id="repeatEditor" source="nodeeditors/formnode-editor-repeat-panel.fxml" />
                     </children>
                 </StackPane>
             </items>

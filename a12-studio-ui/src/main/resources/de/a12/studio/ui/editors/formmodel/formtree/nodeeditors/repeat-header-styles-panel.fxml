@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../../../stylesheet.css"
+            text="%header_styles" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.RepeatHeaderStylesPanelController">
+    <BorderPane>
+        <center>
+            <VBox>
+                <fx:include fx:id="headerStylesList" source="../../styles-panel.fxml"
+                            styleClass="titled-pane-sub-child" />
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

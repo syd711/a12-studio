@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
@@ -23,6 +24,7 @@ import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelControlle
 import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRepeatPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorScreenPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSectionPanelController;
@@ -102,6 +104,10 @@ public class FormModelTreeController implements Initializable {
   private Node controlEditor;
   @FXML
   private FormNodeEditorControlPanelController controlEditorController;
+  @FXML
+  private Node repeatEditor;
+  @FXML
+  private FormNodeEditorRepeatPanelController repeatEditorController;
 
   private ProjectItem projectItem;
   private FormModelContent content;
@@ -155,6 +161,7 @@ public class FormModelTreeController implements Initializable {
     boolean isSection = node instanceof Section;
     boolean isControlGrid = node instanceof ControlGrid;
     boolean isControl = node instanceof Control;
+    boolean isRepeat = node instanceof AbstractRepeat;
 
     setVisible(rowEditor, isRow);
     setVisible(multiColumnSectionEditor, isMultiColumnSection);
@@ -162,7 +169,8 @@ public class FormModelTreeController implements Initializable {
     setVisible(sectionEditor, isSection);
     setVisible(controlGridEditor, isControlGrid);
     setVisible(controlEditor, isControl);
-    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection || isControlGrid || isControl));
+    setVisible(repeatEditor, isRepeat);
+    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection || isControlGrid || isControl || isRepeat));
 
     if (isRow) {
       rowEditorController.setRow((Row) node, documentModel);
@@ -181,6 +189,9 @@ public class FormModelTreeController implements Initializable {
     }
     else if (isControl) {
       controlEditorController.setControl((Control) node, documentModel, content);
+    }
+    else if (isRepeat) {
+      repeatEditorController.setRepeat((AbstractRepeat) node, documentModel, content);
     }
   }
 

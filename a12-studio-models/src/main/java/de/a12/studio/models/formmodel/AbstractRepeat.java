@@ -38,4 +38,19 @@ public abstract class AbstractRepeat extends ScreenElement {
   private TableStyle tableStyle;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private RowAction defaultRowAction;
+  // Per-Repeat overrides for label, hint and placeholder (take precedence over GroupConfigEntry values).
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private LocalizedText label;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private TextContainer hint;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private TextContainer placeholder;
+  // Horizontal alignment applied to all columns of this repeat's overview table header and body rows.
+  // Possible values mirror the SME reference: e.g. "left", "center", "right".
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String defaultHorizontalAlignment;
+  // Style classes applied specifically to this repeat's column header row (separate from the body Styles
+  // inherited from ScreenElement.style).
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Style> headerStyle = new ArrayList<>();
 }
