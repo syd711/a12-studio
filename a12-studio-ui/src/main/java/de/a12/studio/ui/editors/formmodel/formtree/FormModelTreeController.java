@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
@@ -22,6 +23,9 @@ import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelController;
 import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorConfirmControlPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRepeatPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorScreenPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSectionPanelController;
@@ -97,10 +101,26 @@ public class FormModelTreeController implements Initializable {
   private Node controlGridEditor;
   @FXML
   private FormNodeEditorControlGridPanelController controlGridEditorController;
+  @FXML
+  private Node controlEditor;
+  @FXML
+  private FormNodeEditorControlPanelController controlEditorController;
+  @FXML
+  private Node confirmControlEditor;
+  @FXML
+  private FormNodeEditorConfirmControlPanelController confirmControlEditorController;
+  @FXML
+  private Node repeatEditor;
+  @FXML
+  private FormNodeEditorRepeatPanelController repeatEditorController;
 
   private ProjectItem projectItem;
   private FormModelContent content;
   private FormModelActions actions;
+
+  // Kept so node editors (Section, Row, ControlGrid, Screen) can populate their Hide Condition
+  // field combos with the boolean fields available from the linked Document Model.
+  private @Nullable DocumentModel documentModel;
 
   private Map<String, Element> documentElementsById = Map.of();
 
@@ -145,16 +165,23 @@ public class FormModelTreeController implements Initializable {
     boolean isScreen = node instanceof Screen;
     boolean isSection = node instanceof Section;
     boolean isControlGrid = node instanceof ControlGrid;
+    boolean isConfirmControl = node instanceof Control && isConfirmField((Control) node);
+    boolean isControl = node instanceof Control && !isConfirmControl;
+    boolean isRepeat = node instanceof AbstractRepeat;
 
     setVisible(rowEditor, isRow);
     setVisible(multiColumnSectionEditor, isMultiColumnSection);
     setVisible(screenEditor, isScreen);
     setVisible(sectionEditor, isSection);
     setVisible(controlGridEditor, isControlGrid);
-    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection || isControlGrid));
+    setVisible(controlEditor, isControl);
+    setVisible(confirmControlEditor, isConfirmControl);
+    setVisible(repeatEditor, isRepeat);
+    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection
+        || isControlGrid || isControl || isConfirmControl || isRepeat));
 
     if (isRow) {
-      rowEditorController.setRow((Row) node);
+      rowEditorController.setRow((Row) node, documentModel);
     }
     else if (isMultiColumnSection) {
       multiColumnSectionEditorController.setSection((MultiColumnSection) node);
@@ -163,10 +190,19 @@ public class FormModelTreeController implements Initializable {
       screenEditorController.setScreen((Screen) node, screenIds());
     }
     else if (isSection) {
-      sectionEditorController.setSection((Section) node);
+      sectionEditorController.setSection((Section) node, documentModel);
     }
     else if (isControlGrid) {
-      controlGridEditorController.setControlGrid((ControlGrid) node);
+      controlGridEditorController.setControlGrid((ControlGrid) node, documentModel);
+    }
+    else if (isControl) {
+      controlEditorController.setControl((Control) node, documentModel, content);
+    }
+    else if (isConfirmControl) {
+      confirmControlEditorController.setControl((Control) node, documentModel, content);
+    }
+    else if (isRepeat) {
+      repeatEditorController.setRepeat((AbstractRepeat) node, documentModel, content);
     }
   }
 
@@ -192,6 +228,7 @@ public class FormModelTreeController implements Initializable {
   public void setModel(@NonNull FormModel model, @Nullable DocumentModel documentModel, @NonNull ProjectItem projectItem) {
     this.projectItem = projectItem;
     this.content = ensureContent(model);
+    this.documentModel = documentModel;
     this.documentElementsById = indexDocumentModel(documentModel);
     this.elementIndex = hasModelRoot(documentModel)
         ? new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
@@ -542,6 +579,20 @@ public class FormModelTreeController implements Initializable {
   private Element resolveDraggedDocumentElement(@NonNull Dragboard dragboard) {
     Object elementId = dragboard.getContent(DocumentSourceTreeController.SOURCE_ELEMENT_DRAG_FORMAT);
     return elementId instanceof String id ? documentElementsById.get(id) : null;
+  }
+
+  /**
+   * Returns true when the given {@link Control}'s {@link Control#getElementRef()} resolves to a
+   * {@link de.a12.studio.models.documentmodel.ConfirmFieldType} field in the currently loaded
+   * Document Model. Used by {@link #updateEditorPane} to route confirm-type controls to the
+   * dedicated confirm-field editor with its Dependencies tab.
+   */
+  private boolean isConfirmField(@NonNull Control control) {
+    if (control.getElementRef() == null) return false;
+    Element element = documentElementsById.get(control.getElementRef());
+    return element instanceof FieldElement field
+        && field.getField() != null
+        && field.getField().getFieldType() instanceof de.a12.studio.models.documentmodel.ConfirmFieldType;
   }
 
   private static boolean isRepeatableGroup(@Nullable Element element) {

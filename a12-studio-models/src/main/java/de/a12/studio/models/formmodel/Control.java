@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @JsonPropertyOrder({"type", "id", "name", "offset", "span", "style", "readonly", "messageExposition", "label",
-    "datePickerConfig", "elementRef", "tooltipsOnTop"})
+    "hint", "placeholder", "accessibility", "datePickerConfig", "elementRef", "tooltipsOnTop", "annotations"})
 public class Control extends Cell {
 
   // Reference to the underlying Document Model field (or group, for attachments) this Control edits.
@@ -31,6 +31,21 @@ public class Control extends Cell {
   private Boolean readonly;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private DatePickerConfig datePickerConfig;
+  // Per-Control overrides for hint, placeholder and accessibility text (control-level values take precedence
+  // over the model-wide FieldConfigEntry values stored in FormModelContent.fieldConfiguration).
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private TextContainer hint;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private TextContainer placeholder;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private TextContainer accessibility;
+  // Hides this control when the referenced boolean field equals hideConditionValue.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String hideConditionField;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String hideConditionValue;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<de.a12.studio.models.Annotation> annotations = new ArrayList<>();
 
   public Control() {
     setType(CellType.CONTROL);

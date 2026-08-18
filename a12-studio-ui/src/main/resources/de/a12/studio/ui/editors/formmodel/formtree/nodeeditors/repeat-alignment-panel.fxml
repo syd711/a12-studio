@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../../../stylesheet.css"
+            text="%alignment" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.RepeatAlignmentPanelController">
+    <BorderPane>
+        <center>
+            <GridPane hgap="10.0" vgap="8.0">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="120.0" prefWidth="140.0" />
+                    <ColumnConstraints hgrow="ALWAYS" />
+                </columnConstraints>
+                <Label styleClass="field-label" text="%horizontal_alignment" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <ComboBox fx:id="horizontalAlignmentCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <padding>
+                    <Insets bottom="4.0" top="4.0" />
+                </padding>
+            </GridPane>
+        </center>
+    </BorderPane>
+</TitledPane>

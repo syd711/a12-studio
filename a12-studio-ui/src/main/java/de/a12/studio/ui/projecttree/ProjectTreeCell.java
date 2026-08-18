@@ -141,14 +141,22 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     List<ModelValidationError> validationErrors = item.getValidationErrors();
     if (validationErrors.isEmpty()) {
       getStyleClass().remove("validation-error");
-      setTooltip(WidgetFactory.createTooltip(item.getDisplayName()));
+      String appGroupTooltip = item.getApplicationGroupTooltip();
+      String tooltipText = appGroupTooltip != null
+          ? item.getDisplayName() + "\n" + appGroupTooltip
+          : item.getDisplayName();
+      setTooltip(WidgetFactory.createTooltip(tooltipText));
     }
     else {
       if (!getStyleClass().contains("validation-error")) {
         getStyleClass().add("validation-error");
       }
+      String appGroupTooltip = item.getApplicationGroupTooltip();
       String messages = validationErrors.stream().map(error -> "• " + error.message()).collect(Collectors.joining("\n"));
-      setTooltip(WidgetFactory.createTooltip(item.getDisplayName() + "\n" + messages));
+      String tooltipText = appGroupTooltip != null
+          ? item.getDisplayName() + "\n" + appGroupTooltip + "\n" + messages
+          : item.getDisplayName() + "\n" + messages;
+      setTooltip(WidgetFactory.createTooltip(tooltipText));
     }
     if (item.isFolder()) {
       boundTreeItem = getTreeItem();

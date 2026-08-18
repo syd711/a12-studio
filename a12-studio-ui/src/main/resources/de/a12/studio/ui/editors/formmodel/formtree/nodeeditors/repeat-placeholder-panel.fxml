@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@../../../../stylesheet.css"
+            text="%placeholder" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.RepeatPlaceholderPanelController">
+    <BorderPane>
+        <center>
+            <VBox spacing="8.0">
+                <fx:include fx:id="groupConfigPlaceholder" source="../../../propertyeditors/localized-text-panel.fxml"
+                            styleClass="titled-pane-sub-child" />
+                <fx:include fx:id="repeatPlaceholder" source="../../../propertyeditors/localized-text-panel.fxml"
+                            styleClass="titled-pane-sub-child" />
+            </VBox>
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="../../../../components/error-container.fxml"
+                        BorderPane.alignment="CENTER" />
+        </top>
+    </BorderPane>
+</TitledPane>

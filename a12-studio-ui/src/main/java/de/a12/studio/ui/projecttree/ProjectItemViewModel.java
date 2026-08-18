@@ -6,7 +6,9 @@ import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +19,19 @@ public class ProjectItemViewModel {
   private final ProjectItem projectItem;
   private final Map<String, List<ModelValidationError>> validationErrorsByPath;
 
+  /** Non-null only on the root node when application groups are enabled and a group name is set. */
+  @Nullable
+  private final String applicationGroupName;
+
   public ProjectItemViewModel(@NonNull ProjectItem projectItem, @NonNull Map<String, List<ModelValidationError>> validationErrorsByPath) {
+    this(projectItem, validationErrorsByPath, null);
+  }
+
+  public ProjectItemViewModel(@NonNull ProjectItem projectItem, @NonNull Map<String, List<ModelValidationError>> validationErrorsByPath,
+                               @Nullable String applicationGroupName) {
     this.projectItem = projectItem;
     this.validationErrorsByPath = validationErrorsByPath;
+    this.applicationGroupName = applicationGroupName;
   }
 
   public String getName() {
@@ -28,12 +40,28 @@ public class ProjectItemViewModel {
 
   public String getDisplayName() {
     String name = getName();
-    if (!hasModel()) {
+    if (!hasModel() && applicationGroupName == null) {
       return name;
+    }
+    if (!hasModel()) {
+      // root folder with application group
+      return name + " [" + applicationGroupName + "]";
     }
 
     int dot = name.lastIndexOf('.');
     return dot > 0 ? name.substring(0, dot) : name;
+  }
+
+  /**
+   * Returns a tooltip text for the root node when application groups are enabled, or {@code null}
+   * if no application group is active for this item.
+   */
+  @Nullable
+  public String getApplicationGroupTooltip() {
+    if (applicationGroupName == null) {
+      return null;
+    }
+    return StudioBundle.get("project_tree.application_group_tooltip") + " " + applicationGroupName;
   }
 
   public boolean isFolder() {

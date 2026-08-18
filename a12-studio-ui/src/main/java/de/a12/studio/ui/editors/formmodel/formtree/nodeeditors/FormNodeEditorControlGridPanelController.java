@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.ColumnLayout;
 import de.a12.studio.models.formmodel.ControlGrid;
 import de.a12.studio.ui.editors.formmodel.NamePanelController;
@@ -11,12 +12,14 @@ import de.a12.studio.ui.editors.propertyeditors.ColumnLayoutPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
 import javafx.fxml.FXML;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The Form Model tree's right-hand editor pane for a selected {@link ControlGrid} node ({@link
  * FormModelTreeController}): Name, Layout ({@code layout.lg}, via the shared {@link ColumnLayoutPanelController}),
  * Responsive Layout ({@code layout.md}/{@code layout.sm}, via {@link ResponsiveLayoutPanelController}), Label
- * (per-locale text or expression, bound to {@link ControlGrid#getTitle()}), Styles and Annotations.
+ * (per-locale text or expression, bound to {@link ControlGrid#getTitle()}), Hide Condition (boolean field from
+ * the linked Document Model and condition value), Styles and Annotations.
  */
 public class FormNodeEditorControlGridPanelController {
 
@@ -29,6 +32,8 @@ public class FormNodeEditorControlGridPanelController {
   @FXML
   private LocalizedTextTypePanelController labelController;
   @FXML
+  private HideConditionPanelController hideConditionController;
+  @FXML
   private StylesPanelController stylesController;
   @FXML
   private AnnotationsPanelController annotationsController;
@@ -38,12 +43,16 @@ public class FormNodeEditorControlGridPanelController {
     labelController.configureCustom("label", "Label");
   }
 
-  public void setControlGrid(@NonNull ControlGrid grid) {
+  public void setControlGrid(@NonNull ControlGrid grid, @Nullable DocumentModel documentModel) {
     nameController.setCustom(grid::getName, grid::setName);
     layoutController.setCustom(() -> grid.getLayout() != null ? grid.getLayout().getLg() : null,
         value -> getOrCreateLayout(grid).setLg(value));
     responsiveLayoutController.setControlGrid(grid);
     labelController.setCustom(grid::getTitle, grid::setTitle);
+    hideConditionController.configure(
+        grid::getHideConditionField, grid::setHideConditionField,
+        grid::getHideConditionValue, grid::setHideConditionValue,
+        documentModel);
     stylesController.setCustom(grid::getStyle, grid::getStyle);
     annotationsController.setCustom(grid::getAnnotations);
   }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@../../../../stylesheet.css"
+            text="%field_information" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.GroupInformationPanelController">
+    <BorderPane>
+        <center>
+            <VBox spacing="8.0">
+                <GridPane hgap="10.0" vgap="4.0">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120.0" prefWidth="140.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+                    <Label styleClass="field-label" text="%group_id" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Label fx:id="groupIdLabel" styleClass="read-only-value" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    <Label styleClass="field-label" text="%repeatability" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label fx:id="repeatabilityLabel" styleClass="read-only-value" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <Label styleClass="field-label" text="%document_model_path" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Label fx:id="documentModelPathLabel" styleClass="read-only-value" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                </GridPane>
+                <fx:include fx:id="internalDescription" source="../../../propertyeditors/localized-text-panel.fxml" />
+                <padding>
+                    <Insets top="4.0" />
+                </padding>
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

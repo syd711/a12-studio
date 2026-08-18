@@ -64,6 +64,46 @@ public class NewModelFactory {
     return createModel(parent, modelType, name, null);
   }
 
+  /**
+   * Persists an already-constructed {@link A12Model} (e.g. one assembled by an import wizard) as a
+   * new project item under {@code parent}.  The caller is responsible for populating the model's
+   * {@code content} and {@code locales}; this method sets the id, modelType and modelVersion from
+   * the model's own {@link A12Model#getModelType()} field, defaulting to
+   * {@link ModelType#DOCUMENT} when the type is not yet set.
+   *
+   * @param parent    the folder that will own the new file
+   * @param model     the pre-built model to persist
+   * @param name      the desired filename (without extension)
+   * @return the new {@link ProjectItem} backed by the written file
+   * @throws IOException if the file cannot be created or written
+   */
+  public static ProjectItem createModelFromExisting(@NonNull ProjectItem parent,
+                                                    @NonNull A12Model<?> model,
+                                                    @NonNull String name) throws IOException {
+    ProjectItem item = parent.createChildModel(name);
+    ModelType modelType = model.getModelType() != null ? model.getModelType() : ModelType.DOCUMENT;
+    model.setId(ProjectItem.idFromFileName(item.getName()));
+    model.setModelType(modelType);
+    model.setModelVersion(modelType.getCurrentVersion());
+    item.setModel(model);
+    item.save();
+    return item;
+  }
+
+  /**
+   * Exposes the shared {@link ModelConfig} defaults so callers outside this class (e.g. import
+   * wizards) can reuse them without duplicating the logic.
+   */
+  public static ModelConfig defaultModelConfig() {
+    ModelConfig modelConfig = new ModelConfig();
+    modelConfig.setTimeZone("UTC");
+    modelConfig.setDecimalSeparator(".");
+    ConditionLanguage conditionLanguage = new ConditionLanguage();
+    conditionLanguage.setCode("en_US");
+    modelConfig.setConditionLanguage(conditionLanguage);
+    return modelConfig;
+  }
+
   public static ProjectItem createModel(@NonNull ProjectItem parent, @NonNull ModelType modelType, @NonNull String name,
       String documentModelId) throws IOException {
     A12Model<?> model = buildModel(modelType, name, resolveDefaultLocales(parent), documentModelId);
@@ -110,18 +150,6 @@ public class NewModelFactory {
     model.setContent(content);
     model.setLocales(locales);
     return model;
-  }
-
-  // Kernel deserialization requires these fields to be present; values match the convention used
-  // across existing document models in this project (see e.g. Person_DM.json).
-  private static ModelConfig defaultModelConfig() {
-    ModelConfig modelConfig = new ModelConfig();
-    modelConfig.setTimeZone("UTC");
-    modelConfig.setDecimalSeparator(".");
-    ConditionLanguage conditionLanguage = new ConditionLanguage();
-    conditionLanguage.setCode("en_US");
-    modelConfig.setConditionLanguage(conditionLanguage);
-    return modelConfig;
   }
 
   // New models seed their locales from the project's settings.json (general.locales) so they stay

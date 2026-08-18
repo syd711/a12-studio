@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.AdvancedSettings;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.Studio;
@@ -15,6 +16,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -64,7 +66,8 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   public void load(@NonNull Project project) {
     this.project = project;
     this.validationErrorsByPath = validateAllModels(project);
-    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
+    String applicationGroupName = resolveApplicationGroupName(project);
+    this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath, applicationGroupName);
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
     rootTreeItem.setExpanded(true);
     projectTree.setRoot(rootTreeItem);
@@ -153,6 +156,21 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     else if (item.getModel() != null) {
       result.add(item);
     }
+  }
+
+  /**
+   * Returns the configured application group name when application groups are enabled and the name
+   * is non-blank, or {@code null} otherwise. Used to annotate the project root node in the tree.
+   */
+  private String resolveApplicationGroupName(@NonNull Project project) {
+    AdvancedSettings advanced = project.getSettings().getAdvancedSettings();
+    if (advanced.isUseApplicationGroups()) {
+      String name = advanced.getApplicationGroupName();
+      if (name != null && !name.isBlank()) {
+        return name;
+      }
+    }
+    return null;
   }
 
   private void onNewModel(@NonNull ModelType modelType) {
@@ -310,10 +328,39 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem);
     ProjectTreeContextMenu contextMenuFactory = new ProjectTreeContextMenu(menuFactory);
     for (ModelType modelType : ModelType.values()) {
-      MenuItem modelItem = new MenuItem(modelType.getDisplayName());
-      modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
-      modelItem.setOnAction(event -> onNewModel(modelType));
-      newButton.getItems().add(modelItem);
+      if (modelType == ModelType.DOCUMENT) {
+        // Document Model gets a submenu with import options.
+        Menu documentMenu = new Menu(modelType.getDisplayName());
+        documentMenu.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+
+        MenuItem createBlank = new MenuItem(StudioBundle.get("new_document_model.create_blank"));
+        createBlank.setOnAction(event -> onNewModel(ModelType.DOCUMENT));
+        documentMenu.getItems().add(createBlank);
+
+        documentMenu.getItems().add(new SeparatorMenuItem());
+
+        MenuItem fromAccess = new MenuItem(StudioBundle.get("new_document_model.from_access"));
+        FontIcon accessIcon = WidgetFactory.createIcon("mdi2d-database-import-outline");
+        accessIcon.getStyleClass().add("menu-icon");
+        fromAccess.setGraphic(accessIcon);
+        fromAccess.setOnAction(event -> menuFactory.onImportFromAccessDatabase(resolveTargetFolder()));
+        documentMenu.getItems().add(fromAccess);
+
+        MenuItem fromExcel = new MenuItem(StudioBundle.get("new_document_model.from_excel"));
+        FontIcon excelIcon = WidgetFactory.createIcon(Icons.FILE_TABLE_OUTLINE);
+        excelIcon.getStyleClass().add("menu-icon");
+        fromExcel.setGraphic(excelIcon);
+        fromExcel.setOnAction(event -> menuFactory.onImportFromExcel(resolveTargetFolder()));
+        documentMenu.getItems().add(fromExcel);
+
+        newButton.getItems().add(documentMenu);
+      }
+      else {
+        MenuItem modelItem = new MenuItem(modelType.getDisplayName());
+        modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+        modelItem.setOnAction(event -> onNewModel(modelType));
+        newButton.getItems().add(modelItem);
+      }
     }
     newButton.getItems().add(new SeparatorMenuItem());
     MenuItem folderItem = new MenuItem(StudioBundle.get("folder"));

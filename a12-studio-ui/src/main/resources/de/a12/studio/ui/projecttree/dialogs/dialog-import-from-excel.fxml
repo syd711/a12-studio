@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="560.0"
+            styleClass="navigation-panel" stylesheets="@../../stylesheet.css"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.projecttree.dialogs.ImportFromExcelDialogController">
+   <top>
+      <fx:include fx:id="header" source="../../components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <VBox spacing="0.0" BorderPane.alignment="TOP_LEFT">
+         <BorderPane.margin>
+            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+         </BorderPane.margin>
+
+         <!-- File chooser row -->
+         <Label styleClass="field-label" text="%import_excel.file" />
+         <HBox spacing="8.0" alignment="CENTER_LEFT">
+            <VBox.margin><Insets top="4.0" /></VBox.margin>
+            <TextField fx:id="filePathField" HBox.hgrow="ALWAYS" editable="false"
+                       promptText="%import_excel.no_file_selected" styleClass="field-value">
+               <font><Font size="13.0" /></font>
+            </TextField>
+            <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowse"
+                    styleClass="secondary-button" text="%import_excel.browse">
+               <graphic>
+                  <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="16" styleClass="button-icon" />
+               </graphic>
+               <tooltip><Tooltip text="%import_excel.browse_tooltip" /></tooltip>
+            </Button>
+         </HBox>
+
+         <!-- Column list -->
+         <Label styleClass="field-label" text="%import_excel.columns">
+            <VBox.margin><Insets top="14.0" /></VBox.margin>
+         </Label>
+         <Label styleClass="field-hint" text="%import_excel.columns_hint">
+            <VBox.margin><Insets top="2.0" bottom="4.0" /></VBox.margin>
+         </Label>
+         <ListView fx:id="columnListView" prefHeight="160.0" maxWidth="1.7976931348623157E308">
+            <VBox.margin><Insets top="2.0" /></VBox.margin>
+         </ListView>
+
+         <!-- Model name -->
+         <Label styleClass="field-label" text="%import_excel.model_name">
+            <VBox.margin><Insets top="14.0" /></VBox.margin>
+         </Label>
+         <TextField fx:id="modelNameField" promptText="%import_excel.model_name_prompt">
+            <VBox.margin><Insets top="4.0" /></VBox.margin>
+            <font><Font size="14.0" /></font>
+         </TextField>
+
+         <!-- Location -->
+         <Label styleClass="field-label" text="%location">
+            <VBox.margin><Insets top="14.0" /></VBox.margin>
+         </Label>
+         <Label fx:id="pathLabel" styleClass="field-value" />
+      </VBox>
+   </center>
+   <bottom>
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" styleClass="footer-toolbar"
+               BorderPane.alignment="CENTER">
+         <items>
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false"
+                    onAction="#onDialogSubmit" styleClass="primary-button"
+                    text="%import_excel.create_button" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false"
+                    onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
+         </items>
+      </ToolBar>
+   </bottom>
+</BorderPane>

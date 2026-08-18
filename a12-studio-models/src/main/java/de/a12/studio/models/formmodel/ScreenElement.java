@@ -41,4 +41,11 @@ public abstract class ScreenElement {
   // SME's "annotated_mixin" - a plain "annotations" field on the wire, matching documentmodel.Element.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Annotation> annotations = new ArrayList<>();
+
+  // Hides this element when the referenced boolean field equals hideConditionValue.
+  // hideConditionField holds the document model field id; hideConditionValue is "true" or null (= "no value").
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String hideConditionField;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String hideConditionValue;
 }

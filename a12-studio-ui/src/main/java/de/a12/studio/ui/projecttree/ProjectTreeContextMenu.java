@@ -11,6 +11,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 class ProjectTreeContextMenu {
 
@@ -25,10 +26,37 @@ class ProjectTreeContextMenu {
 
     Menu newMenu = new Menu(StudioBundle.get("new"));
     for (ModelType modelType : ModelType.values()) {
-      MenuItem modelItem = new MenuItem(modelType.getDisplayName());
-      modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
-      modelItem.setOnAction(event -> actions.onCreateNewModel(projectItem, modelType));
-      newMenu.getItems().add(modelItem);
+      if (modelType == ModelType.DOCUMENT) {
+        // Replace the plain Document Model entry with a submenu that offers additional import options.
+        Menu documentMenu = new Menu(modelType.getDisplayName());
+        documentMenu.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+
+        MenuItem createBlank = new MenuItem(StudioBundle.get("new_document_model.create_blank"));
+        createBlank.setOnAction(event -> actions.onCreateNewModel(projectItem, ModelType.DOCUMENT));
+        documentMenu.getItems().add(createBlank);
+
+        documentMenu.getItems().add(new SeparatorMenuItem());
+
+        MenuItem fromAccess = new MenuItem(StudioBundle.get("new_document_model.from_access"));
+        FontIcon accessIcon = withMenuIconStyle(WidgetFactory.createIcon("mdi2d-database-import-outline"));
+        fromAccess.setGraphic(accessIcon);
+        fromAccess.setOnAction(event -> actions.onImportFromAccessDatabase(projectItem));
+        documentMenu.getItems().add(fromAccess);
+
+        MenuItem fromExcel = new MenuItem(StudioBundle.get("new_document_model.from_excel"));
+        FontIcon excelIcon = withMenuIconStyle(WidgetFactory.createIcon(Icons.FILE_TABLE_OUTLINE));
+        fromExcel.setGraphic(excelIcon);
+        fromExcel.setOnAction(event -> actions.onImportFromExcel(projectItem));
+        documentMenu.getItems().add(fromExcel);
+
+        newMenu.getItems().add(documentMenu);
+      }
+      else {
+        MenuItem modelItem = new MenuItem(modelType.getDisplayName());
+        modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+        modelItem.setOnAction(event -> actions.onCreateNewModel(projectItem, modelType));
+        newMenu.getItems().add(modelItem);
+      }
     }
     newMenu.getItems().add(new SeparatorMenuItem());
     MenuItem newFolder = new MenuItem(StudioBundle.get("new_folder"));

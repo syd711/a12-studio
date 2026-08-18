@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" stylesheets="@../../../../stylesheet.css"
+            styleClass="properties-panel" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRepeatPanelController">
+    <content>
+        <VBox spacing="12.0" styleClass="field-editor">
+            <children>
+                <fx:include fx:id="fieldInformation" source="group-information-panel.fxml" />
+                <fx:include fx:id="label" source="repeat-label-panel.fxml" />
+                <fx:include fx:id="hint" source="repeat-hint-panel.fxml" />
+                <fx:include fx:id="placeholder" source="repeat-placeholder-panel.fxml" />
+                <fx:include fx:id="columnSettings" source="repeat-column-settings-panel.fxml" />
+                <fx:include fx:id="alignment" source="repeat-alignment-panel.fxml" />
+                <fx:include fx:id="additionalSettings" source="repeat-additional-settings-panel.fxml" />
+                <fx:include fx:id="hideCondition" source="hide-condition-panel.fxml" />
+                <fx:include fx:id="styles" source="../../styles-panel.fxml" />
+                <fx:include fx:id="headerStyles" source="repeat-header-styles-panel.fxml" />
+                <fx:include fx:id="annotations" source="../../../propertyeditors/annotations-panel.fxml" />
+            </children>
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+        </VBox>
+    </content>
+</ScrollPane>

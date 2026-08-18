@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TabPane stylesheets="@../../../../stylesheet.css" styleClass="sub-tab-panel"
+         tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorConfirmControlPanelController">
+    <tabs>
+        <!-- Tab 1: Control — identical property panels to the standard field control editor -->
+        <Tab text="%control">
+            <content>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                    <content>
+                        <VBox spacing="12.0" styleClass="field-editor">
+                            <children>
+                                <fx:include fx:id="fieldInformation" source="field-information-panel.fxml" />
+                                <fx:include fx:id="label" source="control-label-panel.fxml" />
+                                <fx:include fx:id="hint" source="control-hint-panel.fxml" />
+                                <fx:include fx:id="placeholder" source="control-placeholder-panel.fxml" />
+                                <fx:include fx:id="hideCondition" source="hide-condition-panel.fxml" />
+                                <fx:include fx:id="accessibility" source="control-accessibility-panel.fxml" />
+                                <fx:include fx:id="styles" source="../../styles-panel.fxml" />
+                                <fx:include fx:id="annotations" source="../../../propertyeditors/annotations-panel.fxml" />
+                            </children>
+                            <padding>
+                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                            </padding>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </content>
+        </Tab>
+
+        <!-- Tab 2: Dependencies — tree selection for each confirm value -->
+        <Tab text="%dependencies">
+            <content>
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                    <content>
+                        <fx:include fx:id="dependencies" source="confirm-dependencies-panel.fxml" />
+                    </content>
+                </ScrollPane>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>
