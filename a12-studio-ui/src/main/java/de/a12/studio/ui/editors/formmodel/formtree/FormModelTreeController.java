@@ -22,6 +22,7 @@ import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelController;
 import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorScreenPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSectionPanelController;
@@ -97,6 +98,10 @@ public class FormModelTreeController implements Initializable {
   private Node controlGridEditor;
   @FXML
   private FormNodeEditorControlGridPanelController controlGridEditorController;
+  @FXML
+  private Node controlEditor;
+  @FXML
+  private FormNodeEditorControlPanelController controlEditorController;
 
   private ProjectItem projectItem;
   private FormModelContent content;
@@ -149,13 +154,15 @@ public class FormModelTreeController implements Initializable {
     boolean isScreen = node instanceof Screen;
     boolean isSection = node instanceof Section;
     boolean isControlGrid = node instanceof ControlGrid;
+    boolean isControl = node instanceof Control;
 
     setVisible(rowEditor, isRow);
     setVisible(multiColumnSectionEditor, isMultiColumnSection);
     setVisible(screenEditor, isScreen);
     setVisible(sectionEditor, isSection);
     setVisible(controlGridEditor, isControlGrid);
-    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection || isControlGrid));
+    setVisible(controlEditor, isControl);
+    setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection || isControlGrid || isControl));
 
     if (isRow) {
       rowEditorController.setRow((Row) node, documentModel);
@@ -171,6 +178,9 @@ public class FormModelTreeController implements Initializable {
     }
     else if (isControlGrid) {
       controlGridEditorController.setControlGrid((ControlGrid) node, documentModel);
+    }
+    else if (isControl) {
+      controlEditorController.setControl((Control) node, documentModel, content);
     }
   }
 
