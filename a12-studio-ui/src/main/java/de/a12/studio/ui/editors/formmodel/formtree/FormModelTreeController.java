@@ -102,6 +102,10 @@ public class FormModelTreeController implements Initializable {
   private FormModelContent content;
   private FormModelActions actions;
 
+  // Kept so node editors (Section, Row, ControlGrid, Screen) can populate their Hide Condition
+  // field combos with the boolean fields available from the linked Document Model.
+  private @Nullable DocumentModel documentModel;
+
   private Map<String, Element> documentElementsById = Map.of();
 
   // Resolves Control/Repeat/Repeat Overview Column display names (see FormElementViewModel#getName), following
@@ -154,7 +158,7 @@ public class FormModelTreeController implements Initializable {
     setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection || isControlGrid));
 
     if (isRow) {
-      rowEditorController.setRow((Row) node);
+      rowEditorController.setRow((Row) node, documentModel);
     }
     else if (isMultiColumnSection) {
       multiColumnSectionEditorController.setSection((MultiColumnSection) node);
@@ -163,10 +167,10 @@ public class FormModelTreeController implements Initializable {
       screenEditorController.setScreen((Screen) node, screenIds());
     }
     else if (isSection) {
-      sectionEditorController.setSection((Section) node);
+      sectionEditorController.setSection((Section) node, documentModel);
     }
     else if (isControlGrid) {
-      controlGridEditorController.setControlGrid((ControlGrid) node);
+      controlGridEditorController.setControlGrid((ControlGrid) node, documentModel);
     }
   }
 
@@ -192,6 +196,7 @@ public class FormModelTreeController implements Initializable {
   public void setModel(@NonNull FormModel model, @Nullable DocumentModel documentModel, @NonNull ProjectItem projectItem) {
     this.projectItem = projectItem;
     this.content = ensureContent(model);
+    this.documentModel = documentModel;
     this.documentElementsById = indexDocumentModel(documentModel);
     this.elementIndex = hasModelRoot(documentModel)
         ? new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
