@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="12.0" stylesheets="@../../../../stylesheet.css"
+      xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.ConfirmDependenciesPanelController">
+    <TitledPane expanded="true" maxWidth="Infinity" text="%confirm_value_true">
+        <BorderPane>
+            <center>
+                <TreeView fx:id="trueTree" prefHeight="200.0" />
+            </center>
+        </BorderPane>
+    </TitledPane>
+    <TitledPane expanded="true" maxWidth="Infinity" text="%confirm_value_no_value">
+        <BorderPane>
+            <center>
+                <TreeView fx:id="noValueTree" prefHeight="200.0" />
+            </center>
+        </BorderPane>
+    </TitledPane>
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+</VBox>

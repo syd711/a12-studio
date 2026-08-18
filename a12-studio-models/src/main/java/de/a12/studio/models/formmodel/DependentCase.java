@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
@@ -17,4 +20,8 @@ public class DependentCase {
   private Boolean notRelevant;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean readonly;
+  // Ids of form nodes (Section, ControlGrid, etc.) that are hidden when this case applies.
+  // Populated by the confirm-field node editor's Dependencies tab tree selection.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<String> notRelevantNodes = new ArrayList<>();
 }
