@@ -47,6 +47,9 @@ public class PreferencesController implements Initializable {
   private Button shortcutsBtn;
 
   @FXML
+  private Button pluginsBtn;
+
+  @FXML
   private StackPane contentStack;
 
   @FXML
@@ -124,6 +127,11 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onShortcuts() {
     showPage(shortcutsBtn, "preference-shortcuts.fxml");
+  }
+
+  @FXML
+  private void onPlugins() {
+    showPage(pluginsBtn, "preference-plugins.fxml");
   }
 
   private void showPage(Button button, String fxml) {

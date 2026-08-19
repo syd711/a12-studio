@@ -222,3 +222,80 @@ public class PluginManager {
     return null;
   }
 }
+
+
+  // ---------------------------------------------------------------------------
+  // Marketplace
+  // ---------------------------------------------------------------------------
+
+  private static final String MARKETPLACE_RESOURCE = "/marketplace.json";
+
+  /**
+   * Reads the bundled {@code marketplace.json} and returns all entries whose
+   * {@code a12Version} prefix matches the running studio version.
+   *
+   * <p>Matching rule: the plugin's {@code a12Version} field (e.g. {@code "2606"}) must be
+   * a prefix of {@link de.a12.studio.ui.util.StudioVersion#get()} (e.g. {@code "2606.06-ext0-001"}).
+   * This allows minor / patch releases to stay compatible with plugins built for the
+   * same major version.
+   *
+   * @return list of matching marketplace entries, or an empty list if the resource is missing
+   */
+  @NonNull
+  public java.util.List<Marketplace.MarketplaceEntry> getMarketplaceEntries() {
+    try (java.io.InputStream in = getClass().getResourceAsStream(MARKETPLACE_RESOURCE)) {
+      if (in == null) {
+        log.warn("marketplace.json not found on classpath");
+        return java.util.List.of();
+      }
+      Marketplace marketplace = OBJECT_MAPPER.readValue(in, Marketplace.class);
+      String studioVersion = de.a12.studio.ui.util.StudioVersion.get();
+      return marketplace.getPlugins().stream()
+          .filter(e -> isCompatible(e.getA12Version(), studioVersion))
+          .toList();
+    }
+    catch (Exception e) {
+      log.warn("Failed to read marketplace.json: {}", e.getMessage(), e);
+      return java.util.List.of();
+    }
+  }
+
+  /**
+   * Returns whether a plugin with the given {@code a12Version} requirement is compatible
+   * with the running {@code studioVersion}.
+   *
+   * <p>The plugin's version is treated as a prefix: {@code "2606"} matches
+   * {@code "2606.06-ext0-001"} and {@code "2606.99"} but not {@code "2607.0"}.
+   */
+  static boolean isCompatible(@NonNull String a12Version, @NonNull String studioVersion) {
+    if (a12Version.isBlank() || studioVersion.isBlank() || "dev".equals(studioVersion)) {
+      return true; // permissive in dev builds
+    }
+    return studioVersion.startsWith(a12Version);
+  }
+
+  /**
+   * Returns {@code true} if a plugin with the given name is currently installed
+   * (i.e. its JAR was successfully loaded from the {@code plugins/} directory).
+   */
+  public boolean isInstalled(@NonNull String pluginName) {
+    return loadedPlugins.stream()
+        .anyMatch(p -> pluginName.equals(p.getDescriptor().getName()));
+  }
+
+  /**
+   * Returns the {@link LoadedPlugin} for the given name, or {@code null} if not installed.
+   */
+  @org.jspecify.annotations.Nullable
+  public LoadedPlugin getLoadedPlugin(@NonNull String pluginName) {
+    return loadedPlugins.stream()
+        .filter(p -> pluginName.equals(p.getDescriptor().getName()))
+        .findFirst()
+        .orElse(null);
+  }
+
+  /** Returns the {@code plugins/} directory (created on demand by {@link #scanPlugins()}). */
+  @NonNull
+  public java.io.File getPluginsDir() {
+    return pluginsDir;
+  }
