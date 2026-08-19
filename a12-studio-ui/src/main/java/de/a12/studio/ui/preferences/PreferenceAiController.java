@@ -1,6 +1,6 @@
 package de.a12.studio.ui.preferences;
 
-import de.a12.studio.models.projects.settings.JsonSettings;
+import de.a12.studio.models.projects.settings.AiSettings;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
@@ -32,7 +32,7 @@ public class PreferenceAiController implements Initializable {
   @FXML
   private Button claudePathBrowseButton;
 
-  private final JsonSettings settings = JsonSettings.load();
+  private final AiSettings settings = AiSettings.load();
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -42,14 +42,14 @@ public class PreferenceAiController implements Initializable {
       persistAndNotify();
     });
 
-    boolean configurePath = settings.getClaudePathMode() == JsonSettings.ClaudePathMode.CONFIGURE_PATH;
+    boolean configurePath = settings.getClaudePathMode() == AiSettings.ClaudePathMode.CONFIGURE_PATH;
     openFromPathRadioButton.setSelected(!configurePath);
     configurePathRadioButton.setSelected(configurePath);
     claudePathField.setText(settings.getClaudeExecutablePath());
     updatePathFieldState(configurePath);
 
     configurePathRadioButton.selectedProperty().addListener((observable, oldValue, isConfigurePath) -> {
-      settings.setClaudePathMode(isConfigurePath ? JsonSettings.ClaudePathMode.CONFIGURE_PATH : JsonSettings.ClaudePathMode.OPEN_FROM_PATH);
+      settings.setClaudePathMode(isConfigurePath ? AiSettings.ClaudePathMode.CONFIGURE_PATH : AiSettings.ClaudePathMode.OPEN_FROM_PATH);
       persistAndNotify();
       updatePathFieldState(isConfigurePath);
     });

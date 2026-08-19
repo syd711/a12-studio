@@ -10,7 +10,7 @@ import de.a12.studio.models.Annotation;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.A12Settings;
-import de.a12.studio.models.projects.settings.JsonSettings;
+import de.a12.studio.models.projects.settings.AiSettings;
 import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -292,8 +292,8 @@ public class MenuBarController implements Initializable, StudioEventListener {
   }
 
   private static String resolveClaudeCommand() {
-    JsonSettings settings = JsonSettings.load();
-    if (settings.getClaudePathMode() == JsonSettings.ClaudePathMode.CONFIGURE_PATH
+    AiSettings settings = AiSettings.load();
+    if (settings.getClaudePathMode() == AiSettings.ClaudePathMode.CONFIGURE_PATH
         && settings.getClaudeExecutablePath() != null
         && !settings.getClaudeExecutablePath().isEmpty()) {
       return settings.getClaudeExecutablePath();
@@ -323,7 +323,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
    *  the settings the individual buttons also depend on change. */
   private void refreshProjectDependentButtons() {
     refreshPreviewAppButtonsVisibility();
-    refreshClaudeConsoleButton(JsonSettings.load());
+    refreshClaudeConsoleButton(AiSettings.load());
     boolean visible = project != null;
     searchBtn.setVisible(visible);
     searchBtn.setManaged(visible);
@@ -350,15 +350,15 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @Override
   public void settingsChanged(@NonNull SettingsChangedEvent event) {
-    if (event.getSettings().getSettingsType().equals(JsonSettings.SettingsType.AI)) {
-      refreshClaudeConsoleButton((JsonSettings) event.getSettings());
+    if (event.getSettings().getSettingsType().equals(AiSettings.SettingsType.AI)) {
+      refreshClaudeConsoleButton((AiSettings) event.getSettings());
     }
-    if (event.getSettings().getSettingsType().equals(JsonSettings.SettingsType.A12_INSTALLATION)) {
+    if (event.getSettings().getSettingsType().equals(AiSettings.SettingsType.A12_INSTALLATION)) {
       refreshPreviewAppButtonsVisibility();
     }
   }
 
-  private void refreshClaudeConsoleButton(JsonSettings settings) {
+  private void refreshClaudeConsoleButton(AiSettings settings) {
     boolean visible = project != null && settings.isAddClaudeConsoleButton();
     claudeConsoleBtn.setVisible(visible);
     claudeConsoleBtn.setManaged(visible);

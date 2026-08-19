@@ -1,7 +1,7 @@
 package de.a12.studio.models.projects;
 
 import de.a12.studio.models.projects.settings.AdvancedSettings;
-import de.a12.studio.models.projects.settings.JsonSettings;
+import de.a12.studio.models.projects.settings.AiSettings;
 import de.a12.studio.models.projects.settings.annotations.AnnotationSettings;
 import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import de.a12.studio.models.projects.settings.UISettings;
@@ -15,7 +15,7 @@ public class ProjectSettings {
 
   private final UISettings uiSettings;
 
-  private final JsonSettings jsonSettings;
+  private final AiSettings jsonSettings;
 
   private final AnnotationSettings annotationSettings;
 
@@ -23,7 +23,7 @@ public class ProjectSettings {
 
   private final AdvancedSettings advancedSettings;
 
-  private ProjectSettings(UISettings uiSettings, JsonSettings jsonSettings,
+  private ProjectSettings(UISettings uiSettings, AiSettings jsonSettings,
                           AnnotationSettings annotationSettings, ProjectRootSettings projectRootSettings,
                           AdvancedSettings advancedSettings) {
     this.uiSettings = uiSettings;
@@ -37,7 +37,7 @@ public class ProjectSettings {
     return uiSettings;
   }
 
-  public JsonSettings getAISettings() {
+  public AiSettings getAISettings() {
     return jsonSettings;
   }
 
@@ -54,10 +54,10 @@ public class ProjectSettings {
   }
 
   public static ProjectSettings load(@NonNull File projectFolder) {
-    File settingsFolder = de.a12.studio.models.util.JsonSettings.resolveSettingsFolder(projectFolder, SETTINGS_FOLDER_NAME);
+    File settingsFolder = de.a12.studio.models.util.AiSettings.resolveSettingsFolder(projectFolder, SETTINGS_FOLDER_NAME);
 
     UISettings uiSettings = UISettings.load();
-    JsonSettings jsonSettings = JsonSettings.load();
+    AiSettings jsonSettings = AiSettings.load();
     AnnotationSettings annotationSettings = AnnotationSettings.load(settingsFolder);
     ProjectRootSettings projectRootSettings = ProjectRootSettings.load(projectFolder);
     AdvancedSettings advancedSettings = AdvancedSettings.load(settingsFolder);
