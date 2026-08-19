@@ -2,7 +2,7 @@ package de.a12.studio.ui;
 
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.A12Settings;
-import de.a12.studio.models.projects.settings.JsonSettings;
+import de.a12.studio.models.projects.settings.AiSettings;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
@@ -86,7 +86,7 @@ public class FooterController implements Initializable, StudioEventListener {
 
   @Override
   public void settingsChanged(@NonNull SettingsChangedEvent event) {
-    if (event.getSettings().getSettingsType().equals(JsonSettings.SettingsType.A12_INSTALLATION)) {
+    if (event.getSettings().getSettingsType().equals(AiSettings.SettingsType.A12_INSTALLATION)) {
       refreshPreviewAppStatusVisibility();
     }
   }

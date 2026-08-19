@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.preferences.PreferencePluginsPanelController">
+    <top>
+        <VBox BorderPane.alignment="CENTER_LEFT">
+            <children>
+                <Label styleClass="preference-title" text="%a12_studio_settings" />
+                <Label styleClass="preference-subtitle" text="%plugins" />
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="12.0" left="12.0" top="12.0" />
+            </BorderPane.margin>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="8.0" BorderPane.alignment="TOP_LEFT">
+            <BorderPane.margin>
+                <Insets left="12.0" right="12.0" top="4.0" />
+            </BorderPane.margin>
+            <children>
+                <Label styleClass="field-description" wrapText="true" text="%plugins.description" />
+
+                <TableView fx:id="pluginsTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="iconCol" prefWidth="48" minWidth="48" maxWidth="48"
+                                     text="" resizable="false" />
+                        <TableColumn fx:id="nameCol" prefWidth="180" minWidth="120"
+                                     text="%plugins.col_name" />
+                        <TableColumn fx:id="descriptionCol" prefWidth="320" minWidth="200"
+                                     text="%plugins.col_description" />
+                        <TableColumn fx:id="versionCol" prefWidth="80" minWidth="70"
+                                     text="%plugins.col_version" />
+                        <TableColumn fx:id="statusCol" prefWidth="160" minWidth="140"
+                                     text="%plugins.col_status" resizable="false" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN" />
+                    </columnResizePolicy>
+                </TableView>
+
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <children>
+                        <ProgressIndicator fx:id="progressIndicator" prefHeight="20.0" prefWidth="20.0" />
+                        <Label fx:id="statusLabel" styleClass="field-description" wrapText="true" />
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="12.0" />
+            </padding>
+        </VBox>
+    </center>
+</BorderPane>

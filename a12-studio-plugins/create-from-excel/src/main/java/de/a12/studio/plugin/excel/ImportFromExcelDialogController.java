@@ -1,12 +1,11 @@
-package de.a12.studio.ui.projecttree.dialogs;
+package de.a12.studio.plugin.excel;
 
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.components.StudioFileChooser;
-import de.a12.studio.ui.projecttree.importdb.ExcelImportService;
-import de.a12.studio.ui.projecttree.importdb.ExcelImportService.ColumnInfo;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.StudioBundle;
+import java.util.ResourceBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -39,7 +38,7 @@ public class ImportFromExcelDialogController implements DialogController {
    */
   public record ExcelImportInput(
       @NonNull File excelFile,
-      @NonNull List<ColumnInfo> columns,
+      @NonNull List<ExcelImportService.ColumnInfo> columns,
       @NonNull String modelName
   ) {
   }
@@ -67,7 +66,7 @@ public class ImportFromExcelDialogController implements DialogController {
   private File currentExcelFile;
 
   /** Columns read from the first sheet, populated after a file is chosen. */
-  private List<ColumnInfo> currentColumns = List.of();
+  private List<ExcelImportService.ColumnInfo> currentColumns = List.of();
 
   private final ExcelImportService importService = new ExcelImportService();
 
@@ -77,11 +76,9 @@ public class ImportFromExcelDialogController implements DialogController {
 
   @FXML
   private void initialize() {
-    // Column list is display-only; selection is not required to enable OK.
     columnListView.setMouseTransparent(true);
     columnListView.setFocusTraversable(false);
 
-    // OK enabled when a file is loaded and a valid model name has been entered.
     okButton.disableProperty().bind(Bindings.createBooleanBinding(
         () -> currentExcelFile == null
             || !FileUtils.isValidWindowsFilename(modelNameField.getText()),
@@ -133,12 +130,11 @@ public class ImportFromExcelDialogController implements DialogController {
 
     Thread thread = new Thread(() -> {
       try {
-        List<ColumnInfo> columns = importService.readFirstSheetColumns(file);
+        List<ExcelImportService.ColumnInfo> columns = importService.readFirstSheetColumns(file);
         Platform.runLater(() -> {
           currentExcelFile = file;
           filePathField.setText(file.getAbsolutePath());
           if (modelNameField.getText().isBlank()) {
-            // Pre-fill model name from filename without extension.
             String fileName = file.getName();
             int dot = fileName.lastIndexOf('.');
             modelNameField.setText(dot > 0 ? fileName.substring(0, dot) : fileName);
@@ -149,7 +145,7 @@ public class ImportFromExcelDialogController implements DialogController {
           }
           else {
             columnListView.getItems().setAll(
-                columns.stream().map(ColumnInfo::name).toList());
+                columns.stream().map(ExcelImportService.ColumnInfo::name).toList());
             columnListView.setPlaceholder(null);
           }
         });
@@ -183,7 +179,10 @@ public class ImportFromExcelDialogController implements DialogController {
   public static Optional<ExcelImportInput> show(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
     FXMLLoader loader = new FXMLLoader(
         ImportFromExcelDialogController.class.getResource("dialog-import-from-excel.fxml"));
-    loader.setResources(StudioBundle.getBundle());
+    loader.setResources(ResourceBundle.getBundle(
+        "de.a12.studio.plugin.excel.messages",
+        java.util.Locale.getDefault(),
+        ImportFromExcelDialogController.class.getClassLoader()));
     Stage stage = WidgetFactory.createDialogStage(
         "dialog-import-from-excel", loader, owner,
         StudioBundle.get("import_excel.dialog_title"));

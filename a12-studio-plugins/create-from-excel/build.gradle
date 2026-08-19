@@ -1,0 +1,22 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+javafx {
+    version = '21.0.4'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+dependencies {
+    implementation project(':a12-studio-commons')
+    implementation project(':a12-studio-plugin-manager')
+    implementation 'org.apache.poi:poi:5.3.0'
+    implementation 'org.apache.poi:poi-ooxml:5.3.0'
+}
+
+// Bundle plugin.json into the root of the JAR so PluginManager can find it.
+processResources {
+    from(projectDir) {
+        include 'plugin.json'
+    }
+}

@@ -1,0 +1,16 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+javafx {
+    version = '21.0.4'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+dependencies {
+    implementation project(':a12-studio-commons')
+    implementation project(':a12-studio-models')
+    // Jackson for parsing plugin.json descriptors – use the same Jackson 3.x
+    // family already present in a12-studio-models (comes transitively via commons).
+    implementation 'tools.jackson.core:jackson-databind:3.1.4'
+}

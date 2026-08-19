@@ -1,4 +1,4 @@
-package de.a12.studio.ui.projecttree.importdb;
+package de.a12.studio.plugin.access;
 
 import com.healthmarketscience.jackcess.Column;
 import com.healthmarketscience.jackcess.DataType;

@@ -1,0 +1,34 @@
+{
+  "plugins": [
+    {
+      "name": "Create from Access Database",
+      "description": "Imports a Document Model from a Microsoft Access database (.accdb / .mdb). The plugin reads table structure and maps column types to Document Model field types automatically.",
+      "pluginVersion": "1.0.0",
+      "a12Version": "2606",
+      "icon": "",
+      "downloadUrl": "https://github.com/syd711/a12-studio/releases/latest/download/a12-studio-plugins-create-from-access.jar",
+      "extensionPoints": [
+        {
+          "name": "createMenu",
+          "class": "de.a12.studio.plugin.access.AccessCreateMenuEntry"
+        }
+      ],
+      "pluginJsonUrl": "https://raw.githubusercontent.com/syd711/a12-studio/main/a12-studio-plugins/create-from-access/plugin.json"
+    },
+    {
+      "name": "Create from Excel",
+      "description": "Imports a Document Model from a Microsoft Excel workbook (.xlsx / .xls). Column headers become field names; cell types are sampled to infer the appropriate Document Model field type.",
+      "pluginVersion": "1.0.0",
+      "a12Version": "2606",
+      "icon": "",
+      "downloadUrl": "https://github.com/syd711/a12-studio/releases/latest/download/a12-studio-plugins-create-from-excel.jar",
+      "extensionPoints": [
+        {
+          "name": "createMenu",
+          "class": "de.a12.studio.plugin.excel.ExcelCreateMenuEntry"
+        }
+      ],
+      "pluginJsonUrl": "https://raw.githubusercontent.com/syd711/a12-studio/main/a12-studio-plugins/create-from-excel/plugin.json"
+    }
+  ]
+}
