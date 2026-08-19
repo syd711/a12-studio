@@ -1,4 +1,4 @@
-package de.a12.studio.ui.projecttree.importdb;
+package de.a12.studio.plugin.excel;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -36,11 +36,20 @@ public class ExcelImportService {
   // -------------------------------------------------------------------------
 
   /**
-   * Column name + inferred Document Model field type, mirroring {@link AccessImportService.ColumnInfo}
-   * so that the rest of the import pipeline ({@code ProjectTreeMenuActions}) can handle both
-   * sources uniformly.
+   * The subset of Document Model field types we map Excel column types to.
    */
-  public record ColumnInfo(@NonNull String name, @NonNull AccessImportService.ColumnFieldType fieldType) {
+  public enum ColumnFieldType {
+    STRING,
+    NUMBER,
+    BOOLEAN,
+    DATE,
+    DATE_TIME
+  }
+
+  /**
+   * Column name + inferred Document Model field type.
+   */
+  public record ColumnInfo(@NonNull String name, @NonNull ColumnFieldType fieldType) {
   }
 
   /**
@@ -79,7 +88,7 @@ public class ExcelImportService {
   }
 
   /**
-   * Reads the columns of the given sheet.  The first non-empty row is treated as the header; cells
+   * Reads the columns of the given sheet. The first non-empty row is treated as the header; cells
    * below it are sampled to infer the best-fitting Document Model field type for each column.
    *
    * @param excelFile an {@code .xlsx} or {@code .xls} file
@@ -102,7 +111,6 @@ public class ExcelImportService {
   // -------------------------------------------------------------------------
 
   private List<ColumnInfo> readColumnsFromSheet(@NonNull Sheet sheet) {
-    // Locate the first non-empty row (the header).
     Row headerRow = findHeaderRow(sheet);
     if (headerRow == null) {
       return List.of();
@@ -111,7 +119,6 @@ public class ExcelImportService {
     int firstCol = headerRow.getFirstCellNum();
     int lastCol = headerRow.getLastCellNum(); // exclusive
 
-    // Collect header names and initialise inferred type tracking per column.
     List<String> headers = new ArrayList<>();
     for (int c = firstCol; c < lastCol; c++) {
       Cell cell = headerRow.getCell(c);
@@ -119,9 +126,7 @@ public class ExcelImportService {
       headers.add(name.isBlank() ? "Column" + (c + 1) : name);
     }
 
-    // Infer column types from subsequent data rows.
-    AccessImportService.ColumnFieldType[] inferred =
-        new AccessImportService.ColumnFieldType[headers.size()];
+    ColumnFieldType[] inferred = new ColumnFieldType[headers.size()];
     int headerRowIdx = headerRow.getRowNum();
     int sampledRows = 0;
     for (int r = headerRowIdx + 1;
@@ -133,20 +138,18 @@ public class ExcelImportService {
       sampledRows++;
       for (int c = firstCol; c < lastCol; c++) {
         int idx = c - firstCol;
-        if (inferred[idx] == AccessImportService.ColumnFieldType.STRING) {
-          continue; // already fallen back to STRING – no point scanning further
+        if (inferred[idx] == ColumnFieldType.STRING) {
+          continue;
         }
         Cell cell = row.getCell(c);
-        AccessImportService.ColumnFieldType cellType = inferCellType(cell);
+        ColumnFieldType cellType = inferCellType(cell);
         inferred[idx] = mergeTypes(inferred[idx], cellType);
       }
     }
 
-    // Build results – default to STRING for columns that had no data.
     List<ColumnInfo> result = new ArrayList<>(headers.size());
     for (int i = 0; i < headers.size(); i++) {
-      AccessImportService.ColumnFieldType type =
-          inferred[i] != null ? inferred[i] : AccessImportService.ColumnFieldType.STRING;
+      ColumnFieldType type = inferred[i] != null ? inferred[i] : ColumnFieldType.STRING;
       result.add(new ColumnInfo(headers.get(i), type));
     }
     return result;
@@ -167,12 +170,8 @@ public class ExcelImportService {
     return null;
   }
 
-  /**
-   * Maps a single POI {@link Cell} to the most specific {@link AccessImportService.ColumnFieldType}
-   * that describes its value. Blank / null cells return {@code null} (no information).
-   */
   @Nullable
-  private AccessImportService.ColumnFieldType inferCellType(@Nullable Cell cell) {
+  private ColumnFieldType inferCellType(@Nullable Cell cell) {
     if (cell == null) {
       return null;
     }
@@ -181,35 +180,22 @@ public class ExcelImportService {
         : cell.getCellType();
 
     return switch (type) {
-      case BOOLEAN -> AccessImportService.ColumnFieldType.BOOLEAN;
+      case BOOLEAN -> ColumnFieldType.BOOLEAN;
       case NUMERIC -> DateUtil.isCellDateFormatted(cell)
-          ? AccessImportService.ColumnFieldType.DATE_TIME
-          : AccessImportService.ColumnFieldType.NUMBER;
-      case STRING -> AccessImportService.ColumnFieldType.STRING;
-      default -> null; // BLANK, ERROR, _NONE – no information
+          ? ColumnFieldType.DATE_TIME
+          : ColumnFieldType.NUMBER;
+      case STRING -> ColumnFieldType.STRING;
+      default -> null;
     };
   }
 
-  /**
-   * Combines the current accumulated type for a column with the type inferred from one more cell.
-   *
-   * <p>Type precedence (most to least specific):
-   * <ol>
-   *   <li>{@code null} – no data yet → defer to the new observation</li>
-   *   <li>{@code BOOLEAN} – only stays BOOLEAN if all sampled values are also BOOLEAN</li>
-   *   <li>{@code DATE_TIME} / {@code DATE} – only stays if numeric cell types are date-formatted</li>
-   *   <li>{@code NUMBER} – loses to STRING, DATE/DATE_TIME on type mismatch</li>
-   *   <li>{@code STRING} – the universal fallback; once reached, stays STRING</li>
-   * </ol>
-   */
   @NonNull
-  private AccessImportService.ColumnFieldType mergeTypes(
-      @Nullable AccessImportService.ColumnFieldType accumulated,
-      @Nullable AccessImportService.ColumnFieldType observed) {
+  private ColumnFieldType mergeTypes(
+      @Nullable ColumnFieldType accumulated,
+      @Nullable ColumnFieldType observed) {
 
     if (observed == null) {
-      // blank cell → no new information, keep whatever we have
-      return accumulated != null ? accumulated : AccessImportService.ColumnFieldType.STRING;
+      return accumulated != null ? accumulated : ColumnFieldType.STRING;
     }
     if (accumulated == null) {
       return observed;
@@ -217,7 +203,6 @@ public class ExcelImportService {
     if (accumulated == observed) {
       return accumulated;
     }
-    // Any mismatch between distinct types → fall back to STRING
-    return AccessImportService.ColumnFieldType.STRING;
+    return ColumnFieldType.STRING;
   }
 }

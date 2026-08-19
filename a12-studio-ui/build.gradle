@@ -30,6 +30,8 @@ javafx {
 
 dependencies {
     implementation project(':a12-studio-commons')
+    implementation project(':a12-studio-plugin:create-from-access')
+    implementation project(':a12-studio-plugin:create-from-excel')
     implementation project(':a12-studio-models')
     implementation project(':a12-studio-models-validation')
     implementation project(':a12-studio-data-services')
@@ -45,10 +47,6 @@ dependencies {
     // intercepted before the shell's own reserved Snap Assist handling consumes it.
     implementation 'net.java.dev.jna:jna-platform:5.15.0'
     // Pure-Java Microsoft Access reader; no ODBC or native drivers needed.
-    implementation 'com.healthmarketscience.jackcess:jackcess:4.0.7'
-    // Apache POI for reading Excel files (.xlsx / .xls); poi-ooxml covers the modern xlsx format.
-    implementation 'org.apache.poi:poi:5.3.0'
-    implementation 'org.apache.poi:poi-ooxml:5.3.0'
 
     testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'

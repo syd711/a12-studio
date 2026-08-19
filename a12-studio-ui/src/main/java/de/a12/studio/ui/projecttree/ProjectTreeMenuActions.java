@@ -14,12 +14,12 @@ import de.a12.studio.models.documentmodel.DateFieldType;
 import de.a12.studio.models.documentmodel.NumberFieldType;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.ui.components.StudioFolderChooser;
-import de.a12.studio.ui.projecttree.dialogs.ImportFromAccessDialogController;
-import de.a12.studio.ui.projecttree.dialogs.ImportFromAccessDialogController.AccessImportInput;
-import de.a12.studio.ui.projecttree.dialogs.ImportFromExcelDialogController;
-import de.a12.studio.ui.projecttree.dialogs.ImportFromExcelDialogController.ExcelImportInput;
-import de.a12.studio.ui.projecttree.importdb.AccessImportService.ColumnFieldType;
-import de.a12.studio.ui.projecttree.importdb.AccessImportService.ColumnInfo;
+import de.a12.studio.plugin.access.ImportFromAccessDialogController;
+import de.a12.studio.plugin.access.ImportFromAccessDialogController.AccessImportInput;
+import de.a12.studio.plugin.excel.ImportFromExcelDialogController;
+import de.a12.studio.plugin.excel.ImportFromExcelDialogController.ExcelImportInput;
+import de.a12.studio.plugin.access.AccessImportService.ColumnFieldType;
+import de.a12.studio.plugin.access.AccessImportService.ColumnInfo;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.zip.ZipUtil;
@@ -111,10 +111,10 @@ public class ProjectTreeMenuActions {
     }
 
     ExcelImportInput data = input.get();
-    // ExcelImportService.ColumnInfo uses AccessImportService.ColumnFieldType, so we map to
-    // the shared ColumnInfo type used by the common builder method.
+    // Convert ExcelImportService.ColumnFieldType -> AccessImportService.ColumnFieldType by name
+    // so the shared buildDocumentModelFromColumns method can handle both import sources.
     List<ColumnInfo> columns = data.columns().stream()
-        .map(c -> new ColumnInfo(c.name(), c.fieldType()))
+        .map(c -> new ColumnInfo(c.name(), ColumnFieldType.valueOf(c.fieldType().name())))
         .toList();
     try {
       DocumentModel model = buildDocumentModelFromColumns(parent, data.modelName(), data.modelName(), columns);
