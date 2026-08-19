@@ -9,5 +9,13 @@ javafx {
 
 dependencies {
     implementation project(':a12-studio-commons')
+    implementation project(':a12-studio-plugin-manager')
     implementation 'com.healthmarketscience.jackcess:jackcess:4.0.7'
+}
+
+// Bundle plugin.json into the root of the JAR so PluginManager can find it.
+processResources {
+    from(projectDir) {
+        include 'plugin.json'
+    }
 }

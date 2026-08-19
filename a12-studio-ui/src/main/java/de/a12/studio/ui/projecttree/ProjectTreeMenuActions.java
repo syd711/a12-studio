@@ -1,36 +1,24 @@
 package de.a12.studio.ui.projecttree;
 
-import de.a12.studio.models.documentmodel.DateTimeFieldType;
-import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.documentmodel.DocumentModelContent;
-import de.a12.studio.models.documentmodel.FieldConfig;
-import de.a12.studio.models.documentmodel.FieldElement;
-import de.a12.studio.models.documentmodel.GroupConfig;
-import de.a12.studio.models.documentmodel.GroupElement;
-import de.a12.studio.models.documentmodel.ModelInfo;
-import de.a12.studio.models.documentmodel.ModelRoot;
-import de.a12.studio.models.documentmodel.BooleanFieldType;
-import de.a12.studio.models.documentmodel.DateFieldType;
-import de.a12.studio.models.documentmodel.NumberFieldType;
-import de.a12.studio.models.documentmodel.StringFieldType;
-import de.a12.studio.ui.components.StudioFolderChooser;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.NewModelFactory;
+import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.plugin.access.AccessImportService.ColumnFieldType;
 import de.a12.studio.plugin.access.ImportFromAccessDialogController;
 import de.a12.studio.plugin.access.ImportFromAccessDialogController.AccessImportInput;
 import de.a12.studio.plugin.excel.ImportFromExcelDialogController;
 import de.a12.studio.plugin.excel.ImportFromExcelDialogController.ExcelImportInput;
-import de.a12.studio.plugin.access.AccessImportService.ColumnFieldType;
-import de.a12.studio.plugin.access.AccessImportService.ColumnInfo;
-import de.a12.studio.ui.util.StudioBundle;
-import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.ui.util.zip.ZipUtil;
-import de.a12.studio.models.ModelType;
-import de.a12.studio.models.NewModelFactory;
-import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.models.projects.settings.ProjectRootSettings;
-import de.a12.studio.models.Locale;
+import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
+import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController.NewModelInput;
+import de.a12.studio.ui.util.DocumentModelBuilder;
+import de.a12.studio.ui.util.DocumentModelBuilder.ColumnDescriptor;
+import de.a12.studio.ui.util.DocumentModelBuilder.ColumnType;
+import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.ui.util.zip.ZipUtil;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,7 +58,6 @@ public class ProjectTreeMenuActions {
     if (name == null || name.isBlank()) {
       return;
     }
-
     try {
       parent.createChildFolder(name.trim());
       onReload.run();
@@ -111,13 +97,11 @@ public class ProjectTreeMenuActions {
     }
 
     ExcelImportInput data = input.get();
-    // Convert ExcelImportService.ColumnFieldType -> AccessImportService.ColumnFieldType by name
-    // so the shared buildDocumentModelFromColumns method can handle both import sources.
-    List<ColumnInfo> columns = data.columns().stream()
-        .map(c -> new ColumnInfo(c.name(), ColumnFieldType.valueOf(c.fieldType().name())))
+    List<ColumnDescriptor> columns = data.columns().stream()
+        .map(c -> new ColumnDescriptor(c.name(), ColumnType.valueOf(c.fieldType().name())))
         .toList();
     try {
-      DocumentModel model = buildDocumentModelFromColumns(parent, data.modelName(), data.modelName(), columns);
+      var model = DocumentModelBuilder.build(parent, data.modelName(), data.modelName(), columns);
       ProjectItem item = NewModelFactory.createModelFromExisting(parent, model, data.modelName());
       onReload.run();
       onOpen.accept(new ProjectItemViewModel(item, Map.of()));
@@ -135,8 +119,11 @@ public class ProjectTreeMenuActions {
     }
 
     AccessImportInput data = input.get();
+    List<ColumnDescriptor> columns = data.columns().stream()
+        .map(c -> new ColumnDescriptor(c.name(), toColumnType(c.fieldType())))
+        .toList();
     try {
-      DocumentModel model = buildDocumentModelFromColumns(parent, data.modelName(), data.tableName(), data.columns());
+      var model = DocumentModelBuilder.build(parent, data.modelName(), data.tableName(), columns);
       ProjectItem item = NewModelFactory.createModelFromExisting(parent, model, data.modelName());
       onReload.run();
       onOpen.accept(new ProjectItemViewModel(item, Map.of()));
@@ -147,100 +134,18 @@ public class ProjectTreeMenuActions {
     }
   }
 
-  /**
-   * Builds a {@link DocumentModel} whose fields mirror the provided columns.
-   * All fields are placed in a single root group named after the source (table/sheet name).
-   *
-   * @param parent    target project folder (used to resolve default locales)
-   * @param modelName the document model name (also the {@link de.a12.studio.models.documentmodel.ModelInfo} name)
-   * @param groupName label for the root group (typically the table or sheet name)
-   * @param columns   ordered list of columns to turn into fields
-   */
-  private DocumentModel buildDocumentModelFromColumns(@NonNull ProjectItem parent,
-                                                      @NonNull String modelName,
-                                                      @NonNull String groupName,
-                                                      @NonNull List<ColumnInfo> columns) {
-    DocumentModel model = new DocumentModel();
-
-    DocumentModelContent content = new DocumentModelContent();
-
-    ModelInfo modelInfo = new ModelInfo();
-    modelInfo.setName(modelName);
-    content.setModelInfo(modelInfo);
-    content.setModelConfig(NewModelFactory.defaultModelConfig());
-
-    // Build a single root group containing one field per source column.
-    GroupElement rootGroup = new GroupElement();
-    rootGroup.setId(sanitizeId(groupName));
-    rootGroup.setName(groupName);
-    GroupConfig groupConfig = new GroupConfig();
-
-    for (ColumnInfo col : columns) {
-      FieldElement field = new FieldElement();
-      field.setId(sanitizeId(col.name()));
-      field.setName(col.name());
-
-      FieldConfig fieldConfig = new FieldConfig();
-      fieldConfig.setFieldType(toFieldType(col.fieldType()));
-      field.setField(fieldConfig);
-
-      groupConfig.getElements().add(field);
-    }
-
-    rootGroup.setGroup(groupConfig);
-
-    ModelRoot modelRoot = new ModelRoot();
-    modelRoot.getRootGroups().add(rootGroup);
-    content.setModelRoot(modelRoot);
-
-    model.setContent(content);
-    model.setLocales(resolveDefaultLocales(parent));
-    return model;
-  }
-
-  /** Converts an {@link AccessImportService.ColumnFieldType} to the appropriate Document Model {@link de.a12.studio.models.documentmodel.FieldType}. */
-  private de.a12.studio.models.documentmodel.FieldType toFieldType(@NonNull ColumnFieldType columnFieldType) {
-    return switch (columnFieldType) {
-      case BOOLEAN -> new BooleanFieldType();
-      case NUMBER -> new NumberFieldType();
-      case DATE -> new DateFieldType();
-      case DATE_TIME -> new DateTimeFieldType();
-      default -> new StringFieldType();
+  private static ColumnType toColumnType(@NonNull ColumnFieldType type) {
+    return switch (type) {
+      case BOOLEAN   -> ColumnType.BOOLEAN;
+      case NUMBER    -> ColumnType.NUMBER;
+      case DATE      -> ColumnType.DATE;
+      case DATE_TIME -> ColumnType.DATE_TIME;
+      default        -> ColumnType.STRING;
     };
   }
 
-  /**
-   * Turns an arbitrary name into a valid document model element id: strips leading digits,
-   * replaces any character that isn't a letter/digit/underscore with an underscore.
-   */
-  private String sanitizeId(@NonNull String name) {
-    String id = name.replaceAll("[^A-Za-z0-9_]", "_");
-    if (!id.isEmpty() && Character.isDigit(id.charAt(0))) {
-      id = "_" + id;
-    }
-    return id.isEmpty() ? "field" : id;
-  }
-
-  private List<Locale> resolveDefaultLocales(@NonNull ProjectItem parent) {
-    ProjectItem root = parent;
-    while (root.getParent() != null) {
-      root = root.getParent();
-    }
-    List<Locale> projectLocales = ProjectRootSettings.load(root.getFile()).getGeneral().getLocales();
-    if (projectLocales.isEmpty()) {
-      Locale en = new Locale();
-      en.setCode("en");
-      Locale de = new Locale();
-      de.setCode("de");
-      return new ArrayList<>(List.of(en, de));
-    }
-    List<Locale> locales = new ArrayList<>();
-    for (Locale pl : projectLocales) {
-      Locale locale = new Locale();
-      locale.setCode(pl.getCode());
-      locales.add(locale);
-    }
-    return locales;
+  void executePluginEntry(@NonNull ICreateItemMenuEntry entry, @NonNull ProjectItem targetFolder) {
+    entry.execute(getStage(), targetFolder);
   }
 
   void onRenameItem(@NonNull ProjectItem item) {
@@ -249,7 +154,6 @@ public class ProjectTreeMenuActions {
     if (name == null || name.isBlank() || name.equals(item.getName())) {
       return;
     }
-
     String oldPath = item.getPath();
     try {
       item.renameTo(name.trim());
@@ -278,10 +182,8 @@ public class ProjectTreeMenuActions {
     if (destinationFolder == null) {
       return;
     }
-
     String dateSuffix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"));
     File zipFile = new File(destinationFolder, item.getName() + "_" + dateSuffix + ".zip");
-
     try {
       ZipUtil.zipFolder(item.getFile(), zipFile, (file, path) -> { });
     }
@@ -304,7 +206,6 @@ public class ProjectTreeMenuActions {
     if (!canMoveItem(source, targetFolder)) {
       return;
     }
-
     try {
       source.moveTo(targetFolder);
       onReload.run();

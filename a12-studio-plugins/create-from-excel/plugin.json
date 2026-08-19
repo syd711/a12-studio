@@ -1,0 +1,14 @@
+{
+  "name": "Create from Excel",
+  "description": "Imports a Document Model from a Microsoft Excel workbook (.xlsx / .xls). Column headers become field names; cell types are sampled to infer the appropriate Document Model field type.",
+  "pluginVersion": "1.0.0",
+  "a12Version": "2606",
+  "icon": "",
+  "downloadUrl": "",
+  "extensionPoints": [
+    {
+      "name": "createMenu",
+      "class": "de.a12.studio.plugin.excel.ExcelCreateMenuEntry"
+    }
+  ]
+}

@@ -13,6 +13,8 @@ import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
+import de.a12.studio.plugin.manager.PluginManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.KeyCode;
@@ -337,21 +339,21 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         createBlank.setOnAction(event -> onNewModel(ModelType.DOCUMENT));
         documentMenu.getItems().add(createBlank);
 
-        documentMenu.getItems().add(new SeparatorMenuItem());
-
-        MenuItem fromAccess = new MenuItem(StudioBundle.get("new_document_model.from_access"));
-        FontIcon accessIcon = WidgetFactory.createIcon("mdi2d-database-import-outline");
-        accessIcon.getStyleClass().add("menu-icon");
-        fromAccess.setGraphic(accessIcon);
-        fromAccess.setOnAction(event -> menuFactory.onImportFromAccessDatabase(resolveTargetFolder()));
-        documentMenu.getItems().add(fromAccess);
-
-        MenuItem fromExcel = new MenuItem(StudioBundle.get("new_document_model.from_excel"));
-        FontIcon excelIcon = WidgetFactory.createIcon(Icons.FILE_TABLE_OUTLINE);
-        excelIcon.getStyleClass().add("menu-icon");
-        fromExcel.setGraphic(excelIcon);
-        fromExcel.setOnAction(event -> menuFactory.onImportFromExcel(resolveTargetFolder()));
-        documentMenu.getItems().add(fromExcel);
+        // Append plugin-contributed "createMenu" extension points as import options.
+        List<ICreateItemMenuEntry> pluginEntries = PluginManager.getInstance().getCreateMenuEntries();
+        if (!pluginEntries.isEmpty()) {
+          documentMenu.getItems().add(new SeparatorMenuItem());
+          for (ICreateItemMenuEntry entry : pluginEntries) {
+            MenuItem pluginItem = new MenuItem(entry.getMenuLabel());
+            javafx.scene.Node graphic = entry.getMenuGraphic();
+            if (graphic != null) {
+              graphic.getStyleClass().add("menu-icon");
+              pluginItem.setGraphic(graphic);
+            }
+            pluginItem.setOnAction(event -> entry.execute(getStage(), resolveTargetFolder()));
+            documentMenu.getItems().add(pluginItem);
+          }
+        }
 
         newButton.getItems().add(documentMenu);
       }

@@ -30,6 +30,7 @@ javafx {
 
 dependencies {
     implementation project(':a12-studio-commons')
+    implementation project(':a12-studio-plugin-manager')
     implementation project(':a12-studio-plugins:create-from-access')
     implementation project(':a12-studio-plugins:create-from-excel')
     implementation project(':a12-studio-models')

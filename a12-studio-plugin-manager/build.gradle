@@ -9,4 +9,8 @@ javafx {
 
 dependencies {
     implementation project(':a12-studio-commons')
+    implementation project(':a12-studio-models')
+    // Jackson for parsing plugin.json descriptors – use the same Jackson 3.x
+    // family already present in a12-studio-models (comes transitively via commons).
+    implementation 'tools.jackson.core:jackson-databind:3.1.4'
 }
