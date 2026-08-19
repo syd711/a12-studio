@@ -2,7 +2,7 @@ package de.a12.studio.models.projects.settings;
 
 import java.io.File;
 
-public class JsonSettings extends de.a12.studio.models.util.JsonSettings {
+public class AiSettings extends de.a12.studio.models.util.JsonSettings {
 
   static final String SETTINGS_FOLDER_NAME = ".a12-studio";
 
@@ -53,8 +53,8 @@ public class JsonSettings extends de.a12.studio.models.util.JsonSettings {
     this.claudeExecutablePath = claudeExecutablePath;
   }
 
-  public static JsonSettings load() {
+  public static AiSettings load() {
     File homeFolder = resolveSettingsFolder(new File(System.getProperty("user.home")), SETTINGS_FOLDER_NAME);
-    return de.a12.studio.models.util.JsonSettings.load(new File(homeFolder, SETTINGS_FILE_NAME), JsonSettings.class);
+    return de.a12.studio.models.util.JsonSettings.load(new File(homeFolder, SETTINGS_FILE_NAME), AiSettings.class);
   }
 }

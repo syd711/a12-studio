@@ -44,6 +44,45 @@ tasks.register('generateLicenses') {
     }
 }
 
+tasks.register('generateMarketplace') {
+    group = 'plugins'
+    description = 'Scans all plugin.json files in the workspace and aggregates them into marketplace.json.'
+
+    def pluginDirs = subprojects
+        .collect { proj -> file("${proj.projectDir}/plugin.json") }
+        .findAll { it.exists() }
+
+    inputs.files(pluginDirs)
+
+    def outputFile = file("${rootDir}/a12-studio-plugin-manager/src/main/resources/marketplace.json")
+    outputs.file(outputFile)
+
+    doLast {
+        def plugins = pluginDirs.collect { pluginJson ->
+            def slurper = new groovy.json.JsonSlurper()
+            def descriptor = slurper.parse(pluginJson)
+            // Derive the raw GitHub download URL for the JAR from the module path.
+            // The JAR artifact lives at:
+            //   https://github.com/syd711/a12-studio/releases/download/<tag>/<module>-<version>.jar
+            // For the marketplace downloadUrl we point to the raw plugin.json so the
+            // manager can also show it; the actual JAR download URL is set per-release.
+            // Here we compute the canonical raw-content URL for the plugin.json itself
+            // so that the manager can always discover the latest descriptor.
+            def relPath = rootDir.toPath().relativize(pluginJson.toPath()).toString().replace('\\', '/')
+            descriptor['pluginJsonUrl'] = "https://raw.githubusercontent.com/syd711/a12-studio/main/${relPath}"
+            // Point downloadUrl to the shadow/fat JAR built by the module.
+            def moduleDir = pluginJson.parentFile
+            def moduleName = rootDir.toPath().relativize(moduleDir.toPath()).toString().replace('\\', '/').replace('/', '-')
+            descriptor['downloadUrl'] = "https://github.com/syd711/a12-studio/releases/latest/download/${moduleName}.jar"
+            return descriptor
+        }
+        def json = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([plugins: plugins]))
+        outputFile.parentFile.mkdirs()
+        outputFile.text = json
+        logger.lifecycle("marketplace.json written with ${plugins.size()} plugin(s) to ${outputFile}")
+    }
+}
+
 subprojects {
     apply plugin: 'java'
 

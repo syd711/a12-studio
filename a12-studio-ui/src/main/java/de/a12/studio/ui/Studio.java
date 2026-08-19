@@ -1,6 +1,7 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.ui.util.*;
+import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.projects.Project;
@@ -61,6 +62,9 @@ public class Studio extends Application implements StudioEventListener {
     }
 
     StudioEventManager.getInstance().addListener(this);
+
+    // Initialize plugin manager – scans the plugins/ directory next to the application root.
+    PluginManager.initialize(new java.io.File(System.getProperty("user.dir")));
 
     FXMLLoader loader = new FXMLLoader(Studio.class.getResource("scene-root.fxml"));
     loader.setResources(StudioBundle.getBundle());

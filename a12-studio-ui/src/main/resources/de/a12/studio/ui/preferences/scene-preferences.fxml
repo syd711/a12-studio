@@ -36,6 +36,7 @@
                                                 <Button fx:id="a12InstallationBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onA12Installation" styleClass="preference-button" text="%a12_installation" />
                                                 <Button fx:id="previewSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPreviewSettings" styleClass="preference-button" text="%preview_settings" />
                                                 <Button fx:id="shortcutsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onShortcuts" styleClass="preference-button" text="%shortcuts" />
+                                                <Button fx:id="pluginsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPlugins" styleClass="preference-button" text="%plugins" />
                                        </children>
                                     </VBox>
                                  </children>

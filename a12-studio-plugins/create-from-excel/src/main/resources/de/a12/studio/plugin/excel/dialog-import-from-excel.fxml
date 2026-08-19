@@ -14,11 +14,11 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="560.0"
-            styleClass="navigation-panel" stylesheets="@../../stylesheet.css"
+            styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.projecttree.dialogs.ImportFromAccessDialogController">
+            fx:controller="de.a12.studio.plugin.excel.ImportFromExcelDialogController">
    <top>
-      <fx:include fx:id="header" source="../../components/scene-dialog-header.fxml" />
+      <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
    </top>
    <center>
       <VBox spacing="0.0" BorderPane.alignment="TOP_LEFT">
@@ -27,38 +27,38 @@
          </BorderPane.margin>
 
          <!-- File chooser row -->
-         <Label styleClass="field-label" text="%import_access.database_file" />
+         <Label styleClass="field-label" text="%import_excel.file" />
          <HBox spacing="8.0" alignment="CENTER_LEFT">
             <VBox.margin><Insets top="4.0" /></VBox.margin>
             <TextField fx:id="filePathField" HBox.hgrow="ALWAYS" editable="false"
-                       promptText="%import_access.no_file_selected" styleClass="field-value">
+                       promptText="%import_excel.no_file_selected" styleClass="field-value">
                <font><Font size="13.0" /></font>
             </TextField>
             <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowse"
-                    styleClass="secondary-button" text="%import_access.browse">
+                    styleClass="secondary-button" text="%import_excel.browse">
                <graphic>
                   <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="16" styleClass="button-icon" />
                </graphic>
-               <tooltip><Tooltip text="%import_access.browse_tooltip" /></tooltip>
+               <tooltip><Tooltip text="%import_excel.browse_tooltip" /></tooltip>
             </Button>
          </HBox>
 
-         <!-- Table list -->
-         <Label styleClass="field-label" text="%import_access.select_table">
+         <!-- Column list -->
+         <Label styleClass="field-label" text="%import_excel.columns">
             <VBox.margin><Insets top="14.0" /></VBox.margin>
          </Label>
-         <Label fx:id="tableHintLabel" styleClass="field-hint" text="%import_access.table_hint">
+         <Label styleClass="field-hint" text="%import_excel.columns_hint">
             <VBox.margin><Insets top="2.0" bottom="4.0" /></VBox.margin>
          </Label>
-         <ListView fx:id="tableListView" prefHeight="160.0" maxWidth="1.7976931348623157E308">
+         <ListView fx:id="columnListView" prefHeight="160.0" maxWidth="1.7976931348623157E308">
             <VBox.margin><Insets top="2.0" /></VBox.margin>
          </ListView>
 
          <!-- Model name -->
-         <Label styleClass="field-label" text="%import_access.model_name">
+         <Label styleClass="field-label" text="%import_excel.model_name">
             <VBox.margin><Insets top="14.0" /></VBox.margin>
          </Label>
-         <TextField fx:id="modelNameField" promptText="%import_access.model_name_prompt">
+         <TextField fx:id="modelNameField" promptText="%import_excel.model_name_prompt">
             <VBox.margin><Insets top="4.0" /></VBox.margin>
             <font><Font size="14.0" /></font>
          </TextField>
@@ -76,7 +76,7 @@
          <items>
             <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false"
                     onAction="#onDialogSubmit" styleClass="primary-button"
-                    text="%import_access.create_button" />
+                    text="%import_excel.create_button" />
             <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false"
                     onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
          </items>

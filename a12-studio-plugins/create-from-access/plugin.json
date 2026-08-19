@@ -1,0 +1,14 @@
+{
+  "name": "Create from Access Database",
+  "description": "Imports a Document Model from a Microsoft Access database (.accdb / .mdb). The plugin reads table structure and maps column types to Document Model field types automatically.",
+  "pluginVersion": "1.0.0",
+  "a12Version": "2606",
+  "icon": "",
+  "downloadUrl": "",
+  "extensionPoints": [
+    {
+      "name": "createMenu",
+      "class": "de.a12.studio.plugin.access.AccessCreateMenuEntry"
+    }
+  ]
+}

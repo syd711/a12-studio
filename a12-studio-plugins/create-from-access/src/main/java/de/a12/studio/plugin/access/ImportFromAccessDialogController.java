@@ -1,12 +1,11 @@
-package de.a12.studio.ui.projecttree.dialogs;
+package de.a12.studio.plugin.access;
 
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.components.StudioFileChooser;
-import de.a12.studio.ui.projecttree.importdb.AccessImportService;
-import de.a12.studio.ui.projecttree.importdb.AccessImportService.ColumnInfo;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.StudioBundle;
+import java.util.ResourceBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -42,7 +41,7 @@ public class ImportFromAccessDialogController implements DialogController {
   public record AccessImportInput(
       @NonNull File accessFile,
       @NonNull String tableName,
-      @NonNull List<ColumnInfo> columns,
+      @NonNull List<AccessImportService.ColumnInfo> columns,
       @NonNull String modelName
   ) {
   }
@@ -72,7 +71,7 @@ public class ImportFromAccessDialogController implements DialogController {
   private File currentAccessFile;
 
   /** Columns of the currently selected table, or empty if none selected yet. */
-  private List<ColumnInfo> currentColumns = List.of();
+  private List<AccessImportService.ColumnInfo> currentColumns = List.of();
 
   private final AccessImportService importService = new AccessImportService();
 
@@ -206,7 +205,10 @@ public class ImportFromAccessDialogController implements DialogController {
   public static Optional<AccessImportInput> show(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
     FXMLLoader loader = new FXMLLoader(
         ImportFromAccessDialogController.class.getResource("dialog-import-from-access.fxml"));
-    loader.setResources(StudioBundle.getBundle());
+    loader.setResources(ResourceBundle.getBundle(
+        "de.a12.studio.plugin.access.messages",
+        java.util.Locale.getDefault(),
+        ImportFromAccessDialogController.class.getClassLoader()));
     Stage stage = WidgetFactory.createDialogStage(
         "dialog-import-from-access", loader, owner,
         StudioBundle.get("import_access.dialog_title"));
