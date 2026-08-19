@@ -1,0 +1,20 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+javafx {
+    version = '21.0.4'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+dependencies {
+    implementation project(':a12-studio-models')
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'commons-io:commons-io:2.22.0'
+    implementation 'org.apache.commons:commons-lang3:3.16.0'
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
+    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0'
+    implementation 'org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.4.0'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.7'
+    implementation 'net.java.dev.jna:jna-platform:5.15.0'
+}
