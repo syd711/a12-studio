@@ -40,7 +40,7 @@ public class ExcelImportService {
    * so that the rest of the import pipeline ({@code ProjectTreeMenuActions}) can handle both
    * sources uniformly.
    */
-  public record ColumnInfo(@NonNull String name, @NonNull AccessImportService.ColumnFieldType fieldType) {
+  public record ColumnInfo(@NonNull String name, AccessImportService.@NonNull ColumnFieldType fieldType) {
   }
 
   /**
@@ -171,8 +171,7 @@ public class ExcelImportService {
    * Maps a single POI {@link Cell} to the most specific {@link AccessImportService.ColumnFieldType}
    * that describes its value. Blank / null cells return {@code null} (no information).
    */
-  @Nullable
-  private AccessImportService.ColumnFieldType inferCellType(@Nullable Cell cell) {
+  private AccessImportService.@Nullable ColumnFieldType inferCellType(@Nullable Cell cell) {
     if (cell == null) {
       return null;
     }
@@ -202,10 +201,9 @@ public class ExcelImportService {
    *   <li>{@code STRING} – the universal fallback; once reached, stays STRING</li>
    * </ol>
    */
-  @NonNull
-  private AccessImportService.ColumnFieldType mergeTypes(
-      @Nullable AccessImportService.ColumnFieldType accumulated,
-      @Nullable AccessImportService.ColumnFieldType observed) {
+  private AccessImportService.@NonNull ColumnFieldType mergeTypes(
+      AccessImportService.@Nullable ColumnFieldType accumulated,
+      AccessImportService.@Nullable ColumnFieldType observed) {
 
     if (observed == null) {
       // blank cell → no new information, keep whatever we have

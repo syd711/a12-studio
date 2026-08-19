@@ -11,7 +11,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import org.jspecify.annotations.NonNull;
-import org.kordamp.ikonli.javafx.FontIcon;
 
 class ProjectTreeContextMenu {
 
@@ -38,13 +37,13 @@ class ProjectTreeContextMenu {
         documentMenu.getItems().add(new SeparatorMenuItem());
 
         MenuItem fromAccess = new MenuItem(StudioBundle.get("new_document_model.from_access"));
-        FontIcon accessIcon = withMenuIconStyle(WidgetFactory.createIcon("mdi2d-database-import-outline"));
+        Node accessIcon = withMenuIconStyle(WidgetFactory.createIcon("mdi2d-database-import-outline"));
         fromAccess.setGraphic(accessIcon);
         fromAccess.setOnAction(event -> actions.onImportFromAccessDatabase(projectItem));
         documentMenu.getItems().add(fromAccess);
 
         MenuItem fromExcel = new MenuItem(StudioBundle.get("new_document_model.from_excel"));
-        FontIcon excelIcon = withMenuIconStyle(WidgetFactory.createIcon(Icons.FILE_TABLE_OUTLINE));
+        Node excelIcon = withMenuIconStyle(WidgetFactory.createIcon(Icons.FILE_TABLE_OUTLINE));
         fromExcel.setGraphic(excelIcon);
         fromExcel.setOnAction(event -> actions.onImportFromExcel(projectItem));
         documentMenu.getItems().add(fromExcel);
