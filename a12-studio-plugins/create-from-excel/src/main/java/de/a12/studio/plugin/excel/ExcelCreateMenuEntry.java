@@ -64,7 +64,7 @@ public class ExcelCreateMenuEntry implements ICreateItemMenuEntry {
     }
   }
 
-  private static ColumnType toColumnType(@NonNull ExcelImportService.ColumnFieldType type) {
+  private static ColumnType toColumnType(ExcelImportService.@NonNull ColumnFieldType type) {
     return switch (type) {
       case BOOLEAN   -> ColumnType.BOOLEAN;
       case NUMBER    -> ColumnType.NUMBER;

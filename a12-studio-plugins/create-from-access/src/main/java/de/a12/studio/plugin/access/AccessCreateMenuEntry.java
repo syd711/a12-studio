@@ -63,7 +63,7 @@ public class AccessCreateMenuEntry implements ICreateItemMenuEntry {
     }
   }
 
-  private static ColumnType toColumnType(@NonNull AccessImportService.ColumnFieldType type) {
+  private static ColumnType toColumnType(AccessImportService.@NonNull ColumnFieldType type) {
     return switch (type) {
       case BOOLEAN   -> ColumnType.BOOLEAN;
       case NUMBER    -> ColumnType.NUMBER;

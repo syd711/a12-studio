@@ -204,7 +204,7 @@ public class PluginManager {
   }
 
   /** Loads and instantiates the extension-point class, returning {@code null} on any error. */
-  private Object instantiate(@NonNull PluginDescriptor.ExtensionPoint ep,
+  private Object instantiate(PluginDescriptor.@NonNull ExtensionPoint ep,
                              @NonNull URLClassLoader classLoader,
                              @NonNull String jarName) {
     try {
@@ -221,8 +221,6 @@ public class PluginManager {
     }
     return null;
   }
-}
-
 
   // ---------------------------------------------------------------------------
   // Marketplace
@@ -241,8 +239,7 @@ public class PluginManager {
    *
    * @return list of matching marketplace entries, or an empty list if the resource is missing
    */
-  @NonNull
-  public java.util.List<Marketplace.MarketplaceEntry> getMarketplaceEntries() {
+  public java.util.@NonNull List<Marketplace.MarketplaceEntry> getMarketplaceEntries() {
     try (java.io.InputStream in = getClass().getResourceAsStream(MARKETPLACE_RESOURCE)) {
       if (in == null) {
         log.warn("marketplace.json not found on classpath");
@@ -295,7 +292,7 @@ public class PluginManager {
   }
 
   /** Returns the {@code plugins/} directory (created on demand by {@link #scanPlugins()}). */
-  @NonNull
-  public java.io.File getPluginsDir() {
+  public java.io.@NonNull File getPluginsDir() {
     return pluginsDir;
   }
+}

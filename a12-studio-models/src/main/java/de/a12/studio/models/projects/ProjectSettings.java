@@ -54,7 +54,7 @@ public class ProjectSettings {
   }
 
   public static ProjectSettings load(@NonNull File projectFolder) {
-    File settingsFolder = de.a12.studio.models.util.AiSettings.resolveSettingsFolder(projectFolder, SETTINGS_FOLDER_NAME);
+    File settingsFolder = AiSettings.resolveSettingsFolder(projectFolder, SETTINGS_FOLDER_NAME);
 
     UISettings uiSettings = UISettings.load();
     AiSettings jsonSettings = AiSettings.load();

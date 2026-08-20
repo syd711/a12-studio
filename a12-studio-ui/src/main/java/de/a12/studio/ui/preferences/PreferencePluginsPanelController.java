@@ -176,7 +176,7 @@ public class PreferencePluginsPanelController implements Initializable {
   // Install / remove actions
   // ---------------------------------------------------------------------------
 
-  private void onInstallPlugin(@NonNull Marketplace.MarketplaceEntry entry,
+  private void onInstallPlugin(Marketplace.@NonNull MarketplaceEntry entry,
                                @NonNull TableCell<Marketplace.MarketplaceEntry, Marketplace.MarketplaceEntry> cell) {
     if (entry.getDownloadUrl() == null || entry.getDownloadUrl().isBlank()) {
       WidgetFactory.showAlert(getStage(cell), StudioBundle.get("plugins.no_download_url"), entry.getName());
@@ -209,7 +209,7 @@ public class PreferencePluginsPanelController implements Initializable {
     thread.start();
   }
 
-  private void onRemovePlugin(@NonNull Marketplace.MarketplaceEntry entry,
+  private void onRemovePlugin(Marketplace.@NonNull MarketplaceEntry entry,
                               @NonNull TableCell<Marketplace.MarketplaceEntry, Marketplace.MarketplaceEntry> cell) {
     File pluginsDir = PluginManager.getInstance().getPluginsDir();
     String fileName = deriveFileName(entry);
@@ -271,7 +271,7 @@ public class PreferencePluginsPanelController implements Initializable {
   }
 
   @NonNull
-  private static String deriveFileName(@NonNull Marketplace.MarketplaceEntry entry) {
+  private static String deriveFileName(Marketplace.@NonNull MarketplaceEntry entry) {
     // Derive a filename from the download URL or fall back to sanitized plugin name.
     String url = entry.getDownloadUrl();
     if (url != null && !url.isBlank() && url.contains("/")) {
