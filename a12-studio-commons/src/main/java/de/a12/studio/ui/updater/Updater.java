@@ -304,12 +304,6 @@ public class Updater {
   }
 
   public static File getWriteableBaseFolder() {
-    if (!OSUtil.isMac()) {
-      return new File("./");
-    }
-    else {
-      log.info("Setting base path for Mac download to {}", System.getProperty("MAC_WRITE_PATH"));
-      return new File(System.getProperty("MAC_WRITE_PATH"));
-    }
+    return de.a12.studio.ui.util.AppPaths.getWriteableBaseFolder();
   }
 }

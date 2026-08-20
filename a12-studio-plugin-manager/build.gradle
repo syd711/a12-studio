@@ -11,6 +11,10 @@ dependencies {
     implementation project(':a12-studio-commons')
     implementation project(':a12-studio-models')
     implementation 'org.slf4j:slf4j-api:2.0.17'
+    // CommonMark – Markdown → HTML conversion for plugin descriptions.
+    implementation 'org.commonmark:commonmark:0.24.0'
+    implementation 'org.commonmark:commonmark-ext-gfm-tables:0.24.0'
+
     // Jackson for parsing plugin.json descriptors – use the same Jackson 3.x
     // family already present in a12-studio-models (comes transitively via commons).
     implementation 'tools.jackson.core:jackson-databind:3.1.4'

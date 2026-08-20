@@ -2,10 +2,12 @@
   "plugins": [
     {
       "name": "Create from Access Database",
-      "description": "Imports a Document Model from a Microsoft Access database (.accdb / .mdb). The plugin reads table structure and maps column types to Document Model field types automatically.",
+      "description": "## Create from Access Database\n\nImports a **Document Model** from a Microsoft Access database (`.accdb` / `.mdb`).\n\n### Features\n\n- **Automatic field mapping** – column types are mapped to Document Model field types automatically\n- **Table selection** – choose which table to import from a dropdown list\n- **Preview** – see a flat list of fields before confirming the import\n- **No ODBC required** – uses the pure-Java [Jackcess](https://jackcess.sourceforge.io/) library, so no native drivers or DSN configuration is needed\n\n### How it works\n\n1. Open the **File → New** menu and select *Create from Access Database*\n2. Pick an `.accdb` or `.mdb` file\n3. Select the source table from the list\n4. Confirm – the Document Model is created immediately\n\n### Supported field types\n\n| Access type | Document Model type |\n|-------------|--------------------|\n| Text / Memo | `STRING` |\n| Number / Currency | `DECIMAL` |\n| Date/Time | `DATE` |\n| Yes/No | `BOOLEAN` |\n\n> **Note:** Linked tables and password-protected databases are not supported in this version.\n\n![Plugin overview](https://raw.githubusercontent.com/syd711/a12-studio/main/docs/images/plugin-access-overview.png)",
       "pluginVersion": "1.0.0",
       "a12Version": "2606",
-      "icon": "",
+      "author": "A12 Studio Team",
+      "license": "MIT",
+      "icon": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAKklEQVR4nGNwazpBU8QwasGoBaMWjFowasGoBaMWjFowasGoBaMWDBULADx8QFu8gRucAAAAAElFTkSuQmCC",
       "downloadUrl": "https://github.com/syd711/a12-studio/releases/latest/download/a12-studio-plugins-create-from-access.jar",
       "extensionPoints": [
         {
@@ -17,10 +19,12 @@
     },
     {
       "name": "Create from Excel",
-      "description": "Imports a Document Model from a Microsoft Excel workbook (.xlsx / .xls). Column headers become field names; cell types are sampled to infer the appropriate Document Model field type.",
+      "description": "## Create from Excel\n\nImports a **Document Model** from a Microsoft Excel workbook (`.xlsx` / `.xls`).\n\n### Features\n\n- **Header detection** – column headers in the first row automatically become field names\n- **Type inference** – cell types are sampled to infer the appropriate Document Model field type\n- **Preview** – a flat field list is shown before the import is confirmed\n- **Wide format support** – reads both modern `.xlsx` and legacy `.xls` formats via [Apache POI](https://poi.apache.org/)\n\n### How it works\n\n1. Open the **File → New** menu and select *Create from Excel*\n2. Choose an `.xlsx` or `.xls` file\n3. Review the detected fields in the preview list\n4. Enter a name and confirm – the Document Model is created immediately\n\n### Field type mapping\n\n| Excel cell type | Document Model type |\n|-----------------|--------------------|\n| String | `STRING` |\n| Numeric | `DECIMAL` |\n| Boolean | `BOOLEAN` |\n| Date / Time | `DATE` |\n| Formula result | inferred from value |\n\n> **Tip:** Make sure your first row contains descriptive column headers – they are used directly as field names in the generated model.\n\n![Plugin overview](https://raw.githubusercontent.com/syd711/a12-studio/main/docs/images/plugin-excel-overview.png)",
       "pluginVersion": "1.0.0",
       "a12Version": "2606",
-      "icon": "",
+      "author": "A12 Studio Team",
+      "license": "MIT",
+      "icon": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAKklEQVR4nGOwWRVFU8QwasGoBaMWjFowasGoBaMWjFowasGoBaMWDBULAFrfAExTPJMuAAAAAElFTkSuQmCC",
       "downloadUrl": "https://github.com/syd711/a12-studio/releases/latest/download/a12-studio-plugins-create-from-excel.jar",
       "extensionPoints": [
         {
