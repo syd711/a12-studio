@@ -1,6 +1,6 @@
 package de.a12.studio.ui.util.localsettings;
 
-import de.a12.studio.ui.updater.Updater;
+import de.a12.studio.ui.util.AppPaths;
 import de.a12.studio.ui.util.PropertiesStore;
 import javafx.scene.shape.Rectangle;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ public class LocalUISettings {
   }
 
   private static void initialize() {
-    File basePath = Updater.getWriteableBaseFolder();
+    File basePath = AppPaths.getWriteableBaseFolder();
     propertiesFile = new File(basePath, "config/settings.properties");
     propertiesFile.getParentFile().mkdirs();
     store = PropertiesStore.create(propertiesFile);

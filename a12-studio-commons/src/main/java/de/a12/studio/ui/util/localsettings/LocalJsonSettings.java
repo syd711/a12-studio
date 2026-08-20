@@ -1,6 +1,6 @@
 package de.a12.studio.ui.util.localsettings;
 
-import de.a12.studio.ui.updater.Updater;
+import de.a12.studio.ui.util.AppPaths;
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
@@ -64,7 +64,7 @@ abstract public class LocalJsonSettings {
 
   private static File getConfigFile(String configName) {
     String settingsFileName = configName + ".json";
-    File basePath = Updater.getWriteableBaseFolder();
+    File basePath = AppPaths.getWriteableBaseFolder();
     File parent = new File(basePath, "config/");
     if (!parent.exists()) {
       parent.mkdirs();
