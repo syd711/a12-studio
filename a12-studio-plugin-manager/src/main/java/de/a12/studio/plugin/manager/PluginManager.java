@@ -2,6 +2,7 @@ package de.a12.studio.plugin.manager;
 
 import tools.jackson.databind.ObjectMapper;
 import de.a12.studio.ui.util.StudioVersion;
+import de.a12.studio.plugin.manager.PluginDescriptor.ExtensionPoint;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -170,7 +171,7 @@ public class PluginManager {
 
     // 3. Instantiate each registered extension point.
     List<ICreateItemMenuEntry> createMenuEntries = new ArrayList<>();
-    for (PluginDescriptor.ExtensionPoint ep : descriptor.getExtensionPoints()) {
+    for (ExtensionPoint ep : descriptor.getExtensionPoints()) {
       Object instance = instantiate(ep, pluginClassLoader, jarFile.getName());
       if (instance == null) {
         continue;
@@ -206,7 +207,7 @@ public class PluginManager {
   }
 
   /** Loads and instantiates the extension-point class, returning {@code null} on any error. */
-  private Object instantiate(@NonNull PluginDescriptor.ExtensionPoint ep,
+  private Object instantiate(@NonNull ExtensionPoint ep,
                              @NonNull URLClassLoader classLoader,
                              @NonNull String jarName) {
     try {
