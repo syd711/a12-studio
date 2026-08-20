@@ -385,3 +385,71 @@
 .preview-app-status-icon.status-stopped {
     -fx-icon-color: -fx-error-bg;
 }
+/**
+ * Plugin Manager – master-detail panel styles
+ */
+
+/* Left pane containing search + list */
+.plugin-list-pane {
+    -fx-border-color: -fx-border-color-theme;
+    -fx-border-width: 0 1 0 0;
+    -fx-padding: 0 8 0 0;
+}
+
+/* Search field */
+.search-field {
+    -fx-prompt-text-fill: -fx-text-color-disabled;
+}
+
+/* ListView that holds plugin cells */
+.plugin-list {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.plugin-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 4 0 4 0;
+}
+
+.plugin-list .list-cell:selected {
+    -fx-background-color: -fx-panel-color;
+    -fx-background-radius: 6;
+}
+
+/* Individual plugin card inside the list */
+.plugin-list-cell {
+    -fx-padding: 6 8 6 8;
+}
+
+.plugin-cell-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+}
+
+.plugin-cell-meta {
+    -fx-font-size: 11px;
+    -fx-text-fill: -fx-text-muted;
+}
+
+/* Right detail pane */
+.plugin-detail-pane {
+    -fx-padding: 0 0 0 12;
+}
+
+.plugin-detail-header {
+    -fx-padding: 4 0 12 0;
+}
+
+.plugin-detail-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+}
+
+.plugin-detail-meta {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-text-muted;
+}

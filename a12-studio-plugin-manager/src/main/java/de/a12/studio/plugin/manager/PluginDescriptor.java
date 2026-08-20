@@ -53,6 +53,16 @@ public class PluginDescriptor {
   @Nullable
   private String icon;
 
+  /** Plugin author (person or organisation). */
+  @JsonProperty("author")
+  @Nullable
+  private String author;
+
+  /** SPDX license identifier or short license name (e.g. {@code "MIT"}, {@code "Apache-2.0"}). */
+  @JsonProperty("license")
+  @Nullable
+  private String license;
+
   /** URL from which this plugin JAR can be downloaded or updated. */
   @JsonProperty("downloadUrl")
   @Nullable

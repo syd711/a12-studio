@@ -1,30 +1,34 @@
 package de.a12.studio.ui.preferences;
 
+import de.a12.studio.plugin.manager.MarkdownRenderer;
 import de.a12.studio.plugin.manager.Marketplace;
 import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -43,17 +47,36 @@ import java.util.ResourceBundle;
 public class PreferencePluginsPanelController implements Initializable {
 
   // ---------------------------------------------------------------------------
-  // FXML
+  // FXML fields
   // ---------------------------------------------------------------------------
 
-  @FXML private TableView<Marketplace.MarketplaceEntry> pluginsTable;
-  @FXML private TableColumn<Marketplace.MarketplaceEntry, Marketplace.MarketplaceEntry> iconCol;
-  @FXML private TableColumn<Marketplace.MarketplaceEntry, String> nameCol;
-  @FXML private TableColumn<Marketplace.MarketplaceEntry, String> descriptionCol;
-  @FXML private TableColumn<Marketplace.MarketplaceEntry, String> versionCol;
-  @FXML private TableColumn<Marketplace.MarketplaceEntry, Marketplace.MarketplaceEntry> statusCol;
-  @FXML private Label statusLabel;
+  @FXML private TextField searchField;
+  @FXML private ListView<Marketplace.MarketplaceEntry> pluginListView;
+
+  @FXML private VBox detailPane;
+  @FXML private VBox emptyDetailPane;
+
+  // Detail header
+  @FXML private ImageView detailIcon;
+  @FXML private Label detailName;
+  @FXML private Label detailVersion;
+  @FXML private Label detailAuthor;
+  @FXML private Label detailLicense;
+  @FXML private Button actionButton;
+
+  // Description
+  @FXML private WebView descriptionWebView;
+
+  // Status bar
   @FXML private ProgressIndicator progressIndicator;
+  @FXML private Label statusLabel;
+
+  // ---------------------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------------------
+
+  private ObservableList<Marketplace.MarketplaceEntry> allEntries;
+  @Nullable private Marketplace.MarketplaceEntry selectedEntry;
 
   // ---------------------------------------------------------------------------
   // Initialise
@@ -61,103 +84,47 @@ public class PreferencePluginsPanelController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    setupColumns();
     statusLabel.setText("");
     progressIndicator.setVisible(false);
+    showDetail(false);
+
+    setupList();
+    setupSearch();
     loadMarketplace();
   }
 
   // ---------------------------------------------------------------------------
-  // Column setup
+  // List setup
   // ---------------------------------------------------------------------------
 
-  private void setupColumns() {
-    // Icon column
-    iconCol.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue()));
-    iconCol.setCellFactory(col -> new TableCell<>() {
-      private final ImageView imageView = new ImageView();
-      {
-        imageView.setFitWidth(32);
-        imageView.setFitHeight(32);
-        imageView.setPreserveRatio(true);
-        setAlignment(Pos.CENTER);
-      }
-      @Override
-      protected void updateItem(Marketplace.MarketplaceEntry entry, boolean empty) {
-        super.updateItem(entry, empty);
-        if (empty || entry == null) {
-          setGraphic(null);
-        } else {
-          Image img = decodeIcon(entry.getIcon());
-          imageView.setImage(img);
-          setGraphic(img != null ? imageView : null);
-        }
-      }
-    });
+  private void setupList() {
+    pluginListView.setCellFactory(lv -> new PluginListCell());
+    pluginListView.getSelectionModel().selectedItemProperty().addListener(
+        (obs, old, entry) -> onEntrySelected(entry));
+  }
 
-    // Name column
-    nameCol.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getName()));
+  private void setupSearch() {
+    searchField.textProperty().addListener((obs, old, text) -> applyFilter(text));
+  }
 
-    // Description column
-    descriptionCol.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getDescription()));
-    descriptionCol.setCellFactory(col -> new TableCell<>() {
-      private final Label label = new Label();
-      {
-        label.setWrapText(true);
-        label.setMaxWidth(Double.MAX_VALUE);
-        label.getStyleClass().add("field-description");
-      }
-      @Override
-      protected void updateItem(String text, boolean empty) {
-        super.updateItem(text, empty);
-        if (empty || text == null) {
-          setGraphic(null);
-        } else {
-          label.setText(text);
-          setGraphic(label);
-        }
-      }
-    });
+  private void applyFilter(String text) {
+    if (allEntries == null) return;
+    if (text == null || text.isBlank()) {
+      pluginListView.setItems(allEntries);
+    } else {
+      String lower = text.toLowerCase();
+      ObservableList<Marketplace.MarketplaceEntry> filtered = FXCollections.observableArrayList(
+          allEntries.stream()
+              .filter(e -> containsIgnoreCase(e.getName(), lower)
+                  || containsIgnoreCase(e.getDescription(), lower)
+                  || containsIgnoreCase(e.getAuthor(), lower))
+              .toList());
+      pluginListView.setItems(filtered);
+    }
+  }
 
-    // Version column
-    versionCol.setCellValueFactory(p -> new ReadOnlyStringWrapper(p.getValue().getPluginVersion()));
-
-    // Status/action column – shows "Installed" checkbox (disabled, read-only) + Install/Remove button
-    statusCol.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue()));
-    statusCol.setCellFactory(col -> new TableCell<>() {
-      private final CheckBox installedCheck = new CheckBox();
-      private final Button actionBtn = new Button();
-      private final VBox box = new VBox(4, installedCheck, actionBtn);
-      {
-        box.setAlignment(Pos.CENTER);
-        installedCheck.setMouseTransparent(true);
-        installedCheck.setFocusTraversable(false);
-        installedCheck.setText(StudioBundle.get("plugins.installed"));
-        actionBtn.setMinWidth(120);
-      }
-      @Override
-      protected void updateItem(Marketplace.MarketplaceEntry entry, boolean empty) {
-        super.updateItem(entry, empty);
-        if (empty || entry == null) {
-          setGraphic(null);
-          return;
-        }
-        boolean installed = PluginManager.getInstance().isInstalled(entry.getName());
-        installedCheck.setSelected(installed);
-        if (installed) {
-          actionBtn.setText(StudioBundle.get("plugins.remove"));
-          actionBtn.getStyleClass().removeAll("primary-button", "secondary-button");
-          actionBtn.getStyleClass().add("secondary-button");
-          actionBtn.setOnAction(e -> onRemovePlugin(entry, this));
-        } else {
-          actionBtn.setText(StudioBundle.get("plugins.install"));
-          actionBtn.getStyleClass().removeAll("primary-button", "secondary-button");
-          actionBtn.getStyleClass().add("primary-button");
-          actionBtn.setOnAction(e -> onInstallPlugin(entry, this));
-        }
-        setGraphic(box);
-      }
-    });
+  private static boolean containsIgnoreCase(@Nullable String haystack, String needle) {
+    return haystack != null && haystack.toLowerCase().contains(needle);
   }
 
   // ---------------------------------------------------------------------------
@@ -166,20 +133,88 @@ public class PreferencePluginsPanelController implements Initializable {
 
   private void loadMarketplace() {
     List<Marketplace.MarketplaceEntry> entries = PluginManager.getInstance().getMarketplaceEntries();
-    pluginsTable.setItems(FXCollections.observableArrayList(entries));
+    allEntries = FXCollections.observableArrayList(entries);
+    pluginListView.setItems(allEntries);
     if (entries.isEmpty()) {
       statusLabel.setText(StudioBundle.get("plugins.no_compatible_plugins"));
     }
   }
 
   // ---------------------------------------------------------------------------
-  // Install / remove actions
+  // Selection handling
   // ---------------------------------------------------------------------------
 
-  private void onInstallPlugin(@NonNull Marketplace.MarketplaceEntry entry,
-                               @NonNull TableCell<Marketplace.MarketplaceEntry, Marketplace.MarketplaceEntry> cell) {
+  private void onEntrySelected(@Nullable Marketplace.MarketplaceEntry entry) {
+    selectedEntry = entry;
+    if (entry == null) {
+      showDetail(false);
+      return;
+    }
+    showDetail(true);
+    populateDetail(entry);
+  }
+
+  private void populateDetail(@NonNull Marketplace.MarketplaceEntry entry) {
+    // Icon
+    Image img = decodeIcon(entry.getIcon());
+    detailIcon.setImage(img);
+
+    // Meta labels
+    detailName.setText(entry.getName());
+    detailVersion.setText("v" + nullSafe(entry.getPluginVersion()));
+    detailAuthor.setText(nullSafe(entry.getAuthor(), StudioBundle.get("plugins.unknown_author")));
+    detailLicense.setText(nullSafe(entry.getLicense(), StudioBundle.get("plugins.unknown_license")));
+
+    // Install / Remove button
+    refreshActionButton(entry);
+
+    // Description as HTML rendered from Markdown
+    String html = MarkdownRenderer.toHtml(entry.getDescription());
+    descriptionWebView.getEngine().loadContent(html, "text/html");
+  }
+
+  private void refreshActionButton(@NonNull Marketplace.MarketplaceEntry entry) {
+    boolean installed = PluginManager.getInstance().isInstalled(entry.getName());
+    if (installed) {
+      actionButton.setText(StudioBundle.get("plugins.remove"));
+      actionButton.getStyleClass().removeAll("primary-button", "secondary-button");
+      actionButton.getStyleClass().add("secondary-button");
+    } else {
+      actionButton.setText(StudioBundle.get("plugins.install"));
+      actionButton.getStyleClass().removeAll("primary-button", "secondary-button");
+      actionButton.getStyleClass().add("primary-button");
+    }
+  }
+
+  private void showDetail(boolean show) {
+    detailPane.setVisible(show);
+    detailPane.setManaged(show);
+    emptyDetailPane.setVisible(!show);
+    emptyDetailPane.setManaged(!show);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Action button handler
+  // ---------------------------------------------------------------------------
+
+  @FXML
+  private void onActionButtonClicked() {
+    if (selectedEntry == null) return;
+    boolean installed = PluginManager.getInstance().isInstalled(selectedEntry.getName());
+    if (installed) {
+      onRemovePlugin(selectedEntry);
+    } else {
+      onInstallPlugin(selectedEntry);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Install / remove logic
+  // ---------------------------------------------------------------------------
+
+  private void onInstallPlugin(@NonNull Marketplace.MarketplaceEntry entry) {
     if (entry.getDownloadUrl() == null || entry.getDownloadUrl().isBlank()) {
-      WidgetFactory.showAlert(getStage(cell), StudioBundle.get("plugins.no_download_url"), entry.getName());
+      WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.no_download_url"), entry.getName());
       return;
     }
 
@@ -194,14 +229,14 @@ public class PreferencePluginsPanelController implements Initializable {
         downloadFile(entry.getDownloadUrl(), dest);
         Platform.runLater(() -> {
           setProgress(false, StudioBundle.get("plugins.install_restart_required", entry.getName()));
-          pluginsTable.refresh();
+          pluginListView.refresh();
+          if (selectedEntry != null) refreshActionButton(selectedEntry);
         });
       } catch (IOException ex) {
         log.error("Failed to download plugin '{}': {}", entry.getName(), ex.getMessage(), ex);
         Platform.runLater(() -> {
           setProgress(false, "");
-          WidgetFactory.showAlert(getStage(cell),
-              StudioBundle.get("plugins.download_failed"), ex.getMessage());
+          WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.download_failed"), ex.getMessage());
         });
       }
     }, "plugin-installer");
@@ -209,13 +244,11 @@ public class PreferencePluginsPanelController implements Initializable {
     thread.start();
   }
 
-  private void onRemovePlugin(@NonNull Marketplace.MarketplaceEntry entry,
-                              @NonNull TableCell<Marketplace.MarketplaceEntry, Marketplace.MarketplaceEntry> cell) {
+  private void onRemovePlugin(@NonNull Marketplace.MarketplaceEntry entry) {
     File pluginsDir = PluginManager.getInstance().getPluginsDir();
     String fileName = deriveFileName(entry);
     File jarFile = new File(pluginsDir, fileName);
     if (!jarFile.exists()) {
-      // Try to find by scanning the plugins dir for any JAR matching the plugin name
       File[] jars = pluginsDir.listFiles(f -> f.getName().endsWith(".jar"));
       if (jars != null) {
         for (File jar : jars) {
@@ -236,17 +269,18 @@ public class PreferencePluginsPanelController implements Initializable {
     }
 
     if (!jarFile.exists()) {
-      WidgetFactory.showAlert(getStage(cell), StudioBundle.get("plugins.jar_not_found"), entry.getName());
+      WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.jar_not_found"), entry.getName());
       return;
     }
 
     try {
       Files.delete(jarFile.toPath());
       setProgress(false, StudioBundle.get("plugins.remove_restart_required", entry.getName()));
-      pluginsTable.refresh();
+      pluginListView.refresh();
+      if (selectedEntry != null) refreshActionButton(selectedEntry);
     } catch (IOException ex) {
       log.error("Failed to delete plugin JAR '{}': {}", jarFile.getName(), ex.getMessage(), ex);
-      WidgetFactory.showAlert(getStage(cell), StudioBundle.get("plugins.remove_failed"), ex.getMessage());
+      WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.remove_failed"), ex.getMessage());
     }
   }
 
@@ -272,7 +306,6 @@ public class PreferencePluginsPanelController implements Initializable {
 
   @NonNull
   private static String deriveFileName(@NonNull Marketplace.MarketplaceEntry entry) {
-    // Derive a filename from the download URL or fall back to sanitized plugin name.
     String url = entry.getDownloadUrl();
     if (url != null && !url.isBlank() && url.contains("/")) {
       String lastSegment = url.substring(url.lastIndexOf('/') + 1);
@@ -283,10 +316,9 @@ public class PreferencePluginsPanelController implements Initializable {
     return entry.getName().replaceAll("[^A-Za-z0-9._-]", "_") + ".jar";
   }
 
-  private static javafx.scene.image.Image decodeIcon(String base64) {
-    if (base64 == null || base64.isBlank()) {
-      return null;
-    }
+  @Nullable
+  private static Image decodeIcon(@Nullable String base64) {
+    if (base64 == null || base64.isBlank()) return null;
     try {
       byte[] bytes = Base64.getDecoder().decode(base64);
       return new Image(new ByteArrayInputStream(bytes));
@@ -300,7 +332,85 @@ public class PreferencePluginsPanelController implements Initializable {
     statusLabel.setText(message);
   }
 
-  private Stage getStage(@NonNull TableCell<?, ?> cell) {
-    return (Stage) cell.getTableView().getScene().getWindow();
+  @Nullable
+  private Stage getStage() {
+    if (pluginListView.getScene() == null) return null;
+    return (Stage) pluginListView.getScene().getWindow();
+  }
+
+  private static String nullSafe(@Nullable String s) {
+    return s != null ? s : "";
+  }
+
+  private static String nullSafe(@Nullable String s, String fallback) {
+    return (s != null && !s.isBlank()) ? s : fallback;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Custom list cell
+  // ---------------------------------------------------------------------------
+
+  private static class PluginListCell extends ListCell<Marketplace.MarketplaceEntry> {
+
+    private final HBox root = new HBox(10);
+    private final ImageView iconView = new ImageView();
+    private final CheckBox installedCheck = new CheckBox();
+    private final Label nameLabel = new Label();
+    private final Label versionLabel = new Label();
+    private final Label authorLabel = new Label();
+    private final VBox textBox = new VBox(2);
+
+    PluginListCell() {
+      iconView.setFitWidth(36);
+      iconView.setFitHeight(36);
+      iconView.setPreserveRatio(true);
+
+      installedCheck.setMouseTransparent(true);
+      installedCheck.setFocusTraversable(false);
+
+      nameLabel.getStyleClass().add("plugin-cell-name");
+      versionLabel.getStyleClass().add("plugin-cell-meta");
+      authorLabel.getStyleClass().add("plugin-cell-meta");
+
+      HBox metaRow = new HBox(8, versionLabel, authorLabel);
+      metaRow.setAlignment(Pos.CENTER_LEFT);
+
+      textBox.getChildren().addAll(nameLabel, metaRow);
+      HBox.setHgrow(textBox, Priority.ALWAYS);
+
+      Region spacer = new Region();
+      HBox.setHgrow(spacer, Priority.ALWAYS);
+
+      root.setAlignment(Pos.CENTER_LEFT);
+      root.getChildren().addAll(iconView, textBox, spacer, installedCheck);
+      root.getStyleClass().add("plugin-list-cell");
+    }
+
+    @Override
+    protected void updateItem(Marketplace.MarketplaceEntry entry, boolean empty) {
+      super.updateItem(entry, empty);
+      if (empty || entry == null) {
+        setGraphic(null);
+        return;
+      }
+      Image img = decodeIcon(entry.getIcon());
+      iconView.setImage(img);
+      nameLabel.setText(entry.getName());
+      versionLabel.setText("v" + (entry.getPluginVersion() != null ? entry.getPluginVersion() : ""));
+      authorLabel.setText(entry.getAuthor() != null ? entry.getAuthor() : "");
+      installedCheck.setSelected(PluginManager.getInstance().isInstalled(entry.getName()));
+      setGraphic(root);
+    }
+
+    @Nullable
+    private static Image decodeIcon(@Nullable String base64) {
+      if (base64 == null || base64.isBlank()) return null;
+      try {
+        byte[] bytes = Base64.getDecoder().decode(base64);
+        return new Image(new ByteArrayInputStream(bytes));
+      } catch (Exception e) {
+        return null;
+      }
+    }
   }
 }
