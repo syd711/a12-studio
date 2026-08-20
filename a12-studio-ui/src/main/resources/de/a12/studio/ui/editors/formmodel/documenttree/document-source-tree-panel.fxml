@@ -14,7 +14,7 @@
     <top>
         <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
             <items>
-                <fx:include fx:id="search" source="../../../components/search-field.fxml" />
+                <fx:include fx:id="search" source="/de/a12/studio/ui/components/search-field.fxml" />
                 <Separator orientation="VERTICAL" />
                 <Button fx:id="expandAllButton" accessibleText="%expand_all" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
                     <graphic>

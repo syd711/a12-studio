@@ -244,7 +244,7 @@ public class PluginManager {
    * @return list of matching marketplace entries, or an empty list if the resource is missing
    */
   @NonNull
-  public List<Marketplace.MarketplaceEntry> getMarketplaceEntries() {
+  public List<MarketplaceEntry> getMarketplaceEntries() {
     try (InputStream in = getClass().getResourceAsStream(MARKETPLACE_RESOURCE)) {
       if (in == null) {
         log.warn("marketplace.json not found on classpath");

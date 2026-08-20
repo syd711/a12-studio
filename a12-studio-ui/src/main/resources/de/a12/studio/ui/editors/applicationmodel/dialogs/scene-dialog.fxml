@@ -10,13 +10,13 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" minHeight="700.0" minWidth="650.0" styleClass="navigation-panel" stylesheets="@../../../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="root" minHeight="700.0" minWidth="650.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.applicationmodel.dialogs.SceneDialogController">
    <top>
       <fx:include fx:id="header" source="../../../components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@../../../stylesheet.css">
+      <ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css">
          <content>
             <VBox spacing="12.0" styleClass="field-editor">
                <padding>

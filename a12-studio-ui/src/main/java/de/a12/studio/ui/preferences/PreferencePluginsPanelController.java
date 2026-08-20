@@ -2,6 +2,7 @@ package de.a12.studio.ui.preferences;
 
 import de.a12.studio.plugin.manager.MarkdownRenderer;
 import de.a12.studio.plugin.manager.Marketplace;
+import de.a12.studio.plugin.manager.MarketplaceEntry;
 import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -51,7 +52,7 @@ public class PreferencePluginsPanelController implements Initializable {
   // ---------------------------------------------------------------------------
 
   @FXML private TextField searchField;
-  @FXML private ListView<Marketplace.MarketplaceEntry> pluginListView;
+  @FXML private ListView<MarketplaceEntry> pluginListView;
 
   @FXML private VBox detailPane;
   @FXML private VBox emptyDetailPane;
@@ -75,9 +76,9 @@ public class PreferencePluginsPanelController implements Initializable {
   // State
   // ---------------------------------------------------------------------------
 
-  private ObservableList<Marketplace.MarketplaceEntry> allEntries;
+  private ObservableList<MarketplaceEntry> allEntries;
 
-  private Marketplace.MarketplaceEntry selectedEntry;
+  private MarketplaceEntry selectedEntry;
 
   // ---------------------------------------------------------------------------
   // Initialise
@@ -114,7 +115,7 @@ public class PreferencePluginsPanelController implements Initializable {
       pluginListView.setItems(allEntries);
     } else {
       String lower = text.toLowerCase();
-      ObservableList<Marketplace.MarketplaceEntry> filtered = FXCollections.observableArrayList(
+      ObservableList<MarketplaceEntry> filtered = FXCollections.observableArrayList(
           allEntries.stream()
               .filter(e -> containsIgnoreCase(e.getName(), lower)
                   || containsIgnoreCase(e.getDescription(), lower)
@@ -133,7 +134,7 @@ public class PreferencePluginsPanelController implements Initializable {
   // ---------------------------------------------------------------------------
 
   private void loadMarketplace() {
-    List<Marketplace.MarketplaceEntry> entries = PluginManager.getInstance().getMarketplaceEntries();
+    List<MarketplaceEntry> entries = PluginManager.getInstance().getMarketplaceEntries();
     allEntries = FXCollections.observableArrayList(entries);
     pluginListView.setItems(allEntries);
     if (entries.isEmpty()) {
@@ -145,7 +146,7 @@ public class PreferencePluginsPanelController implements Initializable {
   // Selection handling
   // ---------------------------------------------------------------------------
 
-  private void onEntrySelected(Marketplace.MarketplaceEntry entry) {
+  private void onEntrySelected(MarketplaceEntry entry) {
     selectedEntry = entry;
     if (entry == null) {
       showDetail(false);
@@ -155,7 +156,7 @@ public class PreferencePluginsPanelController implements Initializable {
     populateDetail(entry);
   }
 
-  private void populateDetail(Marketplace.MarketplaceEntry entry) {
+  private void populateDetail(MarketplaceEntry entry) {
     // Icon
     Image img = decodeIcon(entry.getIcon());
     detailIcon.setImage(img);
@@ -174,7 +175,7 @@ public class PreferencePluginsPanelController implements Initializable {
     descriptionWebView.getEngine().loadContent(html, "text/html");
   }
 
-  private void refreshActionButton(Marketplace.MarketplaceEntry entry) {
+  private void refreshActionButton(MarketplaceEntry entry) {
     boolean installed = PluginManager.getInstance().isInstalled(entry.getName());
     if (installed) {
       actionButton.setText(StudioBundle.get("plugins.remove"));
@@ -213,7 +214,7 @@ public class PreferencePluginsPanelController implements Initializable {
   // Install / remove logic
   // ---------------------------------------------------------------------------
 
-  private void onInstallPlugin(Marketplace.@NonNull MarketplaceEntry entry) {
+  private void onInstallPlugin(@NonNull MarketplaceEntry entry) {
     if (entry.getDownloadUrl() == null || entry.getDownloadUrl().isBlank()) {
       WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.no_download_url"), entry.getName());
       return;
@@ -245,7 +246,7 @@ public class PreferencePluginsPanelController implements Initializable {
     thread.start();
   }
 
-  private void onRemovePlugin(Marketplace.@NonNull MarketplaceEntry entry) {
+  private void onRemovePlugin(@NonNull MarketplaceEntry entry) {
     File pluginsDir = PluginManager.getInstance().getPluginsDir();
     String fileName = deriveFileName(entry);
     File jarFile = new File(pluginsDir, fileName);
@@ -306,7 +307,7 @@ public class PreferencePluginsPanelController implements Initializable {
   }
 
   @NonNull
-  private static String deriveFileName(Marketplace.@NonNull MarketplaceEntry entry) {
+  private static String deriveFileName(@NonNull MarketplaceEntry entry) {
     String url = entry.getDownloadUrl();
     if (url != null && !url.isBlank() && url.contains("/")) {
       String lastSegment = url.substring(url.lastIndexOf('/') + 1);
@@ -351,7 +352,7 @@ public class PreferencePluginsPanelController implements Initializable {
   // Custom list cell
   // ---------------------------------------------------------------------------
 
-  private static class PluginListCell extends ListCell<Marketplace.MarketplaceEntry> {
+  private static class PluginListCell extends ListCell<MarketplaceEntry> {
 
     private final HBox root = new HBox(10);
     private final ImageView iconView = new ImageView();
@@ -388,7 +389,7 @@ public class PreferencePluginsPanelController implements Initializable {
     }
 
     @Override
-    protected void updateItem(Marketplace.MarketplaceEntry entry, boolean empty) {
+    protected void updateItem(MarketplaceEntry entry, boolean empty) {
       super.updateItem(entry, empty);
       if (empty || entry == null) {
         setGraphic(null);

@@ -19,21 +19,4 @@ public class Marketplace {
 
   @JsonProperty("plugins")
   private List<MarketplaceEntry> plugins = new ArrayList<>();
-
-  // ---------------------------------------------------------------------------
-
-  /**
-   * A single entry in the marketplace – the full plugin descriptor plus the
-   * resolved JAR download URL computed at build time by the {@code generateMarketplace}
-   * Gradle task.
-   */
-  @Getter
-  @Setter
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class MarketplaceEntry extends PluginDescriptor {
-
-    /** Canonical URL of the {@code plugin.json} in the GitHub repository. */
-    @JsonProperty("pluginJsonUrl")
-    private String pluginJsonUrl;
-  }
 }

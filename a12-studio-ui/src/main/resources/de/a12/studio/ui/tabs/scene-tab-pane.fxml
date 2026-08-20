@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.TabPane?>
 
-<TabPane fx:id="tabPane" stylesheets="@../stylesheet.css" tabClosingPolicy="ALL_TABS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.tabs.TabPaneController">
+<TabPane fx:id="tabPane" stylesheets="@/de/a12/studio/ui/stylesheet.css" tabClosingPolicy="ALL_TABS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.tabs.TabPaneController">
   <tabs>
   </tabs>
 </TabPane>

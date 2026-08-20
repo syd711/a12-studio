@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreferenceA12InstallationController">
+<BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreferenceA12InstallationController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
@@ -33,7 +33,7 @@
             </Button>
                     </children>
                 </HBox>
-                <fx:include fx:id="errorContainer" source="../components/error-container.fxml">
+                <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml">
                     <VBox.margin>
                         <Insets top="6.0" />
                     </VBox.margin>
