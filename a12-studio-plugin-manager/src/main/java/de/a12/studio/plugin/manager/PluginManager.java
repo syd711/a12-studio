@@ -1,9 +1,11 @@
 package de.a12.studio.plugin.manager;
 
 import tools.jackson.databind.ObjectMapper;
+import de.a12.studio.ui.util.StudioVersion;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -241,21 +243,21 @@ public class PluginManager {
    * @return list of matching marketplace entries, or an empty list if the resource is missing
    */
   @NonNull
-  public java.util.List<Marketplace.MarketplaceEntry> getMarketplaceEntries() {
-    try (java.io.InputStream in = getClass().getResourceAsStream(MARKETPLACE_RESOURCE)) {
+  public List<Marketplace.MarketplaceEntry> getMarketplaceEntries() {
+    try (InputStream in = getClass().getResourceAsStream(MARKETPLACE_RESOURCE)) {
       if (in == null) {
         log.warn("marketplace.json not found on classpath");
-        return java.util.List.of();
+        return List.of();
       }
       Marketplace marketplace = OBJECT_MAPPER.readValue(in, Marketplace.class);
-      String studioVersion = de.a12.studio.ui.util.StudioVersion.get();
+      String studioVersion = StudioVersion.get();
       return marketplace.getPlugins().stream()
           .filter(e -> isCompatible(e.getA12Version(), studioVersion))
           .toList();
     }
     catch (Exception e) {
       log.warn("Failed to read marketplace.json: {}", e.getMessage(), e);
-      return java.util.List.of();
+      return List.of();
     }
   }
 
@@ -285,7 +287,7 @@ public class PluginManager {
   /**
    * Returns the {@link LoadedPlugin} for the given name, or {@code null} if not installed.
    */
-  @org.jspecify.annotations.Nullable
+  @Nullable
   public LoadedPlugin getLoadedPlugin(@NonNull String pluginName) {
     return loadedPlugins.stream()
         .filter(p -> pluginName.equals(p.getDescriptor().getName()))
@@ -295,7 +297,7 @@ public class PluginManager {
 
   /** Returns the {@code plugins/} directory (created on demand by {@link #scanPlugins()}). */
   @NonNull
-  public java.io.File getPluginsDir() {
+  public File getPluginsDir() {
     return pluginsDir;
   }
 }
