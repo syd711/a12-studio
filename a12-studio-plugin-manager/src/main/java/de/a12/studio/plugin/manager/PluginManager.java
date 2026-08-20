@@ -221,7 +221,6 @@ public class PluginManager {
     }
     return null;
   }
-}
 
 
   // ---------------------------------------------------------------------------
@@ -299,3 +298,4 @@ public class PluginManager {
   public java.io.File getPluginsDir() {
     return pluginsDir;
   }
+}
