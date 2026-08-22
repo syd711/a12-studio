@@ -45,6 +45,14 @@
                                                <HBox alignment="CENTER_LEFT" styleClass="sidebar-panel-header" BorderPane.alignment="CENTER">
                                                    <children>
                                                        <Label maxWidth="Infinity" styleClass="sidebar-panel-title" text="%document_relationship_model" HBox.hgrow="ALWAYS" />
+                                                       <Button onAction="#onTogglePinDocumentRelationshipModel" styleClass="sidebar-panel-toggle">
+                                                           <graphic>
+                                                               <FontIcon fx:id="pinDocumentRelationshipModelIcon" iconLiteral="mdi2p-pin-outline" iconSize="16" />
+                                                           </graphic>
+                                                           <tooltip>
+                                                               <Tooltip fx:id="pinDocumentRelationshipModelTooltip" text="%pin" />
+                                                           </tooltip>
+                                                       </Button>
                                                        <Button onAction="#onToggleDocumentRelationshipModelCollapsed" styleClass="sidebar-panel-toggle">
                                                            <graphic>
                                                                <FontIcon iconLiteral="mdi2c-chevron-left" iconSize="16" />
@@ -77,7 +85,7 @@
                                                </Group>
                                            </children>
                                            <padding>
-                                               <Insets bottom="12.0" top="8.0" />
+                                               <Insets bottom="12.0" top="92.0" />
                                            </padding>
                                        </VBox>
                                    </children>

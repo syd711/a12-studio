@@ -25,10 +25,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.List;
@@ -113,8 +115,14 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private Node documentRelationshipModelExpandedPane;
   @FXML
   private Node documentRelationshipModelCollapsedStrip;
+  @FXML
+  private FontIcon pinDocumentRelationshipModelIcon;
+  @FXML
+  private Tooltip pinDocumentRelationshipModelTooltip;
 
   private static final double DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION = 0.32;
+
+  private boolean documentRelationshipModelPinned = false;
 
   public void loadModel(@NonNull A12Model<?> model) {
     load((FormModel) model);
@@ -140,6 +148,18 @@ public class FormModelEditorController extends AbstractEditorController implemen
     DocumentModel documentModel = resolveDataBindingDocumentModel(formModel);
     documentSourceTreeController.load(documentModel);
     formModelTreeController.setModel(formModel, documentModel, projectItem);
+    formModelTreeController.setOnNodeSelected(this::onFormModelTreeNodeSelected);
+  }
+
+  /**
+   * Auto-collapses the "Document/Relationship Model" side panel whenever a node is selected in the Form Model
+   * tree, unless the panel is currently pinned via {@link #onTogglePinDocumentRelationshipModel}. No-op while
+   * already collapsed.
+   */
+  private void onFormModelTreeNodeSelected() {
+    if (!documentRelationshipModelPinned && documentRelationshipModelExpandedPane.isVisible()) {
+      setDocumentRelationshipModelCollapsed(true);
+    }
   }
 
   private @Nullable DocumentModel resolveDataBindingDocumentModel(@NonNull FormModel formModel) {
@@ -280,7 +300,10 @@ public class FormModelEditorController extends AbstractEditorController implemen
    */
   @FXML
   private void onToggleDocumentRelationshipModelCollapsed() {
-    boolean collapsing = documentRelationshipModelExpandedPane.isVisible();
+    setDocumentRelationshipModelCollapsed(documentRelationshipModelExpandedPane.isVisible());
+  }
+
+  private void setDocumentRelationshipModelCollapsed(boolean collapsing) {
     documentRelationshipModelExpandedPane.setVisible(!collapsing);
     documentRelationshipModelExpandedPane.setManaged(!collapsing);
     documentRelationshipModelCollapsedStrip.setVisible(collapsing);
@@ -296,6 +319,18 @@ public class FormModelEditorController extends AbstractEditorController implemen
       documentRelationshipModelPane.setMaxWidth(Double.MAX_VALUE);
       overviewSplitPane.setDividerPosition(0, DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION);
     }
+  }
+
+  /**
+   * Toggles whether the "Document/Relationship Model" side panel is pinned: while pinned, selecting a node in
+   * the Form Model tree ({@link #onFormModelTreeNodeSelected}) leaves the panel alone; while unpinned, such a
+   * selection auto-collapses it.
+   */
+  @FXML
+  private void onTogglePinDocumentRelationshipModel() {
+    documentRelationshipModelPinned = !documentRelationshipModelPinned;
+    pinDocumentRelationshipModelIcon.setIconLiteral(documentRelationshipModelPinned ? "mdi2p-pin" : "mdi2p-pin-outline");
+    pinDocumentRelationshipModelTooltip.setText(StudioBundle.get(documentRelationshipModelPinned ? "unpin" : "pin"));
   }
 
   @Override

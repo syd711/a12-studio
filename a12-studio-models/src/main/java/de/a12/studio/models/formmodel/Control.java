@@ -10,9 +10,9 @@ import java.util.List;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"type", "id", "name", "offset", "span", "style", "readonly", "messageExposition", "label",
-    "hint", "placeholder", "accessibility", "datePickerConfig", "elementRef", "tooltipsOnTop",
-    "labelHiddenButRead", "annotations"})
+@JsonPropertyOrder({"type", "id", "name", "offset", "span", "style", "readonly", "readonlyPresentation",
+    "messageExposition", "markingOfRequiredFields", "label", "hint", "placeholder", "accessibility",
+    "datePickerConfig", "elementRef", "tooltipsOnTop", "labelHiddenButRead", "annotations"})
 public class Control extends Cell {
 
   // Reference to the underlying Document Model field (or group, for attachments) this Control edits.
@@ -33,6 +33,15 @@ public class Control extends Cell {
   private Boolean labelHiddenButRead;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean readonly;
+  // Per-Control override of the model-wide FormModelContent.readonlyPresentation default ("INPUT"/"TEXT"),
+  // e.g. how a readonly Control renders. Unset falls back to that model setting.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String readonlyPresentation;
+  // Per-Control override of the model-wide FormModelContent.markingOfRequiredFields default
+  // ("NONE"/"REQUIRED"/"ALWAYS"), i.e. whether this Control's label shows a required-field asterisk.
+  // Unset falls back to that model setting.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String markingOfRequiredFields;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private DatePickerConfig datePickerConfig;
   // Per-Control overrides for hint, placeholder and accessibility text (control-level values take precedence

@@ -132,6 +132,8 @@ public class FormModelTreeController implements Initializable {
 
   private TreeItem<FormElementViewModel> draggedTreeItem;
 
+  private Runnable onNodeSelected;
+
   private enum DropLocation {ABOVE, BELOW, INTO}
 
   private record DropTarget(TreeItem<FormElementViewModel> targetItem, DropLocation location) {
@@ -146,8 +148,22 @@ public class FormModelTreeController implements Initializable {
       setupCellDragAndDrop(cell);
       return cell;
     });
-    tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> updateEditorPane(newValue));
+    tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+      updateEditorPane(newValue);
+      if (newValue != null && onNodeSelected != null) {
+        onNodeSelected.run();
+      }
+    });
     updateEditorPane(null);
+  }
+
+  /**
+   * Registers a callback invoked whenever a node is selected in this tree (not on deselection), used by
+   * {@link de.a12.studio.ui.editors.formmodel.FormModelEditorController} to auto-collapse the "Document/
+   * Relationship Model" sidebar panel while it isn't pinned.
+   */
+  public void setOnNodeSelected(@Nullable Runnable onNodeSelected) {
+    this.onNodeSelected = onNodeSelected;
   }
 
   /**

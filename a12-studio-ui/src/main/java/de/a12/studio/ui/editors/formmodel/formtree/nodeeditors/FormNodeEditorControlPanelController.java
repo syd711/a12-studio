@@ -26,6 +26,9 @@ import org.jspecify.annotations.Nullable;
  *       "Field Configuration" and "Control".</li>
  *   <li><b>Layout</b> ({@link ControlLayoutPanelController}) — offset/span grid values per responsive
  *       breakpoint (lg/md/sm), on {@link Control#getOffset()} and {@link Control#getSpan()}.</li>
+ *   <li><b>Additional Settings</b> ({@link AdditionalSettingsPanelController}) — initial value/exposition
+ *       (model-wide {@code FieldConfigEntry}), message position, readonly, readonly presentation and
+ *       required-field asterisk marking.</li>
  *   <li><b>Hide Condition</b> ({@link HideConditionPanelController}) — boolean field selector and condition
  *       value combo, populated from the linked Document Model's boolean fields. Note: {@link Control} does not
  *       extend {@link de.a12.studio.models.formmodel.ScreenElement}, so it carries its own
@@ -51,6 +54,8 @@ public class FormNodeEditorControlPanelController {
   @FXML
   private ControlLayoutPanelController layoutController;
   @FXML
+  private AdditionalSettingsPanelController additionalSettingsController;
+  @FXML
   private HideConditionPanelController hideConditionController;
   @FXML
   private ControlAccessibilityPanelController accessibilityController;
@@ -68,6 +73,7 @@ public class FormNodeEditorControlPanelController {
     hintController.setControl(control, content);
     placeholderController.setControl(control, content);
     layoutController.setControl(control);
+    additionalSettingsController.setControl(control, content);
     hideConditionController.configure(
         control::getHideConditionField, control::setHideConditionField,
         control::getHideConditionValue, control::setHideConditionValue,
