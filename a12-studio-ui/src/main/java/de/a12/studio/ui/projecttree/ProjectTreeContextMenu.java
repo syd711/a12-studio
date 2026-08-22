@@ -54,7 +54,14 @@ class ProjectTreeContextMenu {
           }
         }
 
-        newMenu.getItems().add(documentMenu);
+        if (documentMenu.getItems().size() == 1) {
+          // No import options were contributed; render the blank-create entry directly instead of a single-entry submenu.
+          createBlank.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+          newMenu.getItems().add(createBlank);
+        }
+        else {
+          newMenu.getItems().add(documentMenu);
+        }
       }
       else {
         MenuItem modelItem = new MenuItem(modelType.getDisplayName());

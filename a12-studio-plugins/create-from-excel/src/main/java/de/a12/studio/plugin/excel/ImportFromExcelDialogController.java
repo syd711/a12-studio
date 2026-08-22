@@ -137,7 +137,8 @@ public class ImportFromExcelDialogController implements DialogController {
           if (modelNameField.getText().isBlank()) {
             String fileName = file.getName();
             int dot = fileName.lastIndexOf('.');
-            modelNameField.setText(dot > 0 ? fileName.substring(0, dot) : fileName);
+            String baseName = dot > 0 ? fileName.substring(0, dot) : fileName;
+            modelNameField.setText(baseName + "_DM");
           }
           currentColumns = columns;
           if (columns.isEmpty()) {
@@ -179,6 +180,7 @@ public class ImportFromExcelDialogController implements DialogController {
   public static Optional<ExcelImportInput> show(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
     FXMLLoader loader = new FXMLLoader(
         ImportFromExcelDialogController.class.getResource("dialog-import-from-excel.fxml"));
+    loader.setClassLoader(ImportFromExcelDialogController.class.getClassLoader());
     loader.setResources(StudioBundle.withFallback(ResourceBundle.getBundle(
         "de.a12.studio.plugin.excel.messages",
         java.util.Locale.getDefault(),

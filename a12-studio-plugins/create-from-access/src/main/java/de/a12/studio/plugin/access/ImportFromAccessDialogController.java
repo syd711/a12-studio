@@ -73,6 +73,16 @@ public class ImportFromAccessDialogController implements DialogController {
   /** Columns of the currently selected table, or empty if none selected yet. */
   private List<AccessImportService.ColumnInfo> currentColumns = List.of();
 
+  /**
+   * Whether {@link #modelNameField} still holds a value we auto-filled from the selected
+   * table name, as opposed to text the user typed themselves. While {@code true}, selecting a
+   * different table updates the field to match; once the user edits it manually, it is left alone.
+   */
+  private boolean modelNameAutoFilled = true;
+
+  /** Guard so the auto-fill listener update to {@link #modelNameField} isn't mistaken for a user edit. */
+  private boolean updatingModelNameProgrammatically;
+
   private final AccessImportService importService = new AccessImportService();
 
   // -------------------------------------------------------------------------
@@ -83,12 +93,21 @@ public class ImportFromAccessDialogController implements DialogController {
   private void initialize() {
     tableListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-    // Populate model name field from the selected table name as a convenience default.
+    // Populate model name field from the selected table name as a convenience default, and keep
+    // it in sync with the table selection until the user edits it manually.
+    modelNameField.textProperty().addListener((obs, old, current) -> {
+      if (!updatingModelNameProgrammatically) {
+        modelNameAutoFilled = false;
+      }
+    });
     tableListView.getSelectionModel().selectedItemProperty().addListener((obs, old, selected) -> {
       if (selected != null) {
         loadColumnsForTable(selected);
-        if (modelNameField.getText().isBlank()) {
-          modelNameField.setText(selected);
+        if (modelNameField.getText().isBlank() || modelNameAutoFilled) {
+          updatingModelNameProgrammatically = true;
+          modelNameField.setText(selected + "_DM");
+          updatingModelNameProgrammatically = false;
+          modelNameAutoFilled = true;
         }
       }
     });
@@ -205,6 +224,7 @@ public class ImportFromAccessDialogController implements DialogController {
   public static Optional<AccessImportInput> show(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
     FXMLLoader loader = new FXMLLoader(
         ImportFromAccessDialogController.class.getResource("dialog-import-from-access.fxml"));
+    loader.setClassLoader(ImportFromAccessDialogController.class.getClassLoader());
     loader.setResources(StudioBundle.withFallback(ResourceBundle.getBundle(
         "de.a12.studio.plugin.access.messages",
         java.util.Locale.getDefault(),

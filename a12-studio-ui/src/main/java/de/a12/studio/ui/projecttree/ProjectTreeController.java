@@ -350,12 +350,19 @@ public class ProjectTreeController implements Initializable, StudioEventListener
               graphic.getStyleClass().add("menu-icon");
               pluginItem.setGraphic(graphic);
             }
-            pluginItem.setOnAction(event -> entry.execute(getStage(), resolveTargetFolder()));
+            pluginItem.setOnAction(event -> menuFactory.executePluginEntry(entry, resolveTargetFolder()));
             documentMenu.getItems().add(pluginItem);
           }
         }
 
-        newButton.getItems().add(documentMenu);
+        if (documentMenu.getItems().size() == 1) {
+          // No import options were contributed; render the blank-create entry directly instead of a single-entry submenu.
+          createBlank.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+          newButton.getItems().add(createBlank);
+        }
+        else {
+          newButton.getItems().add(documentMenu);
+        }
       }
       else {
         MenuItem modelItem = new MenuItem(modelType.getDisplayName());

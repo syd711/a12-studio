@@ -3,19 +3,13 @@ package de.a12.studio.ui.projecttree;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.plugin.access.AccessImportService.ColumnFieldType;
-import de.a12.studio.plugin.access.ImportFromAccessDialogController;
-import de.a12.studio.plugin.access.ImportFromAccessDialogController.AccessImportInput;
-import de.a12.studio.plugin.excel.ImportFromExcelDialogController;
-import de.a12.studio.plugin.excel.ImportFromExcelDialogController.ExcelImportInput;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController.NewModelInput;
-import de.a12.studio.ui.util.DocumentModelBuilder;
-import de.a12.studio.ui.util.DocumentModelBuilder.ColumnDescriptor;
 import de.a12.studio.ui.util.DocumentModelBuilder.ColumnType;
+import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.zip.ZipUtil;
@@ -28,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -72,7 +65,8 @@ public class ProjectTreeMenuActions {
   }
 
   void onCreateNewModel(@NonNull ProjectItem parent, ModelType preselectedType) {
-    Optional<NewModelInput> input = NewModelDialogController.show(getStage(), parent, preselectedType);
+    ProjectItem targetFolder = parent.isRoot() ? ProjectModelFolders.resolveDefaultModelFolder(parent) : parent;
+    Optional<NewModelInput> input = NewModelDialogController.show(getStage(), targetFolder, preselectedType);
     if (input.isEmpty()) {
       return;
     }
@@ -81,7 +75,7 @@ public class ProjectTreeMenuActions {
     String name = input.get().name();
     String documentModelId = input.get().documentModelId();
     try {
-      ProjectItem item = NewModelFactory.createModel(parent, modelType, name, documentModelId);
+      ProjectItem item = NewModelFactory.createModel(targetFolder, modelType, name, documentModelId);
       onReload.run();
       onOpen.accept(new ProjectItemViewModel(item, Map.of()));
     }
@@ -90,62 +84,9 @@ public class ProjectTreeMenuActions {
     }
   }
 
-  void onImportFromExcel(@NonNull ProjectItem parent) {
-    Optional<ExcelImportInput> input = ImportFromExcelDialogController.show(getStage(), parent);
-    if (input.isEmpty()) {
-      return;
-    }
-
-    ExcelImportInput data = input.get();
-    List<ColumnDescriptor> columns = data.columns().stream()
-        .map(c -> new ColumnDescriptor(c.name(), ColumnType.valueOf(c.fieldType().name())))
-        .toList();
-    try {
-      var model = DocumentModelBuilder.build(parent, data.modelName(), data.modelName(), columns);
-      ProjectItem item = NewModelFactory.createModelFromExisting(parent, model, data.modelName());
-      onReload.run();
-      onOpen.accept(new ProjectItemViewModel(item, Map.of()));
-    }
-    catch (IOException e) {
-      log.error("Failed to create document model from Excel file '{}': {}", data.excelFile().getName(), e.getMessage(), e);
-      showError(StudioBundle.get("could_not_create_item", data.modelName()), e);
-    }
-  }
-
-  void onImportFromAccessDatabase(@NonNull ProjectItem parent) {
-    Optional<AccessImportInput> input = ImportFromAccessDialogController.show(getStage(), parent);
-    if (input.isEmpty()) {
-      return;
-    }
-
-    AccessImportInput data = input.get();
-    List<ColumnDescriptor> columns = data.columns().stream()
-        .map(c -> new ColumnDescriptor(c.name(), toColumnType(c.fieldType())))
-        .toList();
-    try {
-      var model = DocumentModelBuilder.build(parent, data.modelName(), data.tableName(), columns);
-      ProjectItem item = NewModelFactory.createModelFromExisting(parent, model, data.modelName());
-      onReload.run();
-      onOpen.accept(new ProjectItemViewModel(item, Map.of()));
-    }
-    catch (IOException e) {
-      log.error("Failed to create document model from Access table '{}': {}", data.tableName(), e.getMessage(), e);
-      showError(StudioBundle.get("could_not_create_item", data.modelName()), e);
-    }
-  }
-
-  private static ColumnType toColumnType(@NonNull ColumnFieldType type) {
-    return switch (type) {
-      case BOOLEAN   -> ColumnType.BOOLEAN;
-      case NUMBER    -> ColumnType.NUMBER;
-      case DATE      -> ColumnType.DATE;
-      case DATE_TIME -> ColumnType.DATE_TIME;
-      default        -> ColumnType.STRING;
-    };
-  }
-
   void executePluginEntry(@NonNull ICreateItemMenuEntry entry, @NonNull ProjectItem targetFolder) {
-    entry.execute(getStage(), targetFolder);
+    ProjectItem resolvedTargetFolder = targetFolder.isRoot() ? ProjectModelFolders.resolveDefaultModelFolder(targetFolder) : targetFolder;
+    entry.execute(getStage(), resolvedTargetFolder);
   }
 
   void onRenameItem(@NonNull ProjectItem item) {
