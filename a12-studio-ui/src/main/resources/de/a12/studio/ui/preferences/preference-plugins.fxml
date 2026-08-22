@@ -2,26 +2,20 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListCell?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.preferences.PreferencePluginsPanelController">
+<BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreferencePluginsPanelController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
@@ -36,17 +30,14 @@
     <center>
         <HBox spacing="0.0" BorderPane.alignment="TOP_LEFT">
             <BorderPane.margin>
-                <Insets left="12.0" right="12.0" top="4.0" bottom="12.0" />
+                <Insets bottom="12.0" left="12.0" right="12.0" top="4.0" />
             </BorderPane.margin>
 
             <!-- ── LEFT: search + list ── -->
-            <VBox spacing="6.0" prefWidth="280.0" minWidth="240.0" maxWidth="320.0"
-                  styleClass="plugin-list-pane">
+            <VBox maxWidth="320.0" minWidth="240.0" prefWidth="300.0" spacing="6.0" styleClass="plugin-list-pane">
                 <children>
-                    <TextField fx:id="searchField" promptText="%plugins.search"
-                               styleClass="search-field" />
-                    <ListView fx:id="pluginListView" VBox.vgrow="ALWAYS"
-                              styleClass="plugin-list" />
+                    <TextField fx:id="searchField" promptText="%plugins.search" styleClass="search-field" />
+                    <ListView fx:id="pluginListView" styleClass="plugin-list" VBox.vgrow="ALWAYS" />
                 </children>
                 <VBox.margin>
                     <Insets right="12.0" />
@@ -54,54 +45,48 @@
             </VBox>
 
             <!-- ── RIGHT: detail panel ── -->
-            <VBox fx:id="detailPane" spacing="0.0" HBox.hgrow="ALWAYS"
-                  styleClass="plugin-detail-pane" visible="false">
+            <VBox fx:id="detailPane" spacing="0.0" styleClass="plugin-detail-pane" visible="false" HBox.hgrow="ALWAYS">
                 <children>
                     <!-- Header row: icon + name/version/author/license -->
-                    <HBox spacing="14.0" alignment="CENTER_LEFT" styleClass="plugin-detail-header">
+                    <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="plugin-detail-header">
                         <children>
-                            <StackPane minWidth="48.0" minHeight="48.0">
+                            <StackPane minHeight="48.0" minWidth="48.0">
                                 <children>
-                                    <ImageView fx:id="detailIcon" fitWidth="48.0" fitHeight="48.0"
-                                               preserveRatio="true" />
+                                    <ImageView fx:id="detailIcon" fitHeight="48.0" fitWidth="48.0" preserveRatio="true" />
                                 </children>
                             </StackPane>
                             <VBox spacing="3.0" HBox.hgrow="ALWAYS">
                                 <children>
                                     <Label fx:id="detailName" styleClass="plugin-detail-name" />
-                                    <HBox spacing="12.0" alignment="CENTER_LEFT">
+                                    <HBox alignment="CENTER_LEFT" spacing="12.0">
                                         <children>
                                             <Label fx:id="detailVersion" styleClass="plugin-detail-meta" />
-                                            <Label text="·" styleClass="plugin-detail-meta" />
+                                            <Label styleClass="plugin-detail-meta" text="·" />
                                             <Label fx:id="detailAuthor" styleClass="plugin-detail-meta" />
-                                            <Label text="·" styleClass="plugin-detail-meta" />
+                                            <Label styleClass="plugin-detail-meta" text="·" />
                                             <Label fx:id="detailLicense" styleClass="plugin-detail-meta" />
                                         </children>
                                     </HBox>
                                 </children>
                             </VBox>
                             <Region HBox.hgrow="ALWAYS" />
-                            <Button fx:id="actionButton" styleClass="primary-button"
-                                    onAction="#onActionButtonClicked" />
+                            <Button fx:id="actionButton" onAction="#onActionButtonClicked" styleClass="primary-button" />
                         </children>
                         <padding>
-                            <Insets top="8.0" bottom="12.0" />
+                            <Insets bottom="12.0" top="8.0" />
                         </padding>
                     </HBox>
 
                     <Separator />
 
                     <!-- Description WebView -->
-                    <WebView fx:id="descriptionWebView" VBox.vgrow="ALWAYS"
-                             minHeight="200.0" />
+                    <WebView fx:id="descriptionWebView" minHeight="200.0" VBox.vgrow="ALWAYS" />
 
                     <!-- Status row -->
                     <HBox alignment="CENTER_LEFT" spacing="8.0">
                         <children>
-                            <ProgressIndicator fx:id="progressIndicator" prefHeight="18.0"
-                                               prefWidth="18.0" visible="false" />
-                            <Label fx:id="statusLabel" styleClass="field-description"
-                                   wrapText="true" />
+                            <ProgressIndicator fx:id="progressIndicator" prefHeight="18.0" prefWidth="18.0" visible="false" />
+                            <Label fx:id="statusLabel" styleClass="field-description" wrapText="true" />
                         </children>
                         <padding>
                             <Insets top="6.0" />
@@ -116,8 +101,7 @@
             <!-- ── Placeholder shown when nothing is selected ── -->
             <VBox fx:id="emptyDetailPane" alignment="CENTER" HBox.hgrow="ALWAYS">
                 <children>
-                    <Label text="%plugins.select_hint" styleClass="field-description"
-                           wrapText="true" />
+                    <Label styleClass="field-description" text="%plugins.select_hint" wrapText="true" />
                 </children>
             </VBox>
         </HBox>

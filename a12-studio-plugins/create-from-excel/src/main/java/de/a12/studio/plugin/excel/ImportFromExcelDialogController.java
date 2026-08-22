@@ -179,10 +179,10 @@ public class ImportFromExcelDialogController implements DialogController {
   public static Optional<ExcelImportInput> show(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
     FXMLLoader loader = new FXMLLoader(
         ImportFromExcelDialogController.class.getResource("dialog-import-from-excel.fxml"));
-    loader.setResources(ResourceBundle.getBundle(
+    loader.setResources(StudioBundle.withFallback(ResourceBundle.getBundle(
         "de.a12.studio.plugin.excel.messages",
         java.util.Locale.getDefault(),
-        ImportFromExcelDialogController.class.getClassLoader()));
+        ImportFromExcelDialogController.class.getClassLoader())));
     Stage stage = WidgetFactory.createDialogStage(
         "dialog-import-from-excel", loader, owner,
         StudioBundle.get("import_excel.dialog_title"));

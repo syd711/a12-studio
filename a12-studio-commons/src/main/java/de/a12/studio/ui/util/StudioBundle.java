@@ -3,9 +3,13 @@ package de.a12.studio.ui.util;
 import lombok.extern.slf4j.Slf4j;
 
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Central access point for the UI resource bundle ({@code messages.properties}).
@@ -85,5 +89,36 @@ public final class StudioBundle {
       return ResourceBundle.getBundle(BUNDLE_BASE, Locale.ROOT,
           StudioBundle.class.getClassLoader());
     }
+  }
+
+  /**
+   * Wraps {@code primary} so that lookups missing from it fall through to the main studio
+   * bundle ({@link #getBundle()}). Intended for plugins that load their own message bundle
+   * via {@link javafx.fxml.FXMLLoader#setResources} but whose FXML includes shared components
+   * (e.g. {@code scene-dialog-header.fxml}) that reference core keys like {@code a12_studio} or
+   * {@code close}, which don't exist in the plugin's own bundle.
+   */
+  public static ResourceBundle withFallback(ResourceBundle primary) {
+    return new ResourceBundle() {
+      @Override
+      protected Object handleGetObject(String key) {
+        if (primary.containsKey(key)) {
+          return primary.getObject(key);
+        }
+        try {
+          return bundle.getObject(key);
+        }
+        catch (MissingResourceException e) {
+          return null;
+        }
+      }
+
+      @Override
+      public Enumeration<String> getKeys() {
+        Set<String> keys = new HashSet<>(Collections.list(primary.getKeys()));
+        keys.addAll(Collections.list(bundle.getKeys()));
+        return Collections.enumeration(keys);
+      }
+    };
   }
 }

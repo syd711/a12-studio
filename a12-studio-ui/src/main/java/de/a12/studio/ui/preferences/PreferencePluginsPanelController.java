@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -42,6 +43,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Slf4j
@@ -89,6 +91,8 @@ public class PreferencePluginsPanelController implements Initializable {
     statusLabel.setText("");
     progressIndicator.setVisible(false);
     showDetail(false);
+
+    descriptionWebView.getEngine().setUserStyleSheetLocation(MarkdownRenderer.getStylesheetUrl());
 
     setupList();
     setupSearch();
@@ -217,6 +221,12 @@ public class PreferencePluginsPanelController implements Initializable {
   private void onInstallPlugin(@NonNull MarketplaceEntry entry) {
     if (entry.getDownloadUrl() == null || entry.getDownloadUrl().isBlank()) {
       WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.no_download_url"), entry.getName());
+      return;
+    }
+
+    Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(getStage(),
+        StudioBundle.get("plugins.install_confirm", entry.getName()), null, null, StudioBundle.get("plugins.install"));
+    if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
       return;
     }
 

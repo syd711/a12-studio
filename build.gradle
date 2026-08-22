@@ -1,5 +1,6 @@
 plugins {
     id 'com.github.jk1.dependency-license-report' version '3.1.4'
+    id 'com.gradleup.shadow' version '9.5.1' apply false
 }
 
 import com.github.jk1.license.render.InventoryHtmlReportRenderer
@@ -44,6 +45,12 @@ tasks.register('generateLicenses') {
     }
 }
 
+// Shared by generateMarketplace (downloadUrl) and buildPluginJars (archiveFileName) so a
+// locally-built plugin jar has the same filename as the one the marketplace entry points to.
+def pluginModuleJarName = { File moduleDir ->
+    rootDir.toPath().relativize(moduleDir.toPath()).toString().replace('\\', '/').replace('/', '-') + '.jar'
+}
+
 tasks.register('generateMarketplace') {
     group = 'plugins'
     description = 'Scans all plugin.json files in the workspace and aggregates them into marketplace.json.'
@@ -72,8 +79,7 @@ tasks.register('generateMarketplace') {
             descriptor['pluginJsonUrl'] = "https://raw.githubusercontent.com/syd711/a12-studio/main/${relPath}"
             // Point downloadUrl to the shadow/fat JAR built by the module.
             def moduleDir = pluginJson.parentFile
-            def moduleName = rootDir.toPath().relativize(moduleDir.toPath()).toString().replace('\\', '/').replace('/', '-')
-            descriptor['downloadUrl'] = "https://github.com/syd711/a12-studio/releases/latest/download/${moduleName}.jar"
+            descriptor['downloadUrl'] = "https://github.com/syd711/a12-studio/releases/latest/download/${pluginModuleJarName(moduleDir)}"
             return descriptor
         }
         def json = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([plugins: plugins]))
@@ -83,11 +89,34 @@ tasks.register('generateMarketplace') {
     }
 }
 
+tasks.register('buildPluginJars', Copy) {
+    group = 'plugins'
+    description = 'Builds a fat JAR (via shadowJar) for each a12-studio-plugins module and copies it into the root plugins/ folder.'
+
+    def pluginProjects = subprojects.findAll { proj -> file("${proj.projectDir}/plugin.json").exists() }
+    dependsOn pluginProjects.collect { "${it.path}:shadowJar" }
+
+    pluginProjects.each { proj ->
+        from(proj.tasks.named('shadowJar').flatMap { it.archiveFile })
+    }
+    into "${rootDir}/plugins"
+}
+
 subprojects {
     apply plugin: 'java'
 
     group = 'de.a12.studio'
     version = '2606.06-ext0-001'
+
+    // Plugin modules (identified by a plugin.json descriptor) also get the shadow plugin so
+    // they can be built into standalone fat JARs for the root plugins/ folder, see
+    // buildPluginJars below.
+    if (file('plugin.json').exists()) {
+        apply plugin: 'com.gradleup.shadow'
+        tasks.named('shadowJar') {
+            archiveFileName = pluginModuleJarName(projectDir)
+        }
+    }
 
     tasks.withType(JavaCompile).configureEach {
         options.release = 21

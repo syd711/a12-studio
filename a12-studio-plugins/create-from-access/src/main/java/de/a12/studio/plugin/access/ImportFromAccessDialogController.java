@@ -205,10 +205,10 @@ public class ImportFromAccessDialogController implements DialogController {
   public static Optional<AccessImportInput> show(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
     FXMLLoader loader = new FXMLLoader(
         ImportFromAccessDialogController.class.getResource("dialog-import-from-access.fxml"));
-    loader.setResources(ResourceBundle.getBundle(
+    loader.setResources(StudioBundle.withFallback(ResourceBundle.getBundle(
         "de.a12.studio.plugin.access.messages",
         java.util.Locale.getDefault(),
-        ImportFromAccessDialogController.class.getClassLoader()));
+        ImportFromAccessDialogController.class.getClassLoader())));
     Stage stage = WidgetFactory.createDialogStage(
         "dialog-import-from-access", loader, owner,
         StudioBundle.get("import_access.dialog_title"));
