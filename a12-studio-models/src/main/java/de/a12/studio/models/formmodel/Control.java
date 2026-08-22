@@ -11,7 +11,8 @@ import java.util.List;
 @Getter
 @Setter
 @JsonPropertyOrder({"type", "id", "name", "offset", "span", "style", "readonly", "messageExposition", "label",
-    "hint", "placeholder", "accessibility", "datePickerConfig", "elementRef", "tooltipsOnTop", "annotations"})
+    "hint", "placeholder", "accessibility", "datePickerConfig", "elementRef", "tooltipsOnTop",
+    "labelHiddenButRead", "annotations"})
 public class Control extends Cell {
 
   // Reference to the underlying Document Model field (or group, for attachments) this Control edits.
@@ -27,6 +28,9 @@ public class Control extends Cell {
   private String messageExposition;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean tooltipsOnTop;
+  // Keeps the label mandatory for screen readers while hiding it visually on screen.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean labelHiddenButRead;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean readonly;
   @JsonInclude(JsonInclude.Include.NON_NULL)

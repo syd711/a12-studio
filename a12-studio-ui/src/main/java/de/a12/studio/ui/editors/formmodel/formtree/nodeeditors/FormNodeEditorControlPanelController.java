@@ -26,8 +26,9 @@ import org.jspecify.annotations.Nullable;
  *       value combo, populated from the linked Document Model's boolean fields. Note: {@link Control} does not
  *       extend {@link de.a12.studio.models.formmodel.ScreenElement}, so it carries its own
  *       {@code hideConditionField}/{@code hideConditionValue} pair (see {@code Control.java}).</li>
- *   <li><b>Accessibility</b> ({@link ControlAccessibilityPanelController}) — per-locale alternative label for
- *       screen readers, stored in {@link Control#getAccessibility()}.</li>
+ *   <li><b>Accessibility</b> ({@link ControlAccessibilityPanelController}) — checkbox keeping the label mandatory
+ *       for screen readers while hiding it visually on screen, stored in
+ *       {@link Control#getLabelHiddenButRead()}.</li>
  *   <li><b>Styles</b> ({@link StylesPanelController}) — CSS style classes on {@link Control#getStyle()}.</li>
  *   <li><b>Annotations</b> ({@link AnnotationsPanelController}) — model annotations on
  *       {@link Control#getAnnotations()}.</li>

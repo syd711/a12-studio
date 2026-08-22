@@ -1,51 +1,40 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
-import de.a12.studio.models.Label;
 import de.a12.studio.models.formmodel.Control;
-import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
-import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * "Accessibility" property editor for a selected {@link Control} node: edits {@link Control#getAccessibility()},
- * a per-locale text used as an alternative label for screen readers (analogous to an HTML {@code aria-label}).
- * Wraps a single plain {@link LocalizedTextPanelController} — no expression support, no Field Configuration
- * variant (this is a purely per-Control UI concern, not a field-level default).
+ * "Accessibility" property editor for a selected {@link Control} node: a single checkbox toggling {@link
+ * Control#getLabelHiddenButRead()} — the control's label stays mandatory for screen readers but can be hidden
+ * visually on screen. Not tied to a single {@code Element}, so it follows the model-header pattern (a plain
+ * {@link #setControl} entry point, {@code bindCheckBox} ignoring its unused {@code Element} argument),
+ * mirroring {@link SectionNamePanelController}.
  */
 public class ControlAccessibilityPanelController extends AbstractPropertyEditor implements Initializable {
 
   @FXML
-  private LocalizedTextPanelController accessibilityTextController;
+  private CheckBox hideLabelCheckBox;
+
+  private Control control;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    accessibilityTextController.configureCustom("accessibilityText", "");
-    accessibilityTextController.setCollapsed();
+    hideLabelCheckBox.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("hide_label_hint")));
+    bindCheckBox(hideLabelCheckBox, (el, value) -> control.setLabelHiddenButRead(value ? Boolean.TRUE : null));
   }
 
   public void setControl(@NonNull Control control) {
-    accessibilityTextController.setCustom(
-        () -> texts(control.getAccessibility()),
-        () -> ensureAccessibility(control).getText());
-  }
-
-  private static List<Label> texts(@Nullable TextContainer c) {
-    return c != null ? c.getText() : List.of();
-  }
-
-  private static TextContainer ensureAccessibility(@NonNull Control control) {
-    if (control.getAccessibility() == null) {
-      control.setAccessibility(new TextContainer());
-    }
-    return control.getAccessibility();
+    this.control = control;
+    setFieldValue(hideLabelCheckBox, Boolean.TRUE.equals(control.getLabelHiddenButRead()));
   }
 }

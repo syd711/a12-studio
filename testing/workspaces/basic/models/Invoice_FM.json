@@ -47,10 +47,22 @@
       }
     ],
     "subHeaderBox": {
-      "id": "subHeaderBox1"
+      "id": "subHeaderBox1",
+      "minorButtons": {
+        "button": []
+      },
+      "majorButtons": {
+        "button": []
+      }
     },
     "footerBox": {
-      "id": "footerBox1"
+      "id": "footerBox1",
+      "minorButtons": {
+        "button": []
+      },
+      "majorButtons": {
+        "button": []
+      }
     },
     "screens": [
       {
@@ -99,7 +111,26 @@
                   "destructive": true
                 },
                 "event": "event_cancel",
-                "scope": "HIDDEN_IN_READONLY_MODE"
+                "scope": "HIDDEN_IN_READONLY_MODE",
+                "orCreateButtonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Cancel"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Abbrechen"
+                        }
+                      ]
+                    }
+                  },
+                  "priority": "SECONDARY",
+                  "destructive": true
+                }
               }
             ]
           },
@@ -132,7 +163,28 @@
                 },
                 "target": "screen-14588",
                 "validation": "partial",
-                "scope": "HIDDEN_IN_READONLY_MODE"
+                "scope": "HIDDEN_IN_READONLY_MODE",
+                "orCreateButtonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Order Summary"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bestellübersicht"
+                        }
+                      ]
+                    }
+                  },
+                  "icon": {
+                    "name": "list"
+                  },
+                  "priority": "SECONDARY"
+                }
               }
             ]
           }
@@ -238,7 +290,8 @@
                       {
                         "type": "Row",
                         "id": "row_ab734",
-                        "name": "<Row>"
+                        "name": "<Row>",
+                        "cell": []
                       }
                     ],
                     "verticalAlignment": "BOTTOM"
@@ -1336,7 +1389,28 @@
                   "priority": "SECONDARY"
                 },
                 "target": "#previous",
-                "scope": "HIDDEN_IN_READONLY_MODE"
+                "scope": "HIDDEN_IN_READONLY_MODE",
+                "orCreateButtonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Back"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Zurück"
+                        }
+                      ]
+                    }
+                  },
+                  "icon": {
+                    "name": "arrow_back"
+                  },
+                  "priority": "SECONDARY"
+                }
               }
             ]
           },
@@ -1369,7 +1443,28 @@
                 },
                 "event": "event_submit",
                 "validation": "partial",
-                "scope": "HIDDEN_IN_READONLY_MODE"
+                "scope": "HIDDEN_IN_READONLY_MODE",
+                "orCreateButtonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Place Order"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bestellung Absenden"
+                        }
+                      ]
+                    }
+                  },
+                  "icon": {
+                    "name": "shopping_cart"
+                  },
+                  "priority": "PRIMARY"
+                }
               }
             ]
           }
@@ -1956,6 +2051,12 @@
           "initialValue": "false",
           "exposition": "CHECKBOX",
           "elementRef": "include_7c34e_field_9b3e4"
+        },
+        {
+          "elementRef": "include_7c34e_field_fbf75"
+        },
+        {
+          "elementRef": "include_7c34e_group_8bd8d"
         }
       ]
     },
