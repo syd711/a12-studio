@@ -82,17 +82,19 @@ jobs:
       - name: Create macOS App Image
         working-directory: ./mac-build
         run: |
+          set -euo pipefail
           echo "=== DEBUG ==="
           echo "app_version=${{ steps.project.outputs.app_version }}"
           echo "runtime_image=${{ steps.jre.outputs.runtime_image }}"
           echo "--- JRE home contents ---"
           ls -la ../${{ steps.jre.outputs.runtime_image }}/ || echo "JRE home MISSING"
-          echo "--- jpackage version ---"
-          jpackage --version 2>&1 || echo "jpackage not found"
+          echo "--- jpackage location ---"
+          which jpackage 2>&1 || echo "::error::jpackage not in PATH"
+          jpackage --version 2>&1 || echo "::error::jpackage --version failed"
           echo "--- input jar ---"
           ls -lh input/ || echo "input dir missing"
           echo "=== RUNNING JPACKAGE ==="
-          jpackage --name A12-Studio \
+          OUTPUT=$(jpackage --name A12-Studio \
             --input input \
             --app-version ${{ steps.project.outputs.app_version }} \
             --main-jar a12-studio-ui.jar \
@@ -103,8 +105,9 @@ jobs:
             --runtime-image ../${{ steps.jre.outputs.runtime_image }} \
             --java-options "-Xmx512m" \
             --java-options "--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED" \
-            2>&1
-          echo "=== JPACKAGE EXIT: $? ==="
+            2>&1) || { echo "::error::jpackage failed: $OUTPUT"; exit 1; }
+          echo "$OUTPUT"
+          echo "=== JPACKAGE SUCCESS ==="
 
       - name: Create JRE Update Artifact from App Bundle
         working-directory: ./mac-build
