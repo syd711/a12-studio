@@ -51,6 +51,9 @@ jobs:
         run: |
           VERSION=$(grep "^version" build.gradle | sed "s/version = '//;s/'//")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # jpackage requires a purely numeric version (e.g. 2606.6.1); strip any alpha/hyphen suffix
+          APP_VERSION=$(echo "$VERSION" | grep -oP '^\d+(\.\d+)*' | head -1)
+          echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
 
       - name: Download Zulu JRE with JavaFX for macOS
         run: |
@@ -72,7 +75,7 @@ jobs:
         run: |
           jpackage --name A12-Studio \
             --input input \
-            --app-version ${{ steps.project.outputs.version }} \
+            --app-version ${{ steps.project.outputs.app_version }} \
             --main-jar a12-studio-ui.jar \
             --main-class de.a12.studio.ui.Launcher \
             --type app-image \
@@ -168,6 +171,9 @@ jobs:
         run: |
           VERSION=$(grep "^version" build.gradle | sed "s/version = '//;s/'//")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # jpackage requires a purely numeric version (e.g. 2606.6.1); strip any alpha/hyphen suffix
+          APP_VERSION=$(echo "$VERSION" | grep -oP '^\d+(\.\d+)*' | head -1)
+          echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
 
       - name: Download Zulu JRE with JavaFX for Linux
         run: |
@@ -190,7 +196,7 @@ jobs:
         run: |
           jpackage --name A12-Studio \
             --input input \
-            --app-version ${{ steps.project.outputs.version }} \
+            --app-version ${{ steps.project.outputs.app_version }} \
             --main-jar a12-studio-ui.jar \
             --main-class de.a12.studio.ui.Launcher \
             --type app-image \
@@ -241,6 +247,9 @@ jobs:
         run: |
           $version = (Select-String -Path build.gradle -Pattern "version = '(.*)'").Matches[0].Groups[1].Value
           echo "version=$version" >> $env:GITHUB_OUTPUT
+          # jpackage requires a purely numeric version; strip any alpha/hyphen suffix
+          $appVersion = [regex]::Match($version, '^\d+(\.\d+)*').Value
+          echo "app_version=$appVersion" >> $env:GITHUB_OUTPUT
 
       - name: Build Installer
         run: .\gradlew.bat :a12-studio-ui:buildInstaller
