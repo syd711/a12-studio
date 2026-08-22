@@ -27,11 +27,13 @@ jobs:
             os: macos-15-intel
             jre_bundle: zulu21.42.19-ca-fx-jre21.0.7-macosx_x64.tar.gz
             jre_folder: zulu21.42.19-ca-fx-jre21.0.7-macosx_x64
+            jre_home_suffix: zulu-21.jre/Contents/Home
           - arch: arm64
             java_arch: aarch64
             os: macos-15
             jre_bundle: zulu21.42.19-ca-fx-jre21.0.7-macosx_aarch64.tar.gz
             jre_folder: zulu21.42.19-ca-fx-jre21.0.7-macosx_aarch64
+            jre_home_suffix: zulu-21.jre/Contents/Home
 
     steps:
       - name: Checkout A12 Studio
@@ -67,11 +69,10 @@ jobs:
         id: jre
         run: |
           tar -xzf ${{ matrix.jre_bundle }}
-          # On macOS, Zulu bundles have a nested structure: JRE_FOLDER/zulu-21.jre/Contents/Home
-          # On Linux, the structure is flat: JRE_FOLDER/bin, lib, release
-          # Find the directory containing the "release" file (= the actual Java home)
-          JAVA_HOME_PATH=$(find ${{ matrix.jre_folder }} -name "release" -maxdepth 5 | head -1 | xargs dirname)
-          echo "Resolved Java home: $JAVA_HOME_PATH"
+          # Use the known Zulu macOS bundle structure: JRE_FOLDER/zulu-21.jre/Contents/Home
+          JAVA_HOME_PATH="${{ matrix.jre_folder }}/${{ matrix.jre_home_suffix }}"
+          echo "Java home path: $JAVA_HOME_PATH"
+          ls -la "$JAVA_HOME_PATH/bin/java" || { echo "ERROR: bin/java not found at $JAVA_HOME_PATH"; ls -la ${{ matrix.jre_folder }}/; exit 1; }
           echo "runtime_image=$JAVA_HOME_PATH" >> $GITHUB_OUTPUT
 
       - name: Build structure for packaging
