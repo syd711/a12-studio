@@ -101,7 +101,8 @@ jobs:
             --icon ../mac-package/A12-Studio.icns \
             --dest ./ \
             --runtime-image ../${{ steps.jre.outputs.runtime_image }} \
-            @../mac-package/jpackage_args.txt \
+            --java-options "-Xmx512m" \
+            --java-options "--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED" \
             2>&1
           echo "=== JPACKAGE EXIT: $? ==="
 
@@ -156,6 +157,7 @@ jobs:
 
       - name: Upload macOS Build Artifact
         uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: macOS-build-${{ matrix.arch }}
           path: |
@@ -163,6 +165,7 @@ jobs:
 
       - name: Upload macOS JRE Artifact
         uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: java-runtime-mac-${{ matrix.arch }}
           path: |
@@ -240,6 +243,7 @@ jobs:
 
       - name: Upload Linux Build Artifact
         uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: linux-build-x64
           path: |
