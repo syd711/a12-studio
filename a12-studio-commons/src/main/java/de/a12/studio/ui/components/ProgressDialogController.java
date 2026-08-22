@@ -1,6 +1,5 @@
 package de.a12.studio.ui.components;
 
-import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
@@ -128,7 +127,7 @@ public class ProgressDialogController implements Initializable, DialogController
                   Platform.runLater(() -> {
                     String msg = StudioBundle.get("progress_finished", model.getTitle());
                     String help = StudioBundle.get("progress_processed_of", progressResultModel.getProcessed(), model.getMax());
-                    WidgetFactory.showInformation(Studio.stage, msg, help);
+                    WidgetFactory.showInformation(stage, msg, help);
                   });
                 }
               });
@@ -139,7 +138,7 @@ public class ProgressDialogController implements Initializable, DialogController
               if (!runsInBackground) {
                 Platform.runLater(stage::close);
               }
-              Platform.runLater(() -> WidgetFactory.showAlert(Studio.stage, StudioBundle.get("progress_error", e.getMessage())));
+              Platform.runLater(() -> WidgetFactory.showAlert(stage, StudioBundle.get("progress_error", e.getMessage())));
             }
             return null;
           }

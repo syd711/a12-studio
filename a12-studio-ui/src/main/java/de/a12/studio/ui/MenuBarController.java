@@ -1,6 +1,9 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.ui.components.FileSearchDialogController;
+import de.a12.studio.ui.components.ProgressDialog;
+import de.a12.studio.ui.components.ProgressModel;
+import de.a12.studio.ui.components.ProgressResultModel;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.newproject.NewProjectDialogController;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
@@ -108,15 +111,61 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   private void openProject(File file) {
     LocalUISettings.saveProject(file);
-    project = new Project();
-    project.load(file);
 
-    autoDetectApplicationGroups(project);
+    ProgressDialog.createProgressDialog(Studio.stage, new ProgressModel<Void>(StudioBundle.get("opening_project")) {
 
-    StudioEventManager.getInstance().fireProjectOpenEvent(project);
+      private boolean done = false;
 
-    refreshRecentProjectsMenu();
-    refreshProjectDependentButtons();
+      @Override
+      public boolean isIndeterminate() {
+        return true;
+      }
+
+      @Override
+      public boolean isCancelable() {
+        return false;
+      }
+
+      @Override
+      public boolean isShowSummary() {
+        return false;
+      }
+
+      @Override
+      public int getMax() {
+        return 1;
+      }
+
+      @Override
+      public Void getNext() {
+        done = true;
+        return null;
+      }
+
+      @Override
+      public String nextToString(Void next) {
+        return null;
+      }
+
+      @Override
+      public void processNext(ProgressResultModel progressResultModel, Void next) {
+        project = new Project();
+        project.load(file);
+        autoDetectApplicationGroups(project);
+      }
+
+      @Override
+      public boolean hasNext() {
+        return !done;
+      }
+
+      @Override
+      public void finalizeModel(ProgressResultModel progressResultModel) {
+        StudioEventManager.getInstance().fireProjectOpenEvent(project);
+        refreshRecentProjectsMenu();
+        refreshProjectDependentButtons();
+      }
+    });
   }
 
   /**

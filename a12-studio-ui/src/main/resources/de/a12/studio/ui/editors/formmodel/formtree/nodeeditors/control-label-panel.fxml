@@ -10,7 +10,9 @@
     <BorderPane>
         <center>
             <VBox spacing="8.0">
-                <fx:include fx:id="fieldConfigLabel" source="../../../propertyeditors/localized-text-type-panel.fxml"
+                <fx:include fx:id="documentModelLabel" source="../../../propertyeditors/localized-text-readonly-panel.fxml"
+                            styleClass="titled-pane-sub-child" />
+                <fx:include fx:id="fieldConfigLabel" source="../../../propertyeditors/localized-text-readonly-panel.fxml"
                             styleClass="titled-pane-sub-child" />
                 <fx:include fx:id="controlLabel" source="../../../propertyeditors/localized-text-type-panel.fxml"
                             styleClass="titled-pane-sub-child" />

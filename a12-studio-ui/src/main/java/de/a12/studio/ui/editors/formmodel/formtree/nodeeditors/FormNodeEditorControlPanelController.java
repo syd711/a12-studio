@@ -16,8 +16,9 @@ import org.jspecify.annotations.Nullable;
  * <ol>
  *   <li><b>Field Information</b> ({@link FieldInformationPanelController}) — read-only: field ID, data type,
  *       Document Model path, and internal description of the bound Document Model element.</li>
- *   <li><b>Label</b> ({@link ControlLabelPanelController}) — two {@code LocalizedTextType} sub-editors:
- *       "Field Configuration" (model-wide) and "Control" (per-control override), both with expression chooser.</li>
+ *   <li><b>Label</b> ({@link ControlLabelPanelController}) — read-only "Document Model" (the bound Document
+ *       Model field's label) and "Field Configuration" (model-wide) sub-editors, plus an editable "Control"
+ *       (per-control override) {@code LocalizedTextType} sub-editor with expression chooser.</li>
  *   <li><b>Hint</b> ({@link ControlHintPanelController}) — two plain localized text sub-editors:
  *       "Field Configuration" and "Control".</li>
  *   <li><b>Placeholder</b> ({@link ControlPlaceholderPanelController}) — two plain localized text sub-editors:
@@ -59,7 +60,7 @@ public class FormNodeEditorControlPanelController {
       @Nullable DocumentModel documentModel,
       @Nullable FormModelContent content) {
     fieldInformationController.setControl(control, documentModel);
-    labelController.setControl(control, content);
+    labelController.setControl(control, documentModel, content);
     hintController.setControl(control, content);
     placeholderController.setControl(control, content);
     hideConditionController.configure(

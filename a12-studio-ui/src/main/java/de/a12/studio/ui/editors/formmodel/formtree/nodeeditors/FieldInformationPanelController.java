@@ -6,7 +6,7 @@ import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.formmodel.Control;
-import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.LocalizedTextReadonlyPanelController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
@@ -28,7 +28,7 @@ import java.util.List;
  *   <li><b>Document Model Path</b> — the slash-separated ancestor path resolved by walking the Document
  *       Model's group tree, or just the id when unresolvable (dangling reference, no Document Model).</li>
  *   <li><b>Internal Field Description</b> — the field element's {@code internalDescription} per-locale texts,
- *       shown via the shared {@link LocalizedTextPanelController} in read-only mode.</li>
+ *       shown via the shared {@link LocalizedTextReadonlyPanelController}.</li>
  * </ul>
  * All content is read-only; no editing takes place here.
  */
@@ -45,12 +45,11 @@ public class FieldInformationPanelController {
   private Label documentModelPathLabel;
 
   @FXML
-  private LocalizedTextPanelController internalDescriptionController;
+  private LocalizedTextReadonlyPanelController internalDescriptionController;
 
   @FXML
   private void initialize() {
     internalDescriptionController.configureCustom("internalDescription", StudioBundle.get("internal_field_description"));
-    internalDescriptionController.setCollapsed();
   }
 
   /**

@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
  * "Control" tab contains all the same property panels as the standard control editor:</p>
  * <ol>
  *   <li>Field Information (read-only)</li>
- *   <li>Label (Field Configuration + Control, with expression chooser)</li>
+ *   <li>Label (Document Model + Field Configuration, read-only; Control, with expression chooser)</li>
  *   <li>Hint (Field Configuration + Control, plain localized text)</li>
  *   <li>Placeholder (Field Configuration + Control, plain localized text)</li>
  *   <li>Hide Condition</li>
@@ -59,7 +59,7 @@ public class FormNodeEditorConfirmControlPanelController {
 
     // Control tab
     fieldInformationController.setControl(control, documentModel);
-    labelController.setControl(control, content);
+    labelController.setControl(control, documentModel, content);
     hintController.setControl(control, content);
     placeholderController.setControl(control, content);
     hideConditionController.configure(

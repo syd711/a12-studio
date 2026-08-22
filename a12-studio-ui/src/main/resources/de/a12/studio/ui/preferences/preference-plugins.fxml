@@ -34,7 +34,7 @@
             </BorderPane.margin>
 
             <!-- ── LEFT: search + list ── -->
-            <VBox maxWidth="320.0" minWidth="240.0" prefWidth="300.0" spacing="6.0" styleClass="plugin-list-pane">
+            <VBox maxWidth="300.0" minWidth="300.0" prefWidth="300.0" spacing="6.0" styleClass="plugin-list-pane">
                 <children>
                     <TextField fx:id="searchField" promptText="%plugins.search" styleClass="search-field" />
                     <ListView fx:id="pluginListView" styleClass="plugin-list" VBox.vgrow="ALWAYS" />

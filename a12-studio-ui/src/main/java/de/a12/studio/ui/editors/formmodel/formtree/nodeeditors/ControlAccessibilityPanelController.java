@@ -7,6 +7,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -24,12 +25,15 @@ public class ControlAccessibilityPanelController extends AbstractPropertyEditor 
   @FXML
   private CheckBox hideLabelCheckBox;
 
+  @FXML
+  private Label hideLabelInfoIcon;
+
   private Control control;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    hideLabelCheckBox.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("hide_label_hint")));
+    WidgetFactory.createHelpIcon(hideLabelInfoIcon, StudioBundle.get("hide_label_hint"));
     bindCheckBox(hideLabelCheckBox, (el, value) -> control.setLabelHiddenButRead(value ? Boolean.TRUE : null));
   }
 

@@ -10,7 +10,8 @@
  */
 .field-label {
     -fx-font-size: 12px;
-    -fx-text-fill: -fx-text-muted;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-section-header;
     -fx-padding: 3px 0 3px 1px;
 }
 .section-header {
@@ -44,4 +45,27 @@
 .validation-error {
     -fx-text-fill: -fx-error-bg;
     -fx-font-weight: bold;
+}
+
+/**
+ * Read-only "table" display (e.g. LocalizedTextReadonlyPanelController's per-locale text list): a plain
+ * two-column GridPane styled to resemble a lightweight table - a colored header row plus a thin divider
+ * line under every row, no outer border or background.
+ */
+.readonly-table-header-cell {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-section-header;
+    -fx-padding: 0 0 4px 1px;
+}
+
+.readonly-table-cell {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-text-color;
+    -fx-padding: 5px 0 5px 1px;
+}
+
+.readonly-table-divider .line {
+    -fx-border-color: -fx-border-divider;
+    -fx-border-width: 1px 0 0 0;
 }
