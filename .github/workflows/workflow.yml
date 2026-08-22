@@ -289,8 +289,15 @@ jobs:
           Write-Host "Extracted version=$version app_version=$appVersion" 
 
       - name: Build Installer
-        run: .\gradlew.bat :a12-studio-ui:buildInstaller --stacktrace 2>&1
-        shell: cmd
+        shell: pwsh
+        run: |
+          $output = .\gradlew.bat :a12-studio-ui:buildInstaller --stacktrace 2>&1 | Out-String
+          Write-Host $output
+          if ($LASTEXITCODE -ne 0) {
+            $errorLines = $output -split "`n" | Where-Object { $_ -match "FAILED|Exception|Error|> Task" } | Select-Object -Last 20
+            Write-Host "::error::Gradle failed: $($errorLines -join ' | ')"
+            exit 1
+          }
 
       - name: Download macOS x64 Artifact
         uses: actions/download-artifact@v4
