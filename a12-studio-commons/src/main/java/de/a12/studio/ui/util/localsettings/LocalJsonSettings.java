@@ -11,11 +11,27 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 abstract public class LocalJsonSettings {
 
   public final static ObjectMapper objectMapper;
+
+  /**
+   * Settings files are small and written from UI event handlers (e.g. a SplitPane divider-position listener
+   * firing during an animated collapse/expand), so {@link #save()} keeps the actual disk write off the caller's
+   * thread - otherwise a blocking write lands on the JavaFX Application Thread mid-animation and shows up as a
+   * frame hitch. A single-threaded executor keeps writes to the same file in submission order.
+   */
+  private final static ExecutorService saveExecutor =
+      Executors.newSingleThreadExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "local-json-settings-writer");
+        thread.setDaemon(true);
+        return thread;
+      });
 
   File settingsFile;
 
@@ -75,7 +91,15 @@ abstract public class LocalJsonSettings {
 
   public void save() {
     try {
-      objectMapper.writeValue(settingsFile, this);
+      byte[] json = objectMapper.writeValueAsBytes(this);
+      saveExecutor.submit(() -> {
+        try {
+          Files.write(settingsFile.toPath(), json);
+        }
+        catch (IOException e) {
+          log.error("Failed to write {}: {}", settingsFile.getName(), e.getMessage(), e);
+        }
+      });
     }
     catch (Exception e) {
       log.error("Failed to write {}: {}", settingsFile.getName(), e.getMessage(), e);

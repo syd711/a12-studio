@@ -135,6 +135,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private static final String DOCUMENT_RELATIONSHIP_MODEL_COLLAPSED_FLAG = "documentRelationshipModelCollapsed";
 
   private boolean documentRelationshipModelPinned = false;
+  private boolean documentRelationshipModelCollapsed = false;
   private @Nullable Timeline documentRelationshipModelToggleTimeline;
 
   public void loadModel(@NonNull A12Model<?> model) {
@@ -170,7 +171,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
    * already collapsed.
    */
   private void onFormModelTreeNodeSelected() {
-    if (!documentRelationshipModelPinned && documentRelationshipModelExpandedPane.isVisible()) {
+    if (!documentRelationshipModelPinned && !documentRelationshipModelCollapsed) {
       setDocumentRelationshipModelCollapsed(true);
     }
   }
@@ -323,6 +324,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
   }
 
   private void setDocumentRelationshipModelCollapsed(boolean collapsing, boolean animate) {
+    documentRelationshipModelCollapsed = collapsing;
     if (documentRelationshipModelToggleTimeline != null) {
       documentRelationshipModelToggleTimeline.stop();
       documentRelationshipModelToggleTimeline = null;
@@ -403,7 +405,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     overviewSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
-      if (documentRelationshipModelExpandedPane.isVisible()) {
+      if (!documentRelationshipModelCollapsed) {
         saveDividerPosition(newValue.doubleValue());
       }
     });
