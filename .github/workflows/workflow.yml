@@ -49,11 +49,12 @@ jobs:
       - name: Extract project version
         id: project
         run: |
-          VERSION=$(grep "^version" build.gradle | sed "s/version = '//;s/'//")
+          VERSION=$(grep "version = '" build.gradle | grep -v "javafx" | head -1 | sed "s/.*version = '//;s/'.*//")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          # jpackage requires a purely numeric version (e.g. 2606.6.1); strip any alpha/hyphen suffix
-          APP_VERSION=$(echo "$VERSION" | grep -oP '^\d+(\.\d+)*' | head -1)
+          # jpackage requires a purely numeric version; strip alpha/hyphen suffix (POSIX sed, works on macOS + Linux)
+          APP_VERSION=$(echo "$VERSION" | sed 's/[^0-9.].*$//')
           echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version=$VERSION app_version=$APP_VERSION"
 
       - name: Download Zulu JRE with JavaFX for macOS
         run: |
@@ -73,6 +74,8 @@ jobs:
       - name: Create macOS App Image
         working-directory: ./mac-build
         run: |
+          echo "app_version=${{ steps.project.outputs.app_version }}"
+          echo "version=${{ steps.project.outputs.version }}"
           jpackage --name A12-Studio \
             --input input \
             --app-version ${{ steps.project.outputs.app_version }} \
@@ -169,11 +172,11 @@ jobs:
       - name: Extract project version
         id: project
         run: |
-          VERSION=$(grep "^version" build.gradle | sed "s/version = '//;s/'//")
+          VERSION=$(grep "version = '" build.gradle | grep -v "javafx" | head -1 | sed "s/.*version = '//;s/'.*//")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          # jpackage requires a purely numeric version (e.g. 2606.6.1); strip any alpha/hyphen suffix
-          APP_VERSION=$(echo "$VERSION" | grep -oP '^\d+(\.\d+)*' | head -1)
+          APP_VERSION=$(echo "$VERSION" | sed 's/[^0-9.].*$//')
           echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version=$VERSION app_version=$APP_VERSION"
 
       - name: Download Zulu JRE with JavaFX for Linux
         run: |
@@ -194,6 +197,8 @@ jobs:
       - name: Create Linux App Image
         working-directory: ./linux-build
         run: |
+          echo "app_version=${{ steps.project.outputs.app_version }}"
+          echo "version=${{ steps.project.outputs.version }}"
           jpackage --name A12-Studio \
             --input input \
             --app-version ${{ steps.project.outputs.app_version }} \
@@ -245,11 +250,12 @@ jobs:
         id: project
         shell: pwsh
         run: |
-          $version = (Select-String -Path build.gradle -Pattern "version = '(.*)'").Matches[0].Groups[1].Value
+          $version = (Select-String -Path build.gradle -Pattern "version = '(.*)'").Matches | Where-Object { $_.Value -notmatch "javafx" } | Select-Object -First 1 | ForEach-Object { $_.Groups[1].Value }
           echo "version=$version" >> $env:GITHUB_OUTPUT
           # jpackage requires a purely numeric version; strip any alpha/hyphen suffix
           $appVersion = [regex]::Match($version, '^\d+(\.\d+)*').Value
           echo "app_version=$appVersion" >> $env:GITHUB_OUTPUT
+          Write-Host "Extracted version=$version app_version=$appVersion" 
 
       - name: Build Installer
         run: .\gradlew.bat :a12-studio-ui:buildInstaller
