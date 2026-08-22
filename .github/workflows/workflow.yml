@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout A12 Studio
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Zulu JDK 21 with JavaFX
         uses: actions/setup-java@v5
@@ -64,7 +64,15 @@ jobs:
         run: ./gradlew :a12-studio-ui:shadowJar
 
       - name: Prepare Java Runtime
-        run: tar -xzf ${{ matrix.jre_bundle }}
+        id: jre
+        run: |
+          tar -xzf ${{ matrix.jre_bundle }}
+          # On macOS, Zulu bundles have a nested structure: JRE_FOLDER/zulu-21.jre/Contents/Home
+          # On Linux, the structure is flat: JRE_FOLDER/bin, lib, release
+          # Find the directory containing the "release" file (= the actual Java home)
+          JAVA_HOME_PATH=$(find ${{ matrix.jre_folder }} -name "release" -maxdepth 5 | head -1 | xargs dirname)
+          echo "Resolved Java home: $JAVA_HOME_PATH"
+          echo "runtime_image=$JAVA_HOME_PATH" >> $GITHUB_OUTPUT
 
       - name: Build structure for packaging
         run: |
@@ -74,12 +82,16 @@ jobs:
       - name: Create macOS App Image
         working-directory: ./mac-build
         run: |
+          echo "=== DEBUG ==="
           echo "app_version=${{ steps.project.outputs.app_version }}"
-          echo "version=${{ steps.project.outputs.version }}"
-          echo "--- JRE folder contents ---"
-          ls -la ../${{ matrix.jre_folder }} || echo "JRE folder missing!"
+          echo "runtime_image=${{ steps.jre.outputs.runtime_image }}"
+          echo "--- JRE home contents ---"
+          ls -la ../${{ steps.jre.outputs.runtime_image }}/ || echo "JRE home MISSING"
           echo "--- jpackage version ---"
-          jpackage --version
+          jpackage --version 2>&1 || echo "jpackage not found"
+          echo "--- input jar ---"
+          ls -lh input/ || echo "input dir missing"
+          echo "=== RUNNING JPACKAGE ==="
           jpackage --name A12-Studio \
             --input input \
             --app-version ${{ steps.project.outputs.app_version }} \
@@ -88,8 +100,10 @@ jobs:
             --type app-image \
             --icon ../mac-package/A12-Studio.icns \
             --dest ./ \
-            --runtime-image ../${{ matrix.jre_folder }} \
-            @../mac-package/jpackage_args.txt
+            --runtime-image ../${{ steps.jre.outputs.runtime_image }} \
+            @../mac-package/jpackage_args.txt \
+            2>&1
+          echo "=== JPACKAGE EXIT: $? ==="
 
       - name: Create JRE Update Artifact from App Bundle
         working-directory: ./mac-build
@@ -141,14 +155,14 @@ jobs:
           cp deploy-mac/A12-Studio-${{ steps.project.outputs.version }}.dmg A12-Studio-Client-MacOS-${{ matrix.arch }}.dmg
 
       - name: Upload macOS Build Artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: macOS-build-${{ matrix.arch }}
           path: |
             ./mac-build/A12-Studio-Client-MacOS-${{ matrix.arch }}.dmg
 
       - name: Upload macOS JRE Artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: java-runtime-mac-${{ matrix.arch }}
           path: |
@@ -163,7 +177,7 @@ jobs:
 
     steps:
       - name: Checkout A12 Studio
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Zulu JDK 21 with JavaFX
         uses: actions/setup-java@v5
@@ -191,7 +205,12 @@ jobs:
         run: ./gradlew :a12-studio-ui:shadowJar
 
       - name: Prepare Java Runtime
-        run: tar -xzf zulu21-fx-jre-linux-x64.tar.gz
+        id: jre
+        run: |
+          tar -xzf zulu21-fx-jre-linux-x64.tar.gz
+          JAVA_HOME_PATH=$(find zulu21.42.19-ca-fx-jre21.0.7-linux_x64 -name "release" -maxdepth 5 | head -1 | xargs dirname)
+          echo "Resolved Java home: $JAVA_HOME_PATH"
+          echo "runtime_image=$JAVA_HOME_PATH" >> $GITHUB_OUTPUT
 
       - name: Build structure for packaging
         run: |
@@ -202,7 +221,7 @@ jobs:
         working-directory: ./linux-build
         run: |
           echo "app_version=${{ steps.project.outputs.app_version }}"
-          echo "version=${{ steps.project.outputs.version }}"
+          echo "runtime_image=${{ steps.jre.outputs.runtime_image }}"
           jpackage --name A12-Studio \
             --input input \
             --app-version ${{ steps.project.outputs.app_version }} \
@@ -211,7 +230,7 @@ jobs:
             --type app-image \
             --icon ../mac-package/A12-Studio-512.png \
             --dest ./ \
-            --runtime-image ../zulu21.42.19-ca-fx-jre21.0.7-linux_x64 \
+            --runtime-image ../${{ steps.jre.outputs.runtime_image }} \
             @../mac-package/jpackage_args.txt
 
       - name: Package Linux App Image as ZIP
@@ -220,7 +239,7 @@ jobs:
           zip -r A12-Studio-Client-linux-x64.zip A12-Studio/
 
       - name: Upload Linux Build Artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: linux-build-x64
           path: |
@@ -241,7 +260,7 @@ jobs:
         run: choco install innosetup --yes
 
       - name: Checkout A12 Studio
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup JDK 21
         uses: actions/setup-java@v5
@@ -265,37 +284,37 @@ jobs:
         run: .\gradlew.bat :a12-studio-ui:buildInstaller
 
       - name: Download macOS x64 Artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: macOS-build-x64
           path: ./Output/A12-Studio/
 
       - name: Download macOS arm64 Artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: macOS-build-arm64
           path: ./Output/A12-Studio/
 
       - name: Download macOS x64 JRE Artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: java-runtime-mac-x64
           path: ./Output/A12-Studio/
 
       - name: Download macOS arm64 JRE Artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: java-runtime-mac-arm64
           path: ./Output/A12-Studio/
 
       - name: Download Linux x64 Artifact
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@v4
         with:
           name: linux-build-x64
           path: ./Output/A12-Studio/
 
       - name: Upload Installer Artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: A12-Studio-Installer-${{ steps.project.outputs.version }}
           path: |
