@@ -73,7 +73,7 @@ public class FormNodeEditorControlPanelController {
     hintController.setControl(control, content);
     placeholderController.setControl(control, content);
     layoutController.setControl(control);
-    additionalSettingsController.setControl(control, content);
+    additionalSettingsController.setControl(control, elementIndex, content);
     hideConditionController.configure(
         control::getHideConditionField, control::setHideConditionField,
         control::getHideConditionValue, control::setHideConditionValue,

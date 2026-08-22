@@ -142,14 +142,13 @@
     -fx-padding: 0;
 }
 
-/* TitledPane nested two levels deep, i.e. inside a .titled-pane-child's content - same accent-line treatment. */
+/* TitledPane nested two levels deep, i.e. inside a .titled-pane-child's content. */
 .titled-pane-sub-child {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
-    -fx-border-color: transparent transparent transparent -fx-titled-pane-border;
-    -fx-border-width: 0 0 0 2px;
+    -fx-border-width: 0;
     -fx-border-radius: 0;
-    -fx-padding: 0 0 0 14px;
+    -fx-padding: 0;
 }
 
 .titled-pane-sub-child > .title,
@@ -158,6 +157,10 @@
     -fx-background-radius: 0;
     -fx-border-width: 0;
     -fx-padding: 4px 0 4px 2px;
+}
+
+.titled-pane.titled-pane-sub-child > .title > .text {
+    -fx-font-size: 14px;
 }
 
 .titled-pane-sub-child > *.content {

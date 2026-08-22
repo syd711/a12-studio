@@ -15,6 +15,8 @@ public class BaseTableSettings extends LocalJsonSettings {
 
   private Map<String, Double> dividerPositions = new HashMap<>();
 
+  private Map<String, Boolean> flags = new HashMap<>();
+
   public List<String> getColumnOrder() {
     return columnOrder;
   }
@@ -51,5 +53,17 @@ public class BaseTableSettings extends LocalJsonSettings {
       return dividerPositions.get(key);
     }
     return -1;
+  }
+
+  public Map<String, Boolean> getFlags() {
+    return flags;
+  }
+
+  public void setFlags(Map<String, Boolean> flags) {
+    this.flags = flags;
+  }
+
+  public boolean getFlag(@NonNull String key) {
+    return flags.getOrDefault(key, false);
   }
 }

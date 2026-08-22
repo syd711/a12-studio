@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
@@ -32,11 +33,14 @@ import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSec
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.HideConditionPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.localsettings.BaseTableSettings;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.ClipboardContent;
@@ -74,8 +78,14 @@ public class FormModelTreeController implements Initializable {
   private static final List<String> DROP_STYLE_CLASSES =
       List.of("tree-row-drop-above", "tree-row-drop-below", "tree-row-drop-into");
 
+  private static final String TABLE_SETTINGS_ID = ModelType.FORM.getValue();
+  private static final String TREE_DIVIDER_ID = "treeEditorDivider";
+
   @FXML
   private SearchFieldController searchController;
+
+  @FXML
+  private SplitPane treeEditorSplitPane;
 
   @FXML
   private TreeView<FormElementViewModel> tree;
@@ -155,6 +165,30 @@ public class FormModelTreeController implements Initializable {
       }
     });
     updateEditorPane(null);
+
+    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
+    applyDividerPosition(tableSettings);
+    treeEditorSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) ->
+        saveDividerPosition(newValue.doubleValue()));
+  }
+
+  private void applyDividerPosition(BaseTableSettings tableSettings) {
+    if (tableSettings == null) {
+      return;
+    }
+    double position = tableSettings.getDividerPosition(TREE_DIVIDER_ID);
+    if (position >= 0) {
+      treeEditorSplitPane.setDividerPosition(0, position);
+    }
+  }
+
+  private void saveDividerPosition(double position) {
+    BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
+    if (tableSettings == null) {
+      return;
+    }
+    tableSettings.getDividerPositions().put(TREE_DIVIDER_ID, position);
+    tableSettings.save();
   }
 
   /**

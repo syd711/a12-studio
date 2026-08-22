@@ -21,6 +21,12 @@ import de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.localsettings.BaseTableSettings;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -28,6 +34,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -121,8 +128,14 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private Tooltip pinDocumentRelationshipModelTooltip;
 
   private static final double DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION = 0.32;
+  private static final Duration DOCUMENT_RELATIONSHIP_MODEL_TOGGLE_DURATION = Duration.millis(200);
+
+  private static final String OVERVIEW_DIVIDER_ID = "overviewDivider";
+  private static final String DOCUMENT_RELATIONSHIP_MODEL_PINNED_FLAG = "documentRelationshipModelPinned";
+  private static final String DOCUMENT_RELATIONSHIP_MODEL_COLLAPSED_FLAG = "documentRelationshipModelCollapsed";
 
   private boolean documentRelationshipModelPinned = false;
+  private @Nullable Timeline documentRelationshipModelToggleTimeline;
 
   public void loadModel(@NonNull A12Model<?> model) {
     load((FormModel) model);
@@ -296,7 +309,9 @@ public class FormModelEditorController extends AbstractEditorController implemen
    * only whichever of the two is current and clamping {@code documentRelationshipModelPane}'s
    * maxWidth to that node's own preferred width so the SplitPane hands the freed-up width to the
    * sibling form model tree, moving the divider along with it. Re-expanding restores maxWidth and
-   * the divider's original position.
+   * the divider's original position. The transition is animated (200ms width + cross-fade); {@link
+   * #restoreDocumentRelationshipModelState()} calls the non-animated overload so restoring saved
+   * state on editor load doesn't flash.
    */
   @FXML
   private void onToggleDocumentRelationshipModelCollapsed() {
@@ -304,21 +319,68 @@ public class FormModelEditorController extends AbstractEditorController implemen
   }
 
   private void setDocumentRelationshipModelCollapsed(boolean collapsing) {
-    documentRelationshipModelExpandedPane.setVisible(!collapsing);
-    documentRelationshipModelExpandedPane.setManaged(!collapsing);
-    documentRelationshipModelCollapsedStrip.setVisible(collapsing);
-    documentRelationshipModelCollapsedStrip.setManaged(collapsing);
-    if (collapsing) {
-      documentRelationshipModelPane.setMaxWidth(44);
-      double totalWidth = overviewSplitPane.getWidth();
-      if (totalWidth > 0) {
-        overviewSplitPane.setDividerPosition(0, 44 / totalWidth);
+    setDocumentRelationshipModelCollapsed(collapsing, true);
+  }
+
+  private void setDocumentRelationshipModelCollapsed(boolean collapsing, boolean animate) {
+    if (documentRelationshipModelToggleTimeline != null) {
+      documentRelationshipModelToggleTimeline.stop();
+      documentRelationshipModelToggleTimeline = null;
+    }
+
+    double totalWidth = overviewSplitPane.getWidth();
+    double targetDividerPosition = collapsing
+        ? (totalWidth > 0 ? 44 / totalWidth : 0)
+        : (getSavedOverviewDividerPosition() >= 0 ? getSavedOverviewDividerPosition() : DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION);
+    Node showingNode = collapsing ? documentRelationshipModelCollapsedStrip : documentRelationshipModelExpandedPane;
+    Node hidingNode = collapsing ? documentRelationshipModelExpandedPane : documentRelationshipModelCollapsedStrip;
+
+    if (!animate || totalWidth <= 0) {
+      hidingNode.setVisible(false);
+      hidingNode.setManaged(false);
+      showingNode.setVisible(true);
+      showingNode.setManaged(true);
+      documentRelationshipModelPane.setMaxWidth(collapsing ? 44 : Double.MAX_VALUE);
+      if (totalWidth > 0 || !collapsing) {
+        overviewSplitPane.setDividerPosition(0, targetDividerPosition);
       }
+      saveFlag(DOCUMENT_RELATIONSHIP_MODEL_COLLAPSED_FLAG, collapsing);
+      return;
     }
-    else {
-      documentRelationshipModelPane.setMaxWidth(Double.MAX_VALUE);
-      overviewSplitPane.setDividerPosition(0, DOCUMENT_RELATIONSHIP_MODEL_DIVIDER_POSITION);
-    }
+
+    double startWidth = documentRelationshipModelPane.getWidth();
+    double targetWidth = collapsing ? 44 : targetDividerPosition * totalWidth;
+
+    documentRelationshipModelPane.setMaxWidth(startWidth);
+    showingNode.setOpacity(0);
+    showingNode.setVisible(true);
+    showingNode.setManaged(true);
+    hidingNode.setManaged(true);
+    overviewSplitPane.setDividerPosition(0, targetDividerPosition);
+
+    Timeline timeline = new Timeline(
+        new KeyFrame(Duration.ZERO,
+            new KeyValue(documentRelationshipModelPane.maxWidthProperty(), startWidth, Interpolator.EASE_BOTH),
+            new KeyValue(hidingNode.opacityProperty(), 1, Interpolator.EASE_BOTH),
+            new KeyValue(showingNode.opacityProperty(), 0, Interpolator.EASE_BOTH)),
+        new KeyFrame(DOCUMENT_RELATIONSHIP_MODEL_TOGGLE_DURATION,
+            new KeyValue(documentRelationshipModelPane.maxWidthProperty(), targetWidth, Interpolator.EASE_BOTH),
+            new KeyValue(hidingNode.opacityProperty(), 0, Interpolator.EASE_BOTH),
+            new KeyValue(showingNode.opacityProperty(), 1, Interpolator.EASE_BOTH)));
+    timeline.setOnFinished(event -> {
+      hidingNode.setVisible(false);
+      hidingNode.setManaged(false);
+      hidingNode.setOpacity(1);
+      showingNode.setOpacity(1);
+      documentRelationshipModelPane.setMaxWidth(collapsing ? 44 : Double.MAX_VALUE);
+      overviewSplitPane.setDividerPosition(0, targetDividerPosition);
+      documentRelationshipModelToggleTimeline = null;
+    });
+
+    documentRelationshipModelToggleTimeline = timeline;
+    timeline.play();
+
+    saveFlag(DOCUMENT_RELATIONSHIP_MODEL_COLLAPSED_FLAG, collapsing);
   }
 
   /**
@@ -329,12 +391,65 @@ public class FormModelEditorController extends AbstractEditorController implemen
   @FXML
   private void onTogglePinDocumentRelationshipModel() {
     documentRelationshipModelPinned = !documentRelationshipModelPinned;
+    applyPinVisuals();
+    saveFlag(DOCUMENT_RELATIONSHIP_MODEL_PINNED_FLAG, documentRelationshipModelPinned);
+  }
+
+  private void applyPinVisuals() {
     pinDocumentRelationshipModelIcon.setIconLiteral(documentRelationshipModelPinned ? "mdi2p-pin" : "mdi2p-pin-outline");
     pinDocumentRelationshipModelTooltip.setText(StudioBundle.get(documentRelationshipModelPinned ? "unpin" : "pin"));
   }
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    overviewSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
+      if (documentRelationshipModelExpandedPane.isVisible()) {
+        saveDividerPosition(newValue.doubleValue());
+      }
+    });
+    restoreDocumentRelationshipModelState();
+  }
+
+  private void restoreDocumentRelationshipModelState() {
+    BaseTableSettings tableSettings = getBaseTableSettings();
+    if (tableSettings == null) {
+      return;
+    }
+    documentRelationshipModelPinned = tableSettings.getFlag(DOCUMENT_RELATIONSHIP_MODEL_PINNED_FLAG);
+    applyPinVisuals();
+    boolean collapsed = tableSettings.getFlag(DOCUMENT_RELATIONSHIP_MODEL_COLLAPSED_FLAG);
+    if (collapsed) {
+      Platform.runLater(() -> setDocumentRelationshipModelCollapsed(true, false));
+    }
+    else {
+      double position = getSavedOverviewDividerPosition();
+      if (position >= 0) {
+        Platform.runLater(() -> overviewSplitPane.setDividerPosition(0, position));
+      }
+    }
+  }
+
+  private double getSavedOverviewDividerPosition() {
+    BaseTableSettings tableSettings = getBaseTableSettings();
+    return tableSettings == null ? -1 : tableSettings.getDividerPosition(OVERVIEW_DIVIDER_ID);
+  }
+
+  private void saveDividerPosition(double position) {
+    BaseTableSettings tableSettings = getBaseTableSettings();
+    if (tableSettings == null) {
+      return;
+    }
+    tableSettings.getDividerPositions().put(OVERVIEW_DIVIDER_ID, position);
+    tableSettings.save();
+  }
+
+  private void saveFlag(@NonNull String key, boolean value) {
+    BaseTableSettings tableSettings = getBaseTableSettings();
+    if (tableSettings == null) {
+      return;
+    }
+    tableSettings.getFlags().put(key, value);
+    tableSettings.save();
   }
 
   /**
