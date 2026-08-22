@@ -291,11 +291,16 @@ jobs:
       - name: Build Installer
         shell: pwsh
         run: |
-          $output = .\gradlew.bat :a12-studio-ui:buildInstaller --stacktrace 2>&1 | Out-String
-          Write-Host $output
-          if ($LASTEXITCODE -ne 0) {
-            $errorLines = $output -split "`n" | Where-Object { $_ -match "FAILED|Exception|Error|> Task" } | Select-Object -Last 20
-            Write-Host "::error::Gradle failed: $($errorLines -join ' | ')"
+          $proc = Start-Process -FilePath ".\gradlew.bat" `
+            -ArgumentList ":a12-studio-ui:buildInstaller", "--info" `
+            -NoNewWindow -Wait -PassThru `
+            -RedirectStandardOutput "gradle-out.txt" `
+            -RedirectStandardError "gradle-err.txt"
+          Get-Content gradle-out.txt | Select-Object -Last 80 | Write-Host
+          Get-Content gradle-err.txt | Write-Host
+          if ($proc.ExitCode -ne 0) {
+            $tail = (Get-Content gradle-out.txt | Select-Object -Last 30) -join "`n"
+            Write-Output "::error::Gradle buildInstaller failed (exit $($proc.ExitCode)): $tail"
             exit 1
           }
 
