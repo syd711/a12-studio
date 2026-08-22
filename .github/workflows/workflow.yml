@@ -289,7 +289,8 @@ jobs:
           Write-Host "Extracted version=$version app_version=$appVersion" 
 
       - name: Build Installer
-        run: .\gradlew.bat :a12-studio-ui:buildInstaller
+        run: .\gradlew.bat :a12-studio-ui:buildInstaller --stacktrace 2>&1
+        shell: cmd
 
       - name: Download macOS x64 Artifact
         uses: actions/download-artifact@v4
