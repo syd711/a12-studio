@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
-import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.Row;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.formmodel.NamePanelController;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
@@ -34,13 +34,14 @@ public class FormNodeEditorRowPanelController {
     labelController.configureCustom("label", "Label");
   }
 
-  public void setRow(@NonNull Row row, @Nullable DocumentModel documentModel) {
+  public void setRow(@NonNull Row row, @Nullable ElementIndex elementIndex,
+      HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     nameController.setCustom(row::getName, row::setName);
     labelController.setCustom(row::getTitle, row::setTitle);
     hideConditionController.configure(
         row::getHideConditionField, row::setHideConditionField,
         row::getHideConditionValue, row::setHideConditionValue,
-        documentModel);
+        elementIndex, hideConditionScope);
     stylesController.setCustom(row::getStyle, row::getStyle);
     annotationsController.setCustom(row::getAnnotations);
   }

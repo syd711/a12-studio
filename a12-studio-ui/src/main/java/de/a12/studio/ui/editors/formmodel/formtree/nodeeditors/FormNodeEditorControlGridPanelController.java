@@ -1,8 +1,8 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
-import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.ColumnLayout;
 import de.a12.studio.models.formmodel.ControlGrid;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.formmodel.NamePanelController;
 import de.a12.studio.ui.editors.formmodel.ResponsiveLayoutPanelController;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
@@ -43,7 +43,8 @@ public class FormNodeEditorControlGridPanelController {
     labelController.configureCustom("label", "Label");
   }
 
-  public void setControlGrid(@NonNull ControlGrid grid, @Nullable DocumentModel documentModel) {
+  public void setControlGrid(@NonNull ControlGrid grid, @Nullable ElementIndex elementIndex,
+      HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     nameController.setCustom(grid::getName, grid::setName);
     layoutController.setCustom(() -> grid.getLayout() != null ? grid.getLayout().getLg() : null,
         value -> getOrCreateLayout(grid).setLg(value));
@@ -52,7 +53,7 @@ public class FormNodeEditorControlGridPanelController {
     hideConditionController.configure(
         grid::getHideConditionField, grid::setHideConditionField,
         grid::getHideConditionValue, grid::setHideConditionValue,
-        documentModel);
+        elementIndex, hideConditionScope);
     stylesController.setCustom(grid::getStyle, grid::getStyle);
     annotationsController.setCustom(grid::getAnnotations);
   }

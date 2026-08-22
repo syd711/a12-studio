@@ -32,7 +32,7 @@
       </HBox>
     </VBox>
 
-    <TitledPane fx:id="enumerationValuesPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%enumeration_values">
+    <TitledPane fx:id="enumerationValuesPane" collapsible="false" maxWidth="Infinity" styleClass="titled-pane-child" text="%enumeration_values">
       <VBox spacing="10.0">
         <padding>
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

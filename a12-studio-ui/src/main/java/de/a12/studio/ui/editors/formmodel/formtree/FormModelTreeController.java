@@ -29,6 +29,7 @@ import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRep
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorScreenPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSectionPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.HideConditionPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
@@ -181,7 +182,7 @@ public class FormModelTreeController implements Initializable {
         || isControlGrid || isControl || isConfirmControl || isRepeat));
 
     if (isRow) {
-      rowEditorController.setRow((Row) node, documentModel);
+      rowEditorController.setRow((Row) node, elementIndex, containerHideConditionScope(selectedItem));
     }
     else if (isMultiColumnSection) {
       multiColumnSectionEditorController.setSection((MultiColumnSection) node);
@@ -190,10 +191,10 @@ public class FormModelTreeController implements Initializable {
       screenEditorController.setScreen((Screen) node, screenIds());
     }
     else if (isSection) {
-      sectionEditorController.setSection((Section) node, documentModel);
+      sectionEditorController.setSection((Section) node, elementIndex, containerHideConditionScope(selectedItem));
     }
     else if (isControlGrid) {
-      controlGridEditorController.setControlGrid((ControlGrid) node, documentModel);
+      controlGridEditorController.setControlGrid((ControlGrid) node, elementIndex, containerHideConditionScope(selectedItem));
     }
     else if (isControl) {
       controlEditorController.setControl((Control) node, documentModel, elementIndex, content);
@@ -202,8 +203,36 @@ public class FormModelTreeController implements Initializable {
       confirmControlEditorController.setControl((Control) node, documentModel, elementIndex, content);
     }
     else if (isRepeat) {
-      repeatEditorController.setRepeat((AbstractRepeat) node, documentModel, content);
+      repeatEditorController.setRepeat((AbstractRepeat) node, documentModel, content,
+          elementIndex, containerHideConditionScope(selectedItem));
     }
+  }
+
+  /**
+   * Where a Section/Row/ControlGrid/Repeat node should look for hide-condition master fields: anchored at the
+   * Document Model group the nearest ancestor {@link AbstractRepeat} iterates over ({@code groupRef}), or -
+   * when this node isn't nested in any Repeat - {@link HideConditionPanelController.MasterFieldScope#root()},
+   * mirroring the SME reference's {@code resolveClosestRepeatGroupOrRoot}.
+   */
+  private HideConditionPanelController.@NonNull MasterFieldScope containerHideConditionScope(
+      @Nullable TreeItem<FormElementViewModel> selectedItem) {
+    AbstractRepeat ancestorRepeat = findAncestorRepeat(selectedItem);
+    return ancestorRepeat == null
+        ? HideConditionPanelController.MasterFieldScope.root()
+        : HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(ancestorRepeat.getGroupRef(), elementIndex);
+  }
+
+  // Walks strictly upward from the selected tree item (never including it) to find the nearest enclosing Repeat.
+  private static @Nullable AbstractRepeat findAncestorRepeat(@Nullable TreeItem<FormElementViewModel> item) {
+    TreeItem<FormElementViewModel> current = item == null ? null : item.getParent();
+    while (current != null) {
+      Object node = current.getValue() != null ? current.getValue().getNode() : null;
+      if (node instanceof AbstractRepeat repeat) {
+        return repeat;
+      }
+      current = current.getParent();
+    }
+    return null;
   }
 
   private static void setVisible(@NonNull Node node, boolean visible) {

@@ -69,7 +69,7 @@
                                                </VBox>
                                            </center>
                                        </BorderPane>
-                                       <VBox fx:id="documentRelationshipModelCollapsedStrip" alignment="TOP_CENTER" managed="false" onMouseClicked="#onToggleDocumentRelationshipModelCollapsed" styleClass="sidebar-panel-strip" visible="false">
+                                       <VBox fx:id="documentRelationshipModelCollapsedStrip" alignment="TOP_CENTER" managed="false" maxWidth="44.0" minWidth="44.0" onMouseClicked="#onToggleDocumentRelationshipModelCollapsed" prefWidth="44.0" styleClass="sidebar-panel-strip" visible="false">
                                            <children>
                                                <FontIcon iconLiteral="mdi2c-chevron-right" iconSize="16" styleClass="sidebar-panel-strip-icon" />
                                                <Group rotate="-90.0">

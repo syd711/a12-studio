@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
-import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.Section;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
@@ -34,13 +34,14 @@ public class FormNodeEditorSectionPanelController {
     labelController.configureCustom("label", "Label");
   }
 
-  public void setSection(@NonNull Section section, @Nullable DocumentModel documentModel) {
+  public void setSection(@NonNull Section section, @Nullable ElementIndex elementIndex,
+      HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     nameController.setSection(section);
     labelController.setCustom(section::getTitle, section::setTitle);
     hideConditionController.configure(
         section::getHideConditionField, section::setHideConditionField,
         section::getHideConditionValue, section::setHideConditionValue,
-        documentModel);
+        elementIndex, hideConditionScope);
     stylesController.setCustom(section::getStyle, section::getStyle);
     annotationsController.setCustom(section::getAnnotations);
   }

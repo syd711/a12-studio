@@ -152,6 +152,10 @@ public class MenuBarController implements Initializable, StudioEventListener {
         project = new Project();
         project.load(file);
         autoDetectApplicationGroups(project);
+
+        Platform.runLater(()-> {
+          StudioEventManager.getInstance().fireProjectOpenEvent(project);
+        });
       }
 
       @Override
@@ -161,7 +165,6 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
       @Override
       public void finalizeModel(ProgressResultModel progressResultModel) {
-        StudioEventManager.getInstance().fireProjectOpenEvent(project);
         refreshRecentProjectsMenu();
         refreshProjectDependentButtons();
       }

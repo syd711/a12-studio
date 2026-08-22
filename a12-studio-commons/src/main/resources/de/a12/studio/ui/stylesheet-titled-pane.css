@@ -38,6 +38,10 @@
     -fx-font-size: 12px;
 }
 
+.titled-pane.titled-pane-child > .title > .text {
+    -fx-font-size: 14px;
+}
+
 .titled-pane:collapsed > .title > .text {
     -fx-fill: -fx-text-faint;
 }
@@ -62,16 +66,16 @@
 
 /*
  * Nested TitledPane shown as a child inside another TitledPane's content. Rather than repeating
- * the full card treatment, it's flattened to a plain header with a left accent line running down
- * through its header and body, signalling "this is a subsection" without nesting another card.
+ * the full card treatment, it's flattened to a plain header, signalling "this is a subsection"
+ * without nesting another card. Always expanded (FXML sets collapsible="false") - the arrow
+ * toggle is hidden to match, since there is nothing left for it to do.
  */
 .titled-pane-child {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
-    -fx-border-color: transparent transparent transparent -fx-titled-pane-border;
-    -fx-border-width: 0 0 0 2px;
+    -fx-border-width: 0;
     -fx-border-radius: 0;
-    -fx-padding: 0 0 0 14px;
+    -fx-padding: 0;
 }
 
 .titled-pane-child > .title,
@@ -80,6 +84,13 @@
     -fx-background-radius: 0;
     -fx-border-width: 0;
     -fx-padding: 4px 0 4px 2px;
+}
+
+.titled-pane-child > .title > .arrow-button {
+    -fx-padding: 0;
+    -fx-min-width: 0;
+    -fx-pref-width: 0;
+    -fx-max-width: 0;
 }
 
 .titled-pane-child > *.content {

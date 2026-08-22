@@ -1,6 +1,9 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.GroupConfig;
+import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextReadonlyPanelController;
@@ -68,15 +71,10 @@ public class FieldInformationPanelController {
 
     fieldIdLabel.setText(elementRef);
 
-    Optional<FieldElement> field = elementIndex.resolveElement(elementRef)
-        .filter(FieldElement.class::isInstance)
-        .map(FieldElement.class::cast);
+    Optional<Element> resolved = elementIndex.resolveElement(elementRef);
 
     // Data type
-    dataTypeLabel.setText(field
-        .map(FieldElement::getField)
-        .map(config -> config.getFieldType() != null ? config.getFieldType().getType() : null)
-        .orElse("–"));
+    dataTypeLabel.setText(resolved.map(FieldInformationPanelController::describeDataType).orElse("–"));
 
     // Document Model Path — slash-separated, as resolved by ElementIndex (falls back to the raw id
     // when unresolvable, i.e. a dangling reference).
@@ -85,7 +83,27 @@ public class FieldInformationPanelController {
         Arrays.stream(path.split("/")).filter(segment -> !segment.isEmpty()).toList()));
 
     // Internal description (read-only via setCustom with write supplier pointing to the same list)
-    internalDescriptionController.setCustom(() -> field.map(FieldElement::getInternalDescription).orElseGet(List::of));
+    internalDescriptionController.setCustom(() -> resolved.map(Element::getInternalDescription).orElseGet(List::of));
+  }
+
+  /**
+   * Mirrors {@code ElementViewModel.getType()}: a plain {@link FieldElement} shows its {@code FieldType},
+   * while a {@link GroupElement} with {@code usageType == "multi-select"} (e.g. a "Pronouns" multi-select
+   * group) is not a {@link FieldElement} at all, so it must be special-cased here rather than falling
+   * through to "–".
+   */
+  private static String describeDataType(Element element) {
+    if (element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() != null) {
+      return fieldElement.getField().getFieldType().getType();
+    }
+    if (element instanceof GroupElement groupElement
+        && groupElement.getGroup() != null
+        && GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType())) {
+      return "Multi-Select";
+    }
+    return "–";
   }
 
   private void clearAll(@Nullable String elementRef) {

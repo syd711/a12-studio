@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
@@ -51,7 +52,9 @@ public class FormNodeEditorRepeatPanelController {
 
   public void setRepeat(@NonNull AbstractRepeat repeat,
       @Nullable DocumentModel documentModel,
-      @Nullable FormModelContent content) {
+      @Nullable FormModelContent content,
+      @Nullable ElementIndex elementIndex,
+      HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     fieldInformationController.setRepeat(repeat, documentModel);
     labelController.setRepeat(repeat, content);
     hintController.setRepeat(repeat, content);
@@ -62,7 +65,7 @@ public class FormNodeEditorRepeatPanelController {
     hideConditionController.configure(
         repeat::getHideConditionField, repeat::setHideConditionField,
         repeat::getHideConditionValue, repeat::setHideConditionValue,
-        documentModel);
+        elementIndex, hideConditionScope);
     stylesController.setCustom(repeat::getStyle, repeat::getStyle);
     headerStylesController.setRepeat(repeat);
     annotationsController.setCustom(repeat::getAnnotations);

@@ -50,7 +50,7 @@
         </rowConstraints>
     </GridPane>
 
-    <TitledPane fx:id="suggestionsPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%suggestions">
+    <TitledPane fx:id="suggestionsPane" collapsible="false" maxWidth="Infinity" styleClass="titled-pane-child" text="%suggestions">
       <VBox spacing="8.0">
         <padding>
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

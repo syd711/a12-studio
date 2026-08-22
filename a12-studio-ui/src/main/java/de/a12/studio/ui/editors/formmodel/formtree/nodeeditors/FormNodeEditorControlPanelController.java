@@ -24,6 +24,8 @@ import org.jspecify.annotations.Nullable;
  *       "Field Configuration" and "Control".</li>
  *   <li><b>Placeholder</b> ({@link ControlPlaceholderPanelController}) — two plain localized text sub-editors:
  *       "Field Configuration" and "Control".</li>
+ *   <li><b>Layout</b> ({@link ControlLayoutPanelController}) — offset/span grid values per responsive
+ *       breakpoint (lg/md/sm), on {@link Control#getOffset()} and {@link Control#getSpan()}.</li>
  *   <li><b>Hide Condition</b> ({@link HideConditionPanelController}) — boolean field selector and condition
  *       value combo, populated from the linked Document Model's boolean fields. Note: {@link Control} does not
  *       extend {@link de.a12.studio.models.formmodel.ScreenElement}, so it carries its own
@@ -35,8 +37,6 @@ import org.jspecify.annotations.Nullable;
  *   <li><b>Annotations</b> ({@link AnnotationsPanelController}) — model annotations on
  *       {@link Control#getAnnotations()}.</li>
  * </ol>
- * The "Layout" section (offset / span) is intentionally omitted for now — it will be added in a separate step
- * once the layout editor components are in place.
  */
 public class FormNodeEditorControlPanelController {
 
@@ -48,6 +48,8 @@ public class FormNodeEditorControlPanelController {
   private ControlHintPanelController hintController;
   @FXML
   private ControlPlaceholderPanelController placeholderController;
+  @FXML
+  private ControlLayoutPanelController layoutController;
   @FXML
   private HideConditionPanelController hideConditionController;
   @FXML
@@ -65,10 +67,11 @@ public class FormNodeEditorControlPanelController {
     labelController.setControl(control, documentModel, content);
     hintController.setControl(control, content);
     placeholderController.setControl(control, content);
+    layoutController.setControl(control);
     hideConditionController.configure(
         control::getHideConditionField, control::setHideConditionField,
         control::getHideConditionValue, control::setHideConditionValue,
-        documentModel);
+        elementIndex, HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(control.getElementRef(), elementIndex));
     accessibilityController.setControl(control);
     stylesController.setCustom(control::getStyle, control::getStyle);
     annotationsController.setCustom(control::getAnnotations);

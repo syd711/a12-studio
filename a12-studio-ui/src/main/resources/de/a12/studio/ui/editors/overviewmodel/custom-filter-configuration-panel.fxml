@@ -106,7 +106,7 @@
                     </VBox>
 
                     <!-- Filter Selector -->
-                    <TitledPane fx:id="filterSelectorPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%filter_selector">
+                    <TitledPane fx:id="filterSelectorPane" collapsible="false" maxWidth="Infinity" styleClass="titled-pane-child" text="%filter_selector">
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -170,7 +170,7 @@
                     </TitledPane>
 
                     <!-- Header Subtitle -->
-                    <TitledPane fx:id="headerSubtitlePane" maxWidth="Infinity" styleClass="titled-pane-child" text="%header_subtitle">
+                    <TitledPane fx:id="headerSubtitlePane" collapsible="false" maxWidth="Infinity" styleClass="titled-pane-child" text="%header_subtitle">
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -182,7 +182,7 @@
                     </TitledPane>
 
                     <!-- Search Bar -->
-                    <TitledPane fx:id="searchBarPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%search_bar">
+                    <TitledPane fx:id="searchBarPane" collapsible="false" maxWidth="Infinity" styleClass="titled-pane-child" text="%search_bar">
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -211,7 +211,7 @@
                     </TitledPane>
 
                     <!-- Filter Button -->
-                    <TitledPane fx:id="filterButtonPane" maxWidth="Infinity" styleClass="titled-pane-child" text="%filter_button">
+                    <TitledPane fx:id="filterButtonPane" collapsible="false" maxWidth="Infinity" styleClass="titled-pane-child" text="%filter_button">
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
