@@ -445,10 +445,6 @@ public class FormModelTreeController implements Initializable {
       return;
     }
     tree.getSelectionModel().select(item);
-    int row = tree.getRow(item);
-    if (row >= 0) {
-      tree.scrollTo(row);
-    }
   }
 
   private TreeItem<FormElementViewModel> findTreeItem(TreeItem<FormElementViewModel> item, @NonNull Object node) {

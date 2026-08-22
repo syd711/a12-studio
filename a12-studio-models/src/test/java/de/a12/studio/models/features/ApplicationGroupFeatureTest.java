@@ -3,6 +3,7 @@ package de.a12.studio.models.features;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.TestHelper;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.Directive;
@@ -167,20 +168,10 @@ class ApplicationGroupFeatureTest {
   }
 
   private static Path copyBasicProject(Path tempDir) throws IOException {
-    Path source = resolveTestingBasicDir();
+    Path source = TestHelper.resolveTestingBasicDir();
     Path projectDir = tempDir.resolve("basic");
     copyDirectory(source, projectDir);
     return projectDir;
-  }
-
-  private static Path resolveTestingBasicDir() {
-    for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
-      Path candidate = dir.resolve("testing").resolve("basic");
-      if (Files.isDirectory(candidate)) {
-        return candidate;
-      }
-    }
-    throw new IllegalStateException("Could not locate 'testing/basic' above " + Path.of("").toAbsolutePath());
   }
 
   private static void copyDirectory(Path source, Path target) throws IOException {
