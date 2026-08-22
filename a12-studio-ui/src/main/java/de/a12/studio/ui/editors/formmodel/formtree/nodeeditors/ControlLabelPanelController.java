@@ -42,7 +42,7 @@ public class ControlLabelPanelController extends AbstractPropertyEditor implemen
   private LocalizedTextReadonlyPanelController documentModelLabelController;
 
   @FXML
-  private LocalizedTextReadonlyPanelController fieldConfigLabelController;
+  private LocalizedTextTypePanelController fieldConfigLabelController;
 
   @FXML
   private LocalizedTextTypePanelController controlLabelController;
@@ -58,7 +58,7 @@ public class ControlLabelPanelController extends AbstractPropertyEditor implemen
   public void setControl(@NonNull Control control, @Nullable DocumentModel documentModel, @Nullable FormModelContent content) {
     FieldConfigEntry entry = FieldConfigEntryHelper.findOrCreate(control, content);
     documentModelLabelController.setCustom(() -> findFieldLabel(control.getElementRef(), documentModel));
-    fieldConfigLabelController.setCustom(() -> textsOf(entry.getLabel()));
+    fieldConfigLabelController.setCustom(entry::getLabel, entry::setLabel);
     controlLabelController.setCustom(control::getLabel, control::setLabel);
   }
 

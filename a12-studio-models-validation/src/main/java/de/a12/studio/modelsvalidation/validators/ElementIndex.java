@@ -121,7 +121,7 @@ public class ElementIndex {
     if (elementId == null) {
       return null;
     }
-    return resolve(elementId, new HashSet<>(List.of(model.getId()))).orElse(elementId);
+    return resolve(elementId, new HashSet<>(List.of(model.getId()))).map(Resolution::path).orElse(elementId);
   }
 
   /** Whether {@code elementId} resolves to an actual element, direct or through an Include (see {@link
@@ -131,10 +131,23 @@ public class ElementIndex {
     return elementId != null && resolve(elementId, new HashSet<>(List.of(model.getId()))).isPresent();
   }
 
-  private Optional<String> resolve(String elementId, Set<String> visitedModelIds) {
+  /**
+   * Resolves {@code elementId} to the actual {@link Element} it refers to, direct or through an Include (see
+   * {@link #resolveDisplayPath} for the reference-resolution rules). Unlike {@link #resolveDisplayPath}, this
+   * returns the element itself - e.g. so a caller can inspect a {@link FieldElement}'s {@code FieldType} -
+   * rather than just its display path. Empty when {@code elementId} is a dangling reference, or {@code null}.
+   */
+  public Optional<Element> resolveElement(String elementId) {
+    if (elementId == null) {
+      return Optional.empty();
+    }
+    return resolve(elementId, new HashSet<>(List.of(model.getId()))).map(Resolution::element);
+  }
+
+  private Optional<Resolution> resolve(String elementId, Set<String> visitedModelIds) {
     Optional<Element> direct = findById(elementId);
     if (direct.isPresent()) {
-      return Optional.of(getPath(direct.get()));
+      return Optional.of(new Resolution(direct.get(), getPath(direct.get())));
     }
     for (Element element : all) {
       if (!(element instanceof GroupElement group) || group.getGroup() == null
@@ -150,13 +163,15 @@ public class ElementIndex {
           || !visitedModelIds.add(included.getId())) {
         continue;
       }
-      Optional<String> innerPath = new ElementIndex(included, otherModels).resolve(elementId.substring(prefix.length()), visitedModelIds);
-      if (innerPath.isPresent()) {
-        return Optional.of(getPath(group) + innerPath.get());
+      Optional<Resolution> inner = new ElementIndex(included, otherModels).resolve(elementId.substring(prefix.length()), visitedModelIds);
+      if (inner.isPresent()) {
+        return Optional.of(new Resolution(inner.get().element(), getPath(group) + inner.get().path()));
       }
     }
     return Optional.empty();
   }
+
+  private record Resolution(Element element, String path) {}
 
   private DocumentModel resolveIncludedModel(String reference) {
     if (reference == null) {

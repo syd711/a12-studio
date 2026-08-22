@@ -196,10 +196,10 @@ public class FormModelTreeController implements Initializable {
       controlGridEditorController.setControlGrid((ControlGrid) node, documentModel);
     }
     else if (isControl) {
-      controlEditorController.setControl((Control) node, documentModel, content);
+      controlEditorController.setControl((Control) node, documentModel, elementIndex, content);
     }
     else if (isConfirmControl) {
-      confirmControlEditorController.setControl((Control) node, documentModel, content);
+      confirmControlEditorController.setControl((Control) node, documentModel, elementIndex, content);
     }
     else if (isRepeat) {
       repeatEditorController.setRepeat((AbstractRepeat) node, documentModel, content);

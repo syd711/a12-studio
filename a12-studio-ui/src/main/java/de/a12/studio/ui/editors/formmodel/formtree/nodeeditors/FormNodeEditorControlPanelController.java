@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
@@ -58,8 +59,9 @@ public class FormNodeEditorControlPanelController {
 
   public void setControl(@NonNull Control control,
       @Nullable DocumentModel documentModel,
+      @Nullable ElementIndex elementIndex,
       @Nullable FormModelContent content) {
-    fieldInformationController.setControl(control, documentModel);
+    fieldInformationController.setControl(control, elementIndex);
     labelController.setControl(control, documentModel, content);
     hintController.setControl(control, content);
     placeholderController.setControl(control, content);

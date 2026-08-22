@@ -29,9 +29,9 @@
     ],
     "modelReferences": [
       {
-        "purpose": "document-model-for-overview",
-        "modelType": "document",
         "alias": "DM",
+        "modelType": "document",
+        "purpose": "document-model-for-overview",
         "reference": "Company_DM"
       }
     ]
@@ -41,15 +41,18 @@
       "enableFilter": true,
       "showFullTextSearch": true,
       "pagingSize": 10,
+      "showRowCount": true,
       "newFilterConfiguration": {
         "filterSelector": {
           "viewMode": "overlay",
           "initialVisibility": "hide",
           "searchBar": {
-            "enabled": false
+            "enabled": false,
+            "value": null
           },
           "showSetFiltersOnly": {
-            "enabled": false
+            "enabled": false,
+            "value": null
           },
           "trigger": {
             "enabled": true,
@@ -57,7 +60,8 @@
           }
         },
         "joinOperator": {
-          "enabled": false
+          "enabled": false,
+          "value": null
         },
         "invert": {
           "enabled": true,
@@ -80,55 +84,16 @@
             "filterItems": [
               {
                 "id": "filter-item-95c06",
-                "type": "string",
-                "options": {
-                  "fieldId": "field_67684",
-                  "invert": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "empty": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "caseSensitive": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "exactMatch": {
-                    "enabled": true,
-                    "value": false
-                  }
-                }
+                "type": "string"
               },
               {
                 "id": "filter-item-13b70",
-                "type": "string",
-                "options": {
-                  "fieldId": "field_16af2",
-                  "invert": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "empty": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "caseSensitive": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "exactMatch": {
-                    "enabled": true,
-                    "value": false
-                  }
-                }
+                "type": "string"
               }
             ]
           }
         ]
-      },
-      "showRowCount": true
+      }
     },
     "columns": [
       {
@@ -143,20 +108,20 @@
             "text": "Logo"
           }
         ],
-        "width": 1,
+        "width": 1.0,
         "elementRef": "group_8e00a",
         "sortable": false
       },
       {
         "id": "column-4949b",
-        "width": 1,
+        "width": 1.0,
         "elementRef": "field_67684",
         "sortable": true,
         "preferredSorting": "ASC"
       },
       {
         "id": "column-9d296",
-        "width": 1,
+        "width": 1.0,
         "elementRef": "field_16af2",
         "sortable": false
       }
@@ -199,6 +164,10 @@
       "leftSlot": [
         {
           "type": "button",
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
           "label": [
             {
               "locale": "en",
@@ -209,10 +178,6 @@
               "text": "Neu"
             }
           ],
-          "event": "add",
-          "icon": {
-            "name": "add"
-          },
           "destructive": false,
           "primary": false
         }
