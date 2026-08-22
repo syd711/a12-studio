@@ -76,6 +76,10 @@ jobs:
         run: |
           echo "app_version=${{ steps.project.outputs.app_version }}"
           echo "version=${{ steps.project.outputs.version }}"
+          echo "--- JRE folder contents ---"
+          ls -la ../${{ matrix.jre_folder }} || echo "JRE folder missing!"
+          echo "--- jpackage version ---"
+          jpackage --version
           jpackage --name A12-Studio \
             --input input \
             --app-version ${{ steps.project.outputs.app_version }} \
