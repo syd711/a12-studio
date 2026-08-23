@@ -7,6 +7,7 @@ import de.a12.studio.models.projects.settings.AdvancedSettings;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -35,9 +36,7 @@ public final class ApplicationGroupValidator implements ModelValidator {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "This model's application group (\"" + (actualGroup == null ? "" : actualGroup)
-            + "\") does not match the project's configured application group \"" + expectedGroup
-            + "\". Re-apply the Application Group feature to fix this.",
+        ValidationMessages.get("validation.applicationGroup.mismatch", actualGroup == null ? "" : actualGroup, expectedGroup),
         Severity.ERROR.name()));
   }
 

@@ -10,6 +10,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -48,14 +49,14 @@ public final class NumberFieldValueLimitValidator implements ModelValidator {
       double maxAllowedValue = Math.pow(10.0, MAX_DIGITS - maxDecimalPlaces) - Math.pow(10.0, -maxDecimalPlaces);
       if (numberType.getMaxValue() != null && numberType.getMaxValue() > maxAllowedValue) {
         errors.add(new ModelValidationError(model, field.getId(), ElementProperty.DATA_TYPE,
-            "The maximum value of the number type in field [id: " + field.getId() + "] is specified with '" + numberType.getMaxValue()
-                + "'. It may not exceed '" + printLimit(maxAllowedValue, maxDecimalPlaces) + "'.",
+            ValidationMessages.get("validation.numberFieldValueLimit.maxExceeded", field.getId(), numberType.getMaxValue(),
+                printLimit(maxAllowedValue, maxDecimalPlaces)),
             Severity.ERROR.name()));
       }
       if (numberType.getMinValue() != null && Math.abs(numberType.getMinValue()) > maxAllowedValue) {
         errors.add(new ModelValidationError(model, field.getId(), ElementProperty.DATA_TYPE,
-            "The minimum value of the number type in field [id: " + field.getId() + "] is specified with '" + numberType.getMinValue()
-                + "'. It may not exceed '-" + printLimit(maxAllowedValue, maxDecimalPlaces) + "'.",
+            ValidationMessages.get("validation.numberFieldValueLimit.minExceeded", field.getId(), numberType.getMinValue(),
+                printLimit(maxAllowedValue, maxDecimalPlaces)),
             Severity.ERROR.name()));
       }
     }

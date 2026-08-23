@@ -9,6 +9,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
@@ -39,7 +40,7 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
     List<FieldRef> fields = filterConfig.getFields();
     if (fields.isEmpty()) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "At least one field must be selected for a custom field selection.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.overviewFilterCustomFields.empty"), Severity.ERROR.name()));
     }
 
     List<ModelValidationError> errors = new ArrayList<>();
@@ -51,7 +52,7 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
       }
       if (!seen.add(fieldId)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The field \"" + fieldId + "\" is selected more than once.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.overviewFilterCustomFields.duplicate", fieldId), Severity.ERROR.name()));
       }
     }
 
@@ -68,15 +69,12 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
       Element element = OverviewElementResolution.resolve(index, fieldId);
       if (element == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The reference is invalid. The referenced field \"" + fieldId + "\" does not exist in the document model.",
-            Severity.ERROR.name()));
+            ValidationMessages.get("validation.common.fieldReferenceMissing", fieldId), Severity.ERROR.name()));
         continue;
       }
       if (OverviewElementResolution.isIndexedFalse(element)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The \"indexed\" annotation of field \"" + element.getName()
-                + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
-            Severity.ERROR.name()));
+            ValidationMessages.get("validation.common.indexedAnnotationFalse", element.getName()), Severity.ERROR.name()));
       }
     }
     return errors;

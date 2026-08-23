@@ -5,6 +5,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,7 @@ public final class SchemaVersionValidator implements ModelValidator {
     String version = documentModel.getModelVersion();
     if (version == null || !VERSION_PATTERN.matcher(version).matches()) {
       errors.add(error(model,
-          "Document model version " + version + " does not match proper version schema. Expected version is " + COMPATIBLE_SCHEMA_VERSION
-              + "."));
+          ValidationMessages.get("validation.schemaVersion.unparsable", version, COMPATIBLE_SCHEMA_VERSION)));
       return errors;
     }
     Matcher actual = VERSION_PATTERN.matcher(version);
@@ -43,8 +43,7 @@ public final class SchemaVersionValidator implements ModelValidator {
     boolean compatibleVersion = Integer.parseInt(actual.group(1)) == Integer.parseInt(compatible.group(1))
         && Double.parseDouble(compatible.group(2)) >= Double.parseDouble(actual.group(2));
     if (!compatibleVersion) {
-      errors.add(error(model, "Version mismatch: Document model version is " + version + " and application version is "
-          + COMPATIBLE_SCHEMA_VERSION + "."));
+      errors.add(error(model, ValidationMessages.get("validation.schemaVersion.mismatch", version, COMPATIBLE_SCHEMA_VERSION)));
     }
     return errors;
   }

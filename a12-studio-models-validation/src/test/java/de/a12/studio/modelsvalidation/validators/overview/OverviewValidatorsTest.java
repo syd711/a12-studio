@@ -73,6 +73,17 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void filterGroupsValidatorReportsMissingIdMissingFieldAndUnindexedField() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterGroupsValidator_invalid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFilterGroupsValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    // Missing group id, a filter item with no field reference, plus a field reference annotated indexed=false.
+    assertEquals(3, errors.size());
+  }
+
+  @Test
   void pagingSizeValidatorReportsInvalidValue() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewPagingSizeValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewPagingSizeValidator().validate(model, TestModels.context(model));

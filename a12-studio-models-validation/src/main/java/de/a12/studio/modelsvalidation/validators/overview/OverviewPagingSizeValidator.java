@@ -5,6 +5,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public final class OverviewPagingSizeValidator implements ModelValidator {
     if (pagingSize == null || pagingSize >= 1) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "Paging Size must be at least 1.", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID,
+        ValidationMessages.get("validation.overviewPagingSize.tooLow"), Severity.ERROR.name()));
   }
 }

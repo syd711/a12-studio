@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,19 +25,19 @@ public final class NameConventionValidator implements ModelValidator {
   public List<ModelValidationError> validate(A12Model<?> model, ValidationContext context) {
     String id = model.getId();
     if (id == null || id.isBlank()) {
-      return List.of(new ModelValidationError(model, ELEMENT_ID, "The model name must not be empty.", Severity.ERROR.name()));
+      return List.of(new ModelValidationError(model, ELEMENT_ID,
+          ValidationMessages.get("validation.nameConvention.empty"), Severity.ERROR.name()));
     }
 
     List<ModelValidationError> errors = new ArrayList<>();
     if (!NAME_PATTERN.matcher(id).matches()) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "Model names must only consist of letters, digits, hyphens, underscores and periods, may only start "
-              + "with an underscore or letter and must be at most 100 characters long.",
+          ValidationMessages.get("validation.nameConvention.invalidCharacters"),
           Severity.ERROR.name()));
     }
     if (id.toLowerCase().startsWith("xml")) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "Model names must not start with \"xml\".", Severity.ERROR.name()));
+          ValidationMessages.get("validation.nameConvention.xmlPrefix"), Severity.ERROR.name()));
     }
     return errors;
   }

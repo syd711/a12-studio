@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public final class ModelIdFilenameValidator implements ModelValidator {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "The model name \"" + model.getId() + "\" differs from the file name \"" + fileName + "\". Model name and file name must match.",
+        ValidationMessages.get("validation.modelIdFilename.mismatch", model.getId(), fileName),
         Severity.ERROR.name()));
   }
 }

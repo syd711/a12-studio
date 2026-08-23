@@ -17,6 +17,7 @@ import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -99,8 +100,7 @@ public final class ControlGridLayoutValidator implements ModelValidator {
     }
     if (total > columnCount) {
       errors.add(new ModelValidationError(model, grid.getId(),
-          "Form model field [" + grid.getName() + "] contains a wrong number of columns for layout lg. The expected "
-              + "number of columns is " + columnCount + " but there are " + total + " defined columns.",
+          ValidationMessages.get("validation.controlGridLayout.wrongColumnCount", grid.getName(), columnCount, total),
           Severity.ERROR.name()));
     }
   }
@@ -114,8 +114,8 @@ public final class ControlGridLayoutValidator implements ModelValidator {
         int position = cumulative + offset;
         if (position > columnCount) {
           errors.add(new ModelValidationError(model, cell.getId(),
-              "The element [" + cell.getId() + "] exceeds for layout " + breakpoint + " with offset [" + offset
-                  + "] the defined maximum index [" + columnCount + "] for the control grid [" + grid.getName() + "].",
+              ValidationMessages.get("validation.controlGridLayout.exceedsMaxIndex", cell.getId(), breakpoint, offset, columnCount,
+                  grid.getName()),
               Severity.ERROR.name()));
         }
         cumulative = position + valueOrDefault(cell.getSpan(), breakpoint, 1);

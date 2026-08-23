@@ -9,6 +9,7 @@ import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
@@ -46,8 +47,7 @@ public final class FormFieldReferenceValidator implements ModelValidator {
       if (entry.getElementRef() != null && !entry.getElementRef().isBlank()
           && !knownElementIds.contains(entry.getElementRef())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The field \"" + entry.getElementRef()
-                + "\" is referenced in the Form Model but does not exist in the referenced Document Model.",
+            ValidationMessages.get("validation.formFieldReference.missing", entry.getElementRef()),
             Severity.ERROR.name()));
       }
     }

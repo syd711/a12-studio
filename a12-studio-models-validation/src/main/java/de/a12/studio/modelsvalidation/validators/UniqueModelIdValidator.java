@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public final class UniqueModelIdValidator implements ModelValidator {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "The chosen name already exists in the workspace, please choose another name.",
+        ValidationMessages.get("validation.uniqueModelId.duplicate"),
         Severity.ERROR.name()));
   }
 }

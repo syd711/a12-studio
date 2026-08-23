@@ -12,15 +12,16 @@ import java.util.List;
 /**
  * One entry of a {@link FilterGroup#getFilterItems()}. Covers the properties the platform docs ({@code
  * overview_engine-overviewengine-dev-docs.md} / {@code sme-sme-om-ba-docs.md}, "Filter Items") describe as
- * common to every filter item: a Field Reference ({@link #fieldRef}), the derived {@link #type}, {@link
- * #showInFilterBar}, {@link #collapsed}, and {@link #label}/{@link #icon}.
+ * common to every filter item: a Field Reference ({@link #options}' {@code fieldId}), the derived {@link #type},
+ * {@link #showInFilterBar}, {@link #collapsed}, and {@link #label}/{@link #icon}.
  * <p>
- * NOTE: unlike {@link FilterSelectorConfig}/{@link FilterTriggerConfig} (verified against {@code
- * testing/basic/models/Company_OM.json}), no fixture or SME reference exists anywhere in this codebase for a
- * populated {@code filterGroups} entry - {@code Company_OM.json}'s is {@code []}. The field-type-specific option
- * groups the docs describe (Boolean/Confirm criteria, String view mode, Enumeration initial criteria/pinned
- * values, Number ranges, Date/Time ranges and periods) and Filter-Definition-based (query) items are therefore
- * intentionally not modeled here - only Field Reference-based items are supported for now, matching how {@link
+ * The field reference lives under {@link #options} (SME's actual shape: {@code options.fieldId}), not as a
+ * sibling {@code fieldRef}/{@code FieldRef} property - that was this class's original (incorrect) guess, which
+ * caused every open/save cycle through the Overview Model editor to silently drop the field reference via {@code
+ * ignoreUnknown = true} (recovered from {@code testing/workspaces/basic/models/Company_OM.json}'s git history,
+ * commit {@code 059be31}, which shows the real shape; commit {@code 8f4757d} shows this class's old {@code
+ * fieldRef}-based (de)serialization stripping it back out). Filter-Definition-based (query) items are still not
+ * modeled - only Field Reference-based items are supported for now, matching how {@link
  * de.a12.studio.models.overviewmodel.FilterSection} was bootstrapped without its dialog fields.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,7 +32,7 @@ public class FilterItem {
   private String id;
   private String type;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private FieldRef fieldRef;
+  private FilterItemOptions options;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean showInFilterBar;
   @JsonInclude(JsonInclude.Include.NON_NULL)

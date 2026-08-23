@@ -6,6 +6,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
@@ -34,6 +35,6 @@ public final class OverviewDocumentModelRequiredValidator implements ModelValida
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "A Document Model or Query Model reference is required.", Severity.ERROR.name()));
+        ValidationMessages.get("validation.overviewDocumentModelRequired.missing"), Severity.ERROR.name()));
   }
 }

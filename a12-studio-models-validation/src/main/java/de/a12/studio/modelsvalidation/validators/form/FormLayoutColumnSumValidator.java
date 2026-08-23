@@ -9,6 +9,7 @@ import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public final class FormLayoutColumnSumValidator implements ModelValidator {
     }
     if (sum > 12) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "Layout lg sum must not be > 12 (multi-column section \"" + section.getName() + "\" has " + sum + ").",
+          ValidationMessages.get("validation.formLayoutColumnSum.sumExceeds12", section.getName(), sum),
           Severity.ERROR.name()));
     }
     checkSameColumnCount(model, section, "md", section.getLayout().getMd(), lg.length, errors);
@@ -78,8 +79,8 @@ public final class FormLayoutColumnSumValidator implements ModelValidator {
     }
     if (parse(layout).length != lgColumns) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "Number of columns for " + breakpoint + " must be the same as for lg (multi-column section \""
-              + section.getName() + "\").", Severity.ERROR.name()));
+          ValidationMessages.get("validation.formLayoutColumnSum.columnCountMismatch", breakpoint, section.getName()),
+          Severity.ERROR.name()));
     }
   }
 

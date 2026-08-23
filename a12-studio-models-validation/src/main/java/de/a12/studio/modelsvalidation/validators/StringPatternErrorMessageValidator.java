@@ -11,6 +11,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public final class StringPatternErrorMessageValidator implements ModelValidator 
         continue;
       }
       errors.add(new ModelValidationError(model, field.getId(), ElementProperty.ERROR_MESSAGE,
-          "The pattern '" + pattern + "' is specified, but the corresponding error text is not.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.stringPatternErrorMessage.missing", pattern), Severity.ERROR.name()));
     }
     return errors;
   }

@@ -5,6 +5,7 @@ import de.a12.studio.models.ModelReference;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public final class HeaderModelReferenceValidator implements ModelValidator {
       if (context.findOtherModel(reference.getReference()) == null) {
         String type = reference.getModelType() != null ? reference.getModelType().getDisplayName() : "model";
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The referenced " + type + " \"" + reference.getReference() + "\" is missing in the workspace.",
+            ValidationMessages.get("validation.headerModelReference.missing", type, reference.getReference()),
             Severity.ERROR.name()));
       }
     }

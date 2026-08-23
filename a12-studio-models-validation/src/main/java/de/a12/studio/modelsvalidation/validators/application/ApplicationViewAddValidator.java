@@ -13,6 +13,7 @@ import de.a12.studio.models.applicationmodel.ViewAddDirective;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -65,13 +66,13 @@ public final class ApplicationViewAddValidator implements ModelValidator {
       }
       if (viewAdd.getName() == null || viewAdd.getName().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "A name is required for VIEW_ADD directives.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.applicationViewAdd.missingName"), Severity.ERROR.name()));
       }
       for (ModelDescriptor descriptor : viewAdd.getModels()) {
         if (descriptor.getName() != null && !descriptor.getName().isBlank()
             && context.findOtherModel(descriptor.getName()) == null) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "The model \"" + descriptor.getName() + "\" referenced by a VIEW_ADD directive does not exist in the workspace.",
+              ValidationMessages.get("validation.applicationViewAdd.missingModel", descriptor.getName()),
               Severity.ERROR.name()));
         }
       }

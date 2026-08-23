@@ -7,6 +7,7 @@ import de.a12.studio.models.documentmodel.ModelConfig;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.List;
 
@@ -23,9 +24,6 @@ public final class TimeZoneValidator implements ModelValidator {
   // every document model in a project must agree on one of them, mirroring SME's TimeZoneCheck rule.
   private static final String EUROPE_BERLIN = "Europe/Berlin";
 
-  private static final String TIME_ZONE_MISMATCH_MESSAGE =
-      "There is a document model with time zone Europe/Berlin in this workspace. This model's time zone needs to be Europe/Berlin as well.";
-
   @Override
   public List<ModelValidationError> validate(A12Model<?> model, ValidationContext context) {
     if (!(model instanceof DocumentModel documentModel)) {
@@ -41,7 +39,8 @@ public final class TimeZoneValidator implements ModelValidator {
     if (!otherModelUsesEuropeBerlin) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, TIME_ZONE_MISMATCH_MESSAGE, Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID,
+        ValidationMessages.get("validation.timeZone.mismatch"), Severity.ERROR.name()));
   }
 
   private static String getTimeZone(DocumentModel documentModel) {

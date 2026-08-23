@@ -1,7 +1,7 @@
 package de.a12.studio.ui.editors.overviewmodel.dialogs;
 
-import de.a12.studio.models.overviewmodel.FieldRef;
 import de.a12.studio.models.overviewmodel.FilterItem;
+import de.a12.studio.models.overviewmodel.FilterItemOptions;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
@@ -26,10 +26,9 @@ import java.util.Optional;
  * {@link FilterItem} is mutated live and the outer {@link FilterGroupDialogController}'s own OK does the actual
  * save, in one go, once the whole group is confirmed.
  * <p>
- * Only Field Reference-based items are supported - see {@link FilterItem}'s class doc for why the field-type-
- * specific option groups (Boolean/String/Enumeration/Number/Date, ...) and Filter-Definition-based (query)
- * items aren't modeled: no fixture or reference implementation exists anywhere in this codebase for a populated
- * {@code filterGroups} entry to build them against.
+ * Only Field Reference-based items are supported - see {@link FilterItem}'s class doc for which field-type-
+ * specific {@link FilterItemOptions} are modeled and which (Boolean/Enumeration/Number/Date, and
+ * Filter-Definition-based/query items) aren't.
  */
 public class FilterItemDialogController implements DialogController {
 
@@ -77,7 +76,7 @@ public class FilterItemDialogController implements DialogController {
       if (updatingFromModel) {
         return;
       }
-      item.setFieldRef(fieldRefOrNull(newValue));
+      setFieldId(newValue);
       item.setType(OverviewElementOptions.filterItemFieldType(documentModelIndex, newValue));
       updateTypeField();
       validate();
@@ -105,7 +104,7 @@ public class FilterItemDialogController implements DialogController {
 
     updatingFromModel = true;
     try {
-      fieldRefField.setValue(item.getFieldRef() != null ? item.getFieldRef().getFieldId() : null);
+      fieldRefField.setValue(item.getOptions() != null ? item.getOptions().getFieldId() : null);
       showInFilterBarField.setSelected(Boolean.TRUE.equals(item.getShowInFilterBar()));
       collapsedField.setSelected(Boolean.TRUE.equals(item.getCollapsed()));
     }
@@ -151,12 +150,18 @@ public class FilterItemDialogController implements DialogController {
     okButton.setDisable(fieldRefField.getValue() == null);
   }
 
-  private static FieldRef fieldRefOrNull(String fieldId) {
+  private void setFieldId(String fieldId) {
     if (fieldId == null) {
-      return null;
+      if (item.getOptions() != null) {
+        item.getOptions().setFieldId(null);
+      }
+      return;
     }
-    FieldRef fieldRef = new FieldRef();
-    fieldRef.setFieldId(fieldId);
-    return fieldRef;
+    FilterItemOptions options = item.getOptions();
+    if (options == null) {
+      options = new FilterItemOptions();
+      item.setOptions(options);
+    }
+    options.setFieldId(fieldId);
   }
 }

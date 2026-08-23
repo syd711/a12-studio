@@ -15,6 +15,7 @@ import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnsNotEmpt
 import de.a12.studio.modelsvalidation.validators.overview.OverviewDocumentModelRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterCustomFieldsValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterGroupsValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterSectionsValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewInitialSortingReferenceValidator;
@@ -40,6 +41,7 @@ public final class OverviewModelValidationService {
       new OverviewFilterModeRequiredValidator(),
       new OverviewFilterCustomFieldsValidator(),
       new OverviewFilterSectionsValidator(),
+      new OverviewFilterGroupsValidator(),
       new OverviewPagingSizeValidator(),
       new OverviewInitialSortingReferenceValidator(),
       new OverviewStylesValidator()));

@@ -5,6 +5,7 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public final class LocaleCodeValidator implements ModelValidator {
       String code = locale.getCode();
       if (code == null || !LOCALE_PATTERN.matcher(code).matches()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "\"" + code + "\" is not a valid locale code. Valid values are e.g. \"en\" or \"en_US\".",
+            ValidationMessages.get("validation.localeCode.invalid", code),
             Severity.ERROR.name()));
       }
     }

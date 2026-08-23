@@ -8,6 +8,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
@@ -43,20 +44,16 @@ public final class OverviewFieldReferenceValidator implements ModelValidator {
       Element element = OverviewElementResolution.resolve(index, elementRef);
       if (element == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The reference is invalid. The referenced field \"" + elementRef
-                + "\" does not exist in the document model.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.common.fieldReferenceMissing", elementRef), Severity.ERROR.name()));
         continue;
       }
       if (OverviewElementResolution.isIndexedFalse(element)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The \"indexed\" annotation of field \"" + element.getName()
-                + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
-            Severity.ERROR.name()));
+            ValidationMessages.get("validation.common.indexedAnnotationFalse", element.getName()), Severity.ERROR.name()));
       }
       if (OverviewElementResolution.isInRepeatableGroup(index, element)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The reference is invalid. The referenced field \"" + element.getName() + "\" is repeatable.",
-            Severity.ERROR.name()));
+            ValidationMessages.get("validation.overviewFieldReference.repeatable", element.getName()), Severity.ERROR.name()));
       }
     }
     return errors;

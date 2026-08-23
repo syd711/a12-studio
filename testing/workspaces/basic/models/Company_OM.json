@@ -89,11 +89,49 @@
             "filterItems": [
               {
                 "id": "filter-item-95c06",
-                "type": "string"
+                "type": "string",
+                "options": {
+                  "fieldId": "field_67684",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
               },
               {
                 "id": "filter-item-13b70",
-                "type": "string"
+                "type": "string",
+                "options": {
+                  "fieldId": "field_16af2",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
               }
             ]
           }

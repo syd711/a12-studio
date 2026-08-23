@@ -7,6 +7,7 @@ import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -32,14 +33,14 @@ public final class FormDocumentModelReferenceValidator implements ModelValidator
             .toList();
     if (documentReferences.isEmpty()) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "The document model reference is required. Select a valid one and apply.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.formDocumentModelReference.missing"), Severity.ERROR.name()));
     }
 
     List<ModelValidationError> errors = new ArrayList<>();
     for (ModelReference reference : documentReferences) {
       if (context.findOtherDocumentModel(reference.getReference()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "No valid referenced document model: \"" + reference.getReference() + "\" does not exist in the workspace.",
+            ValidationMessages.get("validation.formDocumentModelReference.invalid", reference.getReference()),
             Severity.ERROR.name()));
       }
     }

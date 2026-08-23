@@ -45,8 +45,11 @@ public class Dialogs {
     stage.setOnHidden(event -> controller.destroy());
 
     FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
+    // root's minWidth/minHeight (see overview-column-dialog.fxml) are 700/760; the stage must
+    // allow at least that plus the shadowWrapper's padding on both sides, or the root can't lay
+    // out at its real minimum and the header/footer get clipped.
+    stage.setMinWidth(700 + 2 * WidgetFactory.DIALOG_SHADOW_MARGIN);
+    stage.setMinHeight(760 + 2 * WidgetFactory.DIALOG_SHADOW_MARGIN);
 
     stage.showAndWait();
     return controller.isConfirmed();

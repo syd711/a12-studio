@@ -13,6 +13,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,13 +70,13 @@ public final class AttachmentGroupValidator implements ModelValidator {
       missingFields.removeAll(fieldNames);
       if (!missingFields.isEmpty()) {
         errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL,
-            "Missing fields [" + String.join(", ", missingFields) + "] for attachment with group [" + groupElement.getName() + "]."));
+            ValidationMessages.get("validation.attachmentGroup.missingFields", String.join(", ", missingFields), groupElement.getName())));
       }
       List<String> missingRules = new ArrayList<>(requiredRules);
       missingRules.removeAll(rulesPresent);
       if (!missingRules.isEmpty()) {
         errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL,
-            "Missing rules [" + String.join(", ", missingRules) + "] for attachment with group [" + groupElement.getName() + "]."));
+            ValidationMessages.get("validation.attachmentGroup.missingRules", String.join(", ", missingRules), groupElement.getName())));
       }
 
       if (fieldNames.contains("content")) {
@@ -90,8 +91,8 @@ public final class AttachmentGroupValidator implements ModelValidator {
                 boolean noValueValidation = Boolean.TRUE.equals(options.getNoValueValidation());
                 boolean lineBreaksPermitted = Boolean.TRUE.equals(options.getLineBreaksPermitted());
                 if (!noValueValidation || !lineBreaksPermitted) {
-                  errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL, "Field [content] in group [" + groupElement.getName()
-                      + "] must specify both \"noValueValidation\" and \"linebreaksPermitted\"."));
+                  errors.add(error(model, groupElement.getId(), ElementProperty.GENERAL,
+                      ValidationMessages.get("validation.attachmentGroup.contentFieldOptions", groupElement.getName())));
                 }
               }
             });

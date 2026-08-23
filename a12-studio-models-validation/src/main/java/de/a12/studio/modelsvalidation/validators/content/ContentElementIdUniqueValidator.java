@@ -6,6 +6,7 @@ import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public final class ContentElementIdUniqueValidator implements ModelValidator {
   private void collectDuplicates(ContentModel model, ContentElement element, Set<String> seen, List<ModelValidationError> errors) {
     if (element.getId() != null && !seen.add(element.getId())) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "The element id \"" + element.getId() + "\" is used more than once in the content tree.",
+          ValidationMessages.get("validation.contentElementIdUnique.duplicate", element.getId()),
           Severity.ERROR.name()));
     }
     if (element.getChildren() != null) {

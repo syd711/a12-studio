@@ -9,6 +9,7 @@ import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -32,7 +33,8 @@ public final class FormSiblingNameUniquenessValidator implements ModelValidator 
     for (Screen screen : formModel.getContent().getScreens()) {
       if (screen.getName() != null && !screenNames.add(screen.getName())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The screen name \"" + screen.getName() + "\" is used more than once.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.formSiblingNameUniqueness.duplicateScreen", screen.getName()),
+            Severity.ERROR.name()));
       }
       checkSiblings(model, screen.getScreenElements(), errors);
     }
@@ -47,7 +49,7 @@ public final class FormSiblingNameUniquenessValidator implements ModelValidator 
     for (ScreenElement element : siblings) {
       if (element.getName() != null && !element.getName().isBlank() && !names.add(element.getName())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The element name \"" + element.getName() + "\" is used more than once among siblings.",
+            ValidationMessages.get("validation.formSiblingNameUniqueness.duplicateSibling", element.getName()),
             Severity.ERROR.name()));
       }
       if (element instanceof MultiColumnSection section) {

@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public final class MissingLocaleValidator implements ModelValidator {
     if (!missing) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "Please add at least one locale.", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID,
+        ValidationMessages.get("validation.missingLocale.missing"), Severity.ERROR.name()));
   }
 }

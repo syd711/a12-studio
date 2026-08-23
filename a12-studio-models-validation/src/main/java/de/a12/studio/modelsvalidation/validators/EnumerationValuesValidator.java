@@ -12,6 +12,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +41,15 @@ public final class EnumerationValuesValidator implements ModelValidator {
         continue;
       }
       boolean isMultiSelectValueField = isMultiSelectValueField(index, field);
-      checkMinimumValues(model, field.getId(), "field", enumerationFieldType, isMultiSelectValueField, errors);
+      checkMinimumValues(model, field.getId(), ValidationMessages.get("validation.enumerationValues.kind.field"),
+          enumerationFieldType, isMultiSelectValueField, errors);
     }
 
     if (documentModel.getContent().getTypeDefinitions() != null) {
       for (TypeDefinition typeDefinition : documentModel.getContent().getTypeDefinitions()) {
         if (typeDefinition.getFieldType() instanceof EnumerationFieldType enumerationFieldType) {
-          checkMinimumValues(model, typeDefinition.getId(), "type definition", enumerationFieldType, false, errors);
+          checkMinimumValues(model, typeDefinition.getId(), ValidationMessages.get("validation.enumerationValues.kind.typeDefinition"),
+              enumerationFieldType, false, errors);
         }
       }
     }
@@ -64,8 +67,8 @@ public final class EnumerationValuesValidator implements ModelValidator {
       return;
     }
     String message = isMultiSelectValueField
-        ? "The enumeration in " + elementKind + " [id: " + elementId + "] is the value field of a multi-select group and must have at least 2 values."
-        : "The enumeration in " + elementKind + " [id: " + elementId + "] must have at least 1 value.";
+        ? ValidationMessages.get("validation.enumerationValues.tooFewForMultiSelect", elementKind, elementId)
+        : ValidationMessages.get("validation.enumerationValues.empty", elementKind, elementId);
     errors.add(new ModelValidationError(model, elementId, ElementProperty.DATA_TYPE, message, Severity.ERROR.name()));
   }
 

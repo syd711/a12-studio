@@ -5,6 +5,7 @@ import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
@@ -21,11 +22,11 @@ public final class ContentRootElementValidator implements ModelValidator {
     }
     if (contentModel.getContent().getRoot() == null) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "The content model has no root element.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.contentRootElement.missingRoot"), Severity.ERROR.name()));
     }
     if (contentModel.getContent().getRoot().getType() == null || contentModel.getContent().getRoot().getType().isBlank()) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "The root element has no type.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.contentRootElement.missingType"), Severity.ERROR.name()));
     }
     return List.of();
   }

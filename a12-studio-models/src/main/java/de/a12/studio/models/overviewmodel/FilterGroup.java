@@ -15,9 +15,8 @@ import java.util.List;
  * {@link #label} is the multilingual title shown in the application, {@link #icon} decorates the group header,
  * {@link #collapsed} controls its initial state, and {@link #filterItems} holds its {@link FilterItem}s.
  * <p>
- * See {@link FilterItem} for why the field-type-specific option groups and Filter-Definition-based items aren't
- * modeled - {@code testing/basic/models/Company_OM.json}'s {@code filterGroups} is {@code []}, so there is no
- * fixture evidence for a populated group beyond what the docs describe in prose.
+ * See {@link FilterItem} for the field reference/option modeling of {@link #filterItems} - only String-type
+ * matching options and Filter-Definition-based (query) items remain unmodeled there.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter

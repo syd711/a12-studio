@@ -10,6 +10,7 @@ import de.a12.studio.models.applicationmodel.Scene;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -58,22 +59,25 @@ public final class ApplicationUniqueNamesValidator implements ModelValidator {
     Set<String> moduleNames = new HashSet<>();
     for (Module module : applicationModel.getContent().getModules()) {
       if (module.getName() != null && !moduleNames.add(module.getName())) {
-        errors.add(error(model, MODULES_ELEMENT_ID, "This module name is not unique: \"" + module.getName() + "\"."));
+        errors.add(error(model, MODULES_ELEMENT_ID, ValidationMessages.get("validation.applicationUniqueNames.module", module.getName())));
       }
       Set<String> flowNames = new HashSet<>();
       for (Flow flow : module.getFlows()) {
         if (flow.getName() != null && !flowNames.add(flow.getName())) {
-          errors.add(error(model, flowsElementId(module.getName()), "This flow name is not unique: \"" + flow.getName() + "\"."));
+          errors.add(error(model, flowsElementId(module.getName()),
+              ValidationMessages.get("validation.applicationUniqueNames.flow", flow.getName())));
         }
         Set<String> sceneNames = new HashSet<>();
         for (Scene scene : flow.getScenes()) {
           if (scene.getName() != null && !sceneNames.add(scene.getName())) {
-            errors.add(error(model, scenesElementId(module.getName()), "This scene name is not unique: \"" + scene.getName() + "\"."));
+            errors.add(error(model, scenesElementId(module.getName()),
+                ValidationMessages.get("validation.applicationUniqueNames.scene", scene.getName())));
           }
           Set<String> caseNames = new HashSet<>();
           for (Case sceneCase : scene.getCases()) {
             if (sceneCase.getName() != null && !caseNames.add(sceneCase.getName())) {
-              errors.add(error(model, casesElementId(scene.getName()), "This case name is not unique: \"" + sceneCase.getName() + "\"."));
+              errors.add(error(model, casesElementId(scene.getName()),
+                  ValidationMessages.get("validation.applicationUniqueNames.case", sceneCase.getName())));
             }
           }
         }
@@ -89,7 +93,7 @@ public final class ApplicationUniqueNamesValidator implements ModelValidator {
 
   private void collectRegionNames(A12Model<?> model, Region region, Set<String> seen, List<ModelValidationError> errors) {
     if (region.getName() != null && !seen.add(region.getName())) {
-      errors.add(error(model, REGION_ELEMENT_ID, "This region name is not unique: \"" + region.getName() + "\"."));
+      errors.add(error(model, REGION_ELEMENT_ID, ValidationMessages.get("validation.applicationUniqueNames.region", region.getName())));
     }
     for (Region subRegion : region.getSubRegions()) {
       collectRegionNames(model, subRegion, seen, errors);

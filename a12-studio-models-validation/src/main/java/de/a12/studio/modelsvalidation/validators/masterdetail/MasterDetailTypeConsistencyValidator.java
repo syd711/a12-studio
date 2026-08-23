@@ -5,6 +5,7 @@ import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
@@ -25,17 +26,17 @@ public final class MasterDetailTypeConsistencyValidator implements ModelValidato
     String type = masterDetailModel.getContent().getType();
     if (type == null || type.isBlank()) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "The master-detail type is required.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.masterDetailTypeConsistency.missingType"), Severity.ERROR.name()));
     }
     if ("overview".equals(type)
         && (masterDetailModel.getContent().getOverviewModel() == null || masterDetailModel.getContent().getOverviewModel().isBlank())) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "An overview model is required for master-detail type \"overview\".", Severity.ERROR.name()));
+          ValidationMessages.get("validation.masterDetailTypeConsistency.missingOverviewModel"), Severity.ERROR.name()));
     }
     if ("tree".equals(type)
         && (masterDetailModel.getContent().getTreeModel() == null || masterDetailModel.getContent().getTreeModel().isBlank())) {
       return List.of(new ModelValidationError(model, ELEMENT_ID,
-          "A tree model is required for master-detail type \"tree\".", Severity.ERROR.name()));
+          ValidationMessages.get("validation.masterDetailTypeConsistency.missingTreeModel"), Severity.ERROR.name()));
     }
     return List.of();
   }

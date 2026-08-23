@@ -3,10 +3,10 @@ package de.a12.studio.ui.editors.overviewmodel;
 import de.a12.studio.models.Label;
 import de.a12.studio.models.overviewmodel.BooleanUserAccessOption;
 import de.a12.studio.models.overviewmodel.Column;
-import de.a12.studio.models.overviewmodel.FieldRef;
 import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.FilterGroup;
 import de.a12.studio.models.overviewmodel.FilterItem;
+import de.a12.studio.models.overviewmodel.FilterItemOptions;
 import de.a12.studio.models.overviewmodel.FilterSelectorConfig;
 import de.a12.studio.models.overviewmodel.FilterTriggerConfig;
 import de.a12.studio.models.overviewmodel.FilterTriggerValue;
@@ -448,9 +448,9 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
 
     FilterItem item = new FilterItem();
     item.setId("filter-item-" + shortId());
-    FieldRef fieldRef = new FieldRef();
-    fieldRef.setFieldId(fieldId);
-    item.setFieldRef(fieldRef);
+    FilterItemOptions options = new FilterItemOptions();
+    options.setFieldId(fieldId);
+    item.setOptions(options);
     item.setType(OverviewElementOptions.filterItemFieldType(documentModelIndex, fieldId));
     group.getFilterItems().add(item);
 
@@ -555,8 +555,8 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     if (!label.isBlank()) {
       return label;
     }
-    if (item.getFieldRef() != null && item.getFieldRef().getFieldId() != null) {
-      return OverviewElementOptions.displayPath(documentModelIndex, item.getFieldRef().getFieldId());
+    if (item.getOptions() != null && item.getOptions().getFieldId() != null) {
+      return OverviewElementOptions.displayPath(documentModelIndex, item.getOptions().getFieldId());
     }
     return "";
   }

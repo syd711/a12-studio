@@ -24,7 +24,7 @@ class FilterItemSnapshot {
     FilterItem restored = JsonSettings.objectMapper.readValue(json, FilterItem.class);
     item.setId(restored.getId());
     item.setType(restored.getType());
-    item.setFieldRef(restored.getFieldRef());
+    item.setOptions(restored.getOptions());
     item.setShowInFilterBar(restored.getShowInFilterBar());
     item.setCollapsed(restored.getCollapsed());
     item.getLabel().clear();

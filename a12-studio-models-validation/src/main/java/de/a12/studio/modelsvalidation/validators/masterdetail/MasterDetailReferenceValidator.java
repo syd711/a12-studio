@@ -9,6 +9,7 @@ import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -34,26 +35,26 @@ public final class MasterDetailReferenceValidator implements ModelValidator {
     if (overviewModel != null && !overviewModel.isBlank()
         && !(context.findOtherModel(overviewModel) instanceof OverviewModel)) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "The given overview model \"" + overviewModel + "\" could not be found.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.masterDetailReference.overviewNotFound", overviewModel), Severity.ERROR.name()));
     }
 
     String treeModel = masterDetailModel.getContent().getTreeModel();
     if (treeModel != null && !treeModel.isBlank()
         && !(context.findOtherModel(treeModel) instanceof TreeModel)) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "The given tree model \"" + treeModel + "\" could not be found.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.masterDetailReference.treeNotFound", treeModel), Severity.ERROR.name()));
     }
 
     for (FormMapping mapping : masterDetailModel.getContent().getFormMapping()) {
       if (mapping.getDocumentModel() != null && !mapping.getDocumentModel().isBlank()
           && context.findOtherDocumentModel(mapping.getDocumentModel()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The given document model \"" + mapping.getDocumentModel() + "\" could not be found.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.masterDetailReference.documentNotFound", mapping.getDocumentModel()), Severity.ERROR.name()));
       }
       if (mapping.getFormModel() != null && !mapping.getFormModel().isBlank()
           && !(context.findOtherModel(mapping.getFormModel()) instanceof FormModel)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The given form model \"" + mapping.getFormModel() + "\" could not be found.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.masterDetailReference.formNotFound", mapping.getFormModel()), Severity.ERROR.name()));
       }
     }
     return errors;

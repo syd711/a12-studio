@@ -197,8 +197,8 @@ public class FilterGroupDialogController implements DialogController {
     if (label != null) {
       return label;
     }
-    if (item.getFieldRef() != null && item.getFieldRef().getFieldId() != null) {
-      return OverviewElementOptions.displayPath(documentModelIndex, item.getFieldRef().getFieldId());
+    if (item.getOptions() != null && item.getOptions().getFieldId() != null) {
+      return OverviewElementOptions.displayPath(documentModelIndex, item.getOptions().getFieldId());
     }
     return "";
   }

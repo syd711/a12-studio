@@ -7,6 +7,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ public final class DuplicateIdValidator implements ModelValidator {
         String elementPaths = elements.stream().map(index::getPath).reduce((a, b) -> a + ", " + b).orElse("");
         for (Element element : elements) {
           errors.add(new ModelValidationError(model, element.getId(), ElementProperty.GENERAL,
-              "The id [" + id + "] of element on path '" + index.getPath(element) + "' is not unique: Used by [" + elementPaths + "].",
+              ValidationMessages.get("validation.duplicateId.notUnique", id, index.getPath(element), elementPaths),
               Severity.ERROR.name()));
         }
       }

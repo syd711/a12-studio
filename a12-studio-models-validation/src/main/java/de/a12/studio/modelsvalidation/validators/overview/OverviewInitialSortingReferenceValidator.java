@@ -8,6 +8,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public final class OverviewInitialSortingReferenceValidator implements ModelVali
       String idref = columnRef.getIdref();
       if (idref != null && !idref.isBlank() && !columnIds.contains(idref)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "Sorting references a column that no longer exists (\"" + idref + "\").", Severity.ERROR.name()));
+            ValidationMessages.get("validation.overviewInitialSortingReference.missing", idref), Severity.ERROR.name()));
       }
     }
     return errors;

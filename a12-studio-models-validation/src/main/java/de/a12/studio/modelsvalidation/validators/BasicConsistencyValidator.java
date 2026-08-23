@@ -14,6 +14,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,10 +41,12 @@ public final class BasicConsistencyValidator implements ModelValidator {
     List<ModelValidationError> errors = new ArrayList<>();
     for (Element element : index.allElements()) {
       if (isBlank(element.getId())) {
-        errors.add(error(model, element.getId(), ElementProperty.GENERAL, "Element on path '" + index.getPath(element) + "': The id is empty."));
+        errors.add(error(model, element.getId(), ElementProperty.GENERAL,
+            ValidationMessages.get("validation.basicConsistency.emptyId", index.getPath(element))));
       }
       if (isBlank(element.getName())) {
-        errors.add(error(model, element.getId(), ElementProperty.GENERAL, "Element with id '" + element.getId() + "': The name is empty."));
+        errors.add(error(model, element.getId(), ElementProperty.GENERAL,
+            ValidationMessages.get("validation.basicConsistency.emptyName", element.getId())));
       }
       if (element instanceof FieldElement field && field.getField() != null) {
         checkEnumerationOrTypeDef(model, index, field, errors);
@@ -67,7 +70,7 @@ public final class BasicConsistencyValidator implements ModelValidator {
         for (var value : values) {
           if (value.getValue() != null && !seenValues.add(value.getValue())) {
             errors.add(error(model, field.getId(), ElementProperty.DATA_TYPE,
-                "Field with id '" + field.getId() + "': The enumeration contains the value '" + value.getValue() + "' multiple times."));
+                ValidationMessages.get("validation.basicConsistency.duplicateEnumValue", field.getId(), value.getValue())));
           }
         }
       }
@@ -76,8 +79,8 @@ public final class BasicConsistencyValidator implements ModelValidator {
       if (categories != null) {
         for (var category : categories) {
           if (category.getName() != null && !seenCategories.add(category.getName())) {
-            errors.add(error(model, field.getId(), ElementProperty.DATA_TYPE, "Field with id '" + field.getId()
-                + "': The enumeration contains the category '" + category.getName() + "' multiple times."));
+            errors.add(error(model, field.getId(), ElementProperty.DATA_TYPE,
+                ValidationMessages.get("validation.basicConsistency.duplicateEnumCategory", field.getId(), category.getName())));
           }
         }
       }
@@ -85,20 +88,23 @@ public final class BasicConsistencyValidator implements ModelValidator {
     if (fieldType instanceof TypeDefFieldType typeDefType
         && (typeDefType.getTypeDefType() == null || isBlank(typeDefType.getTypeDefType().getTypeDefinitionId()))) {
       errors.add(error(model, field.getId(), ElementProperty.TYPE,
-          "Field with id '" + field.getId() + "': The id of the referenced type definition is not set properly."));
+          ValidationMessages.get("validation.basicConsistency.invalidTypeDefReference", field.getId())));
     }
   }
 
   private static void checkRule(A12Model<?> model, RuleElement rule, List<ModelValidationError> errors) {
     var ruleConfig = rule.getRule();
     if (isBlank(ruleConfig.getErrorCode())) {
-      errors.add(error(model, rule.getId(), ElementProperty.GENERAL, "Rule with id '" + rule.getId() + "': The error code is empty."));
+      errors.add(error(model, rule.getId(), ElementProperty.GENERAL,
+          ValidationMessages.get("validation.basicConsistency.emptyRuleErrorCode", rule.getId())));
     }
     if (isBlank(ruleConfig.getErrorCondition())) {
-      errors.add(error(model, rule.getId(), ElementProperty.GENERAL, "Rule with id '" + rule.getId() + "': The error condition is empty."));
+      errors.add(error(model, rule.getId(), ElementProperty.GENERAL,
+          ValidationMessages.get("validation.basicConsistency.emptyRuleErrorCondition", rule.getId())));
     }
     if (isBlank(ruleConfig.getErrorEntityRelPath())) {
-      errors.add(error(model, rule.getId(), ElementProperty.GENERAL, "Rule with id '" + rule.getId() + "': The error entity is not set properly."));
+      errors.add(error(model, rule.getId(), ElementProperty.GENERAL,
+          ValidationMessages.get("validation.basicConsistency.invalidRuleErrorEntity", rule.getId())));
     }
   }
 
@@ -106,12 +112,12 @@ public final class BasicConsistencyValidator implements ModelValidator {
     var computationConfig = computation.getComputation();
     if (isBlank(computationConfig.getComputedFieldRelPath())) {
       errors.add(error(model, computation.getId(), ElementProperty.GENERAL,
-          "Computation with id '" + computation.getId() + "': The computed field is not set properly."));
+          ValidationMessages.get("validation.basicConsistency.invalidComputedField", computation.getId())));
     }
     if (computationConfig.getComputationAlternatives() != null
         && computationConfig.getComputationAlternatives().stream().anyMatch(a -> isBlank(a.getOperation()))) {
       errors.add(error(model, computation.getId(), ElementProperty.GENERAL,
-          "Computation with id '" + computation.getId() + "': One of the computation operations is empty."));
+          ValidationMessages.get("validation.basicConsistency.emptyComputationOperation", computation.getId())));
     }
   }
 
@@ -119,7 +125,7 @@ public final class BasicConsistencyValidator implements ModelValidator {
     String indexFieldName = group.getGroup().getIndexFieldName();
     if (indexFieldName != null && isBlank(indexFieldName)) {
       errors.add(error(model, group.getId(), ElementProperty.GROUP_PROPERTIES,
-          "Group with id '" + group.getId() + "': The name of the index field is not set properly."));
+          ValidationMessages.get("validation.basicConsistency.invalidIndexFieldName", group.getId())));
     }
   }
 

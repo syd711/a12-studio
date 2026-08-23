@@ -15,6 +15,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -26,17 +27,11 @@ import java.util.stream.Collectors;
  * Checks for errors the ported kernel rules ({@link BasicConsistencyValidator} and siblings) don't cover:
  * missing/unresolved references between elements. We use simple generic error messages instead of the
  * kernel's own wording so that changes to that wording don't need to be integrated into this code — except
- * {@link #INDEX_FIELD_INVALID_MESSAGE}, which is shown directly in the Group properties panel and is kept
- * verbatim on purpose.
+ * {@code validation.missingReference.indexFieldInvalid}, which is shown directly in the Group properties
+ * panel and is kept verbatim (matching SME's DomainGroup meta-model rule "A12_INDEX_FIELD_INVALID_REFERENCE",
+ * see client/resources/models/documentModel/DomainGroup.json in the SME repo) on purpose.
  */
 public final class MissingReferenceValidator implements ModelValidator {
-
-  // Verbatim text of SME's DomainGroup meta-model rule "A12_INDEX_FIELD_INVALID_REFERENCE" (see
-  // client/resources/models/documentModel/DomainGroup.json in the SME repo), which fires the moment a group's
-  // configured index field no longer resolves to a field in the group (e.g. that field was deleted). Kept
-  // verbatim, unlike the other generic messages below, so the Group properties panel can show users the exact
-  // wording they already know from SME.
-  public static final String INDEX_FIELD_INVALID_MESSAGE = "The index field is not a valid field.";
 
   @Override
   public List<ModelValidationError> validate(A12Model<?> model, ValidationContext context) {
@@ -51,27 +46,31 @@ public final class MissingReferenceValidator implements ModelValidator {
         String groupPath = index.getPath(groupElement);
         if (hasMissingIncludeReference(groupElement, context.otherDocumentModels())) {
           result.add(error(model, groupElement.getId(), ElementProperty.INCLUDE_REFERENCE,
-              "Include with path '" + groupPath + "': Missing Include Reference"));
+              ValidationMessages.get("validation.missingReference.missingIncludeReference", groupPath)));
         }
         if (hasMissingIndexField(groupElement, index)) {
-          result.add(error(model, groupElement.getId(), ElementProperty.GROUP_PROPERTIES, INDEX_FIELD_INVALID_MESSAGE));
+          result.add(error(model, groupElement.getId(), ElementProperty.GROUP_PROPERTIES,
+              ValidationMessages.get("validation.missingReference.indexFieldInvalid")));
         }
         for (Element duplicate : getElementsWithDuplicatedNames(groupElement)) {
           result.add(error(model, duplicate.getId(), ElementProperty.GENERAL,
-              "Element with path '" + groupPath + "': Multiple Elements with same path"));
+              ValidationMessages.get("validation.missingReference.duplicatePath", groupPath)));
         }
       } else if (element instanceof ComputationElement computation) {
         if (hasMissingComputedField(computation, index)) {
           String path = index.getPath(computation);
-          result.add(error(model, computation.getId(), ElementProperty.GENERAL, "Computation with path '" + path + "': Missing Computed Field"));
+          result.add(error(model, computation.getId(), ElementProperty.GENERAL,
+              ValidationMessages.get("validation.missingReference.missingComputedField", path)));
         }
       } else if (element instanceof FieldElement field) {
         String path = index.getPath(field);
         if (hasTooFewEnumValues(field, index)) {
-          result.add(error(model, field.getId(), ElementProperty.DATA_TYPE, "Field with path '" + path + "': Enumeration must have at least two values"));
+          result.add(error(model, field.getId(), ElementProperty.DATA_TYPE,
+              ValidationMessages.get("validation.missingReference.tooFewEnumValues", path)));
         }
         if (hasMissingTypeDef(field, index)) {
-          result.add(error(model, field.getId(), ElementProperty.TYPE, "Field with path '" + path + "': Missing Type Definition"));
+          result.add(error(model, field.getId(), ElementProperty.TYPE,
+              ValidationMessages.get("validation.missingReference.missingTypeDefinition", path)));
         }
       }
     }
