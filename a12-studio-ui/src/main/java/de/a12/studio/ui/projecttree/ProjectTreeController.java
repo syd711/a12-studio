@@ -11,10 +11,12 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
 import de.a12.studio.plugin.manager.PluginManager;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.KeyCode;
@@ -67,12 +69,22 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   public void load(@NonNull Project project) {
     this.project = project;
-    this.validationErrorsByPath = validateAllModels(project);
+    this.validationErrorsByPath = new HashMap<>();
     String applicationGroupName = resolveApplicationGroupName(project);
     this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath, applicationGroupName);
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
     rootTreeItem.setExpanded(true);
     projectTree.setRoot(rootTreeItem);
+    JFXFuture.supplyAsync(()-> {
+      Map<String, List<ModelValidationError>> errors = validateAllModels(project);
+      return errors;
+    }).thenAcceptLater((errors) -> {
+      if (this.project != project) {
+        return;
+      }
+      validationErrorsByPath.putAll(errors);
+      projectTree.refresh();
+    });
   }
 
   @Override

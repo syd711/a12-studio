@@ -2,16 +2,12 @@ package de.a12.studio.ui;
 
 import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.components.ProgressDialog;
-import de.a12.studio.ui.components.ProgressModel;
-import de.a12.studio.ui.components.ProgressResultModel;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.newproject.NewProjectDialogController;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
-import de.a12.studio.models.Annotation;
 import de.a12.studio.models.projects.Project;
-import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.models.projects.settings.AiSettings;
 import de.a12.studio.ui.events.SettingsChangedEvent;
@@ -50,7 +46,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.CountDownLatch;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
@@ -113,113 +108,11 @@ public class MenuBarController implements Initializable, StudioEventListener {
   private void openProject(File file) {
     LocalUISettings.saveProject(file);
 
-    ProgressDialog.createProgressDialog(Studio.stage, new ProgressModel<Void>(StudioBundle.get("opening_project")) {
-
-      private boolean done = false;
-
-      @Override
-      public boolean isIndeterminate() {
-        return true;
-      }
-
-      @Override
-      public boolean isCancelable() {
-        return false;
-      }
-
-      @Override
-      public boolean isShowSummary() {
-        return false;
-      }
-
-      @Override
-      public int getMax() {
-        return 1;
-      }
-
-      @Override
-      public Void getNext() {
-        done = true;
-        return null;
-      }
-
-      @Override
-      public String nextToString(Void next) {
-        return null;
-      }
-
-      @Override
-      public void processNext(ProgressResultModel progressResultModel, Void next) {
-        project = new Project();
-        project.load(file);
-        autoDetectApplicationGroups(project);
-
-        // Block this background thread until the project-open event has actually finished
-        // dispatching on the FX thread (tree/tabs built), so the progress dialog - which closes
-        // as soon as processNext() returns - doesn't hide before the editor is actually shown.
-        CountDownLatch projectOpenedLatch = new CountDownLatch(1);
-        Platform.runLater(() -> {
-          try {
-            StudioEventManager.getInstance().fireProjectOpenEvent(project);
-          }
-          finally {
-            projectOpenedLatch.countDown();
-          }
-        });
-        try {
-          projectOpenedLatch.await();
-        }
-        catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-        }
-      }
-
-      @Override
-      public boolean hasNext() {
-        return !done;
-      }
-
-      @Override
-      public void finalizeModel(ProgressResultModel progressResultModel) {
-        refreshRecentProjectsMenu();
-        refreshProjectDependentButtons();
-      }
-    });
-  }
-
-  /**
-   * Scans all models in the project tree for the "applicationGroup" annotation.
-   * If found and the feature is not yet enabled in AdvancedSettings,
-   * it is activated and persisted automatically.
-   */
-  private void autoDetectApplicationGroups(@NonNull Project project) {
-    de.a12.studio.models.projects.settings.AdvancedSettings settings =
-        project.getSettings().getAdvancedSettings();
-    if (settings.isUseApplicationGroups()) {
-      return;
-    }
-    if (hasApplicationGroupAnnotation(project.getRoot())) {
-      settings.setUseApplicationGroups(true);
-      settings.save();
-    }
-  }
-
-  private boolean hasApplicationGroupAnnotation(@NonNull ProjectItem item) {
-    if (item.isFolder()) {
-      for (ProjectItem child : item.getChildren()) {
-        if (hasApplicationGroupAnnotation(child)) {
-          return true;
-        }
-      }
-    }
-    else if (item.getModel() != null) {
-      for (Annotation annotation : item.getModel().getAnnotations()) {
-        if ("applicationGroup".equals(annotation.getName())) {
-          return true;
-        }
-      }
-    }
-    return false;
+    ProgressDialog.createProgressDialog(Studio.stage,
+        new OpenProjectProgressModel(file, loadedProject -> project = loadedProject, () -> {
+          refreshRecentProjectsMenu();
+          refreshProjectDependentButtons();
+        }));
   }
 
   private void refreshRecentProjectsMenu() {

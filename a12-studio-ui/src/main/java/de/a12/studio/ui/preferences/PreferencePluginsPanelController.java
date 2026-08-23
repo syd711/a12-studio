@@ -4,9 +4,10 @@ import de.a12.studio.plugin.manager.MarkdownRenderer;
 import de.a12.studio.plugin.manager.Marketplace;
 import de.a12.studio.plugin.manager.MarketplaceEntry;
 import de.a12.studio.plugin.manager.PluginManager;
+import de.a12.studio.ui.components.ProgressDialog;
+import de.a12.studio.ui.components.ProgressResultModel;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -34,11 +35,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Base64;
@@ -230,30 +227,22 @@ public class PreferencePluginsPanelController implements Initializable {
       return;
     }
 
-    setProgress(true, StudioBundle.get("plugins.downloading", entry.getName()));
+    File pluginsDir = PluginManager.getInstance().getPluginsDir();
+    pluginsDir.mkdirs();
+    File dest = new File(pluginsDir, deriveFileName(entry));
 
-    Thread thread = new Thread(() -> {
-      try {
-        File pluginsDir = PluginManager.getInstance().getPluginsDir();
-        pluginsDir.mkdirs();
-        String fileName = deriveFileName(entry);
-        File dest = new File(pluginsDir, fileName);
-        downloadFile(entry.getDownloadUrl(), dest);
-        Platform.runLater(() -> {
-          setProgress(false, StudioBundle.get("plugins.install_restart_required", entry.getName()));
-          pluginListView.refresh();
-          if (selectedEntry != null) refreshActionButton(selectedEntry);
-        });
-      } catch (IOException ex) {
-        log.error("Failed to download plugin '{}': {}", entry.getName(), ex.getMessage(), ex);
-        Platform.runLater(() -> {
-          setProgress(false, "");
-          WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.download_failed"), ex.getMessage());
-        });
-      }
-    }, "plugin-installer");
-    thread.setDaemon(true);
-    thread.start();
+    ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(),
+        new PluginDownloadProgressModel(
+            StudioBundle.get("plugins.downloading", entry.getName()), entry.getDownloadUrl(), dest));
+
+    if (result.isSuccess()) {
+      setProgress(false, StudioBundle.get("plugins.install_restart_required", entry.getName()));
+      pluginListView.refresh();
+      if (selectedEntry != null) refreshActionButton(selectedEntry);
+    }
+    else if (!result.isCancelled()) {
+      log.error("Failed to download plugin '{}'", entry.getName());
+    }
   }
 
   private void onRemovePlugin(@NonNull MarketplaceEntry entry) {
@@ -299,22 +288,6 @@ public class PreferencePluginsPanelController implements Initializable {
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
-
-  private static void downloadFile(@NonNull String urlString, @NonNull File dest) throws IOException {
-    URL url = URI.create(urlString).toURL();
-    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    connection.setConnectTimeout(15_000);
-    connection.setReadTimeout(60_000);
-    connection.setRequestProperty("User-Agent", "a12-studio-plugin-manager");
-    int status = connection.getResponseCode();
-    if (status != HttpURLConnection.HTTP_OK) {
-      throw new IOException("Server returned HTTP " + status + " for: " + urlString);
-    }
-    try (InputStream in = connection.getInputStream();
-         FileOutputStream out = new FileOutputStream(dest)) {
-      in.transferTo(out);
-    }
-  }
 
   @NonNull
   private static String deriveFileName(@NonNull MarketplaceEntry entry) {
