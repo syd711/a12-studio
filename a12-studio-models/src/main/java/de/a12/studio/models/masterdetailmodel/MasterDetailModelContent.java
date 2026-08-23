@@ -20,6 +20,7 @@ public class MasterDetailModelContent {
   // keeps every pre-existing master-detail model file byte-for-byte unchanged on save.
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String treeModel;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer formWidth;
   private List<FormMapping> formMapping = new ArrayList<>();
 }

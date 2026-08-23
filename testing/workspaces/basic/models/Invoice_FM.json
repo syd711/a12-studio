@@ -111,26 +111,7 @@
                   "destructive": true
                 },
                 "event": "event_cancel",
-                "scope": "HIDDEN_IN_READONLY_MODE",
-                "orCreateButtonStyling": {
-                  "label": {
-                    "type": "Multilingual",
-                    "multilingualText": {
-                      "text": [
-                        {
-                          "locale": "en",
-                          "text": "Cancel"
-                        },
-                        {
-                          "locale": "de",
-                          "text": "Abbrechen"
-                        }
-                      ]
-                    }
-                  },
-                  "priority": "SECONDARY",
-                  "destructive": true
-                }
+                "scope": "HIDDEN_IN_READONLY_MODE"
               }
             ]
           },
@@ -163,28 +144,7 @@
                 },
                 "target": "screen-14588",
                 "validation": "partial",
-                "scope": "HIDDEN_IN_READONLY_MODE",
-                "orCreateButtonStyling": {
-                  "label": {
-                    "type": "Multilingual",
-                    "multilingualText": {
-                      "text": [
-                        {
-                          "locale": "en",
-                          "text": "Order Summary"
-                        },
-                        {
-                          "locale": "de",
-                          "text": "Bestellübersicht"
-                        }
-                      ]
-                    }
-                  },
-                  "icon": {
-                    "name": "list"
-                  },
-                  "priority": "SECONDARY"
-                }
+                "scope": "HIDDEN_IN_READONLY_MODE"
               }
             ]
           }
@@ -1389,28 +1349,7 @@
                   "priority": "SECONDARY"
                 },
                 "target": "#previous",
-                "scope": "HIDDEN_IN_READONLY_MODE",
-                "orCreateButtonStyling": {
-                  "label": {
-                    "type": "Multilingual",
-                    "multilingualText": {
-                      "text": [
-                        {
-                          "locale": "en",
-                          "text": "Back"
-                        },
-                        {
-                          "locale": "de",
-                          "text": "Zurück"
-                        }
-                      ]
-                    }
-                  },
-                  "icon": {
-                    "name": "arrow_back"
-                  },
-                  "priority": "SECONDARY"
-                }
+                "scope": "HIDDEN_IN_READONLY_MODE"
               }
             ]
           },
@@ -1443,28 +1382,7 @@
                 },
                 "event": "event_submit",
                 "validation": "partial",
-                "scope": "HIDDEN_IN_READONLY_MODE",
-                "orCreateButtonStyling": {
-                  "label": {
-                    "type": "Multilingual",
-                    "multilingualText": {
-                      "text": [
-                        {
-                          "locale": "en",
-                          "text": "Place Order"
-                        },
-                        {
-                          "locale": "de",
-                          "text": "Bestellung Absenden"
-                        }
-                      ]
-                    }
-                  },
-                  "icon": {
-                    "name": "shopping_cart"
-                  },
-                  "priority": "PRIMARY"
-                }
+                "scope": "HIDDEN_IN_READONLY_MODE"
               }
             ]
           }

@@ -61,7 +61,7 @@
         },
         "joinOperator": {
           "enabled": false,
-          "value": null
+          "value": "all"
         },
         "invert": {
           "enabled": true,

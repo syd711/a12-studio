@@ -95,6 +95,7 @@ public abstract class Button implements EventButtonLike {
     icon.setName(name);
   }
 
+  @JsonIgnore
   public ButtonStyling getOrCreateButtonStyling() {
     if (buttonStyling == null) {
       buttonStyling = new ButtonStyling();

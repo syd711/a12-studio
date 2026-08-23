@@ -11,7 +11,8 @@ import lombok.Setter;
 public class ModelInfo {
 
   private String name;
-  private boolean immutable;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean immutable;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String comment;
 }

@@ -1,11 +1,6 @@
 name: A12 Studio Build
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 concurrency:
