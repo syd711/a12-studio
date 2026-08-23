@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="560.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController">
+   <top>
+      <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <VBox alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" BorderPane.alignment="CENTER">
+         <children>
+            <Label styleClass="field-label" text="%name">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="nameField" promptText="%enter_the_overview_model_name_here">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </TextField>
+            <Label styleClass="field-label" text="%location">
+               <VBox.margin>
+                  <Insets top="12.0" />
+               </VBox.margin>
+            </Label>
+            <Label fx:id="pathLabel" styleClass="field-value" />
+            <Label styleClass="field-label" text="%fields">
+               <VBox.margin>
+                  <Insets top="12.0" />
+               </VBox.margin>
+            </Label>
+            <Label fx:id="fieldsEmptyLabel" styleClass="field-value" text="%no_fields_found_in_selection" />
+            <ScrollPane fitToWidth="true" prefHeight="260.0" VBox.vgrow="ALWAYS">
+               <content>
+                  <VBox fx:id="fieldsBox" spacing="4.0" />
+               </content>
+               <VBox.margin>
+                  <Insets top="6.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="3.0" left="6.0" right="3.0" top="3.0" />
+               </padding>
+            </ScrollPane>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+   <bottom>
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <items>
+          <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%create_model" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
+         </items>
+      </ToolBar>
+   </bottom>
+</BorderPane>

@@ -1,14 +1,22 @@
 package de.a12.studio.ui.editors.documentmodel;
 
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
+import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.FieldOption;
+import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.Result;
 import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController;
 import de.a12.studio.ui.util.FileUtils;
@@ -27,9 +35,13 @@ import javafx.scene.control.TreeTableView;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import de.a12.studio.ui.util.StudioBundle;
@@ -57,6 +69,12 @@ public class DocumentModelActions {
     this.onModelChanged = onModelChanged;
   }
 
+  /**
+   * Called fresh for every right-click (see {@link DocumentModelElementsTreeController}'s row factory, which
+   * builds a new menu per {@code ContextMenuEvent} instead of caching one via {@code TreeTableRow.setContextMenu}
+   * in {@code updateItem}), so the "Create Overview Model from Selection" entry below always reflects the
+   * tree's actual selection at click time.
+   */
   public ContextMenu createContextMenu(@NonNull Element element) {
     ContextMenu contextMenu = new ContextMenu();
     contextMenu.getItems().addAll(createElementMenuItems(element));
@@ -68,6 +86,13 @@ public class DocumentModelActions {
     if (!new ElementViewModel(element).hasFixedChildren()) {
       Menu createMenu = new Menu("_Create...");
       createMenu.getItems().addAll(createAddMenuItems());
+      List<TreeItem<ElementViewModel>> selection = new ArrayList<>(elementsTreeTable.getSelectionModel().getSelectedItems());
+      if (selection.size() > 1) {
+        createMenu.getItems().add(new SeparatorMenuItem());
+        MenuItem overviewModelItem = createMenuItem("_Overview Model from Selection...", WidgetFactory.createModelIcon(Icons.PNG_MODEL_OVERVIEW));
+        overviewModelItem.setOnAction(event -> onCreateOverviewModelFromSelection(selection));
+        createMenu.getItems().add(overviewModelItem);
+      }
       items.add(createMenu);
       items.add(new SeparatorMenuItem());
     }
@@ -163,6 +188,81 @@ public class DocumentModelActions {
 
     commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), newElement, insertionPoint.index()));
     onModelChanged.accept(newElement);
+  }
+
+  /**
+   * Opens {@link Dialogs#showCreateOverviewModel} for {@code selection} (the tree's current multi-selection,
+   * required by the caller to have more than one item) and, once confirmed, creates a new Overview Model in
+   * this Document Model's own folder with one Column per checked field, in {@link #collectFields}'s order.
+   */
+  private void onCreateOverviewModelFromSelection(@NonNull List<TreeItem<ElementViewModel>> selection) {
+    DocumentModel documentModel = (DocumentModel) projectItem.getModel();
+    ElementIndex index = new ElementIndex(documentModel);
+    List<FieldElement> fields = collectFields(selection);
+    List<FieldOption> fieldOptions = fields.stream().map(field -> new FieldOption(field.getId(), index.getPath(field))).toList();
+
+    ProjectItem targetFolder = projectItem.getParent();
+    Optional<Result> input = Dialogs.showCreateOverviewModel(Studio.stage, targetFolder, fieldOptions, defaultOverviewModelName(documentModel.getId()));
+    if (input.isEmpty()) {
+      return;
+    }
+
+    try {
+      ProjectItem newItem = NewModelFactory.createModel(targetFolder, ModelType.OVERVIEW, input.get().name(), documentModel.getId());
+      OverviewModel overviewModel = (OverviewModel) newItem.getModel();
+      for (String fieldId : input.get().selectedFieldIds()) {
+        Column column = new Column();
+        column.setId("column-" + shortId());
+        column.setWidth(1.0);
+        column.setElementRef(fieldId);
+        overviewModel.getContent().getColumns().add(column);
+      }
+      newItem.save();
+    }
+    catch (IOException e) {
+      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("could_not_create_item", input.get().name()), e.getMessage());
+    }
+  }
+
+  /**
+   * Every {@link FieldElement} reachable from {@code selection}: a directly selected field is included as-is,
+   * a directly selected {@link GroupElement} contributes every field nested under it (recursively, so a
+   * sub-group's fields are included too), and everything else (rules, computations, attachments/multi-select
+   * as a whole) contributes nothing. Selections are deduplicated by id and first collapsed to their top-level
+   * items via {@link #topLevelSelection} so a field selected both directly and as part of a selected ancestor
+   * group isn't counted twice.
+   */
+  private List<FieldElement> collectFields(@NonNull List<TreeItem<ElementViewModel>> selection) {
+    List<FieldElement> fields = new ArrayList<>();
+    Set<String> seenIds = new LinkedHashSet<>();
+    for (TreeItem<ElementViewModel> item : topLevelSelection(selection)) {
+      collectFields(item.getValue().getElement(), fields, seenIds);
+    }
+    return fields;
+  }
+
+  private void collectFields(@NonNull Element element, @NonNull List<FieldElement> fields, @NonNull Set<String> seenIds) {
+    if (element instanceof FieldElement fieldElement) {
+      if (seenIds.add(fieldElement.getId())) {
+        fields.add(fieldElement);
+      }
+    }
+    else if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
+      for (Element child : groupElement.getGroup().getElements()) {
+        collectFields(child, fields, seenIds);
+      }
+    }
+  }
+
+  // Mirrors the "<Base>_DM" -> "<Base>_OM" naming convention used across testing/basic's fixture models
+  // (e.g. Company_DM.json / Company_OM.json).
+  private static String defaultOverviewModelName(@NonNull String documentModelId) {
+    String base = documentModelId.endsWith("_DM") ? documentModelId.substring(0, documentModelId.length() - 3) : documentModelId;
+    return base + "_OM";
+  }
+
+  private static String shortId() {
+    return UUID.randomUUID().toString().replace("-", "").substring(0, 5);
   }
 
   /**

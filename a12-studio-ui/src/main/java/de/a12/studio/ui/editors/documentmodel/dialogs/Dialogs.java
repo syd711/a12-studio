@@ -4,6 +4,8 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.FieldOption;
+import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.Result;
 import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController.IncludeInput;
 import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -11,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 import de.a12.studio.ui.util.StudioBundle;
@@ -46,6 +49,17 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("include-dialog", fxmlLoader, owner, StudioBundle.get("new_include"));
     IncludeDialogController controller = (IncludeDialogController) stage.getUserData();
     controller.init(stage, project, excludedModel, defaultName);
+    stage.showAndWait();
+    return controller.getResult();
+  }
+
+  public static Optional<Result> showCreateOverviewModel(Stage owner, @NonNull ProjectItem targetFolder,
+      @NonNull List<FieldOption> fields, @NonNull String defaultName) {
+    FXMLLoader fxmlLoader = new FXMLLoader(CreateOverviewModelDialogController.class.getResource("create-overview-model-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("create-overview-model-dialog", fxmlLoader, owner, StudioBundle.get("create_overview_model_from_selection"));
+    CreateOverviewModelDialogController controller = (CreateOverviewModelDialogController) stage.getUserData();
+    controller.init(stage, targetFolder, fields, defaultName);
     stage.showAndWait();
     return controller.getResult();
   }

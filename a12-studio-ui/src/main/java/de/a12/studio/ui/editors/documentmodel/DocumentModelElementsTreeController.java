@@ -627,8 +627,6 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         @Override
         protected void updateItem(ElementViewModel item, boolean empty) {
           super.updateItem(item, empty);
-          setContextMenu(empty || item == null || hasFixedChildrenAncestor(item.getElement())
-              ? null : documentModelActions.createContextMenu(item.getElement()));
           boolean fixedChildLeaf = !empty && item != null && hasFixedChildrenAncestor(item.getElement());
           if (fixedChildLeaf) {
             if (!getStyleClass().contains("fixed-child-row")) {
@@ -641,6 +639,18 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         }
       };
       setupRowDragAndDrop(row);
+      // Built fresh on every request (rather than once in updateItem and cached via setContextMenu) so its
+      // items - notably the multi-selection-only "Create Overview Model from Selection" entry, see
+      // DocumentModelActions#createElementMenuItems - reflect the tree's actual selection at click time; a row
+      // is only re-populated via updateItem on row reuse/scroll, not on every subsequent multi-selection change.
+      row.setOnContextMenuRequested(event -> {
+        ElementViewModel item = row.getItem();
+        if (row.isEmpty() || item == null || hasFixedChildrenAncestor(item.getElement())) {
+          return;
+        }
+        documentModelActions.createContextMenu(item.getElement()).show(row, event.getScreenX(), event.getScreenY());
+        event.consume();
+      });
       return row;
     });
     setupTreeDragAndDrop();
