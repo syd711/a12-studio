@@ -7,7 +7,6 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.FieldOption;
 import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.Result;
 import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController.IncludeInput;
-import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -26,10 +25,7 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("document-type-settings", fxmlLoader, Studio.stage, StudioBundle.get("type_definitions") + titleSuffix());
     TypeDefinitionSettingsDialog controller = (TypeDefinitionSettingsDialog) stage.getUserData();
     controller.setStage(stage);
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
+    WidgetFactory.installResizable(stage);
     stage.setOnHidden(event -> controller.destroy());
 
     stage.showAndWait();
@@ -49,6 +45,8 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("include-dialog", fxmlLoader, owner, StudioBundle.get("new_include"));
     IncludeDialogController controller = (IncludeDialogController) stage.getUserData();
     controller.init(stage, project, excludedModel, defaultName);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.getResult();
   }
@@ -60,6 +58,8 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("create-overview-model-dialog", fxmlLoader, owner, StudioBundle.get("create_overview_model_from_selection"));
     CreateOverviewModelDialogController controller = (CreateOverviewModelDialogController) stage.getUserData();
     controller.init(stage, targetFolder, fields, defaultName);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.getResult();
   }

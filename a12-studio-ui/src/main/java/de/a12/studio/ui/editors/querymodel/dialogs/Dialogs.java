@@ -25,10 +25,12 @@ public class Dialogs {
   public static boolean showFilterDefinition(Stage owner, @NonNull QueryModelContent content) {
     FXMLLoader fxmlLoader = new FXMLLoader(QueryFilterDefinitionDialogController.class.getResource("query-filter-definition-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, StudioBundle.get("edit_filter_definition"));
+    Stage stage = WidgetFactory.createDialogStage("query-filter-definition-dialog", fxmlLoader, owner, StudioBundle.get("edit_filter_definition"));
     QueryFilterDefinitionDialogController controller = (QueryFilterDefinitionDialogController) stage.getUserData();
     controller.init(stage, content);
     stage.setOnHidden(event -> controller.destroy());
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.isConfirmed();
   }
@@ -50,9 +52,11 @@ public class Dialogs {
   private static boolean showSort(Stage owner, String title, ProjectItem projectItem, @NonNull QuerySort sort) {
     FXMLLoader fxmlLoader = new FXMLLoader(QuerySortDialogController.class.getResource("query-sort-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
+    Stage stage = WidgetFactory.createDialogStage("query-sort-dialog", fxmlLoader, owner, title);
     QuerySortDialogController controller = (QuerySortDialogController) stage.getUserData();
     controller.init(stage, projectItem, sort);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.isConfirmed();
   }

@@ -6,6 +6,7 @@ import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
@@ -31,7 +32,6 @@ public final class TreeHierarchicalColumnRefValidator implements ModelValidator 
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "The hierarchical column reference \"" + hierarchicalColumnRef + "\" does not exist in the tree's columns.",
-        Severity.ERROR.name()));
+        ValidationMessages.get("validation.treeHierarchicalColumnRef.missing", hierarchicalColumnRef), Severity.ERROR.name()));
   }
 }

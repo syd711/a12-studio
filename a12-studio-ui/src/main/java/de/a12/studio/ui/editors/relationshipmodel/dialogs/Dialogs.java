@@ -38,10 +38,12 @@ public class Dialogs {
   private static boolean showEntity(Stage owner, String title, List<String> documentModelOptions, EntityCharacteristic entity) {
     FXMLLoader fxmlLoader = new FXMLLoader(EntityCharacteristicDialogController.class.getResource("entity-characteristic-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
+    Stage stage = WidgetFactory.createDialogStage("entity-characteristic-dialog", fxmlLoader, owner, title);
     EntityCharacteristicDialogController controller = (EntityCharacteristicDialogController) stage.getUserData();
     controller.init(stage, entity, documentModelOptions);
     stage.setOnHidden(event -> controller.destroy());
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.isConfirmed();
   }

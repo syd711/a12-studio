@@ -9,6 +9,7 @@ import de.a12.studio.models.printmodel.PrintSegmentDefinition;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -38,8 +39,7 @@ public final class PrintHeadlineOrderValidator implements ModelValidator {
         }
         if (level > lastLevel + 1) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "Headline level " + level + " is used before level " + (lastLevel + 1)
-                  + ". Headline levels must be used in order.", Severity.WARNING.name()));
+              ValidationMessages.get("validation.printHeadlineOrder.outOfOrder", level, lastLevel + 1), Severity.WARNING.name()));
         }
         lastLevel = level;
       }

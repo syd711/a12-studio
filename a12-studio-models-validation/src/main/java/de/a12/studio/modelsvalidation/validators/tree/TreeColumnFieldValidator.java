@@ -11,6 +11,7 @@ import de.a12.studio.models.treemodel.TreeNodeColumn;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
@@ -42,8 +43,8 @@ public final class TreeColumnFieldValidator implements ModelValidator {
       for (TreeNodeColumn mapping : node.getColumns()) {
         if (mapping.getColumnRef() == null || !columnIds.contains(mapping.getColumnRef())) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "The column reference \"" + mapping.getColumnRef() + "\" of node type \"" + node.getId()
-                  + "\" does not exist in the tree's columns.", Severity.ERROR.name()));
+              ValidationMessages.get("validation.treeColumnField.unknownColumn", mapping.getColumnRef(), node.getId()),
+              Severity.ERROR.name()));
         }
         if (index == null || mapping.getElementRef() == null || mapping.getElementRef().isBlank()) {
           continue;
@@ -54,15 +55,12 @@ public final class TreeColumnFieldValidator implements ModelValidator {
             .orElse(null);
         if (element == null) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "The reference is invalid. The referenced field \"" + mapping.getElementRef()
-                  + "\" does not exist in the document model \"" + node.getDocumentModelRef() + "\".",
+              ValidationMessages.get("validation.treeColumnField.missingField", mapping.getElementRef(), node.getDocumentModelRef()),
               Severity.ERROR.name()));
         }
         else if (isIndexedFalse(element)) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "The \"indexed\" annotation of field \"" + element.getName()
-                  + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
-              Severity.ERROR.name()));
+              ValidationMessages.get("validation.common.indexedAnnotationFalse", element.getName()), Severity.ERROR.name()));
         }
       }
     }

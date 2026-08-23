@@ -6,6 +6,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.HashSet;
@@ -26,8 +27,7 @@ public final class RelationshipUniqueRolesValidator implements ModelValidator {
     for (EntityCharacteristic entity : relationshipModel.getContent().getEntityCharacteristics()) {
       if (entity.getRole() != null && !entity.getRole().isBlank() && !seen.add(entity.getRole())) {
         return List.of(new ModelValidationError(model, ELEMENT_ID,
-            "The role \"" + entity.getRole() + "\" is already taken by the other entity. Roles must be unique.",
-            Severity.ERROR.name()));
+            ValidationMessages.get("validation.relationshipUniqueRoles.duplicate", entity.getRole()), Severity.ERROR.name()));
       }
     }
     return List.of();

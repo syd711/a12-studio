@@ -5,6 +5,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
@@ -24,6 +25,6 @@ public final class RelationshipEntityCountValidator implements ModelValidator {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        "Please ensure that exactly two related entities are specified.", Severity.ERROR.name()));
+        ValidationMessages.get("validation.relationshipEntityCount.wrongCount"), Severity.ERROR.name()));
   }
 }

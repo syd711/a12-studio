@@ -27,6 +27,8 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-role", fxmlLoader, owner, title);
     RoleDialogController controller = (RoleDialogController) stage.getUserData();
     controller.init(stage, role);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.applyResultTo(role);
   }
@@ -46,6 +48,8 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-user", fxmlLoader, owner, title);
     UserDialogController controller = (UserDialogController) stage.getUserData();
     controller.init(stage, user);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.applyResultTo(user);
   }

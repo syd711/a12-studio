@@ -7,7 +7,6 @@ import de.a12.studio.models.applicationmodel.Directive;
 import de.a12.studio.models.applicationmodel.Flow;
 import de.a12.studio.models.applicationmodel.Menu;
 import de.a12.studio.models.applicationmodel.Scene;
-import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -33,10 +32,7 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("dialog-children-menu", fxmlLoader, owner, title);
     ChildMenuDialogController controller = (ChildMenuDialogController) stage.getUserData();
     controller.init(stage, menu, snapshot);
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
+    WidgetFactory.installResizable(stage);
     stage.setOnHidden(event -> controller.destroy());
 
     stage.showAndWait();
@@ -57,6 +53,8 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("dialog-module", fxmlLoader, owner, title);
     ModuleDialogController controller = (ModuleDialogController) stage.getUserData();
     controller.init(stage, initialName);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.getResult();
   }
@@ -75,6 +73,8 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("dialog-subregion", fxmlLoader, owner, title);
     SubregionDialogController controller = (SubregionDialogController) stage.getUserData();
     controller.init(stage, initialName);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.getResult();
   }
@@ -114,10 +114,7 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("dialogscene", fxmlLoader, owner, title);
     SceneDialogController controller = (SceneDialogController) stage.getUserData();
     controller.init(stage, flow, scene, snapshot);
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
+    WidgetFactory.installResizable(stage);
 
     stage.showAndWait();
     return controller.isConfirmed();
@@ -139,10 +136,7 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("dialog-case", fxmlLoader, owner, title);
     CaseDialogController controller = (CaseDialogController) stage.getUserData();
     controller.init(stage, caseObj, snapshot);
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
+    WidgetFactory.installResizable(stage);
 
     stage.setOnHidden(event -> controller.destroy());
     stage.showAndWait();
@@ -163,10 +157,7 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("dialog-directive", fxmlLoader, owner, title);
     DirectiveDialogController controller = (DirectiveDialogController) stage.getUserData();
     controller.init(stage, existing);
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
+    WidgetFactory.installResizable(stage);
 
     stage.showAndWait();
     return controller.getResult();

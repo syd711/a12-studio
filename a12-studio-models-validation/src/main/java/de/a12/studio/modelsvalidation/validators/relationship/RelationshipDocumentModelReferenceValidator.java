@@ -6,6 +6,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -25,12 +26,12 @@ public final class RelationshipDocumentModelReferenceValidator implements ModelV
     for (EntityCharacteristic entity : relationshipModel.getContent().getEntityCharacteristics()) {
       if (entity.getDocumentModel() == null || entity.getDocumentModel().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "A Document Model must be selected for role \"" + entity.getRole() + "\".", Severity.ERROR.name()));
+            ValidationMessages.get("validation.relationshipDocumentModelReference.missing", entity.getRole()), Severity.ERROR.name()));
       }
       else if (context.findOtherDocumentModel(entity.getDocumentModel()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The Document Model \"" + entity.getDocumentModel() + "\" of role \"" + entity.getRole()
-                + "\" does not exist in the workspace.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.relationshipDocumentModelReference.notFound",
+                entity.getDocumentModel(), entity.getRole()), Severity.ERROR.name()));
       }
     }
 
@@ -38,7 +39,7 @@ public final class RelationshipDocumentModelReferenceValidator implements ModelV
     if (linkDocumentModel != null && !linkDocumentModel.isBlank()
         && context.findOtherDocumentModel(linkDocumentModel) == null) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "The Link Document Model \"" + linkDocumentModel + "\" does not exist in the workspace.", Severity.ERROR.name()));
+          ValidationMessages.get("validation.relationshipDocumentModelReference.linkNotFound", linkDocumentModel), Severity.ERROR.name()));
     }
     return errors;
   }

@@ -3,7 +3,6 @@ package de.a12.studio.ui.editors.formmodel.dialogs;
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.EventButton;
 import de.a12.studio.models.util.JsonSettings;
-import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -56,10 +55,7 @@ public class Dialogs {
     FormButtonDialogController controller = (FormButtonDialogController) stage.getUserData();
     controller.init(stage, screenIds, button);
     stage.setOnHidden(event -> controller.destroy());
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
+    WidgetFactory.installResizable(stage);
 
     stage.showAndWait();
     // Reads back controller.getButton() rather than the local `button` above, since onTypeChanged may have

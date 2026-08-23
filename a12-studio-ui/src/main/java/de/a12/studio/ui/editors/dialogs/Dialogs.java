@@ -1,6 +1,5 @@
 package de.a12.studio.ui.editors.dialogs;
 
-import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.Studio;
@@ -15,10 +14,7 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("document-mode-settings", fxmlLoader, Studio.stage, StudioBundle.get("model_settings"));
     ModelSettingsDialog controller = (ModelSettingsDialog) stage.getUserData();
     controller.setStage(stage);
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
+    WidgetFactory.installResizable(stage);
     stage.setOnHidden(event -> controller.destroy());
 
     stage.showAndWait();

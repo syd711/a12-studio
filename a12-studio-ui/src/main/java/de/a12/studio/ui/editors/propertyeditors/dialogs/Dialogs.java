@@ -24,6 +24,8 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("category-dialog", fxmlLoader, owner, title);
     CategoryDialogController controller = (CategoryDialogController) stage.getUserData();
     controller.initDialog(stage, name, description);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
 
     if (controller.getResult().isEmpty() || controller.getResult().get() != ButtonType.OK) {
@@ -39,9 +41,11 @@ fxmlLoader.setResources(StudioBundle.getBundle());
   public static Optional<List<String>> showSuggestions(Stage owner, String title, List<String> initialValues) {
     FXMLLoader fxmlLoader = new FXMLLoader(SuggestionsDialogController.class.getResource("suggestions-dialog.fxml"));
 fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
+    Stage stage = WidgetFactory.createDialogStage("suggestions-dialog", fxmlLoader, owner, title);
     SuggestionsDialogController controller = (SuggestionsDialogController) stage.getUserData();
     controller.initDialog(stage, initialValues);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
 
     if (controller.getResult().isEmpty() || controller.getResult().get() != ButtonType.OK) {
@@ -63,6 +67,8 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("uniqueness-criterion-dialog", fxmlLoader, owner, title);
     DocumentUniquenessCriterionDialogController controller = (DocumentUniquenessCriterionDialogController) stage.getUserData();
     controller.initDialog(stage, model, criterion, usedNames);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.getResult();
   }

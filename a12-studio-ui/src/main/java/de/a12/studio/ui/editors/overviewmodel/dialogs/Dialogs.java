@@ -6,7 +6,6 @@ import de.a12.studio.models.overviewmodel.FilterGroup;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterSection;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
-import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -43,13 +42,7 @@ public class Dialogs {
     OverviewColumnDialogController controller = (OverviewColumnDialogController) stage.getUserData();
     controller.init(stage, documentModelIndex, documentModelId, column);
     stage.setOnHidden(event -> controller.destroy());
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    // root's minWidth/minHeight (see overview-column-dialog.fxml) are 700/760; the stage must
-    // allow at least that plus the shadowWrapper's padding on both sides, or the root can't lay
-    // out at its real minimum and the header/footer get clipped.
-    stage.setMinWidth(700 + 2 * WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinHeight(760 + 2 * WidgetFactory.DIALOG_SHADOW_MARGIN);
+    WidgetFactory.installResizable(stage);
 
     stage.showAndWait();
     return controller.isConfirmed();
@@ -70,6 +63,8 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("overview-multi-selection-action-dialog", fxmlLoader, owner, title);
     MultiSelectionActionDialogController controller = (MultiSelectionActionDialogController) stage.getUserData();
     controller.initDialog(stage, button);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.isConfirmed();
   }
@@ -87,15 +82,11 @@ public class Dialogs {
   private static boolean showSection(Stage owner, String title, ElementIndex documentModelIndex, FilterSection section) {
     FXMLLoader fxmlLoader = new FXMLLoader(SectionDataDialogController.class.getResource("overview-section-data-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
+    Stage stage = WidgetFactory.createDialogStage("overview-section-data-dialog", fxmlLoader, owner, title);
     SectionDataDialogController controller = (SectionDataDialogController) stage.getUserData();
     controller.initDialog(stage, documentModelIndex, section);
     stage.setOnHidden(event -> controller.destroy());
-
-    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
-    stage.setMinWidth(800);
-    stage.setMinHeight(600);
-    stage.setOnHidden(event -> controller.destroy());
+    WidgetFactory.installResizable(stage);
 
     stage.showAndWait();
     return controller.isConfirmed();
@@ -119,6 +110,8 @@ public class Dialogs {
     FilterGroupDialogController controller = (FilterGroupDialogController) stage.getUserData();
     controller.init(stage, documentModelIndex, group);
     stage.setOnHidden(event -> controller.destroy());
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.isConfirmed();
   }
@@ -138,6 +131,8 @@ public class Dialogs {
     FilterItemDialogController controller = (FilterItemDialogController) stage.getUserData();
     controller.init(stage, documentModelIndex, item);
     stage.setOnHidden(event -> controller.destroy());
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.isConfirmed();
   }

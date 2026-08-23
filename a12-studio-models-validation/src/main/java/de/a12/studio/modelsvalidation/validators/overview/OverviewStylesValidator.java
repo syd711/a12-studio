@@ -5,6 +5,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -23,7 +24,8 @@ public final class OverviewStylesValidator implements ModelValidator {
     List<ModelValidationError> errors = new ArrayList<>();
     for (String style : overviewModel.getContent().getStyles()) {
       if (style == null || style.isBlank()) {
-        errors.add(new ModelValidationError(model, ELEMENT_ID, "A style value is required; remove the empty entry or set a value.", Severity.ERROR.name()));
+        errors.add(new ModelValidationError(model, ELEMENT_ID,
+            ValidationMessages.get("validation.overviewStyles.emptyValue"), Severity.ERROR.name()));
       }
     }
     return errors;

@@ -7,6 +7,7 @@ import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -49,16 +50,15 @@ public final class PrintTableColumnWidthValidator implements ModelValidator {
         double value = width.doubleValue();
         if (value != Math.floor(value) || value < 1 || value > 100) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "The " + type + " element \"" + definition.getId()
-                  + "\" has a column width of " + width + "; widths must be integers between 1 and 100.",
+              ValidationMessages.get("validation.printTableColumnWidth.invalidWidth", type, definition.getId(), width),
               Severity.ERROR.name()));
         }
         sum += (int) value;
       }
       if (anyWidth && sum > 100) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The column widths of the " + type + " element \"" + definition.getId()
-                + "\" sum to " + sum + "; the sum must not exceed 100.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.printTableColumnWidth.sumExceeds100", type, definition.getId(), sum),
+            Severity.ERROR.name()));
       }
     }
     return errors;

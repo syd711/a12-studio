@@ -11,6 +11,7 @@ import de.a12.studio.models.printmodel.PrintTextElement;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -54,8 +55,8 @@ public final class PrintElementReferenceIntegrityValidator implements ModelValid
       for (PrintElementReference reference : segment.getElementReferences()) {
         if (reference.getRefId() == null || !definitionIds.contains(reference.getRefId())) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "Segment \"" + segment.getTitle() + "\" references the element definition \"" + reference.getRefId()
-                  + "\" which does not exist.", Severity.ERROR.name()));
+              ValidationMessages.get("validation.printElementReferenceIntegrity.missingElementDefinition",
+                  segment.getTitle(), reference.getRefId()), Severity.ERROR.name()));
         }
       }
     }
@@ -65,8 +66,8 @@ public final class PrintElementReferenceIntegrityValidator implements ModelValid
         for (EntityRef entity : text.getText().getEntities()) {
           if (entity.getRefId() == null || !definitionIds.contains(entity.getRefId())) {
             errors.add(new ModelValidationError(model, ELEMENT_ID,
-                "The text element \"" + definition.getId() + "\" embeds the entity \"" + entity.getRefId()
-                    + "\" which does not exist in the element definitions.", Severity.ERROR.name()));
+                ValidationMessages.get("validation.printElementReferenceIntegrity.missingEntity",
+                    definition.getId(), entity.getRefId()), Severity.ERROR.name()));
           }
         }
       }
@@ -76,7 +77,7 @@ public final class PrintElementReferenceIntegrityValidator implements ModelValid
       for (PrintStructureEntry entry : printModel.getContent().getGeneral().getStructure()) {
         if (entry.getId() == null || !segmentIds.contains(entry.getId())) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
-              "The document structure references the segment \"" + entry.getId() + "\" which does not exist.",
+              ValidationMessages.get("validation.printElementReferenceIntegrity.missingSegment", entry.getId()),
               Severity.ERROR.name()));
         }
       }

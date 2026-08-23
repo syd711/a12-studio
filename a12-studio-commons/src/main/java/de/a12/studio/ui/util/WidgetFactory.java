@@ -32,6 +32,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -397,6 +398,21 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     }
 
     return stage;
+  }
+
+  /**
+   * Enables edge/drag resize (see {@link FXResizeHelper}) on a dialog stage created via {@link
+   * #createDialogStage}. The stage's minimum size is derived from the dialog's own FXML root
+   * minWidth/minHeight (plus the {@link #DIALOG_SHADOW_MARGIN} padding createDialogStage wraps it
+   * in), instead of every call site guessing a number - a mismatched guess smaller than the root's
+   * real minimum let the stage shrink past what the content could lay out at, clipping the
+   * header/footer. Must be called after {@link #createDialogStage} on the same stage.
+   */
+  public static void installResizable(Stage stage) {
+    FXResizeHelper.install(stage, 30, 6, DIALOG_SHADOW_MARGIN);
+    Region content = (Region) ((Pane) stage.getScene().getRoot()).getChildren().get(0);
+    stage.setMinWidth(content.minWidth(-1) + 2 * DIALOG_SHADOW_MARGIN);
+    stage.setMinHeight(content.minHeight(-1) + 2 * DIALOG_SHADOW_MARGIN);
   }
 
   private static void restoreStagePosition(String stateId, Stage stage) {

@@ -7,6 +7,7 @@ import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ public final class PrintDocumentModelReferenceValidator implements ModelValidato
       if (reference.getModelType() == ModelType.DOCUMENT
           && reference.getReference() != null && reference.getReference().contains(".")) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The referenced Document Model \"" + reference.getReference()
-                + "\" must not contain dots in its name.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.printDocumentModelReference.dotsInName", reference.getReference()),
+            Severity.ERROR.name()));
       }
     }
     return errors;

@@ -37,6 +37,8 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("sourcemodel-dialog", fxmlLoader, owner, title);
     SourceModelDialogController controller = (SourceModelDialogController) stage.getUserData();
     controller.initDialog(stage, sourceModel);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.isConfirmed();
   }

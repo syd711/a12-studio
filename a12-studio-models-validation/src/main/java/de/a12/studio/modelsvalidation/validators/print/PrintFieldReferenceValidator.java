@@ -10,6 +10,7 @@ import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
@@ -42,14 +43,14 @@ public final class PrintFieldReferenceValidator implements ModelValidator {
       FieldRef field = fieldElement.getField();
       if (field.getModel() == null || field.getModel().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The field element \"" + definition.getId() + "\" does not reference a Document Model.",
+            ValidationMessages.get("validation.printFieldReference.missingModelReference", definition.getId()),
             Severity.ERROR.name()));
         continue;
       }
       DocumentModel documentModel = context.findOtherDocumentModel(field.getModel());
       if (documentModel == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The Document Model \"" + field.getModel() + "\" referenced by a field element does not exist in the workspace.",
+            ValidationMessages.get("validation.printFieldReference.missingModel", field.getModel()),
             Severity.ERROR.name()));
         continue;
       }
@@ -59,8 +60,8 @@ public final class PrintFieldReferenceValidator implements ModelValidator {
       ElementIndex index = indexCache.computeIfAbsent(field.getModel(), key -> new ElementIndex(documentModel));
       if (!pathResolves(index, field.getPath())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The field path \"" + field.getPath() + "\" does not resolve against the Document Model \""
-                + field.getModel() + "\".", Severity.ERROR.name()));
+            ValidationMessages.get("validation.printFieldReference.unresolvablePath", field.getPath(), field.getModel()),
+            Severity.ERROR.name()));
       }
     }
     return errors;

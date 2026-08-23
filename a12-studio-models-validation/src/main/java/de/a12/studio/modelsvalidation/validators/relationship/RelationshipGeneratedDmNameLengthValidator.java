@@ -6,6 +6,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -36,8 +37,7 @@ public final class RelationshipGeneratedDmNameLengthValidator implements ModelVa
       }
       if (model.getId().length() + entity.getRole().length() + GENERATED_SUFFIX_LENGTH > MAX_NAME_LENGTH) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "Given the role \"" + entity.getRole() + "\" and the model name \"" + model.getId()
-                + "\", the generated document model name will exceed 100 characters.",
+            ValidationMessages.get("validation.relationshipGeneratedDmNameLength.tooLong", entity.getRole(), model.getId()),
             Severity.ERROR.name()));
       }
     }

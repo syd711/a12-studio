@@ -6,6 +6,7 @@ import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -25,12 +26,12 @@ public final class TreeDocumentModelReferenceValidator implements ModelValidator
     for (TreeNode node : treeModel.getContent().getNodes()) {
       if (node.getDocumentModelRef() == null || node.getDocumentModelRef().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "A Document Model must be selected for node type \"" + node.getId() + "\".", Severity.ERROR.name()));
+            ValidationMessages.get("validation.treeDocumentModelReference.missing", node.getId()), Severity.ERROR.name()));
       }
       else if (context.findOtherDocumentModel(node.getDocumentModelRef()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The Document Model \"" + node.getDocumentModelRef() + "\" of node type \"" + node.getId()
-                + "\" does not exist in the workspace.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.treeDocumentModelReference.notFound",
+                node.getDocumentModelRef(), node.getId()), Severity.ERROR.name()));
       }
     }
     return errors;

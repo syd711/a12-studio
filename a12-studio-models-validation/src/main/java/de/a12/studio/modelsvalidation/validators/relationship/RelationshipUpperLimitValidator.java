@@ -7,6 +7,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -30,8 +31,7 @@ public final class RelationshipUpperLimitValidator implements ModelValidator {
       }
       if (multiplicity.getUpperLimit() == null || multiplicity.getUpperLimit() < 1) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "When not unbounded, the multiplicity of role \"" + entity.getRole() + "\" must have an upper limit of at least 1.",
-            Severity.ERROR.name()));
+            ValidationMessages.get("validation.relationshipUpperLimit.missing", entity.getRole()), Severity.ERROR.name()));
       }
     }
     return errors;

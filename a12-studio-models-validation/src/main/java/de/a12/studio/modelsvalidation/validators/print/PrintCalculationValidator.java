@@ -9,6 +9,7 @@ import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -35,20 +36,20 @@ public final class PrintCalculationValidator implements ModelValidator {
       Calculation calculation = element.getCalculation();
       if (calculation.getName() == null || calculation.getName().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The calculation element \"" + definition.getId() + "\" has no name.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.printCalculation.missingName", definition.getId()), Severity.ERROR.name()));
       }
       boolean anyOperation = calculation.getComputationAlternatives().stream()
           .map(ComputationStep::getOperation)
           .anyMatch(operation -> operation != null && !operation.isBlank());
       if (!anyOperation) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The calculation \"" + calculation.getName() + "\" has no computation operation.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.printCalculation.missingOperation", calculation.getName()), Severity.ERROR.name()));
       }
       if (calculation.getModel() != null && !calculation.getModel().isBlank()
           && context.findOtherDocumentModel(calculation.getModel()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The Document Model \"" + calculation.getModel() + "\" referenced by calculation \""
-                + calculation.getName() + "\" does not exist in the workspace.", Severity.ERROR.name()));
+            ValidationMessages.get("validation.printCalculation.missingModel", calculation.getModel(), calculation.getName()),
+            Severity.ERROR.name()));
       }
     }
     return errors;

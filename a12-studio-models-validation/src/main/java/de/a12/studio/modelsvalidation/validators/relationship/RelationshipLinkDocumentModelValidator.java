@@ -7,6 +7,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -39,13 +40,11 @@ public final class RelationshipLinkDocumentModelValidator implements ModelValida
     String linkDocumentModel = relationshipModel.getContent().getLinkDocumentModelValue();
     if (linkDocumentModel != null && !linkDocumentModel.isBlank()) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "Due to the link constraints of the related entities, no link document model may be configured.",
-          Severity.WARNING.name()));
+          ValidationMessages.get("validation.relationshipLinkDocumentModel.linkNotAllowed"), Severity.WARNING.name()));
     }
     if (Boolean.TRUE.equals(relationshipModel.getContent().getDuplicatesAllowed())) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
-          "Due to the link constraints of the related entities, duplicates are not allowed.",
-          Severity.WARNING.name()));
+          ValidationMessages.get("validation.relationshipLinkDocumentModel.duplicatesNotAllowed"), Severity.WARNING.name()));
     }
     return errors;
   }

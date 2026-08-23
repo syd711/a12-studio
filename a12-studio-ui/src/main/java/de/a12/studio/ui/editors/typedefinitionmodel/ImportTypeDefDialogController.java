@@ -101,6 +101,8 @@ public class ImportTypeDefDialogController implements DialogController {
     Stage stage = WidgetFactory.createDialogStage("import-typedef-dialog", fxmlLoader, owner, "Import Type Definitions");
     ImportTypeDefDialogController controller = (ImportTypeDefDialogController) stage.getUserData();
     controller.init(stage, candidates);
+    WidgetFactory.installResizable(stage);
+
     stage.showAndWait();
     return controller.getResult();
   }

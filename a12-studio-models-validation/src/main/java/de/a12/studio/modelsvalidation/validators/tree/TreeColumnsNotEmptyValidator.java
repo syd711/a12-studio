@@ -5,6 +5,7 @@ import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public final class TreeColumnsNotEmptyValidator implements ModelValidator {
     if (!treeModel.getContent().getColumns().isEmpty()) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "Columns must not be empty.", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID,
+        ValidationMessages.get("validation.treeColumnsNotEmpty.empty"), Severity.ERROR.name()));
   }
 }

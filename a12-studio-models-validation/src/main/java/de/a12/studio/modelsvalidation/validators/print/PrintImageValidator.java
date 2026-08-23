@@ -7,6 +7,7 @@ import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public final class PrintImageValidator implements ModelValidator {
       Object alternativeText = generic.getExtras().get("alternativeText");
       if (alternativeText == null || String.valueOf(alternativeText).isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            "The image element \"" + definition.getId() + "\" has no alternative text. An alternative text is required.",
+            ValidationMessages.get("validation.printImage.missingAlternativeText", definition.getId()),
             Severity.ERROR.name()));
       }
     }
