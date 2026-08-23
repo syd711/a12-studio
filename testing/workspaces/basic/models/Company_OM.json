@@ -42,6 +42,11 @@
       "showFullTextSearch": true,
       "pagingSize": 10,
       "showRowCount": true,
+      "filterConfiguration": {
+        "showFilterButton": null,
+        "showFilterBar": null,
+        "filterMode": "all_columns"
+      },
       "newFilterConfiguration": {
         "filterSelector": {
           "viewMode": "overlay",

@@ -5,6 +5,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public final class OverviewFilterModeRequiredValidator implements ModelValidator
     if (filterMode != null && !filterMode.isBlank()) {
       return List.of();
     }
-    return List.of(new ModelValidationError(model, ELEMENT_ID, "The field is mandatory.", Severity.ERROR.name()));
+    return List.of(new ModelValidationError(model, ELEMENT_ID,
+        ValidationMessages.get("validation.overviewFilterModeRequired.missing"), Severity.ERROR.name()));
   }
 }

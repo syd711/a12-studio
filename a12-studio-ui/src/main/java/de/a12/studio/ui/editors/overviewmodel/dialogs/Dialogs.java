@@ -39,10 +39,15 @@ public class Dialogs {
   private static boolean showColumn(Stage owner, String title, ElementIndex documentModelIndex, String documentModelId, Column column) {
     FXMLLoader fxmlLoader = new FXMLLoader(OverviewColumnDialogController.class.getResource("overview-column-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(null, fxmlLoader, owner, title);
+    Stage stage = WidgetFactory.createDialogStage("overview-column-dialog", fxmlLoader, owner, title);
     OverviewColumnDialogController controller = (OverviewColumnDialogController) stage.getUserData();
     controller.init(stage, documentModelIndex, documentModelId, column);
     stage.setOnHidden(event -> controller.destroy());
+
+    FXResizeHelper.install(stage, 30, 6, WidgetFactory.DIALOG_SHADOW_MARGIN);
+    stage.setMinWidth(800);
+    stage.setMinHeight(600);
+
     stage.showAndWait();
     return controller.isConfirmed();
   }

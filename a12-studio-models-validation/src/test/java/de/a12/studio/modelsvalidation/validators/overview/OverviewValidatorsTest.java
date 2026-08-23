@@ -49,7 +49,7 @@ class OverviewValidatorsTest {
     List<ModelValidationError> errors = new OverviewFilterModeRequiredValidator().validate(model, TestModels.context(model));
 
     assertEquals(1, errors.size());
-    assertTrue(errors.get(0).message().contains("mandatory"));
+    assertTrue(errors.get(0).message().contains("Filter Mode"));
   }
 
   @Test

@@ -33,7 +33,7 @@
 
     <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
       <children>
-        <Label styleClass="field-label" text="%document_model" />
+        <Label styleClass="field-label" text="%document_model_link" />
         <HBox alignment="CENTER_LEFT" spacing="6.0">
           <children>
             <ComboBox fx:id="documentModelCombo" editable="false" maxWidth="Infinity" HBox.hgrow="ALWAYS" />

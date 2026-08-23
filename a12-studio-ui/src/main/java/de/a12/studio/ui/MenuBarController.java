@@ -50,6 +50,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
@@ -153,9 +154,24 @@ public class MenuBarController implements Initializable, StudioEventListener {
         project.load(file);
         autoDetectApplicationGroups(project);
 
-        Platform.runLater(()-> {
-          StudioEventManager.getInstance().fireProjectOpenEvent(project);
+        // Block this background thread until the project-open event has actually finished
+        // dispatching on the FX thread (tree/tabs built), so the progress dialog - which closes
+        // as soon as processNext() returns - doesn't hide before the editor is actually shown.
+        CountDownLatch projectOpenedLatch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+          try {
+            StudioEventManager.getInstance().fireProjectOpenEvent(project);
+          }
+          finally {
+            projectOpenedLatch.countDown();
+          }
         });
+        try {
+          projectOpenedLatch.await();
+        }
+        catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
       }
 
       @Override
