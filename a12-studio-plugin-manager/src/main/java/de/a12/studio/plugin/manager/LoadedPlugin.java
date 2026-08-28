@@ -40,6 +40,9 @@ public class LoadedPlugin {
   /** All {@link IProjectOpenedListener} instances contributed by this plugin. */
   private final List<IProjectOpenedListener> projectOpenedListeners;
 
+  /** All {@link IProjectToolbarButtonContribution} instances contributed by this plugin. */
+  private final List<IProjectToolbarButtonContribution> projectToolbarButtonContributions;
+
   LoadedPlugin(@NonNull PluginDescriptor descriptor,
                @NonNull URLClassLoader classLoader,
                @NonNull List<ICreateItemMenuEntry> createMenuEntries,
@@ -47,7 +50,8 @@ public class LoadedPlugin {
                @NonNull List<IModelSaveInterceptor> modelSaveInterceptors,
                @NonNull List<IModelValidatorContribution> modelValidatorContributions,
                @NonNull List<INewModelNameInterceptor> newModelNameInterceptors,
-               @NonNull List<IProjectOpenedListener> projectOpenedListeners) {
+               @NonNull List<IProjectOpenedListener> projectOpenedListeners,
+               @NonNull List<IProjectToolbarButtonContribution> projectToolbarButtonContributions) {
     this.descriptor = descriptor;
     this.classLoader = classLoader;
     this.createMenuEntries = createMenuEntries;
@@ -56,5 +60,6 @@ public class LoadedPlugin {
     this.modelValidatorContributions = modelValidatorContributions;
     this.newModelNameInterceptors = newModelNameInterceptors;
     this.projectOpenedListeners = projectOpenedListeners;
+    this.projectToolbarButtonContributions = projectToolbarButtonContributions;
   }
 }

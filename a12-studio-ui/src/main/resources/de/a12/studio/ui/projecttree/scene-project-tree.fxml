@@ -18,7 +18,7 @@
     <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
-              <ToolBar prefHeight="40.0" prefWidth="200.0">
+              <ToolBar fx:id="projectToolbar" prefHeight="40.0" prefWidth="200.0">
                   <items>
                       <MenuButton fx:id="newButton" accessibleText="%new" mnemonicParsing="false" styleClass="default-button">
                           <graphic>

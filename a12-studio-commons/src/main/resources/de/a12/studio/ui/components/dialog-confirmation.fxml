@@ -8,12 +8,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="450.0" styleClass="navigation-panel" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.ConfirmationDialogController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="450.0" styleClass="navigation-panel" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.ConfirmationDialogController">
    <top>
       <fx:include fx:id="header" source="scene-dialog-header.fxml" />
    </top>
    <center>
-      <VBox alignment="BASELINE_LEFT" maxWidth="600.0" prefHeight="90.0" BorderPane.alignment="TOP_LEFT">
+      <VBox alignment="BASELINE_LEFT" maxWidth="600.0" prefHeight="110.0" BorderPane.alignment="TOP_LEFT">
          <children>
             <Label fx:id="textLabel" maxWidth="600.0" styleClass="dialog-text" text="%label" wrapText="true">
                <font>
@@ -30,7 +30,7 @@
             <Label fx:id="helpLabel2" layoutX="10.0" layoutY="43.0" maxWidth="600.0" styleClass="preference-description" text="%label" wrapText="true" />
          </children>
          <BorderPane.margin>
-            <Insets bottom="24.0" left="24.0" right="24.0" top="12.0" />
+            <Insets bottom="12.0" left="24.0" right="24.0" top="12.0" />
          </BorderPane.margin>
       </VBox>
    </center>

@@ -36,6 +36,13 @@ public class StudioEventManager {
     }
   }
 
+  public void fireTabsRestoredEvent(@NonNull Project project) {
+    TabsRestoredEvent event = new TabsRestoredEvent(project);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.tabsRestored(event);
+    }
+  }
+
   public void fireProjectClosedEvent(@NonNull Project project) {
     ProjectClosedEvent event = new ProjectClosedEvent(project);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {

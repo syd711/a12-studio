@@ -1,0 +1,100 @@
+/**
+ * Model Type Colors
+ *
+ * One accent color per ModelType (de.a12.studio.models.ModelType), picked up from that model
+ * type's icon background (a12-studio-ui/.../icons/Model-*.png) so tab colors and icon colors
+ * always agree. Each type also gets a "-bright" variant (base color lightened ~25% in HSL) used
+ * to tint that model type's editor tab header when the "Enable Colorful Studio" preference
+ * (PreferenceAppGeneralPanelController / LocalUISettings.COLORFUL_STUDIO_ENABLED) is on.
+ */
+* {
+    -fx-model-color-document: #3C91ED;
+    -fx-model-color-document-bright: #B1D3F8;
+
+    -fx-model-color-form: #4ABA70;
+    -fx-model-color-form-bright: #A6DDB9;
+
+    -fx-model-color-overview: #EDA82F;
+    -fx-model-color-overview-bright: #F7D9A4;
+
+    -fx-model-color-relationship: #CD4A4A;
+    -fx-model-color-relationship-bright: #E9AEAE;
+
+    -fx-model-color-application: #955DCD;
+    -fx-model-color-application-bright: #D5BEEB;
+
+    -fx-model-color-content: #2FBABA;
+    -fx-model-color-content-bright: #88E1E1;
+
+    -fx-model-color-typedefinition: #ED702F;
+    -fx-model-color-typedefinition-bright: #F7C1A4;
+
+    -fx-model-color-masterdetail: #DF5495;
+    -fx-model-color-masterdetail-bright: #F3BFD8;
+
+    -fx-model-color-print: #8CBA38;
+    -fx-model-color-print-bright: #C4DE93;
+
+    -fx-model-color-tree: #4AA8ED;
+    -fx-model-color-tree-bright: #BEE0F9;
+
+    -fx-model-color-combination: #EDC34A;
+    -fx-model-color-combination-bright: #F9E9BE;
+
+    -fx-model-color-mapping: #5DCD95;
+    -fx-model-color-mapping-bright: #BEEBD5;
+
+    -fx-model-color-query: #BA82ED;
+    -fx-model-color-query-bright: #F8F1FD;
+
+    -fx-model-color-structuralmapping: #ED8254;
+    -fx-model-color-structuralmapping-bright: #F9D6C7;
+}
+
+/**
+ * Per-model-type tab header tinting ("Enable Colorful Studio" preference). TabPaneController adds
+ * a "model-tab-<modeltype>" style class (lowercase ModelType#name()) to every open editor Tab, and
+ * a "colorful-studio" style class to the TabPane itself iff the preference is enabled - so all rules
+ * below are inert (falling back to stylesheet-tab-pane.css's plain tab styling) unless both are present.
+ */
+.tab-pane.colorful-studio .tab.model-tab-document { -fx-background-color: -fx-model-color-document-bright; }
+.tab-pane.colorful-studio .tab.model-tab-document:selected { -fx-background-color: -fx-model-color-document-bright; -fx-border-color: -fx-model-color-document; }
+
+.tab-pane.colorful-studio .tab.model-tab-form { -fx-background-color: -fx-model-color-form-bright; }
+.tab-pane.colorful-studio .tab.model-tab-form:selected { -fx-background-color: -fx-model-color-form-bright; -fx-border-color: -fx-model-color-form; }
+
+.tab-pane.colorful-studio .tab.model-tab-overview { -fx-background-color: -fx-model-color-overview-bright; }
+.tab-pane.colorful-studio .tab.model-tab-overview:selected { -fx-background-color: -fx-model-color-overview-bright; -fx-border-color: -fx-model-color-overview; }
+
+.tab-pane.colorful-studio .tab.model-tab-relationship { -fx-background-color: -fx-model-color-relationship-bright; }
+.tab-pane.colorful-studio .tab.model-tab-relationship:selected { -fx-background-color: -fx-model-color-relationship-bright; -fx-border-color: -fx-model-color-relationship; }
+
+.tab-pane.colorful-studio .tab.model-tab-application { -fx-background-color: -fx-model-color-application-bright; }
+.tab-pane.colorful-studio .tab.model-tab-application:selected { -fx-background-color: -fx-model-color-application-bright; -fx-border-color: -fx-model-color-application; }
+
+.tab-pane.colorful-studio .tab.model-tab-content { -fx-background-color: -fx-model-color-content-bright; }
+.tab-pane.colorful-studio .tab.model-tab-content:selected { -fx-background-color: -fx-model-color-content-bright; -fx-border-color: -fx-model-color-content; }
+
+.tab-pane.colorful-studio .tab.model-tab-typedefinition { -fx-background-color: -fx-model-color-typedefinition-bright; }
+.tab-pane.colorful-studio .tab.model-tab-typedefinition:selected { -fx-background-color: -fx-model-color-typedefinition-bright; -fx-border-color: -fx-model-color-typedefinition; }
+
+.tab-pane.colorful-studio .tab.model-tab-masterdetail { -fx-background-color: -fx-model-color-masterdetail-bright; }
+.tab-pane.colorful-studio .tab.model-tab-masterdetail:selected { -fx-background-color: -fx-model-color-masterdetail-bright; -fx-border-color: -fx-model-color-masterdetail; }
+
+.tab-pane.colorful-studio .tab.model-tab-print { -fx-background-color: -fx-model-color-print-bright; }
+.tab-pane.colorful-studio .tab.model-tab-print:selected { -fx-background-color: -fx-model-color-print-bright; -fx-border-color: -fx-model-color-print; }
+
+.tab-pane.colorful-studio .tab.model-tab-tree { -fx-background-color: -fx-model-color-tree-bright; }
+.tab-pane.colorful-studio .tab.model-tab-tree:selected { -fx-background-color: -fx-model-color-tree-bright; -fx-border-color: -fx-model-color-tree; }
+
+.tab-pane.colorful-studio .tab.model-tab-combination { -fx-background-color: -fx-model-color-combination-bright; }
+.tab-pane.colorful-studio .tab.model-tab-combination:selected { -fx-background-color: -fx-model-color-combination-bright; -fx-border-color: -fx-model-color-combination; }
+
+.tab-pane.colorful-studio .tab.model-tab-mapping { -fx-background-color: -fx-model-color-mapping-bright; }
+.tab-pane.colorful-studio .tab.model-tab-mapping:selected { -fx-background-color: -fx-model-color-mapping-bright; -fx-border-color: -fx-model-color-mapping; }
+
+.tab-pane.colorful-studio .tab.model-tab-query { -fx-background-color: -fx-model-color-query-bright; }
+.tab-pane.colorful-studio .tab.model-tab-query:selected { -fx-background-color: -fx-model-color-query-bright; -fx-border-color: -fx-model-color-query; }
+
+.tab-pane.colorful-studio .tab.model-tab-structuralmapping { -fx-background-color: -fx-model-color-structuralmapping-bright; }
+.tab-pane.colorful-studio .tab.model-tab-structuralmapping:selected { -fx-background-color: -fx-model-color-structuralmapping-bright; -fx-border-color: -fx-model-color-structuralmapping; }

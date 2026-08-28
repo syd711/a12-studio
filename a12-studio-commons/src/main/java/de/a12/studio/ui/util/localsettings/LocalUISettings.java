@@ -24,6 +24,9 @@ public class LocalUISettings {
   /** BCP-47 language tag persisted across sessions, e.g. "en", "de", or "" for OS default. */
   public static final String LANGUAGE = "language";
 
+  /** Whether editor tabs (and their icons) are tinted per model type; see TabPaneController. */
+  public static final String COLORFUL_STUDIO_ENABLED = "colorfulStudioEnabled";
+
   private static PropertiesStore store;
 
   private static List<LocalSettingsChangeListener> listeners;

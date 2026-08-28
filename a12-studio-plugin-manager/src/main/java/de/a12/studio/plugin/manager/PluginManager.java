@@ -11,8 +11,10 @@ import org.jspecify.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,8 +40,9 @@ import java.util.jar.JarFile;
  *       {@link IProjectSettingsPanelContribution} for {@code "projectSettingsPanel"},
  *       {@link IModelSaveInterceptor} for {@code "modelSave"},
  *       {@link IModelValidatorContribution} for {@code "modelValidator"},
- *       {@link INewModelNameInterceptor} for {@code "newModelName"}, and
- *       {@link IProjectOpenedListener} for {@code "projectOpened"}.</li>
+ *       {@link INewModelNameInterceptor} for {@code "newModelName"},
+ *       {@link IProjectOpenedListener} for {@code "projectOpened"}, and
+ *       {@link IProjectToolbarButtonContribution} for {@code "projectToolbarButton"}.</li>
  * </ul>
  */
 @Slf4j
@@ -65,6 +68,12 @@ public class PluginManager {
 
   /** Extension point name for project-opened listener contributions. */
   public static final String EP_PROJECT_OPENED = "projectOpened";
+
+  /** Extension point name for project-tree-toolbar-button contributions. */
+  public static final String EP_PROJECT_TOOLBAR_BUTTON = "projectToolbarButton";
+
+  /** Suffix appended to a downloaded update JAR while its predecessor is still locked by the running JVM. */
+  private static final String PENDING_UPDATE_SUFFIX = ".pending";
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -122,6 +131,8 @@ public class PluginManager {
       }
     }
 
+    applyPendingUpdates();
+
     File[] jars = pluginsDir.listFiles(f -> f.isFile() && f.getName().endsWith(".jar"));
     if (jars == null || jars.length == 0) {
       log.info("No plugin JARs found in: {}", pluginsDir.getAbsolutePath());
@@ -142,6 +153,34 @@ public class PluginManager {
       }
       catch (Exception e) {
         log.warn("Failed to load plugin from '{}': {}", jar.getName(), e.getMessage(), e);
+      }
+    }
+  }
+
+  /**
+   * Replaces every previously installed plugin JAR with its downloaded update.
+   *
+   * <p>An update cannot overwrite its JAR while the old version is still loaded (its
+   * {@link URLClassLoader} keeps the file open/locked), so {@link #getPendingUpdateFile(String)}
+   * downloads it next to the old JAR with a {@value #PENDING_UPDATE_SUFFIX} suffix instead. On the
+   * next startup, before any plugin is loaded, this method deletes the stale JAR (now unlocked,
+   * since the previous JVM has exited) and renames the pending file into its place.
+   */
+  private void applyPendingUpdates() {
+    File[] pendingFiles = pluginsDir.listFiles(f -> f.isFile() && f.getName().endsWith(PENDING_UPDATE_SUFFIX));
+    if (pendingFiles == null) return;
+
+    for (File pendingFile : pendingFiles) {
+      String targetName = pendingFile.getName().substring(0,
+          pendingFile.getName().length() - PENDING_UPDATE_SUFFIX.length());
+      File target = new File(pluginsDir, targetName);
+      try {
+        Files.deleteIfExists(target.toPath());
+        Files.move(pendingFile.toPath(), target.toPath());
+        log.info("Applied pending update for plugin JAR: {}", targetName);
+      }
+      catch (IOException e) {
+        log.warn("Failed to apply pending update for '{}': {}", targetName, e.getMessage(), e);
       }
     }
   }
@@ -228,6 +267,19 @@ public class PluginManager {
     return Collections.unmodifiableList(result);
   }
 
+  /**
+   * Returns all {@link IProjectToolbarButtonContribution} instances contributed by all loaded
+   * plugins, in plugin load order.
+   */
+  @NonNull
+  public List<IProjectToolbarButtonContribution> getProjectToolbarButtonContributions() {
+    List<IProjectToolbarButtonContribution> result = new ArrayList<>();
+    for (LoadedPlugin plugin : loadedPlugins) {
+      result.addAll(plugin.getProjectToolbarButtonContributions());
+    }
+    return Collections.unmodifiableList(result);
+  }
+
   // ---------------------------------------------------------------------------
   // Internal loading logic
   // ---------------------------------------------------------------------------
@@ -260,6 +312,7 @@ public class PluginManager {
     List<IModelValidatorContribution> modelValidatorContributions = new ArrayList<>();
     List<INewModelNameInterceptor> newModelNameInterceptors = new ArrayList<>();
     List<IProjectOpenedListener> projectOpenedListeners = new ArrayList<>();
+    List<IProjectToolbarButtonContribution> projectToolbarButtonContributions = new ArrayList<>();
     for (ExtensionPoint ep : descriptor.getExtensionPoints()) {
       Object instance = instantiate(ep, pluginClassLoader, jarFile.getName());
       if (instance == null) {
@@ -319,13 +372,23 @@ public class PluginManager {
               ep.getClassName(), jarFile.getName());
         }
       }
+      else if (EP_PROJECT_TOOLBAR_BUTTON.equals(ep.getName())) {
+        if (instance instanceof IProjectToolbarButtonContribution entry) {
+          projectToolbarButtonContributions.add(entry);
+        }
+        else {
+          log.warn("Class '{}' in '{}' does not implement IProjectToolbarButtonContribution, skipping.",
+              ep.getClassName(), jarFile.getName());
+        }
+      }
       else {
         log.warn("Unknown extension point '{}' in '{}', skipping.", ep.getName(), jarFile.getName());
       }
     }
 
     return new LoadedPlugin(descriptor, pluginClassLoader, createMenuEntries, projectSettingsPanelContributions,
-        modelSaveInterceptors, modelValidatorContributions, newModelNameInterceptors, projectOpenedListeners);
+        modelSaveInterceptors, modelValidatorContributions, newModelNameInterceptors, projectOpenedListeners,
+        projectToolbarButtonContributions);
   }
 
   /** Reads and parses the {@code plugin.json} from inside the given JAR, or returns {@code null}. */
@@ -435,5 +498,78 @@ public class PluginManager {
   @NonNull
   public File getPluginsDir() {
     return pluginsDir;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Updates
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Returns the JAR file the given plugin was actually loaded from, or {@code null} if it is
+   * not currently installed/loaded.
+   */
+  @Nullable
+  public File getInstalledJarFile(@NonNull String pluginName) {
+    LoadedPlugin plugin = getLoadedPlugin(pluginName);
+    if (plugin == null) return null;
+    URL[] urls = plugin.getClassLoader().getURLs();
+    if (urls.length == 0) return null;
+    try {
+      return new File(urls[0].toURI());
+    }
+    catch (URISyntaxException e) {
+      return null;
+    }
+  }
+
+  /**
+   * Returns the staging file an update download should be written to for the given target JAR
+   * file name. See {@link #applyPendingUpdates()} for why the update cannot be written directly
+   * to the target file name while the studio is running.
+   */
+  @NonNull
+  public File getPendingUpdateFile(@NonNull String jarFileName) {
+    return new File(pluginsDir, jarFileName + PENDING_UPDATE_SUFFIX);
+  }
+
+  /**
+   * Returns whether a newer version of the given (currently installed) plugin is available in
+   * the marketplace.
+   */
+  public boolean isUpdateAvailable(@NonNull String pluginName, @Nullable String marketplaceVersion) {
+    if (marketplaceVersion == null || marketplaceVersion.isBlank()) return false;
+    LoadedPlugin plugin = getLoadedPlugin(pluginName);
+    if (plugin == null) return false;
+    String installedVersion = plugin.getDescriptor().getPluginVersion();
+    if (installedVersion == null || installedVersion.isBlank()) return false;
+    return compareVersions(marketplaceVersion, installedVersion) > 0;
+  }
+
+  /**
+   * Compares two dot-separated numeric version strings (e.g. {@code "1.2.0"}), segment by
+   * segment. Missing trailing segments are treated as {@code 0}; non-numeric segments are
+   * treated as {@code 0} as well, so unparsable versions never look newer than a valid one.
+   *
+   * @return a negative number if {@code v1 < v2}, zero if equal, a positive number if {@code v1 > v2}
+   */
+  static int compareVersions(@NonNull String v1, @NonNull String v2) {
+    String[] p1 = v1.split("\\.");
+    String[] p2 = v2.split("\\.");
+    int length = Math.max(p1.length, p2.length);
+    for (int i = 0; i < length; i++) {
+      int n1 = i < p1.length ? parseVersionSegment(p1[i]) : 0;
+      int n2 = i < p2.length ? parseVersionSegment(p2[i]) : 0;
+      if (n1 != n2) return Integer.compare(n1, n2);
+    }
+    return 0;
+  }
+
+  private static int parseVersionSegment(@NonNull String segment) {
+    try {
+      return Integer.parseInt(segment.trim());
+    }
+    catch (NumberFormatException e) {
+      return 0;
+    }
   }
 }

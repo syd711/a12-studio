@@ -178,7 +178,11 @@ public class PreferencePluginsPanelController implements Initializable {
 
   private void refreshActionButton(MarketplaceEntry entry) {
     boolean installed = PluginManager.getInstance().isInstalled(entry.getName());
-    if (installed) {
+    if (installed && PluginManager.getInstance().isUpdateAvailable(entry.getName(), entry.getPluginVersion())) {
+      actionButton.setText(StudioBundle.get("plugins.update"));
+      actionButton.getStyleClass().removeAll("primary-button", "secondary-button");
+      actionButton.getStyleClass().add("primary-button");
+    } else if (installed) {
       actionButton.setText(StudioBundle.get("plugins.remove"));
       actionButton.getStyleClass().removeAll("primary-button", "secondary-button");
       actionButton.getStyleClass().add("secondary-button");
@@ -204,7 +208,9 @@ public class PreferencePluginsPanelController implements Initializable {
   private void onActionButtonClicked() {
     if (selectedEntry == null) return;
     boolean installed = PluginManager.getInstance().isInstalled(selectedEntry.getName());
-    if (installed) {
+    if (installed && PluginManager.getInstance().isUpdateAvailable(selectedEntry.getName(), selectedEntry.getPluginVersion())) {
+      onUpdatePlugin(selectedEntry);
+    } else if (installed) {
       onRemovePlugin(selectedEntry);
     } else {
       onInstallPlugin(selectedEntry);
@@ -245,6 +251,40 @@ public class PreferencePluginsPanelController implements Initializable {
     }
   }
 
+  private void onUpdatePlugin(@NonNull MarketplaceEntry entry) {
+    if (entry.getDownloadUrl() == null || entry.getDownloadUrl().isBlank()) {
+      WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.no_download_url"), entry.getName());
+      return;
+    }
+
+    Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(getStage(),
+        StudioBundle.get("plugins.update_confirm", entry.getName()), null, null, StudioBundle.get("plugins.update"));
+    if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
+      return;
+    }
+
+    // The plugin currently in use is still loaded and its JAR is locked by the running JVM, so
+    // the update is staged next to it and only swapped in on the next startup, before any
+    // plugin is loaded (see PluginManager.applyPendingUpdates()).
+    PluginManager pluginManager = PluginManager.getInstance();
+    File installedJar = pluginManager.getInstalledJarFile(entry.getName());
+    String jarFileName = installedJar != null ? installedJar.getName() : deriveFileName(entry);
+    File dest = pluginManager.getPendingUpdateFile(jarFileName);
+
+    ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(),
+        new PluginDownloadProgressModel(
+            StudioBundle.get("plugins.downloading", entry.getName()), entry.getDownloadUrl(), dest));
+
+    if (result.isSuccess()) {
+      setProgress(false, StudioBundle.get("plugins.update_restart_required", entry.getName()));
+      pluginListView.refresh();
+      if (selectedEntry != null) refreshActionButton(selectedEntry);
+    }
+    else if (!result.isCancelled()) {
+      log.error("Failed to download plugin update '{}'", entry.getName());
+    }
+  }
+
   private void onRemovePlugin(@NonNull MarketplaceEntry entry) {
     File pluginsDir = PluginManager.getInstance().getPluginsDir();
     String fileName = deriveFileName(entry);
@@ -272,6 +312,16 @@ public class PreferencePluginsPanelController implements Initializable {
     if (!jarFile.exists()) {
       WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.jar_not_found"), entry.getName());
       return;
+    }
+
+    // Clean up any staged update for this JAR so it isn't resurrected on next startup.
+    File pendingUpdate = PluginManager.getInstance().getPendingUpdateFile(jarFile.getName());
+    if (pendingUpdate.exists()) {
+      try {
+        Files.delete(pendingUpdate.toPath());
+      } catch (IOException ex) {
+        log.warn("Failed to delete staged plugin update '{}': {}", pendingUpdate.getName(), ex.getMessage(), ex);
+      }
     }
 
     try {

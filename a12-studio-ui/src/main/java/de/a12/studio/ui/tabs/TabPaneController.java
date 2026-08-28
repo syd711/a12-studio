@@ -11,6 +11,7 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,14 +21,17 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
+@Slf4j
 public class TabPaneController implements Initializable, StudioEventListener {
 
   @FXML
@@ -39,35 +43,62 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
-    this.project = event.getProject();
+    Project project = event.getProject();
+    this.project = project;
     tabPane.getTabs().clear();
-
     restoringSelection = true;
+
+    List<String> openedFiles = new ArrayList<>(project.getSettings().getUISettings().getOpenedFiles());
+    String selectedFile = project.getSettings().getUISettings().getSelectedFile();
+    restoreNextTab(project, openedFiles, 0, selectedFile);
+  }
+
+  /**
+   * Restores one previously-open tab per FX pulse (via {@link Platform#runLater}) instead of looping
+   * through all of them in a single call. {@link EditorFactory#create} builds a full Scene Graph (FXML +
+   * controller {@code load()}) per tab, which - unlike the project/model loading that already happens on a
+   * background thread before this fires - must run on the FX Application Thread. Chaining one
+   * {@code runLater} per tab lets a pulse (and with it, e.g. the open-project progress dialog's
+   * indeterminate animation) run between tabs instead of the FX thread being blocked solid for the whole
+   * restore. Fires {@link TabsRestoredEvent} once done (or on error) so callers that need to know when the
+   * restore actually finished - see {@link de.a12.studio.ui.OpenProjectProgressModel} - can wait for it
+   * instead of assuming {@code projectOpened} dispatch means tabs are already showing.
+   */
+  private void restoreNextTab(@NonNull Project project, @NonNull List<String> openedFiles, int index, String selectedFile) {
+    if (this.project != project) {
+      // Project was switched/closed while restoring; abandon silently, but still signal completion so
+      // nothing keeps waiting on the now-irrelevant restore.
+      StudioEventManager.getInstance().fireTabsRestoredEvent(project);
+      return;
+    }
+
+    if (index >= openedFiles.size()) {
+      restoringSelection = false;
+      StudioEventManager.getInstance().fireTabsRestoredEvent(project);
+      return;
+    }
+
     try {
-      String selectedFile = event.getProject().getSettings().getUISettings().getSelectedFile();
-      Tab tabToSelect = null;
-      for (String path : event.getProject().getSettings().getUISettings().getOpenedFiles()) {
-        File file = new File(path);
-        // Resolved through the project's own tree (rather than a fresh `new ProjectItem(file)`) so this
-        // shares the exact same ProjectItem/model instance as the rest of the UI, e.g. ProjectTreeController's
-        // tree - which looks up nodes by model reference equality when revalidating after a save, and would
-        // otherwise never find a match for edits made through a restored tab, permanently missing its
-        // validation-error updates.
-        ProjectItem item = file.exists() ? project.getRoot().findByPath(path) : null;
-        if (item != null) {
-          open(item);
-          if (path.equals(selectedFile)) {
-            tabToSelect = tabPane.getTabs().get(tabPane.getTabs().size() - 1);
-          }
+      String path = openedFiles.get(index);
+      File file = new File(path);
+      // Resolved through the project's own tree (rather than a fresh `new ProjectItem(file)`) so this
+      // shares the exact same ProjectItem/model instance as the rest of the UI, e.g. ProjectTreeController's
+      // tree - which looks up nodes by model reference equality when revalidating after a save, and would
+      // otherwise never find a match for edits made through a restored tab, permanently missing its
+      // validation-error updates.
+      ProjectItem item = file.exists() ? project.getRoot().findByPath(path) : null;
+      if (item != null) {
+        open(item);
+        if (path.equals(selectedFile)) {
+          tabPane.getSelectionModel().select(tabPane.getTabs().get(tabPane.getTabs().size() - 1));
         }
       }
-      if (tabToSelect != null) {
-        tabPane.getSelectionModel().select(tabToSelect);
-      }
     }
-    finally {
-      restoringSelection = false;
+    catch (Exception e) {
+      log.error("Failed to restore tab '{}': {}", openedFiles.get(index), e.getMessage(), e);
     }
+
+    Platform.runLater(() -> restoreNextTab(project, openedFiles, index + 1, selectedFile));
   }
 
   @Override
@@ -148,10 +179,10 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
     A12Model<?> model = item.getModel();
     if (model instanceof TypeDefinitionModel) {
-      tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(ModelType.TYPEDEFINITION)));
+      applyModelTabStyle(tab, ModelType.TYPEDEFINITION);
     }
     else if (model != null) {
-      tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(model.getModelType())));
+      applyModelTabStyle(tab, model.getModelType());
     }
     else if (item.getAuthDocument() != null) {
       FontIcon icon = new FontIcon(item.getAuthDocument() instanceof RolesDocument
@@ -182,6 +213,19 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
     tab.setContent(content);
     installDoubleClickHandler(tab);
+  }
+
+  /**
+   * Sets the tab's icon and, for the "Enable Colorful Studio" preference (see
+   * PreferenceAppGeneralPanelController / stylesheet-model-colors.css), a "model-tab-&lt;type&gt;" style
+   * class (lowercase {@link ModelType#name()}) so the tab header can be tinted per model type. The
+   * class is added unconditionally - stylesheet-model-colors.css only applies it while the TabPane
+   * itself also carries "colorful-studio" (toggled by {@link #applyColorfulStudioSetting()}), so this
+   * stays inert when the preference is off.
+   */
+  private void applyModelTabStyle(@NonNull Tab tab, @NonNull ModelType modelType) {
+    tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+    tab.getStyleClass().add("model-tab-" + modelType.name().toLowerCase());
   }
 
   private void installDoubleClickHandler(@NonNull Tab tab) {
@@ -271,6 +315,26 @@ public class TabPaneController implements Initializable, StudioEventListener {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
     tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> onSelectionChanged(newTab));
+
+    applyColorfulStudioSetting();
+    LocalUISettings.addListener((key, value) -> {
+      if (LocalUISettings.COLORFUL_STUDIO_ENABLED.equals(key)) {
+        applyColorfulStudioSetting();
+      }
+    });
+  }
+
+  /** Toggles the "colorful-studio" style class that gates stylesheet-model-colors.css's per-tab tinting. */
+  private void applyColorfulStudioSetting() {
+    boolean enabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
+    if (enabled) {
+      if (!tabPane.getStyleClass().contains("colorful-studio")) {
+        tabPane.getStyleClass().add("colorful-studio");
+      }
+    }
+    else {
+      tabPane.getStyleClass().remove("colorful-studio");
+    }
   }
 
   private void onSelectionChanged(Tab newTab) {

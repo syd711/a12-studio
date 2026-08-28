@@ -14,15 +14,21 @@ import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
+import de.a12.studio.plugin.manager.IProjectToolbarButtonContribution;
 import de.a12.studio.plugin.manager.PluginManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
@@ -42,6 +48,9 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   @FXML
   private MenuButton newButton;
+
+  @FXML
+  private ToolBar projectToolbar;
 
   private Project project;
   private ProjectItemViewModel rootViewModel;
@@ -320,6 +329,31 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     return (Stage) projectTree.getScene().getWindow();
   }
 
+  private void addPluginToolbarButtons() {
+    List<IProjectToolbarButtonContribution> contributions = PluginManager.getInstance().getProjectToolbarButtonContributions();
+    if (contributions.isEmpty()) {
+      return;
+    }
+    projectToolbar.getItems().add(new Separator(Orientation.VERTICAL));
+    for (IProjectToolbarButtonContribution contribution : contributions) {
+      Button button = new Button();
+      button.setMnemonicParsing(false);
+      button.getStyleClass().add("default-button");
+      Node graphic = contribution.getGraphic();
+      graphic.getStyleClass().add("toolbar-icon");
+      button.setGraphic(graphic);
+      String tooltip = contribution.getTooltip();
+      button.setAccessibleText(tooltip);
+      button.setTooltip(WidgetFactory.createTooltip(tooltip));
+      button.setOnAction(event -> {
+        if (project != null) {
+          contribution.execute(getStage(), project);
+        }
+      });
+      projectToolbar.getItems().add(button);
+    }
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem);
@@ -373,6 +407,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     folderItem.setGraphic(folderIcon);
     folderItem.setOnAction(event -> onNewFolder());
     newButton.getItems().add(folderItem);
+    addPluginToolbarButtons();
     StudioEventManager.getInstance().addListener(this);
     projectTree.setOnKeyPressed(event -> {
       TreeItem<ProjectItemViewModel> selected = projectTree.getSelectionModel().getSelectedItem();

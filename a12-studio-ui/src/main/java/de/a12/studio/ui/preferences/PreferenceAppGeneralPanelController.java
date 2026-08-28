@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -34,6 +35,9 @@ public class PreferenceAppGeneralPanelController implements Initializable {
 
   @FXML
   private Button resetDialogsButton;
+
+  @FXML
+  private CheckBox colorfulStudioCheckBox;
 
   @FXML
   private void onResetDialogs() {
@@ -77,5 +81,10 @@ public class PreferenceAppGeneralPanelController implements Initializable {
         }
       }
     });
+
+    // --- Colorful Studio ---
+    colorfulStudioCheckBox.setSelected(LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true));
+    colorfulStudioCheckBox.selectedProperty().addListener((obs, oldVal, newVal) ->
+        LocalUISettings.saveProperty(LocalUISettings.COLORFUL_STUDIO_ENABLED, String.valueOf(newVal)));
   }
 }

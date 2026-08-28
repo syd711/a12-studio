@@ -11,6 +11,10 @@ public interface StudioEventListener {
 
   }
 
+  default void tabsRestored(@NonNull TabsRestoredEvent event) {
+
+  }
+
   default void modelOpened(@NonNull ModelOpenedEvent event) {
 
   }
