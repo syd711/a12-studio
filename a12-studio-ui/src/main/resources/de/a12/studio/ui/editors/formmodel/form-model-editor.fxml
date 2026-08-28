@@ -22,6 +22,7 @@
     <right>
         <ToolBar orientation="VERTICAL" BorderPane.alignment="CENTER">
             <items>
+                <Label prefHeight="48" text="" />
                 <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
                 <Separator prefHeight="0.0" prefWidth="0.0" />
                 <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />
