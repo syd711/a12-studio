@@ -381,76 +381,7 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "EnumerationType",
-                          "EnumerationType": {
-                            "values": [
-                              {
-                                "value": "RegAddress",
-                                "label": [
-                                  {
-                                    "locale": "en",
-                                    "text": "Registered address"
-                                  },
-                                  {
-                                    "locale": "de",
-                                    "text": "Registrierte Adresse"
-                                  }
-                                ]
-                              },
-                              {
-                                "value": "Postal",
-                                "label": [
-                                  {
-                                    "locale": "en",
-                                    "text": "Postal address"
-                                  },
-                                  {
-                                    "locale": "de",
-                                    "text": "Postalische Adresse"
-                                  }
-                                ]
-                              },
-                              {
-                                "value": "Billing",
-                                "label": [
-                                  {
-                                    "locale": "en",
-                                    "text": "Billing address"
-                                  },
-                                  {
-                                    "locale": "de",
-                                    "text": "Rechnungsadresse"
-                                  }
-                                ]
-                              },
-                              {
-                                "value": "Site",
-                                "label": [
-                                  {
-                                    "locale": "en",
-                                    "text": "Site address"
-                                  },
-                                  {
-                                    "locale": "de",
-                                    "text": "Seitenadresse"
-                                  }
-                                ]
-                              },
-                              {
-                                "value": "Other",
-                                "label": [
-                                  {
-                                    "locale": "en",
-                                    "text": "Other"
-                                  },
-                                  {
-                                    "locale": "de",
-                                    "text": "Andere"
-                                  }
-                                ]
-                              }
-                            ]
-                          }
+                          "type": "StringType"
                         },
                         "label": [
                           {

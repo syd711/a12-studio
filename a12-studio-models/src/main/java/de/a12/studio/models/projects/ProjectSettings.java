@@ -1,6 +1,5 @@
 package de.a12.studio.models.projects;
 
-import de.a12.studio.models.projects.settings.AdvancedSettings;
 import de.a12.studio.models.projects.settings.AiSettings;
 import de.a12.studio.models.projects.settings.annotations.AnnotationSettings;
 import de.a12.studio.models.projects.settings.ProjectRootSettings;
@@ -21,16 +20,12 @@ public class ProjectSettings {
 
   private final ProjectRootSettings projectRootSettings;
 
-  private final AdvancedSettings advancedSettings;
-
   private ProjectSettings(UISettings uiSettings, AiSettings jsonSettings,
-                          AnnotationSettings annotationSettings, ProjectRootSettings projectRootSettings,
-                          AdvancedSettings advancedSettings) {
+                          AnnotationSettings annotationSettings, ProjectRootSettings projectRootSettings) {
     this.uiSettings = uiSettings;
     this.jsonSettings = jsonSettings;
     this.annotationSettings = annotationSettings;
     this.projectRootSettings = projectRootSettings;
-    this.advancedSettings = advancedSettings;
   }
 
   public UISettings getUISettings() {
@@ -49,10 +44,6 @@ public class ProjectSettings {
     return projectRootSettings;
   }
 
-  public AdvancedSettings getAdvancedSettings() {
-    return advancedSettings;
-  }
-
   public static ProjectSettings load(@NonNull File projectFolder) {
     File settingsFolder = AiSettings.resolveSettingsFolder(projectFolder, SETTINGS_FOLDER_NAME);
 
@@ -60,7 +51,6 @@ public class ProjectSettings {
     AiSettings jsonSettings = AiSettings.load();
     AnnotationSettings annotationSettings = AnnotationSettings.load(settingsFolder);
     ProjectRootSettings projectRootSettings = ProjectRootSettings.load(projectFolder);
-    AdvancedSettings advancedSettings = AdvancedSettings.load(settingsFolder);
-    return new ProjectSettings(uiSettings, jsonSettings, annotationSettings, projectRootSettings, advancedSettings);
+    return new ProjectSettings(uiSettings, jsonSettings, annotationSettings, projectRootSettings);
   }
 }

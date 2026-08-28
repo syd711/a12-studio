@@ -25,11 +25,36 @@ public class LoadedPlugin {
   /** All {@link ICreateItemMenuEntry} instances contributed by this plugin. */
   private final List<ICreateItemMenuEntry> createMenuEntries;
 
+  /** All {@link IProjectSettingsPanelContribution} instances contributed by this plugin. */
+  private final List<IProjectSettingsPanelContribution> projectSettingsPanelContributions;
+
+  /** All {@link IModelSaveInterceptor} instances contributed by this plugin. */
+  private final List<IModelSaveInterceptor> modelSaveInterceptors;
+
+  /** All {@link IModelValidatorContribution} instances contributed by this plugin. */
+  private final List<IModelValidatorContribution> modelValidatorContributions;
+
+  /** All {@link INewModelNameInterceptor} instances contributed by this plugin. */
+  private final List<INewModelNameInterceptor> newModelNameInterceptors;
+
+  /** All {@link IProjectOpenedListener} instances contributed by this plugin. */
+  private final List<IProjectOpenedListener> projectOpenedListeners;
+
   LoadedPlugin(@NonNull PluginDescriptor descriptor,
                @NonNull URLClassLoader classLoader,
-               @NonNull List<ICreateItemMenuEntry> createMenuEntries) {
+               @NonNull List<ICreateItemMenuEntry> createMenuEntries,
+               @NonNull List<IProjectSettingsPanelContribution> projectSettingsPanelContributions,
+               @NonNull List<IModelSaveInterceptor> modelSaveInterceptors,
+               @NonNull List<IModelValidatorContribution> modelValidatorContributions,
+               @NonNull List<INewModelNameInterceptor> newModelNameInterceptors,
+               @NonNull List<IProjectOpenedListener> projectOpenedListeners) {
     this.descriptor = descriptor;
     this.classLoader = classLoader;
     this.createMenuEntries = createMenuEntries;
+    this.projectSettingsPanelContributions = projectSettingsPanelContributions;
+    this.modelSaveInterceptors = modelSaveInterceptors;
+    this.modelValidatorContributions = modelValidatorContributions;
+    this.newModelNameInterceptors = newModelNameInterceptors;
+    this.projectOpenedListeners = projectOpenedListeners;
   }
 }

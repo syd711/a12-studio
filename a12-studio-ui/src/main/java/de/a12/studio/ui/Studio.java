@@ -1,13 +1,19 @@
 package de.a12.studio.ui;
 
 import de.a12.studio.ui.util.*;
+import de.a12.studio.models.NewModelFactory;
+import de.a12.studio.plugin.manager.IModelSaveInterceptor;
+import de.a12.studio.plugin.manager.IModelValidatorContribution;
+import de.a12.studio.plugin.manager.INewModelNameInterceptor;
 import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.modelsvalidation.ValidationService;
+import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
@@ -65,6 +71,12 @@ public class Studio extends Application implements StudioEventListener {
 
     // Initialize plugin manager – scans the plugins/ directory next to the application root.
     PluginManager.initialize(new java.io.File(System.getProperty("user.dir")));
+    for (IModelSaveInterceptor interceptor : PluginManager.getInstance().getModelSaveInterceptors()) {
+      ProjectItem.registerBeforeSaveHook(interceptor::beforeSave);
+    }
+    for (INewModelNameInterceptor interceptor : PluginManager.getInstance().getNewModelNameInterceptors()) {
+      NewModelFactory.registerNameHook(interceptor::adjustName);
+    }
 
     FXMLLoader loader = new FXMLLoader(Studio.class.getResource("scene-root.fxml"));
     loader.setResources(StudioBundle.getBundle());
@@ -190,6 +202,12 @@ public class Studio extends Application implements StudioEventListener {
     // error badge).
     currentProject = event.getProject();
     validationService = new ValidationService(currentProject);
+    for (IModelValidatorContribution contribution : PluginManager.getInstance().getModelValidatorContributions()) {
+      ModelValidator validator = contribution.createValidator();
+      for (ModelType modelType : contribution.getModelTypes()) {
+        validationService.addValidator(modelType, validator);
+      }
+    }
 
     String studioVersion = StudioVersion.get();
     stage.setTitle("A12 Studio - " + studioVersion + " - " + currentProject.getName());

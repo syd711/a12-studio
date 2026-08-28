@@ -20,9 +20,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 public class ProjectItem {
+
+  /**
+   * Extension hook: something to run right before a {@link ProjectItem} is written to disk.
+   * Registered by plugin-aware code (e.g. {@code de.a12.studio.ui.Studio}) so that plugin-contributed
+   * {@code IModelSaveInterceptor}s run on every save, without this module depending on the plugin
+   * manager.
+   */
+  public interface BeforeSaveHook {
+    void beforeSave(ProjectItem item);
+  }
+
+  private static final List<BeforeSaveHook> beforeSaveHooks = new CopyOnWriteArrayList<>();
+
+  public static void registerBeforeSaveHook(BeforeSaveHook hook) {
+    beforeSaveHooks.add(hook);
+  }
 
   @Getter
   private File file;
@@ -46,6 +63,9 @@ public class ProjectItem {
   }
 
   public void save() {
+    for (BeforeSaveHook hook : beforeSaveHooks) {
+      hook.beforeSave(this);
+    }
     try {
       if (model != null) {
         JsonSettings.objectMapper.writeValue(new File(getPath()), model);
@@ -58,6 +78,19 @@ public class ProjectItem {
     catch (Exception e) {
       log.error("Failed to save '{}': {}", getPath(), e.getMessage(), e);
     }
+  }
+
+  /**
+   * Walks up to the root {@link ProjectItem} (the project folder itself, see {@link Project#getRoot()})
+   * and returns its file. Lets code that only has a {@link ProjectItem} (not a {@link Project}) find
+   * the project's {@code .studio} settings folder.
+   */
+  public File getProjectFolder() {
+    ProjectItem current = this;
+    while (current.parent != null) {
+      current = current.parent;
+    }
+    return current.file;
   }
 
   private void load() {

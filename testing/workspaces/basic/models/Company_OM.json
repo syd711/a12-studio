@@ -136,6 +136,11 @@
             ]
           }
         ]
+      },
+      "multiSelection": {
+        "collapseOption": null,
+        "counterOption": null,
+        "selectionArea": null
       }
     },
     "columns": [
@@ -223,6 +228,12 @@
           ],
           "destructive": false,
           "primary": false
+        },
+        {
+          "type": "button",
+          "event": null,
+          "destructive": null,
+          "primary": null
         }
       ],
       "rightSlot": [
@@ -237,6 +248,14 @@
     "footerBox": {
       "leftSlot": [],
       "rightSlot": []
+    },
+    "contextMenu": {
+      "groups": [
+        {
+          "name": "group-d1c8b",
+          "actions": []
+        }
+      ]
     }
   }
 }

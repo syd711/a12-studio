@@ -1,8 +1,10 @@
-package de.a12.studio.models.features;
+package de.a12.studio.plugin.applicationgroups;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.features.A12StudioFeatureException;
+import de.a12.studio.models.features.A12StudioProjectFeature;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
@@ -47,7 +49,7 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
 
   @Override
   public ApplicationGroupResult apply(Project project) throws A12StudioFeatureException {
-    String groupName = project.getSettings().getAdvancedSettings().getApplicationGroupName();
+    String groupName = ApplicationGroupsSettings.load(project.getFolder()).getApplicationGroupName();
     if (!isValidGroupName(groupName)) {
       throw new A12StudioFeatureException("\"" + groupName + "\" is not a valid application group name.");
     }
@@ -111,7 +113,7 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
     }
   }
 
-  private static String stripExistingGroupPrefix(A12Model<?> model) {
+  static String stripExistingGroupPrefix(A12Model<?> model) {
     String id = model.getId();
     String existingGroup = findAnnotationValue(model, ANNOTATION_NAME);
     if (existingGroup != null && id.startsWith(existingGroup + "_")) {
@@ -120,7 +122,7 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
     return id;
   }
 
-  private static String findAnnotationValue(A12Model<?> model, String name) {
+  static String findAnnotationValue(A12Model<?> model, String name) {
     for (Annotation annotation : model.getAnnotations()) {
       if (name.equals(annotation.getName())) {
         return annotation.getValue();
@@ -129,7 +131,7 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
     return null;
   }
 
-  private static void setApplicationGroupAnnotation(A12Model<?> model, String groupName) {
+  static void setApplicationGroupAnnotation(A12Model<?> model, String groupName) {
     for (Annotation annotation : model.getAnnotations()) {
       if (ANNOTATION_NAME.equals(annotation.getName())) {
         annotation.setValue(groupName);

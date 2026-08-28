@@ -70,14 +70,25 @@
                                 </children>
                             </VBox>
                             <Region HBox.hgrow="ALWAYS" />
-                            <Button fx:id="actionButton" onAction="#onActionButtonClicked" styleClass="primary-button" />
                         </children>
                         <padding>
                             <Insets bottom="12.0" top="8.0" />
                         </padding>
                     </HBox>
 
-                    <Separator />
+                    <Separator>
+                  <VBox.margin>
+                     <Insets />
+                  </VBox.margin></Separator>
+               <HBox alignment="CENTER_RIGHT">
+                  <children>
+                            <Button fx:id="actionButton" onAction="#onActionButtonClicked" styleClass="primary-button" />
+                  </children>
+                  <VBox.margin>
+                     <Insets bottom="3.0" top="3.0" />
+                  </VBox.margin>
+               </HBox>
+               <Separator layoutX="22.0" layoutY="74.0" />
 
                     <!-- Description WebView -->
                     <WebView fx:id="descriptionWebView" minHeight="200.0" VBox.vgrow="ALWAYS" />

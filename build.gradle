@@ -52,6 +52,8 @@ def pluginModuleJarName = { File moduleDir ->
 }
 
 tasks.register('generateMarketplace') {
+    dependsOn('buildPluginJars')
+
     group = 'plugins'
     description = 'Scans all plugin.json files in the workspace and aggregates them into marketplace.json.'
 

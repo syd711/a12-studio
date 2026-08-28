@@ -1,9 +1,8 @@
-package de.a12.studio.models.features;
+package de.a12.studio.plugin.applicationgroups;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelReference;
-import de.a12.studio.models.TestHelper;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.Directive;
@@ -46,7 +45,7 @@ class ApplicationGroupFeatureTest {
   void prefixesEveryModelAndRewritesReferences(@TempDir Path tempDir) throws Exception {
     Path projectDir = copyBasicProject(tempDir);
     Project project = loadProject(projectDir);
-    project.getSettings().getAdvancedSettings().setApplicationGroupName("App");
+    setGroupName(projectDir, "App");
 
     ApplicationGroupResult result = new ApplicationGroupFeature().apply(project);
 
@@ -116,7 +115,7 @@ class ApplicationGroupFeatureTest {
   void reapplyingWithSameGroupNameIsIdempotent(@TempDir Path tempDir) throws Exception {
     Path projectDir = copyBasicProject(tempDir);
     Project project = loadProject(projectDir);
-    project.getSettings().getAdvancedSettings().setApplicationGroupName("App");
+    setGroupName(projectDir, "App");
     new ApplicationGroupFeature().apply(project);
 
     project.reload();
@@ -136,11 +135,11 @@ class ApplicationGroupFeatureTest {
   void reapplyingWithDifferentGroupNameStripsThePreviousPrefix(@TempDir Path tempDir) throws Exception {
     Path projectDir = copyBasicProject(tempDir);
     Project project = loadProject(projectDir);
-    project.getSettings().getAdvancedSettings().setApplicationGroupName("App");
+    setGroupName(projectDir, "App");
     new ApplicationGroupFeature().apply(project);
 
     project.reload();
-    project.getSettings().getAdvancedSettings().setApplicationGroupName("Other");
+    setGroupName(projectDir, "Other");
     new ApplicationGroupFeature().apply(project);
 
     File modelsDir = new File(projectDir.toFile(), "models");
@@ -167,11 +166,27 @@ class ApplicationGroupFeatureTest {
     return project;
   }
 
+  private static void setGroupName(Path projectDir, String groupName) {
+    ApplicationGroupsSettings settings = ApplicationGroupsSettings.load(projectDir.toFile());
+    settings.setApplicationGroupName(groupName);
+    settings.save();
+  }
+
   private static Path copyBasicProject(Path tempDir) throws IOException {
-    Path source = TestHelper.resolveTestingBasicDir();
+    Path source = resolveTestingBasicDir();
     Path projectDir = tempDir.resolve("basic");
     copyDirectory(source, projectDir);
     return projectDir;
+  }
+
+  private static Path resolveTestingBasicDir() {
+    for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
+      Path candidate = dir.resolve("testing").resolve("workspaces").resolve("basic");
+      if (Files.isDirectory(candidate)) {
+        return candidate;
+      }
+    }
+    throw new IllegalStateException("Could not locate 'testing/workspaces/basic' above " + Path.of("").toAbsolutePath());
   }
 
   private static void copyDirectory(Path source, Path target) throws IOException {

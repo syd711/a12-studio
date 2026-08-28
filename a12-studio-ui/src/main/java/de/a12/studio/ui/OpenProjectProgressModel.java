@@ -1,9 +1,8 @@
 package de.a12.studio.ui;
 
-import de.a12.studio.models.Annotation;
 import de.a12.studio.models.projects.Project;
-import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.models.projects.settings.AdvancedSettings;
+import de.a12.studio.plugin.manager.IProjectOpenedListener;
+import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.components.ProgressModel;
 import de.a12.studio.ui.components.ProgressResultModel;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -68,7 +67,9 @@ class OpenProjectProgressModel extends ProgressModel<Void> {
   public void processNext(ProgressResultModel progressResultModel, Void next) {
     Project project = new Project();
     project.load(file);
-    autoDetectApplicationGroups(project);
+    for (IProjectOpenedListener listener : PluginManager.getInstance().getProjectOpenedListeners()) {
+      listener.onProjectOpened(project);
+    }
     onProjectLoaded.accept(project);
 
     // Block this background thread until the project-open event has actually finished
@@ -101,37 +102,4 @@ class OpenProjectProgressModel extends ProgressModel<Void> {
     onFinalize.run();
   }
 
-  /**
-   * Scans all models in the project tree for the "applicationGroup" annotation.
-   * If found and the feature is not yet enabled in AdvancedSettings,
-   * it is activated and persisted automatically.
-   */
-  private void autoDetectApplicationGroups(@NonNull Project project) {
-    AdvancedSettings settings = project.getSettings().getAdvancedSettings();
-    if (settings.isUseApplicationGroups()) {
-      return;
-    }
-    if (hasApplicationGroupAnnotation(project.getRoot())) {
-      settings.setUseApplicationGroups(true);
-      settings.save();
-    }
-  }
-
-  private boolean hasApplicationGroupAnnotation(@NonNull ProjectItem item) {
-    if (item.isFolder()) {
-      for (ProjectItem child : item.getChildren()) {
-        if (hasApplicationGroupAnnotation(child)) {
-          return true;
-        }
-      }
-    }
-    else if (item.getModel() != null) {
-      for (Annotation annotation : item.getModel().getAnnotations()) {
-        if ("applicationGroup".equals(annotation.getName())) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
 }

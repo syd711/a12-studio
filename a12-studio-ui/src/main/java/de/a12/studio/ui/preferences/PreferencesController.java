@@ -1,10 +1,15 @@
 package de.a12.studio.ui.preferences;
 
+import de.a12.studio.plugin.manager.IProjectSettingsPanelContribution;
+import de.a12.studio.plugin.manager.PluginManager;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -24,9 +29,6 @@ public class PreferencesController implements Initializable {
 
   @FXML
   private Button generalSettingsBtn;
-
-  @FXML
-  private Button advancedSettingsBtn;
 
   @FXML
   private Button aiSettingsBtn;
@@ -55,6 +57,9 @@ public class PreferencesController implements Initializable {
   @FXML
   private VBox projectSettingsNav;
 
+  @FXML
+  private VBox projectSettingsButtonsBox;
+
   private final Map<String, Parent> pages = new HashMap<>();
 
   private Button selectedButton;
@@ -73,6 +78,19 @@ public class PreferencesController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     showPage(appGeneralSettingsBtn, "preference-app-general.fxml");
+    addPluginContributedSettingsPanels();
+  }
+
+  private void addPluginContributedSettingsPanels() {
+    for (IProjectSettingsPanelContribution contribution : PluginManager.getInstance().getProjectSettingsPanelContributions()) {
+      Button button = new Button(contribution.getLabel());
+      button.setGraphic(contribution.getGraphic());
+      button.setAlignment(Pos.BASELINE_LEFT);
+      button.setMnemonicParsing(false);
+      button.getStyleClass().add("preference-button");
+      button.setOnAction(e -> showPage(button, contribution.createPanel(Studio.getCurrentProject())));
+      projectSettingsButtonsBox.getChildren().add(button);
+    }
   }
 
   public void showSection(PreferencesOpenRequestedEvent.@NonNull Section section) {
@@ -92,11 +110,6 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onGeneralSettings() {
     showPage(generalSettingsBtn, "preference-general.fxml");
-  }
-
-  @FXML
-  private void onAdvancedSettings() {
-    showPage(advancedSettingsBtn, "preference-advanced.fxml");
   }
 
   @FXML
@@ -135,13 +148,16 @@ public class PreferencesController implements Initializable {
   }
 
   private void showPage(Button button, String fxml) {
+    showPage(button, pages.computeIfAbsent(fxml, this::loadPage));
+  }
+
+  private void showPage(Button button, Node page) {
     if (selectedButton != null) {
       selectedButton.getStyleClass().remove("preference-button-selected");
     }
     button.getStyleClass().add("preference-button-selected");
     selectedButton = button;
 
-    Parent page = pages.computeIfAbsent(fxml, this::loadPage);
     contentStack.getChildren().setAll(page);
   }
 

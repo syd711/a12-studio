@@ -34,8 +34,12 @@ import java.util.jar.JarFile;
  *   <li>Must contain a {@code plugin.json} at the root of the JAR.</li>
  *   <li>Each extension point class must have a public no-arg constructor.</li>
  *   <li>Each extension point class must implement the interface that corresponds
- *       to its {@code "name"} field (currently {@link ICreateItemMenuEntry} for
- *       {@code "createMenu"}).</li>
+ *       to its {@code "name"} field: {@link ICreateItemMenuEntry} for {@code "createMenu"},
+ *       {@link IProjectSettingsPanelContribution} for {@code "projectSettingsPanel"},
+ *       {@link IModelSaveInterceptor} for {@code "modelSave"},
+ *       {@link IModelValidatorContribution} for {@code "modelValidator"},
+ *       {@link INewModelNameInterceptor} for {@code "newModelName"}, and
+ *       {@link IProjectOpenedListener} for {@code "projectOpened"}.</li>
  * </ul>
  */
 @Slf4j
@@ -46,6 +50,21 @@ public class PluginManager {
 
   /** Extension point name for "New > Document" menu contributions. */
   public static final String EP_CREATE_MENU = "createMenu";
+
+  /** Extension point name for project-settings panel contributions. */
+  public static final String EP_PROJECT_SETTINGS_PANEL = "projectSettingsPanel";
+
+  /** Extension point name for model-save interceptor contributions. */
+  public static final String EP_MODEL_SAVE = "modelSave";
+
+  /** Extension point name for model-validator contributions. */
+  public static final String EP_MODEL_VALIDATOR = "modelValidator";
+
+  /** Extension point name for new-model-name interceptor contributions. */
+  public static final String EP_NEW_MODEL_NAME = "newModelName";
+
+  /** Extension point name for project-opened listener contributions. */
+  public static final String EP_PROJECT_OPENED = "projectOpened";
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -144,6 +163,71 @@ public class PluginManager {
     return Collections.unmodifiableList(result);
   }
 
+  /**
+   * Returns all {@link IProjectSettingsPanelContribution} instances contributed by all loaded
+   * plugins, in plugin load order.
+   */
+  @NonNull
+  public List<IProjectSettingsPanelContribution> getProjectSettingsPanelContributions() {
+    List<IProjectSettingsPanelContribution> result = new ArrayList<>();
+    for (LoadedPlugin plugin : loadedPlugins) {
+      result.addAll(plugin.getProjectSettingsPanelContributions());
+    }
+    return Collections.unmodifiableList(result);
+  }
+
+  /**
+   * Returns all {@link IModelSaveInterceptor} instances contributed by all loaded plugins, in
+   * plugin load order.
+   */
+  @NonNull
+  public List<IModelSaveInterceptor> getModelSaveInterceptors() {
+    List<IModelSaveInterceptor> result = new ArrayList<>();
+    for (LoadedPlugin plugin : loadedPlugins) {
+      result.addAll(plugin.getModelSaveInterceptors());
+    }
+    return Collections.unmodifiableList(result);
+  }
+
+  /**
+   * Returns all {@link IModelValidatorContribution} instances contributed by all loaded plugins,
+   * in plugin load order.
+   */
+  @NonNull
+  public List<IModelValidatorContribution> getModelValidatorContributions() {
+    List<IModelValidatorContribution> result = new ArrayList<>();
+    for (LoadedPlugin plugin : loadedPlugins) {
+      result.addAll(plugin.getModelValidatorContributions());
+    }
+    return Collections.unmodifiableList(result);
+  }
+
+  /**
+   * Returns all {@link INewModelNameInterceptor} instances contributed by all loaded plugins, in
+   * plugin load order.
+   */
+  @NonNull
+  public List<INewModelNameInterceptor> getNewModelNameInterceptors() {
+    List<INewModelNameInterceptor> result = new ArrayList<>();
+    for (LoadedPlugin plugin : loadedPlugins) {
+      result.addAll(plugin.getNewModelNameInterceptors());
+    }
+    return Collections.unmodifiableList(result);
+  }
+
+  /**
+   * Returns all {@link IProjectOpenedListener} instances contributed by all loaded plugins, in
+   * plugin load order.
+   */
+  @NonNull
+  public List<IProjectOpenedListener> getProjectOpenedListeners() {
+    List<IProjectOpenedListener> result = new ArrayList<>();
+    for (LoadedPlugin plugin : loadedPlugins) {
+      result.addAll(plugin.getProjectOpenedListeners());
+    }
+    return Collections.unmodifiableList(result);
+  }
+
   // ---------------------------------------------------------------------------
   // Internal loading logic
   // ---------------------------------------------------------------------------
@@ -171,6 +255,11 @@ public class PluginManager {
 
     // 3. Instantiate each registered extension point.
     List<ICreateItemMenuEntry> createMenuEntries = new ArrayList<>();
+    List<IProjectSettingsPanelContribution> projectSettingsPanelContributions = new ArrayList<>();
+    List<IModelSaveInterceptor> modelSaveInterceptors = new ArrayList<>();
+    List<IModelValidatorContribution> modelValidatorContributions = new ArrayList<>();
+    List<INewModelNameInterceptor> newModelNameInterceptors = new ArrayList<>();
+    List<IProjectOpenedListener> projectOpenedListeners = new ArrayList<>();
     for (ExtensionPoint ep : descriptor.getExtensionPoints()) {
       Object instance = instantiate(ep, pluginClassLoader, jarFile.getName());
       if (instance == null) {
@@ -185,12 +274,58 @@ public class PluginManager {
               ep.getClassName(), jarFile.getName());
         }
       }
+      else if (EP_PROJECT_SETTINGS_PANEL.equals(ep.getName())) {
+        if (instance instanceof IProjectSettingsPanelContribution entry) {
+          projectSettingsPanelContributions.add(entry);
+        }
+        else {
+          log.warn("Class '{}' in '{}' does not implement IProjectSettingsPanelContribution, skipping.",
+              ep.getClassName(), jarFile.getName());
+        }
+      }
+      else if (EP_MODEL_SAVE.equals(ep.getName())) {
+        if (instance instanceof IModelSaveInterceptor entry) {
+          modelSaveInterceptors.add(entry);
+        }
+        else {
+          log.warn("Class '{}' in '{}' does not implement IModelSaveInterceptor, skipping.",
+              ep.getClassName(), jarFile.getName());
+        }
+      }
+      else if (EP_MODEL_VALIDATOR.equals(ep.getName())) {
+        if (instance instanceof IModelValidatorContribution entry) {
+          modelValidatorContributions.add(entry);
+        }
+        else {
+          log.warn("Class '{}' in '{}' does not implement IModelValidatorContribution, skipping.",
+              ep.getClassName(), jarFile.getName());
+        }
+      }
+      else if (EP_NEW_MODEL_NAME.equals(ep.getName())) {
+        if (instance instanceof INewModelNameInterceptor entry) {
+          newModelNameInterceptors.add(entry);
+        }
+        else {
+          log.warn("Class '{}' in '{}' does not implement INewModelNameInterceptor, skipping.",
+              ep.getClassName(), jarFile.getName());
+        }
+      }
+      else if (EP_PROJECT_OPENED.equals(ep.getName())) {
+        if (instance instanceof IProjectOpenedListener entry) {
+          projectOpenedListeners.add(entry);
+        }
+        else {
+          log.warn("Class '{}' in '{}' does not implement IProjectOpenedListener, skipping.",
+              ep.getClassName(), jarFile.getName());
+        }
+      }
       else {
         log.warn("Unknown extension point '{}' in '{}', skipping.", ep.getName(), jarFile.getName());
       }
     }
 
-    return new LoadedPlugin(descriptor, pluginClassLoader, createMenuEntries);
+    return new LoadedPlugin(descriptor, pluginClassLoader, createMenuEntries, projectSettingsPanelContributions,
+        modelSaveInterceptors, modelValidatorContributions, newModelNameInterceptors, projectOpenedListeners);
   }
 
   /** Reads and parses the {@code plugin.json} from inside the given JAR, or returns {@code null}. */

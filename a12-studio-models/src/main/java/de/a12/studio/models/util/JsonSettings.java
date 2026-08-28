@@ -27,7 +27,8 @@ public abstract class JsonSettings {
     PREVIEW,
     PROJECT_ROOT,
     A12_INSTALLATION,
-    ADVANCED
+    /** Used by plugin-owned settings classes (e.g. a12-studio-plugins/application-groups). */
+    PLUGIN
   }
 
   public final static ObjectMapper objectMapper;

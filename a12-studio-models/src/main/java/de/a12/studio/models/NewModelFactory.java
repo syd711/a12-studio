@@ -53,12 +53,38 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NewModelFactory {
 
   // Type Definition Models don't have their own header modelType; they are DocumentModels flagged with
   // this annotation (see ModelFactory), so the header written here must stay "document".
   private static final String TD_ONLY_ANNOTATION = "tdonly";
+
+  /**
+   * Extension hook: something that can adjust the filename of a model about to be created.
+   * Registered by plugin-aware code (e.g. {@code de.a12.studio.ui.Studio}) so that plugin-contributed
+   * {@code INewModelNameInterceptor}s run on every model creation, without this module depending on
+   * the plugin manager. Applied to the filename only, never to the display name seeded into the
+   * model's own content (see {@link #buildModel}).
+   */
+  public interface NewModelNameHook {
+    @NonNull String adjustName(@NonNull ProjectItem parent, ModelType modelType, @NonNull String proposedName);
+  }
+
+  private static final List<NewModelNameHook> nameHooks = new CopyOnWriteArrayList<>();
+
+  public static void registerNameHook(NewModelNameHook hook) {
+    nameHooks.add(hook);
+  }
+
+  private static String applyNameHooks(ProjectItem parent, ModelType modelType, String name) {
+    String result = name;
+    for (NewModelNameHook hook : nameHooks) {
+      result = hook.adjustName(parent, modelType, result);
+    }
+    return result;
+  }
 
   public static ProjectItem createModel(@NonNull ProjectItem parent, @NonNull ModelType modelType, @NonNull String name) throws IOException {
     return createModel(parent, modelType, name, null);
@@ -80,8 +106,9 @@ public class NewModelFactory {
   public static ProjectItem createModelFromExisting(@NonNull ProjectItem parent,
                                                     @NonNull A12Model<?> model,
                                                     @NonNull String name) throws IOException {
-    ProjectItem item = parent.createChildModel(name);
     ModelType modelType = model.getModelType() != null ? model.getModelType() : ModelType.DOCUMENT;
+    String fileName = applyNameHooks(parent, modelType, name);
+    ProjectItem item = parent.createChildModel(fileName);
     model.setId(ProjectItem.idFromFileName(item.getName()));
     model.setModelType(modelType);
     model.setModelVersion(modelType.getCurrentVersion());
@@ -108,7 +135,8 @@ public class NewModelFactory {
       String documentModelId) throws IOException {
     A12Model<?> model = buildModel(modelType, name, resolveDefaultLocales(parent), documentModelId);
 
-    ProjectItem item = parent.createChildModel(name);
+    String fileName = applyNameHooks(parent, modelType, name);
+    ProjectItem item = parent.createChildModel(fileName);
     // Type Definition Models are persisted with header modelType "document" (see TD_ONLY_ANNOTATION
     // above), so the version must come from ModelType.DOCUMENT too, not from the typedefinition entry.
     ModelType headerModelType = model instanceof TypeDefinitionModel ? ModelType.DOCUMENT : modelType;
