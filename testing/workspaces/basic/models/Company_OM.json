@@ -45,7 +45,7 @@
       "filterConfiguration": {
         "showFilterButton": null,
         "showFilterBar": null,
-        "filterMode": "custom_list"
+        "filterMode": "custom_filter"
       },
       "newFilterConfiguration": {
         "filterSelector": {
@@ -66,7 +66,7 @@
         },
         "joinOperator": {
           "enabled": false,
-          "value": "all"
+          "value": null
         },
         "invert": {
           "enabled": true,
@@ -134,19 +134,39 @@
                 }
               }
             ]
+          },
+          {
+            "id": "filter-group-9d36f",
+            "name": "adsfsaf",
+            "label": [
+              {
+                "locale": "en",
+                "text": "wrqwerwqr"
+              }
+            ]
           }
         ]
       },
       "multiSelection": {
-        "collapseOption": null,
-        "counterOption": null,
-        "selectionArea": null
-      },
-      "initialSorting": [
-        {
-          "idref": "column-08f11"
-        }
-      ]
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": null,
+        "buttons": [
+          {
+            "event": "delete_selected",
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "sadf"
+                }
+              ]
+            },
+            "destructive": false,
+            "primary": false
+          }
+        ]
+      }
     },
     "columns": [
       {
@@ -161,20 +181,20 @@
             "text": "Logo"
           }
         ],
-        "width": 1.0,
+        "width": 1,
         "elementRef": "group_8e00a",
         "sortable": false
       },
       {
         "id": "column-4949b",
-        "width": 1.0,
+        "width": 1,
         "elementRef": "field_67684",
         "sortable": true,
         "preferredSorting": "ASC"
       },
       {
         "id": "column-9d296",
-        "width": 1.0,
+        "width": 1,
         "elementRef": "field_16af2",
         "sortable": false
       }
@@ -237,13 +257,16 @@
         {
           "type": "button",
           "event": null,
-          "destructive": null,
-          "primary": null
+          "destructive": false,
+          "primary": false
         }
       ],
       "rightSlot": [
         {
           "type": "search"
+        },
+        {
+          "type": "filter"
         }
       ]
     },
@@ -255,10 +278,6 @@
       "groups": [
         {
           "name": "group-d1c8b",
-          "actions": []
-        },
-        {
-          "name": "group-e51b9",
           "actions": []
         }
       ]

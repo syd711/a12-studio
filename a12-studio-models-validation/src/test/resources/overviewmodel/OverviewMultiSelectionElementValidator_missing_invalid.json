@@ -1,0 +1,40 @@
+{
+  "header": {
+    "id": "OverviewMultiSelectionElementValidator_missing_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple"
+      }
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "button"
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        }
+      ]
+    }
+  }
+}

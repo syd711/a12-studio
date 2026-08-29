@@ -279,18 +279,34 @@ public class Updater {
       return false;
     }
 
-    List<Integer> versionASegments = Arrays.stream(versionA.split("\\.")).map(Integer::parseInt).toList();
-    List<Integer> versionBSegments = Arrays.stream(versionB.split("\\.")).map(Integer::parseInt).toList();
+    List<Integer> versionASegments = extractNumericSegments(versionA);
+    List<Integer> versionBSegments = extractNumericSegments(versionB);
 
-    for (int i = 0; i < versionBSegments.size(); i++) {
-      if (versionASegments.get(i).intValue() == versionBSegments.get(i).intValue()) {
+    int length = Math.max(versionASegments.size(), versionBSegments.size());
+    for (int i = 0; i < length; i++) {
+      int a = i < versionASegments.size() ? versionASegments.get(i) : 0;
+      int b = i < versionBSegments.size() ? versionBSegments.get(i) : 0;
+      if (a == b) {
         continue;
       }
 
-      return versionASegments.get(i) > versionBSegments.get(i);
+      return a > b;
     }
 
     return false;
+  }
+
+  /**
+   * Splits a version string on every run of non-digit characters (e.g. {@code "."}, {@code "-"},
+   * {@code "-ext"}) and parses the remaining digit runs as integers, in order. This tolerates the
+   * real studio version scheme (e.g. {@code "2606.06-ext0-0.0.1"}), which mixes dots and hyphenated
+   * alpha markers rather than being purely dot-separated numeric like {@code "1.0.1"}.
+   */
+  private static List<Integer> extractNumericSegments(String version) {
+    return Arrays.stream(version.split("\\D+"))
+        .filter(segment -> !segment.isEmpty())
+        .map(Integer::parseInt)
+        .toList();
   }
 
   public static String loadTemplate(String templateName) throws IOException {

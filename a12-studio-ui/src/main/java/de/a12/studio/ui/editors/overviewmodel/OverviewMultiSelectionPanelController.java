@@ -5,6 +5,8 @@ import de.a12.studio.models.overviewmodel.Confirmation;
 import de.a12.studio.models.overviewmodel.MultiSelectionConfig;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewMultiSelectionElementValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.overviewmodel.dialogs.Dialogs;
@@ -99,12 +101,23 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
         return;
       }
       if (newValue) {
-        ensureMultiSelectionConfig();
+        MultiSelectionConfig config = ensureMultiSelectionConfig();
+        if (config.getCollapseOption() == null || config.getCollapseOption().isBlank()) {
+          String defaultCollapseOption = COLLAPSE_OPTIONS.get(1);
+          config.setCollapseOption(defaultCollapseOption);
+          collapseOptionField.setValue(defaultCollapseOption);
+        }
+        if (config.getCounterOption() == null || config.getCounterOption().isBlank()) {
+          String defaultCounterOption = COUNTER_OPTIONS.get(1);
+          config.setCounterOption(defaultCounterOption);
+          counterOptionField.setValue(defaultCounterOption);
+        }
       }
       else {
         ensureConfiguration().setMultiSelection(null);
       }
       commitHeaderChange();
+      refreshValidationError();
     });
 
     collapseOptionField.getItems().setAll(COLLAPSE_OPTIONS);
@@ -179,6 +192,28 @@ public class OverviewMultiSelectionPanelController extends AbstractPropertyEdito
     }
     finally {
       updatingFromModel = false;
+    }
+    refreshValidationError();
+  }
+
+  /** Called by the owning editor whenever the Subheader panels change, since {@link
+   * OverviewMultiSelectionElementValidator}'s result also depends on whether a Multi-Selection element is
+   * present there. */
+  public void refresh() {
+    refreshValidationError();
+  }
+
+  private void refreshValidationError() {
+    if (model == null) {
+      return;
+    }
+    List<ModelValidationError> errors =
+        Studio.getValidationService().validateElement(model, OverviewMultiSelectionElementValidator.ELEMENT_ID);
+    if (errors.isEmpty()) {
+      hideError();
+    }
+    else {
+      showError(errors.get(0).severity(), errors.get(0).message());
     }
   }
 

@@ -32,6 +32,7 @@
                             <Label styleClass="section-header" text="%filter_groups" />
                             <HBox fx:id="filterGroupColumnHeaders" spacing="10.0">
                                 <children>
+                                    <Label styleClass="field-label" text="" prefWidth="18.0" />
                                     <GridPane hgap="10.0" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                                         <columnConstraints>
                                             <ColumnConstraints percentWidth="33.33" />
@@ -43,7 +44,7 @@
                                  <RowConstraints />
                               </rowConstraints>
                                     </GridPane>
-                                    <Region maxWidth="90.0" minWidth="90.0" prefWidth="90.0" HBox.hgrow="NEVER" />
+                                    <Region maxWidth="110.0" minWidth="110.0" prefWidth="110.0" HBox.hgrow="NEVER" />
                                 </children>
                             </HBox>
                             <VBox fx:id="filterGroupRows" spacing="8.0" />

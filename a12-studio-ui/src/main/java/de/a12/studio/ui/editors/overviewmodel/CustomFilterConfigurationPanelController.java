@@ -27,6 +27,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -35,12 +36,14 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SplitMenuButton;
+import javafx.scene.input.DataFormat;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.Collections;
@@ -51,7 +54,14 @@ import java.util.UUID;
 
 public class CustomFilterConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
 
-  private static final double ACTIONS_BOX_WIDTH = 100.0;
+  // 3 action buttons (.default-button/.move-button, each min-width 34px) + 2 * 4px inter-button spacing,
+  // matching createFilterGroupActionsBox()'s actual content width - must stay in sync with the "90.0"-wide
+  // header Region above the SplitMenuButton in the FXML so the header and rows line up on the right edge.
+  private static final double ACTIONS_BOX_WIDTH = 110.0;
+
+  // Identifies a filter-group row-reorder drag; the dragboard content is the dragged row's current index into
+  // getFilterGroups().
+  private static final DataFormat FILTER_GROUP_INDEX = new DataFormat("application/x-a12-overview-filter-group-index");
 
   @FXML
   private HBox filterGroupColumnHeaders;
@@ -494,6 +504,8 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
   }
 
   private HBox createFilterGroupRow(FilterGroup group, int index, int rowCount) {
+    FontIcon dragHandle = RowFactory.createDragHandle();
+
     javafx.scene.control.Label nameCell = new javafx.scene.control.Label(filterGroupSummary(group));
     nameCell.setId("filterGroupName-" + index);
     nameCell.setMaxWidth(Double.MAX_VALUE);
@@ -512,6 +524,8 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     contentGrid.getColumnConstraints().addAll(nameColumn, itemsColumn);
     contentGrid.add(nameCell, 0, 0);
     contentGrid.add(itemsCell, 1, 0);
+    GridPane.setValignment(nameCell, VPos.CENTER);
+    GridPane.setValignment(itemsCell, VPos.CENTER);
     HBox.setHgrow(contentGrid, Priority.ALWAYS);
 
     HBox actionsBox = createFilterGroupActionsBox(group, index, rowCount);
@@ -520,10 +534,18 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     actionsBox.setMaxWidth(ACTIONS_BOX_WIDTH);
     HBox.setHgrow(actionsBox, Priority.NEVER);
 
-    HBox row = new HBox(10.0, contentGrid, actionsBox);
+    HBox row = new HBox(10.0, dragHandle, contentGrid, actionsBox);
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
+    RowFactory.setupRowDragAndDrop(row, dragHandle, FILTER_GROUP_INDEX, index, this::onFilterGroupRowDropped);
     return row;
+  }
+
+  private void onFilterGroupRowDropped(int fromIndex, int insertBeforeIndex) {
+    if (RowFactory.reorder(getFilterGroups(), fromIndex, insertBeforeIndex)) {
+      rebuildFilterGroupRows();
+      commitHeaderChange();
+    }
   }
 
   private VBox createFilterItemsCell(FilterGroup group, int index) {

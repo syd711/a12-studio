@@ -16,6 +16,7 @@ import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.TabErrorBadge;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
@@ -158,6 +159,14 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
       }
     });
     showValidationError(null);
+    errorContainerController.errorProperty().addListener((observable, oldValue, newValue) -> {
+      log.info("[TabErrorBadge] {} error-container errorProperty changed to {}", getClass().getSimpleName(), newValue);
+      TabErrorBadge.refresh(root);
+    });
+    errorContainerController.severityProperty().addListener((observable, oldValue, newValue) -> {
+      log.info("[TabErrorBadge] {} error-container severityProperty changed to {}", getClass().getSimpleName(), newValue);
+      TabErrorBadge.refresh(root);
+    });
   }
 
   /**

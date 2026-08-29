@@ -59,6 +59,12 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
 
   private List<BoxElement> rows;
 
+  // Notified after every structural change (add/reorder/delete/type change), so the owning editor can keep
+  // sibling panels whose validation derives from this list (e.g. the Multi-Selection panel's "exactly one
+  // Multi-Selection element" check) in sync.
+  private Runnable onChange = () -> {
+  };
+
   public void configure(@NonNull String title, @NonNull String settingsKeySuffix, @NonNull List<BoxElement> rows) {
     setTitle(title);
     setSettingsKeySuffix(settingsKeySuffix);
@@ -66,11 +72,15 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     rebuildRows();
   }
 
+  public void setOnChange(@NonNull Runnable onChange) {
+    this.onChange = onChange;
+  }
+
   @FXML
   private void onAdd() {
     rows.add(new ButtonElement());
     rebuildRows();
-    commitHeaderChange();
+    notifyChanged();
   }
 
   private void rebuildRows() {
@@ -153,6 +163,7 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     };
     rows.set(index, newElement);
     rebuildRows();
+    onChange.run();
   }
 
   private static String displayNameFor(BoxElement element) {
@@ -176,7 +187,7 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
       if (result.isPresent() && result.get() == ButtonType.OK) {
         rows.remove(element);
         rebuildRows();
-        commitHeaderChange();
+        notifyChanged();
       }
     });
 
@@ -188,6 +199,11 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   private void moveRow(int fromIndex, int toIndex) {
     Collections.swap(rows, fromIndex, toIndex);
     rebuildRows();
+    notifyChanged();
+  }
+
+  private void notifyChanged() {
     commitHeaderChange();
+    onChange.run();
   }
 }

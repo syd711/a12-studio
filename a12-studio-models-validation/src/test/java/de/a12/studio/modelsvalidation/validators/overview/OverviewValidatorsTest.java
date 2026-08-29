@@ -126,6 +126,24 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void multiSelectionElementValidatorReportsMissingElement() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewMultiSelectionElementValidator_missing_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewMultiSelectionElementValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("No Multi-Selection element is added"));
+  }
+
+  @Test
+  void multiSelectionElementValidatorReportsDuplicateElement() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewMultiSelectionElementValidator_duplicate_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewMultiSelectionElementValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("Only one Multi-Selection is allowed"));
+  }
+
+  @Test
   void pagingSizeValidatorReportsInvalidValue() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewPagingSizeValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewPagingSizeValidator().validate(model, TestModels.context(model));

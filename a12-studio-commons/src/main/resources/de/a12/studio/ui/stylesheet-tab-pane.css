@@ -127,3 +127,17 @@
     -fx-text-fill: -fx-selection-text;
     -fx-font-weight: normal;
 }
+
+/**
+ * Sub-tab-panel error badge: a small dot overlaid on a Tab's label (see TabErrorBadge) when a
+ * property editor panel nested inside that tab is currently showing a validation problem.
+ */
+.tab-error-badge {
+    -fx-fill: -fx-error-bg;
+    -fx-stroke: -fx-background;
+    -fx-stroke-width: 1.5px;
+}
+
+.tab-error-badge:warning {
+    -fx-fill: -fx-warning-bg;
+}

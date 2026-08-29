@@ -19,6 +19,7 @@ import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterGroupsVa
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterSectionsValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewInitialSortingReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewMultiSelectionElementValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewPagingSizeValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewStylesValidator;
 
@@ -42,6 +43,7 @@ public final class OverviewModelValidationService {
       new OverviewFilterCustomFieldsValidator(),
       new OverviewFilterSectionsValidator(),
       new OverviewFilterGroupsValidator(),
+      new OverviewMultiSelectionElementValidator(),
       new OverviewPagingSizeValidator(),
       new OverviewInitialSortingReferenceValidator(),
       new OverviewStylesValidator()));
