@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
@@ -38,8 +39,11 @@ import de.a12.studio.ui.util.StudioBundle;
  * single Element (styles live on the model's content), so it follows the model-header pattern used by e.g.
  * {@link de.a12.studio.ui.editors.applicationmodel.ModulesPanelController}. Also reused, via {@link #setColumn}, for a single {@link Column}'s header-
  * cell and content-cell style lists ({@link #configureColumnHeaderStyles} / {@link #configureColumnContentStyles}),
- * which have no dedicated validator (that only exists for the model-level list), so {@link #refreshStylesError}
- * is a no-op in that mode.
+ * and, via {@link #setCustom}, for an arbitrary owner's own {@code List<String>} styles field (e.g. a {@link
+ * de.a12.studio.models.overviewmodel.Button}/{@link de.a12.studio.models.overviewmodel.ButtonElement}'s {@code
+ * styles}, edited by {@link de.a12.studio.ui.editors.propertyeditors.dialogs.EventButtonDialogController}) -
+ * neither of which have a dedicated validator (that only exists for the model-level list), so {@link
+ * #refreshStylesError} is a no-op in those modes.
  */
 public class StylesPanelController extends AbstractPropertyEditor {
 
@@ -64,6 +68,24 @@ public class StylesPanelController extends AbstractPropertyEditor {
 
   private Function<Column, List<String>> columnStylesAccessor;
 
+  // Set (instead of model/column) by setCustom(), for a plain List<String> living on neither the model's own
+  // content nor a Column - e.g. an overviewmodel.Button/ButtonElement's own styles, edited from a modal dialog
+  // (see EventButtonDialogController) rather than the currently selected project item's own editor. Behaves
+  // like column mode: refreshStylesError() is a no-op, since there's no dedicated validator for this list either.
+  private Supplier<List<String>> customStylesSupplier;
+
+  /**
+   * Binds this panel to an arbitrary owner's {@code List<String>} styles field via a getter, e.g. {@code
+   * button::getStyles}. {@code stylesSupplier} is used for both reading and writing, so the owner (e.g. the
+   * {@code Button}) must already exist.
+   */
+  public void setCustom(@NonNull Supplier<List<String>> stylesSupplier) {
+    this.model = null;
+    this.column = null;
+    this.customStylesSupplier = stylesSupplier;
+    rebuildRows();
+  }
+
   public void configureColumnHeaderStyles() {
     this.columnStylesAccessor = column -> ensureColumnStyles(column).getHeader();
     setTitle(StudioBundle.get("style_for_header_cells"));
@@ -78,6 +100,7 @@ public class StylesPanelController extends AbstractPropertyEditor {
 
   public void setModel(@NonNull OverviewModel model) {
     this.column = null;
+    this.customStylesSupplier = null;
     this.model = model;
     rebuildRows();
   }
@@ -85,6 +108,7 @@ public class StylesPanelController extends AbstractPropertyEditor {
   /** {@link #configureColumnHeaderStyles} or {@link #configureColumnContentStyles} must be called first. */
   public void setColumn(@NonNull Column column) {
     this.model = null;
+    this.customStylesSupplier = null;
     this.column = column;
     rebuildRows();
   }
@@ -104,6 +128,9 @@ public class StylesPanelController extends AbstractPropertyEditor {
   }
 
   private List<String> getStyles() {
+    if (customStylesSupplier != null) {
+      return customStylesSupplier.get();
+    }
     return column != null ? columnStylesAccessor.apply(column) : model.getContent().getStyles();
   }
 

@@ -146,26 +146,6 @@
             ]
           }
         ]
-      },
-      "multiSelection": {
-        "collapseOption": "collapsible_collapsed",
-        "counterOption": "simple",
-        "selectionArea": null,
-        "buttons": [
-          {
-            "event": "delete_selected",
-            "confirmation": {
-              "title": [
-                {
-                  "locale": "en",
-                  "text": "sadf"
-                }
-              ]
-            },
-            "destructive": false,
-            "primary": false
-          }
-        ]
       }
     },
     "columns": [

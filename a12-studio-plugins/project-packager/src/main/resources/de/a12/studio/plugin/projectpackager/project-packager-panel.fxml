@@ -20,10 +20,10 @@
             </BorderPane.margin>
         </VBox>
     </top>
-    <center>
-        <VBox spacing="3.0" BorderPane.alignment="TOP_LEFT">
+   <center>
+        <VBox spacing="3.0" BorderPane.alignment="CENTER">
             <children>
-                <VBox spacing="3.0">
+                <VBox alignment="CENTER_LEFT" spacing="3.0">
                     <children>
                         <Label styleClass="field-description" text="%project_packager.target_folder_label" />
                         <Label styleClass="field-description" text="%project_packager.description" wrapText="true" />
@@ -48,5 +48,5 @@
                 <Insets left="12.0" right="12.0" top="8.0" />
             </padding>
         </VBox>
-    </center>
+   </center>
 </BorderPane>

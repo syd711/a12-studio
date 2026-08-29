@@ -3,7 +3,7 @@ package de.a12.studio.models.overviewmodel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import de.a12.studio.models.EventButtonLike;
+import de.a12.studio.models.Annotation;
 import de.a12.studio.models.Label;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class Button implements EventButtonLike {
+public class Button implements OverviewButtonLike {
 
   private String event;
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -27,6 +27,13 @@ public class Button implements EventButtonLike {
   private List<Label> description = new ArrayList<>();
   private Boolean destructive;
   private Boolean primary;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean labelHidden;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<String> styles = new ArrayList<>();
+  // SME's "annotated_mixin" - a plain "annotations" field on the wire, matching documentmodel.Element.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Annotation> annotations = new ArrayList<>();
 
   @Override
   @JsonIgnore

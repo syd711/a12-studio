@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.propertyeditors;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
@@ -12,6 +13,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import org.jspecify.annotations.NonNull;
@@ -200,6 +202,12 @@ public final class RowFactory {
     moveDownButton.setDisable(index == rowCount - 1);
     moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
 
-    return new VBox(1, moveUpButton, moveDownButton);
+    VBox box = new VBox(1, moveUpButton, moveDownButton);
+    // Centered (rather than the VBox default of TOP_LEFT) so the pair stays vertically centered next to the
+    // taller edit/delete buttons when this box sits in a row that's taller than its own natural height (e.g.
+    // a multi-line content cell alongside it), instead of sticking to the top of the available space.
+    box.setAlignment(Pos.CENTER);
+    box.setMaxHeight(Region.USE_PREF_SIZE);
+    return box;
   }
 }

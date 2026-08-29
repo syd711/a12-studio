@@ -1,9 +1,13 @@
 package de.a12.studio.ui.util;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -41,6 +45,32 @@ public final class TabErrorBadge {
     log.info("[TabErrorBadge] refresh() from {} (parent={}, scene={})", fromNode.getClass().getSimpleName(),
         fromNode.getParent() != null ? fromNode.getParent().getClass().getSimpleName() : "null",
         fromNode.getScene() != null ? "attached" : "null");
+
+    if (fromNode.getScene() == null) {
+      // Validation can run (e.g. during the initial model load) before this panel's tree is attached to the
+      // app's live Scene, at which point ScrollPane/TabPane haven't reparented their content into their Skin
+      // yet (that only happens once a Skin is created, which requires Scene attachment) - so the ancestor walk
+      // below would dead-end early and never find the owning Tab. Wait for attachment, then retry one pulse
+      // later so that follow-up layout/skin pass has actually run.
+      log.info("[TabErrorBadge]   not yet attached to a Scene - deferring refresh until it is");
+      fromNode.sceneProperty().addListener(new ChangeListener<Scene>() {
+        @Override
+        public void changed(ObservableValue<? extends Scene> observable, Scene oldScene, Scene newScene) {
+          if (newScene != null) {
+            fromNode.sceneProperty().removeListener(this);
+            Platform.runLater(() -> refresh(fromNode));
+          }
+        }
+      });
+      return;
+    }
+
+    // Force any pending CSS/skin pass to run synchronously (e.g. right after the sceneProperty listener above
+    // fires), so skin-driven reparenting - ScrollPane/TabPane only add their content as an actual scene-graph
+    // child once their Skin exists - is guaranteed to have already happened by the time we walk below, rather
+    // than racing whatever the next automatic pulse would have done.
+    fromNode.getScene().getRoot().applyCss();
+    fromNode.getScene().getRoot().layout();
 
     Node current = fromNode.getParent();
     boolean foundSubTabPanel = false;
@@ -140,7 +170,6 @@ public final class TabErrorBadge {
     badge.setTranslateY(-8);
 
     Label label = new Label(originalText);
-    tab.textProperty().addListener((observable, oldValue, newValue) -> label.setText(newValue));
 
     StackPane graphic = new StackPane(label, badge);
     StackPane.setAlignment(badge, Pos.TOP_RIGHT);
@@ -148,6 +177,9 @@ public final class TabErrorBadge {
     tab.setText(null);
     tab.setGraphic(graphic);
     tab.getProperties().put(BADGE_STYLE_CLASS, badge);
+    // Added only now, after our own setText(null) above, so it doesn't immediately fire and overwrite the
+    // label with null; from here on it just keeps the label in sync with any future (external) text change.
+    tab.textProperty().addListener((observable, oldValue, newValue) -> label.setText(newValue));
     return badge;
   }
 

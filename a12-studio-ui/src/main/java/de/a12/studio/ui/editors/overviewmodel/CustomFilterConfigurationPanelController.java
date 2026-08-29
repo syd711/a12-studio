@@ -14,7 +14,9 @@ import de.a12.studio.models.overviewmodel.JoinOperatorConfig;
 import de.a12.studio.models.overviewmodel.NewFilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterGroupsValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.overviewmodel.dialogs.Dialogs;
@@ -41,6 +43,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -55,8 +58,9 @@ import java.util.UUID;
 public class CustomFilterConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
 
   // 3 action buttons (.default-button/.move-button, each min-width 34px) + 2 * 4px inter-button spacing,
-  // matching createFilterGroupActionsBox()'s actual content width - must stay in sync with the "90.0"-wide
-  // header Region above the SplitMenuButton in the FXML so the header and rows line up on the right edge.
+  // matching createFilterGroupActionsBox()'s actual content width - a narrower box lets the buttons overflow
+  // it and eat into the row's right padding. Must stay in sync with the matching 110.0-wide header Region in
+  // the FXML so the header and rows line up on the right edge.
   private static final double ACTIONS_BOX_WIDTH = 110.0;
 
   // Identifies a filter-group row-reorder drag; the dragboard content is the dragged row's current index into
@@ -489,6 +493,7 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     if (model == null) {
       return;
     }
+    refreshValidationError();
     filterGroupRows.getChildren().clear();
 
     List<FilterGroup> groups = currentFilterGroups();
@@ -503,6 +508,23 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     }
   }
 
+  /** {@link OverviewFilterGroupsValidator} keys its errors off a synthetic {@code ELEMENT_ID} for the whole
+   * filter-groups list, not a single bound {@link de.a12.studio.models.documentmodel.Element}, so this panel
+   * must query and display them itself - same pattern as {@link OverviewSortingPanelController}. */
+  private void refreshValidationError() {
+    if (currentFilterGroups().isEmpty()) {
+      hideError();
+      return;
+    }
+    List<ModelValidationError> errors =
+        Studio.getValidationService().validateElement(model, OverviewFilterGroupsValidator.ELEMENT_ID);
+    if (errors.isEmpty()) {
+      hideError();
+    } else {
+      showError(errors.get(0).severity(), errors.get(0).message());
+    }
+  }
+
   private HBox createFilterGroupRow(FilterGroup group, int index, int rowCount) {
     FontIcon dragHandle = RowFactory.createDragHandle();
 
@@ -511,6 +533,13 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     nameCell.setMaxWidth(Double.MAX_VALUE);
     nameCell.setAlignment(Pos.CENTER_LEFT);
     makeClickableToEdit(nameCell, group);
+
+    // Wrapped in a VBox (rather than added to contentGrid directly) so the shorter name label reliably
+    // centers vertically against the taller filter-items column via the wrapper's own alignment, regardless
+    // of the GridPane row's fill/valignment behavior for the Label itself.
+    VBox nameCellWrapper = new VBox(nameCell);
+    nameCellWrapper.setAlignment(Pos.CENTER_LEFT);
+    nameCellWrapper.setMaxHeight(Region.USE_PREF_SIZE);
 
     VBox itemsCell = createFilterItemsCell(group, index);
 
@@ -522,9 +551,9 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     ColumnConstraints itemsColumn = new ColumnConstraints();
     itemsColumn.setPercentWidth(66.67);
     contentGrid.getColumnConstraints().addAll(nameColumn, itemsColumn);
-    contentGrid.add(nameCell, 0, 0);
+    contentGrid.add(nameCellWrapper, 0, 0);
     contentGrid.add(itemsCell, 1, 0);
-    GridPane.setValignment(nameCell, VPos.CENTER);
+    GridPane.setValignment(nameCellWrapper, VPos.CENTER);
     GridPane.setValignment(itemsCell, VPos.CENTER);
     HBox.setHgrow(contentGrid, Priority.ALWAYS);
 
@@ -532,6 +561,7 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     actionsBox.setPrefWidth(ACTIONS_BOX_WIDTH);
     actionsBox.setMinWidth(ACTIONS_BOX_WIDTH);
     actionsBox.setMaxWidth(ACTIONS_BOX_WIDTH);
+    actionsBox.setMaxHeight(Region.USE_PREF_SIZE);
     HBox.setHgrow(actionsBox, Priority.NEVER);
 
     HBox row = new HBox(10.0, dragHandle, contentGrid, actionsBox);
