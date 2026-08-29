@@ -1,10 +1,12 @@
 package de.a12.studio.ui.editors.overviewmodel.dialogs;
 
+import de.a12.studio.models.overviewmodel.ActionGroup;
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.FilterGroup;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterSection;
+import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -131,6 +133,28 @@ public class Dialogs {
     FilterItemDialogController controller = (FilterItemDialogController) stage.getUserData();
     controller.init(stage, documentModelIndex, item);
     stage.setOnHidden(event -> controller.destroy());
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.isConfirmed();
+  }
+
+  public static Optional<ActionGroup> showContextMenuGroupForAdd(Stage owner, OverviewModel model) {
+    ActionGroup group = new ActionGroup();
+    return showContextMenuGroup(owner, StudioBundle.get("add_context_menu_group_title"), model, group)
+        ? Optional.of(group) : Optional.empty();
+  }
+
+  public static boolean showContextMenuGroupForEdit(Stage owner, OverviewModel model, ActionGroup group) {
+    return showContextMenuGroup(owner, StudioBundle.get("edit_context_menu_group_title"), model, group);
+  }
+
+  private static boolean showContextMenuGroup(Stage owner, String title, OverviewModel model, @NonNull ActionGroup group) {
+    FXMLLoader fxmlLoader = new FXMLLoader(ContextMenuGroupDialogController.class.getResource("context-menu-group-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("context-menu-group-dialog", fxmlLoader, owner, title);
+    ContextMenuGroupDialogController controller = (ContextMenuGroupDialogController) stage.getUserData();
+    controller.init(stage, model, group);
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();

@@ -26,13 +26,31 @@
                   <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </padding>
 
-               <!-- Name -->
-               <VBox spacing="2.0">
+               <!-- Name / Group ID -->
+               <HBox spacing="12.0">
                   <children>
-                     <Label styleClass="field-label" text="%name" />
-                     <TextField fx:id="nameField" />
+                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label styleClass="field-label" text="%name" />
+                           <TextField fx:id="nameField" />
+                        </children>
+                     </VBox>
+                     <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                        <children>
+                           <Label styleClass="field-label" text="%group_id" />
+                           <HBox alignment="CENTER_LEFT" spacing="6.0">
+                              <children>
+                                 <TextField fx:id="groupIdField" editable="false" styleClass="readonly-field" HBox.hgrow="ALWAYS" />
+                                 <Button fx:id="copyGroupIdButton" mnemonicParsing="false" onAction="#onCopyGroupId" styleClass="default-button">
+                                    <graphic><FontIcon iconLiteral="mdi2c-content-copy" iconSize="16" /></graphic>
+                                    <tooltip><Tooltip text="%copy" /></tooltip>
+                                 </Button>
+                              </children>
+                           </HBox>
+                        </children>
+                     </VBox>
                   </children>
-               </VBox>
+               </HBox>
 
                <!-- Label -->
                <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
@@ -43,22 +61,7 @@
                <CheckBox fx:id="collapsedField" mnemonicParsing="false" text="%collapsed" />
 
                <!-- Filter Items -->
-               <VBox spacing="10.0">
-                  <children>
-                     <Label styleClass="section-header" text="%filter_items" />
-                     <HBox fx:id="filterItemColumnHeaders" spacing="10.0">
-                        <children>
-                           <Label styleClass="field-label" text="%filter_items" HBox.hgrow="ALWAYS" />
-                        </children>
-                     </HBox>
-                     <VBox fx:id="filterItemRows" spacing="8.0" />
-                     <Label fx:id="filterItemsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
-                     <Button fx:id="addFilterItemButton" mnemonicParsing="false" onAction="#onAddFilterItem" styleClass="primary-button" text="%add_filter_item">
-                        <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
-                        <tooltip><Tooltip text="%add_filter_item" /></tooltip>
-                     </Button>
-                  </children>
-               </VBox>
+               <fx:include fx:id="filterItems" source="filter-items-panel.fxml" />
             </VBox>
          </content>
          <padding>

@@ -10,6 +10,8 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.layout.HBox;
 import de.a12.studio.ui.util.StudioBundle;
 
+import java.util.stream.Collectors;
+
 class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
 
   @Override
@@ -18,6 +20,7 @@ class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
     if (empty || name == null) {
       setText(null);
       setGraphic(null);
+      setTooltip(null);
       getStyleClass().remove("validation-error");
       return;
     }
@@ -26,6 +29,7 @@ class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
     if (viewModel == null) {
       setText(name);
       setGraphic(null);
+      setTooltip(null);
       getStyleClass().remove("validation-error");
     }
     else {
@@ -56,9 +60,12 @@ class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
           getStyleClass().add("validation-error");
         }
         nameLabel.getStyleClass().add("validation-error");
+        String messages = viewModel.getErrorMessages().stream().map(message -> "• " + message).collect(Collectors.joining("\n"));
+        setTooltip(WidgetFactory.createTooltip(messages));
       }
       else {
         getStyleClass().remove("validation-error");
+        setTooltip(null);
       }
     }
   }

@@ -144,10 +144,27 @@ public class ElementIndex {
     return resolve(elementId, new HashSet<>(List.of(model.getId()))).map(Resolution::element);
   }
 
+  /**
+   * True if {@code elementId} resolves (directly, or transitively through nested Includes - see {@link
+   * #resolveElement}) to an element with a repeatable ancestor. Mirrors SME's {@code
+   * getDmReferenceCandidates} {@code isRepeatable} propagation over its merged Include tree: that traversal
+   * flattens an included model's elements as ordinary descendants of the Include node, so the Include
+   * group's own repeatability - and the repeatability of everything above it back to this model's root - is
+   * inherited by every element resolved through it, on top of that element's own ancestors within the
+   * included model itself. False when {@code elementId} doesn't resolve at all.
+   */
+  public boolean isInRepeatableGroup(String elementId) {
+    if (elementId == null) {
+      return false;
+    }
+    return resolve(elementId, new HashSet<>(List.of(model.getId()))).map(Resolution::repeatableAncestor).orElse(false);
+  }
+
   private Optional<Resolution> resolve(String elementId, Set<String> visitedModelIds) {
     Optional<Element> direct = findById(elementId);
     if (direct.isPresent()) {
-      return Optional.of(new Resolution(direct.get(), getPath(direct.get())));
+      Element element = direct.get();
+      return Optional.of(new Resolution(element, getPath(element), hasRepeatableAncestor(element)));
     }
     for (Element element : all) {
       if (!(element instanceof GroupElement group) || group.getGroup() == null
@@ -165,13 +182,32 @@ public class ElementIndex {
       }
       Optional<Resolution> inner = new ElementIndex(included, otherModels).resolve(elementId.substring(prefix.length()), visitedModelIds);
       if (inner.isPresent()) {
-        return Optional.of(new Resolution(inner.get().element(), getPath(group) + inner.get().path()));
+        boolean repeatableThroughInclude = isRepeatable(group) || hasRepeatableAncestor(group);
+        return Optional.of(new Resolution(inner.get().element(), getPath(group) + inner.get().path(),
+            inner.get().repeatableAncestor() || repeatableThroughInclude));
       }
     }
     return Optional.empty();
   }
 
-  private record Resolution(Element element, String path) {}
+  private static boolean isRepeatable(GroupElement group) {
+    return group.getGroup() != null && group.getGroup().getRepeatability() != null && group.getGroup().getRepeatability() > 1;
+  }
+
+  /** True when any ancestor group of {@code element} (not this index's own root group) has a repeatability
+   * above 1. */
+  private boolean hasRepeatableAncestor(Element element) {
+    GroupElement parent = parentOf(element);
+    while (parent != null) {
+      if (isRepeatable(parent) && parentOf(parent) != null) {
+        return true;
+      }
+      parent = parentOf(parent);
+    }
+    return false;
+  }
+
+  private record Resolution(Element element, String path, boolean repeatableAncestor) {}
 
   private DocumentModel resolveIncludedModel(String reference) {
     if (reference == null) {

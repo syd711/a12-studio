@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%filter_items" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.FilterItemsPanelController">
+   <BorderPane>
+      <center>
+         <VBox spacing="8.0" BorderPane.alignment="CENTER">
+            <children>
+               <HBox fx:id="filterItemColumnHeaders" spacing="10.0">
+                  <children>
+                     <Label styleClass="field-label" text="%filter_items" HBox.hgrow="ALWAYS" />
+                  </children>
+               </HBox>
+               <VBox fx:id="filterItemRows" spacing="8.0" />
+               <Label fx:id="filterItemsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+               <Button fx:id="addFilterItemButton" mnemonicParsing="false" onAction="#onAddFilterItem" styleClass="primary-button" text="%add_filter_item">
+                  <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                  <tooltip><Tooltip text="%add_filter_item" /></tooltip>
+               </Button>
+            </children>
+         </VBox>
+      </center>
+   </BorderPane>
+</TitledPane>

@@ -34,7 +34,7 @@ public final class OverviewFieldReferenceValidator implements ModelValidator {
       return List.of();
     }
 
-    ElementIndex index = new ElementIndex(documentModel);
+    ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
     List<ModelValidationError> errors = new ArrayList<>();
     for (Column column : overviewModel.getContent().getColumns()) {
       String elementRef = column.getElementRef();
@@ -51,7 +51,7 @@ public final class OverviewFieldReferenceValidator implements ModelValidator {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.common.indexedAnnotationFalse", element.getName()), Severity.ERROR.name()));
       }
-      if (OverviewElementResolution.isInRepeatableGroup(index, element)) {
+      if (OverviewElementResolution.isInRepeatableGroup(index, elementRef)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.overviewFieldReference.repeatable", element.getName()), Severity.ERROR.name()));
       }

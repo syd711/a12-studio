@@ -35,7 +35,7 @@
                     <CheckBox fx:id="readonlyCheckBox" text="%readonly" />
                     <VBox>
                         <children>
-                            <Label styleClass="field-label" text="%readonly_presentation" />
+                            <Label styleClass="field-label" text="%readonly_presentation_field" />
                             <ComboBox fx:id="readonlyPresentationCombo" maxWidth="Infinity" />
                             <Label fx:id="readonlyPresentationHintLabel" styleClass="placeholder-label" wrapText="true" />
                         </children>

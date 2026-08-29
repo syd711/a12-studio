@@ -29,7 +29,7 @@
                 <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
                 <tooltip><Tooltip text="%add_column" /></tooltip>
             </Button>
-      <CheckBox fx:id="enableColumnsResizeField" mnemonicParsing="false" text="%enable_columns_resize" />
+      <CheckBox fx:id="enableColumnsResizeField" mnemonicParsing="false" text="%enable_columns_resize_overview" />
       <HBox alignment="CENTER_LEFT" spacing="6.0">
         <CheckBox fx:id="showRowCountField" mnemonicParsing="false" text="%show_number_of_entries" />
         <Label prefHeight="9.0" prefWidth="7.0">

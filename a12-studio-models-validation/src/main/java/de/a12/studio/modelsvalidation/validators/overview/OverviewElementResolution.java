@@ -5,7 +5,6 @@ import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
-import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
@@ -36,14 +35,18 @@ public final class OverviewElementResolution {
         .orElse(null);
   }
 
+  /**
+   * Resolves {@code elementRef} against the referenced Document Model, following {@link
+   * ElementIndex#resolveElement} through Include groups - a column can just as validly reference a field
+   * that lives inside an included model via the compound {@code "<includeGroupId>_<targetId>"} id shape, so
+   * {@code index} must have been built with the project's other Document Models (see {@link
+   * ElementIndex#ElementIndex(DocumentModel, java.util.List)}) for that to resolve.
+   */
   public static Element resolve(ElementIndex index, String elementRef) {
     if (elementRef == null || elementRef.isBlank()) {
       return null;
     }
-    return index.allElements().stream()
-        .filter(candidate -> elementRef.equals(candidate.getId()))
-        .findFirst()
-        .orElse(null);
+    return index.resolveElement(elementRef).orElse(null);
   }
 
   public static boolean isIndexedFalse(Element element) {
@@ -58,16 +61,13 @@ public final class OverviewElementResolution {
     return false;
   }
 
-  /** True when any ancestor group (not the root group itself) has a repeatability above 1. */
-  public static boolean isInRepeatableGroup(ElementIndex index, Element element) {
-    GroupElement parent = index.parentOf(element);
-    while (parent != null) {
-      if (parent.getGroup() != null && parent.getGroup().getRepeatability() != null
-          && parent.getGroup().getRepeatability() > 1 && index.parentOf(parent) != null) {
-        return true;
-      }
-      parent = index.parentOf(parent);
-    }
-    return false;
+  /**
+   * True when {@code elementRef} resolves to an element with a repeatable ancestor - delegates to {@link
+   * ElementIndex#isInRepeatableGroup}, which (unlike a plain {@link ElementIndex#parentOf} walk against
+   * {@code index}) correctly accounts for an Include's own repeatability when {@code elementRef} resolves
+   * into an included model rather than {@code index}'s own tree.
+   */
+  public static boolean isInRepeatableGroup(ElementIndex index, String elementRef) {
+    return index.isInRepeatableGroup(elementRef);
   }
 }

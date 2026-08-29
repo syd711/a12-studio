@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="500.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.propertyeditors.dialogs.EventButtonDialogController">
+   <top>
+      <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <VBox spacing="14.0" BorderPane.alignment="TOP_LEFT">
+         <children>
+            <VBox spacing="6.0">
+               <Label styleClass="field-label" text="%event" />
+               <TextField fx:id="eventField" />
+            </VBox>
+            <VBox spacing="6.0">
+               <Label styleClass="field-label" text="%priority" />
+               <ComboBox fx:id="priorityField" maxWidth="Infinity" />
+            </VBox>
+            <CheckBox fx:id="destructiveField" text="%destructive" />
+            <VBox spacing="6.0">
+               <Label styleClass="field-label" text="%icon" />
+               <TextField fx:id="iconField" />
+            </VBox>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="24.0" left="24.0" right="24.0" top="16.0" />
+         </BorderPane.margin>
+      </VBox>
+   </center>
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel">
+               <HBox.margin>
+                  <Insets right="12.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+         </BorderPane.margin>
+      </HBox>
+   </bottom>
+</BorderPane>

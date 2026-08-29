@@ -45,7 +45,7 @@
       "filterConfiguration": {
         "showFilterButton": null,
         "showFilterBar": null,
-        "filterMode": "all_columns"
+        "filterMode": "custom_list"
       },
       "newFilterConfiguration": {
         "filterSelector": {
@@ -141,7 +141,12 @@
         "collapseOption": null,
         "counterOption": null,
         "selectionArea": null
-      }
+      },
+      "initialSorting": [
+        {
+          "idref": "column-08f11"
+        }
+      ]
     },
     "columns": [
       {
@@ -239,9 +244,6 @@
       "rightSlot": [
         {
           "type": "search"
-        },
-        {
-          "type": "filter"
         }
       ]
     },
@@ -253,6 +255,10 @@
       "groups": [
         {
           "name": "group-d1c8b",
+          "actions": []
+        },
+        {
+          "name": "group-e51b9",
           "actions": []
         }
       ]

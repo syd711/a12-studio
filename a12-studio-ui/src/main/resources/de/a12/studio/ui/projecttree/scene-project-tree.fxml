@@ -38,20 +38,20 @@
                           </tooltip>
                       </Button>
                       <Separator orientation="VERTICAL" />
-                      <Button accessibleText="%expand_all" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
+                      <Button accessibleText="%expand_all_project_tree" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
                           <graphic>
                               <FontIcon iconLiteral="mdi2a-arrow-expand-vertical" iconSize="18" styleClass="toolbar-icon" />
                           </graphic>
                           <tooltip>
-                              <Tooltip text="%expand_all" />
+                              <Tooltip text="%expand_all_project_tree" />
                           </tooltip>
                       </Button>
-                      <Button accessibleText="%collapse_all" mnemonicParsing="false" onAction="#onCollapseAll" styleClass="default-button">
+                      <Button accessibleText="%collapse_all_project_tree" mnemonicParsing="false" onAction="#onCollapseAll" styleClass="default-button">
                           <graphic>
                               <FontIcon iconLiteral="mdi2a-arrow-collapse-vertical" iconSize="18" styleClass="toolbar-icon" />
                           </graphic>
                           <tooltip>
-                              <Tooltip text="%collapse_all" />
+                              <Tooltip text="%collapse_all_project_tree" />
                           </tooltip>
                       </Button>
                   </items>

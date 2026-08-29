@@ -16,7 +16,7 @@ public class ElementViewModel {
 
   private final Element element;
 
-  private boolean hasError;
+  private List<String> errorMessages = List.of();
 
   public ElementViewModel(@NonNull Element element) {
     this.element = element;
@@ -27,11 +27,16 @@ public class ElementViewModel {
   }
 
   public boolean hasError() {
-    return hasError;
+    return !errorMessages.isEmpty();
   }
 
-  public void setHasError(boolean hasError) {
-    this.hasError = hasError;
+  /** The messages of every validation error reported against this element's id, for display in a row tooltip. */
+  public List<String> getErrorMessages() {
+    return errorMessages;
+  }
+
+  public void setErrorMessages(@NonNull List<String> errorMessages) {
+    this.errorMessages = errorMessages;
   }
 
   public String getName() {

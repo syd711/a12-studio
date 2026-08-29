@@ -1,250 +1,186 @@
 package de.a12.studio.ui.editors.overviewmodel;
 
-import de.a12.studio.models.Label;
-import de.a12.studio.models.Locale;
 import de.a12.studio.models.overviewmodel.ActionGroup;
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.ContextMenu;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.overviewmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.input.DataFormat;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-import de.a12.studio.ui.util.StudioBundle;
 
 /**
- * Edits an {@link OverviewModel}'s {@code content.contextMenu}: named {@link ActionGroup}s, each holding
- * multilingual title text and a list of {@link Button} actions, matching the SME reference's Context Menu
- * section - "similar to adding Row Actions, but without Priority, Destructive, and Hide Label". Not bound to a
- * single {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern
- * ({@link #commitHeaderChange()}) used by e.g. {@link OverviewSortingPanelController}.
+ * Edits an {@link OverviewModel}'s {@code content.contextMenu}: one draggable, reorderable row per named {@link
+ * ActionGroup}, summarizing its Group Name and Actions - matching the SME reference's Context Menu section
+ * ("similar to adding Row Actions, but without Priority, Destructive, and Hide Label"). Not bound to a single
+ * {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern ({@link
+ * #commitHeaderChange()}) used by e.g. {@link OverviewColumnsPanelController}. Clicking a row (or its Edit
+ * button) opens {@link Dialogs#showContextMenuGroupForEdit}, the full group editor (name, multilingual title,
+ * actions); the Add button opens the same editor via {@link Dialogs#showContextMenuGroupForAdd}, only adding the
+ * new group to {@code content.contextMenu.groups} once it's confirmed.
  */
 public class ContextMenuPanelController extends AbstractPropertyEditor {
 
+  private static final double ACTIONS_BOX_WIDTH = 100.0;
+
+  // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into getGroups().
+  private static final DataFormat GROUP_INDEX = new DataFormat("application/x-a12-context-menu-group-index");
+
   @FXML
-  private ListView<ActionGroup> groupsList;
+  private HBox groupColumnHeaders;
+
   @FXML
-  private javafx.scene.layout.VBox detailBox;
+  private VBox groupRows;
+
   @FXML
-  private TextField groupNameField;
-  @FXML
-  private GridPane groupTitleGrid;
-  @FXML
-  private GridPane actionsGrid;
-  @FXML
-  private javafx.scene.control.Label actionsEmptyLabel;
+  private Label groupsEmptyLabel;
 
   private OverviewModel model;
 
-  // Set while fields are being repopulated from the model, so those programmatic updates aren't mistaken for
-  // user edits and don't trigger a save.
-  private boolean updatingFromModel;
-
   public void setModel(@NonNull OverviewModel model) {
     this.model = model;
+    rebuildRows();
+  }
 
-    groupsList.setCellFactory(list -> new ListCell<>() {
-      @Override
-      protected void updateItem(ActionGroup group, boolean empty) {
-        super.updateItem(group, empty);
-        setText(empty || group == null ? null : describeGroup(group));
-      }
-    });
-    groupsList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> showGroup(newValue));
-
-    groupNameField.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      ActionGroup group = groupsList.getSelectionModel().getSelectedItem();
-      if (group == null) {
-        return;
-      }
-      group.setName(newValue == null || newValue.isBlank() ? null : newValue);
-      groupsList.refresh();
+  @FXML
+  private void onAddGroup() {
+    Dialogs.showContextMenuGroupForAdd(Studio.stage, model).ifPresent(group -> {
+      ensureContextMenu().getGroups().add(group);
+      rebuildRows();
       commitHeaderChange();
     });
-
-    refreshGroupsList();
-    showGroup(null);
   }
 
-  @FXML
-  public void onAddGroup() {
-    ContextMenu contextMenu = ensureContextMenu();
-    ActionGroup group = new ActionGroup();
-    group.setName("group-" + shortId());
-    contextMenu.getGroups().add(group);
-    refreshGroupsList();
-    groupsList.getSelectionModel().select(group);
-    commitHeaderChange();
-  }
-
-  @FXML
-  public void onRemoveGroup() {
-    ActionGroup group = groupsList.getSelectionModel().getSelectedItem();
-    if (group == null) {
-      return;
-    }
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_context_menu_group"), null, null, "Delete");
-    if (result.isEmpty() || result.get() != ButtonType.OK) {
-      return;
-    }
+  private List<ActionGroup> getGroups() {
     ContextMenu contextMenu = model.getContent().getContextMenu();
-    if (contextMenu != null) {
-      contextMenu.getGroups().remove(group);
-    }
-    refreshGroupsList();
-    commitHeaderChange();
+    return contextMenu != null ? contextMenu.getGroups() : List.of();
   }
 
-  @FXML
-  public void onAddAction() {
-    ActionGroup group = groupsList.getSelectionModel().getSelectedItem();
-    if (group == null) {
+  private void rebuildRows() {
+    if (model == null) {
       return;
     }
-    group.getActions().add(new Button());
-    rebuildActionsGrid(group);
-    groupsList.refresh();
-    commitHeaderChange();
-  }
+    groupRows.getChildren().clear();
 
-  private void refreshGroupsList() {
-    ActionGroup selected = groupsList.getSelectionModel().getSelectedItem();
-    ContextMenu contextMenu = model.getContent().getContextMenu();
-    List<ActionGroup> groups = contextMenu != null ? contextMenu.getGroups() : List.of();
-    groupsList.getItems().setAll(groups);
-    if (selected != null && groups.contains(selected)) {
-      groupsList.getSelectionModel().select(selected);
+    List<ActionGroup> groups = getGroups();
+    boolean empty = groups.isEmpty();
+    groupColumnHeaders.setVisible(!empty);
+    groupColumnHeaders.setManaged(!empty);
+    groupsEmptyLabel.setVisible(empty);
+    groupsEmptyLabel.setManaged(empty);
+
+    for (int index = 0; index < groups.size(); index++) {
+      groupRows.getChildren().add(createRow(groups.get(index), index, groups.size()));
     }
   }
 
-  private void showGroup(ActionGroup group) {
-    boolean wasUpdating = updatingFromModel;
-    updatingFromModel = true;
-    try {
-      boolean present = group != null;
-      detailBox.setVisible(present);
-      detailBox.setManaged(present);
-      if (!present) {
-        return;
+  private HBox createRow(ActionGroup group, int index, int rowCount) {
+    FontIcon dragHandle = RowFactory.createDragHandle();
+
+    Label nameCell = new Label(groupName(group));
+    nameCell.setId("contextMenuGroupName-" + index);
+    nameCell.setMaxWidth(Double.MAX_VALUE);
+    makeClickableToEdit(nameCell, group);
+
+    Label actionsCell = new Label(actionsSummary(group));
+    actionsCell.setId("contextMenuGroupActions-" + index);
+    actionsCell.setMaxWidth(Double.MAX_VALUE);
+    actionsCell.setWrapText(true);
+    makeClickableToEdit(actionsCell, group);
+
+    GridPane contentGrid = new GridPane();
+    contentGrid.setHgap(10.0);
+    contentGrid.setMaxWidth(Double.MAX_VALUE);
+    ColumnConstraints nameColumn = new ColumnConstraints();
+    nameColumn.setPercentWidth(40.0);
+    ColumnConstraints actionsColumn = new ColumnConstraints();
+    actionsColumn.setPercentWidth(60.0);
+    contentGrid.getColumnConstraints().addAll(nameColumn, actionsColumn);
+    contentGrid.add(nameCell, 0, 0);
+    contentGrid.add(actionsCell, 1, 0);
+    HBox.setHgrow(contentGrid, Priority.ALWAYS);
+
+    HBox actionsBox = createActionsBox(group, index, rowCount);
+    actionsBox.setPrefWidth(ACTIONS_BOX_WIDTH);
+    actionsBox.setMinWidth(ACTIONS_BOX_WIDTH);
+    actionsBox.setMaxWidth(ACTIONS_BOX_WIDTH);
+    HBox.setHgrow(actionsBox, Priority.NEVER);
+
+    HBox row = new HBox(10.0, dragHandle, contentGrid, actionsBox);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("module-row");
+    RowFactory.setupRowDragAndDrop(row, dragHandle, GROUP_INDEX, index, this::moveGroup);
+    return row;
+  }
+
+  private void makeClickableToEdit(Node node, ActionGroup group) {
+    node.setCursor(Cursor.HAND);
+    node.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        openEditDialog(group);
       }
-      groupNameField.setText(group.getName() != null ? group.getName() : "");
-      rebuildLocaleGrid(groupTitleGrid, group.getTitle(), (code, text) -> setLabelText(group.getTitle(), code, text));
-      rebuildActionsGrid(group);
-    }
-    finally {
-      updatingFromModel = wasUpdating;
+    });
+  }
+
+  private void openEditDialog(ActionGroup group) {
+    if (Dialogs.showContextMenuGroupForEdit(Studio.stage, model, group)) {
+      rebuildRows();
+      commitHeaderChange();
     }
   }
 
-  private void rebuildActionsGrid(ActionGroup group) {
-    actionsGrid.getChildren().clear();
-    List<Button> actions = group.getActions();
-    boolean empty = actions.isEmpty();
-    actionsGrid.setVisible(!empty);
-    actionsGrid.setManaged(!empty);
-    actionsEmptyLabel.setVisible(empty);
-    actionsEmptyLabel.setManaged(empty);
-
-    int row = 0;
-    for (Button action : List.copyOf(actions)) {
-      TextField eventField = new TextField();
-      eventField.setPromptText("Event");
-      eventField.setMaxWidth(Double.MAX_VALUE);
-      GridPane.setHgrow(eventField, Priority.ALWAYS);
-      setFieldValue(eventField, action.getEvent());
-      eventField.textProperty().addListener((observable, oldValue, newValue) -> {
-        if (updatingFromModel) {
-          return;
-        }
-        action.setEvent(newValue.isEmpty() ? null : newValue);
-        commitHeaderChange();
-      });
-
-      TextField iconField = new TextField();
-      iconField.setPromptText("Icon");
-      iconField.setMaxWidth(Double.MAX_VALUE);
-      GridPane.setHgrow(iconField, Priority.ALWAYS);
-      setFieldValue(iconField, action.getIconName());
-      iconField.textProperty().addListener((observable, oldValue, newValue) -> {
-        if (updatingFromModel) {
-          return;
-        }
-        action.setIconName(newValue.isEmpty() ? null : newValue);
-        commitHeaderChange();
-      });
-
-      javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("remove_action"), () -> {
-        actions.remove(action);
-        rebuildActionsGrid(group);
-        groupsList.refresh();
-        commitHeaderChange();
-      });
-
-      actionsGrid.addRow(row++, eventField, iconField, deleteButton);
+  private void moveGroup(int fromIndex, int insertBeforeIndex) {
+    if (RowFactory.reorder(getGroups(), fromIndex, insertBeforeIndex)) {
+      rebuildRows();
+      commitHeaderChange();
     }
   }
 
-  private void rebuildLocaleGrid(GridPane grid, List<Label> labels, BiConsumer<String, String> onTextChange) {
-    grid.getChildren().clear();
-    int row = 0;
-    for (Locale locale : model.getLocales()) {
-      String code = locale.getCode();
-      javafx.scene.control.Label localeLabel = new javafx.scene.control.Label(code);
-      localeLabel.getStyleClass().add("field-label");
+  private HBox createActionsBox(ActionGroup group, int index, int rowCount) {
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-      TextField textField = new TextField(labelText(labels, code));
-      textField.setMaxWidth(Double.MAX_VALUE);
-      GridPane.setHgrow(textField, Priority.ALWAYS);
-      textField.textProperty().addListener((observable, oldValue, newValue) -> {
-        if (updatingFromModel) {
-          return;
-        }
-        onTextChange.accept(code, newValue);
+    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(group));
+
+    javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_context_menu_group"), null, null, StudioBundle.get("delete"));
+      if (result.isPresent() && result.get() == ButtonType.OK) {
+        getGroups().remove(group);
+        rebuildRows();
         commitHeaderChange();
-      });
+      }
+    });
 
-      grid.addRow(row++, localeLabel, textField);
-    }
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
+    actionsBox.setAlignment(Pos.CENTER_LEFT);
+    return actionsBox;
   }
 
-  private static String labelText(List<Label> labels, String locale) {
-    return labels.stream()
-        .filter(label -> locale.equals(label.getLocale()))
-        .map(Label::getText)
-        .filter(text -> text != null)
-        .findFirst()
-        .orElse("");
-  }
-
-  private static void setLabelText(List<Label> labels, String locale, String text) {
-    Label existing = labels.stream()
-        .filter(label -> locale.equals(label.getLocale()))
-        .findFirst()
-        .orElse(null);
-    if (existing == null) {
-      existing = new Label();
-      existing.setLocale(locale);
-      labels.add(existing);
-    }
-    existing.setText(text == null || text.isBlank() ? null : text);
+  private void moveRow(int fromIndex, int toIndex) {
+    Collections.swap(getGroups(), fromIndex, toIndex);
+    rebuildRows();
+    commitHeaderChange();
   }
 
   private ContextMenu ensureContextMenu() {
@@ -254,16 +190,14 @@ public class ContextMenuPanelController extends AbstractPropertyEditor {
     return model.getContent().getContextMenu();
   }
 
-  private static String describeGroup(ActionGroup group) {
-    String name = group.getName() != null ? group.getName() : "(new group)";
-    String actions = group.getActions().stream()
+  private static String groupName(ActionGroup group) {
+    return group.getName() != null ? group.getName() : "";
+  }
+
+  private static String actionsSummary(ActionGroup group) {
+    return group.getActions().stream()
         .map(Button::getEvent)
         .filter(event -> event != null && !event.isBlank())
         .collect(Collectors.joining(", "));
-    return actions.isEmpty() ? name : name + " (" + actions + ")";
-  }
-
-  private static String shortId() {
-    return UUID.randomUUID().toString().replace("-", "").substring(0, 5);
   }
 }

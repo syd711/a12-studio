@@ -33,7 +33,7 @@
                 <CheckBox fx:id="enableColumnsResizeCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                 <Label styleClass="field-label" text="%infinite_scrolling" GridPane.columnIndex="0" GridPane.rowIndex="6" />
                 <CheckBox fx:id="infiniteScrollingCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                <Label styleClass="field-label" text="%readonly_presentation" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                <Label styleClass="field-label" text="%readonly_presentation_field" GridPane.columnIndex="0" GridPane.rowIndex="7" />
                 <ComboBox fx:id="readonlyPresentationCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                 <padding>
                     <Insets bottom="4.0" top="4.0" />

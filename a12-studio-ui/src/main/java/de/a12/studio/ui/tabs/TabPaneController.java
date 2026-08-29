@@ -220,7 +220,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
    * PreferenceAppGeneralPanelController / stylesheet-model-colors.css), a "model-tab-&lt;type&gt;" style
    * class (lowercase {@link ModelType#name()}) so the tab header can be tinted per model type. The
    * class is added unconditionally - stylesheet-model-colors.css only applies it while the TabPane
-   * itself also carries "colorful-studio" (toggled by {@link #applyColorfulStudioSetting()}), so this
+   * itself also carries "colorful-studio" (toggled by {@link #applyColorfulStudioSetting(boolean)}), so this
    * stays inert when the preference is off.
    */
   private void applyModelTabStyle(@NonNull Tab tab, @NonNull ModelType modelType) {
@@ -316,18 +316,21 @@ public class TabPaneController implements Initializable, StudioEventListener {
     StudioEventManager.getInstance().addListener(this);
     tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> onSelectionChanged(newTab));
 
-    applyColorfulStudioSetting();
+    boolean enabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
+    applyColorfulStudioSetting(enabled);
     LocalUISettings.addListener((key, value) -> {
-      if (LocalUISettings.COLORFUL_STUDIO_ENABLED.equals(key)) {
-        applyColorfulStudioSetting();
-      }
+      Platform.runLater(() -> {
+        if (LocalUISettings.COLORFUL_STUDIO_ENABLED.equals(key)) {
+          boolean colorsEnabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
+          applyColorfulStudioSetting(colorsEnabled);
+        }
+      });
     });
   }
 
   /** Toggles the "colorful-studio" style class that gates stylesheet-model-colors.css's per-tab tinting. */
-  private void applyColorfulStudioSetting() {
-    boolean enabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
-    if (enabled) {
+  private void applyColorfulStudioSetting(boolean colorsEnabled) {
+    if (colorsEnabled) {
       if (!tabPane.getStyleClass().contains("colorful-studio")) {
         tabPane.getStyleClass().add("colorful-studio");
       }

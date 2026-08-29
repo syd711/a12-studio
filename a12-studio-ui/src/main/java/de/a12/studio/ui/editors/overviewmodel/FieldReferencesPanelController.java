@@ -46,6 +46,9 @@ public class FieldReferencesPanelController extends AbstractPropertyEditor {
   @FXML
   private Label fieldsEmptyLabel;
 
+  @FXML
+  private Button addButton;
+
   private Supplier<List<FieldRef>> fieldsSupplier;
 
   private ElementIndex documentModelIndex;
@@ -66,13 +69,26 @@ public class FieldReferencesPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    getFields().add(new FieldRef());
+    FieldRef fieldRef = new FieldRef();
+    fieldRef.setFieldId(firstUnselectedFieldId().orElse(null));
+    getFields().add(fieldRef);
     rebuildRows();
     commitHeaderChange();
   }
 
   private List<FieldRef> getFields() {
     return fieldsSupplier.get();
+  }
+
+  /** The first field id (in {@link OverviewElementOptions#elementIds} order) not already used by an existing
+   * row, so {@link #onAdd} pre-selects a sensible default instead of leaving the new row blank, and {@link
+   * #rebuildRows} disables {@link #addButton} once this is empty - i.e. every available field is already
+   * referenced. Empty (not just unresolved) whenever there's no index yet, since there's nothing to add. */
+  private Optional<String> firstUnselectedFieldId() {
+    List<String> usedIds = getFields().stream().map(FieldRef::getFieldId).toList();
+    return OverviewElementOptions.elementIds(documentModelIndex).stream()
+        .filter(id -> !usedIds.contains(id))
+        .findFirst();
   }
 
   private void rebuildRows() {
@@ -91,6 +107,8 @@ public class FieldReferencesPanelController extends AbstractPropertyEditor {
     for (int index = 0; index < fields.size(); index++) {
       fieldRows.getChildren().add(createRow(fields.get(index), index));
     }
+
+    addButton.setDisable(firstUnselectedFieldId().isEmpty());
   }
 
   private HBox createRow(FieldRef fieldRef, int index) {

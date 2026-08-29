@@ -9,6 +9,7 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.layout.HBox;
 
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /** Renders one Form Model tree node: icon + name, plus a per-node context menu built by {@link FormModelActions}. */
 class FormModelTreeCell extends TreeCell<FormElementViewModel> {
@@ -26,6 +27,7 @@ class FormModelTreeCell extends TreeCell<FormElementViewModel> {
       setText(null);
       setGraphic(null);
       setContextMenu(null);
+      setTooltip(null);
       getStyleClass().remove("validation-error");
       return;
     }
@@ -45,9 +47,12 @@ class FormModelTreeCell extends TreeCell<FormElementViewModel> {
         getStyleClass().add("validation-error");
       }
       nameLabel.getStyleClass().add("validation-error");
+      String messages = item.getErrorMessages().stream().map(message -> "• " + message).collect(Collectors.joining("\n"));
+      setTooltip(WidgetFactory.createTooltip(messages));
     }
     else {
       getStyleClass().remove("validation-error");
+      setTooltip(null);
     }
   }
 }

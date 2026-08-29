@@ -60,7 +60,7 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
     if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
       return errors;
     }
-    ElementIndex index = new ElementIndex(documentModel);
+    ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
     for (FieldRef field : fields) {
       String fieldId = field.getFieldId();
       if (fieldId == null || fieldId.isBlank()) {

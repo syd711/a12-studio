@@ -18,7 +18,7 @@
                     <ColumnConstraints minWidth="120.0" prefWidth="140.0" />
                     <ColumnConstraints hgrow="ALWAYS" />
                 </columnConstraints>
-                <Label styleClass="field-label" text="%row_height" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Label styleClass="field-label" text="%row_height_px" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <Spinner fx:id="rowHeightSpinner" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                 <Label styleClass="field-label" text="%table_height" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                 <Spinner fx:id="tableHeightSpinner" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1" />

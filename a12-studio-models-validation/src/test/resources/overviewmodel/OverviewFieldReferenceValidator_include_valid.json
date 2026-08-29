@@ -1,0 +1,39 @@
+{
+  "header": {
+    "id": "OverviewFieldReferenceValidator_include_valid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "RefWithInclude",
+        "reference": "RefWithInclude_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Included"
+          }
+        ],
+        "width": 1,
+        "elementRef": "include_target_field_included",
+        "sortable": false
+      }
+    ]
+  }
+}

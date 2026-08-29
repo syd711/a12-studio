@@ -96,7 +96,7 @@ public final class OverviewFilterSectionsValidator implements ModelValidator {
     if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
       return null;
     }
-    return new ElementIndex(documentModel);
+    return new ElementIndex(documentModel, context.otherDocumentModels());
   }
 
   private static String describeSection(FilterSection section) {

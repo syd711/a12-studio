@@ -435,7 +435,7 @@ public class PluginManager {
    * {@code a12Version} prefix matches the running studio version.
    *
    * <p>Matching rule: the plugin's {@code a12Version} field (e.g. {@code "2606"}) must be
-   * a prefix of {@link de.a12.studio.ui.util.StudioVersion#get()} (e.g. {@code "2606.06-ext0-001"}).
+   * a prefix of {@link de.a12.studio.ui.util.StudioVersion#get()} (e.g. {@code "2606.06-ext0-0.0.1"}).
    * This allows minor / patch releases to stay compatible with plugins built for the
    * same major version.
    *
@@ -465,7 +465,7 @@ public class PluginManager {
    * with the running {@code studioVersion}.
    *
    * <p>The plugin's version is treated as a prefix: {@code "2606"} matches
-   * {@code "2606.06-ext0-001"} and {@code "2606.99"} but not {@code "2607.0"}.
+   * {@code "2606.06-ext0-0.0.1"} and {@code "2606.99"} but not {@code "2607.0"}.
    */
   static boolean isCompatible(@NonNull String a12Version, @NonNull String studioVersion) {
     if (a12Version.isBlank() || studioVersion.isBlank() || "dev".equals(studioVersion)) {

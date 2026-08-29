@@ -128,7 +128,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     if (treeItem == null) {
       return;
     }
-    treeItem.getValue().setHasError(event.getError().isPresent());
+    treeItem.getValue().setErrorMessages(event.getError().map(error -> List.of(error.message())).orElse(List.of()));
     elementsTreeTable.refresh();
   }
 
@@ -235,36 +235,35 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    * with {@code hasError == false} until the next individual field edit re-triggers {@link #elementValidated}.
    */
   private void applyValidationState(@NonNull TreeItem<ElementViewModel> root) {
-    Set<String> erroredElementIds = erroredElementIds();
-    markErrors(root, erroredElementIds);
+    markErrors(root, errorMessagesByElementId());
   }
 
-  private Set<String> erroredElementIds() {
+  private Map<String, List<String>> errorMessagesByElementId() {
     if (!(projectItem.getModel() instanceof DocumentModel documentModel)) {
-      return Set.of();
+      return Map.of();
     }
     try {
       List<ModelValidationError> errors = Studio.getValidationService().validate(documentModel);
-      Set<String> ids = new HashSet<>();
+      Map<String, List<String>> messagesById = new HashMap<>();
       for (ModelValidationError error : errors) {
         if (error.elementId() != null) {
-          ids.add(error.elementId());
+          messagesById.computeIfAbsent(error.elementId(), id -> new ArrayList<>()).add(error.message());
         }
       }
-      return ids;
+      return messagesById;
     }
     catch (Exception e) {
       log.warn("Failed to validate document '{}': {}", projectItem.getPath(), e.getMessage(), e);
-      return Set.of();
+      return Map.of();
     }
   }
 
-  private void markErrors(@NonNull TreeItem<ElementViewModel> treeItem, @NonNull Set<String> erroredElementIds) {
+  private void markErrors(@NonNull TreeItem<ElementViewModel> treeItem, @NonNull Map<String, List<String>> errorMessagesById) {
     if (treeItem.getValue() != null) {
-      treeItem.getValue().setHasError(erroredElementIds.contains(treeItem.getValue().getElement().getId()));
+      treeItem.getValue().setErrorMessages(errorMessagesById.getOrDefault(treeItem.getValue().getElement().getId(), List.of()));
     }
     for (TreeItem<ElementViewModel> child : treeItem.getChildren()) {
-      markErrors(child, erroredElementIds);
+      markErrors(child, errorMessagesById);
     }
   }
 

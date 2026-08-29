@@ -3,17 +3,16 @@ package de.a12.studio.ui.editors.propertyeditors;
 import de.a12.studio.models.EventButtonLike;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -29,17 +28,16 @@ import java.util.function.Supplier;
 
 /**
  * Edits a list of {@link EventButtonLike} rows (e.g. {@code content.rowActionGroup.actions} or a footer/
- * subheader box's button entries) as a compact, fully inline-editable table of Event/Priority/Destructive/Icon,
- * matching the SME reference's "Row Action"/"Major Buttons"/"Minor Buttons" tables. Reusable for any such list
- * by calling {@link #configure} with the list, a title, a settings-key suffix (so several instances of this
- * panel on the same editor don't collide on the same persisted expanded/collapsed state) and a factory for new
- * rows. Not tied to a single {@code de.a12.studio.models.documentmodel.Element}, so it follows the
- * model-header pattern ({@link #commitHeaderChange()}) rather than {@link #commitChange()}.
+ * subheader box's button entries) as a compact table of Event/Priority/Destructive/Icon, matching the SME
+ * reference's "Row Action"/"Major Buttons"/"Minor Buttons" tables. Reusable for any such list by calling
+ * {@link #configure} with the list, a title, a settings-key suffix (so several instances of this panel on the
+ * same editor don't collide on the same persisted expanded/collapsed state) and a factory for new rows. Rows
+ * only summarize each button; the fields are edited in a dedicated dialog (see {@link Dialogs#showEventButton}),
+ * opened via Add/Edit or a single click on a row. Not tied to a single {@code
+ * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern ({@link
+ * #commitHeaderChange()}) rather than {@link #commitChange()}.
  */
 public class EventButtonsPanelController extends AbstractPropertyEditor {
-
-  private static final List<String> PRIORITIES = List.of("PRIMARY", "SECONDARY");
-  private static final String DEFAULT_PRIORITY = "SECONDARY";
 
   // javafx.scene.input.DataFormat registers its mime type in a process-wide static registry and throws if the
   // same string is registered twice, with no way to unregister. settingsKeySuffix alone (e.g. ".rowAction") is
@@ -88,9 +86,28 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    rows.add(newRowFactory.get());
-    rebuildRows();
-    commitHeaderChange();
+    Dialogs.showEventButton(Studio.stage, StudioBundle.get("add_event_button_title"), null).ifPresent(input -> {
+      EventButtonLike row = newRowFactory.get();
+      applyInput(row, input);
+      rows.add(row);
+      rebuildRows();
+      commitHeaderChange();
+    });
+  }
+
+  private void openEditDialog(EventButtonLike row) {
+    Dialogs.showEventButton(Studio.stage, StudioBundle.get("edit_event_button_title"), row).ifPresent(input -> {
+      applyInput(row, input);
+      rebuildRows();
+      commitHeaderChange();
+    });
+  }
+
+  private static void applyInput(EventButtonLike row, Dialogs.EventButtonInput input) {
+    row.setEvent(input.event());
+    row.setPrimary(input.primary() ? Boolean.TRUE : null);
+    row.setDestructive(input.destructive() ? Boolean.TRUE : null);
+    row.setIconName(input.iconName() == null || input.iconName().isEmpty() ? null : input.iconName());
   }
 
   private void rebuildRows() {
@@ -110,38 +127,42 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   private HBox createRow(EventButtonLike row, int index, int rowCount) {
     FontIcon dragHandle = RowFactory.createDragHandle();
 
-    TextField eventField = new TextField();
-    eventField.setId("eventButtonEvent-" + index);
-    eventField.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(eventField, Priority.ALWAYS);
-    setFieldValue(eventField, row.getEvent());
-    bindTextField(eventField, (el, value) -> row.setEvent(value.isEmpty() ? null : value));
+    Label eventLabel = new Label(row.getEvent());
+    eventLabel.setId("eventButtonEvent-" + index);
+    eventLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(eventLabel, Priority.ALWAYS);
+    makeClickableToEdit(eventLabel, row);
 
-    ComboBox<String> priorityField = new ComboBox<>();
-    priorityField.setId("eventButtonPriority-" + index);
-    priorityField.setPrefWidth(140.0);
-    priorityField.getItems().setAll(PRIORITIES);
-    setFieldValue(priorityField, Boolean.TRUE.equals(row.getPrimary()) ? "PRIMARY" : DEFAULT_PRIORITY);
-    bindComboBox(priorityField, (el, value) -> row.setPrimary("PRIMARY".equals(value)));
+    Label priorityLabel = new Label(Boolean.TRUE.equals(row.getPrimary()) ? "PRIMARY" : "SECONDARY");
+    priorityLabel.setId("eventButtonPriority-" + index);
+    priorityLabel.setPrefWidth(140.0);
+    makeClickableToEdit(priorityLabel, row);
 
-    CheckBox destructiveField = new CheckBox();
-    destructiveField.setId("eventButtonDestructive-" + index);
-    destructiveField.setPrefWidth(110.0);
-    setFieldValue(destructiveField, Boolean.TRUE.equals(row.getDestructive()));
-    bindCheckBox(destructiveField, (el, value) -> row.setDestructive(value ? Boolean.TRUE : null));
+    Label destructiveLabel = new Label(Boolean.TRUE.equals(row.getDestructive()) ? "✓" : "");
+    destructiveLabel.setId("eventButtonDestructive-" + index);
+    destructiveLabel.setPrefWidth(110.0);
+    makeClickableToEdit(destructiveLabel, row);
 
-    TextField iconField = new TextField();
-    iconField.setId("eventButtonIcon-" + index);
-    iconField.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(iconField, Priority.ALWAYS);
-    setFieldValue(iconField, row.getIconName());
-    bindTextField(iconField, (el, value) -> row.setIconName(value.isEmpty() ? null : value));
+    Label iconLabel = new Label(row.getIconName());
+    iconLabel.setId("eventButtonIcon-" + index);
+    iconLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(iconLabel, Priority.ALWAYS);
+    makeClickableToEdit(iconLabel, row);
 
-    HBox rowBox = new HBox(10.0, dragHandle, eventField, priorityField, destructiveField, iconField, createActionsBox(row, index, rowCount));
+    HBox rowBox = new HBox(10.0, dragHandle, eventLabel, priorityLabel, destructiveLabel, iconLabel, createActionsBox(row, index, rowCount));
     rowBox.setAlignment(Pos.CENTER_LEFT);
     rowBox.getStyleClass().add("module-row");
     RowFactory.setupRowDragAndDrop(rowBox, dragHandle, indexFormat, index, this::moveRowViaDrag);
     return rowBox;
+  }
+
+  private void makeClickableToEdit(Label label, EventButtonLike row) {
+    label.setCursor(Cursor.HAND);
+    label.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        openEditDialog(row);
+      }
+    });
   }
 
   private void moveRowViaDrag(int fromIndex, int insertBeforeIndex) {
@@ -154,6 +175,8 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(EventButtonLike row, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(row));
+
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_button"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -163,7 +186,7 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
       }
     });
 
-    HBox actionsBox = new HBox(4.0, moveButtonsBox, deleteButton);
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
   }

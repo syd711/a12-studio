@@ -416,35 +416,35 @@ public class FormModelTreeController implements Initializable {
    * edit via {@link #onModelChanged}), so there's no need for a separate per-edit validation hook here.
    */
   private void applyValidationState(@NonNull TreeItem<FormElementViewModel> root) {
-    markErrors(root, erroredElementIds());
+    markErrors(root, errorMessagesByElementId());
   }
 
-  private Set<String> erroredElementIds() {
+  private Map<String, List<String>> errorMessagesByElementId() {
     if (!(projectItem.getModel() instanceof FormModel formModel)) {
-      return Set.of();
+      return Map.of();
     }
     try {
       List<ModelValidationError> errors = Studio.getValidationService().validate(formModel);
-      Set<String> ids = new HashSet<>();
+      Map<String, List<String>> messagesById = new HashMap<>();
       for (ModelValidationError error : errors) {
         if (error.elementId() != null) {
-          ids.add(error.elementId());
+          messagesById.computeIfAbsent(error.elementId(), id -> new ArrayList<>()).add(error.message());
         }
       }
-      return ids;
+      return messagesById;
     }
     catch (Exception e) {
       log.warn("Failed to validate form model '{}': {}", projectItem.getPath(), e.getMessage(), e);
-      return Set.of();
+      return Map.of();
     }
   }
 
-  private void markErrors(@NonNull TreeItem<FormElementViewModel> treeItem, @NonNull Set<String> erroredElementIds) {
+  private void markErrors(@NonNull TreeItem<FormElementViewModel> treeItem, @NonNull Map<String, List<String>> errorMessagesById) {
     if (treeItem.getValue() != null) {
-      treeItem.getValue().setHasError(erroredElementIds.contains(treeItem.getValue().getId()));
+      treeItem.getValue().setErrorMessages(errorMessagesById.getOrDefault(treeItem.getValue().getId(), List.of()));
     }
     for (TreeItem<FormElementViewModel> child : treeItem.getChildren()) {
-      markErrors(child, erroredElementIds);
+      markErrors(child, errorMessagesById);
     }
   }
 

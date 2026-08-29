@@ -13,8 +13,8 @@
 <BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController">
     <right>
         <ToolBar orientation="VERTICAL">
-            <items>
-                <Label prefHeight="48" text="" />
+                <items>
+                    <Label prefHeight="48" text="" />
                 <fx:include fx:id="settingsToolbarButton" source="../editor-settings-toolbar-button.fxml" />
                 <Separator prefHeight="0.0" prefWidth="0.0" />
                 <fx:include fx:id="fileToolbarButtons" source="../editor-file-toolbar-buttons.fxml" />

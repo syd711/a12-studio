@@ -35,6 +35,48 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void fieldReferenceValidatorResolvesFieldInsideIncludedDocumentModel() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFieldReferenceValidator_include_valid.json", OverviewModel.class);
+    DocumentModel hostDm = TestModels.load("/documentmodel/RefWithInclude_DM.json", DocumentModel.class);
+    DocumentModel includedDm = TestModels.load("/documentmodel/RefIncluded_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFieldReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, hostDm, includedDm));
+
+    // The column's elementRef points through the Include group into RefIncluded_DM's own field, not
+    // a direct child of RefWithInclude_DM - must resolve rather than being reported as missing.
+    assertEquals(0, errors.size());
+  }
+
+  @Test
+  void fieldReferenceValidatorReportsRepeatableGroupInsideIncludedDocumentModel() {
+    OverviewModel model = TestModels.load(
+        "/overviewmodel/OverviewFieldReferenceValidator_includeInternalRepeatable_invalid.json", OverviewModel.class);
+    DocumentModel hostDm = TestModels.load("/documentmodel/RefWithIncludeOfRepeatableGroup_DM.json", DocumentModel.class);
+    DocumentModel includedDm = TestModels.load("/documentmodel/RefIncludedWithRepeatableGroup_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFieldReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, hostDm, includedDm));
+
+    // The field is repeatable because of a group *inside* the included model, not the Include itself.
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("is repeatable"));
+  }
+
+  @Test
+  void fieldReferenceValidatorReportsRepeatableInclude() {
+    OverviewModel model = TestModels.load(
+        "/overviewmodel/OverviewFieldReferenceValidator_repeatableInclude_invalid.json", OverviewModel.class);
+    DocumentModel hostDm = TestModels.load("/documentmodel/RefWithRepeatableInclude_DM.json", DocumentModel.class);
+    DocumentModel includedDm = TestModels.load("/documentmodel/RefIncluded_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFieldReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, hostDm, includedDm));
+
+    // The included field itself sits under no repeatable group, but the Include group wrapping it in the
+    // host model is itself repeatable (repeatability=3) - that must propagate to fields reached through it.
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("is repeatable"));
+  }
+
+  @Test
   void documentModelRequiredValidatorReportsMissingReference() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewDocumentModelRequiredValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewDocumentModelRequiredValidator().validate(model, TestModels.context(model));

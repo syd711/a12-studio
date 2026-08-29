@@ -52,6 +52,9 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
   @FXML
   private Label sortingEmptyLabel;
 
+  @FXML
+  private Button addButton;
+
   private OverviewModel model;
 
   private ElementIndex documentModelIndex;
@@ -78,9 +81,22 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    ensureConfiguration().getInitialSorting().add(new ColumnRef());
+    ColumnRef columnRef = new ColumnRef();
+    columnRef.setIdref(firstUnselectedColumnId());
+    ensureConfiguration().getInitialSorting().add(columnRef);
     rebuildRows();
     commitHeaderChange();
+  }
+
+  /** The first {@link Column#getId()} not yet referenced by any existing {@link ColumnRef} in {@link
+   * #getSorting()}, or {@code null} if every column already has a sorting entry (or there are no columns). */
+  private String firstUnselectedColumnId() {
+    List<String> selectedIds = getSorting().stream().map(ColumnRef::getIdref).toList();
+    return getColumns().stream()
+        .map(Column::getId)
+        .filter(id -> id != null && !selectedIds.contains(id))
+        .findFirst()
+        .orElse(null);
   }
 
   private List<ColumnRef> getSorting() {
@@ -114,6 +130,13 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     for (int index = 0; index < sorting.size(); index++) {
       sortingRows.getChildren().add(createRow(sorting.get(index), index, sorting.size()));
     }
+    refreshAddButtonState();
+  }
+
+  /** Disabled once every {@link Column} already has a sorting entry (or there are no columns to sort by),
+   * since there'd be nothing left for a newly added entry to auto-select. */
+  private void refreshAddButtonState() {
+    addButton.setDisable(firstUnselectedColumnId() == null);
   }
 
   private void refreshValidationError() {
@@ -159,6 +182,7 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
       commitHeaderChange();
       refreshValidationError();
       updateColumnValidationState(columnField, columnRef);
+      refreshAddButtonState();
     });
 
     HBox row = new HBox(10.0, dragHandle, columnField, createActionsBox(columnRef, index, rowCount));

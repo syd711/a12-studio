@@ -80,7 +80,7 @@ public final class OverviewFilterGroupsValidator implements ModelValidator {
                   + "\" should not be false. Please resolve this problem in the corresponding Document Model.",
               Severity.ERROR.name()));
         }
-        if (OverviewElementResolution.isInRepeatableGroup(index, element)) {
+        if (OverviewElementResolution.isInRepeatableGroup(index, fieldId)) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
               "The reference is invalid. The referenced field \"" + element.getName() + "\" is repeatable.",
               Severity.ERROR.name()));
@@ -95,7 +95,7 @@ public final class OverviewFilterGroupsValidator implements ModelValidator {
     if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
       return null;
     }
-    return new ElementIndex(documentModel);
+    return new ElementIndex(documentModel, context.otherDocumentModels());
   }
 
   private static String describeGroup(FilterGroup group) {

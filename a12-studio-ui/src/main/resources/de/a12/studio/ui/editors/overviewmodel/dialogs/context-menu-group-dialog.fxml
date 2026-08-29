@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="640.0" minWidth="640.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.ContextMenuGroupDialogController">
+   <top>
+      <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" BorderPane.alignment="CENTER">
+         <content>
+            <VBox spacing="14.0" styleClass="field-editor">
+               <padding>
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+               </padding>
+
+               <!-- Group Name -->
+               <VBox spacing="2.0">
+                  <children>
+                     <Label styleClass="field-label" text="%group_name" />
+                     <TextField fx:id="nameField" />
+                  </children>
+               </VBox>
+
+               <!-- Title -->
+               <VBox spacing="4.0">
+                  <children>
+                     <Label styleClass="field-label" text="%label" />
+                     <GridPane fx:id="titleGrid" hgap="10.0" vgap="6.0">
+                        <columnConstraints>
+                           <ColumnConstraints minWidth="40.0" />
+                           <ColumnConstraints hgrow="ALWAYS" />
+                        </columnConstraints>
+                     </GridPane>
+                  </children>
+               </VBox>
+
+               <!-- Actions -->
+               <VBox spacing="10.0">
+                  <children>
+                     <Label styleClass="section-header" text="%actions" />
+                     <GridPane fx:id="actionsGrid" hgap="8.0" vgap="6.0">
+                        <columnConstraints>
+                           <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                           <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                           <ColumnConstraints hgrow="NEVER" minWidth="32.0" />
+                        </columnConstraints>
+                     </GridPane>
+                     <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+                     <Button fx:id="addActionButton" mnemonicParsing="false" onAction="#onAddAction" styleClass="primary-button" text="%add_action">
+                        <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                        <tooltip><Tooltip text="%add_context_menu_action" /></tooltip>
+                     </Button>
+                  </children>
+               </VBox>
+            </VBox>
+         </content>
+         <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+         </padding>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <items>
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
+         </items>
+         <padding>
+            <Insets bottom="8.0" right="8.0" />
+         </padding>
+      </ToolBar>
+   </bottom>
+</BorderPane>

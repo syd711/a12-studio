@@ -46,7 +46,7 @@ public class FormElementViewModel {
   // reference.
   private final @Nullable ElementIndex elementIndex;
 
-  private boolean hasError;
+  private List<String> errorMessages = List.of();
 
   public FormElementViewModel(@NonNull Object node, @Nullable Object parentNode, @Nullable ElementIndex elementIndex) {
     this.node = node;
@@ -55,11 +55,16 @@ public class FormElementViewModel {
   }
 
   public boolean hasError() {
-    return hasError;
+    return !errorMessages.isEmpty();
   }
 
-  public void setHasError(boolean hasError) {
-    this.hasError = hasError;
+  /** The messages of every validation error reported against this node's id, for display in a row tooltip. */
+  public List<String> getErrorMessages() {
+    return errorMessages;
+  }
+
+  public void setErrorMessages(@NonNull List<String> errorMessages) {
+    this.errorMessages = errorMessages;
   }
 
   public Object getNode() {

@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.propertyeditors.dialogs;
 
 import de.a12.studio.ui.util.StudioBundle;
 
+import de.a12.studio.models.EventButtonLike;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentUniquenessCriterion;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -16,6 +17,9 @@ import java.util.Set;
 public class Dialogs {
 
   public record CategoryInput(String name, String description) {
+  }
+
+  public record EventButtonInput(String event, boolean primary, boolean destructive, String iconName) {
   }
 
   public static Optional<CategoryInput> showCategory(Stage owner, String title, String name, String description) {
@@ -71,5 +75,30 @@ fxmlLoader.setResources(StudioBundle.getBundle());
 
     stage.showAndWait();
     return controller.getResult();
+  }
+
+  /**
+   * @param event the {@link EventButtonLike} row to edit, or {@code null} to create a new one (an empty
+   *              dialog, all fields defaulted).
+   */
+  public static Optional<EventButtonInput> showEventButton(Stage owner, String title, EventButtonLike event) {
+    FXMLLoader fxmlLoader = new FXMLLoader(EventButtonDialogController.class.getResource("event-button-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("event-button-dialog", fxmlLoader, owner, title);
+    EventButtonDialogController controller = (EventButtonDialogController) stage.getUserData();
+    controller.initDialog(stage, event != null ? event.getEvent() : null, event != null && Boolean.TRUE.equals(event.getPrimary()),
+        event != null && Boolean.TRUE.equals(event.getDestructive()), event != null ? event.getIconName() : null);
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+
+    if (controller.getResult().isEmpty() || controller.getResult().get() != ButtonType.OK) {
+      return Optional.empty();
+    }
+    String resultEvent = controller.getEvent();
+    if (resultEvent == null || resultEvent.isBlank()) {
+      return Optional.empty();
+    }
+    return Optional.of(new EventButtonInput(resultEvent, controller.isPrimary(), controller.isDestructive(), controller.getIconName()));
   }
 }
