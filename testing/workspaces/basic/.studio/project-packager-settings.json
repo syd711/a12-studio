@@ -1,5 +1,6 @@
 {
   "targetFolder": "",
+  "enabled": true,
   "settingsType": "PLUGIN",
   "settingsName": "project-packager-settings.json"
 }

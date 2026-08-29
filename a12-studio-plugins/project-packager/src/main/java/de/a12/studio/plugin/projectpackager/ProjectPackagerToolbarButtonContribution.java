@@ -30,6 +30,11 @@ public class ProjectPackagerToolbarButtonContribution implements IProjectToolbar
   }
 
   @Override
+  public boolean isVisible(@NonNull Project project) {
+    return ProjectPackagerSettings.load(project.getFolder()).isEnabled();
+  }
+
+  @Override
   public void execute(@NonNull Stage owner, @NonNull Project project) {
     ProjectPackagerSettings settings = ProjectPackagerSettings.load(project.getFolder());
     String targetFolderPath = settings.getTargetFolder();

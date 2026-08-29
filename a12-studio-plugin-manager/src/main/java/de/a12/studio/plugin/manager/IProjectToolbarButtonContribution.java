@@ -49,4 +49,16 @@ public interface IProjectToolbarButtonContribution {
    * @param project the currently open project
    */
   void execute(@NonNull Stage owner, @NonNull Project project);
+
+  /**
+   * Whether the button should currently be shown in the toolbar for the given project. Checked
+   * when the project is (re)loaded and whenever a {@code SettingsChangedEvent} fires, so plugins
+   * that gate their button behind a project setting can toggle it without a restart.
+   *
+   * @param project the currently open project
+   * @return {@code true} if the button should be visible; defaults to always visible
+   */
+  default boolean isVisible(@NonNull Project project) {
+    return true;
+  }
 }

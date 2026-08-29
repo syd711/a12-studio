@@ -10,6 +10,7 @@ import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -42,6 +43,8 @@ public class FilterGroupDialogController implements DialogController {
   private CheckBox collapsedField;
   @FXML
   private FilterItemsPanelController filterItemsController;
+  @FXML
+  private Button okButton;
 
   // Shared by the embedded label/icon panels so their commits aren't persisted while this dialog is open: this
   // dialog persists everything itself, in one go, once OK is pressed.
@@ -69,6 +72,7 @@ public class FilterGroupDialogController implements DialogController {
       if (!updatingFromModel) {
         group.setName(blankToNull(newValue));
       }
+      updateOkButtonState();
     });
     collapsedField.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
@@ -96,6 +100,14 @@ public class FilterGroupDialogController implements DialogController {
     iconController.setCustom(group::getIcon, group::setIcon);
 
     filterItemsController.init(stage, documentModelIndex, group);
+    filterItemsController.setOnChange(this::updateOkButtonState);
+    updateOkButtonState();
+  }
+
+  private void updateOkButtonState() {
+    boolean nameEmpty = blankToNull(nameField.getText()) == null;
+    boolean noFilterItems = group.getFilterItems().isEmpty();
+    okButton.setDisable(nameEmpty && noFilterItems);
   }
 
   /** Unregisters the embedded panels once this dialog is closed - see {@link Dialogs#showFilterGroup}, which

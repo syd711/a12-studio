@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.EventButtonLike;
+import de.a12.studio.models.overviewmodel.OverviewButtonLike;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
@@ -32,8 +33,10 @@ import java.util.function.Supplier;
  * reference's "Row Action"/"Major Buttons"/"Minor Buttons" tables. Reusable for any such list by calling
  * {@link #configure} with the list, a title, a settings-key suffix (so several instances of this panel on the
  * same editor don't collide on the same persisted expanded/collapsed state) and a factory for new rows. Rows
- * only summarize each button; the fields are edited in a dedicated dialog (see {@link Dialogs#showEventButton}),
- * opened via Add/Edit or a single click on a row. Not tied to a single {@code
+ * only summarize each button; the fields are edited in a dedicated dialog (see {@link
+ * Dialogs#showEventButtonForAdd}/{@link Dialogs#showEventButtonForEdit}), opened via Add/Edit or a single click
+ * on a row - every row here is actually an {@link OverviewButtonLike} (row/newRowFactory are only declared more
+ * loosely so a footer/subheader box's {@code List<BoxElement>} can be passed directly). Not tied to a single {@code
  * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern ({@link
  * #commitHeaderChange()}) rather than {@link #commitChange()}.
  */
@@ -86,9 +89,7 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    Dialogs.showEventButton(Studio.stage, StudioBundle.get("add_event_button_title"), null).ifPresent(input -> {
-      EventButtonLike row = newRowFactory.get();
-      applyInput(row, input);
+    Dialogs.showEventButtonForAdd(Studio.stage, () -> (OverviewButtonLike) newRowFactory.get()).ifPresent(row -> {
       rows.add(row);
       rebuildRows();
       commitHeaderChange();
@@ -96,18 +97,11 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   }
 
   private void openEditDialog(EventButtonLike row) {
-    Dialogs.showEventButton(Studio.stage, StudioBundle.get("edit_event_button_title"), row).ifPresent(input -> {
-      applyInput(row, input);
+    Dialogs.showEventButtonForEdit(Studio.stage, (OverviewButtonLike) row).ifPresent(edited -> {
+      rows.set(rows.indexOf(row), edited);
       rebuildRows();
       commitHeaderChange();
     });
-  }
-
-  private static void applyInput(EventButtonLike row, Dialogs.EventButtonInput input) {
-    row.setEvent(input.event());
-    row.setPrimary(input.primary() ? Boolean.TRUE : null);
-    row.setDestructive(input.destructive() ? Boolean.TRUE : null);
-    row.setIconName(input.iconName() == null || input.iconName().isEmpty() ? null : input.iconName());
   }
 
   private void rebuildRows() {

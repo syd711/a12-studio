@@ -14,12 +14,22 @@ public class ProjectPackagerSettings extends JsonSettings {
 
   private String targetFolder = "";
 
+  private boolean enabled;
+
   public String getTargetFolder() {
     return targetFolder;
   }
 
   public void setTargetFolder(String targetFolder) {
     this.targetFolder = targetFolder;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
   @Override

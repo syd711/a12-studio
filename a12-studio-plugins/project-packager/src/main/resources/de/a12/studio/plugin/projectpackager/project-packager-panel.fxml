@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
@@ -25,14 +26,14 @@
             <children>
                 <VBox alignment="CENTER_LEFT" spacing="3.0">
                     <children>
-                        <Label styleClass="field-description" text="%project_packager.target_folder_label" />
+                        <CheckBox fx:id="enabledCheckBox" mnemonicParsing="false" onAction="#onEnabledChanged" text="%project_packager.enable_checkbox" />
                         <Label styleClass="field-description" text="%project_packager.description" wrapText="true" />
                     </children>
                 </VBox>
                 <HBox alignment="CENTER_LEFT" spacing="6.0">
                     <children>
                         <TextField fx:id="targetFolderField" editable="false" prefWidth="320.0" promptText="%project_packager.target_folder_prompt" />
-                        <Button mnemonicParsing="false" onAction="#onBrowse" styleClass="primary-button" text="%project_packager.browse_button" />
+                        <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowse" styleClass="primary-button" text="%project_packager.browse_button" />
                     </children>
                     <VBox.margin>
                         <Insets top="8.0" />

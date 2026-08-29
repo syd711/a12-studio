@@ -32,7 +32,7 @@
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                         <children>
                            <Label styleClass="field-label" text="%name" />
-                           <TextField fx:id="nameField" />
+                           <TextField fx:id="nameField" promptText="%distinguishes_this_filter_group_from_others" />
                         </children>
                      </VBox>
                      <VBox spacing="2.0" HBox.hgrow="ALWAYS">

@@ -56,6 +56,8 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private ProjectItemViewModel rootViewModel;
   private ProjectTreeMenuActions menuFactory;
   private Map<String, List<ModelValidationError>> validationErrorsByPath = new HashMap<>();
+  private final Map<Button, IProjectToolbarButtonContribution> pluginToolbarButtons = new LinkedHashMap<>();
+  private Separator pluginToolbarSeparator;
 
   @FXML
   private void onExpandAll() {
@@ -77,6 +79,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   public void load(@NonNull Project project) {
     this.project = project;
+    refreshPluginToolbarButtonVisibility();
     this.validationErrorsByPath = new HashMap<>();
     this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
@@ -334,7 +337,8 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     if (contributions.isEmpty()) {
       return;
     }
-    projectToolbar.getItems().add(new Separator(Orientation.VERTICAL));
+    pluginToolbarSeparator = new Separator(Orientation.VERTICAL);
+    projectToolbar.getItems().add(pluginToolbarSeparator);
     for (IProjectToolbarButtonContribution contribution : contributions) {
       Button button = new Button();
       button.setMnemonicParsing(false);
@@ -351,6 +355,22 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         }
       });
       projectToolbar.getItems().add(button);
+      pluginToolbarButtons.put(button, contribution);
+    }
+    refreshPluginToolbarButtonVisibility();
+  }
+
+  private void refreshPluginToolbarButtonVisibility() {
+    boolean anyVisible = false;
+    for (Map.Entry<Button, IProjectToolbarButtonContribution> entry : pluginToolbarButtons.entrySet()) {
+      boolean visible = project != null && entry.getValue().isVisible(project);
+      entry.getKey().setVisible(visible);
+      entry.getKey().setManaged(visible);
+      anyVisible |= visible;
+    }
+    if (pluginToolbarSeparator != null) {
+      pluginToolbarSeparator.setVisible(anyVisible);
+      pluginToolbarSeparator.setManaged(anyVisible);
     }
   }
 

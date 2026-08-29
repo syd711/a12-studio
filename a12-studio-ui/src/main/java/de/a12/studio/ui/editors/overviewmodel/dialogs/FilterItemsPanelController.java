@@ -50,11 +50,20 @@ public class FilterItemsPanelController {
 
   private FilterGroup group;
 
+  // Notified after every structural change (add/delete), so the owning dialog can keep its OK button's
+  // disabled state (name + filter items both empty) in sync.
+  private Runnable onChange = () -> {
+  };
+
   void init(@NonNull Stage stage, ElementIndex documentModelIndex, @NonNull FilterGroup group) {
     this.stage = stage;
     this.documentModelIndex = documentModelIndex;
     this.group = group;
     rebuildRows();
+  }
+
+  void setOnChange(@NonNull Runnable onChange) {
+    this.onChange = onChange;
   }
 
   @FXML
@@ -64,6 +73,7 @@ public class FilterItemsPanelController {
     if (Dialogs.showFilterItemForAdd(stage, documentModelIndex, item)) {
       group.getFilterItems().add(item);
       rebuildRows();
+      onChange.run();
     }
   }
 
@@ -133,6 +143,7 @@ public class FilterItemsPanelController {
       if (confirmResult.isPresent() && confirmResult.get() == ButtonType.OK) {
         group.getFilterItems().remove(item);
         rebuildRows();
+        onChange.run();
       }
     });
 

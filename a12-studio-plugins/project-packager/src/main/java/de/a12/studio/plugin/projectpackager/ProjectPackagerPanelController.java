@@ -5,6 +5,7 @@ import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -14,7 +15,13 @@ import java.io.File;
 public class ProjectPackagerPanelController {
 
   @FXML
+  private CheckBox enabledCheckBox;
+
+  @FXML
   private TextField targetFolderField;
+
+  @FXML
+  private Button browseButton;
 
   @FXML
   private Label statusLabel;
@@ -24,8 +31,17 @@ public class ProjectPackagerPanelController {
   public void setProject(Project project) {
     this.settings = ProjectPackagerSettings.load(project.getFolder());
 
+    enabledCheckBox.setSelected(settings.isEnabled());
     targetFolderField.setText(settings.getTargetFolder());
+    updateTargetFolderControlsDisabled();
     updateStatus();
+  }
+
+  @FXML
+  private void onEnabledChanged() {
+    settings.setEnabled(enabledCheckBox.isSelected());
+    settings.save();
+    updateTargetFolderControlsDisabled();
   }
 
   @FXML
@@ -44,6 +60,12 @@ public class ProjectPackagerPanelController {
     settings.save();
     targetFolderField.setText(selected.getAbsolutePath());
     updateStatus();
+  }
+
+  private void updateTargetFolderControlsDisabled() {
+    boolean disabled = !enabledCheckBox.isSelected();
+    targetFolderField.setDisable(disabled);
+    browseButton.setDisable(disabled);
   }
 
   private void updateStatus() {
