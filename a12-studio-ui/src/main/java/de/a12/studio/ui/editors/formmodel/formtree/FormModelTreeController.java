@@ -20,6 +20,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelController;
 import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
@@ -33,6 +34,7 @@ import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSec
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.HideConditionPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.TabErrorBadge;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXML;
@@ -81,8 +83,14 @@ public class FormModelTreeController implements Initializable {
   private static final String TABLE_SETTINGS_ID = ModelType.FORM.getValue();
   private static final String TREE_DIVIDER_ID = "treeEditorDivider";
 
+  private static final String TREE_VALIDATION_ERROR_MESSAGE =
+      "One or more elements in the tree below have a validation error. See the tree for details.";
+
   @FXML
   private SearchFieldController searchController;
+
+  @FXML
+  private ErrorContainerController errorContainerController;
 
   @FXML
   private SplitPane treeEditorSplitPane;
@@ -411,12 +419,25 @@ public class FormModelTreeController implements Initializable {
 
   /**
    * Marks every tree row whose element has a validation problem (see {@link FormElementViewModel#hasError()} /
-   * {@link FormModelTreeCell}), mirroring {@code DocumentModelElementsTreeController#applyValidationState}.
-   * Re-run on every {@link #applyFilter} call - the tree is always fully rebuilt there (on load and after every
-   * edit via {@link #onModelChanged}), so there's no need for a separate per-edit validation hook here.
+   * {@link FormModelTreeCell}), mirroring {@code DocumentModelElementsTreeController#applyValidationState}, and
+   * reflects the aggregate error state onto this panel's own {@link #errorContainerController} so the enclosing
+   * "Overview" {@link javafx.scene.control.Tab} picks up a {@link TabErrorBadge} even though the actual
+   * per-row errors live on virtualized {@link javafx.scene.control.TreeCell}s that {@link TabErrorBadge}'s
+   * scene-graph walk would otherwise miss whenever an errored row is scrolled out of view. Re-run on every
+   * {@link #applyFilter} call - the tree is always fully rebuilt there (on load and after every edit via
+   * {@link #onModelChanged}), so there's no need for a separate per-edit validation hook here.
    */
   private void applyValidationState(@NonNull TreeItem<FormElementViewModel> root) {
-    markErrors(root, errorMessagesByElementId());
+    Map<String, List<String>> errorMessagesById = errorMessagesByElementId();
+    markErrors(root, errorMessagesById);
+
+    if (errorMessagesById.isEmpty()) {
+      errorContainerController.hide();
+    }
+    else {
+      errorContainerController.show("ERROR", TREE_VALIDATION_ERROR_MESSAGE);
+    }
+    TabErrorBadge.refresh(tree);
   }
 
   private Map<String, List<String>> errorMessagesByElementId() {

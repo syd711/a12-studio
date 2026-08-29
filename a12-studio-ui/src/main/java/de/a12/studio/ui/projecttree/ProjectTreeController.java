@@ -210,14 +210,13 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         validationErrorsByPath.put(item.getPath(),
             List.of(new ModelValidationError(item.getModel(), null, "Failed to parse document: " + e.getMessage(), "ERROR")));
       }
+    }
 
-      Set<Map.Entry<String, List<ModelValidationError>>> entries = validationErrorsByPath.entrySet();
-      for (Map.Entry<String, List<ModelValidationError>> entry : entries) {
-        String key = entry.getKey();
-        List<ModelValidationError> errors = entry.getValue();
-        for (ModelValidationError error : errors) {
-          log.error("[{}] {} Validation Issue: {}: {}", key, error.severity(), error.elementId(), error.message());
-        }
+    for (Map.Entry<String, List<ModelValidationError>> entry : validationErrorsByPath.entrySet()) {
+      String key = entry.getKey();
+      List<ModelValidationError> errors = entry.getValue();
+      for (ModelValidationError error : errors) {
+        log.error("[{}] {} Validation Issue: {}: {}", key, error.severity(), error.elementId(), error.message());
       }
     }
     return validationErrorsByPath;

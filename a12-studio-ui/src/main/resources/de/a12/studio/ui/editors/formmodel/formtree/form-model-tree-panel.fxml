@@ -9,33 +9,39 @@
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController">
     <top>
-        <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
-            <items>
-                <fx:include fx:id="search" source="/de/a12/studio/ui/components/search-field.fxml" />
-                <Separator orientation="VERTICAL" />
-                <Button fx:id="expandAllButton" accessibleText="%expand_all" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2a-arrow-expand-vertical" iconSize="16" styleClass="toolbar-icon" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="%expand_all" />
-                    </tooltip>
-                </Button>
-                <Button fx:id="collapseAllButton" accessibleText="%collapse_all" mnemonicParsing="false" onAction="#onCollapseAll" styleClass="default-button">
-                    <graphic>
-                        <FontIcon iconLiteral="mdi2a-arrow-collapse-vertical" iconSize="16" styleClass="toolbar-icon" />
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="%collapse_all" />
-                    </tooltip>
-                </Button>
-            </items>
-        </ToolBar>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <ToolBar styleClass="panel-toolbar">
+                    <items>
+                        <fx:include fx:id="search" source="/de/a12/studio/ui/components/search-field.fxml" />
+                        <Separator orientation="VERTICAL" />
+                        <Button fx:id="expandAllButton" accessibleText="%expand_all" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2a-arrow-expand-vertical" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%expand_all" />
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="collapseAllButton" accessibleText="%collapse_all" mnemonicParsing="false" onAction="#onCollapseAll" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2a-arrow-collapse-vertical" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%collapse_all" />
+                            </tooltip>
+                        </Button>
+                    </items>
+                </ToolBar>
+                <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" />
+            </children>
+        </VBox>
     </top>
     <center>
         <SplitPane fx:id="treeEditorSplitPane" dividerPositions="0.4" BorderPane.alignment="CENTER">
