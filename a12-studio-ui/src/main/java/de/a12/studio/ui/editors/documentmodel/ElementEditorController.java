@@ -30,4 +30,16 @@ public interface ElementEditorController {
         && groupElement.getGroup() != null
         && GroupConfig.USAGE_TYPE_ATTACHMENT.equals(groupElement.getGroup().getUsageType()));
   }
+
+  /**
+   * Whether the selected element is nested inside an Include group (see {@link
+   * de.a12.studio.ui.editors.documentmodel.ElementViewModel#getChildren}). Such elements are resolved
+   * from - and belong to - the referenced Document Model rather than this one, so they shouldn't be
+   * hand-edited from this model's property editors.
+   */
+  default boolean isWithinInclude(@NonNull List<Element> ancestors) {
+    return ancestors.stream().anyMatch(ancestor -> ancestor instanceof GroupElement groupElement
+        && groupElement.getGroup() != null
+        && groupElement.getGroup().getIncludeConfig() != null);
+  }
 }

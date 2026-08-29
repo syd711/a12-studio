@@ -84,7 +84,7 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
     generalInformationController.setAncestors(ancestors);
     typeDefinitionController.setAncestors(ancestors);
     dataTypeConfigurationController.setAncestors(ancestors);
-    boolean readOnly = isWithinAttachment(ancestors);
+    boolean readOnly = isWithinAttachment(ancestors) || isWithinInclude(ancestors);
     propertyEditors.forEach(propertyEditor -> {
       propertyEditor.setElement(element);
       propertyEditor.setEditorDisabled(readOnly);

@@ -45,7 +45,7 @@ public class DocumentModelAttachmentEditorController implements ElementEditorCon
   @Override
   public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
     generalInformationController.setAncestors(ancestors);
-    boolean readOnly = isWithinAttachment(ancestors);
+    boolean readOnly = isWithinAttachment(ancestors) || isWithinInclude(ancestors);
     propertyEditors.forEach(propertyEditor -> {
       propertyEditor.setElement(element);
       propertyEditor.setEditorDisabled(readOnly);

@@ -15,6 +15,7 @@ import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.commandstack.CommandStack;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
@@ -84,6 +85,10 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private ProjectItem projectItem;
   private ModelRoot modelRoot;
 
+  // Every other Document Model in the project, needed by ElementViewModel to resolve an Include group's
+  // children from the Document Model it references (see ElementViewModel#getChildren).
+  private List<DocumentModel> otherDocumentModels = List.of();
+
   private final CommandStack commandStack = new CommandStack();
 
   private DocumentModelActions documentModelActions;
@@ -103,6 +108,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   public void load(ProjectItem projectItem, @NonNull ModelRoot modelRoot) {
     this.projectItem = projectItem;
     this.modelRoot = modelRoot;
+    this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
     this.documentModelActions =
         new DocumentModelActions(projectItem, modelRoot, commandStack, elementsTreeTable, this::onModelChanged);
     modelTreeAddButton.getItems().addAll(documentModelActions.createAddMenuItems());
@@ -275,7 +281,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   }
 
   private TreeItem<ElementViewModel> toTreeItem(@NonNull Element element) {
-    ElementViewModel viewModel = new ElementViewModel(element);
+    ElementViewModel viewModel = new ElementViewModel(element, otherDocumentModels);
     TreeItem<ElementViewModel> treeItem = new TreeItem<>(viewModel);
     for (ElementViewModel child : viewModel.getChildren()) {
       treeItem.getChildren().add(toTreeItem(child.getElement()));
@@ -284,7 +290,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   }
 
   private TreeItem<ElementViewModel> toFilteredTreeItem(@NonNull Element element, @NonNull String term) {
-    ElementViewModel viewModel = new ElementViewModel(element);
+    ElementViewModel viewModel = new ElementViewModel(element, otherDocumentModels);
     List<TreeItem<ElementViewModel>> matchingChildren = new ArrayList<>();
     for (ElementViewModel child : viewModel.getChildren()) {
       TreeItem<ElementViewModel> filteredChild = toFilteredTreeItem(child.getElement(), term);
@@ -395,7 +401,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     double fraction = rowHeight <= 0 ? 0.5 : relativeY / rowHeight;
 
     boolean canDropInto = targetElement instanceof GroupElement targetGroup && targetGroup.getGroup() != null
-        && !new ElementViewModel(targetElement).hasFixedChildren();
+        && !new ElementViewModel(targetElement).hasFixedChildren() && !hasFixedChildrenAncestor(targetElement);
     if (canDropInto && fraction > 0.25 && fraction < 0.75) {
       return new DropPosition(target, DropLocation.INTO);
     }
@@ -481,7 +487,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    */
   private void setupRowDragAndDrop(@NonNull TreeTableRow<ElementViewModel> row) {
     row.setOnDragDetected(event -> {
-      if (row.isEmpty() || row.getTreeItem() == null) {
+      if (row.isEmpty() || row.getTreeItem() == null
+          || hasFixedChildrenAncestor(row.getTreeItem().getValue().getElement())) {
         return;
       }
       draggedTreeItem = row.getTreeItem();
@@ -612,7 +619,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       @Override
       public void changed(ObservableValue<? extends TreeItem<ElementViewModel>> observable, TreeItem<ElementViewModel> oldValue, TreeItem<ElementViewModel> newValue) {
         modelTreeAddButton.setDisable(newValue == null || isWithinFixedChildrenGroup(newValue.getValue().getElement()));
-        deleteButton.setDisable(newValue == null);
+        deleteButton.setDisable(newValue == null || hasFixedChildrenAncestor(newValue.getValue().getElement()));
       }
     });
     elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());

@@ -336,6 +336,11 @@ public class DocumentModelActions {
   private void onDeleteModelItem() {
     List<TreeItem<ElementViewModel>> selection =
         new ArrayList<>(elementsTreeTable.getSelectionModel().getSelectedItems());
+    // An Include's resolved children (see ElementViewModel#getChildren) belong to the referenced Document
+    // Model's own element lists, not this model's - deleting one would silently mutate that other model's
+    // in-memory graph instead of this one, so they're skipped here regardless of how the deletion was
+    // triggered (toolbar button, Delete key, context menu).
+    selection.removeIf(this::hasFixedChildrenAncestor);
     for (TreeItem<ElementViewModel> treeItem : topLevelSelection(selection)) {
       Command command = createDeleteCommand(treeItem);
       if (command != null) {
@@ -344,6 +349,17 @@ public class DocumentModelActions {
     }
 
     onModelChanged.accept(null);
+  }
+
+  private boolean hasFixedChildrenAncestor(@NonNull TreeItem<ElementViewModel> treeItem) {
+    TreeItem<ElementViewModel> parent = treeItem.getParent();
+    while (parent != null && parent.getValue() != null) {
+      if (new ElementViewModel(parent.getValue().getElement()).hasFixedChildren()) {
+        return true;
+      }
+      parent = parent.getParent();
+    }
+    return false;
   }
 
   private List<TreeItem<ElementViewModel>> topLevelSelection(@NonNull List<TreeItem<ElementViewModel>> selection) {
