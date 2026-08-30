@@ -1,0 +1,33 @@
+{
+  "header": {
+    "id": "FormFieldReferenceValidator_include_valid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "RefWithInclude",
+        "reference": "RefWithInclude_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "elementRef": "include_target_field_included"
+        }
+      ]
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

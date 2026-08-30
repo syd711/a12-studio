@@ -22,6 +22,14 @@ class FormValidatorsTest {
     return TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
   }
 
+  private DocumentModel refWithIncludeDm() {
+    return TestModels.load("/documentmodel/RefWithInclude_DM.json", DocumentModel.class);
+  }
+
+  private DocumentModel refIncludedDm() {
+    return TestModels.load("/documentmodel/RefIncluded_DM.json", DocumentModel.class);
+  }
+
   @Test
   void documentModelReferenceValidatorReportsMissingReference() {
     FormModel model = load("FormDocumentModelReferenceValidator_invalid");
@@ -39,6 +47,15 @@ class FormValidatorsTest {
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("field_missing"));
+  }
+
+  @Test
+  void fieldReferenceValidatorResolvesFieldThroughInclude() {
+    FormModel model = load("FormFieldReferenceValidator_include_valid");
+    List<ModelValidationError> errors = new FormFieldReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refWithIncludeDm(), refIncludedDm()));
+
+    assertEquals(0, errors.size());
   }
 
   @Test

@@ -27,9 +27,7 @@ import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Every field configuration entry must reference a field that still exists in one of the referenced
@@ -51,8 +49,8 @@ public final class FormFieldReferenceValidator implements ModelValidator {
       return List.of();
     }
 
-    Set<String> knownElementIds = collectReferencedDocumentModelElementIds(model, context);
-    if (knownElementIds.isEmpty()) {
+    List<ElementIndex> indexes = referencedDocumentModelIndexes(model, context);
+    if (indexes.isEmpty()) {
       // Without a resolvable document model there is nothing to check against
       // (FormDocumentModelReferenceValidator already reports the missing reference).
       return List.of();
@@ -61,7 +59,7 @@ public final class FormFieldReferenceValidator implements ModelValidator {
     List<ModelValidationError> errors = new ArrayList<>();
     for (FieldConfigEntry entry : formModel.getContent().getFieldConfiguration().getField()) {
       if (entry.getElementRef() == null || entry.getElementRef().isBlank()
-          || knownElementIds.contains(entry.getElementRef())) {
+          || indexes.stream().anyMatch(index -> index.isResolvable(entry.getElementRef()))) {
         continue;
       }
       String message = ValidationMessages.get("validation.formFieldReference.missing", entry.getElementRef());
@@ -138,10 +136,16 @@ public final class FormFieldReferenceValidator implements ModelValidator {
     return ELEMENT_ID;
   }
 
-  private static Set<String> collectReferencedDocumentModelElementIds(A12Model<?> model, ValidationContext context) {
-    Set<String> ids = new HashSet<>();
+  /**
+   * One {@link ElementIndex} per Document Model this Form Model references, each built with the project's
+   * other Document Models so an {@code elementRef} pointing into an {@code include}d model - a compound
+   * {@code "<includeGroupId>_<targetId>"} id whose target elements live entirely in the referenced model, not
+   * locally (see {@link ElementIndex#resolve}) - resolves correctly instead of being reported as missing.
+   */
+  private static List<ElementIndex> referencedDocumentModelIndexes(A12Model<?> model, ValidationContext context) {
+    List<ElementIndex> indexes = new ArrayList<>();
     if (model.getModelReferences() == null) {
-      return ids;
+      return indexes;
     }
     for (ModelReference reference : model.getModelReferences()) {
       if (reference.getModelType() != ModelType.DOCUMENT) {
@@ -151,12 +155,8 @@ public final class FormFieldReferenceValidator implements ModelValidator {
       if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
         continue;
       }
-      new ElementIndex(documentModel).allElements().forEach(element -> {
-        if (element.getId() != null) {
-          ids.add(element.getId());
-        }
-      });
+      indexes.add(new ElementIndex(documentModel, context.otherDocumentModels()));
     }
-    return ids;
+    return indexes;
   }
 }
