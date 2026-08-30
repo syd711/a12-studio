@@ -30,6 +30,8 @@ This project is an alternative editor for A12 models (https://geta12.com/#/getti
 This project is under development.
 You find an up-to-date overview about all supported model type and their status below.
 
+**All checked models here are still under development!!!**
+
 | Model Type | Status            |
 | --- |-------------------|
 | Application Model |    [x]               |
@@ -50,4 +52,4 @@ You find an up-to-date overview about all supported model type and their status 
 
 ## Q&A
 
-Please visit https://a12-studio.discourse.group/ for questions, issues and feature requests.
+Please open a ticket at https://github.com/syd711/a12-studio/issues for questions, issues and feature requests.

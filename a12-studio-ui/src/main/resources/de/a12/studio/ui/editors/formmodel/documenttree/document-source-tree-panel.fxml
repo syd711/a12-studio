@@ -32,6 +32,15 @@
                         <Tooltip text="%collapse_all" />
                     </tooltip>
                 </Button>
+                <Separator orientation="VERTICAL" />
+                <Button fx:id="openDocumentModelButton" accessibleText="%open_document_model" mnemonicParsing="false" onAction="#onOpenDocumentModel" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" styleClass="toolbar-icon" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%open_document_model" />
+                    </tooltip>
+                </Button>
             </items>
         </ToolBar>
     </top>

@@ -24,6 +24,8 @@ import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelController;
 import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
+import de.a12.studio.ui.editors.formmodel.formtree.commands.AddNodeCommand;
+import de.a12.studio.ui.editors.formmodel.formtree.commands.MoveNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorConfirmControlPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlPanelController;
@@ -35,11 +37,15 @@ import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.HideConditionPane
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.TabErrorBadge;
+import de.a12.studio.ui.util.commandstack.Command;
+import de.a12.studio.ui.util.commandstack.CommandStack;
+import de.a12.studio.ui.util.commandstack.CompositeCommand;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
@@ -85,6 +91,12 @@ public class FormModelTreeController implements Initializable {
 
   private static final String TREE_VALIDATION_ERROR_MESSAGE =
       "One or more elements in the tree below have a validation error. See the tree for details.";
+
+  @FXML
+  private Button undoButton;
+
+  @FXML
+  private Button redoButton;
 
   @FXML
   private SearchFieldController searchController;
@@ -136,6 +148,7 @@ public class FormModelTreeController implements Initializable {
   private ProjectItem projectItem;
   private FormModelContent content;
   private FormModelActions actions;
+  private final CommandStack commandStack = new CommandStack();
 
   // Kept so node editors (Section, Row, ControlGrid, Screen) can populate their Hide Condition
   // field combos with the boolean fields available from the linked Document Model.
@@ -173,6 +186,7 @@ public class FormModelTreeController implements Initializable {
       }
     });
     updateEditorPane(null);
+    updateUndoRedoState();
 
     BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
     applyDividerPosition(tableSettings);
@@ -206,6 +220,23 @@ public class FormModelTreeController implements Initializable {
    */
   public void setOnNodeSelected(@Nullable Runnable onNodeSelected) {
     this.onNodeSelected = onNodeSelected;
+  }
+
+  @FXML
+  private void onUndo() {
+    commandStack.undo();
+    onModelChanged(null);
+  }
+
+  @FXML
+  private void onRedo() {
+    commandStack.redo();
+    onModelChanged(null);
+  }
+
+  private void updateUndoRedoState() {
+    undoButton.setDisable(!commandStack.canUndo());
+    redoButton.setDisable(!commandStack.canRedo());
   }
 
   /**
@@ -320,7 +351,7 @@ public class FormModelTreeController implements Initializable {
     this.elementIndex = hasModelRoot(documentModel)
         ? new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
         : null;
-    this.actions = new FormModelActions(content, this::onModelChanged);
+    this.actions = new FormModelActions(content, commandStack, this::onModelChanged);
     tree.setContextMenu(createContextMenu(null));
     applyFilter(searchController.getText());
   }
@@ -391,6 +422,7 @@ public class FormModelTreeController implements Initializable {
   }
 
   private void onModelChanged(@Nullable Object nodeToSelect) {
+    updateUndoRedoState();
     applyFilter(searchController.getText());
     if (nodeToSelect != null) {
       selectNode(nodeToSelect);
@@ -655,20 +687,37 @@ public class FormModelTreeController implements Initializable {
     return new DropTarget(target, location);
   }
 
+  /**
+   * Moves a dragged node to its drop location as a single undoable step: reused across every combination of
+   * source/target container ({@link FormModelActions#siblingsOf} returns {@code null} for the single-slot
+   * {@link de.a12.studio.models.formmodel.EmbeddedRepeat}/{@link de.a12.studio.models.formmodel.DetachedRepeat}
+   * parents) - a plain {@link MoveNodeCommand} when both ends are real sibling lists (also handles same-list
+   * reordering), else a {@link CompositeCommand} pairing a detach (from wherever the node currently lives) with
+   * an attach (to the target list or single slot).
+   */
   private void moveNode(@NonNull TreeItem<FormElementViewModel> draggedItem, @NonNull DropTarget position) {
     FormElementViewModel draggedVm = draggedItem.getValue();
     Object node = draggedVm.getNode();
-    actions.removeNode(draggedVm);
+    List<Object> sourceSiblings = actions.siblingsOf(draggedVm);
 
+    Command command;
     if (position.location() == DropLocation.INTO) {
-      actions.insertAsChild(position.targetItem().getValue().getNode(), node);
+      Object targetNode = position.targetItem().getValue().getNode();
+      List<Object> targetSiblings = FormModelActions.childListOf(targetNode);
+      command = sourceSiblings != null && targetSiblings != null
+          ? new MoveNodeCommand(sourceSiblings, targetSiblings, node, targetSiblings.size())
+          : new CompositeCommand(actions.createDetachCommand(draggedVm), actions.createAttachCommand(targetNode, node));
     }
     else {
       List<Object> targetSiblings = actions.siblingsOf(position.targetItem().getValue());
       int targetIndex = targetSiblings.indexOf(position.targetItem().getValue().getNode());
       int insertIndex = position.location() == DropLocation.BELOW ? targetIndex + 1 : targetIndex;
-      targetSiblings.add(Math.max(0, Math.min(insertIndex, targetSiblings.size())), node);
+      command = sourceSiblings != null
+          ? new MoveNodeCommand(sourceSiblings, targetSiblings, node, insertIndex)
+          : new CompositeCommand(actions.createDetachCommand(draggedVm), new AddNodeCommand(targetSiblings, node, insertIndex));
     }
+
+    commandStack.execute(command);
     actions.notifyChanged(node);
   }
 
@@ -741,7 +790,7 @@ public class FormModelTreeController implements Initializable {
 
     if (targetNode instanceof Row row) {
       Control control = FormModelElementFactory.newControl(element.getId());
-      row.getCell().add(control);
+      commandStack.execute(new AddNodeCommand(FormModelActions.childListOf(row), control, row.getCell().size()));
       actions.notifyChanged(control);
     }
     else if (targetNode instanceof Cell) {
@@ -752,7 +801,7 @@ public class FormModelTreeController implements Initializable {
       Control control = FormModelElementFactory.newControl(element.getId());
       int targetIndex = siblings.indexOf(targetNode);
       int insertIndex = position.location() == DropLocation.BELOW ? targetIndex + 1 : targetIndex;
-      siblings.add(Math.max(0, Math.min(insertIndex, siblings.size())), control);
+      commandStack.execute(new AddNodeCommand(siblings, control, insertIndex));
       actions.notifyChanged(control);
     }
     else if (targetNode instanceof ControlGrid grid) {
@@ -765,20 +814,24 @@ public class FormModelTreeController implements Initializable {
           return;
         }
         int index = siblings.indexOf(targetNode);
-        siblings.add(index + 1, repeat);
+        commandStack.execute(new AddNodeCommand(siblings, repeat, index + 1));
         actions.notifyChanged(repeat);
       }
       else {
         Row row = FormModelElementFactory.newRow();
         Control control = FormModelElementFactory.newControl(element.getId());
         row.getCell().add(control);
-        grid.getRow().add(row);
+        commandStack.execute(new AddNodeCommand(FormModelActions.childListOf(grid), row, grid.getRow().size()));
         actions.notifyChanged(control);
       }
     }
     else if (targetNode instanceof Screen || targetNode instanceof Section || targetNode instanceof MultiColumnSection) {
       InlineRepeat repeat = FormModelElementFactory.newInlineRepeat(element.getId());
-      actions.insertAsChild(targetNode, repeat);
+      Command command = actions.createAttachCommand(targetNode, repeat);
+      if (command == null) {
+        return;
+      }
+      commandStack.execute(command);
       actions.notifyChanged(repeat);
     }
   }

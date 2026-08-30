@@ -14,6 +14,7 @@ import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -54,7 +55,12 @@ public class DocumentSourceTreeController implements Initializable {
   @FXML
   private TreeView<ElementViewModel> tree;
 
+  @FXML
+  private Button openDocumentModelButton;
+
   private ModelRoot modelRoot;
+
+  private String documentModelId;
 
   // Every Document Model in the project, needed by ElementViewModel to resolve an Include group's children
   // from the Document Model it references (see ElementViewModel#getChildren), same as
@@ -76,16 +82,25 @@ public class DocumentSourceTreeController implements Initializable {
 
   public void load(@Nullable DocumentModel model, @NonNull ProjectItem formModelProjectItem) {
     this.modelRoot = model != null && model.getContent() != null ? model.getContent().getModelRoot() : null;
+    this.documentModelId = model != null ? model.getId() : null;
     this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(formModelProjectItem);
     boolean hasModel = modelRoot != null;
     tree.setVisible(hasModel);
     tree.setManaged(hasModel);
+    openDocumentModelButton.setDisable(documentModelId == null);
     if (!hasModel) {
       showPlaceholder();
       return;
     }
     hidePlaceholder();
     applyFilter(searchController.getText());
+  }
+
+  @FXML
+  private void onOpenDocumentModel() {
+    if (documentModelId != null) {
+      ProjectDocumentModels.openModelInEditor(documentModelId);
+    }
   }
 
   private void showPlaceholder() {

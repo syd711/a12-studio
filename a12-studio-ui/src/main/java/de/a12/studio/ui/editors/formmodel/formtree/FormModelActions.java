@@ -17,9 +17,15 @@ import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.formmodel.TextCell;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.formmodel.formtree.commands.AddNodeCommand;
+import de.a12.studio.ui.editors.formmodel.formtree.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.formmodel.formtree.commands.SetSingleChildCommand;
+import de.a12.studio.ui.editors.formmodel.formtree.commands.SwapCommand;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.ui.util.commandstack.Command;
+import de.a12.studio.ui.util.commandstack.CommandStack;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -30,17 +36,17 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
  * Builds the Form Model tree's context menu and carries out its actions: Add (per {@link
- * FormModelNodeTypes#allowedChildTypes}), Delete, Duplicate, Cut/Copy/Paste, Move Up/Down. Also exposes the
- * underlying list-mutation building blocks ({@link #siblingsOf}, {@link #insertAsChild}, {@link #removeNode})
- * to {@link FormModelTreeController} so drag-and-drop reuses the exact same mutation logic instead of
- * duplicating it.
+ * FormModelNodeTypes#allowedChildTypes}), Delete, Duplicate, Cut/Copy/Paste, Move Up/Down - every mutation
+ * going through the shared {@link CommandStack} passed in at construction, so it's undoable via the toolbar's
+ * Undo/Redo buttons. Also exposes the underlying list-mutation building blocks ({@link #siblingsOf}, {@link
+ * #createAttachCommand}, {@link #createDetachCommand}) to {@link FormModelTreeController} so drag-and-drop
+ * builds the exact same kind of commands instead of duplicating the parent-type dispatch.
  * <p>
  * Node duplication/paste clones via a JSON round-trip through the app's shared {@link JsonSettings#objectMapper}
  * (the same mapper used to load/save model files), then {@link #regenerateIds} walks the clone so it never
@@ -56,10 +62,12 @@ class FormModelActions {
   private static Class<?> clipboardType;
 
   private final FormModelContent content;
+  private final CommandStack commandStack;
   private final Consumer<Object> onModelChanged;
 
-  FormModelActions(@NonNull FormModelContent content, @NonNull Consumer<Object> onModelChanged) {
+  FormModelActions(@NonNull FormModelContent content, @NonNull CommandStack commandStack, @NonNull Consumer<Object> onModelChanged) {
     this.content = content;
+    this.commandStack = commandStack;
     this.onModelChanged = onModelChanged;
   }
 
@@ -128,13 +136,18 @@ class FormModelActions {
 
   private void addRootScreen() {
     Screen screen = FormModelElementFactory.newScreen();
-    content.getScreens().add(screen);
+    List<Object> screens = topLevelSiblings();
+    commandStack.execute(new AddNodeCommand(screens, screen, screens.size()));
     onModelChanged.accept(screen);
   }
 
   private void addChild(@NonNull FormElementViewModel target, FormModelNodeTypes.@NonNull ChildTypeDescriptor descriptor) {
     Object newChild = descriptor.factory().get();
-    insertAsChild(target.getNode(), newChild);
+    Command command = createAttachCommand(target.getNode(), newChild);
+    if (command == null) {
+      return;
+    }
+    commandStack.execute(command);
     onModelChanged.accept(newChild);
   }
 
@@ -148,7 +161,7 @@ class FormModelActions {
     if (index < 0 || newIndex < 0 || newIndex >= siblings.size()) {
       return;
     }
-    Collections.swap(siblings, index, newIndex);
+    commandStack.execute(new SwapCommand(siblings, index, newIndex));
     onModelChanged.accept(item.getNode());
   }
 
@@ -163,7 +176,7 @@ class FormModelActions {
     }
     regenerateIds(clone);
     int index = siblings.indexOf(item.getNode());
-    siblings.add(index + 1, clone);
+    commandStack.execute(new AddNodeCommand(siblings, clone, index + 1));
     onModelChanged.accept(clone);
   }
 
@@ -171,7 +184,10 @@ class FormModelActions {
     if (!copyToClipboard(item.getNode())) {
       return;
     }
-    removeNode(item);
+    Command command = createDetachCommand(item);
+    if (command != null) {
+      commandStack.execute(command);
+    }
     onModelChanged.accept(null);
   }
 
@@ -202,7 +218,11 @@ class FormModelActions {
     try {
       Object clone = JsonSettings.objectMapper.readValue(clipboardJson, clipboardType);
       regenerateIds(clone);
-      insertAsChild(target.getNode(), clone);
+      Command command = createAttachCommand(target.getNode(), clone);
+      if (command == null) {
+        return;
+      }
+      commandStack.execute(command);
       onModelChanged.accept(clone);
     }
     catch (Exception e) {
@@ -218,7 +238,10 @@ class FormModelActions {
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }
-    removeNode(item);
+    Command command = createDetachCommand(item);
+    if (command != null) {
+      commandStack.execute(command);
+    }
     onModelChanged.accept(null);
   }
 
@@ -293,13 +316,14 @@ class FormModelActions {
    * Screen}, or its parent's child list otherwise - or {@code null} if the parent is an {@link EmbeddedRepeat}
    * or {@link DetachedRepeat} (a single-slot child has no "siblings" to reorder/insert around).
    */
-  @SuppressWarnings("unchecked")
   List<Object> siblingsOf(@NonNull FormElementViewModel item) {
     Object parent = item.getParentNode();
-    if (parent == null) {
-      return (List<Object>) (List<?>) content.getScreens();
-    }
-    return childListOf(parent);
+    return parent == null ? topLevelSiblings() : childListOf(parent);
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<Object> topLevelSiblings() {
+    return (List<Object>) (List<?>) content.getScreens();
   }
 
   /**
@@ -308,10 +332,11 @@ class FormModelActions {
    * Row}), or {@code null} for a single-slot parent ({@link EmbeddedRepeat}/{@link DetachedRepeat}) or a leaf
    * that can't contain children at all. The unchecked cast is safe: every list here only ever receives objects
    * whose concrete type was chosen by {@link FormModelNodeTypes}, which already restricts factories/clipboard
-   * pastes to the correct type for each parent.
+   * pastes to the correct type for each parent. Package-private so {@link FormModelTreeController}'s
+   * drag-and-drop can resolve the same child lists {@link #createAttachCommand}/{@link #createDetachCommand} do.
    */
   @SuppressWarnings("unchecked")
-  private static List<Object> childListOf(@NonNull Object parent) {
+  static List<Object> childListOf(@NonNull Object parent) {
     if (parent instanceof Screen screen) {
       return (List<Object>) (List<?>) screen.getScreenElements();
     }
@@ -330,42 +355,41 @@ class FormModelActions {
     return null;
   }
 
-  /** Adds {@code child} as the last child of {@code parent}, handling the {@link EmbeddedRepeat}/{@link DetachedRepeat} single-slot case. */
-  void insertAsChild(@NonNull Object parent, @NonNull Object child) {
+  /**
+   * Builds a command that adds {@code child} as the last child of {@code parent} - a real sibling list for most
+   * parent types, or the single {@link EmbeddedRepeat}/{@link DetachedRepeat} slot - undoing by removing/clearing
+   * it again. Returns {@code null} for a parent that can't take a child (shouldn't happen given the callers
+   * already checked via {@link FormModelNodeTypes#canContain}/{@link FormModelNodeTypes#allowedChildTypes}).
+   */
+  Command createAttachCommand(@NonNull Object parent, @NonNull Object child) {
     if (parent instanceof EmbeddedRepeat repeat) {
-      repeat.setControlGrid((ControlGrid) child);
-      return;
+      return new SetSingleChildCommand<>(repeat::setControlGrid, (ControlGrid) child, repeat.getControlGrid());
     }
     if (parent instanceof DetachedRepeat repeat) {
-      repeat.setDetailScreen((Screen) child);
-      return;
+      return new SetSingleChildCommand<>(repeat::setDetailScreen, (Screen) child, repeat.getDetailScreen());
     }
     List<Object> children = childListOf(parent);
-    if (children != null) {
-      children.add(child);
-    }
+    return children == null ? null : new AddNodeCommand(children, child, children.size());
   }
 
-  /** Removes {@code item}'s node from wherever it currently lives (list slot, or single {@link EmbeddedRepeat}/{@link DetachedRepeat} slot). */
-  void removeNode(@NonNull FormElementViewModel item) {
+  /**
+   * Builds a command that removes {@code item}'s node from wherever it currently lives (list slot, or single
+   * {@link EmbeddedRepeat}/{@link DetachedRepeat} slot), undoing by re-inserting/restoring it.
+   */
+  Command createDetachCommand(@NonNull FormElementViewModel item) {
     Object parent = item.getParentNode();
     Object node = item.getNode();
     if (parent == null) {
-      content.getScreens().remove(node);
-      return;
+      return new DeleteNodeCommand(topLevelSiblings(), node);
     }
     if (parent instanceof EmbeddedRepeat repeat) {
-      repeat.setControlGrid(null);
-      return;
+      return new SetSingleChildCommand<ControlGrid>(repeat::setControlGrid, null, repeat.getControlGrid());
     }
     if (parent instanceof DetachedRepeat repeat) {
-      repeat.setDetailScreen(null);
-      return;
+      return new SetSingleChildCommand<Screen>(repeat::setDetailScreen, null, repeat.getDetailScreen());
     }
     List<Object> siblings = childListOf(parent);
-    if (siblings != null) {
-      siblings.remove(node);
-    }
+    return siblings == null ? null : new DeleteNodeCommand(siblings, node);
   }
 
   void notifyChanged(@Nullable Object nodeToSelect) {
