@@ -33,7 +33,7 @@ public class StudioFolderChooser {
   }
 
   public void setInitialDirectory(File folder) {
-    if (folder.exists()) {
+    if (folder != null && folder.exists()) {
       folderChooser.setInitialDirectory(folder);
     }
   }

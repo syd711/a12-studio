@@ -96,7 +96,6 @@ public class MenuBarController implements Initializable, StudioEventListener {
   @FXML
   private void onOpen() {
     StudioFolderChooser chooser = new StudioFolderChooser();
-    chooser.setInitialDirectory(LocalUISettings.getLastFolderSelection());
     chooser.setTitle(StudioBundle.get("choose_project_workspace"));
 
     File file = chooser.showOpenDialog(Studio.stage);
