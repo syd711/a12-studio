@@ -1,1 +1,1 @@
-gradlew.bat :a12-studio-ui:buildInstaller
+call .\gradlew.bat :a12-studio-ui:buildInstaller

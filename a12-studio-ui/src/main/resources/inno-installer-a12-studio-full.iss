@@ -23,7 +23,7 @@ DisableProgramGroupPage=yes
 DisableDirPage=no
 LicenseFile=..\..\..\LICENSE
 OutputDir=../../../Output/A12-Studio
-; SetupIconFile intentionally omitted - no .ico artwork exists yet, add one here once available.
+SetupIconFile=..\..\..\a12-studio-ui\src\main\resources\de\a12\studio\ui\logo.ico
 OutputBaseFilename=A12-Studio-Full-Installer-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
@@ -31,6 +31,13 @@ WizardStyle=modern
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"
+
+[CustomMessages]
+english.AppRunningMsg=A12 Studio is still running.%n%nPlease close A12-Studio.exe before continuing.%n%nClick Retry to check again, or Cancel to abort the installation.
+german.AppRunningMsg=A12 Studio wird noch ausgeführt.%n%nBitte schließen Sie A12-Studio.exe, bevor Sie fortfahren.%n%nKlicken Sie auf "Wiederholen", um erneut zu prüfen, oder auf "Abbrechen", um die Installation abzubrechen.
+english.CreateDesktopIconMsg=Create Desktop Icon for A12 Studio
+german.CreateDesktopIconMsg=Desktop-Symbol für A12 Studio erstellen
 
 [Code]
 function IsProcessRunning(const ProcessName: String): Boolean;
@@ -57,9 +64,7 @@ begin
   Result := True;
   while IsProcessRunning('A12-Studio.exe') do
   begin
-    Msg := 'A12 Studio is still running.' + #13#10 + #13#10 +
-           'Please close A12-Studio.exe before continuing.' + #13#10 + #13#10 +
-           'Click Retry to check again, or Cancel to abort the installation.';
+    Msg := CustomMessage('AppRunningMsg');
     case MsgBox(Msg, mbError, MB_RETRYCANCEL) of
       IDCANCEL:
         begin
@@ -71,21 +76,22 @@ begin
 end;
 
 [Tasks]
-Name: "desktopicon"; Description: "Create Desktop Icon for A12 Studio"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIconMsg}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Dirs]
 Name: "{app}"; Permissions: users-full
 
 [Files]
 Source: "..\..\..\Output\A12-Studio\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
+Source: "..\..\..\a12-studio-ui\src\main\resources\de\a12\studio\ui\logo.ico"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "..\..\..\Output\A12-Studio\a12-studio-ui.jar"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
 Source: "..\..\..\Output\A12-Studio\a12-studio-server.jar"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-full
-Source: "..\..\..\documentation\third-party-licenses\*"; DestDir: "{app}\third-party-licenses"; Flags: ignoreversion recursesubdirs createallsubdirdirs; Permissions: everyone-full
+Source: "..\..\..\documentation\third-party-licenses\*"; DestDir: "{app}\third-party-licenses"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{autoprograms}\A12-Studio\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autoprograms}\A12-Studio\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\logo.ico"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; IconFilename: "{app}\logo.ico"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent

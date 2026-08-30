@@ -1,1 +1,1 @@
-gradlew.bat generateLicenses --no-parallel
+call .\gradlew.bat generateLicenses --no-parallel
