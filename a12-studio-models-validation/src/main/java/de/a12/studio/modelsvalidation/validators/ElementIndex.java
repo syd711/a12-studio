@@ -183,7 +183,13 @@ public class ElementIndex {
       Optional<Resolution> inner = new ElementIndex(included, otherModels).resolve(elementId.substring(prefix.length()), visitedModelIds);
       if (inner.isPresent()) {
         boolean repeatableThroughInclude = isRepeatable(group) || hasRepeatableAncestor(group);
-        return Optional.of(new Resolution(inner.get().element(), getPath(group) + inner.get().path(),
+        // inner.path() starts with the included model's own root-group name, which the include group in
+        // this model (getPath(group), above) already represents as its mount point - e.g. an "Addresses"
+        // include group referencing a Document Model whose own root group is also named "Addresses" would
+        // otherwise duplicate that segment. Strip it so only the elements *below* the included root are
+        // appended.
+        String innerPathBelowIncludedRoot = inner.get().path().replaceFirst("^/[^/]*", "");
+        return Optional.of(new Resolution(inner.get().element(), getPath(group) + innerPathBelowIncludedRoot,
             inner.get().repeatableAncestor() || repeatableThroughInclude));
       }
     }

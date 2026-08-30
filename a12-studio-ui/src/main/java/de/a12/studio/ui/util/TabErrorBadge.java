@@ -73,32 +73,18 @@ public final class TabErrorBadge {
     fromNode.getScene().getRoot().layout();
 
     Node current = fromNode.getParent();
-    boolean foundSubTabPanel = false;
     while (current != null) {
-      log.info("[TabErrorBadge]   ancestor: {} styleClass={}", current.getClass().getSimpleName(), current.getStyleClass());
       if (current instanceof TabPane tabPane && tabPane.getStyleClass().contains(SUB_TAB_PANEL_STYLE_CLASS)) {
-        foundSubTabPanel = true;
-        boolean matchedTab = false;
         for (Tab tab : tabPane.getTabs()) {
           boolean descendant = isDescendant(tab.getContent(), fromNode);
-          log.info("[TabErrorBadge]     tab '{}': content={}, isDescendant={}", tabLabel(tab),
-              tab.getContent() != null ? tab.getContent().getClass().getSimpleName() : "null", descendant);
           if (descendant) {
-            matchedTab = true;
             String severity = worstSeverity(tab.getContent());
-            log.info("[TabErrorBadge]     -> matched tab '{}', worstSeverity={}", tabLabel(tab), severity);
             updateBadge(tab, severity);
             break;
           }
         }
-        if (!matchedTab) {
-          log.info("[TabErrorBadge]   sub-tab-panel TabPane found but no owning Tab matched fromNode");
-        }
       }
       current = current.getParent();
-    }
-    if (!foundSubTabPanel) {
-      log.info("[TabErrorBadge]   no enclosing 'sub-tab-panel' TabPane found while walking up from {}", fromNode.getClass().getSimpleName());
     }
   }
 
