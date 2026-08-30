@@ -5,10 +5,12 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
 import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -54,6 +56,11 @@ public class DocumentSourceTreeController implements Initializable {
 
   private ModelRoot modelRoot;
 
+  // Every Document Model in the project, needed by ElementViewModel to resolve an Include group's children
+  // from the Document Model it references (see ElementViewModel#getChildren), same as
+  // DocumentModelElementsTreeController#otherDocumentModels.
+  private List<DocumentModel> otherDocumentModels = List.of();
+
   private Label placeholderLabel;
 
   @Override
@@ -67,8 +74,9 @@ public class DocumentSourceTreeController implements Initializable {
     });
   }
 
-  public void load(@Nullable DocumentModel model) {
+  public void load(@Nullable DocumentModel model, @NonNull ProjectItem formModelProjectItem) {
     this.modelRoot = model != null && model.getContent() != null ? model.getContent().getModelRoot() : null;
+    this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(formModelProjectItem);
     boolean hasModel = modelRoot != null;
     tree.setVisible(hasModel);
     tree.setManaged(hasModel);
@@ -134,7 +142,7 @@ public class DocumentSourceTreeController implements Initializable {
   }
 
   private TreeItem<ElementViewModel> toTreeItem(@NonNull Element element) {
-    ElementViewModel viewModel = new ElementViewModel(element);
+    ElementViewModel viewModel = new ElementViewModel(element, otherDocumentModels);
     TreeItem<ElementViewModel> item = new TreeItem<>(viewModel);
     for (ElementViewModel child : viewModel.getChildren()) {
       item.getChildren().add(toTreeItem(child.getElement()));
@@ -143,7 +151,7 @@ public class DocumentSourceTreeController implements Initializable {
   }
 
   private TreeItem<ElementViewModel> toFilteredTreeItem(@NonNull Element element, @NonNull String term) {
-    ElementViewModel viewModel = new ElementViewModel(element);
+    ElementViewModel viewModel = new ElementViewModel(element, otherDocumentModels);
     List<TreeItem<ElementViewModel>> matchingChildren = new ArrayList<>();
     for (ElementViewModel child : viewModel.getChildren()) {
       TreeItem<ElementViewModel> filtered = toFilteredTreeItem(child.getElement(), term);

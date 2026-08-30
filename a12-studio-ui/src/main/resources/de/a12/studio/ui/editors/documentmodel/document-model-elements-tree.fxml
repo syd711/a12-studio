@@ -32,7 +32,7 @@
                     </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL" />
-                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="secondary-button" text="%add">
+                <MenuButton fx:id="modelTreeAddButton" mnemonicParsing="false" styleClass="secondary-button">
                <graphic>
                   <FontIcon iconLiteral="mdi2p-plus-circle-outline" iconSize="18" text="󰐙" />
                </graphic></MenuButton>

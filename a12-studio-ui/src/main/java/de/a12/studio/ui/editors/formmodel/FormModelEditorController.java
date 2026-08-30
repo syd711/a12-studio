@@ -160,7 +160,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
    */
   private void loadOverview(@NonNull FormModel formModel) {
     DocumentModel documentModel = resolveDataBindingDocumentModel(formModel);
-    documentSourceTreeController.load(documentModel);
+    documentSourceTreeController.load(documentModel, projectItem);
     formModelTreeController.setModel(formModel, documentModel, projectItem);
     formModelTreeController.setOnNodeSelected(this::onFormModelTreeNodeSelected);
   }
