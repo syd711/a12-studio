@@ -11,6 +11,7 @@ import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
@@ -32,6 +33,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableView;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -47,11 +49,19 @@ import java.util.function.Function;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
- * Builds the document model tree's context menu and carries out its actions (element creation,
- * deletion; Cut/Copy/Paste are still unwired placeholders), plus {@link #createAddMenuItems()},
- * which is also reused by {@link DocumentModelElementsTreeController} for the toolbar "Add" button.
+ * Builds the document model tree's context menu and carries out its actions: element creation, deletion, and
+ * Cut/Copy/Paste ({@link #cutSelection()}/{@link #copySelection()}/{@link #pasteSelection()}, also reused by
+ * {@link DocumentModelElementsTreeController} for the toolbar's Cut/Copy/Paste buttons), plus {@link
+ * #createAddMenuItems()}, which is also reused by that controller for the toolbar "Add" button.
  */
+@Slf4j
 public class DocumentModelActions {
+
+  // Static so Copy/Cut in one Document Model tab and Paste in another (or a later reopen of the same tab)
+  // work, mirroring how a system clipboard behaves. Holds JSON snapshots (one per top-level copied element)
+  // rather than the live objects so repeated pastes each get their own fresh clone with fresh ids (see
+  // #pasteSelection), and so multi-selection Copy/Cut carries every selected top-level element.
+  private static List<String> clipboardJson = List.of();
 
   private final ProjectItem projectItem;
   private final ModelRoot modelRoot;
@@ -96,9 +106,18 @@ public class DocumentModelActions {
       items.add(createMenu);
       items.add(new SeparatorMenuItem());
     }
-    items.add(createMenuItem("_Cut", Icons.CUT));
-    items.add(createMenuItem("Cop_y", Icons.COPY));
-    items.add(createMenuItem("_Paste", Icons.PASTE));
+    MenuItem cutItem = createMenuItem("_Cut", Icons.CUT);
+    cutItem.setOnAction(event -> cutSelection());
+    items.add(cutItem);
+
+    MenuItem copyItem = createMenuItem("Cop_y", Icons.COPY);
+    copyItem.setOnAction(event -> copySelection());
+    items.add(copyItem);
+
+    MenuItem pasteItem = createMenuItem("_Paste", Icons.PASTE);
+    pasteItem.setDisable(!hasClipboardContent());
+    pasteItem.setOnAction(event -> pasteSelection());
+    items.add(pasteItem);
     items.add(new SeparatorMenuItem());
     MenuItem deleteItem = createMenuItem("_Delete", Icons.TRASH);
     deleteItem.setOnAction(event -> confirmAndDeleteSelection());
@@ -309,6 +328,118 @@ public class DocumentModelActions {
       return new InsertionPoint(siblings, siblings.indexOf(selected) + 1);
     }
     return null;
+  }
+
+  /** Whether {@link #pasteSelection()} currently has anything to paste, for the toolbar Paste button's disabled state. */
+  public boolean hasClipboardContent() {
+    return !clipboardJson.isEmpty();
+  }
+
+  /**
+   * Copies the current top-level selection to the clipboard (see {@link #selectionForClipboard()}), leaving
+   * the tree unchanged.
+   */
+  public void copySelection() {
+    List<Element> elements = selectionForClipboard();
+    if (elements.isEmpty()) {
+      return;
+    }
+    copyToClipboard(elements);
+  }
+
+  /**
+   * Copies the current top-level selection to the clipboard, then deletes it the same way {@link
+   * #confirmAndDeleteSelection()} does - but without a confirmation prompt, matching standard Cut behavior
+   * (the removed elements are still recoverable via Paste or Undo).
+   */
+  public void cutSelection() {
+    List<Element> elements = selectionForClipboard();
+    if (elements.isEmpty()) {
+      return;
+    }
+    copyToClipboard(elements);
+    onDeleteModelItem();
+  }
+
+  /**
+   * Pastes every clipboard entry as a fresh clone - with a regenerated id (recursively, see {@link
+   * DocumentModelElementFactory#regenerateIds}) and a name made unique within the destination siblings (see
+   * {@link DocumentModelElementFactory#uniqueName}, so pasting back into the group it was copied from renames
+   * rather than collides) - at the same insertion point {@link #onAddElement} would use for a new element:
+   * as the last child of a selected group, or as a sibling directly after a selected leaf element. Each pasted
+   * top-level element becomes its own undo step, mirroring how {@link #onDeleteModelItem()} handles a
+   * multi-element deletion.
+   */
+  public void pasteSelection() {
+    if (clipboardJson.isEmpty()) {
+      return;
+    }
+    TreeItem<ElementViewModel> selectedItem = elementsTreeTable.getSelectionModel().getSelectedItem();
+    if (selectedItem == null || selectedItem.getValue() == null) {
+      return;
+    }
+    InsertionPoint insertionPoint = resolveInsertionPoint(selectedItem);
+    if (insertionPoint == null) {
+      return;
+    }
+
+    Element firstPasted = null;
+    int index = insertionPoint.index();
+    for (String json : clipboardJson) {
+      Element clone = cloneFromClipboard(json);
+      if (clone == null) {
+        continue;
+      }
+      DocumentModelElementFactory.regenerateIds(clone, modelRoot);
+      clone.setName(DocumentModelElementFactory.uniqueName(clone.getName(), insertionPoint.siblings()));
+      commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), clone, index));
+      index++;
+      if (firstPasted == null) {
+        firstPasted = clone;
+      }
+    }
+    if (firstPasted != null) {
+      onModelChanged.accept(firstPasted);
+    }
+  }
+
+  /**
+   * The tree's current top-level selection (see {@link #topLevelSelection}), skipping any element within a
+   * fixed-children group (attachment/multi-select/include) the same way {@link #onDeleteModelItem()} does -
+   * those belong to a fixed set of children or, for an Include, to another Document Model's own element list.
+   */
+  private List<Element> selectionForClipboard() {
+    List<TreeItem<ElementViewModel>> selection =
+        new ArrayList<>(elementsTreeTable.getSelectionModel().getSelectedItems());
+    selection.removeIf(this::hasFixedChildrenAncestor);
+    List<Element> elements = new ArrayList<>();
+    for (TreeItem<ElementViewModel> treeItem : topLevelSelection(selection)) {
+      elements.add(treeItem.getValue().getElement());
+    }
+    return elements;
+  }
+
+  private static void copyToClipboard(@NonNull List<Element> elements) {
+    try {
+      List<String> json = new ArrayList<>();
+      for (Element element : elements) {
+        json.add(JsonSettings.objectMapper.writeValueAsString(element));
+      }
+      clipboardJson = json;
+    }
+    catch (Exception e) {
+      log.warn("Failed to copy document model element(s) to clipboard: {}", e.getMessage(), e);
+    }
+  }
+
+  private static Element cloneFromClipboard(@NonNull String json) {
+    try {
+      return JsonSettings.objectMapper.readValue(json, Element.class);
+    }
+    catch (Exception e) {
+      log.warn("Failed to paste document model element: {}", e.getMessage(), e);
+      return null;
+    }
   }
 
   /**

@@ -11,14 +11,14 @@
     display: flex;
     height: 100vh;
   }
-  #modules {
+  #sidebar {
     width: 220px;
     flex-shrink: 0;
     border-right: 1px solid #8888;
     padding: 8px;
     overflow-y: auto;
   }
-  #modules button {
+  #sidebar button {
     display: block;
     width: 100%;
     text-align: left;
@@ -30,7 +30,7 @@
     font-size: 14px;
     border-radius: 4px;
   }
-  #modules button.selected {
+  #sidebar button.selected {
     border-color: #4a90d9;
     background: #4a90d922;
   }
@@ -45,22 +45,22 @@
     margin-bottom: 12px;
     font-family: monospace;
   }
-  .region {
+  .node {
     border: 1px solid #8888;
     border-radius: 6px;
     padding: 8px;
     margin: 8px 0;
   }
-  .region-header {
+  .node-header {
     font-weight: bold;
     font-size: 13px;
     margin-bottom: 6px;
   }
-  .region-layout {
+  .node-meta {
     font-weight: normal;
     opacity: 0.6;
   }
-  .view {
+  .node.leaf {
     background: #4a90d922;
     border: 1px solid #4a90d966;
     border-radius: 4px;
@@ -68,25 +68,18 @@
     margin: 4px 0;
     font-size: 13px;
   }
-  .view-header {
-    font-weight: bold;
-  }
-  .view-model {
-    font-weight: normal;
-    opacity: 0.6;
-  }
-  .view-fields {
+  .fields {
     width: 100%;
     border-collapse: collapse;
     margin-top: 6px;
     font-size: 12px;
   }
-  .view-fields th, .view-fields td {
+  .fields th, .fields td {
     text-align: left;
     padding: 3px 6px;
     border-bottom: 1px solid #8884;
   }
-  .view-fields th {
+  .fields th {
     opacity: 0.6;
     font-weight: normal;
   }
@@ -103,10 +96,10 @@
 </style>
 </head>
 <body>
-<div id="modules"></div>
+<div id="sidebar"></div>
 <div id="main">
   <div id="initialActivity"></div>
-  <div id="regionTree"></div>
+  <div id="tree"></div>
 </div>
 <script>
   const modelId = "__MODEL_ID__";
@@ -115,6 +108,7 @@
 
   let selectedModule = null;
   let selectedScene = null;
+  let selectedScreenIndex = 0;
   let lastRenderedJson = null;
 
   function dataUrl() {
@@ -129,8 +123,85 @@
     return labels && labels.length > 0 ? labels[0].text : "(unnamed)";
   }
 
-  function renderModules(modules) {
-    const container = document.getElementById("modules");
+  // Renders a generic {label, meta, fields, children, emptyLabel} node tree shared by the Application Model's
+  // region/view tree and the Form Model's screen/section/control tree (see viewToNode/regionToNode and
+  // screenElementToNode below, which adapt each model's own JSON shape into this common one).
+  function renderNode(node) {
+    const el = document.createElement("div");
+    el.className = "node" + (node.children.length === 0 && node.fields.length === 0 ? " leaf" : "");
+
+    const header = document.createElement("div");
+    header.className = "node-header";
+    header.textContent = (node.label || "") + " ";
+    if (node.meta) {
+      const meta = document.createElement("span");
+      meta.className = "node-meta";
+      meta.textContent = node.meta;
+      header.appendChild(meta);
+    }
+    el.appendChild(header);
+
+    if (node.fields.length > 0) {
+      const table = document.createElement("table");
+      table.className = "fields";
+      node.fields.forEach(field => {
+        const row = document.createElement("tr");
+        const labelCell = document.createElement("td");
+        labelCell.textContent = field.label;
+        row.appendChild(labelCell);
+        const typeCell = document.createElement("td");
+        typeCell.className = "field-type";
+        typeCell.textContent = field.fieldType || "";
+        row.appendChild(typeCell);
+        table.appendChild(row);
+      });
+      el.appendChild(table);
+    }
+
+    if (node.children.length > 0) {
+      node.children.forEach(child => el.appendChild(renderNode(child)));
+    }
+    else if (node.fields.length === 0 && node.emptyLabel) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.textContent = node.emptyLabel;
+      el.appendChild(empty);
+    }
+
+    return el;
+  }
+
+  function renderTree(nodes) {
+    const container = document.getElementById("tree");
+    container.innerHTML = "";
+    nodes.forEach(node => container.appendChild(renderNode(node)));
+  }
+
+  // ---- Application Model: modules (sidebar) -> region/view tree ----
+
+  function viewToNode(view) {
+    return {
+      label: view.name,
+      meta: view.modelName ? "(" + view.modelName + ")" : null,
+      fields: view.fields || [],
+      children: [],
+      emptyLabel: null
+    };
+  }
+
+  function regionToNode(region) {
+    const children = region.views.map(viewToNode).concat(region.subRegions.map(regionToNode));
+    return {
+      label: region.name,
+      meta: region.layout ? "(" + region.layout + ")" : "(no layout)",
+      fields: [],
+      children: children,
+      emptyLabel: children.length === 0 ? "no view" : null
+    };
+  }
+
+  function renderModulesSidebar(modules) {
+    const container = document.getElementById("sidebar");
     container.innerHTML = "";
     modules.forEach(module => {
       const button = document.createElement("button");
@@ -151,81 +222,69 @@
   function renderInitialActivity(descriptor) {
     const entries = Object.entries(descriptor || {});
     const el = document.getElementById("initialActivity");
+    el.hidden = false;
     el.textContent = entries.length === 0
         ? "Initial Activity: (none)"
         : "Initial Activity: " + entries.map(([key, value]) => key + "=" + value).join(", ");
   }
 
-  function renderView(view) {
-    const el = document.createElement("div");
-    el.className = "view";
-
-    const header = document.createElement("div");
-    header.className = "view-header";
-    header.textContent = view.name + " ";
-    if (view.modelName) {
-      const model = document.createElement("span");
-      model.className = "view-model";
-      model.textContent = "(" + view.modelName + ")";
-      header.appendChild(model);
-    }
-    el.appendChild(header);
-
-    if (view.fields && view.fields.length > 0) {
-      const table = document.createElement("table");
-      table.className = "view-fields";
-      view.fields.forEach(field => {
-        const row = document.createElement("tr");
-        const labelCell = document.createElement("td");
-        labelCell.textContent = field.label;
-        row.appendChild(labelCell);
-        const typeCell = document.createElement("td");
-        typeCell.className = "field-type";
-        typeCell.textContent = field.fieldType || "";
-        row.appendChild(typeCell);
-        table.appendChild(row);
-      });
-      el.appendChild(table);
-    }
-
-    return el;
+  function renderApplicationData(data) {
+    renderModulesSidebar(data.application.modules);
+    renderInitialActivity(data.application.initialActivity);
+    const regionTree = data.scene ? data.scene.regionTree : data.application.regionTree;
+    renderTree([regionToNode(regionTree)]);
   }
 
-  function renderRegion(region) {
-    const el = document.createElement("div");
-    el.className = "region";
+  // ---- Form Model: screens (sidebar) -> section/control-grid/repeat tree ----
 
-    const header = document.createElement("div");
-    header.className = "region-header";
-    header.textContent = region.name + " ";
-    const layout = document.createElement("span");
-    layout.className = "region-layout";
-    layout.textContent = region.layout ? "(" + region.layout + ")" : "(no layout)";
-    header.appendChild(layout);
-    el.appendChild(header);
-
-    if (region.views.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "empty";
-      empty.textContent = "no view";
-      el.appendChild(empty);
-    }
-    else {
-      region.views.forEach(view => el.appendChild(renderView(view)));
-    }
-
-    region.subRegions.forEach(subRegion => el.appendChild(renderRegion(subRegion)));
-    return el;
+  function screenElementToNode(element) {
+    return {
+      label: element.title,
+      meta: "(" + element.type + ")",
+      fields: element.fields || [],
+      children: (element.children || []).map(screenElementToNode),
+      emptyLabel: "(empty)"
+    };
   }
+
+  function renderScreensSidebar(screens) {
+    const container = document.getElementById("sidebar");
+    container.innerHTML = "";
+    screens.forEach((screen, index) => {
+      const button = document.createElement("button");
+      button.textContent = screen.title || screen.name || screen.id;
+      if (index === selectedScreenIndex) {
+        button.classList.add("selected");
+      }
+      button.onclick = () => {
+        selectedScreenIndex = index;
+        lastRenderedJson = null;
+        render(lastData);
+      };
+      container.appendChild(button);
+    });
+  }
+
+  function renderFormData(data) {
+    document.getElementById("initialActivity").hidden = true;
+    const screens = data.form.screens;
+    renderScreensSidebar(screens);
+    const screen = screens[Math.min(selectedScreenIndex, screens.length - 1)];
+    renderTree(screen ? screen.elements.map(screenElementToNode) : []);
+  }
+
+  // ---- shared fetch/refresh ----
+
+  let lastData = null;
 
   function render(data) {
-    renderModules(data.application.modules);
-    renderInitialActivity(data.application.initialActivity);
-
-    const regionTree = data.scene ? data.scene.regionTree : data.application.regionTree;
-    const container = document.getElementById("regionTree");
-    container.innerHTML = "";
-    container.appendChild(renderRegion(regionTree));
+    lastData = data;
+    if (data.form) {
+      renderFormData(data);
+    }
+    else {
+      renderApplicationData(data);
+    }
   }
 
   function fetchData() {

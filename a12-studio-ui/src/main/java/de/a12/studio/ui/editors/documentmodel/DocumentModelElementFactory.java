@@ -244,7 +244,56 @@ public class DocumentModelElementFactory {
     return label;
   }
 
-  private static String uniqueName(@NonNull String baseName, @NonNull List<Element> siblings) {
+  /**
+   * Regenerates the id of {@code element} and every descendant, recursively - so a clone produced by
+   * Copy/Cut+Paste (see {@code DocumentModelActions}) never collides with the id(s) of the element it was
+   * copied from. Mirrors the {@code <prefix>_<5-hex-digits>} convention used by the {@code new*Element}
+   * factory methods above, resolving the prefix from the clone's own shape rather than its (stale, copied)
+   * id, since a fixed-children group's prefix (attachment/multi-select/include) isn't otherwise recoverable
+   * once its usage type/includeConfig has already been set by the original creation.
+   */
+  public static void regenerateIds(@NonNull Element element, @NonNull ModelRoot modelRoot) {
+    element.setId(generateId(idPrefix(element), modelRoot));
+    if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
+      for (Element child : groupElement.getGroup().getElements()) {
+        regenerateIds(child, modelRoot);
+      }
+    }
+  }
+
+  private static String idPrefix(@NonNull Element element) {
+    if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
+      GroupConfig group = groupElement.getGroup();
+      if (group.getIncludeConfig() != null) {
+        return ID_PREFIX_INCLUDE;
+      }
+      if (GroupConfig.USAGE_TYPE_ATTACHMENT.equals(group.getUsageType())) {
+        return ID_PREFIX_ATTACHMENT;
+      }
+      if (GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(group.getUsageType())) {
+        return ID_PREFIX_MULTI_SELECT;
+      }
+      return ID_PREFIX_GROUP;
+    }
+    if (element instanceof FieldElement) {
+      return ID_PREFIX_FIELD;
+    }
+    if (element instanceof RuleElement) {
+      return ID_PREFIX_RULE;
+    }
+    if (element instanceof ComputationElement) {
+      return ID_PREFIX_COMPUTATION;
+    }
+    return "element";
+  }
+
+  /**
+   * Returns {@code baseName} unchanged if unused among {@code siblings}, else the same
+   * {@code "<baseName>_<n>"} suffixing convention used to name newly-created elements - also used by
+   * {@code DocumentModelActions} to rename a pasted element that collides with one already in its
+   * destination group (e.g. pasting back into the group it was copied from).
+   */
+  public static String uniqueName(@NonNull String baseName, @NonNull List<Element> siblings) {
     Set<String> usedNames = new HashSet<>();
     for (Element sibling : siblings) {
       usedNames.add(sibling.getName());

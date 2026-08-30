@@ -1,7 +1,5 @@
 package de.a12.studio.dataservices.preview;
 
-import de.a12.studio.models.Label;
-import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.Directive;
@@ -13,8 +11,6 @@ import de.a12.studio.models.applicationmodel.Scene;
 import de.a12.studio.models.applicationmodel.ViewAddDirective;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
-import de.a12.studio.models.documentmodel.FieldElement;
-import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.ProjectItem;
@@ -153,65 +149,33 @@ public class ApplicationModelPreviewService {
    * the column's own label if set, else the resolved Document Model field's label, else its name.
    */
   private List<PreviewFieldDto> resolveOverviewFields(OverviewModel overviewModel, ProjectItem contextItem) {
-    String documentModelId = overviewModel.getModelReferences().stream()
-        .filter(reference -> PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW.equals(reference.getPurpose()))
-        .map(ModelReference::getReference)
-        .findFirst()
-        .orElse(null);
-    if (documentModelId == null) {
+    DocumentModel documentModel = DocumentModelFieldResolver.resolveReferencedDocumentModel(
+        overviewModel, PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW, contextItem);
+    if (documentModel == null) {
       return List.of();
     }
-
-    ProjectItem documentItem = contextItem.findByModelId(documentModelId);
-    if (documentItem == null || !(documentItem.getModel() instanceof DocumentModel documentModel)) {
-      return List.of();
-    }
-
-    Map<String, Element> elementsById = new HashMap<>();
-    indexElements(documentModel.getContent().getModelRoot().getRootGroups(), elementsById);
+    Map<String, Element> elementsById = DocumentModelFieldResolver.index(documentModel);
 
     List<PreviewFieldDto> fields = new ArrayList<>();
     for (Column column : overviewModel.getContent().getColumns()) {
       Element element = elementsById.get(column.getElementRef());
-      fields.add(new PreviewFieldDto(resolveColumnLabel(column, element), resolveFieldType(element)));
+      fields.add(new PreviewFieldDto(resolveColumnLabel(column, element), DocumentModelFieldResolver.fieldType(element)));
     }
     return fields;
   }
 
-  private void indexElements(List<? extends Element> elements, Map<String, Element> target) {
-    for (Element element : elements) {
-      target.put(element.getId(), element);
-      if (element instanceof GroupElement groupElement) {
-        indexElements(groupElement.getGroup().getElements(), target);
-      }
-    }
-  }
-
   private String resolveColumnLabel(Column column, Element element) {
-    String label = firstLabelText(column.getLabel());
+    String label = DocumentModelFieldResolver.firstLabelText(column.getLabel());
     if (label != null) {
       return label;
     }
-    if (element instanceof FieldElement fieldElement) {
-      label = firstLabelText(fieldElement.getField().getLabel());
-      if (label != null) {
-        return label;
-      }
+    label = DocumentModelFieldResolver.fieldLabel(element);
+    if (label != null) {
+      return label;
     }
     if (element != null) {
       return element.getName();
     }
     return column.getElementRef();
-  }
-
-  private String resolveFieldType(Element element) {
-    if (element instanceof FieldElement fieldElement && fieldElement.getField().getFieldType() != null) {
-      return fieldElement.getField().getFieldType().getType();
-    }
-    return null;
-  }
-
-  private String firstLabelText(List<Label> labels) {
-    return labels != null && !labels.isEmpty() ? labels.get(0).getText() : null;
   }
 }

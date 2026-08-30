@@ -36,6 +36,32 @@
                <graphic>
                   <FontIcon iconLiteral="mdi2p-plus-circle-outline" iconSize="18" text="󰐙" />
                </graphic></MenuButton>
+                <Separator orientation="VERTICAL" />
+                <Button fx:id="cutButton" accessibleText="%cut_the_selected_element_s" mnemonicParsing="false" onAction="#onCut" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2c-content-cut" iconSize="18" styleClass="toolbar-icon" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%cut_the_selected_element_s" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="copyButton" accessibleText="%copy_the_selected_element_s" mnemonicParsing="false" onAction="#onCopy" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2c-content-copy" iconSize="18" styleClass="toolbar-icon" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%copy_the_selected_element_s" />
+                    </tooltip>
+                </Button>
+                <Button fx:id="pasteButton" accessibleText="%paste" mnemonicParsing="false" onAction="#onPaste" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2c-content-paste" iconSize="18" styleClass="toolbar-icon" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%paste" />
+                    </tooltip>
+                </Button>
+                <Separator orientation="VERTICAL" />
                 <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteButton" styleClass="delete-button">
                     <tooltip>
                         <Tooltip text="%delete_the_selected_element_s" />

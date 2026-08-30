@@ -68,6 +68,15 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private MenuButton modelTreeAddButton;
 
   @FXML
+  private Button cutButton;
+
+  @FXML
+  private Button copyButton;
+
+  @FXML
+  private Button pasteButton;
+
+  @FXML
   private Button deleteButton;
 
   @FXML
@@ -339,6 +348,43 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     documentModelActions.confirmAndDeleteSelection();
   }
 
+  @FXML
+  private void onCut() {
+    documentModelActions.cutSelection();
+    updateEditingButtonsState();
+  }
+
+  @FXML
+  private void onCopy() {
+    documentModelActions.copySelection();
+    updateEditingButtonsState();
+  }
+
+  @FXML
+  private void onPaste() {
+    documentModelActions.pasteSelection();
+    updateEditingButtonsState();
+  }
+
+  /**
+   * Refreshes the Add/Cut/Copy/Paste/Delete toolbar buttons' disabled state from the current selection and
+   * (for Paste) the clipboard - called from the selection listener and after every Cut/Copy/Paste action,
+   * since Copy changes what Paste can do without changing the selection itself.
+   */
+  private void updateEditingButtonsState() {
+    TreeItem<ElementViewModel> selected = elementsTreeTable.getSelectionModel().getSelectedItem();
+    boolean noSelection = selected == null || selected.getValue() == null;
+    boolean fixedChildrenAncestor = !noSelection && hasFixedChildrenAncestor(selected.getValue().getElement());
+    boolean withinFixedChildrenGroup = !noSelection && isWithinFixedChildrenGroup(selected.getValue().getElement());
+    boolean hasClipboardContent = documentModelActions != null && documentModelActions.hasClipboardContent();
+
+    modelTreeAddButton.setDisable(noSelection || withinFixedChildrenGroup);
+    cutButton.setDisable(noSelection || fixedChildrenAncestor);
+    copyButton.setDisable(noSelection || fixedChildrenAncestor);
+    pasteButton.setDisable(noSelection || withinFixedChildrenGroup || !hasClipboardContent);
+    deleteButton.setDisable(noSelection || fixedChildrenAncestor);
+  }
+
   private enum DropLocation {ABOVE, BELOW, INTO}
 
   private record DropPosition(TreeItem<ElementViewModel> targetItem, DropLocation location) {
@@ -608,8 +654,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    modelTreeAddButton.setDisable(true);
-    deleteButton.setDisable(true);
+    updateEditingButtonsState();
     updateUndoRedoState();
     searchController.setOnSearch(this::applyFilter);
 
@@ -618,8 +663,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     elementsTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ElementViewModel>>() {
       @Override
       public void changed(ObservableValue<? extends TreeItem<ElementViewModel>> observable, TreeItem<ElementViewModel> oldValue, TreeItem<ElementViewModel> newValue) {
-        modelTreeAddButton.setDisable(newValue == null || isWithinFixedChildrenGroup(newValue.getValue().getElement()));
-        deleteButton.setDisable(newValue == null || hasFixedChildrenAncestor(newValue.getValue().getElement()));
+        updateEditingButtonsState();
       }
     });
     elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());

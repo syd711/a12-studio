@@ -85,6 +85,31 @@ public abstract class Browser {
 
   public abstract File getBrowserExe();
 
+  /**
+   * Opens {@code url} in a new, separate window of this browser (both {@link EdgeBrowser} and {@link
+   * ChromeBrowser} are Chromium-based, so {@code --new-window} is supported by either) rather than a new tab
+   * of whatever window is already frontmost.
+   */
+  public void openUrl(String url) {
+    File browserExe = getBrowserExe();
+    if (browserExe == null || !browserExe.exists()) {
+      LOG.error("Cannot open \"{}\": no valid browser installation found!", url);
+      return;
+    }
+
+    try {
+      launched = true;
+      SystemCommandExecutor executor = new SystemCommandExecutor(
+          Arrays.asList(browserExe.getAbsolutePath(), "--new-window", url), false);
+      executor.setDir(browserExe.getParentFile());
+      executor.enableLogging(true);
+      executor.executeCommandAsync();
+    }
+    catch (Exception e) {
+      LOG.error("Failed to open URL \"{}\": {}", url, e.getMessage(), e);
+    }
+  }
+
   public void exitBrowser() {
     try {
       if (launched) {

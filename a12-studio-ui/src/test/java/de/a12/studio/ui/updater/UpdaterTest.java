@@ -28,11 +28,11 @@ class UpdaterTest {
 
   @Test
   void isLargerVersionThan_handlesRealStudioVersionScheme() {
-    assertTrue(Updater.isLargerVersionThan("2606.06-ext0-0.0.2", "2606.06-ext0-0.0.1"));
-    assertFalse(Updater.isLargerVersionThan("2606.06-ext0-0.0.1", "2606.06-ext0-0.0.2"));
-    assertTrue(Updater.isLargerVersionThan("2606.07-ext0-0.0.1", "2606.06-ext0-0.0.9"));
-    assertTrue(Updater.isLargerVersionThan("2606.06-ext1-0.0.1", "2606.06-ext0-0.0.1"));
-    assertFalse(Updater.isLargerVersionThan("2606.06-ext0-0.0.1", "2606.06-ext0-0.0.1"));
+    assertTrue(Updater.isLargerVersionThan("2026.06-ext0-0.0.2", "2026.06-ext0-0.0.1"));
+    assertFalse(Updater.isLargerVersionThan("2026.06-ext0-0.0.1", "2026.06-ext0-0.0.2"));
+    assertTrue(Updater.isLargerVersionThan("2026.07-ext0-0.0.1", "2026.06-ext0-0.0.9"));
+    assertTrue(Updater.isLargerVersionThan("2026.06-ext1-0.0.1", "2026.06-ext0-0.0.1"));
+    assertFalse(Updater.isLargerVersionThan("2026.06-ext0-0.0.1", "2026.06-ext0-0.0.1"));
   }
 
   @Test

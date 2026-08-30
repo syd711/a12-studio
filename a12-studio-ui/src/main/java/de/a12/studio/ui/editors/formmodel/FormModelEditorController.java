@@ -19,6 +19,7 @@ import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController;
 import de.a12.studio.ui.events.ModelSaveEvent;
+import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -27,6 +28,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -141,6 +143,11 @@ public class FormModelEditorController extends AbstractEditorController implemen
   public void loadModel(@NonNull A12Model<?> model) {
     load((FormModel) model);
     updateSettingsErrorBadge();
+  }
+
+  @FXML
+  public void onPreview(ActionEvent e) {
+    PreviewLauncher.openPreviewInBrowser(projectItem);
   }
 
   private void load(@NonNull FormModel formModel) {

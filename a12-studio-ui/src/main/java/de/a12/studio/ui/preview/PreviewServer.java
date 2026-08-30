@@ -3,9 +3,11 @@ package de.a12.studio.ui.preview;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import de.a12.studio.dataservices.preview.ApplicationModelPreviewService;
+import de.a12.studio.dataservices.preview.FormModelPreviewService;
 import de.a12.studio.dataservices.preview.PreviewApplicationDto;
 import de.a12.studio.dataservices.preview.PreviewSceneDto;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.PreviewSettings;
 import de.a12.studio.models.util.JsonSettings;
@@ -23,10 +25,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Embedded HTTP server backing the Application Model preview: a static HTML/JS shell polls a JSON data
- * endpoint on {@link PreviewSettings#getAutoRefreshDelayMillis()}, reading straight from the live in-memory
- * {@link ApplicationModel} held by the editor's {@link ProjectItem} (edits made via property editors are
- * already reflected there, so no explicit change notification is needed - see {@code PreviewLauncher}).
+ * Embedded HTTP server backing the Application Model and Form Model wireframe previews: one shared static
+ * HTML/JS shell ({@code preview.html} - it renders whichever of the two generic shapes its data response
+ * carries, see the file's {@code render()}) polls a JSON data endpoint on {@link
+ * PreviewSettings#getAutoRefreshDelayMillis()}, reading straight from the live in-memory {@link
+ * ApplicationModel}/{@link FormModel} held by the editor's {@link ProjectItem} (edits made via property
+ * editors are already reflected there, so no explicit change notification is needed - see {@code
+ * PreviewLauncher}).
  *
  * <p>Not thread-safe against concurrent edits from the JavaFX application thread while a request is being
  * served (the model classes are plain, unsynchronized POJOs); acceptable for a preview polling a handful of
@@ -45,7 +50,9 @@ public class PreviewServer {
 
   private final Map<String, ProjectItem> registeredModels = new ConcurrentHashMap<>();
 
-  private final ApplicationModelPreviewService previewService = new ApplicationModelPreviewService();
+  private final ApplicationModelPreviewService applicationPreviewService = new ApplicationModelPreviewService();
+
+  private final FormModelPreviewService formPreviewService = new FormModelPreviewService();
 
   private final String shellTemplate;
 
@@ -118,7 +125,8 @@ public class PreviewServer {
   }
 
   private void handleShell(HttpExchange exchange, String modelId) throws IOException {
-    if (!registeredModels.containsKey(modelId)) {
+    ProjectItem projectItem = registeredModels.get(modelId);
+    if (projectItem == null) {
       sendResponse(exchange, 404, "text/plain", "No preview registered for '" + modelId + "'");
       return;
     }
@@ -133,20 +141,32 @@ public class PreviewServer {
 
   private void handleData(HttpExchange exchange, String modelId) throws IOException {
     ProjectItem projectItem = registeredModels.get(modelId);
-    if (projectItem == null || !(projectItem.getModel() instanceof ApplicationModel model)) {
+    if (projectItem == null) {
       sendResponse(exchange, 404, "text/plain", "No preview registered for '" + modelId + "'");
       return;
     }
 
+    if (projectItem.getModel() instanceof FormModel) {
+      handleFormData(exchange, projectItem);
+      return;
+    }
+    if (projectItem.getModel() instanceof ApplicationModel) {
+      handleApplicationData(exchange, projectItem);
+      return;
+    }
+    sendResponse(exchange, 404, "text/plain", "No preview available for model type of '" + modelId + "'");
+  }
+
+  private void handleApplicationData(HttpExchange exchange, ProjectItem projectItem) throws IOException {
     Map<String, String> query = parseQuery(exchange.getRequestURI());
     String moduleName = query.get("module");
     String sceneName = query.get("scene");
 
-    PreviewApplicationDto application = previewService.buildPreview(projectItem);
+    PreviewApplicationDto application = applicationPreviewService.buildPreview(projectItem);
     PreviewSceneDto scene = null;
     if (moduleName != null && sceneName != null) {
       try {
-        scene = previewService.resolveScene(projectItem, moduleName, sceneName);
+        scene = applicationPreviewService.resolveScene(projectItem, moduleName, sceneName);
       }
       catch (IllegalArgumentException e) {
         log.debug("Ignoring unresolved module/scene '{}/{}': {}", moduleName, sceneName, e.getMessage());
@@ -154,6 +174,12 @@ public class PreviewServer {
     }
 
     String json = JsonSettings.objectMapper.writeValueAsString(new PreviewDataResponse(application, scene));
+    sendResponse(exchange, 200, "application/json; charset=utf-8", json);
+  }
+
+  private void handleFormData(HttpExchange exchange, ProjectItem projectItem) throws IOException {
+    String json = JsonSettings.objectMapper.writeValueAsString(
+        new FormPreviewDataResponse(formPreviewService.buildPreview(projectItem)));
     sendResponse(exchange, 200, "application/json; charset=utf-8", json);
   }
 

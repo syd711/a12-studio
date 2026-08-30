@@ -243,8 +243,14 @@ public class SystemUtil {
    * entries when routed through {@code cmd /c start}, same as the plain {@code start "" <url>} call in {@link
    * #openUrl(String)} - a bare {@link ProcessBuilder} call wouldn't find them without their install directory
    * on PATH, which isn't the default for these otherwise.
+   *
+   * <p>Each command also passes the browser's own new-window flag (e.g. Chromium's {@code --new-window},
+   * Firefox's {@code -new-window}) so the preview opens as its own window rather than a new tab of whatever
+   * window is already frontmost - matching {@link de.a12.studio.ui.util.browsers.Browser#openUrl}.
    */
   private static List<String> browserCommand(PreviewSettings.BrowserType browserType, String url) {
+    String newWindowFlag = browserType == PreviewSettings.BrowserType.FIREFOX ? "-new-window" : "--new-window";
+
     if (isWindows()) {
       String executable = switch (browserType) {
         case CHROME -> "chrome";
@@ -252,7 +258,7 @@ public class SystemUtil {
         case EDGE -> "msedge";
         case SYSTEM_DEFAULT -> throw new IllegalStateException("handled by the caller");
       };
-      return List.of("cmd.exe", "/c", "start", "", executable, url);
+      return List.of("cmd.exe", "/c", "start", "", executable, newWindowFlag, url);
     }
     if (isMac()) {
       String appName = switch (browserType) {
@@ -261,7 +267,7 @@ public class SystemUtil {
         case EDGE -> "Microsoft Edge";
         case SYSTEM_DEFAULT -> throw new IllegalStateException("handled by the caller");
       };
-      return List.of("open", "-a", appName, url);
+      return List.of("open", "-a", appName, "--args", newWindowFlag, url);
     }
     String executable = switch (browserType) {
       case CHROME -> "google-chrome";
@@ -269,7 +275,7 @@ public class SystemUtil {
       case EDGE -> "microsoft-edge";
       case SYSTEM_DEFAULT -> throw new IllegalStateException("handled by the caller");
     };
-    return List.of(executable, url);
+    return List.of(executable, newWindowFlag, url);
   }
 
   /**
