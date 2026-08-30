@@ -60,6 +60,15 @@ public class MainDetailModelEditorController extends AbstractEditorController im
     refreshFormMapping();
   }
 
+  /**
+   * Reloads this editor whenever a Document Model is saved in a different tab, so the Form Mapping panel's
+   * Document Model list (see {@link #refreshFormMapping}) doesn't go stale while this tab stays open.
+   */
+  @Override
+  protected void onDocumentModelChangedElsewhere() {
+    load(model);
+  }
+
   private List<String> overviewModelOptions() {
     return ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.OVERVIEW).stream()
         .map(A12Model::getId)

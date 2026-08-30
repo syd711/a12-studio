@@ -14,6 +14,7 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.events.ElementValidatedEvent;
+import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.TabErrorBadge;
@@ -425,6 +426,26 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   @Override
   public void elementValidated(@NonNull ElementValidatedEvent event) {
     if (element != null && event.getElementId().equals(element.getId())) {
+      refreshValidationState();
+    }
+  }
+
+  /**
+   * Same "changed elsewhere, not through this panel's own commit" case as {@link #elementValidated} above,
+   * just triggered by a different Document Model being saved in another tab instead of a sibling panel bound
+   * to the same element - e.g. a Form Model's field-reference panel whose linked Document Model field was
+   * just deleted while this panel stayed open. Own-model saves are already covered by {@link #commitChange}/
+   * {@link #elementValidated}, so this only re-checks for a save of some other model, and only while this
+   * panel is actually bound to an element - a model-header panel (no {@link #element}) never surfaces
+   * element-level validation errors in the first place.
+   */
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    ProjectItem currentItem = Studio.getSelectedProjectItem();
+    if (element == null || currentItem == null || event.getItem().equals(currentItem)) {
+      return;
+    }
+    if (event.getItem().getModel() instanceof DocumentModel) {
       refreshValidationState();
     }
   }

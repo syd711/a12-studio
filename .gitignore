@@ -23,3 +23,5 @@ config/*.properties
 /testing/basic/bundled/seed.tar.gz
 /a12-studio-ui/config/settings.properties
 /testing/basic/.studio/advanced-settings.json
+/testing/workspaces/basic/logs/previewapp-server.log
+/testing/workspaces/basic/bundled/seed.tar.gz

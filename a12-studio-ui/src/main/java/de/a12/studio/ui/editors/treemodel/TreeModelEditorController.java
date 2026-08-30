@@ -220,6 +220,29 @@ public class TreeModelEditorController extends AbstractEditorController implemen
     }
   }
 
+  /**
+   * Refreshes the node Document Model picker's options and, for the currently selected node, its
+   * per-column field mapping combos (see {@link #rebuildColumnMappingRows}) whenever a Document Model is
+   * saved in a different tab - e.g. a Field this node maps a column to was just deleted there - so the
+   * mapping doesn't go stale while this tab stays open.
+   */
+  @Override
+  protected void onDocumentModelChangedElsewhere() {
+    updatingFromModel = true;
+    try {
+      String selectedDocumentModel = nodeDocumentModelField.getValue();
+      nodeDocumentModelField.getItems().setAll(documentModelOptions());
+      nodeDocumentModelField.setValue(selectedDocumentModel);
+    }
+    finally {
+      updatingFromModel = false;
+    }
+    TreeNode selectedNode = nodesList.getSelectionModel().getSelectedItem();
+    if (selectedNode != null) {
+      rebuildColumnMappingRows(selectedNode);
+    }
+  }
+
   private void refreshColumnDependentFields() {
     boolean wasUpdating = updatingFromModel;
     updatingFromModel = true;

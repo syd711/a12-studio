@@ -13,6 +13,7 @@ import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.commands.MoveNodeCommand;
 import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.ModelClosedEvent;
+import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -145,6 +146,22 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     }
     treeItem.getValue().setErrorMessages(event.getError().map(error -> List.of(error.message())).orElse(List.of()));
     elementsTreeTable.refresh();
+  }
+
+  /**
+   * Rebuilds the tree (structure + validation state, see {@link #applyValidationState}) whenever a Document
+   * Model other than this one is saved elsewhere, e.g. an Included model's field was renamed/removed while
+   * this tree is open, or the pool of models an Include group could resolve into changed - mirrors {@link
+   * de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController}'s equivalent handling for a Form
+   * Model's linked Document Model. Registers itself directly rather than going through {@link
+   * de.a12.studio.ui.editors.AbstractEditorController}, same as this class's other event handling above.
+   */
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    if (projectItem != null && !event.getItem().equals(projectItem) && event.getItem().getModel() instanceof DocumentModel) {
+      this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+      applyFilter(searchController.getText());
+    }
   }
 
   public List<Element> getAncestors(@NonNull Element element) {

@@ -465,12 +465,29 @@ public class FormModelEditorController extends AbstractEditorController implemen
    * Refreshes the Form Model tree's cell labels whenever anything belonging to this model is saved, so a
    * Name/Label edit made in the tree's own right-hand editor pane ({@link FormModelTreeController}) - which
    * commits directly rather than going through {@code formtree.FormModelActions}' tree-rebuilding {@code
-   * onModelChanged} - is still reflected in the tree immediately.
+   * onModelChanged} - is still reflected in the tree immediately. Delegates every other save (in particular
+   * a Document Model save elsewhere - see {@link #onDocumentModelChangedElsewhere}) to the base class.
    */
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
     if (event.getItem().equals(projectItem)) {
       formModelTreeController.refreshTreeLabels();
+      return;
+    }
+    super.modelSaved(event);
+  }
+
+  /**
+   * Reloads the Overview tab's Document Model tree and Form Model tree (including their validation state,
+   * see {@link FormModelTreeController#applyFilter}) whenever the linked Document Model - or one it
+   * transitively includes - is saved in a different tab, e.g. a Field deleted there must immediately stop
+   * showing up as draggable/resolvable here, and any now-dangling {@code elementRef} must show its
+   * validation error right away instead of only after this tab is closed and reopened.
+   */
+  @Override
+  protected void onDocumentModelChangedElsewhere() {
+    if (projectItem.getModel() instanceof FormModel formModel) {
+      loadOverview(formModel);
     }
   }
 

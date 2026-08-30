@@ -2,9 +2,11 @@ package de.a12.studio.ui.editors;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.ModelClosedEvent;
+import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.SystemUtil;
@@ -126,6 +128,29 @@ abstract public class AbstractEditorController implements StudioEventListener {
     if (event.getItem().equals(projectItem)) {
       StudioEventManager.getInstance().removeListener(this);
     }
+  }
+
+  /**
+   * Base handling for {@link ModelSaveEvent}: whenever a Document Model other than this editor's own model
+   * is saved elsewhere while this editor is open, dispatches to {@link #onDocumentModelChangedElsewhere},
+   * so editors whose UI derives from other Document Models (a linked/referenced model's tree, an
+   * ElementIndex-backed field combo, a field-reference validator) can refresh those derived views and their
+   * validation state immediately, instead of the change only showing up once the tab is closed and reopened.
+   * Subclasses overriding {@code modelSaved} for their own model's save-handling (e.g. refreshing tree row
+   * labels after a local edit) must call {@code super.modelSaved(event)} to keep this dispatch working.
+   */
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    if (projectItem != null && !event.getItem().equals(projectItem) && event.getItem().getModel() instanceof DocumentModel) {
+      onDocumentModelChangedElsewhere();
+    }
+  }
+
+  /**
+   * Default no-op; see {@link #modelSaved}. Overridden by editors that show a tree/field-picker/validation
+   * state derived from a Document Model other than their own.
+   */
+  protected void onDocumentModelChangedElsewhere() {
   }
 
   @NonNull

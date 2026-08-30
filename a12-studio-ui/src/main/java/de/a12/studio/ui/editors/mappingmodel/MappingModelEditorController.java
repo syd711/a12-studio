@@ -52,6 +52,15 @@ public class MappingModelEditorController extends AbstractEditorController imple
     targetModelPanelController.load(documentModelOptions(), currentTargetDmId());
   }
 
+  /**
+   * Refreshes the Source/Target Document Model pickers whenever a Document Model is saved in a different tab
+   * (added, renamed, or removed elsewhere), so the option lists don't go stale while this tab stays open.
+   */
+  @Override
+  protected void onDocumentModelChangedElsewhere() {
+    load(model);
+  }
+
   private List<DocumentModel> documentModelOptions() {
     return ProjectDocumentModels.getOtherDocumentModels(projectItem);
   }

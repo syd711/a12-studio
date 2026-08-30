@@ -54,6 +54,15 @@ public class RelationshipModelEditorController extends AbstractEditorController 
     linkDocumentModelController.setModel(model, documentModelOptions);
   }
 
+  /**
+   * Refreshes the entities' Document Model option lists whenever a Document Model is saved in a different
+   * tab (added, renamed, or removed elsewhere), so they don't go stale while this tab stays open.
+   */
+  @Override
+  protected void onDocumentModelChangedElsewhere() {
+    load(model);
+  }
+
   private List<String> entityDocumentModelOptions() {
     List<String> options = new ArrayList<>();
     ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.DOCUMENT).stream()

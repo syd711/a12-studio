@@ -299,6 +299,18 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     customFilterConfigurationController.setDocumentModelIndex(documentModelIndex);
   }
 
+  /**
+   * Re-derives {@link #otherDocumentModels} and {@link #documentModelIndex} whenever a Document Model is
+   * saved in a different tab, so a Field this Overview Model's Columns/Sorting/Accessibility/Custom Selection
+   * Of Fields/Section Data/Custom Filter Configuration panels reference immediately reflects being
+   * added/renamed/removed, instead of only after this tab is closed and reopened.
+   */
+  @Override
+  protected void onDocumentModelChangedElsewhere() {
+    otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    refreshDocumentModelIndex();
+  }
+
   // ---- Shared helpers ----
 
   private OverviewConfiguration ensureConfiguration() {

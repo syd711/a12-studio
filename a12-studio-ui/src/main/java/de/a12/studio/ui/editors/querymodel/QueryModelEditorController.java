@@ -23,6 +23,16 @@ public class QueryModelEditorController extends AbstractEditorController {
     updateSettingsErrorBadge();
   }
 
+  /**
+   * Reloads the target Document Model's tree ({@link QueryModelTreeController}) whenever it - or another
+   * Document Model - is saved elsewhere, so a Field added/renamed/removed there shows up immediately instead
+   * of only after this tab is closed and reopened.
+   */
+  @Override
+  protected void onDocumentModelChangedElsewhere() {
+    loadModel(projectItem.getModel());
+  }
+
   @Override
   public @NonNull ModelType getModelType() {
     return ModelType.QUERY;

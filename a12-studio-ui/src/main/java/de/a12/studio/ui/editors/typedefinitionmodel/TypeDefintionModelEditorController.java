@@ -64,6 +64,18 @@ public class TypeDefintionModelEditorController extends AbstractEditorController
     }
   }
 
+  /**
+   * Refreshes the type definitions table whenever some other Document Model saved elsewhere changes this
+   * model's Include/Import graph (see {@link TypeDefinitionTableController#load}), so a type definition
+   * added/removed in an imported model shows up here immediately.
+   */
+  @Override
+  protected void onDocumentModelChangedElsewhere() {
+    if (projectItem.getModel() instanceof DocumentModel documentModel) {
+      load(documentModel);
+    }
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     BaseTableSettings tableSettings = getBaseTableSettings();
