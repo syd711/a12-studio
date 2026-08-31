@@ -13,6 +13,7 @@ import de.a12.studio.models.applicationmodel.Scene;
 import de.a12.studio.models.applicationmodel.SceneChange;
 import de.a12.studio.models.applicationmodel.ViewAddDirective;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import org.junit.jupiter.api.Test;
@@ -85,6 +86,17 @@ class ApplicationGroupFeatureTest {
     String previewAppJson = Files.readString(previewApp.toPath());
     assertTrue(previewAppJson.contains("\"mustEqual\": \"Company_DM\""),
         "MatchCondition.mustEqual is out of scope for the reference rewrite and must be left as-is");
+
+    // QueryModel.json's content directly embeds both a bare targetDocumentModel id (Person_DM) and a
+    // relationshipModel id nested inside its sort array (PersonCompany) - both real models in this fixture,
+    // so both actually get renamed and both fields must follow.
+    File queryModel = new File(modelsDir, "App_QueryModel.json");
+    assertTrue(queryModel.exists());
+    QueryModel queryModelModel = (QueryModel) new ProjectItem(queryModel).getModel();
+    assertEquals("App_Person_DM", queryModelModel.getContent().getTargetDocumentModel(),
+        "QueryModelContent.targetDocumentModel must be rewritten to the new id");
+    assertEquals("App_PersonCompany", queryModelModel.getContent().getSort().get(0).getRelationshipModel(),
+        "QuerySort.relationshipModel must be rewritten to the new id");
   }
 
   private static List<ModelDescriptor> collectModelDescriptors(ApplicationModelContent content) {
@@ -109,6 +121,95 @@ class ApplicationGroupFeatureTest {
         descriptors.addAll(viewAdd.getModels());
       }
     }
+  }
+
+  // Mapping Model, Master-Detail Model and Combined Document Model each hold model-id references that the
+  // real testing/workspaces/basic fixtures don't otherwise exercise (Mapping Model isn't present there at
+  // all), so this test writes minimal synthetic files directly into the copied temp project rather than
+  // touching the shared checked-in fixtures.
+  @Test
+  void rewritesModelIdReferencesInMappingMasterDetailAndCombinedDocumentModels(@TempDir Path tempDir) throws Exception {
+    Path projectDir = copyBasicProject(tempDir);
+    File modelsDir = new File(projectDir.toFile(), "models");
+
+    // TreeNode.id is a local element id, not a model reference - giving it the same value as a real model's
+    // id ("Company_DM") checks that the generic field-name rewrite doesn't touch it by coincidence, while its
+    // sibling documentModelRef (a genuine reference) does get rewritten.
+    writeModel(modelsDir, "Extra_TrM.json", """
+        {
+          "header": {"id": "Extra_TrM", "modelType": "tree", "modelVersion": "1.0.0"},
+          "content": {"nodes": [{"id": "Company_DM", "documentModelRef": "Company_DM"}]}
+        }
+        """);
+    writeModel(modelsDir, "Extra_SmM.json", """
+        {
+          "header": {"id": "Extra_SmM", "modelType": "structuralmapping", "modelVersion": "1.0.0"},
+          "content": {}
+        }
+        """);
+    writeModel(modelsDir, "Extra_MdM.json", """
+        {
+          "header": {"id": "Extra_MdM", "modelType": "module-masterdetail", "modelVersion": "1.0.0"},
+          "content": {"type": "tree", "treeModel": "Extra_TrM"}
+        }
+        """);
+    writeModel(modelsDir, "Extra_MaM.json", """
+        {
+          "header": {"id": "Extra_MaM", "modelType": "mapping", "modelVersion": "1.0.0"},
+          "content": {
+            "Source": [{"name": "src", "dmId": "Company_DM"}],
+            "Target": {"dmId": "Company_DM"},
+            "PreComputationFragment": {"dmId": "Company_DM"},
+            "OverallModel": {"dmId": "Company_DM"},
+            "StructuralMappingModel": {"id": "Extra_SmM"}
+          }
+        }
+        """);
+    writeModel(modelsDir, "Extra_CmM.json", """
+        {
+          "header": {"id": "Extra_CmM", "modelType": "combination", "modelVersion": "1.0.0"},
+          "content": {
+            "baseModelId": "Company_DM",
+            "CombinationSteps": [
+              {"type": "Addition", "AdditiveModel": {"dmId": "Company_DM"}},
+              {"type": "Selection", "SelectionModel": {"smId": "Company_DM"}}
+            ]
+          }
+        }
+        """);
+
+    Project project = loadProject(projectDir);
+    setGroupName(projectDir, "App");
+    new ApplicationGroupFeature().apply(project);
+
+    String treeModelJson = Files.readString(new File(modelsDir, "App_Extra_TrM.json").toPath());
+    assertTrue(treeModelJson.contains("\"documentModelRef\": \"App_Company_DM\""),
+        "TreeNode.documentModelRef must be rewritten to the new id");
+    assertTrue(treeModelJson.contains("\"id\": \"Company_DM\""),
+        "TreeNode.id is a local element id, not a model reference, and must be left untouched even though "
+            + "it happens to equal an old model id");
+
+    String masterDetailJson = Files.readString(new File(modelsDir, "App_Extra_MdM.json").toPath());
+    assertTrue(masterDetailJson.contains("\"treeModel\": \"App_Extra_TrM\""),
+        "MasterDetailModelContent.treeModel must be rewritten to the new id");
+
+    String mappingJson = Files.readString(new File(modelsDir, "App_Extra_MaM.json").toPath());
+    assertFalse(mappingJson.contains("\"dmId\": \"Company_DM\""),
+        "No Mapping Model dmId reference (Target/Source/PreComputationFragment/OverallModel) should still carry the old bare id");
+    assertTrue(mappingJson.contains("\"id\": \"App_Extra_SmM\""),
+        "StructuralMappingModelRef.id must be rewritten to the new id");
+
+    String combinedJson = Files.readString(new File(modelsDir, "App_Extra_CmM.json").toPath());
+    assertTrue(combinedJson.contains("\"baseModelId\": \"App_Company_DM\""),
+        "CombinedDocumentModelContent.baseModelId must be rewritten to the new id");
+    assertTrue(combinedJson.contains("\"dmId\": \"App_Company_DM\""),
+        "DocumentModelIdRef.dmId (AdditiveModel) must be rewritten to the new id");
+    assertTrue(combinedJson.contains("\"smId\": \"App_Company_DM\""),
+        "SelectionModelIdRef.smId must be rewritten to the new id");
+  }
+
+  private static void writeModel(File modelsDir, String fileName, String json) throws IOException {
+    Files.writeString(new File(modelsDir, fileName).toPath(), json);
   }
 
   @Test

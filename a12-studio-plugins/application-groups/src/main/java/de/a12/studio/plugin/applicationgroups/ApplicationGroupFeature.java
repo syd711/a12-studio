@@ -36,12 +36,25 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
   private static final Pattern GROUP_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
 
   // Field names the model validators already treat as holding a model id: ModelDescriptor.documentModel /
-  // MasterDetail's overviewModel & FormMapping.documentModel/formModel / TreeNode.documentModelRef /
+  // MasterDetail's overviewModel, treeModel & FormMapping.documentModel/formModel / TreeNode.documentModelRef /
   // RelationshipModelContent.linkDocumentModel / IncludeConfig.reference & ModelReference.reference /
-  // print FieldRef.model. "name" is only a reference when its sibling "modelType" marks the object as a
+  // print FieldRef.model & Calculation.model / QueryModelContent.targetDocumentModel & QuerySort.relationshipModel /
+  // CombinedDocumentModelContent.baseModelId / Mapping Model's MappingTarget.dmId, MappingSource.dmId,
+  // PreComputationFragmentRef.dmId, OverallModelRef.dmId / combineddocumentmodel's DocumentModelIdRef.dmId &
+  // SelectionModelIdRef.smId. "name" is only a reference when its sibling "modelType" marks the object as a
   // ModelDescriptor - every other "name" in these models (modules, scenes, buttons, ...) must stay untouched.
+  // Deliberately NOT in this set: bare "id" - it's the generic local-element id field on dozens of unrelated
+  // classes (Button.id, TreeNode.id, Cell.id, overviewmodel.Column.id, ...) throughout these content trees, so
+  // matching on the name alone would risk rewriting a coincidental id collision. StructuralMappingModelRef.id
+  // (Mapping Model's content.StructuralMappingModel.id, pointing at a Structural Mapping Model) is the one
+  // legitimate "id"-named reference field; it's handled separately in rewriteNode by requiring the enclosing
+  // field to be literally "StructuralMappingModel", not by adding "id" here.
   private static final Set<String> REFERENCE_FIELD_NAMES = Set.of(
-      "documentModel", "overviewModel", "formModel", "documentModelRef", "linkDocumentModel", "reference", "model");
+      "documentModel", "overviewModel", "formModel", "documentModelRef", "linkDocumentModel", "reference", "model",
+      "treeModel", "targetDocumentModel", "relationshipModel", "baseModelId", "dmId", "smId");
+
+  // See REFERENCE_FIELD_NAMES javadoc above: the one "id"-named reference field, scoped to its wrapper.
+  private static final String STRUCTURAL_MAPPING_MODEL_REF_FIELD_NAME = "StructuralMappingModel";
 
   public static boolean isValidGroupName(String name) {
     return name != null && GROUP_NAME_PATTERN.matcher(name).matches();
@@ -157,7 +170,7 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
     C content = model.getContent();
     if (content != null) {
       JsonNode node = JsonSettings.objectMapper.valueToTree(content);
-      if (rewriteNode(node, idMap)) {
+      if (rewriteNode(node, idMap, null)) {
         @SuppressWarnings("unchecked")
         C updated = (C) JsonSettings.objectMapper.treeToValue(node, content.getClass());
         model.setContent(updated);
@@ -167,15 +180,20 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
     return changed;
   }
 
-  private static boolean rewriteNode(JsonNode node, Map<String, String> idMap) {
+  // enclosingFieldName is the JSON field name the current node was reached through (null at the content
+  // root, and unchanged as array elements are descended into) - it's how "id" can be trusted as a reference
+  // only inside a StructuralMappingModelRef, without treating every other class's local "id" field as one.
+  private static boolean rewriteNode(JsonNode node, Map<String, String> idMap, String enclosingFieldName) {
     boolean changed = false;
     if (node.isObject()) {
       ObjectNode objectNode = (ObjectNode) node;
       boolean modelDescriptorShape = objectNode.has("modelType");
+      boolean structuralMappingModelRefShape = STRUCTURAL_MAPPING_MODEL_REF_FIELD_NAME.equals(enclosingFieldName);
       for (String fieldName : List.copyOf(objectNode.propertyNames())) {
         JsonNode value = objectNode.get(fieldName);
         boolean isReferenceField = REFERENCE_FIELD_NAMES.contains(fieldName)
-            || ("name".equals(fieldName) && modelDescriptorShape);
+            || ("name".equals(fieldName) && modelDescriptorShape)
+            || ("id".equals(fieldName) && structuralMappingModelRefShape);
         if (isReferenceField && value.isString()) {
           String mapped = idMap.get(value.asString());
           if (mapped != null) {
@@ -185,13 +203,13 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
           }
         }
         if (value.isObject() || value.isArray()) {
-          changed |= rewriteNode(value, idMap);
+          changed |= rewriteNode(value, idMap, fieldName);
         }
       }
     }
     else if (node.isArray()) {
       for (JsonNode child : node) {
-        changed |= rewriteNode(child, idMap);
+        changed |= rewriteNode(child, idMap, enclosingFieldName);
       }
     }
     return changed;
