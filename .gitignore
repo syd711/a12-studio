@@ -25,3 +25,4 @@ config/*.properties
 /testing/basic/.studio/advanced-settings.json
 /testing/workspaces/basic/logs/previewapp-server.log
 /testing/workspaces/basic/bundled/seed.tar.gz
+/testing/workspaces/basic/logs/previewapp-server.log.*

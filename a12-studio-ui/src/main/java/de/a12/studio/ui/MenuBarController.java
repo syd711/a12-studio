@@ -4,8 +4,10 @@ import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.components.ProgressDialog;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.newproject.NewProjectDialogController;
+import de.a12.studio.ui.previewapp.PreviewAppDeployer;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
+import de.a12.studio.ui.previewapp.PreviewAppStatusMonitor;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.settings.A12Settings;
@@ -61,6 +63,9 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private Button claudeConsoleBtn;
+
+  @FXML
+  private Button deployBtn;
 
   @FXML
   private Button launchPreviewAppBtn;
@@ -262,6 +267,16 @@ public class MenuBarController implements Initializable, StudioEventListener {
   }
 
   @FXML
+  private void onDeploy() {
+    if (project == null) {
+      return;
+    }
+    deployBtn.setDisable(true);
+    PreviewAppDeployer.deploy(project,
+        () -> refreshDeployButtonState(PreviewAppStatusMonitor.getInstance().getStatus()));
+  }
+
+  @FXML
   private void onLaunchPreviewApp() {
     if (project != null) {
       PreviewAppProcess.getInstance().start(project);
@@ -293,12 +308,19 @@ public class MenuBarController implements Initializable, StudioEventListener {
     String installationPath = A12Settings.load().getInstallationPath();
     boolean visible = project != null && installationPath != null
         && A12Settings.isValidInstallationFolder(new File(installationPath));
+    deployBtn.setVisible(visible);
+    deployBtn.setManaged(visible);
     launchPreviewAppBtn.setVisible(visible);
     launchPreviewAppBtn.setManaged(visible);
     stopPreviewAppBtn.setVisible(visible);
     stopPreviewAppBtn.setManaged(visible);
     previewAppLogBtn.setVisible(visible);
     previewAppLogBtn.setManaged(visible);
+  }
+
+  /** Deploy is only meaningful while the Preview App server is actually reachable locally. */
+  private void refreshDeployButtonState(PreviewAppStatusMonitor.Status status) {
+    deployBtn.setDisable(status != PreviewAppStatusMonitor.Status.RUNNING || PreviewAppDeployer.isDeploying());
   }
 
   private void refreshPreviewAppButtonsState(PreviewAppProcess.State state) {
@@ -350,6 +372,11 @@ public class MenuBarController implements Initializable, StudioEventListener {
     refreshPreviewAppButtonsState(PreviewAppProcess.getInstance().getState());
     PreviewAppProcess.getInstance().stateProperty().addListener(
         (observable, oldState, newState) -> refreshPreviewAppButtonsState(newState));
+
+    PreviewAppStatusMonitor.getInstance().start();
+    refreshDeployButtonState(PreviewAppStatusMonitor.getInstance().getStatus());
+    PreviewAppStatusMonitor.getInstance().statusProperty().addListener(
+        (observable, oldStatus, newStatus) -> refreshDeployButtonState(newStatus));
 
     Platform.runLater(() -> {
       List<String> recentProjects = LocalUISettings.getRecentProjects();

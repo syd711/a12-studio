@@ -50,6 +50,17 @@
          <children>
             <HBox alignment="CENTER_LEFT" spacing="3.0">
                <children>
+                  <Button fx:id="deployBtn" accessibleText="%deploy_models" disable="true" managed="false" mnemonicParsing="false" onAction="#onDeploy" styleClass="menu-bar-button, deploy-models-button, preview-app-button" visible="false">
+                      <graphic>
+                          <FontIcon iconLiteral="mdi2c-cloud-upload-outline" iconSize="20" styleClass="toolbar-icon" />
+                      </graphic>
+                      <tooltip>
+                          <Tooltip text="%deploy_models" />
+                      </tooltip>
+                     <HBox.margin>
+                        <Insets right="6.0" />
+                     </HBox.margin>
+                  </Button>
                   <Button fx:id="launchPreviewAppBtn" accessibleText="%launch_preview_app" managed="false" mnemonicParsing="false" onAction="#onLaunchPreviewApp" styleClass="menu-bar-button, launch-preview-app-button, preview-app-button" visible="false">
                       <graphic>
                           <FontIcon iconLiteral="mdi2p-play" iconSize="20" styleClass="toolbar-icon" />
