@@ -1,14 +1,15 @@
 package de.a12.studio.ui.projecttree;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.util.ModelReferenceRewriter;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController.NewModelInput;
-import de.a12.studio.ui.util.DocumentModelBuilder.ColumnType;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -22,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -33,12 +36,15 @@ public class ProjectTreeMenuActions {
   private final Supplier<Stage> stageSupplier;
   private final Runnable onReload;
   private final Consumer<ProjectItemViewModel> onOpen;
+  private final Supplier<ProjectItem> projectRootSupplier;
 
   public ProjectTreeMenuActions(@NonNull Supplier<Stage> stageSupplier, @NonNull Runnable onReload,
-                                @NonNull Consumer<ProjectItemViewModel> onOpen) {
+                                @NonNull Consumer<ProjectItemViewModel> onOpen,
+                                @NonNull Supplier<ProjectItem> projectRootSupplier) {
     this.stageSupplier = stageSupplier;
     this.onReload = onReload;
     this.onOpen = onOpen;
+    this.projectRootSupplier = projectRootSupplier;
   }
 
   void onOpenItem(@NonNull ProjectItemViewModel item) {
@@ -95,14 +101,69 @@ public class ProjectTreeMenuActions {
     if (name == null || name.isBlank() || name.equals(item.getName())) {
       return;
     }
+
+    String oldId = item.isFolder() ? null : item.getModel() != null ? item.getModel().getId() : null;
     String oldPath = item.getPath();
+
     try {
       item.renameTo(name.trim());
-      StudioEventManager.getInstance().fireModelRenamedEvent(oldPath, item);
-      onReload.run();
     }
     catch (IOException e) {
       showError(StudioBundle.get("could_not_rename_to", name), e);
+      return;
+    }
+
+    // For model files: rewrite all cross-references in the project that pointed at the old id.
+    if (!item.isFolder() && oldId != null && item.getModel() != null) {
+      String newId = item.getModel().getId();
+      if (!newId.equals(oldId)) {
+        rewriteProjectReferences(oldId, newId);
+      }
+    }
+
+    StudioEventManager.getInstance().fireModelRenamedEvent(oldPath, item);
+    onReload.run();
+  }
+
+  /**
+   * Walks the entire project tree and rewrites every cross-reference that pointed at {@code oldId}
+   * to {@code newId} – both in {@code header.modelReferences} and in all content fields that the
+   * model schemas use as model-id references (see {@link ModelReferenceRewriter#REFERENCE_FIELD_NAMES}).
+   * Models that were changed are saved immediately.
+   */
+  private void rewriteProjectReferences(String oldId, String newId) {
+    ProjectItem root = projectRootSupplier.get();
+    if (root == null) {
+      return;
+    }
+    Map<String, String> idMap = Map.of(oldId, newId);
+    List<ProjectItem> allItems = new ArrayList<>();
+    collectModelItems(root, allItems);
+    for (ProjectItem candidate : allItems) {
+      A12Model<?> model = candidate.getModel();
+      if (model == null) {
+        continue;
+      }
+      try {
+        if (ModelReferenceRewriter.rewriteReferences(model, idMap)) {
+          candidate.save();
+          log.info("Updated reference {} -> {} in {}", oldId, newId, candidate.getPath());
+        }
+      }
+      catch (Exception e) {
+        log.warn("Failed to rewrite references in {}: {}", candidate.getPath(), e.getMessage(), e);
+      }
+    }
+  }
+
+  private static void collectModelItems(ProjectItem item, List<ProjectItem> result) {
+    if (item.isFolder()) {
+      for (ProjectItem child : item.getChildren()) {
+        collectModelItems(child, result);
+      }
+    }
+    else if (item.getModel() != null) {
+      result.add(item);
     }
   }
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="header" styleClass="window-header" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.components.ConsoleDialogHeaderController">
+   <left>
+      <Label fx:id="titleLabel" text="%a12_studio" textFill="WHITE" styleClass="window-header-title" BorderPane.alignment="TOP_LEFT">
+         <BorderPane.margin>
+            <Insets left="12.0" top="6.0" />
+         </BorderPane.margin>
+      </Label>
+   </left>
+   <padding>
+      <Insets bottom="4.0" />
+   </padding>
+   <right>
+      <HBox alignment="CENTER" spacing="2.0" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets bottom="3.0" right="6.0" top="6.0" />
+         </BorderPane.margin>
+         <Button fx:id="dockBtn" mnemonicParsing="false" onAction="#onDockClick" prefHeight="24.0" prefWidth="24.0" styleClass="header-button" stylesheets="@../stylesheet.css">
+            <graphic>
+               <FontIcon fx:id="dockIcon" iconLiteral="mdi2d-dock-bottom" iconSize="16" styleClass="header-icon" />
+            </graphic>
+            <tooltip><Tooltip text="%dock_console" /></tooltip>
+         </Button>
+         <Button mnemonicParsing="false" onAction="#onCloseClick" prefHeight="24.0" prefWidth="24.0" styleClass="header-button" stylesheets="@../stylesheet.css">
+            <graphic>
+               <FontIcon iconLiteral="mdi2w-window-close" iconSize="16" styleClass="header-icon" />
+            </graphic>
+            <tooltip><Tooltip text="%close" /></tooltip>
+         </Button>
+      </HBox>
+   </right>
+</BorderPane>

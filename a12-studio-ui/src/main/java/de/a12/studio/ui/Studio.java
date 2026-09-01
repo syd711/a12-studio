@@ -169,6 +169,10 @@ public class Studio extends Application implements StudioEventListener {
     PreviewAppProcess.getInstance().stop();
   }
 
+  public static RootController getRootController() {
+    return rootController;
+  }
+
   public static ProjectItem getSelectedProjectItem() {
     return rootController.getSelectedProjectItem();
   }

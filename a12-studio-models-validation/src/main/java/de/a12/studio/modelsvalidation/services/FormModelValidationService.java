@@ -11,6 +11,7 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.form.ControlGridLayoutValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormButtonScreenReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
@@ -30,6 +31,7 @@ public final class FormModelValidationService {
       new NameConventionValidator(),
       new FormDocumentModelReferenceValidator(),
       new FormFieldReferenceValidator(),
+      new FormButtonScreenReferenceValidator(),
       new FormLayoutColumnSumValidator(),
       new FormSiblingNameUniquenessValidator(),
       new ControlGridLayoutValidator()));
