@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.formmodel.Button;
+import de.a12.studio.models.formmodel.ButtonGroup;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
@@ -8,8 +10,10 @@ import de.a12.studio.models.formmodel.DetachedRepeat;
 import de.a12.studio.models.formmodel.EmbeddedRepeat;
 import de.a12.studio.models.formmodel.ExpressionCell;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.models.formmodel.InlineRepeat;
 import de.a12.studio.models.formmodel.MultiColumnSection;
+import de.a12.studio.models.formmodel.NavigationButton;
 import de.a12.studio.models.formmodel.Row;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.ScreenElement;
@@ -36,6 +40,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -238,11 +244,49 @@ class FormModelActions {
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
     }
+    if (item.getNode() instanceof Screen screen) {
+      removeNavigationButtonsTargeting(screen.getId());
+    }
     Command command = createDetachCommand(item);
     if (command != null) {
       commandStack.execute(command);
     }
     onModelChanged.accept(null);
+  }
+
+  /**
+   * Removes every {@link NavigationButton} whose {@code target} matches {@code screenId} from all
+   * {@link HeaderFooterBox}es in the model (model-level subHeaderBox/footerBox and every per-screen
+   * subHeaderBox/footerBox).  Called before the screen is detached so the model is left consistent.
+   */
+  private void removeNavigationButtonsTargeting(@NonNull String screenId) {
+    List<HeaderFooterBox> boxes = new ArrayList<>();
+    boxes.add(content.getSubHeaderBox());
+    boxes.add(content.getFooterBox());
+    for (Screen screen : content.getScreens()) {
+      boxes.add(screen.getSubHeaderBox());
+      boxes.add(screen.getFooterBox());
+    }
+    for (HeaderFooterBox box : boxes) {
+      if (box == null) {
+        continue;
+      }
+      removeFromGroup(box.getMajorButtons(), screenId);
+      removeFromGroup(box.getMinorButtons(), screenId);
+    }
+  }
+
+  private static void removeFromGroup(@Nullable ButtonGroup group, @NonNull String screenId) {
+    if (group == null) {
+      return;
+    }
+    Iterator<Button> it = group.getButton().iterator();
+    while (it.hasNext()) {
+      Button button = it.next();
+      if (button instanceof NavigationButton navBtn && screenId.equals(navBtn.getTarget())) {
+        it.remove();
+      }
+    }
   }
 
   private Object cloneNode(@NonNull Object node) {
