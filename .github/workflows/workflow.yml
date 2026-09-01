@@ -171,7 +171,7 @@ jobs:
             ./java-runtime-mac-${{ matrix.arch }}.zip
 
   ######################################################################################################################
-  # Linux Build (x64)
+  # Linux Build (x64) — also produces Windows EXE wrappers and JARs for the Packaging job
   ######################################################################################################################
   linux-app-build:
     name: linux-app-build-x64
@@ -203,8 +203,14 @@ jobs:
           curl -L -o zulu21-fx-jre-linux-x64.tar.gz \
             https://cdn.azul.com/zulu/bin/zulu21.42.19-ca-fx-jre21.0.7-linux_x64.tar.gz
 
-      - name: Build fat JAR with Gradle
-        run: ./gradlew :a12-studio-ui:shadowJar
+      - name: Build fat JARs and Windows EXE wrappers with Gradle
+        run: |
+          OUTPUT=$(./gradlew :a12-studio-ui:shadowJar :a12-studio-ui:createExe \
+                             :a12-studio-server:bootJar :a12-studio-server:createExe 2>&1) || {
+            echo "::error::$OUTPUT"
+            exit 1
+          }
+          echo "$OUTPUT"
 
       - name: Prepare Java Runtime
         id: jre
@@ -248,8 +254,23 @@ jobs:
           path: |
             ./linux-build/A12-Studio-Client-linux-x64.zip
 
+      - name: Collect Windows artifacts (JARs + EXE wrappers)
+        run: |
+          mkdir -p windows-artifacts
+          cp a12-studio-ui/build/libs/a12-studio-ui.jar          windows-artifacts/
+          cp a12-studio-server/build/libs/a12-studio-server.jar   windows-artifacts/
+          cp a12-studio-ui/build/launch4j/A12-Studio.exe          windows-artifacts/
+          cp a12-studio-server/build/launch4j/A12-Studio-Server.exe windows-artifacts/
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: windows-artifacts/
+
   ######################################################################################################################
   # Windows Packaging and Release
+  # The Gradle build runs on Linux above; Windows only runs Inno Setup on the pre-built artifacts.
   ######################################################################################################################
   build:
     name: Packaging
@@ -265,37 +286,47 @@ jobs:
       - name: Checkout A12 Studio
         uses: actions/checkout@v4
 
-      - name: Setup JDK 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'zulu'
-          java-version: '21'
-          cache: 'gradle'
-
       - name: Extract project version
         id: project
         shell: pwsh
         run: |
           $version = (Select-String -Path build.gradle -Pattern "version = '(.*)'").Matches | Where-Object { $_.Value -notmatch "javafx" } | Select-Object -First 1 | ForEach-Object { $_.Groups[1].Value }
           echo "version=$version" >> $env:GITHUB_OUTPUT
-          # jpackage requires a purely numeric version; strip any alpha/hyphen suffix
           $appVersion = [regex]::Match($version, '^\d+(\.\d+)*').Value
           echo "app_version=$appVersion" >> $env:GITHUB_OUTPUT
-          Write-Host "Extracted version=$version app_version=$appVersion" 
+          Write-Host "Extracted version=$version app_version=$appVersion"
+
+      - name: Download Windows artifacts (JARs + EXE wrappers)
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-artifacts
+          path: ./Output/A12-Studio/
+
+      - name: Prepare installer script
+        shell: pwsh
+        run: |
+          $version = "${{ steps.project.outputs.version }}"
+          $src = "a12-studio-ui\src\main\resources\inno-installer-a12-studio-full.iss"
+          $dst = "a12-studio-ui\build\installer\inno-installer-a12-studio-full.iss"
+          New-Item -ItemType Directory -Force -Path (Split-Path $dst) | Out-Null
+          (Get-Content $src) -replace '@version@', $version | Set-Content $dst
+          Write-Host "Installer script prepared: $dst"
 
       - name: Build Installer
         shell: pwsh
         run: |
-          $proc = Start-Process -FilePath ".\gradlew.bat" `
-            -ArgumentList ":a12-studio-ui:buildInstaller", "--info" `
+          $iss = "a12-studio-ui\build\installer\inno-installer-a12-studio-full.iss"
+          Write-Host "Running Inno Setup on: $iss"
+          $proc = Start-Process -FilePath "ISCC.exe" `
+            -ArgumentList $iss `
             -NoNewWindow -Wait -PassThru `
-            -RedirectStandardOutput "gradle-out.txt" `
-            -RedirectStandardError "gradle-err.txt"
-          Get-Content gradle-out.txt | Select-Object -Last 80 | Write-Host
-          Get-Content gradle-err.txt | Write-Host
+            -RedirectStandardOutput "iscc-out.txt" `
+            -RedirectStandardError "iscc-err.txt"
+          Get-Content iscc-out.txt | Write-Host
+          Get-Content iscc-err.txt | Write-Host
           if ($proc.ExitCode -ne 0) {
-            $tail = (Get-Content gradle-out.txt | Select-Object -Last 30) -join "`n"
-            Write-Output "::error::Gradle buildInstaller failed (exit $($proc.ExitCode)): $tail"
+            $tail = (Get-Content iscc-out.txt) -join "`n"
+            Write-Output "::error::ISCC.exe failed (exit $($proc.ExitCode)): $tail"
             exit 1
           }
 
