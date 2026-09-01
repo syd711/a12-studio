@@ -45,6 +45,14 @@
                </VBox.margin>
             </Label>
             <Label fx:id="pathLabel" styleClass="field-value" />
+            <VBox>
+               <VBox.margin>
+                  <Insets top="12.0" />
+               </VBox.margin>
+               <children>
+                  <fx:include fx:id="roles" source="../../editors/propertyeditors/roles-panel.fxml" />
+               </children>
+            </VBox>
          </children>
          <BorderPane.margin>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

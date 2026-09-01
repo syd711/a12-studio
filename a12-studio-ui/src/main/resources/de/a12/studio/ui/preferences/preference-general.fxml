@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.preferences.PreferenceGeneralPanelController">
+            fx:controller="de.a12.studio.ui.preferences.PreferenceProjectPanelController">
     <top>
         <VBox BorderPane.alignment="CENTER_LEFT">
             <children>
@@ -38,6 +38,7 @@
                     </VBox.margin>
                     <fx:include fx:id="locales" source="general-locales-panel.fxml" />
                 </VBox>
+
             </children>
             <padding>
                 <Insets left="12.0" right="12.0" top="8.0" />

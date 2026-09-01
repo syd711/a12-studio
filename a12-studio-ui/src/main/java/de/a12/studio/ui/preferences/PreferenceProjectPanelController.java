@@ -14,7 +14,7 @@ import javafx.util.StringConverter;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class PreferenceGeneralPanelController implements Initializable {
+public class PreferenceProjectPanelController implements Initializable {
 
   @FXML
   private ComboBox<GeneralSettings.RelationshipEngineMode> relationshipEngineModeCombo;

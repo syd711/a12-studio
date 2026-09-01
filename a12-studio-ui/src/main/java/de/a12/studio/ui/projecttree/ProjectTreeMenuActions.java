@@ -10,6 +10,7 @@ import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController.NewModelInput;
+import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -80,8 +81,13 @@ public class ProjectTreeMenuActions {
     ModelType modelType = input.get().modelType();
     String name = input.get().name();
     String documentModelId = input.get().documentModelId();
+    List<String> roles = input.get().roles();
     try {
       ProjectItem item = NewModelFactory.createModel(targetFolder, modelType, name, documentModelId);
+      if (!roles.isEmpty()) {
+        RolesEditorPanelController.applyRoles(item.getModel(), roles);
+        item.save();
+      }
       onReload.run();
       onOpen.accept(new ProjectItemViewModel(item, Map.of()));
     }

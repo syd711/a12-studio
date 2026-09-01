@@ -1,6 +1,7 @@
 package de.a12.studio.ui.projecttree.dialogs;
 
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
@@ -21,11 +22,12 @@ import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 public class NewModelDialogController implements DialogController {
 
-  public record NewModelInput(ModelType modelType, String name, String documentModelId) {
+  public record NewModelInput(ModelType modelType, String name, String documentModelId, List<String> roles) {
   }
 
   @FXML
@@ -48,6 +50,9 @@ public class NewModelDialogController implements DialogController {
 
   @FXML
   private Button cancelButton;
+
+  @FXML
+  private RolesEditorPanelController rolesController;
 
   private Stage stage;
 
@@ -115,6 +120,7 @@ public class NewModelDialogController implements DialogController {
         .map(DocumentModel::getId)
         .sorted(Comparator.naturalOrder())
         .toList());
+    controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
     if (preselectedType != null) {
       controller.typeComboBox.getSelectionModel().select(preselectedType);
     }
@@ -125,7 +131,7 @@ public class NewModelDialogController implements DialogController {
       String name = controller.nameField.getText();
       if (modelType != null && name != null && !name.isBlank()) {
         String documentModelId = requiresDocumentModel(modelType) ? controller.documentModelCombo.getValue() : null;
-        return Optional.of(new NewModelInput(modelType, name.trim(), documentModelId));
+        return Optional.of(new NewModelInput(modelType, name.trim(), documentModelId, controller.rolesController.getRoles()));
       }
     }
     return Optional.empty();

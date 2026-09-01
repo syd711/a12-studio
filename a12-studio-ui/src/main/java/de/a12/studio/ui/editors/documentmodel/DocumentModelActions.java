@@ -69,6 +69,13 @@ public class DocumentModelActions {
   private final TreeTableView<ElementViewModel> elementsTreeTable;
   private final Consumer<Element> onModelChanged;
 
+  // Field/Validation Rule/Computation Rule can only be inserted into a selected group, unlike
+  // Group/Attachment/Multi-Select/Include which can also land at the model root (see #resolveInsertionPointForAdd) -
+  // tracked here so #updateAddMenuItemsState can grey them out independently of the toolbar's single Add button.
+  private MenuItem fieldMenuItem;
+  private MenuItem ruleMenuItem;
+  private MenuItem computationMenuItem;
+
   public DocumentModelActions(@NonNull ProjectItem projectItem, @NonNull ModelRoot modelRoot,
                                @NonNull CommandStack commandStack, @NonNull TreeTableView<ElementViewModel> elementsTreeTable,
                                @NonNull Consumer<Element> onModelChanged) {
@@ -129,12 +136,15 @@ public class DocumentModelActions {
     List<MenuItem> items = new ArrayList<>();
     items.add(createAddMenuItem(createMenuItem("_Group", createGroupIcon()),
         siblings -> DocumentModelElementFactory.newGroupElement(siblings, modelRoot)));
-    items.add(createAddMenuItem(createMenuItem("_Field", Icons.ELEMENT_FIELD),
-        siblings -> DocumentModelElementFactory.newFieldElement(siblings, modelRoot)));
-    items.add(createAddMenuItem(createMenuItem("_Validation Rule", Icons.ELEMENT_VALIDATION_RULE),
-        siblings -> DocumentModelElementFactory.newRuleElement(siblings, modelRoot)));
-    items.add(createAddMenuItem(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION),
-        siblings -> DocumentModelElementFactory.newComputationElement(siblings, modelRoot)));
+    fieldMenuItem = createAddMenuItem(createMenuItem("_Field", Icons.ELEMENT_FIELD),
+        siblings -> DocumentModelElementFactory.newFieldElement(siblings, modelRoot));
+    items.add(fieldMenuItem);
+    ruleMenuItem = createAddMenuItem(createMenuItem("_Validation Rule", Icons.ELEMENT_VALIDATION_RULE),
+        siblings -> DocumentModelElementFactory.newRuleElement(siblings, modelRoot));
+    items.add(ruleMenuItem);
+    computationMenuItem = createAddMenuItem(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION),
+        siblings -> DocumentModelElementFactory.newComputationElement(siblings, modelRoot));
+    items.add(computationMenuItem);
     items.add(createAddMenuItem(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT),
         siblings -> DocumentModelElementFactory.newAttachmentElement(siblings, modelRoot)));
     items.add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT),
@@ -144,7 +154,26 @@ public class DocumentModelActions {
     includeItem.setOnAction(event -> onAddInclude());
     items.add(includeItem);
 
+    updateAddMenuItemsState();
     return items;
+  }
+
+  /**
+   * Greys out Field/Validation Rule/Computation Rule whenever nothing is selected - unlike
+   * Group/Attachment/Multi-Select/Include (see {@link #resolveInsertionPointForAdd}), they have no valid
+   * target to insert into when the tree is empty. Called after building the menu and on every selection
+   * change (see {@code DocumentModelElementsTreeController#updateEditingButtonsState}).
+   */
+  public void updateAddMenuItemsState() {
+    boolean hasSelection = hasSelection();
+    fieldMenuItem.setDisable(!hasSelection);
+    ruleMenuItem.setDisable(!hasSelection);
+    computationMenuItem.setDisable(!hasSelection);
+  }
+
+  private boolean hasSelection() {
+    TreeItem<ElementViewModel> selectedItem = elementsTreeTable.getSelectionModel().getSelectedItem();
+    return selectedItem != null && selectedItem.getValue() != null;
   }
 
   private MenuItem createAddMenuItem(@NonNull MenuItem menuItem, @NonNull Function<List<Element>, Element> elementFactory) {
@@ -153,12 +182,7 @@ public class DocumentModelActions {
   }
 
   private void onAddElement(@NonNull Function<List<Element>, Element> elementFactory) {
-    TreeItem<ElementViewModel> selectedItem = elementsTreeTable.getSelectionModel().getSelectedItem();
-    if (selectedItem == null || selectedItem.getValue() == null) {
-      return;
-    }
-
-    InsertionPoint insertionPoint = resolveInsertionPoint(selectedItem);
+    InsertionPoint insertionPoint = resolveInsertionPointForAdd();
     if (insertionPoint == null) {
       return;
     }
@@ -183,12 +207,7 @@ public class DocumentModelActions {
    * de.a12.studio.modelsvalidation.validators.MissingReferenceValidator}).
    */
   private void onAddInclude() {
-    TreeItem<ElementViewModel> selectedItem = elementsTreeTable.getSelectionModel().getSelectedItem();
-    if (selectedItem == null || selectedItem.getValue() == null) {
-      return;
-    }
-
-    InsertionPoint insertionPoint = resolveInsertionPoint(selectedItem);
+    InsertionPoint insertionPoint = resolveInsertionPointForAdd();
     if (insertionPoint == null) {
       return;
     }
@@ -309,6 +328,29 @@ public class DocumentModelActions {
    */
   private record InsertionPoint(List<Element> siblings, int index) {
 
+  }
+
+  /**
+   * Like {@link #resolveInsertionPoint}, but falls back to the end of {@link ModelRoot#getRootGroups()} when
+   * nothing is selected - which happens whenever the tree is empty, since there is then nothing to select.
+   * Only reachable for Group/Attachment/Multi-Select/Include (see {@link #updateAddMenuItemsState}, which
+   * disables Field/Validation Rule/Computation Rule in that state), all of which produce a {@link GroupElement}
+   * valid in the root list.
+   */
+  private InsertionPoint resolveInsertionPointForAdd() {
+    TreeItem<ElementViewModel> selectedItem = elementsTreeTable.getSelectionModel().getSelectedItem();
+    if (selectedItem == null || selectedItem.getValue() == null) {
+      return rootInsertionPoint();
+    }
+    return resolveInsertionPoint(selectedItem);
+  }
+
+  @SuppressWarnings("unchecked")
+  private InsertionPoint rootInsertionPoint() {
+    // Same List<GroupElement> -> List<Element> unchecked widening as MoveNodeCommand's constructor, for the
+    // same reason: ModelRoot#getRootGroups() is typed narrower than the generic siblings list AddNodeCommand needs.
+    List<Element> rootGroups = (List<Element>) (List<?>) modelRoot.getRootGroups();
+    return new InsertionPoint(rootGroups, rootGroups.size());
   }
 
   private InsertionPoint resolveInsertionPoint(@NonNull TreeItem<ElementViewModel> selectedItem) {

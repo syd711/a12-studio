@@ -17,6 +17,7 @@ import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.CommandStack;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
@@ -47,6 +48,10 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private static final String NAME_COLUMN_ID = "name";
 
   private static final String TYPE_COLUMN_ID = "type";
+
+  // Label of the tree's visible, read-only root row (ElementViewModel-less, see #applyFilter), which stands
+  // in for the model itself rather than any single Element.
+  private static final String MODEL_TREE_ROOT_LABEL = "Model Tree";
 
   // Identifies a tree row reorder/reparent drag; the dragboard needs some content to be considered a valid
   // drag source; the actual dragged node is tracked directly via the draggedTreeItem field below since it's
@@ -123,6 +128,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         new DocumentModelActions(projectItem, modelRoot, commandStack, elementsTreeTable, this::onModelChanged);
     modelTreeAddButton.getItems().addAll(documentModelActions.createAddMenuItems());
     applyFilter(searchController.getText());
+    updateEditingButtonsState();
     StudioEventManager.getInstance().addListener(this);
   }
 
@@ -390,16 +396,30 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    */
   private void updateEditingButtonsState() {
     TreeItem<ElementViewModel> selected = elementsTreeTable.getSelectionModel().getSelectedItem();
-    boolean noSelection = selected == null || selected.getValue() == null;
-    boolean fixedChildrenAncestor = !noSelection && hasFixedChildrenAncestor(selected.getValue().getElement());
-    boolean withinFixedChildrenGroup = !noSelection && isWithinFixedChildrenGroup(selected.getValue().getElement());
+    // The visible, read-only "Model Tree" root row has a null value (see #applyFilter), same as no selection
+    // at all - distinguished below from true "nothing selected" (nothingSelected) only where that distinction
+    // matters (the Add button, which Group/Attachment/Multi-Select/Include may still target via
+    // DocumentModelActions#resolveInsertionPointForAdd).
+    boolean hasElementSelected = selected != null && selected.getValue() != null;
+    boolean nothingSelected = selected == null;
+    boolean fixedChildrenAncestor = hasElementSelected && hasFixedChildrenAncestor(selected.getValue().getElement());
+    boolean withinFixedChildrenGroup = hasElementSelected && isWithinFixedChildrenGroup(selected.getValue().getElement());
     boolean hasClipboardContent = documentModelActions != null && documentModelActions.hasClipboardContent();
+    // An empty tree has no selection either, but Group/Attachment/Multi-Select/Include can still be added
+    // as new root groups (see DocumentModelActions#resolveInsertionPointForAdd) - so the Add button stays
+    // enabled in that case, and likewise whenever the root row itself is explicitly selected, with the
+    // selection-only entries (Field/Validation Rule/Computation Rule) greyed out individually by
+    // DocumentModelActions#updateAddMenuItemsState below.
+    boolean treeEmpty = elementsTreeTable.getRoot() == null || elementsTreeTable.getRoot().getChildren().isEmpty();
 
-    modelTreeAddButton.setDisable(noSelection || withinFixedChildrenGroup);
-    cutButton.setDisable(noSelection || fixedChildrenAncestor);
-    copyButton.setDisable(noSelection || fixedChildrenAncestor);
-    pasteButton.setDisable(noSelection || withinFixedChildrenGroup || !hasClipboardContent);
-    deleteButton.setDisable(noSelection || fixedChildrenAncestor);
+    modelTreeAddButton.setDisable((nothingSelected && !treeEmpty) || withinFixedChildrenGroup);
+    if (documentModelActions != null) {
+      documentModelActions.updateAddMenuItemsState();
+    }
+    cutButton.setDisable(!hasElementSelected || fixedChildrenAncestor);
+    copyButton.setDisable(!hasElementSelected || fixedChildrenAncestor);
+    pasteButton.setDisable(!hasElementSelected || withinFixedChildrenGroup || !hasClipboardContent);
+    deleteButton.setDisable(!hasElementSelected || fixedChildrenAncestor);
   }
 
   private enum DropLocation {ABOVE, BELOW, INTO}
@@ -550,7 +570,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    */
   private void setupRowDragAndDrop(@NonNull TreeTableRow<ElementViewModel> row) {
     row.setOnDragDetected(event -> {
-      if (row.isEmpty() || row.getTreeItem() == null
+      if (row.isEmpty() || row.getTreeItem() == null || row.getTreeItem().getValue() == null
           || hasFixedChildrenAncestor(row.getTreeItem().getValue().getElement())) {
         return;
       }
@@ -563,7 +583,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     });
 
     row.setOnDragOver(event -> {
-      if (row.isEmpty() || row.getTreeItem() == null || draggedTreeItem == null
+      if (row.isEmpty() || row.getTreeItem() == null || row.getTreeItem().getValue() == null || draggedTreeItem == null
           || !event.getDragboard().hasContent(ELEMENT_DRAG_FORMAT)) {
         return;
       }
@@ -581,7 +601,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     row.setOnDragExited(event -> clearDropIndicator(row));
 
     row.setOnDragDropped(event -> {
-      if (row.isEmpty() || row.getTreeItem() == null || draggedTreeItem == null) {
+      if (row.isEmpty() || row.getTreeItem() == null || row.getTreeItem().getValue() == null || draggedTreeItem == null) {
         return;
       }
       DropPosition position = resolveDropPosition(draggedTreeItem, row.getTreeItem(), event.getY(), row.getHeight());
@@ -675,7 +695,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     updateUndoRedoState();
     searchController.setOnSearch(this::applyFilter);
 
-    elementsTreeTable.setShowRoot(false);
+    elementsTreeTable.setShowRoot(true);
+    elementsTreeTable.setPlaceholder(WidgetFactory.createDefaultLabel("Add a new document element to the tree."));
     elementsTreeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     elementsTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ElementViewModel>>() {
       @Override
@@ -721,12 +742,19 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       return row;
     });
     setupTreeDragAndDrop();
-    nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
+    nameColumn.setCellValueFactory(param -> {
+      ElementViewModel viewModel = param.getValue().getValue();
+      return new ReadOnlyStringWrapper(viewModel == null ? MODEL_TREE_ROOT_LABEL : viewModel.getName());
+    });
     nameColumn.setCellFactory(column -> new ElementNameTreeCell());
 
 
     typeColumn.setCellValueFactory(param -> {
-      String type = param.getValue().getValue().getType();
+      ElementViewModel viewModel = param.getValue().getValue();
+      if (viewModel == null) {
+        return new ReadOnlyStringWrapper(null);
+      }
+      String type = viewModel.getType();
       if (type != null) {
         type = type.replaceAll("Type", "");
         if (type.equalsIgnoreCase("Rule")) {
