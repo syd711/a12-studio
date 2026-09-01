@@ -290,6 +290,10 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private void onOpenPreviewAppLog() {
+    // Ensure the dock button in the console header is wired to RootController.dockConsole()
+    // before the window is made visible.
+    PreviewAppLogWindow.getInstanceController(Studio.stage)
+        .setOnDockAction(() -> Studio.getRootController().dockConsole());
     PreviewAppLogWindow.show(Studio.stage);
   }
 

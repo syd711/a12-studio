@@ -8,16 +8,25 @@ import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preferences.PreferencesController;
+import de.a12.studio.ui.previewapp.PreviewAppDeployer;
+import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
+import de.a12.studio.ui.previewapp.PreviewAppProcess;
+import de.a12.studio.ui.previewapp.PreviewAppStatusMonitor;
 import de.a12.studio.ui.projecttree.ProjectTreeController;
 import de.a12.studio.ui.tabs.TabPaneController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 import org.jspecify.annotations.NonNull;
@@ -52,7 +61,33 @@ public class RootController implements Initializable, StudioEventListener {
   @FXML
   private StackPane rootStack;
 
+  // --- Docked console panel ---
+
+  @FXML
+  private BorderPane consoleArea;
+
+  @FXML
+  private TextArea dockedLogArea;
+
+  @FXML
+  private Button dockedDeployBtn;
+
+  @FXML
+  private Button dockedLaunchBtn;
+
+  @FXML
+  private Button dockedStopBtn;
+
+  @FXML
+  private Label dockedStateLabel;
+
+  @FXML
+  private Button undockBtn;
+
+  // ---
+
   private Project project;
+  private boolean consoleDocked = false;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -64,7 +99,99 @@ public class RootController implements Initializable, StudioEventListener {
         project.getSettings().getUISettings().save();
       }
     });
+
+    // Wire docked console log area to the process.
+    PreviewAppProcess process = PreviewAppProcess.getInstance();
+    for (String line : process.getLogLines()) {
+      dockedLogArea.appendText(line + "\n");
+    }
+    process.getLogLines().addListener((ListChangeListener<String>) change -> {
+      while (change.next()) {
+        if (change.wasRemoved() && process.getLogLines().isEmpty()) {
+          dockedLogArea.clear();
+        }
+        if (change.wasAdded()) {
+          for (String line : change.getAddedSubList()) {
+            dockedLogArea.appendText(line + "\n");
+          }
+        }
+      }
+    });
+
+    updateDockedState(process.getState());
+    process.stateProperty().addListener((obs, oldState, newState) -> updateDockedState(newState));
+
+    // Docked deploy button follows the same deploy-enabled rules as the menu bar button.
+    PreviewAppStatusMonitor.getInstance().statusProperty().addListener(
+        (obs, oldStatus, newStatus) -> refreshDockedDeployButton(newStatus));
+    refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus());
   }
+
+  private void updateDockedState(PreviewAppProcess.State state) {
+    boolean running = state == PreviewAppProcess.State.RUNNING;
+    boolean busy = state == PreviewAppProcess.State.STARTING || state == PreviewAppProcess.State.STOPPING;
+    dockedLaunchBtn.setDisable(running || busy);
+    dockedStopBtn.setDisable(!running && !busy);
+    dockedStateLabel.setText(state.name());
+  }
+
+  private void refreshDockedDeployButton(PreviewAppStatusMonitor.Status status) {
+    dockedDeployBtn.setDisable(status != PreviewAppStatusMonitor.Status.RUNNING || PreviewAppDeployer.isDeploying());
+  }
+
+  // --- Docked toolbar actions ---
+
+  @FXML
+  private void onDockedLaunch() {
+    if (project != null) {
+      PreviewAppProcess.getInstance().start(project);
+    }
+  }
+
+  @FXML
+  private void onDockedStop() {
+    PreviewAppProcess.getInstance().stop();
+  }
+
+  @FXML
+  private void onDockedDeploy() {
+    if (project == null) return;
+    dockedDeployBtn.setDisable(true);
+    PreviewAppDeployer.deploy(project,
+        () -> refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus()));
+  }
+
+  @FXML
+  private void onUndockConsole() {
+    undockConsole();
+  }
+
+  // --- Dock / undock API ---
+
+  /**
+   * Docks the console into the main view bottom area and hides the floating dialog.
+   * Called from {@link PreviewAppLogWindow} when the user clicks the dock button in the header.
+   */
+  public void dockConsole() {
+    if (consoleDocked) return;
+    consoleDocked = true;
+    PreviewAppLogWindow.hide();
+    consoleArea.setVisible(true);
+    consoleArea.setManaged(true);
+  }
+
+  /**
+   * Releases the console back into its floating dialog and collapses the bottom area.
+   */
+  public void undockConsole() {
+    if (!consoleDocked) return;
+    consoleDocked = false;
+    consoleArea.setVisible(false);
+    consoleArea.setManaged(false);
+    PreviewAppLogWindow.show(Studio.stage);
+  }
+
+  // --- Project lifecycle ---
 
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
@@ -114,8 +241,6 @@ public class RootController implements Initializable, StudioEventListener {
         fadeOut.setToValue(0);
         fadeOut.setOnFinished(e -> rootStack.getChildren().remove(preferencesRoot));
         fadeOut.play();
-        // Preferences can change project-wide validation rules (e.g. application groups), so revalidate
-        // everything once the dialog is gone instead of leaving stale errors in the tree.
         if (project != null) {
           projectTreeController.load(project);
         }

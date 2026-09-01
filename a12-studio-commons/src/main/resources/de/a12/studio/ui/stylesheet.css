@@ -454,3 +454,44 @@
     -fx-font-size: 12px;
     -fx-text-fill: -fx-text-muted;
 }
+
+/**
+ * Docked console panel (bottom area in main view, shown when user docks the log window).
+ */
+.console-panel {
+    -fx-border-color: -fx-border-subtle transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-background-color: -fx-surface-color;
+}
+
+.console-toolbar {
+    -fx-background-color: -fx-panel-color;
+    -fx-border-color: transparent transparent -fx-border-subtle transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: 4px 8px;
+    -fx-spacing: 4px;
+    -fx-min-height: 38px;
+    -fx-pref-height: 38px;
+}
+
+.console-state-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-text-muted;
+}
+
+.console-text-area {
+    -fx-font-family: monospace;
+    -fx-font-size: 12px;
+    -fx-background-color: #1e1e1e;
+    -fx-text-fill: #d4d4d4;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+}
+
+.console-text-area .content {
+    -fx-background-color: #1e1e1e;
+}
+
+.console-text-area .scroll-pane {
+    -fx-background-color: #1e1e1e;
+}
