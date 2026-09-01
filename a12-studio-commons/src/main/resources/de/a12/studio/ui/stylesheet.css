@@ -464,15 +464,6 @@
     -fx-background-color: -fx-surface-color;
 }
 
-.console-resizer {
-    -fx-background-color: -fx-border-subtle;
-    -fx-cursor: v-resize;
-}
-
-.console-resizer:hover {
-    -fx-background-color: -fx-accent-color;
-}
-
 .console-toolbar {
     -fx-background-color: -fx-panel-color;
     -fx-border-color: transparent transparent -fx-border-subtle transparent;

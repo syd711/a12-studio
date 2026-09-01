@@ -27,8 +27,8 @@ public class LocalUISettings {
   /** Whether editor tabs (and their icons) are tinted per model type; see TabPaneController. */
   public static final String COLORFUL_STUDIO_ENABLED = "colorfulStudioEnabled";
 
-  /** Pixel height of the docked preview app console panel; see RootController. */
-  public static final String CONSOLE_HEIGHT = "consoleHeight";
+  /** Divider position (0-100) of the docked preview app console panel's SplitPane; see RootController. */
+  public static final String CONSOLE_DIVIDER_POSITION = "consoleDividerPosition";
 
   /** Whether the docked preview app console panel is shown (vs. minimized); see RootController. */
   public static final String CONSOLE_VISIBLE = "consoleVisible";

@@ -27,11 +27,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.jspecify.annotations.NonNull;
 
@@ -67,20 +64,14 @@ public class RootController implements Initializable, StudioEventListener {
 
   // --- Docked console panel ---
 
-  private static final double DEFAULT_CONSOLE_HEIGHT = 220.0;
-
-  private static final double MIN_CONSOLE_HEIGHT = 100.0;
-
-  private static final double MIN_MAIN_AREA_HEIGHT = 150.0;
+  /** Default divider position (0-100) when the console panel is first docked with no saved preference. */
+  private static final int DEFAULT_CONSOLE_DIVIDER_POSITION = 65;
 
   @FXML
-  private VBox centerVBox;
+  private SplitPane centerSplitPane;
 
   @FXML
   private BorderPane consoleArea;
-
-  @FXML
-  private Region consoleResizer;
 
   @FXML
   private Button minimizeConsoleBtn;
@@ -107,9 +98,6 @@ public class RootController implements Initializable, StudioEventListener {
 
   private Project project;
   private boolean consoleDocked = false;
-
-  private double consoleResizeStartMouseY;
-  private double consoleResizeStartHeight;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -148,9 +136,11 @@ public class RootController implements Initializable, StudioEventListener {
         (obs, oldStatus, newStatus) -> refreshDockedDeployButton(newStatus));
     refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus());
 
-    // Restore the docked console panel's height and open/minimized state from the last session.
-    double savedHeight = LocalUISettings.getInt(LocalUISettings.CONSOLE_HEIGHT, (int) DEFAULT_CONSOLE_HEIGHT);
-    consoleArea.setPrefHeight(Math.max(savedHeight, MIN_CONSOLE_HEIGHT));
+    // The console panel is only ever present in the SplitPane's items while docked and visible;
+    // it starts out included in the FXML purely so FXMLLoader instantiates and injects it.
+    centerSplitPane.getItems().remove(consoleArea);
+
+    // Restore the docked console panel's open/minimized state from the last session.
     if (LocalUISettings.getBoolean(LocalUISettings.CONSOLE_VISIBLE, false)) {
       consoleDocked = true;
       setConsolePanelVisible(true);
@@ -202,26 +192,6 @@ public class RootController implements Initializable, StudioEventListener {
     LocalUISettings.saveProperty(LocalUISettings.CONSOLE_VISIBLE, "false");
   }
 
-  @FXML
-  private void onConsoleResizeStart(MouseEvent event) {
-    consoleResizeStartMouseY = event.getScreenY();
-    consoleResizeStartHeight = consoleArea.getHeight();
-  }
-
-  @FXML
-  private void onConsoleResizeDrag(MouseEvent event) {
-    double delta = consoleResizeStartMouseY - event.getScreenY();
-    double maxHeight = Math.max(MIN_CONSOLE_HEIGHT,
-        centerVBox.getHeight() - consoleResizer.getHeight() - MIN_MAIN_AREA_HEIGHT);
-    double newHeight = Math.min(Math.max(consoleResizeStartHeight + delta, MIN_CONSOLE_HEIGHT), maxHeight);
-    consoleArea.setPrefHeight(newHeight);
-  }
-
-  @FXML
-  private void onConsoleResizeEnd(MouseEvent event) {
-    LocalUISettings.saveProperty(LocalUISettings.CONSOLE_HEIGHT, String.valueOf((int) consoleArea.getHeight()));
-  }
-
   // --- Dock / undock API ---
 
   /**
@@ -263,10 +233,27 @@ public class RootController implements Initializable, StudioEventListener {
   }
 
   private void setConsolePanelVisible(boolean visible) {
-    consoleArea.setVisible(visible);
-    consoleArea.setManaged(visible);
-    consoleResizer.setVisible(visible);
-    consoleResizer.setManaged(visible);
+    if (visible) {
+      if (!centerSplitPane.getItems().contains(consoleArea)) {
+        centerSplitPane.getItems().add(consoleArea);
+        int savedPosition = LocalUISettings.getInt(LocalUISettings.CONSOLE_DIVIDER_POSITION, DEFAULT_CONSOLE_DIVIDER_POSITION);
+        centerSplitPane.setDividerPosition(0, savedPosition / 100.0);
+        // The Divider object itself is only created by the skin on the next layout pass, so
+        // getDividers() is still empty here (mirrors the same wait needed for mainSplitPane
+        // above, in projectOpened()).
+        Platform.runLater(() -> {
+          if (!centerSplitPane.getDividers().isEmpty()) {
+            centerSplitPane.setDividerPosition(0, savedPosition / 100.0);
+            centerSplitPane.getDividers().get(0).positionProperty().addListener((obs, oldValue, newValue) ->
+                LocalUISettings.saveProperty(LocalUISettings.CONSOLE_DIVIDER_POSITION,
+                    String.valueOf((int) Math.round(newValue.doubleValue() * 100))));
+          }
+        });
+      }
+    }
+    else {
+      centerSplitPane.getItems().remove(consoleArea);
+    }
   }
 
   // --- Project lifecycle ---
