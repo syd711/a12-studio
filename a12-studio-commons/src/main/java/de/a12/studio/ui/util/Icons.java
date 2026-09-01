@@ -44,6 +44,7 @@ public interface Icons {
   String SCENE = "mdi2m-movie-open";
   String FLOW = "mdi2a-arrow-bottom-right-bold-box";
   String SERVER = "mdi2s-server";
+  String MODULE = "mdi2v-view-module-outline";
 
   String ELEMENT_GROUP = "mdi2f-folder-outline";
   // PNG assets (in de/a12/studio/ui/icons), not Ikonli glyph literals like the constants above.

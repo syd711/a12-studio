@@ -9,6 +9,8 @@ import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.preview.PreviewLauncher;
+import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -119,6 +121,7 @@ public class ApplicationModelEditorController extends AbstractEditorController i
 
   private Tab createModuleTab(@NonNull Module module) {
     Tab tab = new Tab(module.getName());
+    tab.setGraphic(WidgetFactory.createIcon(Icons.MODULE));
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource(MODULE_EDITOR_FXML));
       loader.setResources(StudioBundle.getBundle());

@@ -15,6 +15,7 @@ import de.a12.studio.ui.previewapp.PreviewAppStatusMonitor;
 import de.a12.studio.ui.projecttree.ProjectTreeController;
 import de.a12.studio.ui.tabs.TabPaneController;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -26,8 +27,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.jspecify.annotations.NonNull;
 
@@ -63,8 +67,23 @@ public class RootController implements Initializable, StudioEventListener {
 
   // --- Docked console panel ---
 
+  private static final double DEFAULT_CONSOLE_HEIGHT = 220.0;
+
+  private static final double MIN_CONSOLE_HEIGHT = 100.0;
+
+  private static final double MIN_MAIN_AREA_HEIGHT = 150.0;
+
+  @FXML
+  private VBox centerVBox;
+
   @FXML
   private BorderPane consoleArea;
+
+  @FXML
+  private Region consoleResizer;
+
+  @FXML
+  private Button minimizeConsoleBtn;
 
   @FXML
   private TextArea dockedLogArea;
@@ -88,6 +107,9 @@ public class RootController implements Initializable, StudioEventListener {
 
   private Project project;
   private boolean consoleDocked = false;
+
+  private double consoleResizeStartMouseY;
+  private double consoleResizeStartHeight;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -125,6 +147,14 @@ public class RootController implements Initializable, StudioEventListener {
     PreviewAppStatusMonitor.getInstance().statusProperty().addListener(
         (obs, oldStatus, newStatus) -> refreshDockedDeployButton(newStatus));
     refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus());
+
+    // Restore the docked console panel's height and open/minimized state from the last session.
+    double savedHeight = LocalUISettings.getInt(LocalUISettings.CONSOLE_HEIGHT, (int) DEFAULT_CONSOLE_HEIGHT);
+    consoleArea.setPrefHeight(Math.max(savedHeight, MIN_CONSOLE_HEIGHT));
+    if (LocalUISettings.getBoolean(LocalUISettings.CONSOLE_VISIBLE, false)) {
+      consoleDocked = true;
+      setConsolePanelVisible(true);
+    }
   }
 
   private void updateDockedState(PreviewAppProcess.State state) {
@@ -166,6 +196,32 @@ public class RootController implements Initializable, StudioEventListener {
     undockConsole();
   }
 
+  @FXML
+  private void onMinimizeConsole() {
+    setConsolePanelVisible(false);
+    LocalUISettings.saveProperty(LocalUISettings.CONSOLE_VISIBLE, "false");
+  }
+
+  @FXML
+  private void onConsoleResizeStart(MouseEvent event) {
+    consoleResizeStartMouseY = event.getScreenY();
+    consoleResizeStartHeight = consoleArea.getHeight();
+  }
+
+  @FXML
+  private void onConsoleResizeDrag(MouseEvent event) {
+    double delta = consoleResizeStartMouseY - event.getScreenY();
+    double maxHeight = Math.max(MIN_CONSOLE_HEIGHT,
+        centerVBox.getHeight() - consoleResizer.getHeight() - MIN_MAIN_AREA_HEIGHT);
+    double newHeight = Math.min(Math.max(consoleResizeStartHeight + delta, MIN_CONSOLE_HEIGHT), maxHeight);
+    consoleArea.setPrefHeight(newHeight);
+  }
+
+  @FXML
+  private void onConsoleResizeEnd(MouseEvent event) {
+    LocalUISettings.saveProperty(LocalUISettings.CONSOLE_HEIGHT, String.valueOf((int) consoleArea.getHeight()));
+  }
+
   // --- Dock / undock API ---
 
   /**
@@ -180,8 +236,8 @@ public class RootController implements Initializable, StudioEventListener {
     if (consoleDocked) return;
     consoleDocked = true;
     PreviewAppLogWindow.hide();
-    consoleArea.setVisible(true);
-    consoleArea.setManaged(true);
+    setConsolePanelVisible(true);
+    LocalUISettings.saveProperty(LocalUISettings.CONSOLE_VISIBLE, "true");
   }
 
   /**
@@ -190,9 +246,27 @@ public class RootController implements Initializable, StudioEventListener {
   public void undockConsole() {
     if (!consoleDocked) return;
     consoleDocked = false;
-    consoleArea.setVisible(false);
-    consoleArea.setManaged(false);
+    setConsolePanelVisible(false);
+    LocalUISettings.saveProperty(LocalUISettings.CONSOLE_VISIBLE, "false");
     PreviewAppLogWindow.show(Studio.stage);
+  }
+
+  /**
+   * Re-shows the docked console panel after it was minimized. Called from the header toolbar's
+   * console button (MenuBarController.onOpenPreviewAppLog) instead of opening the floating dialog
+   * whenever the console is currently docked (visible or minimized).
+   */
+  public void showDockedConsole() {
+    if (!consoleDocked) return;
+    setConsolePanelVisible(true);
+    LocalUISettings.saveProperty(LocalUISettings.CONSOLE_VISIBLE, "true");
+  }
+
+  private void setConsolePanelVisible(boolean visible) {
+    consoleArea.setVisible(visible);
+    consoleArea.setManaged(visible);
+    consoleResizer.setVisible(visible);
+    consoleResizer.setManaged(visible);
   }
 
   // --- Project lifecycle ---

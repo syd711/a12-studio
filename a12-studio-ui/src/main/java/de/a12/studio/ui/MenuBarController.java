@@ -301,10 +301,17 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private void onOpenPreviewAppLog() {
+    RootController root = Studio.getRootController();
+    if (root.isConsoleDocked()) {
+      // Console is embedded in the main view (possibly minimized) - just reveal it again
+      // instead of opening the floating dialog.
+      root.showDockedConsole();
+      return;
+    }
     // Ensure the dock button in the console header is wired to RootController.dockConsole()
     // before the window is made visible.
     PreviewAppLogWindow.getInstanceController(Studio.stage)
-        .setOnDockAction(() -> Studio.getRootController().dockConsole());
+        .setOnDockAction(() -> root.dockConsole());
     PreviewAppLogWindow.show(Studio.stage);
   }
 

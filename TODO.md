@@ -43,7 +43,6 @@ Dialogs that are explicitly documented as incomplete or only partially implement
 - Project Creation: Create empty folders with Preview_AM like the preview app workspace option.
 - Create the same settings of that empty project
 - Open link for user management
-- Provide toggle view option for the console log of the preview app
 - Fix renaming of models
 - Add naming enforcing option
 - Document Model Editor: Add rename nodes ctx menu item

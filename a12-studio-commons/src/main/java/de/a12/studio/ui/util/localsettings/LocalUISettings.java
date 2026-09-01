@@ -27,6 +27,12 @@ public class LocalUISettings {
   /** Whether editor tabs (and their icons) are tinted per model type; see TabPaneController. */
   public static final String COLORFUL_STUDIO_ENABLED = "colorfulStudioEnabled";
 
+  /** Pixel height of the docked preview app console panel; see RootController. */
+  public static final String CONSOLE_HEIGHT = "consoleHeight";
+
+  /** Whether the docked preview app console panel is shown (vs. minimized); see RootController. */
+  public static final String CONSOLE_VISIBLE = "consoleVisible";
+
   private static PropertiesStore store;
 
   private static List<LocalSettingsChangeListener> listeners;
@@ -124,6 +130,10 @@ public class LocalUISettings {
       return store.get(key);
     }
     return null;
+  }
+
+  public static int getInt(@NonNull String key, int defaultValue) {
+    return store.getInt(key, defaultValue);
   }
 
   public static void saveLastFolderLocation(@Nullable File file) {

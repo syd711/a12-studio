@@ -1,14 +1,18 @@
 package de.a12.studio.ui.previewapp;
 
+import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.BorderPane;
+import javafx.geometry.Insets;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -64,13 +68,19 @@ public class PreviewAppLogWindow {
       dhc.setStage(stage);
     }
 
-    // Wrap in shadow padding just like WidgetFactory.createDialogStage does.
+    // Wrap in shadow padding just like WidgetFactory.createDialogStage does. A StackPane with an
+    // explicit Background.EMPTY (not a BorderPane with an inline "-fx-background-color:
+    // transparent" style) is required here: JavaFX auto-adds the "root" style class to whatever
+    // node ends up as the actual Scene root, and stylesheet.css's ".root"/".main" rule paints that
+    // node with -fx-surface-color - only an explicitly-set Background (which CSS won't override)
+    // keeps the shadow-margin area transparent instead of showing as a thick surface-colored frame.
     int shadowMargin = 14;
-    BorderPane shadowWrapper = new BorderPane(root);
-    shadowWrapper.setStyle("-fx-background-color: transparent; -fx-padding: " + shadowMargin + "px;");
+    StackPane shadowWrapper = new StackPane(root);
+    shadowWrapper.setPadding(new Insets(shadowMargin));
+    shadowWrapper.setBackground(Background.EMPTY);
+    shadowWrapper.setPickOnBounds(false);
 
-    Scene scene = new Scene(shadowWrapper, 960 + shadowMargin * 2, 580 + shadowMargin * 2);
-    scene.setFill(Color.TRANSPARENT);
+    Scene scene = new Scene(shadowWrapper, 960 + shadowMargin * 2, 580 + shadowMargin * 2, Color.TRANSPARENT);
     stage.setScene(scene);
     stage.setResizable(true);
     stage.setMinWidth(480 + shadowMargin * 2);
@@ -102,15 +112,14 @@ public class PreviewAppLogWindow {
     });
   }
 
-  private static void persistPosition(String stateId, de.a12.studio.ui.util.Debouncer debouncer) {
+  private static void persistPosition(String stateId, Debouncer debouncer) {
     debouncer.debounce(stateId, () -> {
       if (instance != null) {
-        de.a12.studio.ui.util.localsettings.LocalUISettings.saveLocation(
-            stateId,
+        LocalUISettings.saveLocation(stateId,
             (int) instance.stage.getX(), (int) instance.stage.getY(),
             (int) instance.stage.getWidth(), (int) instance.stage.getHeight());
       }
-    });
+    }, 50);
   }
 
   /** Returns the controller, which exposes the shared TextArea and dock-action wiring. */
