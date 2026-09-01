@@ -9,6 +9,7 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
@@ -55,6 +56,17 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
 
   // See REFERENCE_FIELD_NAMES javadoc above: the one "id"-named reference field, scoped to its wrapper.
   private static final String STRUCTURAL_MAPPING_MODEL_REF_FIELD_NAME = "StructuralMappingModel";
+
+  // Form Model's relationship-widget config, matching SME's BINDING_CONFIG_ANNOTATION_NAME
+  // (client/src/modules/formModel/transformer/binding/graphTransformations.ts). It's stored as an opaque
+  // JSON-encoded string annotation, not typed content, so the rewriteNode() walk over model.getContent()
+  // never sees it - each BindingModel entry's "name" (e.g. {"name": "PersonCompany_Person_SelectedItems_OM",
+  // "use": "link"} inside a components[].models[] array) is matched byte-for-byte against a real model's
+  // header.id at runtime (see ComponentModelInfo.createFromUseAndModelType /
+  // showOverviewModelForBinding.ts's overviewModel.header.id comparison - there is no alias indirection),
+  // so it needs the same idMap rewrite as every other reference field or SME throws "Model info for X could
+  // not be determined" after the referenced model is renamed.
+  private static final String BINDING_CONFIGURATION_ANNOTATION_NAME = "bindingConfiguration";
 
   public static boolean isValidGroupName(String name) {
     return name != null && GROUP_NAME_PATTERN.matcher(name).matches();
@@ -175,6 +187,65 @@ public class ApplicationGroupFeature implements A12StudioProjectFeature<Applicat
         C updated = (C) JsonSettings.objectMapper.treeToValue(node, content.getClass());
         model.setContent(updated);
         changed = true;
+      }
+    }
+
+    changed |= rewriteBindingConfigurationAnnotations(model, idMap);
+    return changed;
+  }
+
+  private static boolean rewriteBindingConfigurationAnnotations(A12Model<?> model, Map<String, String> idMap) {
+    boolean changed = false;
+    for (Annotation annotation : model.getAnnotations()) {
+      if (!BINDING_CONFIGURATION_ANNOTATION_NAME.equals(annotation.getName())) {
+        continue;
+      }
+      String value = annotation.getValue();
+      if (value == null || value.isBlank()) {
+        continue;
+      }
+      JsonNode node;
+      try {
+        node = JsonSettings.objectMapper.readTree(value);
+      }
+      catch (Exception e) {
+        continue;
+      }
+      if (rewriteBindingModelNames(node, idMap)) {
+        annotation.setValue(JsonSettings.objectMapper.writer().without(SerializationFeature.INDENT_OUTPUT)
+            .writeValueAsString(node));
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  // Rewrites the literal model-id "name" of each BindingModel entry, identified by its sibling "use" field
+  // (see BINDING_CONFIGURATION_ANNOTATION_NAME javadoc) - "name" only means a model reference in this shape,
+  // so other unrelated "name" fields in the same JSON (component names, the relationship widget's own
+  // "details.name", "relationshipName", ...) are deliberately left untouched.
+  private static boolean rewriteBindingModelNames(JsonNode node, Map<String, String> idMap) {
+    boolean changed = false;
+    if (node.isObject()) {
+      ObjectNode objectNode = (ObjectNode) node;
+      JsonNode nameNode = objectNode.get("name");
+      if (objectNode.has("use") && nameNode != null && nameNode.isString()) {
+        String mapped = idMap.get(nameNode.asString());
+        if (mapped != null) {
+          objectNode.put("name", mapped);
+          changed = true;
+        }
+      }
+      for (String fieldName : List.copyOf(objectNode.propertyNames())) {
+        JsonNode value = objectNode.get(fieldName);
+        if (value.isObject() || value.isArray()) {
+          changed |= rewriteBindingModelNames(value, idMap);
+        }
+      }
+    }
+    else if (node.isArray()) {
+      for (JsonNode child : node) {
+        changed |= rewriteBindingModelNames(child, idMap);
       }
     }
     return changed;

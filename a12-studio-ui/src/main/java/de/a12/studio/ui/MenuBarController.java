@@ -123,6 +123,12 @@ public class MenuBarController implements Initializable, StudioEventListener {
     recentProjectsMenu.getItems().clear();
 
     List<String> recentProjects = LocalUISettings.getRecentProjects();
+    if (project != null) {
+      String openProjectPath = project.getFolder().getAbsolutePath();
+      recentProjects = recentProjects.stream()
+          .filter(path -> !new File(path).getAbsolutePath().equals(openProjectPath))
+          .toList();
+    }
     if (recentProjects.isEmpty()) {
       MenuItem emptyItem = new MenuItem(StudioBundle.get("no_projects_found"));
       emptyItem.setDisable(true);
@@ -228,6 +234,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
     PreviewAppProcess.getInstance().stop();
     StudioEventManager.getInstance().fireProjectClosedEvent(project);
     project = null;
+    refreshRecentProjectsMenu();
     refreshProjectDependentButtons();
   }
 

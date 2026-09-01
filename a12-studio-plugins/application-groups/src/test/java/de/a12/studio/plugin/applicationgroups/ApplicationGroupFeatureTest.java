@@ -69,6 +69,23 @@ class ApplicationGroupFeatureTest {
         .orElseThrow(() -> new AssertionError("Expected Company_FM to still reference Company_DM by alias"));
     assertEquals("App_Company_DM", dmReference.getReference(), "header.modelReferences must be rewritten to the new id");
 
+    // Company_FM's "bindingConfiguration" header annotation is an opaque JSON-encoded string (SME's
+    // relationship-widget config), holding BindingModel entries like {"name": "PersonCompany_Person_..._OM",
+    // "use": "link"}. SME matches that "name" byte-for-byte against the real target Overview Model's
+    // header.id (no alias indirection), so it must be rewritten just like every other reference field, or
+    // SME throws "Model info for X could not be determined" once the referenced Overview Model is renamed.
+    String bindingConfiguration = findAnnotation(companyFmModel, "bindingConfiguration");
+    assertTrue(bindingConfiguration.contains("\"name\":\"App_PersonCompany_Person_AvailableItems_OM\""),
+        "bindingConfiguration's candidate BindingModel.name must be rewritten to the new id");
+    assertTrue(bindingConfiguration.contains("\"name\":\"App_PersonCompany_Person_SelectedItems_OM\""),
+        "bindingConfiguration's link BindingModel.name must be rewritten to the new id");
+    assertFalse(bindingConfiguration.contains("\"name\":\"PersonCompany_Person_AvailableItems_OM\""),
+        "No BindingModel.name should still carry the old bare id");
+    assertFalse(bindingConfiguration.contains("\"name\":\"PersonCompany_Person_SelectedItems_OM\""),
+        "No BindingModel.name should still carry the old bare id");
+    assertTrue(bindingConfiguration.contains("\"name\":\"PersonCompanyDualPane\""),
+        "The relationship widget's own component/detail \"name\" fields (not BindingModel entries) must stay untouched");
+
     File previewApp = new File(modelsDir, "App_PreviewApp_AM.json");
     assertTrue(previewApp.exists());
     ApplicationModel previewAppModel = (ApplicationModel) new ProjectItem(previewApp).getModel();
