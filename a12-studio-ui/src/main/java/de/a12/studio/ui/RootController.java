@@ -172,6 +172,10 @@ public class RootController implements Initializable, StudioEventListener {
    * Docks the console into the main view bottom area and hides the floating dialog.
    * Called from {@link PreviewAppLogWindow} when the user clicks the dock button in the header.
    */
+  public boolean isConsoleDocked() {
+    return consoleDocked;
+  }
+
   public void dockConsole() {
     if (consoleDocked) return;
     consoleDocked = true;

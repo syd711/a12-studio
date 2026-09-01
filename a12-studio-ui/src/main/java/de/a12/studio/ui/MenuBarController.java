@@ -280,6 +280,10 @@ public class MenuBarController implements Initializable, StudioEventListener {
   private void onLaunchPreviewApp() {
     if (project != null) {
       PreviewAppProcess.getInstance().start(project);
+      RootController root = Studio.getRootController();
+      if (!root.isConsoleDocked() && !PreviewAppLogWindow.isShowing()) {
+        root.dockConsole();
+      }
     }
   }
 
