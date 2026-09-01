@@ -44,5 +44,12 @@ Dialogs that are explicitly documented as incomplete or only partially implement
 - Create the same settings of that empty project
 - Open link for user management
 - Provide toggle view option for the console log of the preview app
-- 
+- Fix renaming of models
+- Add naming enforcing option
+- Document Model Editor: Add rename nodes ctx menu item
+- Form Models:
+  - check new form model dialog with screen from fields
+  - check if I delete screens
+  - add option to duplicate screen
+  - add validator for button on the wrong screen like for the deleted meta or even better, auto delete these
 
