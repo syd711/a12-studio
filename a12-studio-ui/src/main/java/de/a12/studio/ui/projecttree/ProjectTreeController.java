@@ -331,6 +331,10 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     return (Stage) projectTree.getScene().getWindow();
   }
 
+  private ProjectItem getProjectRoot() {
+    return project != null ? project.getRoot() : null;
+  }
+
   private void addPluginToolbarButtons() {
     List<IProjectToolbarButtonContribution> contributions = PluginManager.getInstance().getProjectToolbarButtonContributions();
     if (contributions.isEmpty()) {
@@ -375,7 +379,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem);
+    menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem, this::getProjectRoot);
     ProjectTreeContextMenu contextMenuFactory = new ProjectTreeContextMenu(menuFactory);
     for (ModelType modelType : ModelType.values()) {
       if (modelType == ModelType.DOCUMENT) {
