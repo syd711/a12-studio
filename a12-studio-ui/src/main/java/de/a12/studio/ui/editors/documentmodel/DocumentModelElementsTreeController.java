@@ -38,6 +38,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -112,6 +113,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private TreeItem<ElementViewModel> draggedTreeItem;
 
+  /** The name cell that last received focus — used to trigger inline rename on the correct row. */
+  private ElementNameTreeCell activeNameCell;
+
   public void load(@NonNull DocumentModel model) {
     load(projectItem, model.getContent().getModelRoot());
   }
@@ -126,6 +130,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
     this.documentModelActions =
         new DocumentModelActions(projectItem, modelRoot, commandStack, elementsTreeTable, this::onModelChanged);
+    documentModelActions.setStartRenameCallback(this::startRenameOnSelectedCell);
     modelTreeAddButton.getItems().addAll(documentModelActions.createAddMenuItems());
     applyFilter(searchController.getText());
     updateEditingButtonsState();
@@ -387,6 +392,94 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private void onPaste() {
     documentModelActions.pasteSelection();
     updateEditingButtonsState();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Inline rename
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Applies a rename commit from {@link ElementNameTreeCell}: sets the new name on the element
+   * and persists via {@link #onModelChanged}.
+   */
+  private void renameElement(@NonNull Element element, @NonNull String newName) {
+    element.setName(newName);
+    onModelChanged(element);
+  }
+
+  /**
+   * Triggers inline rename on the name cell of the currently selected row.
+   * Called by {@link DocumentModelActions#startRename()} (from the context menu "Rename"
+   * item and via F2). Scrolls the selected item into view first so the cell is rendered.
+   */
+  private void startRenameOnSelectedCell() {
+    TreeItem<ElementViewModel> selected = elementsTreeTable.getSelectionModel().getSelectedItem();
+    if (selected == null || selected.getValue() == null) {
+      return;
+    }
+    int rowIndex = elementsTreeTable.getRow(selected);
+    if (rowIndex >= 0) {
+      elementsTreeTable.scrollTo(rowIndex);
+    }
+    // The active cell is updated via mouseEntered; for F2 we look up the cell whose row
+    // matches the selection, walking the scene graph of the virtual flow.
+    ElementNameTreeCell found = findNameCellForRow(rowIndex);
+    if (found != null) {
+      found.startInlineEdit();
+    }
+    else if (activeNameCell != null
+        && activeNameCell.getTreeTableRow() != null
+        && activeNameCell.getTreeTableRow().getTreeItem() == selected) {
+      activeNameCell.startInlineEdit();
+    }
+  }
+
+  /**
+   * Walks the tree table's virtual-flow children to find the {@link ElementNameTreeCell}
+   * rendered at {@code rowIndex}, or {@code null} if the row is not currently visible.
+   */
+  private ElementNameTreeCell findNameCellForRow(int rowIndex) {
+    for (javafx.scene.Node node : elementsTreeTable.lookupAll(".tree-table-row-cell")) {
+      if (node instanceof TreeTableRow<?> row && row.getIndex() == rowIndex) {
+        for (javafx.scene.Node child : row.lookupAll(".tree-table-cell")) {
+          if (child instanceof ElementNameTreeCell cell) {
+            return cell;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Installs a long-press (≥ 600 ms) handler on {@code row} that triggers inline rename,
+   * mirroring the F2 and context-menu "Rename" shortcuts. The press is cancelled if the
+   * mouse moves or is released before the threshold.
+   */
+  private void setupLongPressRename(@NonNull TreeTableRow<ElementViewModel> row) {
+    final long LONG_PRESS_MS = 600;
+    final long[] pressStart = {0};
+    final javafx.animation.PauseTransition pause =
+        new javafx.animation.PauseTransition(javafx.util.Duration.millis(LONG_PRESS_MS));
+
+    pause.setOnFinished(event -> {
+      ElementViewModel item = row.getItem();
+      if (!row.isEmpty() && item != null && !hasFixedChildrenAncestor(item.getElement())) {
+        // Select the row first so startRenameOnSelectedCell finds the right item.
+        elementsTreeTable.getSelectionModel().clearSelection();
+        elementsTreeTable.getSelectionModel().select(row.getTreeItem());
+        documentModelActions.startRename();
+      }
+    });
+
+    row.setOnMousePressed(event -> {
+      if (event.isPrimaryButtonDown()) {
+        pressStart[0] = System.currentTimeMillis();
+        pause.playFromStart();
+      }
+    });
+    row.setOnMouseReleased(event -> pause.stop());
+    row.setOnMouseDragged(event -> pause.stop());
   }
 
   /**
@@ -709,6 +802,10 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       if (event.getCode() == KeyCode.DELETE) {
         onDeleteKeyPressed();
       }
+      else if (event.getCode() == KeyCode.F2) {
+        documentModelActions.startRename();
+        event.consume();
+      }
     });
     elementsTreeTable.setRowFactory(treeTable -> {
       TreeTableRow<ElementViewModel> row = new TreeTableRow<>() {
@@ -727,6 +824,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         }
       };
       setupRowDragAndDrop(row);
+      setupLongPressRename(row);
       // Built fresh on every request (rather than once in updateItem and cached via setContextMenu) so its
       // items - notably the multi-selection-only "Create Overview Model from Selection" entry, see
       // DocumentModelActions#createElementMenuItems - reflect the tree's actual selection at click time; a row
@@ -755,7 +853,13 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       ElementViewModel viewModel = param.getValue().getValue();
       return new ReadOnlyStringWrapper(viewModel == null ? MODEL_TREE_ROOT_LABEL : viewModel.getName());
     });
-    nameColumn.setCellFactory(column -> new ElementNameTreeCell());
+    nameColumn.setCellFactory(column -> {
+      ElementNameTreeCell cell = new ElementNameTreeCell();
+      cell.setRenameCallback(this::renameElement);
+      // Track which name cell is under the mouse so F2 / context-menu Rename reach the right cell.
+      cell.setOnMouseEntered(event -> activeNameCell = cell);
+      return cell;
+    });
 
 
     typeColumn.setCellValueFactory(param -> {

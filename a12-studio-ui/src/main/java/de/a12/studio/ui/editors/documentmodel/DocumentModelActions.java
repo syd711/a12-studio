@@ -76,6 +76,21 @@ public class DocumentModelActions {
   private MenuItem ruleMenuItem;
   private MenuItem computationMenuItem;
 
+  /** Triggered when a rename is requested for an element; wired by the tree controller to the active cell. */
+  private Runnable startRenameCallback;
+
+  /** Sets the callback that triggers inline rename on the currently selected cell. */
+  public void setStartRenameCallback(@NonNull Runnable callback) {
+    this.startRenameCallback = callback;
+  }
+
+  /** Invokes the inline-rename callback if one is registered. */
+  public void startRename() {
+    if (startRenameCallback != null) {
+      startRenameCallback.run();
+    }
+  }
+
   public DocumentModelActions(@NonNull ProjectItem projectItem, @NonNull ModelRoot modelRoot,
                                @NonNull CommandStack commandStack, @NonNull TreeTableView<ElementViewModel> elementsTreeTable,
                                @NonNull Consumer<Element> onModelChanged) {
@@ -152,6 +167,12 @@ public class DocumentModelActions {
     pasteItem.setOnAction(event -> pasteSelection());
     items.add(pasteItem);
     items.add(new SeparatorMenuItem());
+
+    MenuItem renameItem = createMenuItem("_Rename", Icons.PENCIL);
+    renameItem.setOnAction(event -> startRename());
+    items.add(renameItem);
+    items.add(new SeparatorMenuItem());
+
     MenuItem deleteItem = createMenuItem("_Delete", Icons.TRASH);
     deleteItem.setOnAction(event -> confirmAndDeleteSelection());
     items.add(deleteItem);
