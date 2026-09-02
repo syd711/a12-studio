@@ -37,6 +37,9 @@ public class PreferencesController implements Initializable {
   private Button annotationSetsBtn;
 
   @FXML
+  private Button deploymentExclusionsBtn;
+
+  @FXML
   private Button modelVersionBtn;
 
   @FXML
@@ -120,6 +123,11 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onAnnotationSets() {
     showPage(annotationSetsBtn, "preference-annotation-sets.fxml");
+  }
+
+  @FXML
+  private void onDeploymentExclusions() {
+    showPage(deploymentExclusionsBtn, "preference-deployment-exclusions.fxml");
   }
 
   @FXML

@@ -1,5 +1,6 @@
 package de.a12.studio.models.projects.settings;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import de.a12.studio.models.Locale;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class GeneralSettings {
 
   private List<Locale> locales = new ArrayList<>();
 
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<String> deploymentExclusions = new ArrayList<>();
 
   public RelationshipEngineMode getRelationshipEngineMode() {
     return relationshipEngineMode;
@@ -47,4 +50,11 @@ public class GeneralSettings {
     this.locales = locales;
   }
 
+  public List<String> getDeploymentExclusions() {
+    return deploymentExclusions;
+  }
+
+  public void setDeploymentExclusions(List<String> deploymentExclusions) {
+    this.deploymentExclusions = deploymentExclusions;
+  }
 }

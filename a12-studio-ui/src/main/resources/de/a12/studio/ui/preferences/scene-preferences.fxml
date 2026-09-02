@@ -56,6 +56,7 @@
                                                 <Button fx:id="generalSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onGeneralSettings" styleClass="preference-button" text="%general" />
                                                 <Button fx:id="aiSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAiSettings" styleClass="preference-button" text="%ai_settings" />
                                                 <Button fx:id="annotationSetsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAnnotationSets" styleClass="preference-button" text="%annotation_sets" />
+                                                <Button fx:id="deploymentExclusionsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onDeploymentExclusions" styleClass="preference-button" text="%deployment_exclusions" />
                                        </children>
                                     </VBox>
                                  </children>
