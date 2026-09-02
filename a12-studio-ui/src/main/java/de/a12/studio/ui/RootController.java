@@ -2,6 +2,8 @@ package de.a12.studio.ui;
 
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.plugin.manager.IFileDropHandler;
+import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
@@ -15,6 +17,7 @@ import de.a12.studio.ui.previewapp.PreviewAppStatusMonitor;
 import de.a12.studio.ui.projecttree.ProjectTreeController;
 import de.a12.studio.ui.tabs.TabPaneController;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -27,17 +30,24 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+@Slf4j
 public class RootController implements Initializable, StudioEventListener {
-
   @FXML
   private StackPane main;
 
@@ -61,6 +71,12 @@ public class RootController implements Initializable, StudioEventListener {
 
   @FXML
   private StackPane rootStack;
+
+  @FXML
+  private StackPane fileDropOverlay;
+
+  @FXML
+  private VBox fileDropZone;
 
   // --- Docked console panel ---
 
@@ -145,6 +161,146 @@ public class RootController implements Initializable, StudioEventListener {
       consoleDocked = true;
       setConsolePanelVisible(true);
     }
+
+    // Install file-drop handlers on the root stack so the overlay covers the entire window.
+    installFileDropHandlers();
+  }
+
+  // ---------------------------------------------------------------------------
+  // File-drop support
+  // ---------------------------------------------------------------------------
+
+  private void installFileDropHandlers() {
+    rootStack.setOnDragOver(this::onDragOver);
+    rootStack.setOnDragEntered(this::onDragEntered);
+    rootStack.setOnDragExited(this::onDragExited);
+    rootStack.setOnDragDropped(this::onDragDropped);
+  }
+
+  private void onDragOver(@NonNull DragEvent event) {
+    Dragboard db = event.getDragboard();
+    if (db.hasFiles() && hasHandlerForAnyFile(db.getFiles())) {
+      event.acceptTransferModes(TransferMode.COPY);
+    }
+    event.consume();
+  }
+
+  private void onDragEntered(@NonNull DragEvent event) {
+    Dragboard db = event.getDragboard();
+    if (db.hasFiles() && hasHandlerForAnyFile(db.getFiles())) {
+      showDropOverlay(true);
+    }
+    event.consume();
+  }
+
+  private void onDragExited(@NonNull DragEvent event) {
+    showDropOverlay(false);
+    event.consume();
+  }
+
+  private void onDragDropped(@NonNull DragEvent event) {
+    showDropOverlay(false);
+    Dragboard db = event.getDragboard();
+    boolean handled = false;
+    if (db.hasFiles()) {
+      for (File file : db.getFiles()) {
+        if (dispatchDroppedFile(file)) {
+          handled = true;
+        }
+      }
+    }
+    event.setDropCompleted(handled);
+    event.consume();
+  }
+
+  /**
+   * Returns {@code true} if at least one of the given files can be handled by the built-in
+   * AI handler or a registered plugin drop handler.
+   */
+  private boolean hasHandlerForAnyFile(@NonNull List<File> files) {
+    for (File file : files) {
+      if (canAiHandleFile(file) || findPluginHandler(file) != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Dispatches a single dropped file to the first willing handler.
+   * Returns {@code true} if the file was accepted.
+   */
+  private boolean dispatchDroppedFile(@NonNull File file) {
+    // 1. Check built-in AI handler first (currently a stub – always returns false).
+    if (canAiHandleFile(file)) {
+      handleFileWithAi(file);
+      return true;
+    }
+
+    // 2. Try plugin handlers in load order.
+    IFileDropHandler handler = findPluginHandler(file);
+    if (handler != null) {
+      ProjectItem target = resolveDropTarget();
+      if (target == null) {
+        log.warn("Cannot handle dropped file '{}': no project open or no folder selected.", file.getName());
+        WidgetFactory.showAlert(Studio.stage, "No project open",
+            "Please open a project before dropping files.");
+        return false;
+      }
+      handler.handle(Studio.stage, target, file);
+      return true;
+    }
+
+    log.debug("No handler found for dropped file: {}", file.getName());
+    return false;
+  }
+
+  /**
+   * Built-in AI file handler stub. Returns {@code false} until AI drop support is implemented.
+   */
+  private boolean canAiHandleFile(@NonNull File file) {
+    // TODO: implement AI-based file handling
+    return false;
+  }
+
+  private void handleFileWithAi(@NonNull File file) {
+    // TODO: implement AI-based file handling
+    log.info("AI file handling not yet implemented for: {}", file.getName());
+  }
+
+  /**
+   * Finds the first plugin {@link IFileDropHandler} that accepts the given file,
+   * or {@code null} if none matches.
+   */
+  private IFileDropHandler findPluginHandler(@NonNull File file) {
+    for (IFileDropHandler handler : PluginManager.getInstance().getFileDropHandlers()) {
+      if (handler.canHandle(file)) {
+        return handler;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the drop target folder: the currently selected project item if it is a folder,
+   * the project root if a project is open but nothing is selected, or {@code null} if no
+   * project is open.
+   */
+  private ProjectItem resolveDropTarget() {
+    if (project == null) {
+      return null;
+    }
+    ProjectItem selected = Studio.getSelectedProjectItem();
+    if (selected != null && selected.isFolder()) {
+      return selected;
+    }
+    // Fall back to the project root folder.
+    return project.getRoot();
+  }
+
+  private void showDropOverlay(boolean show) {
+    fileDropOverlay.setVisible(show);
+    fileDropOverlay.setManaged(show);
   }
 
   private void updateDockedState(PreviewAppProcess.State state) {

@@ -495,3 +495,38 @@
 .console-text-area .scroll-pane {
     -fx-background-color: #1e1e1e;
 }
+
+/* ---------------------------------------------------------------------------
+ * File-drop overlay
+ * ------------------------------------------------------------------------ */
+
+.file-drop-overlay {
+    -fx-background-color: derive(-fx-base, -15%);
+    -fx-opacity: 0.97;
+}
+
+.file-drop-overlay-border {
+    -fx-border-color: -fx-accent;
+    -fx-border-width: 3;
+    -fx-border-style: dashed;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-background-color: derive(-fx-accent, 80%);
+}
+
+.file-drop-icon {
+    -fx-icon-size: 48;
+    -fx-fill: -fx-accent;
+    -fx-icon-color: -fx-accent;
+}
+
+.file-drop-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.file-drop-hint {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-text-muted;
+}

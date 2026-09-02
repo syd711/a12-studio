@@ -43,6 +43,9 @@ public class LoadedPlugin {
   /** All {@link IProjectToolbarButtonContribution} instances contributed by this plugin. */
   private final List<IProjectToolbarButtonContribution> projectToolbarButtonContributions;
 
+  /** All {@link IFileDropHandler} instances contributed by this plugin. */
+  private final List<IFileDropHandler> fileDropHandlers;
+
   LoadedPlugin(@NonNull PluginDescriptor descriptor,
                @NonNull URLClassLoader classLoader,
                @NonNull List<ICreateItemMenuEntry> createMenuEntries,
@@ -51,7 +54,8 @@ public class LoadedPlugin {
                @NonNull List<IModelValidatorContribution> modelValidatorContributions,
                @NonNull List<INewModelNameInterceptor> newModelNameInterceptors,
                @NonNull List<IProjectOpenedListener> projectOpenedListeners,
-               @NonNull List<IProjectToolbarButtonContribution> projectToolbarButtonContributions) {
+               @NonNull List<IProjectToolbarButtonContribution> projectToolbarButtonContributions,
+               @NonNull List<IFileDropHandler> fileDropHandlers) {
     this.descriptor = descriptor;
     this.classLoader = classLoader;
     this.createMenuEntries = createMenuEntries;
@@ -61,5 +65,6 @@ public class LoadedPlugin {
     this.newModelNameInterceptors = newModelNameInterceptors;
     this.projectOpenedListeners = projectOpenedListeners;
     this.projectToolbarButtonContributions = projectToolbarButtonContributions;
+    this.fileDropHandlers = fileDropHandlers;
   }
 }

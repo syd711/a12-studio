@@ -11,6 +11,10 @@
     {
       "name": "createMenu",
       "class": "de.a12.studio.plugin.access.AccessCreateMenuEntry"
+    },
+    {
+      "name": "fileDrop",
+      "class": "de.a12.studio.plugin.access.AccessFileDropHandler"
     }
   ]
 }

@@ -1,0 +1,79 @@
+package de.a12.studio.plugin.excel;
+
+import de.a12.studio.models.NewModelFactory;
+import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.plugin.manager.IFileDropHandler;
+import de.a12.studio.ui.util.DocumentModelBuilder;
+import de.a12.studio.ui.util.DocumentModelBuilder.ColumnDescriptor;
+import de.a12.studio.ui.util.DocumentModelBuilder.ColumnType;
+import de.a12.studio.ui.util.WidgetFactory;
+import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * {@link IFileDropHandler} implementation for Microsoft Excel workbooks.
+ *
+ * <p>Accepts {@code .xlsx} and {@code .xls} files. When a matching file is dropped onto
+ * the studio window, the existing import dialog is opened with the file pre-loaded so the
+ * user only needs to confirm the model name.
+ */
+@Slf4j
+public class ExcelFileDropHandler implements IFileDropHandler {
+
+  private static final List<String> ACCEPTED_TYPES =
+      List.of("application/vnd.ms-excel",
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              "*.xlsx", "*.xls");
+
+  @Override
+  @NonNull
+  public List<String> getAcceptedMimeTypes() {
+    return ACCEPTED_TYPES;
+  }
+
+  @Override
+  public boolean canHandle(@NonNull File file) {
+    String name = file.getName().toLowerCase();
+    return name.endsWith(".xlsx") || name.endsWith(".xls");
+  }
+
+  @Override
+  public void handle(@NonNull Stage owner, @NonNull ProjectItem targetFolder, @NonNull File file) {
+    Optional<ImportFromExcelDialogController.ExcelImportInput> input =
+        ImportFromExcelDialogController.showWithFile(owner, targetFolder, file);
+    if (input.isEmpty()) {
+      return;
+    }
+
+    ImportFromExcelDialogController.ExcelImportInput data = input.get();
+    List<ColumnDescriptor> columns = data.columns().stream()
+        .map(c -> new ColumnDescriptor(c.name(), toColumnType(c.fieldType())))
+        .toList();
+
+    try {
+      var model = DocumentModelBuilder.build(targetFolder, data.modelName(), data.modelName(), columns);
+      NewModelFactory.createModelFromExisting(targetFolder, model, data.modelName());
+    }
+    catch (IOException e) {
+      log.error("Failed to create document model from dropped Excel file '{}': {}",
+          file.getName(), e.getMessage(), e);
+      WidgetFactory.showAlert(owner, "Error", e.getMessage());
+    }
+  }
+
+  private static ColumnType toColumnType(ExcelImportService.@NonNull ColumnFieldType type) {
+    return switch (type) {
+      case BOOLEAN   -> ColumnType.BOOLEAN;
+      case NUMBER    -> ColumnType.NUMBER;
+      case DATE      -> ColumnType.DATE;
+      case DATE_TIME -> ColumnType.DATE_TIME;
+      default        -> ColumnType.STRING;
+    };
+  }
+}

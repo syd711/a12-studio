@@ -206,4 +206,48 @@ public class ImportFromExcelDialogController implements DialogController {
     }
     return Optional.empty();
   }
+
+  /**
+   * Opens the dialog with the given file pre-loaded and blocks until it is closed.
+   *
+   * <p>This variant is used by the file-drop handler: the dialog opens with the Excel
+   * workbook already read so the user only needs to confirm the model name.
+   *
+   * @param owner        the owner stage
+   * @param targetFolder the project item folder into which the new model will be placed
+   * @param preloadFile  the Excel file to pre-load on open
+   * @return the user input, or an empty optional if the dialog was cancelled
+   */
+  public static Optional<ExcelImportInput> showWithFile(@NonNull Stage owner,
+                                                        @NonNull ProjectItem targetFolder,
+                                                        @NonNull File preloadFile) {
+    FXMLLoader loader = new FXMLLoader(
+        ImportFromExcelDialogController.class.getResource("dialog-import-from-excel.fxml"));
+    loader.setClassLoader(ImportFromExcelDialogController.class.getClassLoader());
+    loader.setResources(StudioBundle.withFallback(ResourceBundle.getBundle(
+        "de.a12.studio.plugin.excel.messages",
+        java.util.Locale.getDefault(),
+        ImportFromExcelDialogController.class.getClassLoader())));
+    Stage stage = WidgetFactory.createDialogStage(
+        "dialog-import-from-excel", loader, owner,
+        StudioBundle.get("import_excel.dialog_title"));
+    ImportFromExcelDialogController controller =
+        (ImportFromExcelDialogController) stage.getUserData();
+    controller.stage = stage;
+    controller.pathLabel.setText(targetFolder.getPath());
+    controller.pathLabel.setTooltip(WidgetFactory.createTooltip(targetFolder.getPath()));
+    controller.loadExcelFile(preloadFile);
+    stage.showAndWait();
+
+    if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
+      String modelName = controller.modelNameField.getText().trim();
+      if (controller.currentExcelFile != null && !modelName.isBlank()) {
+        return Optional.of(new ExcelImportInput(
+            controller.currentExcelFile,
+            controller.currentColumns,
+            modelName));
+      }
+    }
+    return Optional.empty();
+  }
 }

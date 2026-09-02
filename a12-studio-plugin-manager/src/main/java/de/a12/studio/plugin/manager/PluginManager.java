@@ -42,7 +42,8 @@ import java.util.jar.JarFile;
  *       {@link IModelValidatorContribution} for {@code "modelValidator"},
  *       {@link INewModelNameInterceptor} for {@code "newModelName"},
  *       {@link IProjectOpenedListener} for {@code "projectOpened"}, and
- *       {@link IProjectToolbarButtonContribution} for {@code "projectToolbarButton"}.</li>
+ *       {@link IProjectToolbarButtonContribution} for {@code "projectToolbarButton"}, and
+ *       {@link IFileDropHandler} for {@code "fileDrop"}.</li>
  * </ul>
  */
 @Slf4j
@@ -71,6 +72,9 @@ public class PluginManager {
 
   /** Extension point name for project-tree-toolbar-button contributions. */
   public static final String EP_PROJECT_TOOLBAR_BUTTON = "projectToolbarButton";
+
+  /** Extension point name for file-drop handler contributions. */
+  public static final String EP_FILE_DROP = "fileDrop";
 
   /** Suffix appended to a downloaded update JAR while its predecessor is still locked by the running JVM. */
   private static final String PENDING_UPDATE_SUFFIX = ".pending";
@@ -280,6 +284,19 @@ public class PluginManager {
     return Collections.unmodifiableList(result);
   }
 
+  /**
+   * Returns all {@link IFileDropHandler} instances contributed by all loaded plugins,
+   * in plugin load order.
+   */
+  @NonNull
+  public List<IFileDropHandler> getFileDropHandlers() {
+    List<IFileDropHandler> result = new ArrayList<>();
+    for (LoadedPlugin plugin : loadedPlugins) {
+      result.addAll(plugin.getFileDropHandlers());
+    }
+    return Collections.unmodifiableList(result);
+  }
+
   // ---------------------------------------------------------------------------
   // Internal loading logic
   // ---------------------------------------------------------------------------
@@ -313,6 +330,7 @@ public class PluginManager {
     List<INewModelNameInterceptor> newModelNameInterceptors = new ArrayList<>();
     List<IProjectOpenedListener> projectOpenedListeners = new ArrayList<>();
     List<IProjectToolbarButtonContribution> projectToolbarButtonContributions = new ArrayList<>();
+    List<IFileDropHandler> fileDropHandlers = new ArrayList<>();
     for (ExtensionPoint ep : descriptor.getExtensionPoints()) {
       Object instance = instantiate(ep, pluginClassLoader, jarFile.getName());
       if (instance == null) {
@@ -381,6 +399,15 @@ public class PluginManager {
               ep.getClassName(), jarFile.getName());
         }
       }
+      else if (EP_FILE_DROP.equals(ep.getName())) {
+        if (instance instanceof IFileDropHandler entry) {
+          fileDropHandlers.add(entry);
+        }
+        else {
+          log.warn("Class '{}' in '{}' does not implement IFileDropHandler, skipping.",
+              ep.getClassName(), jarFile.getName());
+        }
+      }
       else {
         log.warn("Unknown extension point '{}' in '{}', skipping.", ep.getName(), jarFile.getName());
       }
@@ -388,7 +415,7 @@ public class PluginManager {
 
     return new LoadedPlugin(descriptor, pluginClassLoader, createMenuEntries, projectSettingsPanelContributions,
         modelSaveInterceptors, modelValidatorContributions, newModelNameInterceptors, projectOpenedListeners,
-        projectToolbarButtonContributions);
+        projectToolbarButtonContributions, fileDropHandlers);
   }
 
   /** Reads and parses the {@code plugin.json} from inside the given JAR, or returns {@code null}. */

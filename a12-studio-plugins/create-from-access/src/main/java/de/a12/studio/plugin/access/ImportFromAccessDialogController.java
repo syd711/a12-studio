@@ -252,4 +252,50 @@ public class ImportFromAccessDialogController implements DialogController {
     }
     return Optional.empty();
   }
+
+  /**
+   * Opens the dialog with the given file pre-loaded and blocks until it is closed.
+   *
+   * <p>This variant is used by the file-drop handler: the dialog opens with the Access
+   * database already read so the user only needs to select a table and confirm.
+   *
+   * @param owner        the owner stage
+   * @param targetFolder the project item folder into which the new model will be placed
+   * @param preloadFile  the Access database file to pre-load on open
+   * @return the user input, or an empty optional if the dialog was cancelled
+   */
+  public static Optional<AccessImportInput> showWithFile(@NonNull Stage owner,
+                                                         @NonNull ProjectItem targetFolder,
+                                                         @NonNull File preloadFile) {
+    FXMLLoader loader = new FXMLLoader(
+        ImportFromAccessDialogController.class.getResource("dialog-import-from-access.fxml"));
+    loader.setClassLoader(ImportFromAccessDialogController.class.getClassLoader());
+    loader.setResources(StudioBundle.withFallback(ResourceBundle.getBundle(
+        "de.a12.studio.plugin.access.messages",
+        java.util.Locale.getDefault(),
+        ImportFromAccessDialogController.class.getClassLoader())));
+    Stage stage = WidgetFactory.createDialogStage(
+        "dialog-import-from-access", loader, owner,
+        StudioBundle.get("import_access.dialog_title"));
+    ImportFromAccessDialogController controller =
+        (ImportFromAccessDialogController) stage.getUserData();
+    controller.stage = stage;
+    controller.pathLabel.setText(targetFolder.getPath());
+    controller.pathLabel.setTooltip(WidgetFactory.createTooltip(targetFolder.getPath()));
+    controller.loadAccessFile(preloadFile);
+    stage.showAndWait();
+
+    if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
+      String tableName = controller.tableListView.getSelectionModel().getSelectedItem();
+      String modelName = controller.modelNameField.getText().trim();
+      if (controller.currentAccessFile != null && tableName != null && !modelName.isBlank()) {
+        return Optional.of(new AccessImportInput(
+            controller.currentAccessFile,
+            tableName,
+            controller.currentColumns,
+            modelName));
+      }
+    }
+    return Optional.empty();
+  }
 }

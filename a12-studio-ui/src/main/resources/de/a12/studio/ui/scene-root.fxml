@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane fx:id="root" styleClass="root" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.RootController">
@@ -21,6 +22,8 @@
       <StackPane fx:id="rootStack" BorderPane.alignment="CENTER">
          <children>
             <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <!-- drop overlay – rendered last so it appears on top; hidden until a drag enters -->
+
                <top>
                   <fx:include fx:id="menuBar" source="scene-menu-bar.fxml" BorderPane.alignment="CENTER" />
                </top>
@@ -100,6 +103,29 @@
                     <fx:include fx:id="footer" source="scene-footer.fxml" />
                 </bottom>
             </BorderPane>
+
+            <!-- ================================================================
+                 File-drop overlay – covers the entire rootStack while a drag is
+                 in progress; hidden (not managed) by default.
+                 ============================================================== -->
+            <StackPane fx:id="fileDropOverlay" styleClass="file-drop-overlay"
+                       visible="false" managed="false" pickOnBounds="true">
+               <children>
+                  <VBox fx:id="fileDropZone" styleClass="file-drop-overlay-border"
+                        alignment="CENTER" spacing="16" maxWidth="380" maxHeight="260">
+                     <padding>
+                        <Insets top="48" right="48" bottom="48" left="48" />
+                     </padding>
+                     <children>
+                        <FontIcon fx:id="fileDropIcon" iconLiteral="mdi2f-file-import-outline"
+                                  styleClass="file-drop-icon" />
+                        <Label fx:id="fileDropLabel" text="%file_drop_hint"
+                               styleClass="file-drop-label" wrapText="true"
+                               textAlignment="CENTER" />
+                     </children>
+                  </VBox>
+               </children>
+            </StackPane>
          </children>
       </StackPane>
    </center>
