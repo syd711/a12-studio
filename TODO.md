@@ -41,6 +41,8 @@ Dialogs that are explicitly documented as incomplete or only partially implement
 
 ## Misc
 - Project Creation: Create empty folders with Preview_AM like the preview app workspace option.
+- Support DND für CSV or Excel, mdb files.
+- Enforce Model Suffix
 - Create the same settings of that empty project
 - Open link for user management
 - Fix renaming of models
