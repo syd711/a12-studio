@@ -98,6 +98,32 @@ public class DocumentModelActions {
     return contextMenu;
   }
 
+  /**
+   * Creates a context menu for the root node of the document model tree.
+   *
+   * <p>Only the four group-producing variants (Group, Attachment, Multi-Select, Include) are
+   * offered here, since Field / Validation Rule / Computation Rule require a parent group to
+   * land inside and cannot be top-level root children.
+   */
+  public ContextMenu createRootContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+    Menu createMenu = new Menu("_Create...");
+
+    createMenu.getItems().add(createAddMenuItem(createMenuItem("_Group", createGroupIcon()),
+        siblings -> DocumentModelElementFactory.newGroupElement(siblings, modelRoot)));
+    createMenu.getItems().add(createAddMenuItem(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT),
+        siblings -> DocumentModelElementFactory.newAttachmentElement(siblings, modelRoot)));
+    createMenu.getItems().add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT),
+        siblings -> DocumentModelElementFactory.newMultiSelectElement(siblings, modelRoot)));
+
+    MenuItem includeItem = createMenuItem("_Include", Icons.ELEMENT_INCLUDE);
+    includeItem.setOnAction(event -> onAddInclude());
+    createMenu.getItems().add(includeItem);
+
+    contextMenu.getItems().add(createMenu);
+    return contextMenu;
+  }
+
   private List<MenuItem> createElementMenuItems(@NonNull Element element) {
     List<MenuItem> items = new ArrayList<>();
     if (!new ElementViewModel(element).hasFixedChildren()) {

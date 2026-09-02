@@ -733,7 +733,16 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       // is only re-populated via updateItem on row reuse/scroll, not on every subsequent multi-selection change.
       row.setOnContextMenuRequested(event -> {
         ElementViewModel item = row.getItem();
-        if (row.isEmpty() || item == null || hasFixedChildrenAncestor(item.getElement())) {
+        if (row.isEmpty()) {
+          return;
+        }
+        // Root row has a null ElementViewModel — show the group-only create menu.
+        if (item == null) {
+          documentModelActions.createRootContextMenu().show(row, event.getScreenX(), event.getScreenY());
+          event.consume();
+          return;
+        }
+        if (hasFixedChildrenAncestor(item.getElement())) {
           return;
         }
         documentModelActions.createContextMenu(item.getElement()).show(row, event.getScreenX(), event.getScreenY());
