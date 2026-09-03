@@ -47,7 +47,9 @@ Dialogs that are explicitly documented as incomplete or only partially implement
 - Open link for user management
 - Fix renaming of models
 - Add naming enforcing option
-- Document Model Editor: Add rename nodes ctx menu item
+- Document Model Editor:
+  - Add rename nodes ctx menu item
+  - Add predefined patterns for string data type
 - Form Models:
   - check new form model dialog with screen from fields
   - check if I delete screens
