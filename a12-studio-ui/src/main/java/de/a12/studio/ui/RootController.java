@@ -201,16 +201,21 @@ public class RootController implements Initializable, StudioEventListener {
   private void onDragDropped(@NonNull DragEvent event) {
     showDropOverlay(false);
     Dragboard db = event.getDragboard();
-    boolean handled = false;
-    if (db.hasFiles()) {
-      for (File file : db.getFiles()) {
-        if (dispatchDroppedFile(file)) {
-          handled = true;
-        }
-      }
-    }
+    List<File> files = db.hasFiles() ? List.copyOf(db.getFiles()) : List.of();
+    boolean handled = hasHandlerForAnyFile(files);
+    // Tell the OS the drop finished before opening any handler dialog. A handler that
+    // pops a modal dialog (e.g. showAndWait) starts a nested event loop; if that happened
+    // synchronously here, the native drag ghost/cursor stays on screen (on Windows) until
+    // the dialog closes, since the drop-completed signal never gets a chance to reach Glass.
     event.setDropCompleted(handled);
     event.consume();
+    if (handled) {
+      Platform.runLater(() -> {
+        for (File file : files) {
+          dispatchDroppedFile(file);
+        }
+      });
+    }
   }
 
   /**

@@ -4,60 +4,68 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="500.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.projecttree.dialogs.NewModelDialogController">
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="500.0" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.projecttree.dialogs.NewModelDialogController">
    <top>
       <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <VBox alignment="BASELINE_LEFT" prefHeight="150.0" BorderPane.alignment="TOP_LEFT">
-         <children>
-            <Label styleClass="field-label" text="%type">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Label>
-            <ComboBox fx:id="typeComboBox" maxWidth="1.7976931348623157E308" />
-            <Label fx:id="documentModelLabel" styleClass="field-label" text="%document_model">
-               <VBox.margin>
-                  <Insets top="12.0" />
-               </VBox.margin>
-            </Label>
-            <ComboBox fx:id="documentModelCombo" maxWidth="1.7976931348623157E308" />
-            <Label styleClass="field-label" text="%name">
-               <VBox.margin>
-                  <Insets top="12.0" />
-               </VBox.margin>
-            </Label>
-            <TextField fx:id="nameField" promptText="%enter_the_document_name_here">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
-            <Label styleClass="field-label" text="%location">
-               <VBox.margin>
-                  <Insets top="12.0" />
-               </VBox.margin>
-            </Label>
-            <Label fx:id="pathLabel" styleClass="field-value" />
-            <VBox>
-               <VBox.margin>
-                  <Insets top="12.0" />
-               </VBox.margin>
-               <children>
-                  <fx:include fx:id="roles" source="../../editors/propertyeditors/roles-panel.fxml" />
-               </children>
-            </VBox>
-         </children>
+      <ScrollPane vbarPolicy="NEVER" BorderPane.alignment="TOP_LEFT">
          <BorderPane.margin>
-            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+            <Insets />
          </BorderPane.margin>
-      </VBox>
+         <content>
+            <VBox alignment="BASELINE_LEFT">
+               <children>
+                  <Label styleClass="field-label" text="%type">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+                  <ComboBox fx:id="typeComboBox" maxWidth="1.7976931348623157E308" />
+                  <Label fx:id="documentModelLabel" styleClass="field-label" text="%document_model">
+                     <VBox.margin>
+                        <Insets top="12.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ComboBox fx:id="documentModelCombo" maxWidth="1.7976931348623157E308" />
+                  <Label styleClass="field-label" text="%name">
+                     <VBox.margin>
+                        <Insets top="12.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="nameField" promptText="%enter_the_document_name_here">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+                  <Label styleClass="field-label" text="%location">
+                     <VBox.margin>
+                        <Insets top="12.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="pathLabel" styleClass="field-value" />
+                  <VBox>
+                     <VBox.margin>
+                        <Insets top="12.0" />
+                     </VBox.margin>
+                     <children>
+                        <fx:include fx:id="roles" source="../../editors/propertyeditors/roles-panel.fxml" />
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
    </center>
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" styleClass="footer-toolbar" BorderPane.alignment="CENTER">

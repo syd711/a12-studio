@@ -46,6 +46,10 @@
                 {
                     "name": "createMenu",
                     "class": "de.a12.studio.plugin.access.AccessCreateMenuEntry"
+                },
+                {
+                    "name": "fileDrop",
+                    "class": "de.a12.studio.plugin.access.AccessFileDropHandler"
                 }
             ],
             "pluginJsonUrl": "https://raw.githubusercontent.com/syd711/a12-studio/main/a12-studio-plugins/create-from-access/plugin.json"
@@ -63,6 +67,10 @@
                 {
                     "name": "createMenu",
                     "class": "de.a12.studio.plugin.excel.ExcelCreateMenuEntry"
+                },
+                {
+                    "name": "fileDrop",
+                    "class": "de.a12.studio.plugin.excel.ExcelFileDropHandler"
                 }
             ],
             "pluginJsonUrl": "https://raw.githubusercontent.com/syd711/a12-studio/main/a12-studio-plugins/create-from-excel/plugin.json"

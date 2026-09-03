@@ -155,6 +155,12 @@ public class NewModelDialogController implements DialogController {
     if (preselectedType != null) {
       controller.typeComboBox.getSelectionModel().select(preselectedType);
     }
+    WidgetFactory.installResizable(stage);
+    // The dialog's content height is inherently variable (roles list length, document-model
+    // combo visibility), so a persisted height from a previous, shorter-content session can no
+    // longer fit - sizeToScene() re-fits the window to the actual (CSS-applied) content instead
+    // of trusting installResizable's pre-show, unstyled minHeight(-1) estimate to catch this.
+    stage.sizeToScene();
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {

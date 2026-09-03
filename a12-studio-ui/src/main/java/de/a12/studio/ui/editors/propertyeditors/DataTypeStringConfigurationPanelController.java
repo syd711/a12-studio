@@ -13,6 +13,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.events.LocalesChangedEvent;
+import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.SystemUtil;
@@ -39,6 +40,15 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 public class DataTypeStringConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
+
+  private static final int COMMIT_DEBOUNCE_MS = 150;
+
+  private final Debouncer debouncer = new Debouncer();
+
+  // Set while patternComboBox is being repopulated from the model, so those programmatic updates aren't
+  // mistaken for user edits. Local to this panel since the pattern combo isn't bound via the base class's
+  // bindComboBox (it's a ComboBox<Object> with two listeners - value and editor text - not a plain String combo).
+  private boolean updatingFromModel;
 
   @FXML
   private TextField minLengthField;
@@ -90,7 +100,7 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
       }
       String rawPattern = toRawPattern(newVal);
       withStringTypeOptions(element, options -> options.setPattern(rawPattern == null || rawPattern.isEmpty() ? null : rawPattern));
-      debouncer.debounce("patternComboBox", () -> commitChange(patternComboBox), COMMIT_DEBOUNCE_MS, true);
+      debouncer.debounce("patternComboBox", this::commitChange, COMMIT_DEBOUNCE_MS, true);
     });
 
     // Also react to the user typing inside the editable field directly (valueProperty only fires on commit).
@@ -100,7 +110,7 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
       }
       String rawPattern = newVal == null || newVal.isEmpty() ? null : newVal;
       withStringTypeOptions(element, options -> options.setPattern(rawPattern));
-      debouncer.debounce("patternComboBox", () -> commitChange(patternComboBox), COMMIT_DEBOUNCE_MS, true);
+      debouncer.debounce("patternComboBox", this::commitChange, COMMIT_DEBOUNCE_MS, true);
     });
 
     bindTextField(minLengthField, (element, value) -> withStringTypeOptions(element, options -> options.setMinLength(parseInteger(value))));

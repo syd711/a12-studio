@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -275,27 +274,21 @@ public class DeploymentExclusionsDialogController implements DialogController {
   public static Optional<List<String>> show(@NonNull Stage owner,
                                             @NonNull ProjectItem projectRoot,
                                             @NonNull List<String> currentExclusions) {
-    try {
-      FXMLLoader loader = new FXMLLoader(
-          DeploymentExclusionsDialogController.class.getResource(
-              "/de/a12/studio/ui/preferences/dialogs/dialog-deployment-exclusions.fxml"));
-      loader.setResources(StudioBundle.getBundle());
-      Stage stage = WidgetFactory.createDialogStage(
-          "dialog-deployment-exclusions", loader, owner,
-          StudioBundle.get("deployment_exclusions_dialog_title"));
-      DeploymentExclusionsDialogController controller = loader.getController();
-      controller.stage = stage;
-      controller.setProject(projectRoot, currentExclusions);
-      stage.showAndWait();
+    FXMLLoader loader = new FXMLLoader(
+        DeploymentExclusionsDialogController.class.getResource(
+            "/de/a12/studio/ui/preferences/dialogs/dialog-deployment-exclusions.fxml"));
+    loader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage(
+        "dialog-deployment-exclusions", loader, owner,
+        StudioBundle.get("deployment_exclusions_dialog_title"));
+    DeploymentExclusionsDialogController controller = loader.getController();
+    controller.stage = stage;
+    controller.setProject(projectRoot, currentExclusions);
+    stage.showAndWait();
 
-      if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
-        return Optional.of(controller.getSelectedPaths());
-      }
-      return Optional.empty();
+    if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
+      return Optional.of(controller.getSelectedPaths());
     }
-    catch (IOException e) {
-      log.error("Failed to open deployment exclusions dialog", e);
-      return Optional.empty();
-    }
+    return Optional.empty();
   }
 }
