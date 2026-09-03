@@ -34,7 +34,7 @@
                 <HBox>
                     <children>
                         <Button fx:id="editButton" mnemonicParsing="false"
-                                onAction="#onEditExclusions" styleClass="secondary-button"
+                                onAction="#onEditExclusions" styleClass="primary-button"
                                 text="%edit_exclusions">
                             <graphic>
                                 <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="16" />

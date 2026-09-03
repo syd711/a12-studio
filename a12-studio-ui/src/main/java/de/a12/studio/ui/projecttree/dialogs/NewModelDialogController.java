@@ -1,14 +1,18 @@
 package de.a12.studio.ui.projecttree.dialogs;
 
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
@@ -31,8 +35,8 @@ import java.util.Optional;
 
 public class NewModelDialogController implements DialogController {
 
-  public record NewModelInput(ModelType modelType, String name, String documentModelId, List<String> roles,
-      ProjectItem folder, boolean buildScreensFromFields) {
+  public record NewModelInput(ModelType modelType, String name, String documentModelId, List<Locale> locales,
+      List<String> roles, ProjectItem folder, boolean buildScreensFromFields) {
   }
 
   @FXML
@@ -58,6 +62,9 @@ public class NewModelDialogController implements DialogController {
 
   @FXML
   private Button cancelButton;
+
+  @FXML
+  private LocalesPanelController localesController;
 
   @FXML
   private RolesEditorPanelController rolesController;
@@ -166,6 +173,7 @@ public class NewModelDialogController implements DialogController {
     controller.stage = stage;
     controller.targetFolder = targetFolder;
     setupLocationCombo(controller, targetFolder);
+    controller.localesController.initializeLocales(findProjectLocales());
     controller.documentModelCombo.getItems().setAll(ProjectDocumentModels.getOtherDocumentModels(targetFolder).stream()
         .map(DocumentModel::getId)
         .sorted(Comparator.naturalOrder())
@@ -179,11 +187,6 @@ public class NewModelDialogController implements DialogController {
       controller.typeComboBox.getSelectionModel().select(preselectedType);
     }
     WidgetFactory.installResizable(stage);
-    // The dialog's content height is inherently variable (roles list length, document-model
-    // combo visibility), so a persisted height from a previous, shorter-content session can no
-    // longer fit - sizeToScene() re-fits the window to the actual (CSS-applied) content instead
-    // of trusting installResizable's pre-show, unstyled minHeight(-1) estimate to catch this.
-    stage.sizeToScene();
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
@@ -193,8 +196,8 @@ public class NewModelDialogController implements DialogController {
         String documentModelId = requiresDocumentModel(modelType) ? controller.documentModelCombo.getValue() : null;
         ProjectItem folder = controller.locationCombo.getValue();
         boolean buildScreensFromFields = modelType == ModelType.FORM && controller.buildScreensFromFieldsCheckBox.isSelected();
-        return Optional.of(new NewModelInput(modelType, name.trim(), documentModelId, controller.rolesController.getRoles(),
-            folder != null ? folder : targetFolder, buildScreensFromFields));
+        return Optional.of(new NewModelInput(modelType, name.trim(), documentModelId, controller.localesController.getLocales(),
+            controller.rolesController.getRoles(), folder != null ? folder : targetFolder, buildScreensFromFields));
       }
     }
     return Optional.empty();
@@ -229,6 +232,17 @@ public class NewModelDialogController implements DialogController {
         .findFirst()
         .orElse(folders.get(0));
     controller.locationCombo.setValue(defaultFolder);
+  }
+
+  // Seeds the locales panel from the project's own settings.json (general.locales), mirroring
+  // NewModelFactory#resolveDefaultLocales -- so what the dialog shows already matches what the model would
+  // get if the user left the panel untouched.
+  private static List<Locale> findProjectLocales() {
+    Project project = Studio.getCurrentProject();
+    if (project == null) {
+      return List.of();
+    }
+    return project.getSettings().getProjectRootSettings().getGeneral().getLocales();
   }
 
   private static String displayLocation(ProjectItem projectRoot, ProjectItem folder) {

@@ -1,6 +1,7 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.projects.ProjectItem;
@@ -81,13 +82,22 @@ public class ProjectTreeMenuActions {
     ModelType modelType = input.get().modelType();
     String name = input.get().name();
     String documentModelId = input.get().documentModelId();
+    List<Locale> locales = input.get().locales();
     List<String> roles = input.get().roles();
     ProjectItem selectedFolder = input.get().folder();
     boolean buildScreensFromFields = input.get().buildScreensFromFields();
     try {
       ProjectItem item = NewModelFactory.createModel(selectedFolder, modelType, name, documentModelId, buildScreensFromFields);
+      boolean needsSave = false;
+      if (!locales.isEmpty()) {
+        item.getModel().setLocales(locales);
+        needsSave = true;
+      }
       if (!roles.isEmpty()) {
         RolesEditorPanelController.applyRoles(item.getModel(), roles);
+        needsSave = true;
+      }
+      if (needsSave) {
         item.save();
       }
       onReload.run();

@@ -13,6 +13,6 @@
     ]
   },
   "previewApp": {},
-  "settingsName": "settings.json",
-  "settingsType": "PROJECT_ROOT"
+  "settingsType": "PROJECT_ROOT",
+  "settingsName": "settings.json"
 }

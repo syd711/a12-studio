@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -67,6 +68,11 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
 
   private final Debouncer debouncer = new Debouncer();
 
+  // Used only while this panel is not yet bound to a model (see #initializeLocales), for
+  // de.a12.studio.ui.projecttree.dialogs.NewModelDialogController, which only creates the model once its
+  // dialog is confirmed.
+  private final List<Locale> standaloneLocales = new ArrayList<>();
+
   private A12Model<?> model;
 
   public void setModel(@NonNull A12Model<?> model) {
@@ -75,9 +81,38 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
     updateValidation();
   }
 
+  /**
+   * Seeds this panel's rows without binding to a model, for {@link
+   * de.a12.studio.ui.projecttree.dialogs.NewModelDialogController}. Edits made here are read back via
+   * {@link #getLocales()} on submit -- {@link #commitLocalesChange} skips the save/event machinery the
+   * whole time since {@link #model} is never set.
+   */
+  public void initializeLocales(@NonNull List<Locale> initialLocales) {
+    standaloneLocales.clear();
+    for (Locale initialLocale : initialLocales) {
+      Locale copy = new Locale();
+      copy.setCode(initialLocale.getCode());
+      standaloneLocales.add(copy);
+    }
+    rebuildRows();
+    updateValidation();
+  }
+
+  /**
+   * The current locales -- the counterpart to {@link #initializeLocales} for callers that never bind this
+   * panel to a model via {@link #setModel}.
+   */
+  public List<Locale> getLocales() {
+    return List.copyOf(standaloneLocales);
+  }
+
+  private List<Locale> currentLocales() {
+    return model != null ? model.getLocales() : standaloneLocales;
+  }
+
   @FXML
   private void onAdd() {
-    model.getLocales().add(new Locale());
+    currentLocales().add(new Locale());
     rebuildRows();
     updateValidation();
   }
@@ -88,14 +123,14 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
       return rowIndex != null && rowIndex > 0;
     });
 
-    List<Locale> locales = model.getLocales();
+    List<Locale> locales = currentLocales();
     for (int index = 0; index < locales.size(); index++) {
       localesGrid.addRow(index + 1, createLocaleComboBox(index), createActionsBox(index));
     }
   }
 
   private ComboBox<java.util.Locale> createLocaleComboBox(int index) {
-    Locale locale = model.getLocales().get(index);
+    Locale locale = currentLocales().get(index);
     ComboBox<java.util.Locale> comboBox = new ComboBox<>(FXCollections.observableArrayList(AVAILABLE_LOCALES));
     comboBox.setId("locale-" + index);
     comboBox.setEditable(true);
@@ -113,7 +148,7 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_locale"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
-        model.getLocales().remove(index);
+        currentLocales().remove(index);
         rebuildRows();
         commitLocalesChange();
       }
@@ -125,6 +160,13 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
   }
 
   private void commitLocalesChange() {
+    if (model == null) {
+      // Not bound to a model yet (NewModelDialogController) -- nothing to save or revalidate via
+      // ValidationService, just keep the panel's own error container in sync.
+      updateValidation();
+      return;
+    }
+
     commitChange();
     updateValidation();
 
@@ -135,6 +177,14 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
   }
 
   private void updateValidation() {
+    if (model == null) {
+      if (standaloneLocales.isEmpty()) {
+        showError("ERROR", StudioBundle.get("validation.please_add_at_least_one_locale"));
+      } else {
+        hideError();
+      }
+      return;
+    }
     Studio.getValidationService().getMissingLocaleError(model)
         .ifPresentOrElse(message -> showError("ERROR", message), this::hideError);
   }

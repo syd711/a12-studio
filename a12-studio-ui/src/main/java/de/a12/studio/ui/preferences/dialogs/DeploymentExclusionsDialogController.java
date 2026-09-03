@@ -1,5 +1,6 @@
 package de.a12.studio.ui.preferences.dialogs;
 
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.auth.AuthFileType;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
@@ -12,6 +13,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
@@ -22,10 +28,12 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Controller for the "Edit Deployment Exclusions" dialog.
@@ -53,6 +61,12 @@ public class DeploymentExclusionsDialogController implements DialogController {
   private TreeTableColumn<ProjectItem, String> nameColumn;
 
   @FXML
+  private TextField searchField;
+
+  @FXML
+  private MenuButton typeFilterButton;
+
+  @FXML
   private Button okButton;
 
   @FXML
@@ -71,6 +85,12 @@ public class DeploymentExclusionsDialogController implements DialogController {
    * mutated by checkbox interactions.
    */
   private final Map<String, SimpleBooleanProperty> checkedByPath = new HashMap<>();
+
+  /** The root of the (unfiltered) project tree, kept so the tree can be rebuilt on every filter change. */
+  private ProjectItem projectRoot;
+
+  /** Model types currently shown in the tree; all types are shown until the user narrows the selection. */
+  private final Set<ModelType> selectedTypes = EnumSet.allOf(ModelType.class);
 
   // -------------------------------------------------------------------------
   // Initialisation
@@ -136,6 +156,78 @@ public class DeploymentExclusionsDialogController implements DialogController {
     });
 
     modelTree.setShowRoot(true);
+
+    searchField.textProperty().addListener((obs, oldVal, newVal) -> rebuildTree());
+    populateTypeFilterMenu();
+  }
+
+  private void populateTypeFilterMenu() {
+    MenuItem selectAll = new MenuItem(StudioBundle.get("select_all_model_types"));
+    selectAll.setOnAction(e -> {
+      selectedTypes.addAll(EnumSet.allOf(ModelType.class));
+      for (MenuItem item : typeFilterButton.getItems()) {
+        if (item instanceof CheckMenuItem checkMenuItem) {
+          checkMenuItem.setSelected(true);
+        }
+      }
+      rebuildTree();
+    });
+
+    MenuItem deselectAll = new MenuItem(StudioBundle.get("deselect_all_model_types"));
+    deselectAll.setOnAction(e -> {
+      selectedTypes.clear();
+      for (MenuItem item : typeFilterButton.getItems()) {
+        if (item instanceof CheckMenuItem checkMenuItem) {
+          checkMenuItem.setSelected(false);
+        }
+      }
+      rebuildTree();
+    });
+
+    typeFilterButton.getItems().add(selectAll);
+    typeFilterButton.getItems().add(deselectAll);
+    typeFilterButton.getItems().add(new SeparatorMenuItem());
+
+    for (ModelType type : ModelType.values()) {
+      CheckMenuItem item = new CheckMenuItem(type.getDisplayName());
+      item.setSelected(true);
+      item.selectedProperty().addListener((obs, oldVal, newVal) -> {
+        if (newVal) {
+          selectedTypes.add(type);
+        }
+        else {
+          selectedTypes.remove(type);
+        }
+        rebuildTree();
+      });
+      typeFilterButton.getItems().add(item);
+    }
+  }
+
+  @FXML
+  private void onExpandAll() {
+    TreeItem<ProjectItem> root = modelTree.getRoot();
+    if (root != null) {
+      expandAll(root);
+    }
+  }
+
+  @FXML
+  private void onCollapseAll() {
+    TreeItem<ProjectItem> root = modelTree.getRoot();
+    if (root == null) {
+      return;
+    }
+    for (TreeItem<ProjectItem> child : root.getChildren()) {
+      collapseAll(child);
+    }
+  }
+
+  private void collapseAll(@NonNull TreeItem<ProjectItem> item) {
+    item.setExpanded(false);
+    for (TreeItem<ProjectItem> child : item.getChildren()) {
+      collapseAll(child);
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -148,12 +240,25 @@ public class DeploymentExclusionsDialogController implements DialogController {
    */
   public void setProject(@NonNull ProjectItem projectRoot,
                          @NonNull List<String> currentExclusions) {
+    this.projectRoot = projectRoot;
     for (String path : currentExclusions) {
       checkedByPath.put(path, new SimpleBooleanProperty(true));
     }
+    rebuildTree();
+  }
+
+  /**
+   * Rebuilds the displayed tree from {@link #projectRoot}, applying the current search text and
+   * selected model types. Ticked state (in {@link #checkedByPath}) is unaffected, since it is keyed
+   * by path rather than by tree node.
+   */
+  private void rebuildTree() {
+    if (projectRoot == null) {
+      return;
+    }
     TreeItem<ProjectItem> root = buildTree(projectRoot);
+    modelTree.setRoot(root);
     if (root != null) {
-      modelTree.setRoot(root);
       expandAll(root);
     }
   }
@@ -235,7 +340,15 @@ public class DeploymentExclusionsDialogController implements DialogController {
     if (AuthFileType.fromFileName(name) != null) {
       return false;
     }
-    return name.endsWith(".json");
+    if (!name.endsWith(".json")) {
+      return false;
+    }
+    if (item.getModel() == null || !selectedTypes.contains(item.getModel().getModelType())) {
+      return false;
+    }
+    String search = searchField.getText();
+    return search == null || search.isBlank()
+        || item.getDisplayName().toLowerCase().contains(search.trim().toLowerCase());
   }
 
   private void expandAll(@NonNull TreeItem<ProjectItem> item) {
