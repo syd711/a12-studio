@@ -76,6 +76,22 @@ public class RolesEditorPanelController extends AbstractRolesPanelController {
   }
 
   /**
+   * The roles declared on a specific Document Model identified by {@code documentModelId}. Used to
+   * seed the roles panel when creating a Form or Overview model so it inherits the roles of its
+   * document model. Empty if no matching model is found or it declares no roles.
+   */
+  public static List<String> findDocumentModelRoles(@NonNull ProjectItem contextItem, @NonNull String documentModelId) {
+    return ProjectDocumentModels.getOtherDocumentModels(contextItem).stream()
+        .filter(m -> documentModelId.equals(m.getId()))
+        .map(RolesEditorPanelController::findRolesAnnotation)
+        .filter(Objects::nonNull)
+        .flatMap(annotation -> parseRoles(annotation.getValue()).stream())
+        .distinct()
+        .sorted()
+        .toList();
+  }
+
+  /**
    * Sets the {@code roles} header annotation on a freshly created model (see {@link #initializeRoles}'s
    * caller). Unlike {@link #commitRolesChange}, this is a one-shot write for a model that cannot already
    * carry the annotation, so there's nothing to update or remove.

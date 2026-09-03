@@ -56,6 +56,8 @@ public class NewModelDialogController implements DialogController {
 
   private Stage stage;
 
+  private ProjectItem targetFolder;
+
   private Optional<ButtonType> result = Optional.of(ButtonType.CANCEL);
 
   @FXML
@@ -72,13 +74,37 @@ public class NewModelDialogController implements DialogController {
         return null;
       }
     });
-    typeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> updateDocumentModelVisibility(newValue));
+    typeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+      updateDocumentModelVisibility(newValue);
+      if (!requiresDocumentModel(newValue)) {
+        // Switching away from a document-model type: seed roles from the application model instead
+        if (targetFolder != null) {
+          rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+        }
+      } else {
+        // Switching to a document-model type: seed roles from currently selected document model (if any)
+        String selectedDocModel = documentModelCombo.getValue();
+        if (selectedDocModel != null && !selectedDocModel.isBlank()) {
+          onDocumentModelSelected(selectedDocModel);
+        } else {
+          rolesController.initializeRoles(List.of());
+        }
+      }
+    });
+    documentModelCombo.valueProperty().addListener((observable, oldValue, newValue) -> onDocumentModelSelected(newValue));
     typeComboBox.getSelectionModel().selectFirst();
     okButton.disableProperty().bind(Bindings.createBooleanBinding(
         () -> !FileUtils.isValidWindowsFilename(nameField.getText())
             || (requiresDocumentModel(typeComboBox.getValue()) && documentModelCombo.getValue() == null),
         nameField.textProperty(), typeComboBox.valueProperty(), documentModelCombo.valueProperty()));
     nameField.requestFocus();
+  }
+
+  private void onDocumentModelSelected(String documentModelId) {
+    if (documentModelId != null && !documentModelId.isBlank() && targetFolder != null) {
+      List<String> roles = RolesEditorPanelController.findDocumentModelRoles(targetFolder, documentModelId);
+      rolesController.initializeRoles(roles);
+    }
   }
 
   private static boolean requiresDocumentModel(ModelType modelType) {
@@ -114,13 +140,18 @@ public class NewModelDialogController implements DialogController {
     Stage stage = WidgetFactory.createDialogStage("dialog-new-model", fxmlLoader, owner, "New Model");
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;
+    controller.targetFolder = targetFolder;
     controller.pathLabel.setText(targetFolder.getPath());
     controller.pathLabel.setTooltip(WidgetFactory.createTooltip(targetFolder.getPath()));
     controller.documentModelCombo.getItems().setAll(ProjectDocumentModels.getOtherDocumentModels(targetFolder).stream()
         .map(DocumentModel::getId)
         .sorted(Comparator.naturalOrder())
         .toList());
-    controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+    // For model types that require a document model (e.g. FORM), roles are seeded from the selected
+    // document model via onDocumentModelSelected; skip the application model lookup for those types.
+    if (preselectedType == null || !requiresDocumentModel(preselectedType)) {
+      controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+    }
     if (preselectedType != null) {
       controller.typeComboBox.getSelectionModel().select(preselectedType);
     }
