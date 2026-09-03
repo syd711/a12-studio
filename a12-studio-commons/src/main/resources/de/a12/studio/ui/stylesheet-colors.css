@@ -30,7 +30,7 @@
     /* Chrome surfaces (menu bar, toolbars, sidebar, properties panel) */
     -fx-chrome-bg: #FCFCFD;
     -fx-content-bg: -fx-base-1;
-    -fx-tab-strip-bg: #F4F4F4; /*#E5E8EC;*/
+    -fx-tab-strip-bg: -fx-chrome-bg;
 
     /* Borders */
     -fx-border-subtle: #E7E9ED;

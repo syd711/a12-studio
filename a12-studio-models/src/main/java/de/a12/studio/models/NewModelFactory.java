@@ -16,6 +16,7 @@ import de.a12.studio.models.documentmodel.ModelInfo;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.models.formmodel.FormScreenGenerator;
 import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.mappingmodel.MappingModelContent;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
@@ -133,7 +134,12 @@ public class NewModelFactory {
 
   public static ProjectItem createModel(@NonNull ProjectItem parent, @NonNull ModelType modelType, @NonNull String name,
       String documentModelId) throws IOException {
-    A12Model<?> model = buildModel(modelType, name, resolveDefaultLocales(parent), documentModelId);
+    return createModel(parent, modelType, name, documentModelId, false);
+  }
+
+  public static ProjectItem createModel(@NonNull ProjectItem parent, @NonNull ModelType modelType, @NonNull String name,
+      String documentModelId, boolean buildScreensFromFields) throws IOException {
+    A12Model<?> model = buildModel(parent, modelType, name, resolveDefaultLocales(parent), documentModelId, buildScreensFromFields);
 
     String fileName = applyNameHooks(parent, modelType, name);
     ProjectItem item = parent.createChildModel(fileName);
@@ -149,11 +155,12 @@ public class NewModelFactory {
     return item;
   }
 
-  private static A12Model<?> buildModel(ModelType modelType, String name, List<Locale> locales, String documentModelId) throws IOException {
+  private static A12Model<?> buildModel(ProjectItem parent, ModelType modelType, String name, List<Locale> locales,
+      String documentModelId, boolean buildScreensFromFields) throws IOException {
     return switch (modelType) {
       case DOCUMENT -> buildDocumentModel(new DocumentModel(), name, locales);
       case TYPEDEFINITION -> buildTypeDefinitionModel(name, locales);
-      case FORM -> buildFormModel(documentModelId);
+      case FORM -> buildFormModel(parent, documentModelId, locales, buildScreensFromFields);
       case OVERVIEW -> buildOverviewModel(documentModelId);
       case APPLICATION -> buildApplicationModel();
       case MASTERDETAIL -> buildMasterDetailModel();
@@ -222,13 +229,45 @@ public class NewModelFactory {
 
   // alias equal to reference, matching the shape of an existing FM's data-binding reference (see e.g.
   // Invoice_FM.json / GeneralSettingsPanelController#applyDocumentModelReference).
-  private static FormModel buildFormModel(String documentModelId) {
+  private static FormModel buildFormModel(ProjectItem parent, String documentModelId, List<Locale> locales,
+      boolean buildScreensFromFields) {
     FormModel model = new FormModel();
-    model.setContent(new FormModelContent());
+    FormModelContent content = new FormModelContent();
+    model.setContent(content);
     if (documentModelId != null && !documentModelId.isBlank()) {
       model.getModelReferences().add(documentModelReference(ModelReference.PURPOSE_DATA_BINDING, documentModelId, documentModelId));
+      if (buildScreensFromFields) {
+        DocumentModel documentModel = findDocumentModel(parent, documentModelId);
+        if (documentModel != null) {
+          FormScreenGenerator.generate(content, documentModel, locales);
+        }
+      }
     }
     return model;
+  }
+
+  // Searches the whole project tree (from its root, like #resolveDefaultLocales) for the Document Model
+  // backing a newly created Form Model, so "Build Screens from Fields" can read its field structure.
+  private static DocumentModel findDocumentModel(ProjectItem parent, String documentModelId) {
+    ProjectItem root = parent;
+    while (root.getParent() != null) {
+      root = root.getParent();
+    }
+    return findDocumentModelInTree(root, documentModelId);
+  }
+
+  private static DocumentModel findDocumentModelInTree(ProjectItem item, String documentModelId) {
+    if (item.isFolder()) {
+      for (ProjectItem child : item.getChildren()) {
+        DocumentModel found = findDocumentModelInTree(child, documentModelId);
+        if (found != null) {
+          return found;
+        }
+      }
+      return null;
+    }
+    return item.getModel() instanceof DocumentModel documentModel && documentModelId.equals(documentModel.getId())
+        ? documentModel : null;
   }
 
   // alias fixed to "DM", matching the shape of an existing OM's document-model-for-overview reference

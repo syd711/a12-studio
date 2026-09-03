@@ -82,8 +82,10 @@ public class ProjectTreeMenuActions {
     String name = input.get().name();
     String documentModelId = input.get().documentModelId();
     List<String> roles = input.get().roles();
+    ProjectItem selectedFolder = input.get().folder();
+    boolean buildScreensFromFields = input.get().buildScreensFromFields();
     try {
-      ProjectItem item = NewModelFactory.createModel(targetFolder, modelType, name, documentModelId);
+      ProjectItem item = NewModelFactory.createModel(selectedFolder, modelType, name, documentModelId, buildScreensFromFields);
       if (!roles.isEmpty()) {
         RolesEditorPanelController.applyRoles(item.getModel(), roles);
         item.save();

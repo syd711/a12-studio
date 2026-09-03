@@ -4,7 +4,10 @@ import de.a12.studio.models.projects.ProjectItem;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Deque;
+import java.util.List;
 
 /**
  * Resolves the folder a "New Model" dialog should default to when the user hasn't explicitly chosen one (e.g.
@@ -32,6 +35,28 @@ public final class ProjectModelFolders {
 
     ProjectItem firstModelParent = findFirstModelParent(projectRoot);
     return firstModelParent != null ? firstModelParent : projectRoot;
+  }
+
+  /**
+   * Every folder in {@code projectRoot}'s tree, including {@code projectRoot} itself, sorted by absolute path
+   * so {@code projectRoot} (a prefix of every descendant's path) always sorts first. Used to populate the "New
+   * Model" dialog's location combo box, letting the user target any project folder rather than being locked to
+   * wherever the dialog was opened from.
+   */
+  public static List<ProjectItem> listAllFolders(@NonNull ProjectItem projectRoot) {
+    List<ProjectItem> folders = new ArrayList<>();
+    collectFolders(projectRoot, folders);
+    folders.sort(Comparator.comparing(ProjectItem::getPath));
+    return folders;
+  }
+
+  private static void collectFolders(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
+    result.add(item);
+    for (ProjectItem child : item.getChildren()) {
+      if (child.isFolder()) {
+        collectFolders(child, result);
+      }
+    }
   }
 
   private static ProjectItem findModelsFolder(@NonNull ProjectItem root) {

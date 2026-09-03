@@ -4,6 +4,7 @@ import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.ModelType;
@@ -14,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -21,13 +23,16 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 public class NewModelDialogController implements DialogController {
 
-  public record NewModelInput(ModelType modelType, String name, String documentModelId, List<String> roles) {
+  public record NewModelInput(ModelType modelType, String name, String documentModelId, List<String> roles,
+      ProjectItem folder, boolean buildScreensFromFields) {
   }
 
   @FXML
@@ -37,13 +42,16 @@ public class NewModelDialogController implements DialogController {
   private TextField nameField;
 
   @FXML
-  private Label pathLabel;
+  private ComboBox<ProjectItem> locationCombo;
 
   @FXML
   private Label documentModelLabel;
 
   @FXML
   private ComboBox<String> documentModelCombo;
+
+  @FXML
+  private CheckBox buildScreensFromFieldsCheckBox;
 
   @FXML
   private Button okButton;
@@ -62,6 +70,7 @@ public class NewModelDialogController implements DialogController {
 
   @FXML
   private void initialize() {
+    buildScreensFromFieldsCheckBox.setDisable(true);
     typeComboBox.getItems().setAll(ModelType.values());
     typeComboBox.setConverter(new StringConverter<>() {
       @Override
@@ -76,6 +85,7 @@ public class NewModelDialogController implements DialogController {
     });
     typeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
       updateDocumentModelVisibility(newValue);
+      updateBuildScreensFromFieldsVisibility(newValue);
       if (!requiresDocumentModel(newValue)) {
         // Switching away from a document-model type: seed roles from the application model instead
         if (targetFolder != null) {
@@ -91,7 +101,10 @@ public class NewModelDialogController implements DialogController {
         }
       }
     });
-    documentModelCombo.valueProperty().addListener((observable, oldValue, newValue) -> onDocumentModelSelected(newValue));
+    documentModelCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+      onDocumentModelSelected(newValue);
+      buildScreensFromFieldsCheckBox.setDisable(newValue == null || newValue.isBlank());
+    });
     typeComboBox.getSelectionModel().selectFirst();
     okButton.disableProperty().bind(Bindings.createBooleanBinding(
         () -> !FileUtils.isValidWindowsFilename(nameField.getText())
@@ -119,6 +132,17 @@ public class NewModelDialogController implements DialogController {
     documentModelCombo.setManaged(visible);
   }
 
+  // "Build Screens from Fields" only makes sense for Form Models (see FormScreenGenerator); unlike the
+  // Overview Model, which also requires a document model but has no screen tree to generate.
+  private void updateBuildScreensFromFieldsVisibility(ModelType modelType) {
+    boolean visible = modelType == ModelType.FORM;
+    buildScreensFromFieldsCheckBox.setVisible(visible);
+    buildScreensFromFieldsCheckBox.setManaged(visible);
+    if (!visible) {
+      buildScreensFromFieldsCheckBox.setSelected(false);
+    }
+  }
+
   @Override
   public void onDialogCancel() {
     stage.close();
@@ -141,8 +165,7 @@ public class NewModelDialogController implements DialogController {
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;
     controller.targetFolder = targetFolder;
-    controller.pathLabel.setText(targetFolder.getPath());
-    controller.pathLabel.setTooltip(WidgetFactory.createTooltip(targetFolder.getPath()));
+    setupLocationCombo(controller, targetFolder);
     controller.documentModelCombo.getItems().setAll(ProjectDocumentModels.getOtherDocumentModels(targetFolder).stream()
         .map(DocumentModel::getId)
         .sorted(Comparator.naturalOrder())
@@ -168,9 +191,51 @@ public class NewModelDialogController implements DialogController {
       String name = controller.nameField.getText();
       if (modelType != null && name != null && !name.isBlank()) {
         String documentModelId = requiresDocumentModel(modelType) ? controller.documentModelCombo.getValue() : null;
-        return Optional.of(new NewModelInput(modelType, name.trim(), documentModelId, controller.rolesController.getRoles()));
+        ProjectItem folder = controller.locationCombo.getValue();
+        boolean buildScreensFromFields = modelType == ModelType.FORM && controller.buildScreensFromFieldsCheckBox.isSelected();
+        return Optional.of(new NewModelInput(modelType, name.trim(), documentModelId, controller.rolesController.getRoles(),
+            folder != null ? folder : targetFolder, buildScreensFromFields));
       }
     }
     return Optional.empty();
+  }
+
+  // Populates the "Location" combo with every folder in the project, defaulting to the folder named
+  // "models" (matching this project's own New Model default-folder convention, see
+  // ProjectModelFolders#resolveDefaultModelFolder) if one exists anywhere in the tree, else the project
+  // root itself (always first in the sorted list ProjectModelFolders#listAllFolders returns).
+  private static void setupLocationCombo(NewModelDialogController controller, ProjectItem targetFolder) {
+    ProjectItem projectRoot = targetFolder;
+    while (projectRoot.getParent() != null) {
+      projectRoot = projectRoot.getParent();
+    }
+    ProjectItem root = projectRoot;
+
+    List<ProjectItem> folders = ProjectModelFolders.listAllFolders(root);
+    controller.locationCombo.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(ProjectItem folder) {
+        return folder == null ? "" : displayLocation(root, folder);
+      }
+
+      @Override
+      public ProjectItem fromString(String string) {
+        return null;
+      }
+    });
+    controller.locationCombo.getItems().setAll(folders);
+    ProjectItem defaultFolder = folders.stream()
+        .filter(folder -> folder.getName().equalsIgnoreCase("models"))
+        .findFirst()
+        .orElse(folders.get(0));
+    controller.locationCombo.setValue(defaultFolder);
+  }
+
+  private static String displayLocation(ProjectItem projectRoot, ProjectItem folder) {
+    if (folder.equals(projectRoot)) {
+      return "/";
+    }
+    Path relative = projectRoot.getFile().toPath().toAbsolutePath().relativize(folder.getFile().toPath().toAbsolutePath());
+    return relative.toString().replace(File.separatorChar, '/');
   }
 }

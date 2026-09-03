@@ -9,10 +9,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" minWidth="560.0" prefHeight="520.0" prefWidth="560.0"
-            stylesheets="@/de/a12/studio/ui/stylesheet.css"
-            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.preferences.dialogs.DeploymentExclusionsDialogController">
+<BorderPane fx:id="root" minWidth="560.0" prefHeight="520.0" prefWidth="560.0" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.dialogs.DeploymentExclusionsDialogController">
     <top>
         <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
     </top>
@@ -23,9 +20,9 @@
             </padding>
             <children>
                 <Label styleClass="field-label" text="%deployment_exclusions_dialog_hint" wrapText="true" />
-                <TreeTableView fx:id="modelTree" VBox.vgrow="ALWAYS" showRoot="true">
+                <TreeTableView fx:id="modelTree" showRoot="true" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TreeTableColumn fx:id="checkColumn" maxWidth="36.0" minWidth="36.0" prefWidth="36.0" resizable="false" />
+                        <TreeTableColumn fx:id="checkColumn" maxWidth="60.0" minWidth="80.0" resizable="false" />
                         <TreeTableColumn fx:id="nameColumn" prefWidth="480.0" text="%name" />
                     </columns>
                 </TreeTableView>
@@ -35,10 +32,8 @@
     <bottom>
         <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
             <items>
-                <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false"
-                        onAction="#onDialogSubmit" styleClass="primary-button" text="%save" />
-                <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false"
-                        onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
+                <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%save" />
+                <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
             </items>
         </ToolBar>
     </bottom>
