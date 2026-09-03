@@ -1,0 +1,56 @@
+{
+  "header": {
+    "id": "StringPatternErrorMessageValidator_missingOneLocale",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      { "code": "en" },
+      { "code": "de" }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "StringPatternErrorMessageValidator_missingOneLocale",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": { "code": "en_US" }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_root",
+          "name": "Root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_pattern",
+                "name": "Code",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "pattern": "[0-9]{4}",
+                      "errorMessage": [
+                        { "locale": "en", "text": "Must be four digits" }
+                      ]
+                    }
+                  },
+                  "label": [
+                    { "locale": "en", "text": "Code" },
+                    { "locale": "de", "text": "Code" }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

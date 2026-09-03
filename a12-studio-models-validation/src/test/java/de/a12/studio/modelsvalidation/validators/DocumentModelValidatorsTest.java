@@ -233,4 +233,22 @@ class DocumentModelValidatorsTest {
     assertEquals(1, errors.size());
     assertEquals("field_pattern", errors.get(0).elementId());
   }
+
+  @Test
+  void stringPatternErrorMessageValidatorReportsMissingErrorMessageForOneLocale() {
+    DocumentModel model = load("StringPatternErrorMessageValidator_missingOneLocale");
+    List<ModelValidationError> errors = new StringPatternErrorMessageValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size(), "Only the missing 'de' locale must be reported");
+    assertEquals("field_pattern", errors.get(0).elementId());
+    assertTrue(errors.get(0).message().contains("de"), "Error message must name the missing locale");
+  }
+
+  @Test
+  void stringPatternErrorMessageValidatorAcceptsPatternWithErrorMessagesForAllLocales() {
+    DocumentModel model = load("StringPatternErrorMessageValidator_allLocalesCovered");
+    List<ModelValidationError> errors = new StringPatternErrorMessageValidator().validate(model, TestModels.context(model));
+
+    assertTrue(errors.isEmpty(), "A field that provides error messages for every declared locale must not be reported");
+  }
 }
