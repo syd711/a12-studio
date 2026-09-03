@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
@@ -34,7 +36,7 @@
       </VBox>
       <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
         <Label styleClass="field-label" text="%pattern" />
-        <TextField fx:id="patternField" />
+        <ComboBox fx:id="patternComboBox" editable="true" maxWidth="Infinity" />
       </VBox>
 
       <HBox spacing="16.0" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="1">
@@ -49,6 +51,8 @@
            <RowConstraints />
         </rowConstraints>
     </GridPane>
+
+    <Hyperlink fx:id="regexTestLink" text="%regex_test_environment" onAction="#openRegexTestEnvironment" />
 
     <TitledPane fx:id="suggestionsPane" collapsible="false" maxWidth="Infinity" styleClass="titled-pane-child" text="%suggestions">
       <VBox spacing="8.0">

@@ -15,13 +15,17 @@ import de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs;
 import de.a12.studio.ui.events.LocalesChangedEvent;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.SystemUtil;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -43,13 +47,16 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
   private TextField maxLengthField;
 
   @FXML
-  private TextField patternField;
+  private ComboBox<Object> patternComboBox;
 
   @FXML
   private CheckBox lineBreaksCheckBox;
 
   @FXML
   private CheckBox alphabeticalSortingCheckBox;
+
+  @FXML
+  private Hyperlink regexTestLink;
 
   @FXML
   private HBox suggestionsColumnHeaders;
@@ -69,15 +76,54 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     WidgetFactory.restrictToNumericInput(minLengthField);
     WidgetFactory.restrictToNumericInput(maxLengthField);
 
+    // Populate combo with preset entries; the editable text field sits on top for free typing.
+    patternComboBox.getItems().setAll(RegexPreset.ALL);
+
+    // Show "Description  —  pattern" for presets, raw string for anything else (typed text).
+    patternComboBox.setButtonCell(new PatternCell());
+    patternComboBox.setCellFactory(lv -> new PatternCell());
+
+    // When the combo value changes (selection or direct typing) persist the raw pattern string.
+    patternComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      String rawPattern = toRawPattern(newVal);
+      withStringTypeOptions(element, options -> options.setPattern(rawPattern == null || rawPattern.isEmpty() ? null : rawPattern));
+      debouncer.debounce("patternComboBox", () -> commitChange(patternComboBox), COMMIT_DEBOUNCE_MS, true);
+    });
+
+    // Also react to the user typing inside the editable field directly (valueProperty only fires on commit).
+    patternComboBox.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      String rawPattern = newVal == null || newVal.isEmpty() ? null : newVal;
+      withStringTypeOptions(element, options -> options.setPattern(rawPattern));
+      debouncer.debounce("patternComboBox", () -> commitChange(patternComboBox), COMMIT_DEBOUNCE_MS, true);
+    });
+
     bindTextField(minLengthField, (element, value) -> withStringTypeOptions(element, options -> options.setMinLength(parseInteger(value))));
     bindTextField(maxLengthField, (element, value) -> withStringTypeOptions(element, options -> options.setMaxLength(parseInteger(value))));
-    bindTextField(patternField, (element, value) -> withStringTypeOptions(element, options -> options.setPattern(value.isEmpty() ? null : value)));
     bindCheckBox(lineBreaksCheckBox, (element, value) -> withStringTypeOptions(element, options -> options.setLineBreaksPermitted(value ? true : null)));
     bindCheckBox(alphabeticalSortingCheckBox, (element, value) -> withStringTypeOptions(element, options -> options.setAlphabeticalSorting(value ? true : null)));
   }
 
+  @FXML
+  private void openRegexTestEnvironment() {
+    SystemUtil.openUrl("https://regex101.com/");
+  }
+
+  /** Returns the raw pattern string from whatever the combo holds (preset record or plain string). */
+  private static String toRawPattern(Object value) {
+    if (value instanceof RegexPreset preset) {
+      return preset.pattern();
+    }
+    return value != null ? value.toString() : null;
+  }
+
   public ReadOnlyStringProperty patternProperty() {
-    return patternField.textProperty();
+    return patternComboBox.getEditor().textProperty();
   }
 
   @Override
@@ -88,7 +134,17 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     StringTypeOptions options = getStringFieldType(element).map(StringFieldType::getStringType).orElse(null);
     setFieldValue(minLengthField, options != null && options.getMinLength() != null ? String.valueOf(options.getMinLength()) : "");
     setFieldValue(maxLengthField, options != null && options.getMaxLength() != null ? String.valueOf(options.getMaxLength()) : "");
-    setFieldValue(patternField, options != null && options.getPattern() != null ? options.getPattern() : "");
+
+    // Populate pattern: show raw text in editor (presets aren't re-matched on load — user sees the stored expression).
+    String pattern = options != null && options.getPattern() != null ? options.getPattern() : "";
+    updatingFromModel = true;
+    try {
+      patternComboBox.getEditor().setText(pattern);
+      patternComboBox.setValue(pattern);
+    } finally {
+      updatingFromModel = false;
+    }
+
     setFieldValue(lineBreaksCheckBox, options != null && Boolean.TRUE.equals(options.getLineBreaksPermitted()));
     setFieldValue(alphabeticalSortingCheckBox, options != null && Boolean.TRUE.equals(options.getAlphabeticalSorting()));
     rebuildSuggestionsRows();
@@ -103,6 +159,24 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
   public void localesChanged(@NonNull LocalesChangedEvent event) {
     if (event.getItem().equals(projectItem)) {
       rebuildSuggestionsRows();
+    }
+  }
+
+  // ----- Cell rendering -----
+
+  /** Shows "Description  —  pattern" for RegexPreset items, plain text for everything else. */
+  private static final class PatternCell extends ListCell<Object> {
+    @Override
+    protected void updateItem(Object item, boolean empty) {
+      super.updateItem(item, empty);
+      if (empty || item == null) {
+        setText(null);
+        setTooltip(null);
+      } else if (item instanceof RegexPreset preset) {
+        setText(preset.description() + "  \u2014  " + preset.pattern());
+      } else {
+        setText(item.toString());
+      }
     }
   }
 
