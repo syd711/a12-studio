@@ -10,9 +10,10 @@
       {
         "code": "en"
       }
-    ]
+    ],
+    "enforceModelSuffixes": true
   },
   "previewApp": {},
-  "settingsType": "PROJECT_ROOT",
-  "settingsName": "settings.json"
+  "settingsName": "settings.json",
+  "settingsType": "PROJECT_ROOT"
 }

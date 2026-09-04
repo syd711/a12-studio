@@ -40,7 +40,7 @@ public final class ModelSuffixValidator implements ModelValidator {
     }
 
     String fileName = context.projectItem().getName();
-    if (fileName == null || !fileName.toLowerCase().endsWith(".json")) {
+    if (fileName == null || !fileName.toLowerCase().endsWith(".json") || fileName.contains("__generated")) {
       return List.of();
     }
     String baseName = fileName.substring(0, fileName.length() - ".json".length());
