@@ -110,6 +110,8 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    errorContainerController.addStyleClass("error-container-no-radius");
+
     labelsController.configureModelLabels();
     subtitlesController.configureCustom("subtitle", "SUBTITLES");
     annotationsController.hideAnnotationDatasetsButton();

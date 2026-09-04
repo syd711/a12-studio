@@ -89,7 +89,7 @@
                     {
                       "type": "Field",
                       "id": "field_16af2",
-                      "name": "CompanyID",
+                      "name": "CompanyID3",
                       "annotations": [
                         {
                           "name": "enable_approximate_match_search",

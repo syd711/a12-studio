@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
@@ -32,7 +33,18 @@
                   <Insets top="12.0" />
                </VBox.margin>
             </Label>
-            <Label fx:id="pathLabel" styleClass="field-value" />
+            <ComboBox fx:id="locationCombo" maxWidth="1.7976931348623157E308" promptText="%select_a_location" />
+
+            <VBox spacing="24.0">
+               <children>
+                  <fx:include fx:id="locales" source="../../propertyeditors/locales-panel.fxml" />
+                  <fx:include fx:id="roles" source="../../propertyeditors/roles-panel.fxml" />
+               </children>
+               <VBox.margin>
+                  <Insets top="24.0" />
+               </VBox.margin>
+            </VBox>
+
             <Label styleClass="field-label" text="%fields">
                <VBox.margin>
                   <Insets top="12.0" />

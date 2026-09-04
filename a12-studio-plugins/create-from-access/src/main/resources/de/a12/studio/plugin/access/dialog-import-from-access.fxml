@@ -2,8 +2,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
@@ -13,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="560.0"
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="560.0"
             styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.plugin.access.ImportFromAccessDialogController">
@@ -21,10 +23,12 @@
       <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <VBox spacing="0.0" BorderPane.alignment="TOP_LEFT">
-         <BorderPane.margin>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="TOP_LEFT">
+      <content>
+      <VBox spacing="0.0">
+         <padding>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
-         </BorderPane.margin>
+         </padding>
 
          <!-- File chooser row -->
          <Label styleClass="field-label" text="%import_access.database_file" />
@@ -67,8 +71,18 @@
          <Label styleClass="field-label" text="%location">
             <VBox.margin><Insets top="14.0" /></VBox.margin>
          </Label>
-         <Label fx:id="pathLabel" styleClass="field-value" />
+         <ComboBox fx:id="locationCombo" maxWidth="1.7976931348623157E308" promptText="%select_a_location">
+            <VBox.margin><Insets top="4.0" /></VBox.margin>
+         </ComboBox>
+
+         <VBox spacing="24.0">
+            <VBox.margin><Insets top="24.0" /></VBox.margin>
+            <fx:include fx:id="locales" source="/de/a12/studio/ui/editors/propertyeditors/locales-panel.fxml" />
+            <fx:include fx:id="roles" source="/de/a12/studio/ui/editors/propertyeditors/roles-panel.fxml" />
+         </VBox>
       </VBox>
+      </content>
+      </ScrollPane>
    </center>
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" styleClass="footer-toolbar"

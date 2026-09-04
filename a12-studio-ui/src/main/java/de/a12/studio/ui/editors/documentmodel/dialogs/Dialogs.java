@@ -52,12 +52,12 @@ public class Dialogs {
   }
 
   public static Optional<Result> showCreateOverviewModel(Stage owner, @NonNull ProjectItem targetFolder,
-      @NonNull List<FieldOption> fields, @NonNull String defaultName) {
+      @NonNull DocumentModel documentModel, @NonNull List<FieldOption> fields, @NonNull String defaultName) {
     FXMLLoader fxmlLoader = new FXMLLoader(CreateOverviewModelDialogController.class.getResource("create-overview-model-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("create-overview-model-dialog", fxmlLoader, owner, StudioBundle.get("create_overview_model_from_selection"));
     CreateOverviewModelDialogController controller = (CreateOverviewModelDialogController) stage.getUserData();
-    controller.init(stage, targetFolder, fields, defaultName);
+    controller.init(stage, targetFolder, documentModel, fields, defaultName);
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();

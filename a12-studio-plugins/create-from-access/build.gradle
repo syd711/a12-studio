@@ -10,7 +10,9 @@ javafx {
 dependencies {
     implementation project(':a12-studio-commons')
     implementation project(':a12-studio-models')
+    implementation project(':a12-studio-models-validation')
     implementation project(':a12-studio-plugin-manager')
+    implementation project(':a12-studio-ui')
     implementation 'org.slf4j:slf4j-api:2.0.17'
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
     implementation 'com.healthmarketscience.jackcess:jackcess:4.0.7'

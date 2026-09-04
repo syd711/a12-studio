@@ -26,6 +26,14 @@
 }
 
 /**
+ * Context Menus
+ */
+.context-menu {
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+}
+
+/**
  * Font Icons (org.kordamp.ikonli)
  *
  * -fx-fill is set alongside -fx-icon-color because ikonli's FontIcon (a Text subclass)

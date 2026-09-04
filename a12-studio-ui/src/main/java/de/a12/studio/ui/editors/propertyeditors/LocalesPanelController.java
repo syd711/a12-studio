@@ -103,7 +103,7 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
    * panel to a model via {@link #setModel}.
    */
   public List<Locale> getLocales() {
-    return List.copyOf(standaloneLocales);
+    return new ArrayList<>(standaloneLocales);
   }
 
   private List<Locale> currentLocales() {
@@ -167,7 +167,7 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
       return;
     }
 
-    commitChange();
+    commitHeaderChange();
     updateValidation();
 
     ProjectItem projectItem = Studio.getSelectedProjectItem();

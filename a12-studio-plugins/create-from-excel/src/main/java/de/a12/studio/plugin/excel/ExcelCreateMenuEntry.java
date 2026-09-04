@@ -1,8 +1,10 @@
 package de.a12.studio.plugin.excel;
 
 import de.a12.studio.models.NewModelFactory;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
+import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.DocumentModelBuilder.ColumnDescriptor;
 import de.a12.studio.ui.util.DocumentModelBuilder.ColumnType;
@@ -54,8 +56,20 @@ public class ExcelCreateMenuEntry implements ICreateItemMenuEntry {
         .toList();
 
     try {
-      var model = DocumentModelBuilder.build(targetFolder, data.modelName(), data.modelName(), columns);
-      NewModelFactory.createModelFromExisting(targetFolder, model, data.modelName());
+      DocumentModel model = DocumentModelBuilder.build(data.folder(), data.modelName(), data.modelName(), columns);
+      ProjectItem item = NewModelFactory.createModelFromExisting(data.folder(), model, data.modelName());
+      boolean needsSave = false;
+      if (!data.locales().isEmpty()) {
+        item.getModel().setLocales(data.locales());
+        needsSave = true;
+      }
+      if (!data.roles().isEmpty()) {
+        RolesEditorPanelController.applyRoles(item.getModel(), data.roles());
+        needsSave = true;
+      }
+      if (needsSave) {
+        item.save();
+      }
     }
     catch (IOException e) {
       log.error("Failed to create document model from Excel file '{}': {}",

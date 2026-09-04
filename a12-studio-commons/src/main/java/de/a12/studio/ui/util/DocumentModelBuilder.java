@@ -135,7 +135,7 @@ public final class DocumentModelBuilder {
     return id.isEmpty() ? "field" : id;
   }
 
-  /** Resolves the project's configured locales, falling back to en + de if none are set. */
+  /** Resolves the project's configured locales, falling back to the JVM's system locale if none are set. */
   @NonNull
   public static List<Locale> resolveDefaultLocales(@NonNull ProjectItem parent) {
     ProjectItem root = parent;
@@ -144,11 +144,7 @@ public final class DocumentModelBuilder {
     }
     List<Locale> projectLocales = ProjectRootSettings.load(root.getFile()).getGeneral().getLocales();
     if (projectLocales.isEmpty()) {
-      Locale en = new Locale();
-      en.setCode("en");
-      Locale de = new Locale();
-      de.setCode("de");
-      return new ArrayList<>(List.of(en, de));
+      return systemLocaleFallback();
     }
     List<Locale> locales = new ArrayList<>();
     for (Locale pl : projectLocales) {
@@ -157,5 +153,17 @@ public final class DocumentModelBuilder {
       locales.add(locale);
     }
     return locales;
+  }
+
+  /**
+   * A single-element locales list wrapping the JVM's default locale, used wherever no project locales are
+   * configured yet (e.g. {@link #resolveDefaultLocales} and the New Model dialog) so the locales editor
+   * starts from the machine's own locale instead of an arbitrary hardcoded language.
+   */
+  @NonNull
+  public static List<Locale> systemLocaleFallback() {
+    Locale locale = new Locale();
+    locale.setCode(java.util.Locale.getDefault().toLanguageTag());
+    return new ArrayList<>(List.of(locale));
   }
 }

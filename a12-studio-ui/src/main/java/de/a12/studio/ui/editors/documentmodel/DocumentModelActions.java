@@ -20,6 +20,8 @@ import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogC
 import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.Result;
 import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController;
+import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -28,7 +30,6 @@ import de.a12.studio.ui.util.commandstack.CommandStack;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
@@ -46,6 +47,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
@@ -76,15 +78,21 @@ public class DocumentModelActions {
   private MenuItem ruleMenuItem;
   private MenuItem computationMenuItem;
 
-  /** Triggered when a rename is requested for an element; wired by the tree controller to the active cell. */
+  /**
+   * Triggered when a rename is requested for an element; wired by the tree controller to the active cell.
+   */
   private Runnable startRenameCallback;
 
-  /** Sets the callback that triggers inline rename on the currently selected cell. */
+  /**
+   * Sets the callback that triggers inline rename on the currently selected cell.
+   */
   public void setStartRenameCallback(@NonNull Runnable callback) {
     this.startRenameCallback = callback;
   }
 
-  /** Invokes the inline-rename callback if one is registered. */
+  /**
+   * Invokes the inline-rename callback if one is registered.
+   */
   public void startRename() {
     if (startRenameCallback != null) {
       startRenameCallback.run();
@@ -92,8 +100,8 @@ public class DocumentModelActions {
   }
 
   public DocumentModelActions(@NonNull ProjectItem projectItem, @NonNull ModelRoot modelRoot,
-                               @NonNull CommandStack commandStack, @NonNull TreeTableView<ElementViewModel> elementsTreeTable,
-                               @NonNull Consumer<Element> onModelChanged) {
+                              @NonNull CommandStack commandStack, @NonNull TreeTableView<ElementViewModel> elementsTreeTable,
+                              @NonNull Consumer<Element> onModelChanged) {
     this.projectItem = projectItem;
     this.modelRoot = modelRoot;
     this.commandStack = commandStack;
@@ -122,58 +130,53 @@ public class DocumentModelActions {
    */
   public ContextMenu createRootContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
-    Menu createMenu = new Menu("_Create...");
 
-    createMenu.getItems().add(createAddMenuItem(createMenuItem("_Group", createGroupIcon()),
+    contextMenu.getItems().add(createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_group"), createGroupIcon()),
         siblings -> DocumentModelElementFactory.newGroupElement(siblings, modelRoot)));
-    createMenu.getItems().add(createAddMenuItem(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT),
+    contextMenu.getItems().add(createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_attachment"), Icons.ELEMENT_ATTACHMENT),
         siblings -> DocumentModelElementFactory.newAttachmentElement(siblings, modelRoot)));
-    createMenu.getItems().add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT),
+    contextMenu.getItems().add(createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_multi_select"), Icons.ELEMENT_MULTI_SELECT),
         siblings -> DocumentModelElementFactory.newMultiSelectElement(siblings, modelRoot)));
 
-    MenuItem includeItem = createMenuItem("_Include", Icons.ELEMENT_INCLUDE);
+    MenuItem includeItem = createMenuItem(StudioBundle.get("document_model_tree.add_include"), Icons.ELEMENT_INCLUDE);
     includeItem.setOnAction(event -> onAddInclude());
-    createMenu.getItems().add(includeItem);
+    contextMenu.getItems().add(includeItem);
 
-    contextMenu.getItems().add(createMenu);
     return contextMenu;
   }
 
   private List<MenuItem> createElementMenuItems(@NonNull Element element) {
     List<MenuItem> items = new ArrayList<>();
     if (!new ElementViewModel(element).hasFixedChildren()) {
-      Menu createMenu = new Menu("_Create...");
-      createMenu.getItems().addAll(createAddMenuItems());
+      items.addAll(createAddMenuItems());
       List<TreeItem<ElementViewModel>> selection = new ArrayList<>(elementsTreeTable.getSelectionModel().getSelectedItems());
-      if (selection.size() > 1) {
-        createMenu.getItems().add(new SeparatorMenuItem());
-        MenuItem overviewModelItem = createMenuItem("_Overview Model from Selection...", WidgetFactory.createModelIcon(Icons.PNG_MODEL_OVERVIEW));
-        overviewModelItem.setOnAction(event -> onCreateOverviewModelFromSelection(selection));
-        createMenu.getItems().add(overviewModelItem);
-      }
-      items.add(createMenu);
+      items.add(new SeparatorMenuItem());
+      MenuItem overviewModelItem = createMenuItem(StudioBundle.get("document_model_tree.create_overview_model_menu_item"),
+          WidgetFactory.createModelIcon(Icons.PNG_MODEL_OVERVIEW));
+      overviewModelItem.setOnAction(event -> onCreateOverviewModelFromSelection(selection));
+      items.add(overviewModelItem);
       items.add(new SeparatorMenuItem());
     }
-    MenuItem cutItem = createMenuItem("_Cut", Icons.CUT);
+    MenuItem cutItem = createMenuItem(StudioBundle.get("document_model_tree.cut"), Icons.CUT);
     cutItem.setOnAction(event -> cutSelection());
     items.add(cutItem);
 
-    MenuItem copyItem = createMenuItem("Cop_y", Icons.COPY);
+    MenuItem copyItem = createMenuItem(StudioBundle.get("document_model_tree.copy"), Icons.COPY);
     copyItem.setOnAction(event -> copySelection());
     items.add(copyItem);
 
-    MenuItem pasteItem = createMenuItem("_Paste", Icons.PASTE);
+    MenuItem pasteItem = createMenuItem(StudioBundle.get("document_model_tree.paste"), Icons.PASTE);
     pasteItem.setDisable(!hasClipboardContent());
     pasteItem.setOnAction(event -> pasteSelection());
     items.add(pasteItem);
     items.add(new SeparatorMenuItem());
 
-    MenuItem renameItem = createMenuItem("_Rename", Icons.PENCIL);
+    MenuItem renameItem = createMenuItem(StudioBundle.get("rename"), Icons.PENCIL);
     renameItem.setOnAction(event -> startRename());
     items.add(renameItem);
     items.add(new SeparatorMenuItem());
 
-    MenuItem deleteItem = createMenuItem("_Delete", Icons.TRASH);
+    MenuItem deleteItem = createMenuItem(StudioBundle.get("delete"), Icons.TRASH);
     deleteItem.setOnAction(event -> confirmAndDeleteSelection());
     items.add(deleteItem);
     return items;
@@ -181,23 +184,23 @@ public class DocumentModelActions {
 
   public List<MenuItem> createAddMenuItems() {
     List<MenuItem> items = new ArrayList<>();
-    items.add(createAddMenuItem(createMenuItem("_Group", createGroupIcon()),
+    items.add(createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_group"), createGroupIcon()),
         siblings -> DocumentModelElementFactory.newGroupElement(siblings, modelRoot)));
-    fieldMenuItem = createAddMenuItem(createMenuItem("_Field", Icons.ELEMENT_FIELD),
+    fieldMenuItem = createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_field"), Icons.ELEMENT_FIELD),
         siblings -> DocumentModelElementFactory.newFieldElement(siblings, modelRoot));
     items.add(fieldMenuItem);
-    ruleMenuItem = createAddMenuItem(createMenuItem("_Validation Rule", Icons.ELEMENT_VALIDATION_RULE),
+    ruleMenuItem = createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_validation_rule"), Icons.ELEMENT_VALIDATION_RULE),
         siblings -> DocumentModelElementFactory.newRuleElement(siblings, modelRoot));
     items.add(ruleMenuItem);
-    computationMenuItem = createAddMenuItem(createMenuItem("Co_mputation Rule", Icons.ELEMENT_COMPUTATION),
+    computationMenuItem = createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_computation_rule"), Icons.ELEMENT_COMPUTATION),
         siblings -> DocumentModelElementFactory.newComputationElement(siblings, modelRoot));
     items.add(computationMenuItem);
-    items.add(createAddMenuItem(createMenuItem("_Attachment", Icons.ELEMENT_ATTACHMENT),
+    items.add(createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_attachment"), Icons.ELEMENT_ATTACHMENT),
         siblings -> DocumentModelElementFactory.newAttachmentElement(siblings, modelRoot)));
-    items.add(createAddMenuItem(createMenuItem("Multi-_Select", Icons.ELEMENT_MULTI_SELECT),
+    items.add(createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_multi_select"), Icons.ELEMENT_MULTI_SELECT),
         siblings -> DocumentModelElementFactory.newMultiSelectElement(siblings, modelRoot)));
 
-    MenuItem includeItem = createMenuItem("_Include", Icons.ELEMENT_INCLUDE);
+    MenuItem includeItem = createMenuItem(StudioBundle.get("document_model_tree.add_include"), Icons.ELEMENT_INCLUDE);
     includeItem.setOnAction(event -> onAddInclude());
     items.add(includeItem);
 
@@ -287,13 +290,15 @@ public class DocumentModelActions {
     List<FieldOption> fieldOptions = fields.stream().map(field -> new FieldOption(field.getId(), index.getPath(field))).toList();
 
     ProjectItem targetFolder = projectItem.getParent();
-    Optional<Result> input = Dialogs.showCreateOverviewModel(Studio.stage, targetFolder, fieldOptions, defaultOverviewModelName(documentModel.getId()));
+    Optional<Result> input = Dialogs.showCreateOverviewModel(Studio.stage, targetFolder, documentModel, fieldOptions,
+        defaultOverviewModelName(documentModel.getId()));
     if (input.isEmpty()) {
       return;
     }
 
     try {
-      ProjectItem newItem = NewModelFactory.createModel(targetFolder, ModelType.OVERVIEW, input.get().name(), documentModel.getId());
+      ProjectItem selectedFolder = input.get().folder();
+      ProjectItem newItem = NewModelFactory.createModel(selectedFolder, ModelType.OVERVIEW, input.get().name(), documentModel.getId());
       OverviewModel overviewModel = (OverviewModel) newItem.getModel();
       for (String fieldId : input.get().selectedFieldIds()) {
         Column column = new Column();
@@ -302,7 +307,14 @@ public class DocumentModelActions {
         column.setElementRef(fieldId);
         overviewModel.getContent().getColumns().add(column);
       }
+      if (!input.get().locales().isEmpty()) {
+        overviewModel.setLocales(input.get().locales());
+      }
+      if (!input.get().roles().isEmpty()) {
+        RolesEditorPanelController.applyRoles(overviewModel, input.get().roles());
+      }
       newItem.save();
+      StudioEventManager.getInstance().fireModelSavedEvent(newItem);
     }
     catch (IOException e) {
       WidgetFactory.showAlert(Studio.stage, StudioBundle.get("could_not_create_item", input.get().name()), e.getMessage());
@@ -419,7 +431,9 @@ public class DocumentModelActions {
     return null;
   }
 
-  /** Whether {@link #pasteSelection()} currently has anything to paste, for the toolbar Paste button's disabled state. */
+  /**
+   * Whether {@link #pasteSelection()} currently has anything to paste, for the toolbar Paste button's disabled state.
+   */
   public boolean hasClipboardContent() {
     return !clipboardJson.isEmpty();
   }
@@ -593,7 +607,7 @@ public class DocumentModelActions {
   }
 
   private boolean hasSelectedAncestor(@NonNull TreeItem<ElementViewModel> treeItem,
-                                       @NonNull List<TreeItem<ElementViewModel>> selection) {
+                                      @NonNull List<TreeItem<ElementViewModel>> selection) {
     TreeItem<ElementViewModel> ancestor = treeItem.getParent();
     while (ancestor != null) {
       if (selection.contains(ancestor)) {

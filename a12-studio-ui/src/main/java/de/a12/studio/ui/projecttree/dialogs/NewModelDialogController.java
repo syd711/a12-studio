@@ -4,6 +4,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
+import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.ProjectModelFolders;
@@ -27,8 +28,6 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -172,7 +171,7 @@ public class NewModelDialogController implements DialogController {
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;
     controller.targetFolder = targetFolder;
-    setupLocationCombo(controller, targetFolder);
+    ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
     controller.localesController.initializeLocales(findProjectLocales());
     controller.documentModelCombo.getItems().setAll(ProjectDocumentModels.getOtherDocumentModels(targetFolder).stream()
         .map(DocumentModel::getId)
@@ -203,53 +202,16 @@ public class NewModelDialogController implements DialogController {
     return Optional.empty();
   }
 
-  // Populates the "Location" combo with every folder in the project, defaulting to the folder named
-  // "models" (matching this project's own New Model default-folder convention, see
-  // ProjectModelFolders#resolveDefaultModelFolder) if one exists anywhere in the tree, else the project
-  // root itself (always first in the sorted list ProjectModelFolders#listAllFolders returns).
-  private static void setupLocationCombo(NewModelDialogController controller, ProjectItem targetFolder) {
-    ProjectItem projectRoot = targetFolder;
-    while (projectRoot.getParent() != null) {
-      projectRoot = projectRoot.getParent();
-    }
-    ProjectItem root = projectRoot;
-
-    List<ProjectItem> folders = ProjectModelFolders.listAllFolders(root);
-    controller.locationCombo.setConverter(new StringConverter<>() {
-      @Override
-      public String toString(ProjectItem folder) {
-        return folder == null ? "" : displayLocation(root, folder);
-      }
-
-      @Override
-      public ProjectItem fromString(String string) {
-        return null;
-      }
-    });
-    controller.locationCombo.getItems().setAll(folders);
-    ProjectItem defaultFolder = folders.stream()
-        .filter(folder -> folder.getName().equalsIgnoreCase("models"))
-        .findFirst()
-        .orElse(folders.get(0));
-    controller.locationCombo.setValue(defaultFolder);
-  }
-
   // Seeds the locales panel from the project's own settings.json (general.locales), mirroring
   // NewModelFactory#resolveDefaultLocales -- so what the dialog shows already matches what the model would
-  // get if the user left the panel untouched.
+  // get if the user left the panel untouched. Falls back to the JVM's system locale (see
+  // DocumentModelBuilder#systemLocaleFallback) when the project has none configured yet.
   private static List<Locale> findProjectLocales() {
     Project project = Studio.getCurrentProject();
     if (project == null) {
-      return List.of();
+      return DocumentModelBuilder.systemLocaleFallback();
     }
-    return project.getSettings().getProjectRootSettings().getGeneral().getLocales();
-  }
-
-  private static String displayLocation(ProjectItem projectRoot, ProjectItem folder) {
-    if (folder.equals(projectRoot)) {
-      return "/";
-    }
-    Path relative = projectRoot.getFile().toPath().toAbsolutePath().relativize(folder.getFile().toPath().toAbsolutePath());
-    return relative.toString().replace(File.separatorChar, '/');
+    List<Locale> locales = project.getSettings().getProjectRootSettings().getGeneral().getLocales();
+    return locales.isEmpty() ? DocumentModelBuilder.systemLocaleFallback() : locales;
   }
 }

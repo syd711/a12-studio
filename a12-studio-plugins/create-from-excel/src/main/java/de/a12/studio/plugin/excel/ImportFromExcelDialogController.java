@@ -1,9 +1,14 @@
 package de.a12.studio.plugin.excel;
 
+import de.a12.studio.models.Locale;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.components.StudioFileChooser;
+import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
+import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.FileUtils;
+import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import java.util.ResourceBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -13,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -35,11 +41,16 @@ public class ImportFromExcelDialogController implements DialogController {
    * @param excelFile the chosen {@code .xlsx} / {@code .xls} file
    * @param columns   the columns read from the first sheet (header row + inferred types)
    * @param modelName the user-supplied document model name (filename without extension)
+   * @param locales   the locales to set on the new document model
+   * @param roles     the roles to set on the new document model's {@code roles} header annotation
    */
   public record ExcelImportInput(
       @NonNull File excelFile,
       @NonNull List<ExcelImportService.ColumnInfo> columns,
-      @NonNull String modelName
+      @NonNull String modelName,
+      @NonNull ProjectItem folder,
+      @NonNull List<Locale> locales,
+      @NonNull List<String> roles
   ) {
   }
 
@@ -51,9 +62,12 @@ public class ImportFromExcelDialogController implements DialogController {
   @FXML private Button browseButton;
   @FXML private ListView<String> columnListView;
   @FXML private TextField modelNameField;
-  @FXML private Label pathLabel;
+  @FXML private ComboBox<ProjectItem> locationCombo;
   @FXML private Button okButton;
   @FXML private Button cancelButton;
+
+  @FXML private LocalesPanelController localesController;
+  @FXML private RolesEditorPanelController rolesController;
 
   // -------------------------------------------------------------------------
   // State
@@ -191,17 +205,23 @@ public class ImportFromExcelDialogController implements DialogController {
     ImportFromExcelDialogController controller =
         (ImportFromExcelDialogController) stage.getUserData();
     controller.stage = stage;
-    controller.pathLabel.setText(targetFolder.getPath());
-    controller.pathLabel.setTooltip(WidgetFactory.createTooltip(targetFolder.getPath()));
+    ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
+    controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
+    controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+    WidgetFactory.installResizable(stage);
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
       String modelName = controller.modelNameField.getText().trim();
-      if (controller.currentExcelFile != null && !modelName.isBlank()) {
+      ProjectItem folder = controller.locationCombo.getValue();
+      if (controller.currentExcelFile != null && !modelName.isBlank() && folder != null) {
         return Optional.of(new ExcelImportInput(
             controller.currentExcelFile,
             controller.currentColumns,
-            modelName));
+            modelName,
+            folder,
+            controller.localesController.getLocales(),
+            controller.rolesController.getRoles()));
       }
     }
     return Optional.empty();
@@ -234,18 +254,24 @@ public class ImportFromExcelDialogController implements DialogController {
     ImportFromExcelDialogController controller =
         (ImportFromExcelDialogController) stage.getUserData();
     controller.stage = stage;
-    controller.pathLabel.setText(targetFolder.getPath());
-    controller.pathLabel.setTooltip(WidgetFactory.createTooltip(targetFolder.getPath()));
+    ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
+    controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
+    controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
     controller.loadExcelFile(preloadFile);
+    WidgetFactory.installResizable(stage);
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
       String modelName = controller.modelNameField.getText().trim();
-      if (controller.currentExcelFile != null && !modelName.isBlank()) {
+      ProjectItem folder = controller.locationCombo.getValue();
+      if (controller.currentExcelFile != null && !modelName.isBlank() && folder != null) {
         return Optional.of(new ExcelImportInput(
             controller.currentExcelFile,
             controller.currentColumns,
-            modelName));
+            modelName,
+            folder,
+            controller.localesController.getLocales(),
+            controller.rolesController.getRoles()));
       }
     }
     return Optional.empty();

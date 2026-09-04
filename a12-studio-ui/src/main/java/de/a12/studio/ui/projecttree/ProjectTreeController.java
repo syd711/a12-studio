@@ -102,6 +102,13 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     if (project == null || event.getItem().getModel() == null) {
       return;
     }
+    if (findTreeItem(projectTree.getRoot(), event.getItem()) == null) {
+      // Item not yet in the tree (e.g. a model created outside the "New Model" dialog, such as "Create
+      // Overview Model from Selection") -- a full reload is needed to make it appear, since refreshNode
+      // only revalidates items that already have a tree node.
+      onReload();
+      return;
+    }
     refreshNode(event.getItem().getModel());
   }
 

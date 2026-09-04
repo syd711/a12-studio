@@ -3,18 +3,15 @@ package de.a12.studio.ui.preferences;
 import de.a12.studio.models.Locale;
 import de.a12.studio.models.projects.settings.GeneralSettings;
 import de.a12.studio.models.projects.settings.ProjectRootSettings;
-import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.Icons;
-import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -27,7 +24,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -139,12 +135,9 @@ public class GeneralLocalesPanelController implements Initializable {
 
   private HBox createActionsBox(int index) {
     Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
-      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_locale"), null, null, "Delete");
-      if (result.isPresent() && result.get() == ButtonType.OK) {
-        generalSettings.getLocales().remove(index);
-        rebuildRows();
-        commitLocalesChange();
-      }
+      generalSettings.getLocales().remove(index);
+      rebuildRows();
+      commitLocalesChange();
     });
 
     HBox actionsBox = new HBox(4.0, deleteButton);

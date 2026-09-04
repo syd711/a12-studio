@@ -32,6 +32,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -483,6 +485,28 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   }
 
   /**
+   * Installs a double-click handler on {@code row} that starts inline rename, mirroring the F2,
+   * context-menu "Rename" and long-press triggers above. Registered as an event filter (rather
+   * than {@code setOnMouseClicked}) so it runs during the capturing phase and can consume the
+   * double-click before the row's default double-click-to-toggle-expand behavior sees it.
+   */
+  private void setupDoubleClickRename(@NonNull TreeTableRow<ElementViewModel> row) {
+    row.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+      if (event.getClickCount() != 2 || event.getButton() != MouseButton.PRIMARY) {
+        return;
+      }
+      ElementViewModel item = row.getItem();
+      if (row.isEmpty() || item == null || hasFixedChildrenAncestor(item.getElement())) {
+        return;
+      }
+      elementsTreeTable.getSelectionModel().clearSelection();
+      elementsTreeTable.getSelectionModel().select(row.getTreeItem());
+      documentModelActions.startRename();
+      event.consume();
+    });
+  }
+
+  /**
    * Refreshes the Add/Cut/Copy/Paste/Delete toolbar buttons' disabled state from the current selection and
    * (for Paste) the clipboard - called from the selection listener and after every Cut/Copy/Paste action,
    * since Copy changes what Paste can do without changing the selection itself.
@@ -825,6 +849,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       };
       setupRowDragAndDrop(row);
       setupLongPressRename(row);
+      setupDoubleClickRename(row);
       // Built fresh on every request (rather than once in updateItem and cached via setContextMenu) so its
       // items - notably the multi-selection-only "Create Overview Model from Selection" entry, see
       // DocumentModelActions#createElementMenuItems - reflect the tree's actual selection at click time; a row

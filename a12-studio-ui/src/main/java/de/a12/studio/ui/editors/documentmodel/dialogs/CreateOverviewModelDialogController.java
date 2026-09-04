@@ -1,13 +1,18 @@
 package de.a12.studio.ui.editors.documentmodel.dialogs;
 
+import de.a12.studio.models.Locale;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.FileUtils;
-import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.ui.util.ProjectModelFolders;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -32,14 +37,20 @@ public class CreateOverviewModelDialogController implements DialogController {
   public record FieldOption(String id, String label) {
   }
 
-  public record Result(String name, List<String> selectedFieldIds) {
+  public record Result(String name, List<String> selectedFieldIds, List<Locale> locales, List<String> roles, ProjectItem folder) {
   }
 
   @FXML
   private TextField nameField;
 
   @FXML
-  private Label pathLabel;
+  private ComboBox<ProjectItem> locationCombo;
+
+  @FXML
+  private LocalesPanelController localesController;
+
+  @FXML
+  private RolesEditorPanelController rolesController;
 
   @FXML
   private VBox fieldsBox;
@@ -55,6 +66,8 @@ public class CreateOverviewModelDialogController implements DialogController {
 
   private Stage stage;
 
+  private ProjectItem targetFolder;
+
   private List<FieldOption> fields = List.of();
 
   private final List<CheckBox> fieldCheckBoxes = new ArrayList<>();
@@ -67,13 +80,16 @@ public class CreateOverviewModelDialogController implements DialogController {
     nameField.requestFocus();
   }
 
-  void init(Stage stage, @NonNull ProjectItem targetFolder, @NonNull List<FieldOption> fields, @NonNull String defaultName) {
+  void init(Stage stage, @NonNull ProjectItem targetFolder, @NonNull DocumentModel documentModel,
+      @NonNull List<FieldOption> fields, @NonNull String defaultName) {
     this.stage = stage;
+    this.targetFolder = targetFolder;
     this.fields = fields;
 
-    pathLabel.setText(targetFolder.getPath());
-    pathLabel.setTooltip(WidgetFactory.createTooltip(targetFolder.getPath()));
+    ProjectModelFolders.configureLocationCombo(locationCombo, targetFolder);
     nameField.setText(defaultName);
+    localesController.initializeLocales(documentModel.getLocales());
+    rolesController.initializeRoles(RolesEditorPanelController.findDocumentModelRoles(targetFolder, documentModel.getId()));
 
     fieldsBox.getChildren().clear();
     fieldCheckBoxes.clear();
@@ -119,7 +135,9 @@ public class CreateOverviewModelDialogController implements DialogController {
         selectedIds.add(fields.get(i).id());
       }
     }
-    return Optional.of(new Result(name.trim(), selectedIds));
+    ProjectItem folder = locationCombo.getValue();
+    return Optional.of(new Result(name.trim(), selectedIds, localesController.getLocales(), rolesController.getRoles(),
+        folder != null ? folder : targetFolder));
   }
 
   private void validate() {
