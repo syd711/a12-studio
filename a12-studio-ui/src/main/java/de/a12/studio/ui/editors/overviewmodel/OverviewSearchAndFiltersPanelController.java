@@ -4,6 +4,9 @@ import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.NewFilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequiredValidator;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -105,6 +108,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       }
       ensureConfiguration().setEnableFilter(newValue);
       commitHeaderChange();
+      refreshValidationError();
     });
 
     showFilterBarField.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -131,6 +135,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       ensureFilterConfiguration().setFilterMode(newValue);
       commitHeaderChange();
       onRelevanceChange.run();
+      refreshValidationError();
     });
   }
 
@@ -186,6 +191,25 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       updatingFromModel = false;
     }
     onRelevanceChange.run();
+    refreshValidationError();
+  }
+
+  /** {@link OverviewFilterModeRequiredValidator} keys its error off the model's raw {@code filterMode} field
+   * rather than a bound {@link de.a12.studio.models.documentmodel.Element}, so - same pattern as {@link
+   * OverviewSortingPanelController}/{@link OverviewMultiSelectionPanelController} - this panel must query and
+   * display it itself. */
+  private void refreshValidationError() {
+    if (model == null) {
+      return;
+    }
+    List<ModelValidationError> errors =
+        Studio.getValidationService().validateElement(model, OverviewFilterModeRequiredValidator.ELEMENT_ID);
+    if (errors.isEmpty()) {
+      hideError();
+    }
+    else {
+      showError(errors.get(0).severity(), errors.get(0).message());
+    }
   }
 
   private OverviewConfiguration ensureConfiguration() {

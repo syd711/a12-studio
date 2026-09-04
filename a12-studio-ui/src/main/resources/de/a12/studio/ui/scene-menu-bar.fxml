@@ -5,12 +5,14 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane styleClass="dark-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.MenuBarController">
@@ -50,17 +52,22 @@
          <children>
             <HBox alignment="CENTER_LEFT" spacing="3.0">
                <children>
-                  <Button fx:id="deployBtn" accessibleText="%deploy_models" disable="true" managed="false" mnemonicParsing="false" onAction="#onDeploy" styleClass="menu-bar-button, deploy-models-button, preview-app-button" visible="false">
-                      <graphic>
-                          <FontIcon iconLiteral="mdi2c-cloud-upload-outline" iconSize="20" styleClass="toolbar-icon" />
-                      </graphic>
-                      <tooltip>
-                          <Tooltip text="%deploy_models" />
-                      </tooltip>
+                  <StackPane fx:id="deployBtnContainer" managed="false" visible="false">
+                     <children>
+                        <Button fx:id="deployBtn" accessibleText="%deploy_models" disable="true" mnemonicParsing="false" onAction="#onDeploy" styleClass="menu-bar-button, deploy-models-button, preview-app-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2c-cloud-upload-outline" iconSize="20" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%deploy_models" />
+                            </tooltip>
+                        </Button>
+                        <ProgressIndicator fx:id="deploySpinner" mouseTransparent="true" prefHeight="18.0" prefWidth="18.0" visible="false" />
+                     </children>
                      <HBox.margin>
                         <Insets right="6.0" />
                      </HBox.margin>
-                  </Button>
+                  </StackPane>
                   <Button fx:id="launchPreviewAppBtn" accessibleText="%launch_preview_app" managed="false" mnemonicParsing="false" onAction="#onLaunchPreviewApp" styleClass="menu-bar-button, launch-preview-app-button, preview-app-button" visible="false">
                       <graphic>
                           <FontIcon iconLiteral="mdi2p-play" iconSize="20" styleClass="toolbar-icon" />

@@ -92,8 +92,6 @@ public class PreviewAppDeployer {
 
       String token = login(httpClient, apiBase);
       uploadModels(httpClient, apiBase, token, zip);
-
-      showAlert(StudioBundle.get("deploy_models_success"));
     }
     catch (Exception e) {
       log.error("Failed to deploy models to the Preview App server: {}", e.getMessage(), e);

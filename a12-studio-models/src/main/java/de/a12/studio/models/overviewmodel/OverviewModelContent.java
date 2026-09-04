@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 public class OverviewModelContent {
 
-  private OverviewConfiguration configuration;
+  private OverviewConfiguration configuration = new OverviewConfiguration();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Column> columns = new ArrayList<>();
   private RowActionGroup rowActionGroup;

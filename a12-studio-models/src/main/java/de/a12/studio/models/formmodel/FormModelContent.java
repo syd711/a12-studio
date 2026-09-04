@@ -24,9 +24,9 @@ public class FormModelContent {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private HeaderFooterBox footerBox;
   private List<Screen> screens = new ArrayList<>();
-  private FieldConfiguration fieldConfiguration;
-  private GroupConfiguration groupConfiguration;
-  private Defaults defaults;
+  private FieldConfiguration fieldConfiguration = new FieldConfiguration();
+  private GroupConfiguration groupConfiguration = new GroupConfiguration();
+  private Defaults defaults = new Defaults();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String readonlyPresentation;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)

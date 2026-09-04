@@ -32,12 +32,14 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import org.jspecify.annotations.NonNull;
@@ -65,7 +67,13 @@ public class MenuBarController implements Initializable, StudioEventListener {
   private Button claudeConsoleBtn;
 
   @FXML
+  private StackPane deployBtnContainer;
+
+  @FXML
   private Button deployBtn;
+
+  @FXML
+  private ProgressIndicator deploySpinner;
 
   @FXML
   private Button launchPreviewAppBtn;
@@ -279,8 +287,11 @@ public class MenuBarController implements Initializable, StudioEventListener {
       return;
     }
     deployBtn.setDisable(true);
-    PreviewAppDeployer.deploy(project,
-        () -> refreshDeployButtonState(PreviewAppStatusMonitor.getInstance().getStatus()));
+    deploySpinner.setVisible(true);
+    PreviewAppDeployer.deploy(project, () -> {
+      deploySpinner.setVisible(false);
+      refreshDeployButtonState(PreviewAppStatusMonitor.getInstance().getStatus());
+    });
   }
 
   @FXML
@@ -330,8 +341,8 @@ public class MenuBarController implements Initializable, StudioEventListener {
     String installationPath = A12Settings.load().getInstallationPath();
     boolean visible = project != null && installationPath != null
         && A12Settings.isValidInstallationFolder(new File(installationPath));
-    deployBtn.setVisible(visible);
-    deployBtn.setManaged(visible);
+    deployBtnContainer.setVisible(visible);
+    deployBtnContainer.setManaged(visible);
     launchPreviewAppBtn.setVisible(visible);
     launchPreviewAppBtn.setManaged(visible);
     stopPreviewAppBtn.setVisible(visible);

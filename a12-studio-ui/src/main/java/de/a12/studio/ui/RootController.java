@@ -28,6 +28,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.DragEvent;
@@ -97,6 +98,9 @@ public class RootController implements Initializable, StudioEventListener {
 
   @FXML
   private Button dockedDeployBtn;
+
+  @FXML
+  private ProgressIndicator dockedDeploySpinner;
 
   @FXML
   private Button dockedLaunchBtn;
@@ -338,8 +342,11 @@ public class RootController implements Initializable, StudioEventListener {
   private void onDockedDeploy() {
     if (project == null) return;
     dockedDeployBtn.setDisable(true);
-    PreviewAppDeployer.deploy(project,
-        () -> refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus()));
+    dockedDeploySpinner.setVisible(true);
+    PreviewAppDeployer.deploy(project, () -> {
+      dockedDeploySpinner.setVisible(false);
+      refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus());
+    });
   }
 
   @FXML

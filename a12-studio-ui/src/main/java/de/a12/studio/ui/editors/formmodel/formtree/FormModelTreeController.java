@@ -36,6 +36,7 @@ import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSec
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.HideConditionPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.TabErrorBadge;
 import de.a12.studio.ui.util.commandstack.Command;
 import de.a12.studio.ui.util.commandstack.CommandStack;
@@ -89,8 +90,6 @@ public class FormModelTreeController implements Initializable {
   private static final String TABLE_SETTINGS_ID = ModelType.FORM.getValue();
   private static final String TREE_DIVIDER_ID = "treeEditorDivider";
 
-  private static final String TREE_VALIDATION_ERROR_MESSAGE =
-      "One or more elements in the tree below have a validation error. See the tree for details.";
 
   @FXML
   private Button undoButton;
@@ -172,6 +171,8 @@ public class FormModelTreeController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
+    errorContainerController.addStyleClass("error-container-no-radius");
+
     searchController.setOnSearch(this::applyFilter);
     tree.setShowRoot(false);
     tree.setCellFactory(view -> {
@@ -467,7 +468,7 @@ public class FormModelTreeController implements Initializable {
       errorContainerController.hide();
     }
     else {
-      errorContainerController.show("ERROR", TREE_VALIDATION_ERROR_MESSAGE);
+      errorContainerController.show("ERROR", StudioBundle.get("form_model_tree.validation_error_message"));
     }
     TabErrorBadge.refresh(tree);
   }
