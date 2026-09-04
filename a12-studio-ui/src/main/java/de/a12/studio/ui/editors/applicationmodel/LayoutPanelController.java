@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
  */
 public class LayoutPanelController extends AbstractPropertyEditor implements Initializable {
 
-  private static final List<String> LAYOUTS = List.of("ApplicationFrame", "MasterDetail", "Dashboard", "Stash", "Null");
+  private static final List<String> LAYOUTS = List.of("ApplicationFrame", "MasterDetail", "Dashboard", "Stack", "Null");
 
   private static final int COMMIT_DEBOUNCE_MS = 150;
 

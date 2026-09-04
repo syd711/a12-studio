@@ -49,7 +49,7 @@ import java.util.Optional;
  */
 public class DirectiveDialogController implements DialogController {
 
-  private static final List<String> LAYOUTS = List.of("ApplicationFrame", "MasterDetail", "Dashboard", "Stash", "Null");
+  private static final List<String> LAYOUTS = List.of("ApplicationFrame", "MasterDetail", "Dashboard", "Stack", "Null");
 
   private static final List<String> CONSTRAINTS_TYPES = List.of("MasterDetail");
 

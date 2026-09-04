@@ -2,7 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
@@ -14,18 +16,30 @@
       <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <VBox alignment="BASELINE_LEFT" prefHeight="90.0" BorderPane.alignment="TOP_LEFT">
+      <VBox alignment="BASELINE_LEFT" spacing="12.0" BorderPane.alignment="TOP_LEFT">
          <children>
-            <Label styleClass="field-label" text="%name">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Label>
-            <TextField fx:id="nameField" promptText="%enter_the_subregion_name_here">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
+            <VBox>
+               <children>
+                  <Label styleClass="field-label" text="%name" />
+                  <TextField fx:id="nameField" promptText="%enter_the_subregion_name_here">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+               </children>
+            </VBox>
+            <VBox>
+               <children>
+                  <Label styleClass="field-label" text="%layout_name" />
+                  <ComboBox fx:id="layoutCombo" editable="true" maxWidth="Infinity" />
+               </children>
+            </VBox>
+            <VBox>
+               <children>
+                  <Label styleClass="field-label" text="%settings_json" />
+                  <TextArea fx:id="settingsArea" prefRowCount="4" wrapText="true" />
+               </children>
+            </VBox>
          </children>
          <BorderPane.margin>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />

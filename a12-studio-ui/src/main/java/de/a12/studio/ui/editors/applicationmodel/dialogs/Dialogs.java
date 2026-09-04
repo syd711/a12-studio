@@ -6,6 +6,7 @@ import de.a12.studio.models.applicationmodel.Case;
 import de.a12.studio.models.applicationmodel.Directive;
 import de.a12.studio.models.applicationmodel.Flow;
 import de.a12.studio.models.applicationmodel.Menu;
+import de.a12.studio.models.applicationmodel.Region;
 import de.a12.studio.models.applicationmodel.Scene;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -59,20 +60,20 @@ public class Dialogs {
     return controller.getResult();
   }
 
-  public static Optional<String> showSubregionForAdd(Stage owner) {
-    return showSubregion(owner, StudioBundle.get("add_subregion_title"), "");
+  public static Optional<Region> showSubregionForAdd(Stage owner) {
+    return showSubregion(owner, StudioBundle.get("add_subregion_title"), null);
   }
 
-  public static Optional<String> showSubregionForEdit(Stage owner, String currentName) {
-    return showSubregion(owner, StudioBundle.get("edit_subregion_title"), currentName);
+  public static Optional<Region> showSubregionForEdit(Stage owner, Region existing) {
+    return showSubregion(owner, StudioBundle.get("edit_subregion_title"), existing);
   }
 
-  private static Optional<String> showSubregion(Stage owner, String title, String initialName) {
+  private static Optional<Region> showSubregion(Stage owner, String title, Region existing) {
     FXMLLoader fxmlLoader = new FXMLLoader(SubregionDialogController.class.getResource("subregion-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("dialog-subregion", fxmlLoader, owner, title);
     SubregionDialogController controller = (SubregionDialogController) stage.getUserData();
-    controller.init(stage, initialName);
+    controller.init(stage, existing);
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();

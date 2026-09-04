@@ -58,9 +58,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    Dialogs.showSubregionForAdd(Studio.stage).ifPresent(name -> {
-      Region subregion = new Region();
-      subregion.setName(name);
+    Dialogs.showSubregionForAdd(Studio.stage).ifPresent(subregion -> {
       getOrCreateSubRegions().add(subregion);
       rebuildRows();
       commitChange();
@@ -141,8 +139,9 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
   }
 
   private void editSubregion(Region subregion) {
-    Dialogs.showSubregionForEdit(Studio.stage, subregion.getName()).ifPresent(name -> {
-      subregion.setName(name);
+    Dialogs.showSubregionForEdit(Studio.stage, subregion).ifPresent(edited -> {
+      subregion.setName(edited.getName());
+      subregion.setLayout(edited.getLayout());
       rebuildRows();
       commitChange();
     });
