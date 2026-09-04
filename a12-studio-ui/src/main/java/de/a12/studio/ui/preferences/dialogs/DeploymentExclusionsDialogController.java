@@ -397,6 +397,7 @@ public class DeploymentExclusionsDialogController implements DialogController {
     DeploymentExclusionsDialogController controller = loader.getController();
     controller.stage = stage;
     controller.setProject(projectRoot, currentExclusions);
+    WidgetFactory.installResizable(stage);
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {

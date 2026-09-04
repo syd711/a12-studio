@@ -16,57 +16,64 @@
       <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <VBox alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" BorderPane.alignment="CENTER">
-         <children>
-            <Label styleClass="field-label" text="%name">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Label>
-            <TextField fx:id="nameField" promptText="%enter_the_overview_model_name_here">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </TextField>
-            <Label styleClass="field-label" text="%location">
-               <VBox.margin>
-                  <Insets top="12.0" />
-               </VBox.margin>
-            </Label>
-            <ComboBox fx:id="locationCombo" maxWidth="1.7976931348623157E308" promptText="%select_a_location" />
-
-            <VBox spacing="24.0">
-               <children>
-                  <fx:include fx:id="locales" source="../../propertyeditors/locales-panel.fxml" />
-                  <fx:include fx:id="roles" source="../../propertyeditors/roles-panel.fxml" />
-               </children>
-               <VBox.margin>
-                  <Insets top="24.0" />
-               </VBox.margin>
-            </VBox>
-
-            <Label styleClass="field-label" text="%fields">
-               <VBox.margin>
-                  <Insets top="12.0" />
-               </VBox.margin>
-            </Label>
-            <Label fx:id="fieldsEmptyLabel" styleClass="field-value" text="%no_fields_found_in_selection" />
-            <ScrollPane fitToWidth="true" prefHeight="260.0" VBox.vgrow="ALWAYS">
-               <content>
-                  <VBox fx:id="fieldsBox" spacing="4.0" />
-               </content>
-               <VBox.margin>
-                  <Insets top="6.0" />
-               </VBox.margin>
-               <padding>
-                  <Insets bottom="3.0" left="6.0" right="3.0" top="3.0" />
-               </padding>
-            </ScrollPane>
-         </children>
+      <ScrollPane hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
          <BorderPane.margin>
-            <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+            <Insets />
          </BorderPane.margin>
-      </VBox>
+         <content>
+            <VBox maxHeight="1.7976931348623157E308">
+               <children>
+                  <Label styleClass="field-label" text="%name">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="nameField" promptText="%enter_the_overview_model_name_here">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+                  <Label styleClass="field-label" text="%location">
+                     <VBox.margin>
+                        <Insets top="12.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ComboBox fx:id="locationCombo" maxWidth="1.7976931348623157E308" promptText="%select_a_location" />
+      
+                  <Label styleClass="field-label" text="%fields">
+                     <VBox.margin>
+                        <Insets top="12.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="fieldsEmptyLabel" styleClass="field-value" text="%no_fields_found_in_selection" />
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="260.0" VBox.vgrow="ALWAYS">
+                     <content>
+                        <VBox fx:id="fieldsBox" spacing="4.0" />
+                     </content>
+                     <VBox.margin>
+                        <Insets top="6.0" />
+                     </VBox.margin>
+                     <padding>
+                        <Insets bottom="3.0" left="6.0" right="3.0" top="3.0" />
+                     </padding>
+                  </ScrollPane>
+      
+                  <VBox spacing="24.0">
+                     <children>
+                        <fx:include fx:id="locales" source="../../propertyeditors/locales-panel.fxml" />
+                        <fx:include fx:id="roles" source="../../propertyeditors/roles-panel.fxml" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="24.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
    </center>
    <bottom>
       <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" styleClass="footer-toolbar" BorderPane.alignment="CENTER">

@@ -30,6 +30,7 @@ import de.a12.studio.ui.editors.propertyeditors.SupportedCharactersPanelControll
 import de.a12.studio.ui.editors.propertyeditors.TimezonePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
@@ -39,12 +40,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class ModelSettingsDialog implements Initializable, DialogController {
-
-  private static final String GENERIC_ERROR_MESSAGE =
-      "One or more of the panels below contain an error. Please review them before saving.";
-
-  private static final String GENERIC_WARNING_MESSAGE =
-      "One or more of the panels below contain a warning. Please review them before saving.";
 
   @FXML
   private ModelSettingsNamePanelController modelSettingsNameController;
@@ -225,9 +220,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       boolean anyWarning = panels.stream()
           .anyMatch(panel -> panel.errorProperty().get() && "WARNING".equalsIgnoreCase(panel.severityProperty().get()));
       if (anyError) {
-        errorContainerController.show("ERROR", GENERIC_ERROR_MESSAGE);
+        errorContainerController.show("ERROR", StudioBundle.get("model_settings_dialog.generic_error_message"));
       } else if (anyWarning) {
-        errorContainerController.show("WARNING", GENERIC_WARNING_MESSAGE);
+        errorContainerController.show("WARNING", StudioBundle.get("model_settings_dialog.generic_warning_message"));
       } else {
         errorContainerController.hide();
       }
