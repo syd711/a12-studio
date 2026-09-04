@@ -8,6 +8,7 @@ import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -68,7 +69,7 @@ public class FilterItemDialogController implements DialogController {
 
   @FXML
   private void initialize() {
-    labelController.configureCustom("label", "LABEL");
+    labelController.configureCustom("label", StudioBundle.get("label"));
     labelController.setSaveMode(saveMode);
     iconController.setSaveMode(saveMode);
 

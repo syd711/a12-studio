@@ -18,6 +18,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.LocalesChangedEvent;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -111,48 +112,48 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   public void configureInternal() {
-    configure(Element::getInternalDescription, "internal", "DESCRIPTION (INTERNAL)");
+    configure(Element::getInternalDescription, "internal", StudioBundle.get("description_internal"));
   }
 
   public void configureErrorMessages() {
     configure(LocalizedTextPanelController::getErrorMessages, LocalizedTextPanelController::getOrCreateErrorMessages,
-        FIELD_KEY_ERROR_MESSAGES, "ERROR MESSAGES");
+        FIELD_KEY_ERROR_MESSAGES, StudioBundle.get("error_messages"));
   }
 
   public void configureExternal() {
-    configure(Element::getExternalDescription, "external", "DESCRIPTION (EXTERNAL)");
+    configure(Element::getExternalDescription, "external", StudioBundle.get("description_external"));
   }
 
   public void configureHelperText() {
-    configure(LocalizedTextPanelController::getHelperText, "helperText", "HELPER TEXT");
+    configure(LocalizedTextPanelController::getHelperText, "helperText", StudioBundle.get("helper_text"));
   }
 
   public void configureLabel() {
-    configure(LocalizedTextPanelController::getLabel, "label", "LABEL");
+    configure(LocalizedTextPanelController::getLabel, "label", StudioBundle.get("label"));
   }
 
   public void configureModelLabels() {
     this.modelTextsAccessor = A12Model::getLabels;
     this.fieldKey = "labels";
-    setTitle("LABELS");
+    setTitle(StudioBundle.get("labels"));
     setSettingsKeySuffix("." + fieldKey);
   }
 
   public void configureModuleMenuLabel() {
     this.fieldKey = "label";
-    setTitle("LABEL");
+    setTitle(StudioBundle.get("label"));
     setSettingsKeySuffix("." + fieldKey);
   }
 
   public void configureCaseLabel() {
     this.fieldKey = "label";
-    setTitle("LABEL");
+    setTitle(StudioBundle.get("label"));
     setSettingsKeySuffix("." + fieldKey);
   }
 
   public void configureColumnLabel() {
     this.fieldKey = "label";
-    setTitle("LABEL");
+    setTitle(StudioBundle.get("label"));
     setSettingsKeySuffix("." + fieldKey);
   }
 
@@ -180,11 +181,11 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   }
 
   public void configureConfirmationTitle() {
-    configureConfirmation(Confirmation::getTitle, "confirmationTitle", "CONFIRMATION TITLE");
+    configureConfirmation(Confirmation::getTitle, "confirmationTitle", StudioBundle.get("confirmation_title"));
   }
 
   public void configureConfirmationMessage() {
-    configureConfirmation(Confirmation::getMessage, "confirmationMessage", "CONFIRMATION MESSAGE");
+    configureConfirmation(Confirmation::getMessage, "confirmationMessage", StudioBundle.get("confirmation_message"));
   }
 
   private void configureConfirmation(Function<Confirmation, List<Label>> textsAccessor, String fieldKey, String title) {

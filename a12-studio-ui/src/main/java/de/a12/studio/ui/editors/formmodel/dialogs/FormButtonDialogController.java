@@ -22,6 +22,7 @@ import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
@@ -92,8 +93,8 @@ public class FormButtonDialogController implements DialogController {
     stylesController.setSaveMode(saveMode);
     annotationsController.setSaveMode(saveMode);
 
-    labelController.configureCustom("label", "Label");
-    descriptionController.configureCustom("description", "DESCRIPTION");
+    labelController.configureCustom("label", StudioBundle.get("label"));
+    descriptionController.configureCustom("description", StudioBundle.get("description"));
     annotationsController.hideAnnotationDatasetsButton();
 
     functionsController.setOnTypeChanged(this::onTypeChanged);

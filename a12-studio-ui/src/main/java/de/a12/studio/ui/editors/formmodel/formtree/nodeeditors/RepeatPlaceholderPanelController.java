@@ -7,6 +7,7 @@ import de.a12.studio.models.formmodel.GroupConfigEntry;
 import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
@@ -29,8 +30,8 @@ public class RepeatPlaceholderPanelController extends AbstractPropertyEditor imp
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    groupConfigPlaceholderController.configureCustom("groupConfigPlaceholder", "Group Configuration");
-    repeatPlaceholderController.configureCustom("repeatPlaceholder", "Repeat");
+    groupConfigPlaceholderController.configureCustom("groupConfigPlaceholder", StudioBundle.get("group_configuration"));
+    repeatPlaceholderController.configureCustom("repeatPlaceholder", StudioBundle.get("repeat"));
   }
 
   public void setRepeat(@NonNull AbstractRepeat repeat, @Nullable FormModelContent content) {

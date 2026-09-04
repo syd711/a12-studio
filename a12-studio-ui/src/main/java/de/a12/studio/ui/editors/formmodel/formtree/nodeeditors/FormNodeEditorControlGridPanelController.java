@@ -10,6 +10,7 @@ import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ColumnLayoutPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -40,7 +41,7 @@ public class FormNodeEditorControlGridPanelController {
 
   @FXML
   private void initialize() {
-    labelController.configureCustom("label", "Label");
+    labelController.configureCustom("label", StudioBundle.get("label"));
   }
 
   public void setControlGrid(@NonNull ControlGrid grid, @Nullable ElementIndex elementIndex,

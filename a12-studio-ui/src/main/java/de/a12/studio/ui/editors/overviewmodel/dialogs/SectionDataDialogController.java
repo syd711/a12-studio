@@ -9,6 +9,7 @@ import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.FieldReferencesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
@@ -52,7 +53,7 @@ public class SectionDataDialogController implements DialogController {
 
   @FXML
   private void initialize() {
-    labelController.configureCustom("label", "LABEL");
+    labelController.configureCustom("label", StudioBundle.get("label"));
     labelController.setSaveMode(saveMode);
     fieldsController.setSaveMode(saveMode);
   }

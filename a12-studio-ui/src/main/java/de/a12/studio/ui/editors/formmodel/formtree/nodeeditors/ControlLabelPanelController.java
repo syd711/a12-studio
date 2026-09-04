@@ -13,6 +13,7 @@ import de.a12.studio.models.formmodel.MultilingualText;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextReadonlyPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
@@ -50,9 +51,9 @@ public class ControlLabelPanelController extends AbstractPropertyEditor implemen
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    documentModelLabelController.configureCustom("documentModelLabel", "Document Model");
-    fieldConfigLabelController.configureCustom("fieldConfigLabel", "Field Configuration");
-    controlLabelController.configureCustom("controlLabel", "Control");
+    documentModelLabelController.configureCustom("documentModelLabel", StudioBundle.get("document_model_title"));
+    fieldConfigLabelController.configureCustom("fieldConfigLabel", StudioBundle.get("field_configuration"));
+    controlLabelController.configureCustom("controlLabel", StudioBundle.get("control"));
   }
 
   public void setControl(@NonNull Control control, @Nullable DocumentModel documentModel, @Nullable FormModelContent content) {

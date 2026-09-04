@@ -269,7 +269,7 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
       commitHeaderChange();
     });
 
-    headerSubtitleTextController.configureCustom("headerSubtitle", "SUBTITLE");
+    headerSubtitleTextController.configureCustom("headerSubtitle", StudioBundle.get("subtitle"));
   }
 
   private void applyDisplayMode(String value) {
@@ -360,7 +360,7 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
       commitHeaderChange();
     });
 
-    filterButtonLabelController.configureCustom("filterButtonLabel", "LABEL");
+    filterButtonLabelController.configureCustom("filterButtonLabel", StudioBundle.get("label"));
   }
 
   private void populateFilterButton() {

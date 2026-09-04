@@ -5,6 +5,7 @@ import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.GroupConfigEntry;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
@@ -30,8 +31,8 @@ public class RepeatLabelPanelController extends AbstractPropertyEditor implement
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    groupConfigLabelController.configureCustom("groupConfigLabel", "Group Configuration");
-    repeatLabelController.configureCustom("repeatLabel", "Repeat");
+    groupConfigLabelController.configureCustom("groupConfigLabel", StudioBundle.get("group_configuration"));
+    repeatLabelController.configureCustom("repeatLabel", StudioBundle.get("repeat"));
   }
 
   public void setRepeat(@NonNull AbstractRepeat repeat, @Nullable FormModelContent content) {

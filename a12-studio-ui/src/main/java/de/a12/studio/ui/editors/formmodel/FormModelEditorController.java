@@ -212,39 +212,39 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private void loadRepeatDefaultButtonLabels(@NonNull FormModel model) {
     Defaults defaults = ensureDefaults(model);
 
-    addLabelController.configureButtonLabel("ADD", "ADD");
+    addLabelController.configureButtonLabel("ADD", StudioBundle.get("add"));
     addLabelController.setDefaults(defaults);
-    commitAddLabelController.configureButtonLabel("COMMIT_ADD", "COMMIT ADD");
+    commitAddLabelController.configureButtonLabel("COMMIT_ADD", StudioBundle.get("commit_add"));
     commitAddLabelController.setDefaults(defaults);
-    applyLabelController.configureButtonLabel("APPLY", "APPLY");
+    applyLabelController.configureButtonLabel("APPLY", StudioBundle.get("apply"));
     applyLabelController.setDefaults(defaults);
-    editLabelController.configureButtonLabel("EDIT", "EDIT");
+    editLabelController.configureButtonLabel("EDIT", StudioBundle.get("edit_label"));
     editLabelController.setDefaults(defaults);
-    removeLabelController.configureButtonLabel("REMOVE", "REMOVE");
+    removeLabelController.configureButtonLabel("REMOVE", StudioBundle.get("remove"));
     removeLabelController.setDefaults(defaults);
-    viewLabelController.configureButtonLabel("VIEW", "VIEW");
+    viewLabelController.configureButtonLabel("VIEW", StudioBundle.get("view"));
     viewLabelController.setDefaults(defaults);
-    cancelLabelController.configureButtonLabel("CANCEL", "CANCEL");
+    cancelLabelController.configureButtonLabel("CANCEL", StudioBundle.get("cancel"));
     cancelLabelController.setDefaults(defaults);
-    confirmLabelController.configureButtonLabel("CONFIRM", "CONFIRM");
+    confirmLabelController.configureButtonLabel("CONFIRM", StudioBundle.get("confirm"));
     confirmLabelController.setDefaults(defaults);
-    returnLabelController.configureButtonLabel("RETURN", "RETURN");
+    returnLabelController.configureButtonLabel("RETURN", StudioBundle.get("return_label"));
     returnLabelController.setDefaults(defaults);
-    upLabelController.configureButtonLabel("UP", "UP");
+    upLabelController.configureButtonLabel("UP", StudioBundle.get("up"));
     upLabelController.setDefaults(defaults);
-    downLabelController.configureButtonLabel("DOWN", "DOWN");
+    downLabelController.configureButtonLabel("DOWN", StudioBundle.get("down"));
     downLabelController.setDefaults(defaults);
-    copyLabelController.configureButtonLabel("COPY", "COPY");
+    copyLabelController.configureButtonLabel("COPY", StudioBundle.get("copy"));
     copyLabelController.setDefaults(defaults);
-    closeLabelController.configureButtonLabel("CLOSE", "CLOSE");
+    closeLabelController.configureButtonLabel("CLOSE", StudioBundle.get("close"));
     closeLabelController.setDefaults(defaults);
-    downloadLabelController.configureButtonLabel("DOWNLOAD", "DOWNLOAD");
+    downloadLabelController.configureButtonLabel("DOWNLOAD", StudioBundle.get("download"));
     downloadLabelController.setDefaults(defaults);
-    skipLabelController.configureButtonLabel("SKIP", "SKIP");
+    skipLabelController.configureButtonLabel("SKIP", StudioBundle.get("skip"));
     skipLabelController.setDefaults(defaults);
-    replaceLabelController.configureButtonLabel("REPLACE", "REPLACE");
+    replaceLabelController.configureButtonLabel("REPLACE", StudioBundle.get("replace"));
     replaceLabelController.setDefaults(defaults);
-    uploadAsCopyLabelController.configureButtonLabel("UPLOAD_AS_COPY", "UPLOAD AS COPY");
+    uploadAsCopyLabelController.configureButtonLabel("UPLOAD_AS_COPY", StudioBundle.get("upload_as_copy"));
     uploadAsCopyLabelController.setDefaults(defaults);
   }
 

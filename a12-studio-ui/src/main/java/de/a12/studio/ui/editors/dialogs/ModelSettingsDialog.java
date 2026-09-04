@@ -108,7 +108,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     errorContainerController.addStyleClass("error-container-no-radius");
 
     labelsController.configureModelLabels();
-    subtitlesController.configureCustom("subtitle", "SUBTITLES");
+    subtitlesController.configureCustom("subtitle", StudioBundle.get("subtitles"));
     annotationsController.hideAnnotationDatasetsButton();
 
     modelSettingsNameController.setSaveMode(saveMode);

@@ -7,6 +7,7 @@ import de.a12.studio.models.formmodel.GroupConfigEntry;
 import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
@@ -29,8 +30,8 @@ public class RepeatHintPanelController extends AbstractPropertyEditor implements
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    groupConfigHintController.configureCustom("groupConfigHint", "Group Configuration");
-    repeatHintController.configureCustom("repeatHint", "Repeat");
+    groupConfigHintController.configureCustom("groupConfigHint", StudioBundle.get("group_configuration"));
+    repeatHintController.configureCustom("repeatHint", StudioBundle.get("repeat"));
   }
 
   public void setRepeat(@NonNull AbstractRepeat repeat, @Nullable FormModelContent content) {

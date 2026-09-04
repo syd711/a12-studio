@@ -7,6 +7,7 @@ import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
@@ -35,8 +36,8 @@ public class ControlHintPanelController extends AbstractPropertyEditor implement
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    fieldConfigHintController.configureCustom("fieldConfigHint", "Field Configuration");
-    controlHintController.configureCustom("controlHint", "Control");
+    fieldConfigHintController.configureCustom("fieldConfigHint", StudioBundle.get("field_configuration"));
+    controlHintController.configureCustom("controlHint", StudioBundle.get("control"));
   }
 
   public void setControl(@NonNull Control control, @Nullable FormModelContent content) {

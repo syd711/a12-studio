@@ -8,6 +8,7 @@ import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.relationshipmodel.EntityCharacteristicSupport;
 import de.a12.studio.ui.editors.relationshipmodel.EntityCharacteristicsPanelController;
 import de.a12.studio.ui.editors.relationshipmodel.LinkConstraintsPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -56,7 +57,7 @@ public class EntityCharacteristicDialogController implements DialogController {
   private void initialize() {
     entityCharacteristicsController.setSaveMode(saveMode);
     linkConstraintsController.setSaveMode(saveMode);
-    labelsController.configureCustom("labels", "LABELS");
+    labelsController.configureCustom("labels", StudioBundle.get("labels"));
     labelsController.setSaveMode(saveMode);
 
     entityCharacteristicsController.setOnChange(this::validate);

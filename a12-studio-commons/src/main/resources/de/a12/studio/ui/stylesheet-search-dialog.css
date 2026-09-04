@@ -22,6 +22,7 @@
 
 .search-dialog-header {
     -fx-background-color: -fx-surface-color;
+    -fx-background-radius: 6px 6px 0 0;
     -fx-border-color: transparent transparent -fx-border-subtle transparent;
     -fx-border-width: 0 0 1px 0;
 }

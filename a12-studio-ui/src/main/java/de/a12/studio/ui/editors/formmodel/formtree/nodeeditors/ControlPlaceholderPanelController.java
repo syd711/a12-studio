@@ -7,6 +7,7 @@ import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
@@ -36,8 +37,8 @@ public class ControlPlaceholderPanelController extends AbstractPropertyEditor im
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    fieldConfigPlaceholderController.configureCustom("fieldConfigPlaceholder", "Field Configuration");
-    controlPlaceholderController.configureCustom("controlPlaceholder", "Control");
+    fieldConfigPlaceholderController.configureCustom("fieldConfigPlaceholder", StudioBundle.get("field_configuration"));
+    controlPlaceholderController.configureCustom("controlPlaceholder", StudioBundle.get("control"));
   }
 
   public void setControl(@NonNull Control control, @Nullable FormModelContent content) {

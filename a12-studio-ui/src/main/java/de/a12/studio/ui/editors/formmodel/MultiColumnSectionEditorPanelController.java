@@ -9,6 +9,7 @@ import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import org.jspecify.annotations.NonNull;
 
@@ -36,7 +37,7 @@ public class MultiColumnSectionEditorPanelController {
 
   @FXML
   private void initialize() {
-    labelController.configureCustom("label", "LABEL");
+    labelController.configureCustom("label", StudioBundle.get("label"));
   }
 
   public void setSection(@NonNull MultiColumnSection section) {

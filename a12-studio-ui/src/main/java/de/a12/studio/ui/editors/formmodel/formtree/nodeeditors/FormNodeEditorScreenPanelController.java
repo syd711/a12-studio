@@ -49,7 +49,7 @@ public class FormNodeEditorScreenPanelController {
 
   @FXML
   private void initialize() {
-    labelController.configureCustom("label", "Label");
+    labelController.configureCustom("label", StudioBundle.get("label"));
   }
 
   public void setScreen(@NonNull Screen screen, @NonNull List<String> screenIds) {
