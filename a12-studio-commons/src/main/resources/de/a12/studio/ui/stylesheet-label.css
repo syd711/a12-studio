@@ -26,6 +26,17 @@
     -fx-font-style: italic;
 }
 
+/**
+ * Multi-line hint text shown over an otherwise-empty content area (e.g. the tab pane's
+ * "no tab opened" shortcuts/drop hint) - a size step up from the default 14px .label and a
+ * lighter/brighter shade than the near-black default -fx-text-color, so it reads as a
+ * secondary hint rather than body text.
+ */
+.hint-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: -fx-text-muted;
+}
+
 .editor-type-label {
     -fx-font-size: 20px;
     -fx-font-weight: bold;

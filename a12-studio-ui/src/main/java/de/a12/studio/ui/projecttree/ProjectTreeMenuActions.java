@@ -115,8 +115,9 @@ public class ProjectTreeMenuActions {
 
   void onRenameItem(@NonNull ProjectItem item) {
     String title = StudioBundle.get("rename_title");
-    String name = WidgetFactory.showInputDialog(getStage(), title, title, null, null, item.getName());
-    if (name == null || name.isBlank() || name.equals(item.getName())) {
+    String currentName = item.isFolder() ? item.getName() : item.getDisplayName();
+    String name = WidgetFactory.showInputDialog(getStage(), title, title, null, null, currentName);
+    if (name == null || name.isBlank() || name.equals(currentName)) {
       return;
     }
 

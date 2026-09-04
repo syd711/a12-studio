@@ -2,6 +2,7 @@ package de.a12.studio.ui;
 
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.FileSearchDialogController;
+import de.a12.studio.ui.components.RecentFilesDialogController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.updater.Dialogs;
 import de.a12.studio.ui.util.FXResizeHelper;
@@ -37,6 +38,7 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut(StudioBundle.get("ctrl_alt_p"), StudioBundle.get("open_preferences")),
       new Shortcut(StudioBundle.get("ctrl_shift_n"), StudioBundle.get("search_files")),
       new Shortcut(StudioBundle.get("ctrl_shift_f"), StudioBundle.get("find_in_files")),
+      new Shortcut(StudioBundle.get("ctrl_e"), StudioBundle.get("recent_files")),
       new Shortcut(StudioBundle.get("ctrl_alt_u"), StudioBundle.get("show_update_info")),
       new Shortcut(StudioBundle.get("ctrl_alt_h"), StudioBundle.get("resize_window_to_1920x1080")),
       new Shortcut(StudioBundle.get("ctrl_alt_w"), StudioBundle.get("resize_window_to_2560x1440")),
@@ -121,6 +123,10 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
     }
     else if (ke.getCode() == KeyCode.F && ke.isShiftDown() && ke.isControlDown()) {
       FileSearchDialogController.show(stage, Studio.getCurrentProject(), FileSearchDialogController.SearchMode.FIND_IN_FILES);
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.E && ke.isControlDown()) {
+      RecentFilesDialogController.show(stage, Studio.getCurrentProject());
       ke.consume();
     }
   }

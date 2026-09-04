@@ -68,6 +68,7 @@ public class Studio extends Application implements StudioEventListener {
     }
 
     StudioEventManager.getInstance().addListener(this);
+    StudioEventManager.getInstance().addListener(RecentEditsTracker.getInstance());
 
     // Initialize plugin manager – scans the plugins/ directory next to the application root.
     PluginManager.initialize(new java.io.File(System.getProperty("user.dir")));

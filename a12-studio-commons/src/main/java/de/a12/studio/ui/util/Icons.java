@@ -16,6 +16,7 @@ public interface Icons {
   String FOLDER_LOCK_OUTLINE = "mdi2f-folder-lock-outline";
   String FILE_OUTLINE = "mdi2f-file-outline";
   String FILE_TABLE_OUTLINE = "mdi2f-file-table-outline";
+  String HISTORY = "mdi2h-history";
 
   String ARROW_EXPAND_ALL = "mdi2a-arrow-expand-vertical";
   String ARROW_COLLAPSE_ALL = "mdi2a-arrow-collapse-vertical";

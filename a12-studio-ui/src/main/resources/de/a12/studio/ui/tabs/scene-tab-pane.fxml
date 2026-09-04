@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
 
-<TabPane fx:id="tabPane" stylesheets="@/de/a12/studio/ui/stylesheet.css" tabClosingPolicy="ALL_TABS" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.tabs.TabPaneController">
-  <tabs>
-  </tabs>
-</TabPane>
+<StackPane fx:id="root" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.tabs.TabPaneController">
+   <children>
+      <BorderPane>
+         <center>
+            <Label text="%no_tab_opened" textAlignment="LEFT" styleClass="hint-label" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+      <TabPane fx:id="tabPane" tabClosingPolicy="ALL_TABS">
+         <tabs>
+         </tabs>
+      </TabPane>
+   </children>
+</StackPane>

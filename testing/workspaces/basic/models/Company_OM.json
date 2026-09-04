@@ -27,14 +27,7 @@
         "value": "tester,reviewer"
       }
     ],
-    "modelReferences": [
-      {
-        "alias": "DM",
-        "modelType": "document",
-        "purpose": "document-model-for-overview",
-        "reference": "Company_DM"
-      }
-    ]
+    "modelReferences": []
   },
   "content": {
     "configuration": {

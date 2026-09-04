@@ -13,6 +13,7 @@ import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -315,6 +316,8 @@ public class TabPaneController implements Initializable, StudioEventListener {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
     tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> onSelectionChanged(newTab));
+    tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> updateEmptyState());
+    updateEmptyState();
 
     boolean enabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
     applyColorfulStudioSetting(enabled);
@@ -326,6 +329,17 @@ public class TabPaneController implements Initializable, StudioEventListener {
         }
       });
     });
+  }
+
+  /**
+   * Hides the (empty) TabPane so the "%no_tab_opened" placeholder {@link javafx.scene.control.Label}
+   * behind it in scene-tab-pane.fxml's StackPane shows through - mirrors the mainSplitPane
+   * visible/managed toggle in RootController used for the analogous "no project opened" placeholder.
+   */
+  private void updateEmptyState() {
+    boolean empty = tabPane.getTabs().isEmpty();
+    tabPane.setVisible(!empty);
+    tabPane.setManaged(!empty);
   }
 
   /** Toggles the "colorful-studio" style class that gates stylesheet-model-colors.css's per-tab tinting. */
