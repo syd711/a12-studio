@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -74,8 +75,11 @@ public class PreviewAppDeployer {
 
   private static void doDeploy(Project project, Runnable onFinished) {
     try {
+      Set<String> excludedPaths = Set.copyOf(
+          project.getSettings().getProjectRootSettings().getGeneral().getDeploymentExclusions());
+
       List<File> modelFiles = new ArrayList<>();
-      collectModelFiles(project.getRoot(), modelFiles);
+      collectModelFiles(project.getRoot(), excludedPaths, modelFiles);
       if (modelFiles.isEmpty()) {
         showAlert(StudioBundle.get("deploy_models_no_models"));
         return;
@@ -103,10 +107,13 @@ public class PreviewAppDeployer {
     }
   }
 
-  private static void collectModelFiles(ProjectItem item, List<File> out) {
+  private static void collectModelFiles(ProjectItem item, Set<String> excludedPaths, List<File> out) {
+    if (excludedPaths.contains(item.getPath())) {
+      return;
+    }
     if (item.isFolder()) {
       for (ProjectItem child : item.getChildren()) {
-        collectModelFiles(child, out);
+        collectModelFiles(child, excludedPaths, out);
       }
     }
     else if (item.getModel() != null) {

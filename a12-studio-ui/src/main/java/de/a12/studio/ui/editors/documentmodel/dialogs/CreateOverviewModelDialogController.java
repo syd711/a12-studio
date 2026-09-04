@@ -4,6 +4,7 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.FileUtils;
@@ -76,6 +77,10 @@ public class CreateOverviewModelDialogController implements DialogController {
 
   @FXML
   private void initialize() {
+    // Signals RolesEditorPanelController that it's embedded in a dialog, so it hides its "Edit Roles"
+    // button (this dialog builds the model on submit, outside the panel's own save flow, so
+    // Deferred#flush() is never called -- only isEmbeddedInDialog()'s side effect is needed here).
+    rolesController.setSaveMode(new PropertyEditorSaveMode.Deferred());
     nameField.textProperty().addListener((observable, oldValue, newValue) -> validate());
     nameField.requestFocus();
   }

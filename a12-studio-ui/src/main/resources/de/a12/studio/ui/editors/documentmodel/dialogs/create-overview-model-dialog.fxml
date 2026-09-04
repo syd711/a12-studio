@@ -16,7 +16,7 @@
       <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <ScrollPane hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets />
          </BorderPane.margin>

@@ -2,6 +2,7 @@ package de.a12.studio.ui.projecttree.dialogs;
 
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.DocumentModelBuilder;
@@ -76,6 +77,10 @@ public class NewModelDialogController implements DialogController {
 
   @FXML
   private void initialize() {
+    // Signals RolesEditorPanelController that it's embedded in a dialog, so it hides its "Edit Roles"
+    // button (this dialog builds the model on submit, outside the panel's own save flow, so
+    // Deferred#flush() is never called -- only isEmbeddedInDialog()'s side effect is needed here).
+    rolesController.setSaveMode(new PropertyEditorSaveMode.Deferred());
     buildScreensFromFieldsCheckBox.setDisable(true);
     typeComboBox.getItems().setAll(ModelType.values());
     typeComboBox.setConverter(new StringConverter<>() {
