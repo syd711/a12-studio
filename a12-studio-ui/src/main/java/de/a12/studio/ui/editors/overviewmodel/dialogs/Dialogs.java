@@ -65,6 +65,7 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("overview-multi-selection-action-dialog", fxmlLoader, owner, title);
     MultiSelectionActionDialogController controller = (MultiSelectionActionDialogController) stage.getUserData();
     controller.initDialog(stage, button);
+    stage.setOnHidden(event -> controller.destroy());
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();

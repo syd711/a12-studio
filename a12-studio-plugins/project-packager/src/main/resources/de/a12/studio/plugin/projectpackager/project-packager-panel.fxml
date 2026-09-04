@@ -36,7 +36,7 @@
                         <Button fx:id="browseButton" mnemonicParsing="false" onAction="#onBrowse" styleClass="primary-button" text="%project_packager.browse_button" />
                     </children>
                     <VBox.margin>
-                        <Insets top="8.0" />
+                        <Insets left="24.0" top="8.0" />
                     </VBox.margin>
                 </HBox>
                 <Label fx:id="statusLabel" styleClass="field-description" wrapText="true">

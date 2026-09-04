@@ -1,13 +1,16 @@
 package de.a12.studio.ui.editors.documentmodel.dialogs;
 
 import de.a12.studio.models.Locale;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.FileUtils;
+import de.a12.studio.ui.util.ModelSuffixValidation;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -64,6 +67,9 @@ public class CreateOverviewModelDialogController implements DialogController {
 
   @FXML
   private Button cancelButton;
+
+  @FXML
+  private ErrorContainerController errorContainerController;
 
   private Stage stage;
 
@@ -147,6 +153,9 @@ public class CreateOverviewModelDialogController implements DialogController {
 
   private void validate() {
     boolean anySelected = fieldCheckBoxes.stream().anyMatch(CheckBox::isSelected);
-    okButton.setDisable(!FileUtils.isValidWindowsFilename(nameField.getText()) || !anySelected);
+    Optional<String> suffixError = targetFolder == null ? Optional.empty()
+        : ModelSuffixValidation.validate(targetFolder, ModelType.OVERVIEW, nameField.getText());
+    suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    okButton.setDisable(!FileUtils.isValidWindowsFilename(nameField.getText()) || !anySelected || suffixError.isPresent());
   }
 }

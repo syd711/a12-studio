@@ -12,6 +12,7 @@ import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.MissingReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
+import de.a12.studio.modelsvalidation.validators.ModelSuffixValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.MultiSelectGroupValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
@@ -40,6 +41,7 @@ public final class DocumentModelValidationService {
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
+      new ModelSuffixValidator(),
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
       new TimeZoneValidator(),

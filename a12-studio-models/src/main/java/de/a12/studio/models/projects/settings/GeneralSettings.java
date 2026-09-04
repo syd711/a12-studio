@@ -26,6 +26,8 @@ public class GeneralSettings {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<String> deploymentExclusions = new ArrayList<>();
 
+  private boolean enforceModelSuffixes = false;
+
   public RelationshipEngineMode getRelationshipEngineMode() {
     return relationshipEngineMode;
   }
@@ -56,5 +58,13 @@ public class GeneralSettings {
 
   public void setDeploymentExclusions(List<String> deploymentExclusions) {
     this.deploymentExclusions = deploymentExclusions;
+  }
+
+  public boolean isEnforceModelSuffixes() {
+    return enforceModelSuffixes;
+  }
+
+  public void setEnforceModelSuffixes(boolean enforceModelSuffixes) {
+    this.enforceModelSuffixes = enforceModelSuffixes;
   }
 }

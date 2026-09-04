@@ -1,20 +1,22 @@
 package de.a12.studio.plugin.excel;
 
 import de.a12.studio.models.Locale;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.StudioFileChooser;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.FileUtils;
+import de.a12.studio.ui.util.ModelSuffixValidation;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import java.util.ResourceBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -69,12 +71,14 @@ public class ImportFromExcelDialogController implements DialogController {
 
   @FXML private LocalesPanelController localesController;
   @FXML private RolesEditorPanelController rolesController;
+  @FXML private ErrorContainerController errorContainerController;
 
   // -------------------------------------------------------------------------
   // State
   // -------------------------------------------------------------------------
 
   private Stage stage;
+  private ProjectItem targetFolder;
   private Optional<ButtonType> result = Optional.of(ButtonType.CANCEL);
 
   @Nullable
@@ -98,11 +102,16 @@ public class ImportFromExcelDialogController implements DialogController {
     columnListView.setMouseTransparent(true);
     columnListView.setFocusTraversable(false);
 
-    okButton.disableProperty().bind(Bindings.createBooleanBinding(
-        () -> currentExcelFile == null
-            || !FileUtils.isValidWindowsFilename(modelNameField.getText()),
-        modelNameField.textProperty()
-    ));
+    modelNameField.textProperty().addListener((obs, old, current) -> validate());
+  }
+
+  private void validate() {
+    Optional<String> suffixError = targetFolder == null ? Optional.empty()
+        : ModelSuffixValidation.validate(targetFolder, ModelType.DOCUMENT, modelNameField.getText());
+    suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    okButton.setDisable(currentExcelFile == null
+        || !FileUtils.isValidWindowsFilename(modelNameField.getText())
+        || suffixError.isPresent());
   }
 
   // -------------------------------------------------------------------------
@@ -168,6 +177,7 @@ public class ImportFromExcelDialogController implements DialogController {
                 columns.stream().map(ExcelImportService.ColumnInfo::name).toList());
             columnListView.setPlaceholder(null);
           }
+          validate();
         });
       }
       catch (IOException e) {
@@ -210,6 +220,7 @@ public class ImportFromExcelDialogController implements DialogController {
     ImportFromExcelDialogController controller =
         (ImportFromExcelDialogController) stage.getUserData();
     controller.stage = stage;
+    controller.targetFolder = targetFolder;
     ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
     controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
     controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
@@ -259,6 +270,7 @@ public class ImportFromExcelDialogController implements DialogController {
     ImportFromExcelDialogController controller =
         (ImportFromExcelDialogController) stage.getUserData();
     controller.stage = stage;
+    controller.targetFolder = targetFolder;
     ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
     controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
     controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));

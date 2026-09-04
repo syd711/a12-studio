@@ -38,21 +38,3 @@ Dialogs that are explicitly documented as incomplete or only partially implement
 
 **What's missing:** Layout configuration and any other subregion-level properties.
 
-
-## Misc
-- Project Creation: Create empty folders with Preview_AM like the preview app workspace option.
-- Support DND für CSV or Excel, mdb files.
-- Enforce Model Suffix
-- Create the same settings of that empty project
-- Open link for user management
-- Fix renaming of models
-- Add naming enforcing option
-- Document Model Editor:
-  - Add rename nodes ctx menu item
-  - Add predefined patterns for string data type
-- Form Models:
-  - check new form model dialog with screen from fields
-  - check if I delete screens
-  - add option to duplicate screen
-  - add validator for button on the wrong screen like for the deleted meta or even better, auto delete these
-

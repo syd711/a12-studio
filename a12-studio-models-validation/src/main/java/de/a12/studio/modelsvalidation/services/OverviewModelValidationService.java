@@ -8,6 +8,7 @@ import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
+import de.a12.studio.modelsvalidation.validators.ModelSuffixValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
@@ -33,6 +34,7 @@ public final class OverviewModelValidationService {
       new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
+      new ModelSuffixValidator(),
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),

@@ -2,11 +2,13 @@ package de.a12.studio.ui.projecttree.dialogs;
 
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.FileUtils;
+import de.a12.studio.ui.util.ModelSuffixValidation;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
@@ -16,7 +18,6 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -69,6 +70,9 @@ public class NewModelDialogController implements DialogController {
   @FXML
   private RolesEditorPanelController rolesController;
 
+  @FXML
+  private ErrorContainerController errorContainerController;
+
   private Stage stage;
 
   private ProjectItem targetFolder;
@@ -111,17 +115,28 @@ public class NewModelDialogController implements DialogController {
           rolesController.initializeRoles(List.of());
         }
       }
+      validate();
     });
     documentModelCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
       onDocumentModelSelected(newValue);
       buildScreensFromFieldsCheckBox.setDisable(newValue == null || newValue.isBlank());
+      validate();
     });
+    nameField.textProperty().addListener((observable, oldValue, newValue) -> validate());
     typeComboBox.getSelectionModel().selectFirst();
-    okButton.disableProperty().bind(Bindings.createBooleanBinding(
-        () -> !FileUtils.isValidWindowsFilename(nameField.getText())
-            || (requiresDocumentModel(typeComboBox.getValue()) && documentModelCombo.getValue() == null),
-        nameField.textProperty(), typeComboBox.valueProperty(), documentModelCombo.valueProperty()));
     nameField.requestFocus();
+  }
+
+  // Combines the filename/document-model checks the OK button already gated on with the live
+  // "Enforce Model Suffixes" check (see ModelSuffixValidation), surfacing the latter's message in the
+  // dialog's error container per the "validator messages must name the field" convention.
+  private void validate() {
+    boolean validFilename = FileUtils.isValidWindowsFilename(nameField.getText());
+    boolean missingDocumentModel = requiresDocumentModel(typeComboBox.getValue()) && documentModelCombo.getValue() == null;
+    Optional<String> suffixError = targetFolder == null ? Optional.empty()
+        : ModelSuffixValidation.validate(targetFolder, typeComboBox.getValue(), nameField.getText());
+    suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    okButton.setDisable(!validFilename || missingDocumentModel || suffixError.isPresent());
   }
 
   private void onDocumentModelSelected(String documentModelId) {
@@ -190,6 +205,7 @@ public class NewModelDialogController implements DialogController {
     if (preselectedType != null) {
       controller.typeComboBox.getSelectionModel().select(preselectedType);
     }
+    controller.validate();
     WidgetFactory.installResizable(stage);
     stage.showAndWait();
 

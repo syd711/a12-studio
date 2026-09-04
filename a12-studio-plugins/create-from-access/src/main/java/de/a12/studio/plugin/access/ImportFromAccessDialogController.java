@@ -1,20 +1,22 @@
 package de.a12.studio.plugin.access;
 
 import de.a12.studio.models.Locale;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.StudioFileChooser;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.FileUtils;
+import de.a12.studio.ui.util.ModelSuffixValidation;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import java.util.ResourceBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -73,12 +75,14 @@ public class ImportFromAccessDialogController implements DialogController {
 
   @FXML private LocalesPanelController localesController;
   @FXML private RolesEditorPanelController rolesController;
+  @FXML private ErrorContainerController errorContainerController;
 
   // -------------------------------------------------------------------------
   // State
   // -------------------------------------------------------------------------
 
   private Stage stage;
+  private ProjectItem targetFolder;
   private Optional<ButtonType> result = Optional.of(ButtonType.CANCEL);
 
   /** The Access file currently loaded, or {@code null} if none. */
@@ -118,6 +122,7 @@ public class ImportFromAccessDialogController implements DialogController {
       if (!updatingModelNameProgrammatically) {
         modelNameAutoFilled = false;
       }
+      validate();
     });
     tableListView.getSelectionModel().selectedItemProperty().addListener((obs, old, selected) -> {
       if (selected != null) {
@@ -129,16 +134,20 @@ public class ImportFromAccessDialogController implements DialogController {
           modelNameAutoFilled = true;
         }
       }
+      validate();
     });
+  }
 
-    // OK only enabled when: a file is chosen, a table is selected, and a valid name is entered.
-    okButton.disableProperty().bind(Bindings.createBooleanBinding(
-        () -> currentAccessFile == null
-            || tableListView.getSelectionModel().isEmpty()
-            || !FileUtils.isValidWindowsFilename(modelNameField.getText()),
-        tableListView.getSelectionModel().selectedItemProperty(),
-        modelNameField.textProperty()
-    ));
+  // OK only enabled when: a file is chosen, a table is selected, a valid name is entered, and (when
+  // "Enforce Model Suffixes" is on) the name carries the Document Model suffix.
+  private void validate() {
+    Optional<String> suffixError = targetFolder == null ? Optional.empty()
+        : ModelSuffixValidation.validate(targetFolder, ModelType.DOCUMENT, modelNameField.getText());
+    suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    okButton.setDisable(currentAccessFile == null
+        || tableListView.getSelectionModel().isEmpty()
+        || !FileUtils.isValidWindowsFilename(modelNameField.getText())
+        || suffixError.isPresent());
   }
 
   // -------------------------------------------------------------------------
@@ -198,6 +207,7 @@ public class ImportFromAccessDialogController implements DialogController {
             tableListView.getItems().setAll(tableNames);
             tableListView.setPlaceholder(null);
           }
+          validate();
         });
       }
       catch (IOException e) {
@@ -254,6 +264,7 @@ public class ImportFromAccessDialogController implements DialogController {
     ImportFromAccessDialogController controller =
         (ImportFromAccessDialogController) stage.getUserData();
     controller.stage = stage;
+    controller.targetFolder = targetFolder;
     ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
     controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
     controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
@@ -305,6 +316,7 @@ public class ImportFromAccessDialogController implements DialogController {
     ImportFromAccessDialogController controller =
         (ImportFromAccessDialogController) stage.getUserData();
     controller.stage = stage;
+    controller.targetFolder = targetFolder;
     ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
     controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
     controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));

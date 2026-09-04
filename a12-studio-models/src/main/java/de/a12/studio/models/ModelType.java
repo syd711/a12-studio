@@ -13,30 +13,38 @@ import java.util.Map;
 
 public enum ModelType {
 
-  APPLICATION("application", "Application Model"),
-  COMBINATION("combination", "Combination Model"),
-  CONTENT("content", "Content Model"),
-  DOCUMENT("document", "Document Model"),
-  FORM("form", "Form Model"),
-  MAPPING("mapping", "Mapping Model"),
-  MASTERDETAIL("module-masterdetail", "Master-Detail Model"),
-  OVERVIEW("overview", "Overview Model"),
-  PRINT("print", "Print Model"),
-  QUERY("query", "Query Model"),
-  RELATIONSHIP("relationship", "Relationship Model"),
-  STRUCTURALMAPPING("structuralmapping", "Structural Mapping Model"),
-  TREE("tree", "Tree Model"),
-  TYPEDEFINITION("typedefinition", "Type Definition Model");
+  // Filename suffix per the a12 platform's "Standardized Name" naming convention
+  // (documentation/2606-06-doc/overall-model_naming_conventions.md), confirmed by real fixtures for
+  // AM/CM/DM/FM/OM/PM/MDM/TDM. COMBINATION/MAPPING/QUERY/RELATIONSHIP/STRUCTURALMAPPING have no
+  // documented or fixture-confirmed convention; CDM/MM/QM/RM/SMM here are a best-effort, collision-free
+  // scheme consistent with the confirmed ones (SMM is also the literal abbreviation the a12 kernel uses
+  // for Structural Mapping Model, see kernel-kernel-documentation-dev.md's "_SMM_..." annotation name).
+  APPLICATION("application", "Application Model", "AM"),
+  COMBINATION("combination", "Combination Model", "CDM"),
+  CONTENT("content", "Content Model", "CM"),
+  DOCUMENT("document", "Document Model", "DM"),
+  FORM("form", "Form Model", "FM"),
+  MAPPING("mapping", "Mapping Model", "MM"),
+  MASTERDETAIL("module-masterdetail", "Master-Detail Model", "MDM"),
+  OVERVIEW("overview", "Overview Model", "OM"),
+  PRINT("print", "Print Model", "PM"),
+  QUERY("query", "Query Model", "QM"),
+  RELATIONSHIP("relationship", "Relationship Model", "RM"),
+  STRUCTURALMAPPING("structuralmapping", "Structural Mapping Model", "SMM"),
+  TREE("tree", "Tree Model", "TM"),
+  TYPEDEFINITION("typedefinition", "Type Definition Model", "TDM");
 
   private static final String VERSIONS_RESOURCE = "model-versions.json";
   private static final Map<String, JsonNode> MODEL_CONFIG = loadModelConfig();
 
   private final String value;
   private final String displayName;
+  private final String suffix;
 
-  ModelType(String value, String displayName) {
+  ModelType(String value, String displayName, String suffix) {
     this.value = value;
     this.displayName = displayName;
+    this.suffix = suffix;
   }
 
   @JsonValue
@@ -46,6 +54,15 @@ public enum ModelType {
 
   public String getDisplayName() {
     return displayName;
+  }
+
+  /**
+   * The filename suffix (without the leading underscore) conventionally used for this model type,
+   * e.g. {@code "DM"} for {@link #DOCUMENT} so a model is named {@code "SomeName_DM"}. Used by the
+   * "Enforce Model Suffixes" validation setting.
+   */
+  public String getSuffix() {
+    return suffix;
   }
 
   public String getCurrentVersion() {

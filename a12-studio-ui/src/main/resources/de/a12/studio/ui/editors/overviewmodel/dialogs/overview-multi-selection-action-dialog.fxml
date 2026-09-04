@@ -2,30 +2,57 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="360.0" minWidth="480.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="700.0" minWidth="640.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.MultiSelectionActionDialogController">
    <top>
       <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
    </top>
    <center>
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" BorderPane.alignment="CENTER">
          <content>
-            <!-- Intentionally empty for now; the action's Event/Priority/Destructive/Icon/etc. fields are added here in a follow-up. -->
-            <VBox spacing="14.0">
+            <VBox spacing="14.0" styleClass="field-editor">
                <padding>
                   <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </padding>
+               <children>
+                  <VBox spacing="6.0">
+                     <children>
+                        <Label styleClass="field-label" text="%event" />
+                        <ComboBox fx:id="eventField" maxWidth="Infinity" />
+                     </children>
+                  </VBox>
+
+                  <fx:include fx:id="confirmationTitle" source="../../propertyeditors/localized-text-panel.fxml" />
+                  <fx:include fx:id="confirmationMessage" source="../../propertyeditors/localized-text-panel.fxml" />
+
+                  <fx:include fx:id="priority" source="../../propertyeditors/priority-panel.fxml" />
+
+                  <fx:include fx:id="icon" source="../../propertyeditors/icon-panel.fxml" />
+                  <CheckBox fx:id="hideLabelField" mnemonicParsing="false" text="%hide_label" />
+
+                  <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
+                  <fx:include fx:id="description" source="../../propertyeditors/localized-text-panel.fxml" />
+
+                  <fx:include fx:id="styles" source="../styles-panel.fxml" />
+                  <fx:include fx:id="annotations" source="../../propertyeditors/annotations-panel.fxml" />
+               </children>
             </VBox>
          </content>
+         <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+         </padding>
       </ScrollPane>
    </center>
    <bottom>
-      <HBox alignment="CENTER_RIGHT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_RIGHT" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel">
                <HBox.margin>
@@ -34,9 +61,9 @@
             </Button>
             <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
          </children>
-         <padding>
+         <BorderPane.margin>
             <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
-         </padding>
+         </BorderPane.margin>
       </HBox>
    </bottom>
 </BorderPane>

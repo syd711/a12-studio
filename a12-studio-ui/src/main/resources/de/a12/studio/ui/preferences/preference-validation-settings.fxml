@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.preferences.PreferenceValidationSettingsPanelController">
+    <top>
+        <VBox BorderPane.alignment="CENTER_LEFT">
+            <children>
+                <Label styleClass="preference-title" text="%project_settings" />
+                <Label styleClass="preference-subtitle" text="%validation_settings" />
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="12.0" left="12.0" top="12.0" />
+            </BorderPane.margin>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="10.0" BorderPane.alignment="TOP_LEFT">
+            <padding>
+                <Insets left="12.0" right="12.0" top="8.0" />
+            </padding>
+            <children>
+                <CheckBox fx:id="enforceModelSuffixesCheckBox" text="%validation_settings.enforce_model_suffixes" />
+            </children>
+        </VBox>
+    </center>
+</BorderPane>
