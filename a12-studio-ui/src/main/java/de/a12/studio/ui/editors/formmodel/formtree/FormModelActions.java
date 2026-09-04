@@ -101,39 +101,39 @@ class FormModelActions {
     List<Object> siblings = siblingsOf(selected);
     boolean reorderable = siblings != null;
 
-    MenuItem cutItem = createMenuItem("Cu_t", Icons.CUT);
+    MenuItem cutItem = createMenuItem(StudioBundle.get("form_model_tree.cut"), Icons.CUT);
     cutItem.setOnAction(event -> cut(selected));
     contextMenu.getItems().add(cutItem);
 
-    MenuItem copyItem = createMenuItem("_Copy", Icons.COPY);
+    MenuItem copyItem = createMenuItem(StudioBundle.get("form_model_tree.copy"), Icons.COPY);
     copyItem.setOnAction(event -> copy(selected));
     contextMenu.getItems().add(copyItem);
 
-    MenuItem pasteItem = createMenuItem("_Paste", Icons.PASTE);
+    MenuItem pasteItem = createMenuItem(StudioBundle.get("form_model_tree.paste"), Icons.PASTE);
     pasteItem.setDisable(!canPasteInto(selected.getNode()));
     pasteItem.setOnAction(event -> paste(selected));
     contextMenu.getItems().add(pasteItem);
 
-    MenuItem duplicateItem = createMenuItem("D_uplicate", Icons.COPY);
+    MenuItem duplicateItem = createMenuItem(StudioBundle.get("form_model_tree.duplicate"), Icons.COPY);
     duplicateItem.setDisable(!reorderable);
     duplicateItem.setOnAction(event -> duplicate(selected));
     contextMenu.getItems().add(duplicateItem);
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
-    MenuItem moveUpItem = createMenuItem("Move _Up", Icons.ARROW_UP);
+    MenuItem moveUpItem = createMenuItem(StudioBundle.get("form_model_tree.move_up"), Icons.ARROW_UP);
     moveUpItem.setDisable(!reorderable);
     moveUpItem.setOnAction(event -> move(selected, -1));
     contextMenu.getItems().add(moveUpItem);
 
-    MenuItem moveDownItem = createMenuItem("Move Do_wn", Icons.ARROW_DOWN);
+    MenuItem moveDownItem = createMenuItem(StudioBundle.get("form_model_tree.move_down"), Icons.ARROW_DOWN);
     moveDownItem.setDisable(!reorderable);
     moveDownItem.setOnAction(event -> move(selected, 1));
     contextMenu.getItems().add(moveDownItem);
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
-    MenuItem deleteItem = createMenuItem("_Delete", Icons.TRASH);
+    MenuItem deleteItem = createMenuItem(StudioBundle.get("delete"), Icons.TRASH);
     deleteItem.setOnAction(event -> confirmAndDelete(selected));
     contextMenu.getItems().add(deleteItem);
 

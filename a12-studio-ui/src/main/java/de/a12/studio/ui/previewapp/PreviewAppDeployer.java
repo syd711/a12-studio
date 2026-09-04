@@ -1,7 +1,14 @@
 package de.a12.studio.ui.previewapp;
 
+import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.ModelType;
+import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.applicationmodel.Module;
+import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.models.util.MasterDetailModuleGenerator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -9,7 +16,6 @@ import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -31,6 +37,12 @@ import java.util.zip.ZipOutputStream;
  * then PUT a flat zip of the project's model JSON files (one entry per model, named
  * {@code <id>.json}, matching the model-id-equals-filename convention) to its {@code v2/models}
  * endpoint.
+ *
+ * <p>Every model file is zipped byte-for-byte as saved on disk, except Application Models: for
+ * those, any {@code module-masterdetail} {@link ModelReference} in the header gets expanded into a
+ * generated {@link Module} (see {@link MasterDetailModuleGenerator}) appended to a copy of {@code
+ * content.modules} before serializing, mirroring SME's own {@code toFileContentForUpload} step -
+ * the source model on disk (and any open editor tab) is never mutated.
  *
  * <p>Uses the Preview App's fixed local-only "admin"/"a12" account - the documented default
  * credentials for every Preview App user, with full deploy authorization (systemAdmin /
@@ -78,14 +90,14 @@ public class PreviewAppDeployer {
       Set<String> excludedPaths = Set.copyOf(
           project.getSettings().getProjectRootSettings().getGeneral().getDeploymentExclusions());
 
-      List<File> modelFiles = new ArrayList<>();
-      collectModelFiles(project.getRoot(), excludedPaths, modelFiles);
-      if (modelFiles.isEmpty()) {
+      List<ProjectItem> modelItems = new ArrayList<>();
+      collectModelItems(project.getRoot(), excludedPaths, modelItems);
+      if (modelItems.isEmpty()) {
         showAlert(StudioBundle.get("deploy_models_no_models"));
         return;
       }
 
-      byte[] zip = buildModelsZip(modelFiles);
+      byte[] zip = buildModelsZip(modelItems);
 
       String apiBase = "http://localhost:" + PreviewAppInstallation.SERVER_PORT + "/api";
       HttpClient httpClient = HttpClient.newBuilder().connectTimeout(REQUEST_TIMEOUT).build();
@@ -105,30 +117,77 @@ public class PreviewAppDeployer {
     }
   }
 
-  private static void collectModelFiles(ProjectItem item, Set<String> excludedPaths, List<File> out) {
+  private static void collectModelItems(ProjectItem item, Set<String> excludedPaths, List<ProjectItem> out) {
     if (excludedPaths.contains(item.getPath())) {
       return;
     }
     if (item.isFolder()) {
       for (ProjectItem child : item.getChildren()) {
-        collectModelFiles(child, excludedPaths, out);
+        collectModelItems(child, excludedPaths, out);
       }
     }
     else if (item.getModel() != null) {
-      out.add(item.getFile());
+      out.add(item);
     }
   }
 
-  private static byte[] buildModelsZip(List<File> modelFiles) throws IOException {
+  // Package-private (rather than private) so PreviewAppDeployerTest can exercise it directly against a
+  // hand-built list of ProjectItems, without needing a full Project/ProjectSettings fixture.
+  static byte[] buildModelsZip(List<ProjectItem> modelItems) throws IOException {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     try (ZipOutputStream zipOut = new ZipOutputStream(bytes)) {
-      for (File modelFile : modelFiles) {
-        zipOut.putNextEntry(new ZipEntry(modelFile.getName()));
-        zipOut.write(Files.readAllBytes(modelFile.toPath()));
+      for (ProjectItem item : modelItems) {
+        zipOut.putNextEntry(new ZipEntry(item.getFile().getName()));
+        zipOut.write(modelFileContent(item, modelItems));
         zipOut.closeEntry();
       }
     }
     return bytes.toByteArray();
+  }
+
+  /**
+   * The bytes to upload for {@code item}: the file as saved on disk, except for an Application Model that
+   * references one or more Master-Detail Module Models, which gets its generated modules appended first (see
+   * {@link MasterDetailModuleGenerator}) and is re-serialized instead of read verbatim.
+   */
+  private static byte[] modelFileContent(ProjectItem item, List<ProjectItem> modelItems) throws IOException {
+    if (item.getModel() instanceof ApplicationModel applicationModel) {
+      List<ModelReference> masterDetailReferences = applicationModel.getModelReferences().stream()
+          .filter(reference -> reference.getModelType() == ModelType.MASTERDETAIL)
+          .toList();
+      if (!masterDetailReferences.isEmpty()) {
+        return JsonSettings.objectMapper.writeValueAsBytes(
+            withGeneratedModules(applicationModel, masterDetailReferences, modelItems));
+      }
+    }
+    return Files.readAllBytes(item.getFile().toPath());
+  }
+
+  /**
+   * A deep copy of {@code applicationModel} with a generated {@link Module} appended for each of {@code
+   * masterDetailReferences}, in order. Operates on a copy (round-tripped through JSON) so the model instance
+   * backing an open editor tab is never mutated by a deploy.
+   */
+  private static ApplicationModel withGeneratedModules(ApplicationModel applicationModel,
+      List<ModelReference> masterDetailReferences, List<ProjectItem> modelItems) throws IOException {
+    ApplicationModel deployModel = JsonSettings.objectMapper.readValue(
+        JsonSettings.objectMapper.writeValueAsBytes(applicationModel), ApplicationModel.class);
+    for (ModelReference reference : masterDetailReferences) {
+      MasterDetailModel masterDetailModel = findMasterDetailModel(reference.getReference(), modelItems);
+      deployModel.getContent().getModules()
+          .add(MasterDetailModuleGenerator.createModule(reference.getReference(), masterDetailModel));
+    }
+    return deployModel;
+  }
+
+  private static MasterDetailModel findMasterDetailModel(String id, List<ProjectItem> modelItems) throws IOException {
+    return modelItems.stream()
+        .map(ProjectItem::getModel)
+        .filter(candidate -> candidate instanceof MasterDetailModel && id.equals(candidate.getId()))
+        .map(MasterDetailModel.class::cast)
+        .findFirst()
+        .orElseThrow(() -> new IOException(
+            "Application Model references unknown Master-Detail Module Model \"" + id + "\"."));
   }
 
   private static String login(HttpClient httpClient, String apiBase) throws IOException, InterruptedException {
