@@ -94,6 +94,13 @@ shadowJar {
     // merging, shadowJar keeps a single arbitrary pack's file and drops the rest, so FontIcon can
     // resolve icons from only one pack at runtime -- e.g. "Cannot resolve 'bi-exclamation-circle-fill'"
     // when materialdesign2's file wins over bootstrapicons'.
+    // mergeServiceFiles() only configures a transformer to combine same-path service files - it
+    // does nothing if the copy step already dropped the duplicates before the transformer runs.
+    // com.gradleup.shadow (unlike the older com.github.johnrengelman.shadow) defaults CopySpec's
+    // duplicatesStrategy to EXCLUDE, so every META-INF/services/* file after the first one seen
+    // (source-set order, not alphabetical) is silently discarded pre-transform; INCLUDE lets all
+    // of them reach the transformer so mergeServiceFiles() actually has something to merge.
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     mergeServiceFiles()
 }
 

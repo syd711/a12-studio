@@ -100,7 +100,8 @@ public class Studio extends Application implements StudioEventListener {
     // also listen for KEY_RELEASED so StudioKeyEventHandler can track when the Windows key
     // (Win+arrow window snapping) is released, since it isn't reported as a KeyEvent modifier
     scene.addEventHandler(KeyEvent.KEY_RELEASED, keyEventHandler);
-    stage.setTitle("A12 Studio");
+    stage.setTitle("A12 Studio - " + StudioVersion.get());
+    rootController.setTitle("A12 Studio - " + StudioVersion.get());
     stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-180.png")));
     stage.setScene(scene);
     stage.setMinWidth(1480);
@@ -230,7 +231,8 @@ public class Studio extends Application implements StudioEventListener {
   public void projectClosed(@NonNull ProjectClosedEvent event) {
     currentProject = null;
     validationService = null;
-    stage.setTitle("A12 Studio");
+    stage.setTitle("A12 Studio - " + StudioVersion.get());
+    rootController.setTitle("A12 Studio - " + StudioVersion.get());
   }
 
   private static boolean checkModelVersions(Project project) {
