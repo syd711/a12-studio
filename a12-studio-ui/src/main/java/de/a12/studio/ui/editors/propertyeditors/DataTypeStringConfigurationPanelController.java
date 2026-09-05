@@ -66,6 +66,9 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
   private CheckBox alphabeticalSortingCheckBox;
 
   @FXML
+  private CheckBox noValueValidationCheckBox;
+
+  @FXML
   private Hyperlink regexTestLink;
 
   @FXML
@@ -117,6 +120,9 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     bindTextField(maxLengthField, (element, value) -> withStringTypeOptions(element, options -> options.setMaxLength(parseInteger(value))));
     bindCheckBox(lineBreaksCheckBox, (element, value) -> withStringTypeOptions(element, options -> options.setLineBreaksPermitted(value ? true : null)));
     bindCheckBox(alphabeticalSortingCheckBox, (element, value) -> withStringTypeOptions(element, options -> options.setAlphabeticalSorting(value ? true : null)));
+    // Only ever set programmatically before this (DocumentModelElementFactory's attachment "content" field) -
+    // exposed here so a user-authored String field can opt into the same "no kernel value validation" mode.
+    bindCheckBox(noValueValidationCheckBox, (element, value) -> withStringTypeOptions(element, options -> options.setNoValueValidation(value ? true : null)));
   }
 
   @FXML
@@ -157,6 +163,7 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
 
     setFieldValue(lineBreaksCheckBox, options != null && Boolean.TRUE.equals(options.getLineBreaksPermitted()));
     setFieldValue(alphabeticalSortingCheckBox, options != null && Boolean.TRUE.equals(options.getAlphabeticalSorting()));
+    setFieldValue(noValueValidationCheckBox, options != null && Boolean.TRUE.equals(options.getNoValueValidation()));
     rebuildSuggestionsRows();
   }
 

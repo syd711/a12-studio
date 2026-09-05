@@ -2,9 +2,12 @@ package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.ui.util.StudioBundle;
 
+import de.a12.studio.models.documentmodel.ConfirmFieldType;
 import de.a12.studio.models.documentmodel.CustomFieldFieldType;
+import de.a12.studio.models.documentmodel.DateFieldType;
 import de.a12.studio.models.documentmodel.DateFragmentFieldType;
 import de.a12.studio.models.documentmodel.DateRangeFieldType;
+import de.a12.studio.models.documentmodel.DateTimeFieldType;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.EnumerationFieldType;
 import de.a12.studio.models.documentmodel.FieldElement;
@@ -12,6 +15,7 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.NumberFieldType;
 import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.models.documentmodel.TimeFieldType;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
@@ -61,6 +65,14 @@ public class DataTypeConfigurationPanelController extends AbstractPropertyEditor
   private Node enumerationConfigurationNode;
 
   private DataTypeEnumerationConfigurationPanelController enumerationConfigurationController;
+
+  private Node dateConfigurationNode;
+
+  private DataTypeDateConfigurationPanelController dateConfigurationController;
+
+  private Node confirmConfigurationNode;
+
+  private DataTypeConfirmConfigurationPanelController confirmConfigurationController;
 
   private List<Element> ancestors = List.of();
 
@@ -131,6 +143,26 @@ enumerationLoader.setResources(StudioBundle.getBundle());
       return;
     }
     enumerationConfigurationController = enumerationLoader.getController();
+
+    FXMLLoader dateLoader = new FXMLLoader(DataTypeDateConfigurationPanelController.class.getResource("data-type-date-configuration-panel.fxml"));
+dateLoader.setResources(StudioBundle.getBundle());
+    try {
+      dateConfigurationNode = dateLoader.load();
+    } catch (IOException e) {
+      log.error("Error loading data-type-date-configuration-panel.fxml: " + e.getMessage(), e);
+      return;
+    }
+    dateConfigurationController = dateLoader.getController();
+
+    FXMLLoader confirmLoader = new FXMLLoader(DataTypeConfirmConfigurationPanelController.class.getResource("data-type-confirm-configuration-panel.fxml"));
+confirmLoader.setResources(StudioBundle.getBundle());
+    try {
+      confirmConfigurationNode = confirmLoader.load();
+    } catch (IOException e) {
+      log.error("Error loading data-type-confirm-configuration-panel.fxml: " + e.getMessage(), e);
+      return;
+    }
+    confirmConfigurationController = confirmLoader.getController();
   }
 
   public ReadOnlyStringProperty patternProperty() {
@@ -151,6 +183,8 @@ enumerationLoader.setResources(StudioBundle.getBundle());
     dateRangeConfigurationController.setElement(element);
     customConfigurationController.setElement(element);
     enumerationConfigurationController.setElement(element);
+    dateConfigurationController.setElement(element);
+    confirmConfigurationController.setElement(element);
     if (isStringFieldType(element) && isMultiSelectParent()) {
       // A multi-select group's String choices have no configurable properties of their own.
       content.getChildren().setAll(List.of());
@@ -166,6 +200,10 @@ enumerationLoader.setResources(StudioBundle.getBundle());
       content.getChildren().setAll(List.of(customConfigurationNode));
     } else if (isEnumerationFieldType(element)) {
       content.getChildren().setAll(List.of(enumerationConfigurationNode));
+    } else if (isDateLikeFieldType(element)) {
+      content.getChildren().setAll(List.of(dateConfigurationNode));
+    } else if (isConfirmFieldType(element)) {
+      content.getChildren().setAll(List.of(confirmConfigurationNode));
     } else {
       content.getChildren().setAll(List.of());
     }
@@ -206,6 +244,20 @@ enumerationLoader.setResources(StudioBundle.getBundle());
     return element instanceof FieldElement fieldElement
         && fieldElement.getField() != null
         && fieldElement.getField().getFieldType() instanceof EnumerationFieldType;
+  }
+
+  private static boolean isDateLikeFieldType(Element element) {
+    return element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && (fieldElement.getField().getFieldType() instanceof DateFieldType
+            || fieldElement.getField().getFieldType() instanceof DateTimeFieldType
+            || fieldElement.getField().getFieldType() instanceof TimeFieldType);
+  }
+
+  private static boolean isConfirmFieldType(Element element) {
+    return element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() instanceof ConfirmFieldType;
   }
 
   private boolean isMultiSelectParent() {

@@ -153,22 +153,31 @@ backend to validate against). Two new `ElementProperty` tags (`RULE_PROPERTIES`/
 the previous `GENERAL` tag on these checks in `BasicConsistencyValidator`/`MissingReferenceValidator`, so their
 errors surface on the new panels instead of colliding with `GeneralInformationPanelController`'s own `GENERAL` tag.
 
-**2. Still open. Several field types have no data-type configuration panel at all.** `DataTypeConfigurationPanelController`
-only branches on String/Number/DateFragment/DateRange/Custom/Enumeration
-(`DataTypeConfigurationPanelController.java:154-171`) — **Date, DateTime, Time, and Confirm field
-types have zero option panels**. `Date`/`DateTime`/`Time`'s `format` (required per SME's `FORMAT_MISSING` rule)
-can't be set from the UI at all. `Confirm`'s `trueValue`/`falseValue` (SME: `TRUE_FALSE_EQUALS`/`TRUE_FALSE_INVALID`)
-likewise has no panel. (`Unspecified` is deliberately excluded from this list — see the plan file's Phase 3 note:
-kernel changelog A12K-3981 removed `IUnspecifiedType` entirely, auto-migrating existing fields to `String`, so no
-panel should be built for it.)
+**2. DONE (2026-09-05).** Date, DateTime, Time, and Confirm field types had no data-type configuration panel at
+all — `DataTypeConfigurationPanelController` (in the `propertyeditors` package, not `documentmodel` — corrected
+from an earlier pass's wrong package guess) only branched on String/Number/DateFragment/DateRange/Custom/Enumeration.
+Fixed: a new shared `DataTypeDateConfigurationPanelController` (one controller/FXML for all three of
+Date/DateTime/Time, since they're identical in shape — a single `format` string each — switching title/presets/
+accessor at runtime via a small internal `FieldTypeKind` enum) and a new `DataTypeConfirmConfigurationPanelController`.
+**Correction to this doc's own earlier claim:** "Confirm's `trueValue`/`falseValue`" was wrong — that's SME's shape,
+not a12-studio's. Reading `ConfirmFieldType`/`ConfirmTypeOptions` directly shows a12-studio's `ConfirmTypeOptions`
+has exactly one field, `notInDCustomTrueValue` — no `falseValue` counterpart exists in this codebase's data model
+at all (unlike `BooleanFieldType`, which correctly has zero fields and needed no panel). The new Confirm panel
+therefore only exposes that one field; nothing was invented to match SME's shape. (`Unspecified` is still
+deliberately excluded — kernel changelog A12K-3981 removed `IUnspecifiedType` entirely, auto-migrating existing
+fields to `String`, so no panel was built for it.)
 
-**3. Several documented option fields exist on the data model but are unreachable from any panel**:
-`StringTypeOptions.noValueValidation` (only ever set programmatically for the attachment `content` field),
-`DateRangeTypeOptions.rangeSeparator`/`youngerThan1900Check`/`interpretationOfYear`/`notInDCustomFormat`/
-`notInDCustomRangeSeparator`, `DateFragmentTypeOptions.youngerThan1900Check`/`notInDCustomFormat`. SME validates
-several of these against each other (e.g. `younger1900` only valid if `format` contains a year;
-`interpretationOfYear` validity tied to format `DD.MM-DD.MM`) — worth keeping that cross-field validation in mind
-when building the panels, not just exposing bare controls.
+**3. DONE (2026-09-05).** Several documented option fields existed on the data model but were unreachable from
+any panel: `StringTypeOptions.noValueValidation` (only ever set programmatically for the attachment `content`
+field, now a checkbox next to Line Breaks Permitted/Alphabetical Sorting), `DateRangeTypeOptions.rangeSeparator`/
+`youngerThan1900Check`/`interpretationOfYear`/`notInDCustomFormat`/`notInDCustomRangeSeparator`, and
+`DateFragmentTypeOptions.youngerThan1900Check`/`notInDCustomFormat` — all now plain controls on their respective
+panels. **Not done, and flagged as such in code comments on both controllers**: SME conditionally validates some
+of these against each other (e.g. `younger1900` only valid if `format` contains a year), but the exact conditions
+weren't independently confirmable from the documentation available in this repo (grepped
+`documentation/2606-06-doc/` for `notInDCustomFormat`/`interpretationOfYear`/"younger...1900" — no hits beyond a
+single unrelated `interpretationOfYear` mention in the QM filtering docs), so no enable/disable or cross-field
+validation logic was guessed at — the controls are always-editable with no gating.
 
 **4. `RequirednessConfig.errorMessage` (custom "this field is required" message) can be toggled off the default
 but never authored** — `TypeDefinitionPanelController`'s "use default error messages" checkbox only *clears* the

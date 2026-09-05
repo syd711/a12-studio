@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -33,6 +38,40 @@
         </Label>
       </children>
     </HBox>
+
+    <GridPane hgap="10.0" vgap="8.0">
+      <columnConstraints>
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+      </columnConstraints>
+      <rowConstraints>
+        <RowConstraints />
+        <RowConstraints />
+        <RowConstraints />
+      </rowConstraints>
+
+      <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <Label styleClass="field-label" text="%range_separator" />
+        <TextField fx:id="rangeSeparatorField" />
+      </VBox>
+      <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
+        <Label styleClass="field-label" text="%interpretation_of_year" />
+        <TextField fx:id="interpretationOfYearField" />
+      </VBox>
+      <VBox GridPane.columnIndex="0" GridPane.rowIndex="1">
+        <Label styleClass="field-label" text="%custom_format" />
+        <TextField fx:id="notInDCustomFormatField" />
+      </VBox>
+      <VBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+        <Label styleClass="field-label" text="%custom_range_separator" />
+        <TextField fx:id="notInDCustomRangeSeparatorField" />
+      </VBox>
+      <CheckBox fx:id="youngerThan1900CheckBox" text="%younger_than_1900_check" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="2">
+        <GridPane.margin>
+          <Insets top="6.0" />
+        </GridPane.margin>
+      </CheckBox>
+    </GridPane>
   </VBox>
  </center>
  <top>

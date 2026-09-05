@@ -8,7 +8,9 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
@@ -19,6 +21,10 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
+/**
+ * {@code youngerThan1900Check}/{@code notInDCustomFormat} are exposed here as plain controls with no
+ * cross-field validity checks - see the same caveat on {@link DataTypeDateRangeConfigurationPanelController}.
+ */
 public class DataTypeDateFragmentConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final String FORMAT_YEAR = "yyyy";
@@ -36,6 +42,12 @@ public class DataTypeDateFragmentConfigurationPanelController extends AbstractPr
 
   @FXML
   private ComboBox<String> formatComboBox;
+
+  @FXML
+  private TextField notInDCustomFormatField;
+
+  @FXML
+  private CheckBox youngerThan1900CheckBox;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -59,6 +71,8 @@ public class DataTypeDateFragmentConfigurationPanelController extends AbstractPr
     });
 
     bindComboBox(formatComboBox, (element, value) -> withDateFragmentTypeOptions(element, options -> options.setFormatOfFragment(value == null || value.isEmpty() ? null : value)));
+    bindTextField(notInDCustomFormatField, (element, value) -> withDateFragmentTypeOptions(element, options -> options.setNotInDCustomFormat(value == null || value.isBlank() ? null : value)));
+    bindCheckBox(youngerThan1900CheckBox, (element, value) -> withDateFragmentTypeOptions(element, options -> options.setYoungerThan1900Check(value ? true : null)));
   }
 
   @Override
@@ -79,6 +93,8 @@ public class DataTypeDateFragmentConfigurationPanelController extends AbstractPr
     }
 
     setFieldValue(formatComboBox, format);
+    setFieldValue(notInDCustomFormatField, options != null && options.getNotInDCustomFormat() != null ? options.getNotInDCustomFormat() : "");
+    setFieldValue(youngerThan1900CheckBox, options != null && Boolean.TRUE.equals(options.getYoungerThan1900Check()));
   }
 
   @Override

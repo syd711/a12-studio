@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
@@ -33,6 +35,16 @@
         </Label>
       </children>
     </HBox>
+
+    <VBox spacing="4.0">
+      <Label styleClass="field-label" text="%custom_format" />
+      <TextField fx:id="notInDCustomFormatField" />
+    </VBox>
+    <CheckBox fx:id="youngerThan1900CheckBox" text="%younger_than_1900_check">
+      <VBox.margin>
+        <Insets top="6.0" />
+      </VBox.margin>
+    </CheckBox>
   </VBox>
  </center>
  <top>
