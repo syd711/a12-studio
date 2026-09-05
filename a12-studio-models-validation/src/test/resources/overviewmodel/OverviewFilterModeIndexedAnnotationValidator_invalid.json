@@ -1,0 +1,45 @@
+{
+  "header": {
+    "id": "OverviewFilterModeIndexedAnnotationValidator_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Ref_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10,
+      "enableFilter": true,
+      "filterConfiguration": {
+        "filterMode": "all",
+        "showFilterBar": true,
+        "showFilterButton": true
+      }
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          }
+        ],
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ]
+  }
+}
