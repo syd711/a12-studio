@@ -36,7 +36,8 @@
       "/People/Addresses/Country",
       "/People/Addresses/PostalCode",
       "/People/FirstName",
-      "/People/LastName"
+      "/People/LastName",
+      "/People/PersonalData/Gender"
     ],
     "sort": [
       {

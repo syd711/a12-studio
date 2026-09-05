@@ -1,0 +1,15 @@
+{
+  "header": {
+    "id": "QueryTargetDocumentModelRequiredValidator_invalid",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document"
+  }
+}

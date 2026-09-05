@@ -10,6 +10,7 @@ import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.services.ApplicationModelValidationService;
@@ -19,6 +20,7 @@ import de.a12.studio.modelsvalidation.services.FormModelValidationService;
 import de.a12.studio.modelsvalidation.services.MasterDetailModelValidationService;
 import de.a12.studio.modelsvalidation.services.OverviewModelValidationService;
 import de.a12.studio.modelsvalidation.services.PrintModelValidationService;
+import de.a12.studio.modelsvalidation.services.QueryModelValidationService;
 import de.a12.studio.modelsvalidation.services.RelationshipModelValidationService;
 import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
@@ -46,6 +48,7 @@ public class ValidationService {
   private final PrintModelValidationService printModelValidationService = new PrintModelValidationService();
   private final ContentModelValidationService contentModelValidationService = new ContentModelValidationService();
   private final MasterDetailModelValidationService masterDetailModelValidationService = new MasterDetailModelValidationService();
+  private final QueryModelValidationService queryModelValidationService = new QueryModelValidationService();
 
   public ValidationService(Project project) {
     this.project = project;
@@ -64,6 +67,7 @@ public class ValidationService {
       case PrintModel printModel -> printModelValidationService.validate(printModel, context);
       case ContentModel contentModel -> contentModelValidationService.validate(contentModel, context);
       case MasterDetailModel masterDetailModel -> masterDetailModelValidationService.validate(masterDetailModel, context);
+      case QueryModel queryModel -> queryModelValidationService.validate(queryModel, context);
       default -> List.of();
     };
   }
@@ -80,6 +84,7 @@ public class ValidationService {
       case PRINT -> printModelValidationService.addValidator(validator);
       case CONTENT -> contentModelValidationService.addValidator(validator);
       case MASTERDETAIL -> masterDetailModelValidationService.addValidator(validator);
+      case QUERY -> queryModelValidationService.addValidator(validator);
     }
   }
 
@@ -95,6 +100,7 @@ public class ValidationService {
       case PRINT -> printModelValidationService.removeValidator(validator);
       case CONTENT -> contentModelValidationService.removeValidator(validator);
       case MASTERDETAIL -> masterDetailModelValidationService.removeValidator(validator);
+      case QUERY -> queryModelValidationService.removeValidator(validator);
     }
   }
 

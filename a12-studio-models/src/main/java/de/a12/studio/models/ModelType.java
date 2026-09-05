@@ -21,6 +21,12 @@ public enum ModelType {
   // documented or fixture-confirmed convention; CDM/MM/QM/RM/SMM here are a best-effort, collision-free
   // scheme consistent with the confirmed ones (SMM is also the literal abbreviation the a12 kernel uses
   // for Structural Mapping Model, see kernel-kernel-documentation-dev.md's "_SMM_..." annotation name).
+  // QM specifically: checked 2026-09-05 against real SME fixtures and found inconsistent in the wild -
+  // client/resources/input/models/example/.../HighExperienceInterns_QeM.json uses "_QeM", but
+  // integrationTest/cypress/testData/models/omm/refactoring/OverviewModelRefactoring_QM.json (modelType
+  // "query", so a genuine Query Model despite its own file's "OverviewModelRefactoring" name) uses "_QM".
+  // Left as "QM" (not changed to "QeM") since the evidence contradicts itself rather than confirming one
+  // convention over the other.
   APPLICATION("application", "Application Model", "AM"),
   COMBINATION("combination", "Combination Model", "CDM"),
   CONTENT("content", "Content Model", "CM"),

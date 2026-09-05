@@ -1,0 +1,30 @@
+{
+  "header": {
+    "id": "PersonCompany",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": [
+      {
+        "role": "Person",
+        "documentModel": "Person_DM",
+        "ordered": false,
+        "labels": []
+      },
+      {
+        "role": "Company",
+        "documentModel": "Company_DM",
+        "ordered": false,
+        "labels": []
+      }
+    ]
+  }
+}

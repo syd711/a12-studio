@@ -26,6 +26,11 @@
                         <fx:include fx:id="queryModelTree" source="query-model-tree.fxml" />
                     </content>
                 </Tab>
+                <Tab text="%settings">
+                    <content>
+                        <fx:include fx:id="querySettingsPanel" source="query-settings-panel.fxml" />
+                    </content>
+                </Tab>
                 <Tab text="%post_processing">
                     <content>
                         <fx:include fx:id="postProcessingPanel" source="post-processing-panel.fxml" />

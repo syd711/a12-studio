@@ -5,8 +5,10 @@ the original/reference implementation at `C:\workspace\sme`, part of the mgm A12
 from-scratch **Java reimplementation** of the same modeling tool concept — not a port. Use this doc to see what
 SME's editors do, what a12-studio currently has, and what's missing.
 
-Last analyzed: 2026-07-17. SME evolves independently of this repo — re-verify specifics (file paths, endpoint
-names) against `C:\workspace\sme` before relying on them for anything but general orientation.
+Last analyzed: 2026-07-17 (Document Model section's field-level/validator detail refreshed 2026-09-05 — see
+"Field-level & validator gap analysis" below; rest of the doc not re-verified on that pass). SME evolves
+independently of this repo — re-verify specifics (file paths, endpoint names) against `C:\workspace\sme` before
+relying on them for anything but general orientation.
 
 ## Architecture: how the two projects actually relate
 
@@ -87,13 +89,90 @@ Missing or worth checking against SME (`commonDocumentModel/api/editor/*`):
 | Ad hoc testing / live preview | Select elements (Alt+T), server generates a reduced test Document+Validation model, renders in a popup preview | Missing | |
 | Copy elements from another Document Model | "Insert from DM" modal, resolves includes, copies/imports type defs | Missing | |
 | Model diff / compare | `hasModelDiffEditor`, full settings/tree/typedef diff | Missing | |
-| Drag & drop reorder/reparent in tree | Per-element `dnd` metadata (`draggable`/`droppable`/`reorderable`) | Not confirmed present — check tree FXML/controller | |
+| Drag & drop reorder/reparent in tree | Per-element `dnd` metadata (`draggable`/`droppable`/`reorderable`) | **Present** (confirmed 2026-09-05) — `DocumentModelElementsTreeController.setupRowDragAndDrop`/`resolveDropPosition`: reorder above/below, reparent into, root-end drop, with fixed-children/attachment-adjacency vetoes | |
 | Tree filtering (by type, category, annotated-only, etc.) | Rich filter panel (`dmEditorView` filters) | Not confirmed present | |
 | AI-assisted model generation | `documentModel/ai/*` — generates a DM from a prompt/PDF via `@com.mgmtp.ai.generation` | Likely out of scope — needs a conscious decision | |
 | Additive Document Model (overlay/inherit/overwrite editing) | Separate module (`additiveDocumentModel`), full editing mode | `kernel-md-join` dependency present but no editor concept yet | |
 | Composed Document Model (graph composition via Element Picker) | Separate module (`composedDocumentModel`) | Missing | |
 | Multi-select bulk actions | Ctrl+M panel, bulk delete/cut/copy, bulk "Ad hoc Test" | Not confirmed present | |
 | Markdown report generation per element | `createMarkdownReport`, used for AI/export tooling | Missing | |
+
+Also undocumented until now: a12-studio has a context-menu action with **no SME equivalent** —
+"Create Overview Model from Selection" (`DocumentModelActions.onCreateOverviewModelFromSelection`), multi-select
+fields/groups → generates a new Overview Model with one column per field.
+
+### Field-level & validator gap analysis (2026-09-05)
+
+SME's Document Model editor is not hand-coded per-element-type React forms — it's a **self-hosting Form Engine
+editor**: Group/Field/Rule/Computation/TypeDefinition editing UI is generated at runtime from meta document+form
+model pairs (`client/resources/models/documentModel/Domain*.json` + matching `*.json` form models). The
+`Domain*.json` files are themselves Document Models that encode every field, every validation rule
+(condition + per-language message + severity), and requiredness — they're the ground truth for "what SME lets you
+edit and enforce," more authoritative than any individual `.tsx`. `elementEditorView.tsx` only customizes a
+handful of special widgets on top of the generated form: rule/precondition/calculation condition editors with
+kernel-language autocomplete, an enum-values table with per-language columns, a read-only computed "Path" display,
+and reference autocomplete for `Reference_1`-annotated fields.
+
+Comparing that generated surface field-by-field against a12-studio's hand-built panels surfaces gaps well below
+the granularity of the feature table above:
+
+**1. Rule and Computation elements are structurally creatable but functionally uneditable — the single biggest
+gap.** `document-model-validation-rule-editor.fxml`/`document-model-computation-rule-editor.fxml` only wire up the
+generic General Information/Description/Annotations panels. None of `RuleConfig`'s `errorEntityRelPath`,
+`errorCode`, `errorCondition`, `severity`, `errorMessage`, or `ComputationConfig`'s `computedFieldRelPath`,
+`computationAlternatives[]` (each with `precondition`/`operation`), `errorMessage` have any bound UI control. A
+user-created Rule gets only an auto-generated `errorCode` (`DocumentModelElementFactory.newRuleElement`) and is
+otherwise permanently empty. `BasicConsistencyValidator` correctly flags the missing fields as errors forever, but
+there is no UI path to ever fix them — Rule/Computation authoring is currently a dead end in the editor. SME's
+equivalent (`DomainRule.json`/`DomainComputation.json`) validates `errorCondition`/`precondition`/`operation` text
+via the same kernel condition-language check a12-studio already calls elsewhere (`ValidationRuleService`/
+`ComputationRuleService` per the top of this doc), so the condition-editing widget itself doesn't need to be
+invented from scratch — it needs to be wired into these two element editors.
+
+**2. Several field types have no data-type configuration panel at all.** `DataTypeConfigurationPanelController`
+only branches on String/Number/DateFragment/DateRange/Custom/Enumeration
+(`DataTypeConfigurationPanelController.java:154-171`) — **Date, DateTime, Time, Confirm, and Unspecified field
+types have zero option panels**. `Date`/`DateTime`/`Time`'s `format` (required per SME's `FORMAT_MISSING` rule)
+can't be set from the UI at all. `Confirm`'s `trueValue`/`falseValue` (SME: `TRUE_FALSE_EQUALS`/`TRUE_FALSE_INVALID`)
+likewise has no panel. `Unspecified` isn't even in the selectable `DATA_TYPES` list.
+
+**3. Several documented option fields exist on the data model but are unreachable from any panel**:
+`StringTypeOptions.noValueValidation` (only ever set programmatically for the attachment `content` field),
+`DateRangeTypeOptions.rangeSeparator`/`youngerThan1900Check`/`interpretationOfYear`/`notInDCustomFormat`/
+`notInDCustomRangeSeparator`, `DateFragmentTypeOptions.youngerThan1900Check`/`notInDCustomFormat`. SME validates
+several of these against each other (e.g. `younger1900` only valid if `format` contains a year;
+`interpretationOfYear` validity tied to format `DD.MM-DD.MM`) — worth keeping that cross-field validation in mind
+when building the panels, not just exposing bare controls.
+
+**4. `RequirednessConfig.errorMessage` (custom "this field is required" message) can be toggled off the default
+but never authored** — `TypeDefinitionPanelController`'s "use default error messages" checkbox only *clears* the
+list when checked; unchecking it exposes no text field to type a replacement into
+(`type-definition-panel.fxml:104-119`).
+
+**5. Model-level fields with no UI**: `ModelConfig.decimalSeparator`, `ModelConfig.conditionLanguage`, and all of
+`DocumentModelContent.modelInfo` (`name`, `immutable`, `comment` — distinct from the header-level `description`
+field, which *is* editable) are entirely unexposed; grep confirms zero references to `ModelInfo`/`getModelInfo`
+anywhere in `a12-studio-ui`.
+
+**6. `GroupConfig.modelAlias` is a dead field** — no reader or writer anywhere in `a12-studio-ui` or
+`a12-studio-models`/validation. Includes are implemented via a separate `includeConfig` field instead. Needs a
+decision: either this is legacy/mis-modeled and should be removed, or it was intended to mirror SME's
+`modelAlias`-on-Group Include shape and `includeConfig` is the actual (differently-named) implementation of the
+same concept — worth a quick check before touching it either way, since CLAUDE.md's convention is to delete
+confirmed-dead code rather than leave it.
+
+**Existing document-model validators** (`a12-studio-models-validation`, wired via `DocumentModelValidationService`,
+all run together on tree rebuild/save): `SchemaVersionValidator`, `DuplicateIdValidator`,
+`NumberFieldValueLimitValidator`, `EnumerationValuesValidator`, `MultiSelectGroupValidator`,
+`AttachmentGroupValidator`, `BasicConsistencyValidator`, `MissingReferenceValidator`,
+`StringPatternErrorMessageValidator`, plus generic header-level ones (`MissingLocaleValidator`,
+`LocaleCodeValidator`, `ModelIdFilenameValidator`, `ModelSuffixValidator`, `UniqueModelIdValidator`,
+`NameConventionValidator`, `TimeZoneValidator`). Coverage is already broad and roughly matches SME's custom
+structural checks (`DMValidationService.kt`'s `checkMissingErrors` family: dangling Include ref, missing index
+field, duplicate names, missing computed-field target, too-few multi-select enum values, missing TypeDef ref) —
+the gap is not "missing validators," it's "validators correctly demand data that the UI provides no way to enter"
+(see point 1 above). No rule-contradiction/TDG solver exists on either side of this doc's prior analysis, confirmed
+still true.
 
 ### Load/save/validate flow (SME reference)
 
@@ -317,23 +396,59 @@ tests covering every function/operator combination against SME's own test/doc ex
 `QueryLanguageFormatterRoundTripTest` proving `emit → format → emit` is lossless (structurally, not necessarily
 byte-identical text) for every construct — the actual correctness bar for an editor's save/reload cycle.
 
-**Remaining for Phase 3**: none of this is wired into `QueryModelContent` or the editor UI yet — `filterDefinition`
-is still the old single whole-query free-text field, and the tree still has no per-node constraint slot to attach
-these to (that's Phase 2, the editable graph tree, which hasn't started). Also still open: real semantic validation
-(field-exists, relationship/role-exists checks) once there's a schema to check against, and an editor UI component
-(even a plain `RichtextEditorController`-style text box wired to `QueryLanguageEmitter`/`Formatter` would work
-before any autocomplete is built).
+**Status (2026-09-05): Phase 1 (Settings + validators) done, and the compiler is now wired into the UI for the
+existing whole-query filter field** — ahead of the original build-order plan below, which had per-node filtering
+(originally Phase 3) waiting on the editable graph tree (Phase 2). Since `filterDefinition` already existed as a
+plain string field, there was no need to wait: `QueryLanguageEmitter`/`Formatter` validate it today even though
+it's still one whole-query expression, not yet a per-node constraint.
+
+- **Settings tab** (`QuerySettingsPanelController`/`query-settings-panel.fxml`, new "Settings" tab in
+  `query-model-editor.fxml`, matching SME's own tab layout): reuses `TargetModelPanelController` (promoted to the
+  shared `propertyeditors` package per CLAUDE.md's explicit "pick one document model" convention — it already
+  anticipated Query Model as a second consumer) to finally give `content.targetDocumentModel` a UI, and syncs the
+  header's DOCUMENT-type `ModelReference` on change (mirroring `MappingModelEditorController`). Selecting a target
+  DM now also reloads the Model Tree tab so it doesn't keep showing the previous target.
+  `content.projectionName` is deliberately **not** exposed as an editable field — every real fixture/example uses
+  the constant `"document"` (SME itself treats it as read-only for the same reason), so it's auto-defaulted instead
+  of inventing a field for something that isn't meant to vary.
+- **Validators** (`a12-studio-models-validation/.../validators/query/`, registered in a new
+  `QueryModelValidationService`, wired into `ValidationService` for `ModelType.QUERY`): target-DM required
+  (`QueryTargetDocumentModelRequiredValidator`); `fields[]` and non-traversal `sort[].sortBy.field` paths must
+  resolve against the target DM (`QueryFieldReferenceValidator`/`QuerySortFieldReferenceValidator`, via a small
+  `QueryElementResolution` helper doing linear-scan path lookup — Query Model paths are "/"-separated names, unlike
+  Overview's kernel-id-based `elementRef`, so `ElementIndex`'s id resolution doesn't directly apply);
+  `sort[].relationshipModel`/`targetRole` must resolve to a real Relationship Model and a role it actually declares
+  (`QueryRelationshipTraversalValidator` — turns the sorting panel's previous UI-only styling hint into a real
+  error); paging bounds (`QueryPagingBoundsValidator`); and `filterDefinition` syntax
+  (`QueryFilterDefinitionSyntaxValidator`, via `QueryLanguageEmitter`). A sort entry that *does* traverse a
+  relationship has its field-path validation skipped for now — resolving the hop's own target DM to check the
+  field against needs more infrastructure than this pass adds; the traversal itself is still validated.
+- **Filter dialog validation**: `RichtextEditorController` (the shared expression-editor panel also used by
+  Overview/Form) gained a generic `setValidator(Function<String, String>)` hook — on every change (and once on
+  load) it shows the validator's message in its own error container, or clears it. `QueryFilterDefinitionDialogController`
+  wires this to `QueryLanguageEmitter`, and binds the OK button's disabled state to the panel's `errorProperty()` —
+  a syntax error now blocks saving instead of being silently accepted as opaque text.
+- **Scope note recorded live in this session**: the user explicitly decided to skip an ER-diagram element picker
+  for the future editable tree (Phase 2) — a simpler Document-Model list/combo picker will do instead, unlike
+  SME's diagram-based one.
+
+**Still remaining**: the tree has no per-node constraint slot yet (`filterDefinition` is still one whole-query
+expression) — that's coupled to Phase 2, the editable graph tree with relationship-traversal nodes, which hasn't
+started. Real semantic validation of the *filter expression's own* field references (does `[/Foo/Bar]` inside a
+`filterDefinition` string actually exist) also isn't checked — only its syntax is; the sort/fields validators above
+check field-existence for those specific properties, but nothing yet parses `filterDefinition`'s field references
+out of the compiled `Operator` tree to check them the same way. Aggregation and reference/rename tracking are
+unchanged from the plan below.
 
 ### Proposed build order
 
-1. **Settings + validators** (small, no architecture risk): editable `targetDocumentModel`/`projectionName` panel;
-   basic validators (target-DM resolvable, `fields[]`/`sort[].sortBy.field` paths resolve, `sort[]`
-   relationship+role resolves, paging bounds).
+1. ~~**Settings + validators**~~ — done, see Status above.
 2. **Editable graph tree**: add/remove relationship-traversal nodes, scoped to relationships actually connected to
-   the selected node (not every relationship in the project, unlike today's `QueryTraversalOption.options()`).
-3. **Per-node filtering**: port `QL.g4` (Gradle `antlr` plugin) + the compiler pipeline (parser/binder/checker/
-   emitter/importer/formatter/functions) to Java, per the feasibility spike above. Ship with a plain syntax-
-   highlighted editor first; autocomplete is a separate follow-up once the semantic layer exists.
+   the selected node (not every relationship in the project, unlike today's `QueryTraversalOption.options()`); a
+   plain Document-Model list/combo for adding a root (not an ER diagram, per the scope note above).
+3. **Per-node filtering**: give each graph node (not just the whole query) its own constraint, authored/validated
+   via the already-built `QueryLanguageEmitter`/`Formatter`. Autocomplete remains a separate follow-up once a
+   semantic (field-existence-aware) layer exists.
 4. **Aggregation** — only once it's confirmed the kernel path a12-studio would use actually supports an
    aggregation-mode query result; otherwise a documented non-goal.
 5. **Reference/rename tracking** — hook into whatever a12-studio's existing rename/move refactoring mechanism is

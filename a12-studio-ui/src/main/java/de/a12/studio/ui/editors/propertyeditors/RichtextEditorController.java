@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +42,10 @@ public class RichtextEditorController extends AbstractPropertyEditor implements 
 
   private Consumer<String> writer;
 
+  // Optional; maps the current text to an error message (or null if valid), e.g. a query-language grammar
+  // check. Left unset for plain expression fields with no dedicated grammar to validate against.
+  private Function<String, String> validator;
+
   // Set while setCustom() is repopulating codeArea from the model, so the listener below doesn't mistake that
   // programmatic change for a user edit.
   private boolean updatingFromModel;
@@ -58,6 +63,7 @@ public class RichtextEditorController extends AbstractPropertyEditor implements 
         return;
       }
       writer.accept(blankToNull(newValue));
+      validate(newValue);
       commitChange();
     });
     codeArea.textProperty().addListener((observable, oldValue, newValue) ->
@@ -79,6 +85,15 @@ public class RichtextEditorController extends AbstractPropertyEditor implements 
    * de.a12.studio.ui.editors.formmodel.dialogs.FormButtonDialogController}'s label Type combo). */
   public void setVisible(boolean visible) {
     setEditorVisible(visible);
+  }
+
+  /**
+   * Validates the text on every change (and once immediately in {@link #setCustom}), showing {@code validator}'s
+   * message in this panel's error container when non-null. Must be called before {@link #setCustom} so the
+   * initial value is validated too.
+   */
+  public void setValidator(@NonNull Function<String, String> validator) {
+    this.validator = validator;
   }
 
   private static StyleSpans<Collection<String>> computeHighlighting(String text) {
@@ -109,6 +124,19 @@ public class RichtextEditorController extends AbstractPropertyEditor implements 
     }
     finally {
       updatingFromModel = false;
+    }
+    validate(codeArea.getText());
+  }
+
+  private void validate(String text) {
+    if (validator == null) {
+      return;
+    }
+    String error = blankToNull(text) == null ? null : validator.apply(text);
+    if (error != null) {
+      showError("ERROR", error);
+    } else {
+      hideError();
     }
   }
 

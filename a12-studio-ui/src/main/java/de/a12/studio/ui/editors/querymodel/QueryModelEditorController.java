@@ -13,12 +13,21 @@ public class QueryModelEditorController extends AbstractEditorController {
   private QueryModelTreeController queryModelTreeController;
 
   @FXML
+  private QuerySettingsPanelController querySettingsPanelController;
+
+  @FXML
   private PostProcessingPanelController postProcessingPanelController;
+
+  @FXML
+  private void initialize() {
+    querySettingsPanelController.setOnTargetModelChanged(() -> queryModelTreeController.load(projectItem, (QueryModel) projectItem.getModel()));
+  }
 
   @Override
   public void loadModel(@NonNull A12Model<?> model) {
     QueryModel queryModel = (QueryModel) model;
     queryModelTreeController.load(projectItem, queryModel);
+    querySettingsPanelController.load(projectItem, queryModel);
     postProcessingPanelController.load(projectItem, queryModel);
     updateSettingsErrorBadge();
   }

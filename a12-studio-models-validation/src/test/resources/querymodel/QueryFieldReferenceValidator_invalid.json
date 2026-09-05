@@ -1,0 +1,20 @@
+{
+  "header": {
+    "id": "QueryFieldReferenceValidator_invalid",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Ref_DM",
+    "fields": [
+      "/Root/Name",
+      "/Root/DoesNotExist"
+    ]
+  }
+}

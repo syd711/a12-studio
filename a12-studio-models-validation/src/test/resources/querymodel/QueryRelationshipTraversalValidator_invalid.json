@@ -1,0 +1,34 @@
+{
+  "header": {
+    "id": "QueryRelationshipTraversalValidator_invalid",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Ref_DM",
+    "sort": [
+      {
+        "relationshipModel": "NoSuchRelationship",
+        "targetRole": "Company",
+        "sortBy": {
+          "field": "/Root/Name",
+          "direction": "ASC"
+        }
+      },
+      {
+        "relationshipModel": "PersonCompany",
+        "targetRole": "WrongRole",
+        "sortBy": {
+          "field": "/Root/Name",
+          "direction": "ASC"
+        }
+      }
+    ]
+  }
+}
