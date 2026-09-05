@@ -394,6 +394,10 @@
 .preview-app-status-icon.status-stopped {
     -fx-icon-color: -fx-error-bg;
 }
+
+.deploy-spinner {
+    -fx-background-color: transparent;
+}
 /**
  * Plugin Manager – master-detail panel styles
  */

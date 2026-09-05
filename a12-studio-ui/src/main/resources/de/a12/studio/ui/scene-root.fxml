@@ -61,7 +61,7 @@
                                              </graphic>
                                              <tooltip><Tooltip text="%deploy_models" /></tooltip>
                                           </Button>
-                                          <ProgressIndicator fx:id="dockedDeploySpinner" mouseTransparent="true" prefHeight="16.0" prefWidth="16.0" visible="false" />
+                                          <ProgressIndicator fx:id="dockedDeploySpinner" mouseTransparent="true" prefHeight="12.8" prefWidth="12.8" styleClass="deploy-spinner" visible="false" />
                                        </children>
                                     </StackPane>
                                     <Button fx:id="dockedLaunchBtn" accessibleText="%launch_preview_app" mnemonicParsing="false" onAction="#onDockedLaunch" styleClass="menu-bar-button, launch-preview-app-button, preview-app-button">

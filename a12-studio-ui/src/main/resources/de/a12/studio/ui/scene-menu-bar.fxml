@@ -62,7 +62,7 @@
                                 <Tooltip text="%deploy_models" />
                             </tooltip>
                         </Button>
-                        <ProgressIndicator fx:id="deploySpinner" mouseTransparent="true" prefHeight="18.0" prefWidth="18.0" visible="false" />
+                        <ProgressIndicator fx:id="deploySpinner" mouseTransparent="true" prefHeight="14.4" prefWidth="14.4" styleClass="deploy-spinner" visible="false" />
                      </children>
                      <HBox.margin>
                         <Insets right="6.0" />
