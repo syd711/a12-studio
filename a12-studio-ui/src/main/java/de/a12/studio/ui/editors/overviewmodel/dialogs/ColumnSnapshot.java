@@ -38,8 +38,11 @@ class ColumnSnapshot {
     column.setSortable(restored.getSortable());
     column.setPreferredSorting(restored.getPreferredSorting());
     column.setAttachmentDisplayMode(restored.getAttachmentDisplayMode());
+    column.setMultiSelectDisplayMode(restored.getMultiSelectDisplayMode());
     column.getSuffix().clear();
     column.getSuffix().addAll(restored.getSuffix());
+    column.setSuffixRef(restored.getSuffixRef());
+    column.setUseDynamicSuffix(restored.getUseDynamicSuffix());
     column.getSummary().clear();
     column.getSummary().addAll(restored.getSummary());
     column.setName(restored.getName());

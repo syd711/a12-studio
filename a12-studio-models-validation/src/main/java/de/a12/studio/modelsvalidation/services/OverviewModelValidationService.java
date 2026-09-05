@@ -12,17 +12,20 @@ import de.a12.studio.modelsvalidation.validators.ModelSuffixValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnHeaderLabelOrIconValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnsNotEmptyValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewDocumentModelRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterCustomFieldsValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterGroupsValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeIndexedAnnotationValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterSectionsValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewInitialSortingReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewMultiSelectionElementValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewPagingSizeValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewSearchElementValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewSortableMultiSelectValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewStylesValidator;
 
 import java.util.ArrayList;
@@ -41,9 +44,12 @@ public final class OverviewModelValidationService {
       new HeaderModelReferenceValidator(),
       new OverviewColumnsNotEmptyValidator(),
       new OverviewFieldReferenceValidator(),
+      new OverviewSortableMultiSelectValidator(),
+      new OverviewColumnHeaderLabelOrIconValidator(),
       new OverviewDocumentModelRequiredValidator(),
       new OverviewFilterModeRequiredValidator(),
       new OverviewFilterCustomFieldsValidator(),
+      new OverviewFilterModeIndexedAnnotationValidator(),
       new OverviewFilterSectionsValidator(),
       new OverviewFilterGroupsValidator(),
       new OverviewMultiSelectionElementValidator(),

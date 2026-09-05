@@ -30,6 +30,7 @@
                 <tooltip><Tooltip text="%add_column" /></tooltip>
             </Button>
       <CheckBox fx:id="enableColumnsResizeField" mnemonicParsing="false" text="%enable_columns_resize_overview" />
+      <CheckBox fx:id="labelHiddenField" mnemonicParsing="false" text="%hide_model_title" />
       <HBox alignment="CENTER_LEFT" spacing="6.0">
         <CheckBox fx:id="showRowCountField" mnemonicParsing="false" text="%show_number_of_entries" />
         <Label prefHeight="9.0" prefWidth="7.0">

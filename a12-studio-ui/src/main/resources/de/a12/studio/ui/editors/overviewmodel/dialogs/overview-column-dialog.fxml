@@ -79,6 +79,41 @@
                            </VBox>
                         </children>
                      </HBox>
+
+                     <!-- Attachment-typed reference column fields -->
+                     <VBox fx:id="attachmentSection" spacing="2.0">
+                        <children>
+                           <Label styleClass="field-label" text="%attachment_display_mode" />
+                           <ComboBox fx:id="attachmentDisplayModeCombo" maxWidth="Infinity" />
+                        </children>
+                     </VBox>
+
+                     <!-- Multi-select-typed reference column fields -->
+                     <VBox fx:id="multiSelectSection" spacing="2.0">
+                        <children>
+                           <Label styleClass="field-label" text="%multi_select_display_mode" />
+                           <ComboBox fx:id="multiSelectDisplayModeCombo" maxWidth="Infinity" />
+                        </children>
+                     </VBox>
+
+                     <!-- Number-typed reference column fields -->
+                     <VBox fx:id="numberSection" spacing="10.0">
+                        <children>
+                           <CheckBox fx:id="useDynamicSuffixField" mnemonicParsing="false" text="%use_dynamic_suffix" />
+                           <VBox fx:id="staticSuffixBox" spacing="6.0">
+                              <children>
+                                 <fx:include fx:id="suffix" source="../../propertyeditors/localized-text-panel.fxml" />
+                              </children>
+                           </VBox>
+                           <VBox fx:id="dynamicSuffixBox" spacing="2.0">
+                              <children>
+                                 <Label styleClass="field-label" text="%suffix_reference" />
+                                 <ComboBox fx:id="suffixRefCombo" maxWidth="Infinity" />
+                              </children>
+                           </VBox>
+                           <CheckBox fx:id="showSummaryField" mnemonicParsing="false" text="%show_summary" />
+                        </children>
+                     </VBox>
                   </children>
                </VBox>
 

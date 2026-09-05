@@ -7,6 +7,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -216,8 +217,10 @@ public class OverviewReferencePanelController implements Initializable {
   /** The combo box reference is required regardless of which radio button is selected. */
   private void validate() {
     if (overviewReferenceField.getValue() == null) {
-      String missing = queryModelReferenceField.isSelected() ? "A Query Model" : "A Document Model";
-      errorContainerController.show("ERROR", missing + " must be selected.");
+      String missing = queryModelReferenceField.isSelected()
+          ? StudioBundle.get("overview_reference_panel.query_model_option")
+          : StudioBundle.get("overview_reference_panel.document_model_option");
+      errorContainerController.show("ERROR", StudioBundle.get("overview_reference_panel.selection_required", missing));
     }
     else {
       errorContainerController.hide();

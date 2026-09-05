@@ -12,10 +12,14 @@ import de.a12.studio.ui.editors.propertyeditors.RowFactory;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
@@ -109,8 +113,10 @@ public class ContextMenuGroupDialogController implements DialogController {
 
   @FXML
   private void onAddAction() {
-    group.getActions().add(new Button());
-    rebuildActionsGrid();
+    Dialogs.showContextMenuActionForAdd(stage).ifPresent(action -> {
+      group.getActions().add(action);
+      rebuildActionsGrid();
+    });
   }
 
   private void rebuildActionsGrid() {
@@ -124,25 +130,52 @@ public class ContextMenuGroupDialogController implements DialogController {
 
     int row = 0;
     for (Button action : List.copyOf(actions)) {
-      TextField eventField = new TextField(action.getEvent() != null ? action.getEvent() : "");
-      eventField.setPromptText(StudioBundle.get("event"));
-      eventField.setMaxWidth(Double.MAX_VALUE);
-      GridPane.setHgrow(eventField, Priority.ALWAYS);
-      eventField.textProperty().addListener((observable, oldValue, newValue) -> action.setEvent(newValue.isEmpty() ? null : newValue));
+      javafx.scene.control.Label eventLabel = new javafx.scene.control.Label(action.getEvent() != null ? action.getEvent() : "");
+      eventLabel.setMaxWidth(Double.MAX_VALUE);
+      GridPane.setHgrow(eventLabel, Priority.ALWAYS);
+      makeClickableToEdit(eventLabel, action);
 
-      TextField iconField = new TextField(action.getIconName() != null ? action.getIconName() : "");
-      iconField.setPromptText(StudioBundle.get("icon"));
-      iconField.setMaxWidth(Double.MAX_VALUE);
-      GridPane.setHgrow(iconField, Priority.ALWAYS);
-      iconField.textProperty().addListener((observable, oldValue, newValue) -> action.setIconName(newValue.isEmpty() ? null : newValue));
+      javafx.scene.control.Label iconLabel = new javafx.scene.control.Label(action.getIconName() != null ? action.getIconName() : "");
+      iconLabel.setMaxWidth(Double.MAX_VALUE);
+      GridPane.setHgrow(iconLabel, Priority.ALWAYS);
+      makeClickableToEdit(iconLabel, action);
 
-      javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("remove_action"), () -> {
-        actions.remove(action);
-        rebuildActionsGrid();
-      });
+      HBox actionsBox = createActionsBox(action);
 
-      actionsGrid.addRow(row++, eventField, iconField, deleteButton);
+      actionsGrid.addRow(row++, eventLabel, iconLabel, actionsBox);
     }
+  }
+
+  private void makeClickableToEdit(javafx.scene.control.Label label, Button action) {
+    label.setCursor(Cursor.HAND);
+    label.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        openActionEditDialog(action);
+      }
+    });
+  }
+
+  private void openActionEditDialog(Button action) {
+    Dialogs.showContextMenuActionForEdit(stage, action).ifPresent(edited -> {
+      group.getActions().set(group.getActions().indexOf(action), edited);
+      rebuildActionsGrid();
+    });
+  }
+
+  private HBox createActionsBox(Button action) {
+    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openActionEditDialog(action));
+
+    javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("remove_action"), () -> {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_action"), null, null, StudioBundle.get("delete"));
+      if (result.isPresent() && result.get() == ButtonType.OK) {
+        group.getActions().remove(action);
+        rebuildActionsGrid();
+      }
+    });
+
+    HBox actionsBox = new HBox(4.0, editButton, deleteButton);
+    actionsBox.setAlignment(Pos.CENTER_LEFT);
+    return actionsBox;
   }
 
   private void rebuildLocaleGrid(GridPane grid, List<Label> labels, BiConsumer<String, String> onTextChange) {

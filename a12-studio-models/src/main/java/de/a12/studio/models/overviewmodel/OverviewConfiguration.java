@@ -18,6 +18,8 @@ public class OverviewConfiguration {
   private Boolean showFullTextSearch;
   private Integer pagingSize;
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean labelHidden;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean showRowCount;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean enableColumnsResize;

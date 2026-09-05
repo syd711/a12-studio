@@ -7,6 +7,7 @@ import de.a12.studio.models.overviewmodel.FilterGroup;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterSection;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -160,6 +161,46 @@ public class Dialogs {
 
     stage.showAndWait();
     return controller.isConfirmed();
+  }
+
+  /**
+   * Opens the Add dialog for a brand-new, unattached context-menu action - the caller only adds it to its
+   * owning {@link ActionGroup#getActions()} once present, mirroring {@link
+   * de.a12.studio.ui.editors.overviewmodel.dialogs.FilterItemsPanelController}'s Add flow.
+   */
+  public static Optional<Button> showContextMenuActionForAdd(Stage owner) {
+    return showContextMenuAction(owner, StudioBundle.get("add_context_menu_action_title"), new Button());
+  }
+
+  /**
+   * Opens the Edit dialog for a working copy of {@code action}, so a Cancel leaves the real, attached action
+   * untouched - mirrors {@link de.a12.studio.ui.editors.propertyeditors.dialogs.Dialogs#showEventButtonForEdit}.
+   * The caller only replaces the original action with the returned one once present.
+   */
+  public static Optional<Button> showContextMenuActionForEdit(Stage owner, @NonNull Button action) {
+    return showContextMenuAction(owner, StudioBundle.get("edit_context_menu_action_title"), cloneAction(action));
+  }
+
+  private static Optional<Button> showContextMenuAction(Stage owner, String title, Button action) {
+    FXMLLoader fxmlLoader = new FXMLLoader(ContextMenuActionDialogController.class.getResource("context-menu-action-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("context-menu-action-dialog", fxmlLoader, owner, title);
+    ContextMenuActionDialogController controller = (ContextMenuActionDialogController) stage.getUserData();
+    controller.init(stage, action);
+    stage.setOnHidden(event -> controller.destroy());
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+
+    if (!controller.isConfirmed() || action.getEvent() == null || action.getEvent().isBlank()) {
+      return Optional.empty();
+    }
+    return Optional.of(action);
+  }
+
+  private static Button cloneAction(Button action) {
+    String json = JsonSettings.objectMapper.writeValueAsString(action);
+    return JsonSettings.objectMapper.readValue(json, Button.class);
   }
 
   private static String shortId() {

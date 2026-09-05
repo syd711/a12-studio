@@ -5,6 +5,8 @@ import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.GroupConfig;
+import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
@@ -69,5 +71,42 @@ public final class OverviewElementResolution {
    */
   public static boolean isInRepeatableGroup(ElementIndex index, String elementRef) {
     return index.isInRepeatableGroup(elementRef);
+  }
+
+  /**
+   * True when {@code element} is a multi-select group itself, or a field living directly inside one -
+   * columns may reference either shape depending on how the field was picked. Mirrors SME's
+   * {@code DocumentModelApi.isMultiSelect}, used e.g. to disallow {@code sortable} on such columns
+   * ({@link OverviewSortableMultiSelectValidator}).
+   */
+  public static boolean isMultiSelect(ElementIndex index, Element element) {
+    if (isMultiSelectGroup(element)) {
+      return true;
+    }
+    GroupElement parent = index.parentOf(element);
+    return parent != null && isMultiSelectGroup(parent);
+  }
+
+  private static boolean isMultiSelectGroup(Element element) {
+    return element instanceof GroupElement groupElement && groupElement.getGroup() != null
+        && GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType());
+  }
+
+  /**
+   * True when {@code element} is an attachment group itself, or a field living directly inside one - mirrors
+   * {@link #isMultiSelect}, used to detect a column's element-specific display options (e.g. {@code
+   * attachmentDisplayMode}) in the Column dialog.
+   */
+  public static boolean isAttachment(ElementIndex index, Element element) {
+    if (isAttachmentGroup(element)) {
+      return true;
+    }
+    GroupElement parent = index.parentOf(element);
+    return parent != null && isAttachmentGroup(parent);
+  }
+
+  private static boolean isAttachmentGroup(Element element) {
+    return element instanceof GroupElement groupElement && groupElement.getGroup() != null
+        && GroupConfig.USAGE_TYPE_ATTACHMENT.equals(groupElement.getGroup().getUsageType());
   }
 }

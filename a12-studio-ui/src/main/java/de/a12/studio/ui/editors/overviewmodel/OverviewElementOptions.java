@@ -16,12 +16,16 @@ import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.TimeFieldType;
 import de.a12.studio.models.Label;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewElementResolution;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.util.StringConverter;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * Builds the "element reference" option list used by every field-picker in the Overview tab (a column's
@@ -34,6 +38,34 @@ import java.util.List;
 public final class OverviewElementOptions {
 
   private OverviewElementOptions() {
+  }
+
+  /**
+   * When an Overview Model is bound through a Query Model rather than directly through a Document Model,
+   * every field-reference picker should only offer fields the Query Model actually projects ({@code
+   * QueryModelContent.fields}), mirroring SME's {@code getExtendedGetDmCandidates}. Rather than threading an
+   * "allowed ids" parameter through every picker call site (the Columns/Sorting/Accessibility/Custom
+   * Selection Of Fields/Section Data/Custom Filter Configuration panels, plus the Column dialog), the
+   * restriction is attached to the specific {@link ElementIndex} instance it applies to - set once in {@code
+   * OverviewModelEditorController#refreshDocumentModelIndex()} - and consulted transparently by {@link
+   * #elementIds}. A {@link WeakHashMap} means a freshly rebuilt index (e.g. after switching Document
+   * Models/Query Models, which always constructs a new {@link ElementIndex}) starts unrestricted with no
+   * explicit clearing required, and old entries are collected once their index is no longer referenced.
+   */
+  private static final Map<ElementIndex, Set<String>> allowedFieldIdsByIndex = new WeakHashMap<>();
+
+  /** Restricts every field-reference picker backed by {@code index} to {@code allowedIds}; {@code null} (or
+   * an empty set) removes any restriction, so every element in {@code index} is offered again. */
+  public static void restrictFieldIds(ElementIndex index, Set<String> allowedIds) {
+    if (index == null) {
+      return;
+    }
+    if (allowedIds == null || allowedIds.isEmpty()) {
+      allowedFieldIdsByIndex.remove(index);
+    }
+    else {
+      allowedFieldIdsByIndex.put(index, allowedIds);
+    }
   }
 
   /**
@@ -52,8 +84,10 @@ public final class OverviewElementOptions {
     if (index == null) {
       return List.of();
     }
+    Set<String> allowedIds = allowedFieldIdsByIndex.get(index);
     return index.allElements().stream()
         .filter(element -> element.getId() != null)
+        .filter(element -> allowedIds == null || allowedIds.contains(element.getId()))
         .sorted(Comparator.comparing(index::getPath))
         .map(Element::getId)
         .toList();
@@ -142,6 +176,50 @@ public final class OverviewElementOptions {
         .findFirst()
         .map(element -> filterItemFieldType(((FieldElement) element).getField().getFieldType()))
         .orElse(null);
+  }
+
+  /** Every element id in {@code index} whose field type is Enumeration - used to restrict a reference
+   * column's dynamic-suffix field picker ({@code suffixRef}) to fields that can actually supply a per-row
+   * suffix value. */
+  public static List<String> enumerationElementIds(ElementIndex index) {
+    if (index == null) {
+      return List.of();
+    }
+    return elementIds(index).stream()
+        .filter(id -> "enumeration".equals(filterItemFieldType(index, id)))
+        .toList();
+  }
+
+  /** A reference column's element-specific behavior depends on what kind of Document-Model element its
+   * {@code elementRef} resolves to - mirrors SME's own {@code elementType} derivation ({@code
+   * updateColumnByElementRef.ts}), which drives which of the column's type-specific fields ({@code
+   * attachmentDisplayMode}, {@code multiSelectDisplayMode}, {@code suffix}/{@code suffixRef}/{@code summary})
+   * are shown at all. Like SME's, this is derived at edit time from the resolved element and never itself
+   * persisted to the model. */
+  public enum ElementKind {
+    ATTACHMENT, NUMBER, MULTI_SELECT, PLAIN
+  }
+
+  /** {@link ElementKind#PLAIN} if {@code index} is {@code null} or {@code elementRef} doesn't resolve. */
+  public static ElementKind elementKind(ElementIndex index, String elementRef) {
+    if (index == null) {
+      return ElementKind.PLAIN;
+    }
+    Element element = OverviewElementResolution.resolve(index, elementRef);
+    if (element == null) {
+      return ElementKind.PLAIN;
+    }
+    if (OverviewElementResolution.isAttachment(index, element)) {
+      return ElementKind.ATTACHMENT;
+    }
+    if (OverviewElementResolution.isMultiSelect(index, element)) {
+      return ElementKind.MULTI_SELECT;
+    }
+    if (element instanceof FieldElement fieldElement && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() instanceof NumberFieldType) {
+      return ElementKind.NUMBER;
+    }
+    return ElementKind.PLAIN;
   }
 
   private static String filterItemFieldType(FieldType fieldType) {

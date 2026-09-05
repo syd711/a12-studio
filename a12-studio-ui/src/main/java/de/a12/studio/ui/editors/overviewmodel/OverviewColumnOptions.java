@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.overviewmodel;
 
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnHeaderLabelOrIconValidator;
 import javafx.scene.control.ComboBox;
 import javafx.util.StringConverter;
 
@@ -43,6 +44,14 @@ public final class OverviewColumnOptions {
   public static boolean isUnresolvedElementRef(Column column, ElementIndex documentModelIndex) {
     return column != null && column.getElementRef() != null && !column.getElementRef().isBlank()
         && !OverviewElementOptions.isResolved(documentModelIndex, column.getElementRef());
+  }
+
+  /** Whether {@code column} is a reference column with no icon and no visible label - an accessibility
+   * problem flagged by {@link OverviewColumnHeaderLabelOrIconValidator} (WARNING), surfaced here the same way
+   * as {@link #isUnresolvedElementRef} since that validator's shared {@code ELEMENT_ID} can't identify which
+   * column it's about. */
+  public static boolean isMissingLabelOrIcon(Column column) {
+    return OverviewColumnHeaderLabelOrIconValidator.isMissingLabelOrIcon(column);
   }
 
   /** A column with no field reference is an expression column, shown as "Expression Column" wherever it's

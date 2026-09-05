@@ -27,7 +27,14 @@
         "value": "tester,reviewer"
       }
     ],
-    "modelReferences": []
+    "modelReferences": [
+      {
+        "alias": "DM",
+        "modelType": "document",
+        "purpose": "document-model-for-overview",
+        "reference": "Company_DM"
+      }
+    ]
   },
   "content": {
     "configuration": {
@@ -129,11 +136,6 @@
             ]
           }
         ]
-      },
-      "multiSelection": {
-        "collapseOption": "collapsible_collapsed",
-        "counterOption": "simple",
-        "selectionArea": null
       }
     },
     "columns": [

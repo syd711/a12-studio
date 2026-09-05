@@ -9,7 +9,10 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="560.0" minWidth="560.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -57,7 +60,68 @@
                <!-- Icon -->
                <fx:include fx:id="icon" source="../../propertyeditors/icon-panel.fxml" />
 
-               <Label styleClass="placeholder-label" text="%filter_item_type_specific_options_are_not_yet_supp" wrapText="true" />
+               <!-- Matching Options (String fields only) -->
+               <VBox fx:id="matchingOptionsBox" spacing="10.0">
+                  <children>
+                     <Label styleClass="section-header" text="%matching_options" />
+                     <GridPane hgap="24.0" vgap="10.0">
+                        <columnConstraints>
+                           <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                           <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                           <RowConstraints />
+                        </rowConstraints>
+                        <children>
+                           <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                              <children>
+                                 <CheckBox fx:id="invertField" mnemonicParsing="false" text="%invert" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                              <children>
+                                 <CheckBox fx:id="emptyField" mnemonicParsing="false" text="%empty" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                              <children>
+                                 <CheckBox fx:id="invertUserAccessField" mnemonicParsing="false" text="%user_access" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                              <children>
+                                 <CheckBox fx:id="emptyUserAccessField" mnemonicParsing="false" text="%user_access" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                              <children>
+                                 <CheckBox fx:id="caseSensitiveField" mnemonicParsing="false" text="%case_sensitive" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                              <children>
+                                 <CheckBox fx:id="exactMatchField" mnemonicParsing="false" text="%exact_match" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                              <children>
+                                 <CheckBox fx:id="caseSensitiveUserAccessField" mnemonicParsing="false" text="%user_access" />
+                              </children>
+                           </VBox>
+                           <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                              <children>
+                                 <CheckBox fx:id="exactMatchUserAccessField" mnemonicParsing="false" text="%user_access" />
+                              </children>
+                           </VBox>
+                        </children>
+                     </GridPane>
+                  </children>
+               </VBox>
+
+               <Label fx:id="noTypeSpecificOptionsLabel" styleClass="placeholder-label" text="%filter_item_type_specific_options_are_not_yet_supp" wrapText="true" />
             </VBox>
          </content>
          <padding>

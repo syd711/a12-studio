@@ -53,9 +53,9 @@
                      <Label styleClass="section-header" text="%actions" />
                      <GridPane fx:id="actionsGrid" hgap="8.0" vgap="6.0">
                         <columnConstraints>
-                           <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                           <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                           <ColumnConstraints hgrow="NEVER" minWidth="32.0" />
+                           <ColumnConstraints hgrow="ALWAYS" />
+                           <ColumnConstraints hgrow="ALWAYS" />
+                           <ColumnConstraints hgrow="NEVER" minWidth="70.0" />
                         </columnConstraints>
                      </GridPane>
                      <Label fx:id="actionsEmptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />

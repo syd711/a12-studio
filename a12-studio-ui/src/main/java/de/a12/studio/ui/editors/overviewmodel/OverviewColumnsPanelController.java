@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.overviewmodel;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -28,8 +29,10 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import de.a12.studio.ui.util.StudioBundle;
@@ -41,10 +44,13 @@ import de.a12.studio.ui.util.StudioBundle;
  * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
  * {@link OverviewSearchAndFiltersPanelController}. Clicking a row opens {@link Dialogs#showColumnForEdit}, the
  * full column editor; the Add button opens the same editor via {@link Dialogs#showColumnForAdd}, only adding
- * the new column to {@code content.columns} once it's confirmed. Also edits
- * {@link OverviewConfiguration} flags displayed alongside the column list: Enable Columns Resize, Show
- * Number Of Entries and Skip Initial Load (moved here from {@link OverviewSearchAndFiltersPanelController} since
- * all are about how the resulting table of columns is presented).
+ * the new column to {@code content.columns} once it's confirmed. Whenever a column's pin direction changes
+ * (added already pinned, or edited to become pinned/unpinned), {@link #resortByPinDirection()} re-partitions
+ * the list live so LEFT-pinned columns float to the front and RIGHT-pinned columns sink to the back. Also
+ * edits {@link OverviewConfiguration} flags displayed alongside the column list: Enable Columns Resize, Hide
+ * Model Title, Show Number Of Entries and Skip Initial Load (moved here from {@link OverviewSearchAndFiltersPanelController}
+ * since all are about how the resulting table of columns is presented). Show Number Of Entries is disabled
+ * and cleared while Hide Model Title is set, since there is no header left to show a count next to.
  */
 public class OverviewColumnsPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -62,6 +68,9 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
 
   @FXML
   private CheckBox enableColumnsResizeField;
+
+  @FXML
+  private CheckBox labelHiddenField;
 
   @FXML
   private CheckBox showRowCountField;
@@ -95,6 +104,25 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
       ensureConfiguration().setEnableColumnsResize(newValue ? Boolean.TRUE : null);
       commitHeaderChange();
     });
+    labelHiddenField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel || model == null) {
+        return;
+      }
+      ensureConfiguration().setLabelHidden(newValue ? Boolean.TRUE : null);
+      // Number of Entries has nothing to display alongside once the model title is hidden.
+      if (newValue) {
+        ensureConfiguration().setShowRowCount(null);
+        updatingFromModel = true;
+        try {
+          showRowCountField.setSelected(false);
+        }
+        finally {
+          updatingFromModel = false;
+        }
+      }
+      showRowCountField.setDisable(newValue);
+      commitHeaderChange();
+    });
     showRowCountField.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel || model == null) {
         return;
@@ -119,6 +147,9 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
     try {
       OverviewConfiguration configuration = model.getContent().getConfiguration();
       enableColumnsResizeField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getEnableColumnsResize()));
+      boolean labelHidden = configuration != null && Boolean.TRUE.equals(configuration.getLabelHidden());
+      labelHiddenField.setSelected(labelHidden);
+      showRowCountField.setDisable(labelHidden);
       showRowCountField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getShowRowCount()));
       skipInitialLoadField.setSelected(configuration != null && Boolean.TRUE.equals(configuration.getSkipInitialLoad()));
     }
@@ -149,6 +180,9 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   private void onAdd() {
     Dialogs.showColumnForAdd(Studio.stage, documentModelIndex, documentModelId).ifPresent(column -> {
       getColumns().add(column);
+      if (column.getPinDirection() != null) {
+        resortByPinDirection();
+      }
       rebuildRows();
       notifyChanged();
     });
@@ -203,6 +237,11 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
       label.getStyleClass().add("validation-error");
       label.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("path_could_not_be_resolved", summary)));
     }
+    else if (OverviewColumnOptions.isMissingLabelOrIcon(column)) {
+      label.getStyleClass().add("validation-error");
+      label.setTooltip(WidgetFactory.createTooltip(
+          ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing", column.getElementRef())));
+    }
     else {
       label.setTooltip(WidgetFactory.createTooltip(summary));
     }
@@ -243,8 +282,34 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   }
 
   private void openEditDialog(Column column) {
-    Dialogs.showColumnForEdit(Studio.stage, documentModelIndex, documentModelId, column);
+    String pinDirectionBefore = column.getPinDirection();
+    boolean confirmed = Dialogs.showColumnForEdit(Studio.stage, documentModelIndex, documentModelId, column);
+    if (confirmed && !Objects.equals(pinDirectionBefore, column.getPinDirection())) {
+      resortByPinDirection();
+      commitHeaderChange();
+    }
     rebuildRows();
+  }
+
+  /**
+   * Stable-partitions {@code content.columns} so LEFT-pinned columns float to the front and RIGHT-pinned
+   * columns sink to the back, preserving each partition's existing relative order - mirrors SME's live
+   * pin-direction resort ({@code createSortColumnsByPinDirectionMiddleware}), applied here whenever a
+   * column's pin direction changes via the edit dialog rather than only as an export-time transform.
+   */
+  private void resortByPinDirection() {
+    List<Column> columns = getColumns();
+    List<Column> left = columns.stream().filter(c -> Column.PIN_DIRECTION_LEFT.equals(c.getPinDirection())).toList();
+    List<Column> right = columns.stream().filter(c -> Column.PIN_DIRECTION_RIGHT.equals(c.getPinDirection())).toList();
+    List<Column> unpinned = columns.stream()
+        .filter(c -> !Column.PIN_DIRECTION_LEFT.equals(c.getPinDirection()) && !Column.PIN_DIRECTION_RIGHT.equals(c.getPinDirection()))
+        .toList();
+    List<Column> sorted = new ArrayList<>(columns.size());
+    sorted.addAll(left);
+    sorted.addAll(unpinned);
+    sorted.addAll(right);
+    columns.clear();
+    columns.addAll(sorted);
   }
 
   private void moveColumn(int fromIndex, int insertBeforeIndex) {

@@ -27,6 +27,7 @@ import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Edits an {@link OverviewModel}'s "Overview" and "Custom Actions" tabs.
@@ -48,7 +49,9 @@ import java.util.ResourceBundle;
  * de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}, and {@code content.contextMenu},
  * delegated to {@link ContextMenuPanelController}), Row Activation ({@code content.defaultRowAction}, delegated
  * to {@link RowActivationPanelController}) and Title For Interactive Rows ({@code content.configuration.
- * rowTitle}, delegated to {@link de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController}), Subheader ({@code
+ * rowTitle}, delegated to {@link de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController}) and Subtitle
+ * ({@code content.configuration.subtitle}, delegated to another instance of the same {@link
+ * de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController}), Subheader ({@code
  * content.subHeaderBox}, delegated to {@link SubheaderSlotPanelController} - a mixed list of button/search/
  * filter/multi-selection position markers) and Footer ({@code content.footerBox}, Button-only, delegated to
  * {@link de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}). Per the {@code
@@ -121,6 +124,8 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   private RowActivationPanelController rowActivationController;
   @FXML
   private LocalizedTextPanelController rowTitleController;
+  @FXML
+  private LocalizedTextPanelController subtitleController;
 
   // Custom Actions: Subheader
   @FXML
@@ -136,12 +141,14 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
   private OverviewModel model;
   private List<DocumentModel> otherDocumentModels = List.of();
+  private List<QueryModel> otherQueryModels = List.of();
   private ElementIndex documentModelIndex;
 
   @Override
   public void initialize(URL url, ResourceBundle resources) {
     initializeGeneralSettings();
     rowTitleController.configureCustom("rowTitle", StudioBundle.get("title_for_interactive_rows"));
+    subtitleController.configureCustom("subtitle", StudioBundle.get("overview_subtitle"));
   }
 
   private void initializeGeneralSettings() {
@@ -205,7 +212,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     updatingFromModel = true;
     try {
       otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
-      List<QueryModel> otherQueryModels = ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.QUERY).stream()
+      otherQueryModels = ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.QUERY).stream()
           .filter(QueryModel.class::isInstance)
           .map(QueryModel.class::cast)
           .toList();
@@ -249,6 +256,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
     rowActivationController.setModel(model);
     rowTitleController.setCustom(() -> ensureConfiguration().getRowTitle());
+    subtitleController.setCustom(() -> ensureConfiguration().getSubtitle());
 
     ElementBox subHeaderBox = ensureSubHeaderBox();
     subheaderMajorController.configure(StudioBundle.get("major_buttons"), ".subheaderMajor", subHeaderBox.getRightSlot());
@@ -298,12 +306,41 @@ public class OverviewModelEditorController extends AbstractEditorController impl
         .findFirst()
         .orElse(null);
     documentModelIndex = OverviewElementOptions.indexOf(documentModel, otherDocumentModels);
+    OverviewElementOptions.restrictFieldIds(documentModelIndex, queryModelFieldRestriction());
     overviewColumnsController.setDocumentModelIndex(documentModelIndex, documentModelId);
     overviewSortingController.setDocumentModelIndex(documentModelIndex);
     overviewAccessibilityController.setDocumentModelIndex(documentModelIndex);
     customSelectionOfFieldsController.setDocumentModelIndex(documentModelIndex);
     overviewSectionDataController.setDocumentModelIndex(documentModelIndex);
     customFilterConfigurationController.setDocumentModelIndex(documentModelIndex);
+  }
+
+  /**
+   * When this Overview Model is bound through a Query Model (a {@link
+   * ModelReference#PURPOSE_QUERY_MODEL_FOR_OVERVIEW} header reference is present), every field-reference
+   * picker should only offer fields the Query Model actually projects ({@code QueryModelContent.fields}),
+   * mirroring SME's {@code getExtendedGetDmCandidates}. {@code null} - meaning "no restriction" - both in
+   * Document-Model mode and when the referenced Query Model can't be resolved or hasn't projected any
+   * fields yet, so a not-yet-configured Query Model doesn't lock every picker to zero options.
+   */
+  private Set<String> queryModelFieldRestriction() {
+    if (model.getModelReferences() == null) {
+      return null;
+    }
+    String queryModelId = model.getModelReferences().stream()
+        .filter(reference -> ModelReference.PURPOSE_QUERY_MODEL_FOR_OVERVIEW.equals(reference.getPurpose()))
+        .map(ModelReference::getReference)
+        .findFirst()
+        .orElse(null);
+    if (queryModelId == null || queryModelId.isBlank()) {
+      return null;
+    }
+    List<String> fields = otherQueryModels.stream()
+        .filter(queryModel -> queryModelId.equals(queryModel.getId()))
+        .findFirst()
+        .map(queryModel -> queryModel.getContent().getFields())
+        .orElse(null);
+    return fields == null || fields.isEmpty() ? null : Set.copyOf(fields);
   }
 
   /**

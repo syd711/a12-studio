@@ -77,6 +77,37 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void sortableMultiSelectValidatorReportsSortableMultiSelectColumn() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewSortableMultiSelectValidator_invalid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/RefMultiSelect_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewSortableMultiSelectValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("multi-select"));
+  }
+
+  @Test
+  void columnHeaderLabelOrIconValidatorReportsEmptyHeader() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewColumnHeaderLabelOrIconValidator_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewColumnHeaderLabelOrIconValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("no icon and no visible label"));
+  }
+
+  @Test
+  void filterModeIndexedAnnotationValidatorReportsUnindexedFieldForAllMode() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterModeIndexedAnnotationValidator_invalid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFilterModeIndexedAnnotationValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("indexed"));
+  }
+
+  @Test
   void documentModelRequiredValidatorReportsMissingReference() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewDocumentModelRequiredValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewDocumentModelRequiredValidator().validate(model, TestModels.context(model));

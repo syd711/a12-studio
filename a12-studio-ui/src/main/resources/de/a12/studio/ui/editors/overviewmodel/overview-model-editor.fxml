@@ -125,6 +125,7 @@
                                         <!-- Row Activation -->
                                         <fx:include fx:id="rowActivation" source="row-activation-panel.fxml" />
                                         <fx:include fx:id="rowTitle" source="../propertyeditors/localized-text-panel.fxml" />
+                                        <fx:include fx:id="subtitle" source="../propertyeditors/localized-text-panel.fxml" />
 
                                         <!-- Subheader -->
                                         <Label styleClass="editor-type-label " text="%subheader" />

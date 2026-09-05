@@ -29,173 +29,14 @@
     ],
     "modelReferences": [
       {
-        "purpose": "document-model-for-overview",
-        "modelType": "document",
         "alias": "DM",
+        "modelType": "document",
+        "purpose": "document-model-for-overview",
         "reference": "Person_DM"
       }
     ]
   },
   "content": {
-    "columns": [
-      {
-        "id": "column-c3b30",
-        "label": [
-          {
-            "locale": "en",
-            "text": "Profile Picture"
-          },
-          {
-            "locale": "de",
-            "text": "Profilbild"
-          }
-        ],
-        "width": 1,
-        "fixedWidth": true,
-        "elementRef": "group_05909",
-        "sortable": false,
-        "attachmentDisplayMode": "preview"
-      },
-      {
-        "id": "column-5bd25",
-        "width": 2.5,
-        "fixedWidth": true,
-        "alignment": {
-          "header": {
-            "horizontal": "center",
-            "vertical": "bottom"
-          },
-          "content": {
-            "horizontal": "center",
-            "vertical": "bottom"
-          }
-        },
-        "elementRef": "F3",
-        "sortable": true,
-        "preferredSorting": "ASC"
-      },
-      {
-        "id": "column-5847d",
-        "width": 2.5,
-        "fixedWidth": true,
-        "alignment": {
-          "header": {
-            "horizontal": "center",
-            "vertical": "bottom"
-          },
-          "content": {
-            "horizontal": "center",
-            "vertical": "bottom"
-          }
-        },
-        "elementRef": "F4",
-        "sortable": true,
-        "preferredSorting": "ASC"
-      },
-      {
-        "id": "column-3eb14",
-        "width": 1.5,
-        "fixedWidth": true,
-        "alignment": {
-          "header": {
-            "horizontal": "center",
-            "vertical": "bottom"
-          },
-          "content": {
-            "horizontal": "center",
-            "vertical": "bottom"
-          }
-        },
-        "elementRef": "F7",
-        "sortable": false
-      },
-      {
-        "id": "column-d37d5",
-        "width": 1.5,
-        "fixedWidth": true,
-        "alignment": {
-          "header": {
-            "horizontal": "center",
-            "vertical": "bottom"
-          },
-          "content": {
-            "horizontal": "center",
-            "vertical": "bottom"
-          }
-        },
-        "elementRef": "F9",
-        "sortable": false
-      }
-    ],
-    "rowActionGroup": {
-      "actions": [
-        {
-          "event": "event_delete",
-          "confirmation": {
-            "title": [
-              {
-                "locale": "en",
-                "text": "Warning"
-              },
-              {
-                "locale": "de",
-                "text": "Warnung"
-              }
-            ],
-            "message": [
-              {
-                "locale": "en",
-                "text": "Do you really want to delete this entry?"
-              },
-              {
-                "locale": "de",
-                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
-              }
-            ]
-          },
-          "icon": {
-            "name": "delete"
-          },
-          "destructive": false,
-          "primary": false
-        }
-      ]
-    },
-    "subHeaderBox": {
-      "leftSlot": [
-        {
-          "type": "button",
-          "label": [
-            {
-              "locale": "en",
-              "text": "New"
-            },
-            {
-              "locale": "de",
-              "text": "Neu"
-            }
-          ],
-          "event": "add",
-          "icon": {
-            "name": "add"
-          },
-          "destructive": false,
-          "primary": false
-        }
-      ],
-      "rightSlot": [
-        {
-          "type": "filter"
-        },
-        {
-          "type": "search"
-        }
-      ]
-    },
-    "footerBox": {
-      "leftSlot": [],
-      "rightSlot": []
-    },
     "configuration": {
       "enableFilter": true,
       "showFullTextSearch": true,
@@ -360,7 +201,171 @@
             ]
           }
         ]
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": null
       }
+    },
+    "columns": [
+      {
+        "id": "column-c3b30",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Profile Picture"
+          },
+          {
+            "locale": "de",
+            "text": "Profilbild"
+          }
+        ],
+        "width": 1,
+        "fixedWidth": true,
+        "elementRef": "group_05909",
+        "sortable": false,
+        "attachmentDisplayMode": "preview"
+      },
+      {
+        "id": "column-5bd25",
+        "width": 2.5,
+        "fixedWidth": true,
+        "alignment": {
+          "header": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          },
+          "content": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          }
+        },
+        "elementRef": "F3",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-5847d",
+        "width": 2.5,
+        "fixedWidth": true,
+        "alignment": {
+          "header": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          },
+          "content": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          }
+        },
+        "elementRef": "F4",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-3eb14",
+        "width": 1.5,
+        "fixedWidth": true,
+        "alignment": {
+          "header": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          },
+          "content": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          }
+        },
+        "elementRef": "F7",
+        "sortable": false
+      },
+      {
+        "id": "column-d37d5",
+        "width": 1.5,
+        "fixedWidth": true,
+        "alignment": {
+          "header": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          },
+          "content": {
+            "horizontal": "center",
+            "vertical": "bottom"
+          }
+        },
+        "elementRef": "F9",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "event_delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "button",
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "New"
+            },
+            {
+              "locale": "de",
+              "text": "Neu"
+            }
+          ],
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "filter"
+        },
+        {
+          "type": "search"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
     }
   }
 }

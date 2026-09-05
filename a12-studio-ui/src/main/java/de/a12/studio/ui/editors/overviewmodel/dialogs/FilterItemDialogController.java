@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.overviewmodel.dialogs;
 
+import de.a12.studio.models.overviewmodel.BooleanUserAccessOption;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterItemOptions;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
@@ -15,6 +16,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 
@@ -45,6 +47,26 @@ public class FilterItemDialogController implements DialogController {
   private LocalizedTextPanelController labelController;
   @FXML
   private IconPanelController iconController;
+  @FXML
+  private VBox matchingOptionsBox;
+  @FXML
+  private CheckBox invertField;
+  @FXML
+  private CheckBox invertUserAccessField;
+  @FXML
+  private CheckBox emptyField;
+  @FXML
+  private CheckBox emptyUserAccessField;
+  @FXML
+  private CheckBox caseSensitiveField;
+  @FXML
+  private CheckBox caseSensitiveUserAccessField;
+  @FXML
+  private CheckBox exactMatchField;
+  @FXML
+  private CheckBox exactMatchUserAccessField;
+  @FXML
+  private javafx.scene.control.Label noTypeSpecificOptionsLabel;
   @FXML
   private Button okButton;
 
@@ -92,6 +114,47 @@ public class FilterItemDialogController implements DialogController {
         item.setCollapsed(newValue ? Boolean.TRUE : null);
       }
     });
+
+    invertField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureInvert().setValue(newValue);
+      }
+    });
+    invertUserAccessField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureInvert().setEnabled(newValue);
+      }
+    });
+    emptyField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureEmpty().setValue(newValue);
+      }
+    });
+    emptyUserAccessField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureEmpty().setEnabled(newValue);
+      }
+    });
+    caseSensitiveField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureCaseSensitive().setValue(newValue);
+      }
+    });
+    caseSensitiveUserAccessField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureCaseSensitive().setEnabled(newValue);
+      }
+    });
+    exactMatchField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureExactMatch().setValue(newValue);
+      }
+    });
+    exactMatchUserAccessField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureExactMatch().setEnabled(newValue);
+      }
+    });
   }
 
   void init(Stage stage, ElementIndex documentModelIndex, @NonNull FilterItem item) {
@@ -108,6 +171,19 @@ public class FilterItemDialogController implements DialogController {
       fieldRefField.setValue(item.getOptions() != null ? item.getOptions().getFieldId() : null);
       showInFilterBarField.setSelected(Boolean.TRUE.equals(item.getShowInFilterBar()));
       collapsedField.setSelected(Boolean.TRUE.equals(item.getCollapsed()));
+
+      BooleanUserAccessOption invert = currentInvert();
+      invertField.setSelected(invert != null && Boolean.TRUE.equals(invert.getValue()));
+      invertUserAccessField.setSelected(invert != null && Boolean.TRUE.equals(invert.getEnabled()));
+      BooleanUserAccessOption empty = currentEmpty();
+      emptyField.setSelected(empty != null && Boolean.TRUE.equals(empty.getValue()));
+      emptyUserAccessField.setSelected(empty != null && Boolean.TRUE.equals(empty.getEnabled()));
+      BooleanUserAccessOption caseSensitive = currentCaseSensitive();
+      caseSensitiveField.setSelected(caseSensitive != null && Boolean.TRUE.equals(caseSensitive.getValue()));
+      caseSensitiveUserAccessField.setSelected(caseSensitive != null && Boolean.TRUE.equals(caseSensitive.getEnabled()));
+      BooleanUserAccessOption exactMatch = currentExactMatch();
+      exactMatchField.setSelected(exactMatch != null && Boolean.TRUE.equals(exactMatch.getValue()));
+      exactMatchUserAccessField.setSelected(exactMatch != null && Boolean.TRUE.equals(exactMatch.getEnabled()));
     }
     finally {
       updatingFromModel = false;
@@ -145,6 +221,11 @@ public class FilterItemDialogController implements DialogController {
 
   private void updateTypeField() {
     typeField.setText(item.getType() != null ? item.getType() : "");
+    boolean isStringField = "string".equals(item.getType());
+    matchingOptionsBox.setVisible(isStringField);
+    matchingOptionsBox.setManaged(isStringField);
+    noTypeSpecificOptionsLabel.setVisible(!isStringField);
+    noTypeSpecificOptionsLabel.setManaged(!isStringField);
   }
 
   private void validate() {
@@ -158,11 +239,61 @@ public class FilterItemDialogController implements DialogController {
       }
       return;
     }
-    FilterItemOptions options = item.getOptions();
-    if (options == null) {
-      options = new FilterItemOptions();
-      item.setOptions(options);
+    ensureOptions().setFieldId(fieldId);
+  }
+
+  private FilterItemOptions ensureOptions() {
+    if (item.getOptions() == null) {
+      item.setOptions(new FilterItemOptions());
     }
-    options.setFieldId(fieldId);
+    return item.getOptions();
+  }
+
+  private BooleanUserAccessOption currentInvert() {
+    return item.getOptions() != null ? item.getOptions().getInvert() : null;
+  }
+
+  private BooleanUserAccessOption ensureInvert() {
+    FilterItemOptions options = ensureOptions();
+    if (options.getInvert() == null) {
+      options.setInvert(new BooleanUserAccessOption());
+    }
+    return options.getInvert();
+  }
+
+  private BooleanUserAccessOption currentEmpty() {
+    return item.getOptions() != null ? item.getOptions().getEmpty() : null;
+  }
+
+  private BooleanUserAccessOption ensureEmpty() {
+    FilterItemOptions options = ensureOptions();
+    if (options.getEmpty() == null) {
+      options.setEmpty(new BooleanUserAccessOption());
+    }
+    return options.getEmpty();
+  }
+
+  private BooleanUserAccessOption currentCaseSensitive() {
+    return item.getOptions() != null ? item.getOptions().getCaseSensitive() : null;
+  }
+
+  private BooleanUserAccessOption ensureCaseSensitive() {
+    FilterItemOptions options = ensureOptions();
+    if (options.getCaseSensitive() == null) {
+      options.setCaseSensitive(new BooleanUserAccessOption());
+    }
+    return options.getCaseSensitive();
+  }
+
+  private BooleanUserAccessOption currentExactMatch() {
+    return item.getOptions() != null ? item.getOptions().getExactMatch() : null;
+  }
+
+  private BooleanUserAccessOption ensureExactMatch() {
+    FilterItemOptions options = ensureOptions();
+    if (options.getExactMatch() == null) {
+      options.setExactMatch(new BooleanUserAccessOption());
+    }
+    return options.getExactMatch();
   }
 }

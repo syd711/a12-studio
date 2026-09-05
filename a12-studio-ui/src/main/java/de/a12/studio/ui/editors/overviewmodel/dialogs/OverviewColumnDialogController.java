@@ -1,19 +1,23 @@
 package de.a12.studio.ui.editors.overviewmodel.dialogs;
 
+import de.a12.studio.models.Label;
 import de.a12.studio.models.overviewmodel.Alignment;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.ColumnAlignment;
+import de.a12.studio.models.overviewmodel.SummaryConfig;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
+import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions.ElementKind;
 import de.a12.studio.ui.editors.overviewmodel.StylesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -64,6 +68,31 @@ public class OverviewColumnDialogController implements DialogController {
   private VBox preferredSortingBox;
   @FXML
   private ComboBox<String> preferredSortingCombo;
+
+  @FXML
+  private VBox attachmentSection;
+  @FXML
+  private ComboBox<String> attachmentDisplayModeCombo;
+
+  @FXML
+  private VBox multiSelectSection;
+  @FXML
+  private ComboBox<String> multiSelectDisplayModeCombo;
+
+  @FXML
+  private VBox numberSection;
+  @FXML
+  private CheckBox useDynamicSuffixField;
+  @FXML
+  private VBox staticSuffixBox;
+  @FXML
+  private LocalizedTextPanelController suffixController;
+  @FXML
+  private VBox dynamicSuffixBox;
+  @FXML
+  private ComboBox<String> suffixRefCombo;
+  @FXML
+  private CheckBox showSummaryField;
 
   @FXML
   private VBox expressionSection;
@@ -118,6 +147,8 @@ public class OverviewColumnDialogController implements DialogController {
 
   private Column column;
 
+  private ElementIndex documentModelIndex;
+
   private ColumnSnapshot snapshot;
 
   private Optional<ButtonType> result = Optional.of(ButtonType.CANCEL);
@@ -130,6 +161,8 @@ public class OverviewColumnDialogController implements DialogController {
   private void initialize() {
     labelController.configureColumnLabel();
     labelController.setSaveMode(saveMode);
+    suffixController.configureCustom("suffix", StudioBundle.get("suffix"));
+    suffixController.setSaveMode(saveMode);
     stylesHeaderController.configureColumnHeaderStyles();
     stylesHeaderController.setSaveMode(saveMode);
     stylesContentController.configureColumnContentStyles();
@@ -170,6 +203,61 @@ public class OverviewColumnDialogController implements DialogController {
       updateFixedWidthVisibility();
       if (!updatingFromModel) {
         column.setPinDirection(newValue);
+        if (newValue != null) {
+          // A pinned column is implicitly always fixed-width, mirroring the reference implementation's
+          // export rule (fixedWidth: pinDirection ? undefined : fixedWidth).
+          column.setFixedWidth(null);
+          setCheckBoxValue(fixedWidthField, false);
+        }
+      }
+    });
+
+    attachmentDisplayModeCombo.setItems(FXCollections.observableArrayList(Column.ATTACHMENT_DISPLAY_MODE_PREVIEW,
+        Column.ATTACHMENT_DISPLAY_MODE_ICON, Column.ATTACHMENT_DISPLAY_MODE_FILE_NAME,
+        Column.ATTACHMENT_DISPLAY_MODE_ICON_WITH_FILE_NAME));
+    attachmentDisplayModeCombo.setConverter(displayConverter(OverviewColumnDialogController::humanize));
+    attachmentDisplayModeCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        column.setAttachmentDisplayMode(newValue);
+      }
+    });
+
+    multiSelectDisplayModeCombo.setItems(FXCollections.observableArrayList(Column.MULTI_SELECT_DISPLAY_MODE_DEFAULT,
+        Column.MULTI_SELECT_DISPLAY_MODE_COMMA_SEPARATED));
+    multiSelectDisplayModeCombo.setConverter(displayConverter(OverviewColumnDialogController::humanize));
+    multiSelectDisplayModeCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        column.setMultiSelectDisplayMode(newValue);
+      }
+    });
+
+    useDynamicSuffixField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      updateSuffixVisibility();
+      if (updatingFromModel) {
+        return;
+      }
+      column.setUseDynamicSuffix(newValue ? Boolean.TRUE : null);
+      if (newValue) {
+        column.getSuffix().clear();
+      }
+      else {
+        column.setSuffixRef(null);
+      }
+    });
+    suffixRefCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        column.setSuffixRef(newValue);
+      }
+    });
+    showSummaryField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      column.getSummary().clear();
+      if (newValue) {
+        SummaryConfig summaryConfig = new SummaryConfig();
+        summaryConfig.setOperation(SummaryConfig.OPERATION_SUM);
+        column.getSummary().add(summaryConfig);
       }
     });
 
@@ -203,7 +291,9 @@ public class OverviewColumnDialogController implements DialogController {
     elementRefCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
         column.setElementRef(newValue);
+        syncLabelFromElement(newValue);
       }
+      updateElementKindVisibility();
       validate();
     });
     nameField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -232,10 +322,13 @@ public class OverviewColumnDialogController implements DialogController {
   void init(Stage stage, ElementIndex documentModelIndex, String documentModelId, @NonNull Column column) {
     this.stage = stage;
     this.column = column;
+    this.documentModelIndex = documentModelIndex;
     this.snapshot = new ColumnSnapshot(column);
 
     elementRefCombo.getItems().setAll(OverviewElementOptions.elementIds(documentModelIndex));
     OverviewElementOptions.applyElementRefConverter(elementRefCombo, documentModelIndex);
+    suffixRefCombo.getItems().setAll(OverviewElementOptions.enumerationElementIds(documentModelIndex));
+    OverviewElementOptions.applyElementRefConverter(suffixRefCombo, documentModelIndex);
 
     updatingFromModel = true;
     try {
@@ -255,6 +348,16 @@ public class OverviewColumnDialogController implements DialogController {
 
       hideLabelField.setSelected(Boolean.TRUE.equals(column.getLabelHidden()));
 
+      attachmentDisplayModeCombo.setValue(column.getAttachmentDisplayMode() != null
+          ? column.getAttachmentDisplayMode() : Column.ATTACHMENT_DISPLAY_MODE_PREVIEW);
+      multiSelectDisplayModeCombo.setValue(column.getMultiSelectDisplayMode() != null
+          ? column.getMultiSelectDisplayMode() : Column.MULTI_SELECT_DISPLAY_MODE_DEFAULT);
+      boolean dynamicSuffix = Boolean.TRUE.equals(column.getUseDynamicSuffix())
+          || (column.getSuffixRef() != null && !column.getSuffixRef().isBlank());
+      useDynamicSuffixField.setSelected(dynamicSuffix);
+      suffixRefCombo.setValue(column.getSuffixRef());
+      showSummaryField.setSelected(!column.getSummary().isEmpty());
+
       Alignment header = column.getAlignment() != null ? column.getAlignment().getHeader() : null;
       Alignment content = column.getAlignment() != null ? column.getAlignment().getContent() : null;
       horizontalHeaderCombo.setValue(header != null ? header.getHorizontal() : null);
@@ -268,8 +371,10 @@ public class OverviewColumnDialogController implements DialogController {
 
     updateTypeVisibility();
     updateFixedWidthVisibility();
+    updateSuffixVisibility();
 
     labelController.setColumn(column);
+    suffixController.setCustom(column::getSuffix);
     stylesHeaderController.setColumn(column);
     stylesContentController.setColumn(column);
     iconPanelController.setColumn(column);
@@ -283,6 +388,7 @@ public class OverviewColumnDialogController implements DialogController {
    * handler. */
   void destroy() {
     labelController.destroy();
+    suffixController.destroy();
     stylesHeaderController.destroy();
     stylesContentController.destroy();
     iconPanelController.destroy();
@@ -317,6 +423,29 @@ public class OverviewColumnDialogController implements DialogController {
     expressionSection.setVisible(expression);
     expressionSection.setManaged(expression);
     updateSortableVisibility();
+    updateElementKindVisibility();
+  }
+
+  private void updateElementKindVisibility() {
+    boolean expression = TYPE_EXPRESSION.equals(columnTypeCombo.getValue());
+    ElementKind kind = expression ? ElementKind.PLAIN : OverviewElementOptions.elementKind(documentModelIndex, elementRefCombo.getValue());
+    boolean attachment = kind == ElementKind.ATTACHMENT;
+    boolean multiSelect = kind == ElementKind.MULTI_SELECT;
+    boolean number = kind == ElementKind.NUMBER;
+    attachmentSection.setVisible(attachment);
+    attachmentSection.setManaged(attachment);
+    multiSelectSection.setVisible(multiSelect);
+    multiSelectSection.setManaged(multiSelect);
+    numberSection.setVisible(number);
+    numberSection.setManaged(number);
+  }
+
+  private void updateSuffixVisibility() {
+    boolean dynamic = useDynamicSuffixField.isSelected();
+    staticSuffixBox.setVisible(!dynamic);
+    staticSuffixBox.setManaged(!dynamic);
+    dynamicSuffixBox.setVisible(dynamic);
+    dynamicSuffixBox.setManaged(dynamic);
   }
 
   private void updateSortableVisibility() {
@@ -373,6 +502,56 @@ public class OverviewColumnDialogController implements DialogController {
     }
   }
 
+  private void setCheckBoxValue(CheckBox checkBox, boolean value) {
+    boolean wasUpdating = updatingFromModel;
+    updatingFromModel = true;
+    try {
+      checkBox.setSelected(value);
+    }
+    finally {
+      updatingFromModel = wasUpdating;
+    }
+  }
+
+  /**
+   * Pre-fills any currently-blank locale in the column's label from {@code elementRef}'s own field label,
+   * mirroring SME's column-label auto-sync ({@code updateColumnByElementRef.ts}) - never overwrites a
+   * locale the user has already typed non-blank text into, and is a no-op if the element doesn't resolve
+   * to a field with a label (e.g. an attachment group, or a dangling reference).
+   */
+  private void syncLabelFromElement(String elementRef) {
+    List<Label> elementLabel = OverviewElementOptions.fieldLabel(documentModelIndex, elementRef);
+    if (elementLabel.isEmpty()) {
+      return;
+    }
+    List<Label> columnLabel = column.getLabel();
+    boolean changed = false;
+    for (Label source : elementLabel) {
+      boolean hasNonBlankText = columnLabel.stream()
+          .anyMatch(label -> source.getLocale().equals(label.getLocale())
+              && label.getText() != null && !label.getText().isBlank());
+      if (hasNonBlankText) {
+        continue;
+      }
+      Optional<Label> existing = columnLabel.stream()
+          .filter(label -> source.getLocale().equals(label.getLocale()))
+          .findFirst();
+      if (existing.isPresent()) {
+        existing.get().setText(source.getText());
+      }
+      else {
+        Label copy = new Label();
+        copy.setLocale(source.getLocale());
+        copy.setText(source.getText());
+        columnLabel.add(copy);
+      }
+      changed = true;
+    }
+    if (changed) {
+      labelController.setColumn(column);
+    }
+  }
+
   private static boolean isExpressionType(Column column) {
     return (column.getExpression() != null && !column.getExpression().isBlank())
         || (column.getName() != null && !column.getName().isBlank());
@@ -399,6 +578,21 @@ public class OverviewColumnDialogController implements DialogController {
 
   private static String capitalize(String value) {
     return value == null || value.isEmpty() ? value : Character.toUpperCase(value.charAt(0)) + value.substring(1);
+  }
+
+  private static String humanize(String value) {
+    if (value == null || value.isEmpty()) {
+      return value;
+    }
+    String[] words = value.split("_");
+    StringBuilder result = new StringBuilder();
+    for (String word : words) {
+      if (!result.isEmpty()) {
+        result.append(' ');
+      }
+      result.append(capitalize(word));
+    }
+    return result.toString();
   }
 
   private static String blankToNull(String value) {

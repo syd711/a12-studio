@@ -20,8 +20,8 @@ import java.util.List;
 // width's JsonNode type otherwise gets pushed to the end of the property order by Jackson's default
 // introspection regardless of declaration order, so the order must be pinned explicitly here.
 @JsonPropertyOrder({"id", "label", "width", "fixedWidth", "alignment", "pinDirection", "styles", "icon",
-    "labelHidden", "elementRef", "sortable", "preferredSorting", "attachmentDisplayMode", "suffix", "summary",
-    "name", "expression"})
+    "labelHidden", "elementRef", "sortable", "preferredSorting", "attachmentDisplayMode", "multiSelectDisplayMode",
+    "suffix", "suffixRef", "useDynamicSuffix", "summary", "name", "expression"})
 public class Column {
 
   public static final String PIN_DIRECTION_LEFT = "LEFT";
@@ -34,6 +34,9 @@ public class Column {
   public static final String ATTACHMENT_DISPLAY_MODE_ICON = "icon";
   public static final String ATTACHMENT_DISPLAY_MODE_FILE_NAME = "file_name";
   public static final String ATTACHMENT_DISPLAY_MODE_ICON_WITH_FILE_NAME = "icon_with_file_name";
+
+  public static final String MULTI_SELECT_DISPLAY_MODE_DEFAULT = "default";
+  public static final String MULTI_SELECT_DISPLAY_MODE_COMMA_SEPARATED = "comma_separated";
 
   private String id;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -64,7 +67,13 @@ public class Column {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String attachmentDisplayMode;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String multiSelectDisplayMode;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> suffix = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String suffixRef;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean useDynamicSuffix;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<SummaryConfig> summary = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
