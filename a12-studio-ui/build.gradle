@@ -51,6 +51,15 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.5.32'
     implementation 'commons-io:commons-io:2.22.0'
     implementation 'org.apache.commons:commons-lang3:3.16.0'
+    // Bundled here (rather than per-plugin) so plugin modules that need it - directly, or
+    // transitively via a library like jackcess - can depend on it as compileOnly instead of
+    // shipping their own copy in their shadow jar; it's already on the running app's classpath.
+    implementation 'commons-logging:commons-logging:1.4.0'
+    // Bundled here (rather than in the create-from-excel plugin) so any plugin needing Excel
+    // support can depend on it as compileOnly instead of shipping its own copy (with its own
+    // large xmlbeans/commons-compress/etc. transitive graph) in its shadow jar.
+    implementation 'org.apache.poi:poi:5.3.0'
+    implementation 'org.apache.poi:poi-ooxml:5.3.0'
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0'
     implementation 'org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.4.0'

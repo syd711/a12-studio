@@ -10,7 +10,6 @@ out/
 /gradle/
 /a12-studio-ui/build/
 /Output/
-/plugins/*.jar
 /*.log
 config/*.json
 config/*.settings

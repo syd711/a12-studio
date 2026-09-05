@@ -142,7 +142,11 @@ subprojects {
     }
 
     dependencies {
-        implementation 'org.jspecify:jspecify:1.0.0'
+        // compileOnly (not implementation): these are compile-time-only nullness annotations,
+        // never inspected via reflection at runtime, so there's no need to bundle them into any
+        // module's shadow/boot jar - every plugin was otherwise carrying its own redundant copy
+        // on top of the one already bundled into a12-studio-ui's fat jar.
+        compileOnly 'org.jspecify:jspecify:1.0.0'
         compileOnly 'org.projectlombok:lombok:1.18.46'
         annotationProcessor 'org.projectlombok:lombok:1.18.46'
         testCompileOnly 'org.projectlombok:lombok:1.18.46'

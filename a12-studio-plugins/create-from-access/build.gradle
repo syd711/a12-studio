@@ -5,17 +5,31 @@ plugins {
 javafx {
     version = '21.0.4'
     modules = ['javafx.controls', 'javafx.fxml']
+    // Already bundled into a12-studio-ui's fat jar, which sits on the classpath of the running
+    // app that loads this plugin (see PluginManager.loadPlugin()) - don't re-bundle it here.
+    configuration = 'compileOnly'
 }
 
 dependencies {
-    implementation project(':a12-studio-commons')
-    implementation project(':a12-studio-models')
-    implementation project(':a12-studio-models-validation')
-    implementation project(':a12-studio-plugin-manager')
-    implementation project(':a12-studio-ui')
-    implementation 'org.slf4j:slf4j-api:2.0.17'
-    implementation 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
-    implementation 'com.healthmarketscience.jackcess:jackcess:4.0.7'
+    // These, and ikonli below, are already on the host app's runtime classpath (bundled into
+    // a12-studio-ui's own fat jar) by the time PluginManager loads this plugin's jar with the
+    // app's classloader as parent - compileOnly avoids re-bundling them.
+    compileOnly project(':a12-studio-commons')
+    compileOnly project(':a12-studio-models')
+    compileOnly project(':a12-studio-models-validation')
+    compileOnly project(':a12-studio-plugin-manager')
+    compileOnly project(':a12-studio-ui')
+    compileOnly 'org.slf4j:slf4j-api:2.0.17'
+    compileOnly 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
+    // Not provided by the host app - this is the plugin's actual payload dependency. Excludes
+    // its transitive commons-lang3/commons-logging/jspecify pulls since a12-studio-ui already
+    // bundles those (see a12-studio-ui/build.gradle) - without the excludes, shadowJar would
+    // ship a second, older copy of each inside this plugin's own jar.
+    implementation('com.healthmarketscience.jackcess:jackcess:4.0.7') {
+        exclude group: 'org.apache.commons', module: 'commons-lang3'
+        exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'org.jspecify', module: 'jspecify'
+    }
 }
 
 // Bundle plugin.json into the root of the JAR so PluginManager can find it.
