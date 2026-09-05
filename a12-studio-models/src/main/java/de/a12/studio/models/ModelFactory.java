@@ -44,6 +44,10 @@ public class ModelFactory {
       }
 
       ModelType modelType = ModelType.fromValue(modelTypeValue);
+      if (modelType == null) {
+        log.warn("Model type '{}' of '{}' is not supported yet", modelTypeValue, projectItem.getPath());
+        return null;
+      }
       return switch (modelType) {
         case DOCUMENT -> {
           Class<? extends DocumentModel> targetClass = isTypeDefinitionOnly(root) ? TypeDefinitionModel.class : DocumentModel.class;

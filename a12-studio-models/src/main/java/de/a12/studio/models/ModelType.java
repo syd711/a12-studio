@@ -2,6 +2,7 @@ package de.a12.studio.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.extern.slf4j.Slf4j;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Map;
 
+@Slf4j
 public enum ModelType {
 
   // Filename suffix per the a12 platform's "Standardized Name" naming convention
@@ -86,6 +88,16 @@ public enum ModelType {
     return config.get("enabled").asBoolean(true);
   }
 
+  /**
+   * Returns {@code null} (instead of throwing) for a {@code value} not among the ones declared here, e.g.
+   * a real a12 platform model type (Relationship UI Model's {@code "relationship-ui"}, Additive Document
+   * Model's {@code "additive-document"}, Selection Model's {@code "selection"}) that a12-studio has no
+   * editor for yet. This is deliberately lenient: {@link de.a12.studio.models.ModelReference#modelType} is
+   * routinely a reference to a model of a type a12-studio can't open, and callers already null-check it
+   * (e.g. {@code HeaderModelReferenceValidator}) — throwing here would otherwise fail deserialization of the
+   * whole containing model (a Form/Combined Document Model, say) just because one unrelated reference in its
+   * header points at an unsupported type. See {@link ModelFactory#load} for the top-level-model-file case.
+   */
   @JsonCreator
   public static ModelType fromValue(String value) {
     for (ModelType type : values()) {
@@ -93,7 +105,8 @@ public enum ModelType {
         return type;
       }
     }
-    throw new IllegalArgumentException("Unknown model type: " + value);
+    log.warn("Unknown model type: {}", value);
+    return null;
   }
 
   private static Map<String, JsonNode> loadModelConfig() {

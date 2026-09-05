@@ -34,10 +34,6 @@ tasks.register('generateLicenses') {
                 def baseName = licenseFile.name.contains('.') ?
                         licenseFile.name.substring(0, licenseFile.name.lastIndexOf('.')) : licenseFile.name
                 def target = new File(outDir, "${artifactName}-${baseName}.txt")
-                int suffix = 1
-                while (target.exists()) {
-                    target = new File(outDir, "${artifactName}-${baseName}-${suffix++}.txt")
-                }
                 target.bytes = licenseFile.bytes
             }
             artifactDir.deleteDir()

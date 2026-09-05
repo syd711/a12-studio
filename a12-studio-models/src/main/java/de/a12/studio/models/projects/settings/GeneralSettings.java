@@ -1,7 +1,9 @@
 package de.a12.studio.models.projects.settings;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.a12.studio.models.Locale;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +14,30 @@ import java.util.List;
  */
 public class GeneralSettings {
 
+  @Slf4j
   public enum RelationshipEngineMode {
     legacy,
-    standard
+    standard;
+
+    // Tolerates "new" (the natural opposite of "legacy" a user hand-editing settings.json would reach
+    // for, though the app itself has never written it) as an alias for "standard", and any other
+    // unrecognised value by falling back to the default instead of throwing. JsonSettings#fromJson
+    // discards the *entire* enclosing settings object on any deserialization failure here, so a single
+    // bad value in this field would otherwise silently wipe unrelated settings (locales, deployment
+    // exclusions, etc.) back to their defaults the next time the project is saved.
+    @JsonCreator
+    public static RelationshipEngineMode fromValue(String value) {
+      if ("new".equalsIgnoreCase(value)) {
+        return standard;
+      }
+      for (RelationshipEngineMode mode : values()) {
+        if (mode.name().equalsIgnoreCase(value)) {
+          return mode;
+        }
+      }
+      log.warn("Unknown relationship engine mode: {}, defaulting to legacy", value);
+      return legacy;
+    }
   }
 
   private RelationshipEngineMode relationshipEngineMode = RelationshipEngineMode.legacy;

@@ -87,6 +87,12 @@ shadowJar {
     manifest {
         attributes 'Main-Class': 'de.a12.studio.ui.Launcher', 'Implementation-Version': project.version
     }
+    // Each ikonli icon pack (bootstrapicons, materialdesign2, ...) ships its own
+    // META-INF/services/org.kordamp.ikonli.IkonHandler listing only its own provider class. Without
+    // merging, shadowJar keeps a single arbitrary pack's file and drops the rest, so FontIcon can
+    // resolve icons from only one pack at runtime -- e.g. "Cannot resolve 'bi-exclamation-circle-fill'"
+    // when materialdesign2's file wins over bootstrapicons'.
+    mergeServiceFiles()
 }
 
 launch4j {
