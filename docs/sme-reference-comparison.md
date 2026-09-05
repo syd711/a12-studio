@@ -148,6 +148,134 @@ plan around:
 
 ---
 
+## Query Model
+
+*Analyzed 2026-09-05 (rest of this doc last analyzed 2026-07-17 — don't assume the same currency).*
+
+a12-studio's Query Model editor (`a12-studio-ui/.../editors/querymodel/`, data model in
+`a12-studio-models/.../querymodel/`) exists but is a thin shell: the tree is read-only, filtering is a single
+free-text expression for the whole query rather than per-node, there is no UI to set the target Document Model
+after creation, and there are **zero validators**. SME's `queryModel` (`client/src/modules/queryModel/`) is a real
+structured-query editor built on a manipulable document-graph tree with per-node constraint authoring, aggregation,
+and full reference/rename tracking — see comparison below.
+
+### Data model
+
+| Field | a12-studio (`QueryModelContent`) | SME (`Query.QueryRoot` wire format) |
+|---|---|---|
+| Target | `targetDocumentModel` (String, DM id only) | `targetDocumentModel` — can also be a Combined Document Model or Transformer Model output |
+| Projection | `projectionName` | `projectionName` |
+| Field selection | `fields[]` (in-result paths) | `fields[]`, plus a `useAllFields` mode |
+| Filter | `filterDefinition` — **one free-text string for the entire query** | `constraint` — recursive `Operator` AST (`and`/`or`/`not`/`exact_match`/`double_range`/`date_range`/`undefined_match`/`simple_search`/`has`), attachable **per graph node** |
+| Traversal | none — tree is a fixed mirror of the target DM | `links[]` — nested relationship traversals (`relationshipModel`, `targetRole`, optional `constraint`, optional `maxDepth` for self-reference recursion), plus `has(...)` as a filter-only traversal |
+| Sort | `sort[]` (`QuerySort`: optional relationship+role hop, then `QuerySortBy` — field/direction/nullHandling/ignoreCase) | `sort` — same shape (field/direction/nullHandling/ignoreCase) |
+| Paging | `paging` (pageNumber, pageSize) | `paging` — same shape |
+| Aggregation | `aggregateResults` (Boolean) — **dangling flag, no config behind it** | `aggregation` — `group: {field}[]` + `aggregations: {function: count\|sum\|max\|min\|avg, field}[]`, a distinct result-shape mode |
+| Root exclusion | not present | `exclude` — omit the root document itself, return only linked docs |
+
+SME's in-editor representation additionally splits into three independently-validated sub-documents (`settings`
+header form, `documentGraph` tree, `postProcessing` sort/paging/aggregation) that get merged back into the flat
+wire JSON on save (`transformations/qmTransformer.ts`) — a serialization-layer detail, not something a12-studio
+needs to copy architecturally.
+
+### Editor features — gap list
+
+| Feature | SME reference | a12-studio status |
+|---|---|---|
+| Editable tree / document graph | Add a root DM via an ER-diagram picker (reuses the Model Graph Diagram component); add relationship-traversal nodes (only relationships actually connected to the selected node are offered) | **Missing** — tree is a fixed, read-only mirror of one target DM's fields/groups; no traversal nodes, no add/remove |
+| Per-node filter/constraint | Query-language grammar editor (ANTLR-backed, field/relationship autocomplete against the model graph), compiles to the `Operator` AST; semantically validated (field exists, type-correct operator, valid relationship+role) | One whole-query free-text `filterDefinition` via `RichtextEditorController` — confirmed to be a plain `CodeArea` with cosmetic string-literal highlighting only, **no grammar parsing, no autocomplete, no semantic validation** |
+| Target Document Model selection | Settings tab, editable at any time | **No UI at all** — `targetDocumentModel`/`projectionName` can only be set by hand-editing the JSON; `ModelSettingsDialog` explicitly hides model-references/supported-characters for QueryModel |
+| In-result field toggles | Inline tree checkboxes, tri-state on groups, disabled+forced for non-indexed fields | Present (`QueryModelTreeController`'s In-Result column), roughly at parity |
+| Sort | Multi-field, relationship-hop, direction, null-handling, ignore-case | Present (`QuerySort`/`QuerySortBy`/sorting panel), roughly at parity — `QueryTraversalOption.options()` scopes to *every* relationship in the project rather than only ones connected to the target DM |
+| Paging | pageNumber/pageSize | Present, roughly at parity |
+| Aggregation/grouping | Full group-by + count/sum/max/min/avg mode | **Missing** — `aggregateResults` boolean has no config surface behind it |
+| Multi-target-type queries (CDM, Transformer Model as target) | Supported | Not supported — DM only |
+| Reference/rename tracking | Target-DM, relationship, sort/aggregation field-path references are all first-class in SME's refactoring graph; renaming a DM/field auto-updates or flags the query (`qmModule.ts` `refactorDocument()`) | **Missing** — `resolveTargetDocumentModel()` silently produces an empty tree if the stored id no longer resolves, no error surfaced |
+| Validation | Root-required, per-node schema validation, constraint semantic validity, target-role validity, field-projection sanity, tab-level validation counts | **None** — no `QueryModelValidationService`, nothing wired to `ModelType.QUERY` at all; even the sorting panel's "relationship could not be resolved" indicator is a UI style hint, not a real validation error |
+
+### Feasibility spike: the query-grammar dependency (2026-09-05) — **feasible, not kernel-gated**
+
+SME's per-node filter authoring (`@com.mgmtp.a12.sme/qmm-support`, `moduleSupport/qmm/` in the SME repo) turns out
+**not** to require any proprietary a12 kernel/npm-registry access at all — it's a self-contained language toolchain
+that happens to target TypeScript today, not something wrapping a closed kernel API:
+
+- **The grammar itself is a plain, standalone ANTLR4 file** (`moduleSupport/qmm/QL.g4`, 140 lines) with no
+  SME/kernel-specific runtime dependency at the grammar level: `and`/`or`/`!`, 6 binary comparison operators
+  (`== != >= <= ~ !~`), field references (`[/Path/To/Field]`), function-call syntax, and null/boolean/string/number
+  literals. `moduleSupport/qmm/build.gradle.kts` generates the TypeScript parser from it via
+  `org.antlr.v4.Tool -Dlanguage=TypeScript` — but **Java is ANTLR4's native/default target**, and `org.antlr:antlr4`
+  is a plain BSD-licensed artifact on Maven Central, not an a12 kernel dependency. Gradle even ships a built-in
+  `antlr` plugin (`id 'antlr'`, generates Java lexer/parser from `.g4` files in `src/main/antlr`) that a12-studio
+  isn't using anywhere yet but could adopt trivially — a12-studio's `build.gradle` files use plain `java-library` +
+  string coordinates (no version catalog), so adding `antlr4-runtime` is a small, ordinary dependency change.
+- **The relationship-traversal "filter" (`has(...)` in the earlier gap-list table) is not a separate grammar
+  construct** — it's just one of the ~15 built-in functions (confirmed via `functions.ts`/test names:
+  `Has`, date/time/date-range/date-fragment constructors, range and match functions), called through the same
+  `callExpression` grammar rule as everything else. This significantly narrows what a Java port needs to cover —
+  one grammar, one function registry, not a family of special cases.
+- **The compiler pipeline is portable business logic, not UI code**: `parser.ts` (316) → `binder.ts` (285) →
+  `checker.ts` (199) → `emitter.ts` (404) → `importer.ts` (411, the reverse direction) → `formatter.ts` (267) →
+  `functions.ts` (1229, the function/operator registry) → `base/*.ts` type-system/resolver/visitor (~1500) — about
+  4,700 lines total, none of it DOM/React-dependent. This is the real cost of the feature: a bounded, mechanical-ish
+  Java port of an existing, well-tested reference implementation (SME ships unit tests per function in
+  `moduleSupport/qmm/test/core/checker/*.test.ts`), not a from-scratch design.
+- **Only the Monaco-editor integration layer (~1,800 lines: completion/hover/inlay-hint providers, theming) doesn't
+  port** — that's genuinely IDE-specific and would need a JavaFX/RichTextFX-based replacement (building on
+  `RichtextEditorController`, which already hosts a `CodeArea`), reusing the ported binder/checker for the semantic
+  data (field types, valid completions) rather than reimplementing that logic twice.
+- **The emitted target shape, `Query.Operator`**, comes from `@com.mgmtp.a12.dataservices/dataservices-access` (a
+  real published package, not workspace-local) — but since a12-studio only needs to *author and validate* this JSON
+  (not execute queries against live data), the shape can be modeled directly as new a12-studio Java POJOs, the same
+  way `QueryModelContent`/`QuerySort`/`QueryPaging` already hand-model JSON shapes today, without needing the actual
+  kernel/dataservices JAR as a dependency.
+
+**Conclusion: Phase 3 (per-node filtering) should target a Java port of `QL.g4` + the compiler pipeline, not a
+from-scratch structured filter-builder.** This is more work than a simple field/operator/value builder, but it
+gets a12-studio to the exact same query language and JSON output SME produces (so files stay
+interchangeable/round-trippable) instead of inventing a parallel, incompatible filter representation. The
+editor-integration (autocomplete/highlighting) can be scoped down initially — ship the grammar/compiler port with a
+plain syntax-highlighted `RichtextEditorController`-style editor first, add autocomplete as a follow-up once the
+semantic layer (binder/checker) exists to drive it.
+
+**Status (2026-09-05): grammar/parser step done.** `QL.g4` (byte-identical to SME's, since the grammar itself has
+no target-language-specific content) now lives at
+`a12-studio-models/src/main/antlr/de/a12/studio/models/querymodel/ql/QL.g4`, wired up via Gradle's built-in `antlr`
+plugin (`a12-studio-models/build.gradle`, `org.antlr:antlr4:4.13.2` for codegen + `org.antlr:antlr4-runtime:4.13.2`
+as an `api` dependency since generated parser classes are part of this module's public surface). One gotcha worth
+recording: the Gradle ANTLR plugin does **not** infer the Java package from the grammar file's directory nesting —
+without an explicit `-package` argument the generated classes came out in the *default* (unnamed) package despite
+living in the right directory; fixed via `generateGrammarSource { arguments += ['-visitor', '-package',
+'de.a12.studio.models.querymodel.ql'] }`. A smoke test
+(`a12-studio-models/src/test/java/de/a12/studio/models/querymodel/ql/QueryLanguageGrammarTest.java`) parses the
+same sample expressions SME's own `moduleSupport/qmm/test/core/checker/*.test.ts` exercise (field comparisons,
+`and`/`or`/`not`, `Has(...)`, nested/range function calls) and confirms both valid and invalid inputs behave as
+expected — full grammar/lexer parity confirmed, not just "it compiles."
+
+**Remaining for Phase 3**: the semantic pipeline is not started yet — binder (resolve field refs/relationships
+against a model graph), checker (type/overload validation per function), emitter (parse tree → `Query.Operator`
+JSON), importer (the reverse direction, JSON → parse tree, needed to load existing files back into editable text),
+formatter (pretty-printing), and the function/operator registry (`functions.ts`'s ~15 built-ins) all still need a
+Java port — see the line-count breakdown above for relative sizing. None of that is wired into `QueryModelContent`
+or the editor UI yet; `filterDefinition` is still the old free-text field.
+
+### Proposed build order
+
+1. **Settings + validators** (small, no architecture risk): editable `targetDocumentModel`/`projectionName` panel;
+   basic validators (target-DM resolvable, `fields[]`/`sort[].sortBy.field` paths resolve, `sort[]`
+   relationship+role resolves, paging bounds).
+2. **Editable graph tree**: add/remove relationship-traversal nodes, scoped to relationships actually connected to
+   the selected node (not every relationship in the project, unlike today's `QueryTraversalOption.options()`).
+3. **Per-node filtering**: port `QL.g4` (Gradle `antlr` plugin) + the compiler pipeline (parser/binder/checker/
+   emitter/importer/formatter/functions) to Java, per the feasibility spike above. Ship with a plain syntax-
+   highlighted editor first; autocomplete is a separate follow-up once the semantic layer exists.
+4. **Aggregation** — only once it's confirmed the kernel path a12-studio would use actually supports an
+   aggregation-mode query result; otherwise a documented non-goal.
+5. **Reference/rename tracking** — hook into whatever a12-studio's existing rename/move refactoring mechanism is
+   (see the Document Model gap list above — a12-studio doesn't have one yet either, so this is coupled to that
+   broader gap, not query-model-specific work).
+
+---
+
 ## Other model types — survey and priority
 
 Every SME module implements `SMEModule`/`DefaultSMEModule` and (if it's a standalone file type) registers an
@@ -167,7 +295,7 @@ document, serialize back to JSON (occasionally YAML) on save.
 | 7 | **printModel** | Kernel libs present (`print-engine-api/runtime`); `PrintService`/`DocumentModelResolver`/`PrintParameters` scaffolding exists. Most editor-complex of the print family — relies on an external print-engine component library for the layout canvas. Backend renders PDF only (PDFBox or legacy engine), no HTML path. |
 | 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. `print-typesetting` lib already present; no dedicated model/service for either exists yet. |
 | 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model (don't confuse with Document Model itself). |
-| 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side (built on top of a DM), not blocking other model types. |
+| 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side (built on top of a DM), not blocking other model types. See dedicated "Query Model" section above for a12-studio's current gap list. |
 | — | **appModel, masterDetailModel, modelGraphDiagram, treeModel, transformerModel, contentModel, typeDefinitionModel, umModule, settingsModule, filesModule, attachment, data** | Standalone but lower cross-reference count or explicitly experimental in SME itself (contentModel, mappingModel, queryModel, selectionModel, combinationModel, transformerModel, structuralMappingModel are all marked `isExperimental()` in SME). |
 | n/a | **common, preview** | Not model types. `common` = shared editor UI building blocks (element picker, expression editor, tabbed-frame scaffolding) used across modules. `preview` = pure runtime capability (opens a browser window running the live app, synced via postMessage), no persistence, no explorer entry. |
 
@@ -190,7 +318,7 @@ document, serialize back to JSON (occasionally YAML) on save.
 - **printModel** — see priority table.
 - **printSettingModel** — print output settings (page size, margins); no cross-model references.
 - **printTypesettingModel** — typography/typesetting rules referenced by print models; no cross-model references.
-- **queryModel** — reusable structured query (filter/sort/selection tree) over a DM; experimental.
+- **queryModel** — reusable structured query (filter/sort/selection tree) over a DM; experimental. See dedicated "Query Model" section above.
 - **relationshipModel** — associations/candidate constraints, ordered links between DM entities — backbone for link/masterDetailModel/treeModel/formModel bindings.
 - **selectionModel** — reusable selection/filter spec over DM data; experimental.
 - **settingsModule** — single workspace-level `settings.yaml` (deployment exclusions, global project settings) — the one clear YAML (not JSON) file type besides umModule.

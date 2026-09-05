@@ -151,7 +151,7 @@
             "text": "Logo"
           }
         ],
-        "width": 1,
+        "width": 1.0,
         "elementRef": "group_8e00a",
         "sortable": false
       },
@@ -237,6 +237,15 @@
         },
         {
           "type": "filter"
+        },
+        {
+          "type": "search"
+        },
+        {
+          "type": "button",
+          "event": null,
+          "destructive": null,
+          "primary": null
         }
       ]
     },

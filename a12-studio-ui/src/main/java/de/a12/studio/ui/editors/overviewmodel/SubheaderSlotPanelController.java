@@ -17,8 +17,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -27,6 +28,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
@@ -35,19 +37,13 @@ import de.a12.studio.ui.util.StudioBundle;
  * de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}'s rows, or a position-only marker
  * ({@link SearchElement}, {@link FilterElement}, {@link MultiSelectionElement}) with no further configuration
  * - per the SME reference's Subheader documentation ("By clicking ADD ... create a respective action type:
- * Button, Search, Filter, or Multi-Selection"). Changing a row's Action Type replaces that list entry with a
- * freshly constructed instance of the corresponding subtype, since {@link BoxElement} is a sealed/polymorphic
- * hierarchy rather than one class with a mutable type flag. Reused for both Major (right slot) and Minor (left
- * slot) via {@link #configure}. Footer is Button-only, so it uses the simpler {@link
- * de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController} instead.
+ * Button, Search, Filter, or Multi-Selection"). The Action Type is chosen once, from {@link #addButton}'s
+ * menu, when a row is created - it isn't editable afterward, so the Action Type column is a plain label like
+ * every other column. Reused for both Major (right slot) and Minor (left slot) via {@link #configure}. Footer
+ * is Button-only, so it uses the simpler {@link de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}
+ * instead.
  */
 public class SubheaderSlotPanelController extends AbstractPropertyEditor {
-
-  private static final String TYPE_BUTTON = "Button";
-  private static final String TYPE_SEARCH = "Search";
-  private static final String TYPE_FILTER = "Filter";
-  private static final String TYPE_MULTI_SELECTION = "Multi-Selection";
-  private static final List<String> TYPE_OPTIONS = List.of(TYPE_BUTTON, TYPE_SEARCH, TYPE_FILTER, TYPE_MULTI_SELECTION);
 
   private static final String DEFAULT_PRIORITY = "SECONDARY";
 
@@ -55,6 +51,8 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   private GridPane rowsGrid;
   @FXML
   private Label emptyLabel;
+  @FXML
+  private MenuButton addButton;
 
   private List<BoxElement> rows;
 
@@ -68,6 +66,7 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     setTitle(title);
     setSettingsKeySuffix(settingsKeySuffix);
     this.rows = rows;
+    initAddMenu();
     rebuildRows();
   }
 
@@ -75,11 +74,24 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     this.onChange = onChange;
   }
 
-  @FXML
-  private void onAdd() {
-    rows.add(new ButtonElement());
-    rebuildRows();
-    notifyChanged();
+  // Rebuilt (via setAll, so re-running configure() on the same instance doesn't duplicate items) instead of
+  // declared in FXML because each item's action needs to close over the specific element type it creates.
+  private void initAddMenu() {
+    addButton.getItems().setAll(
+        createAddMenuItem(StudioBundle.get("subheader_slot.type_button"), ButtonElement::new),
+        createAddMenuItem(StudioBundle.get("subheader_slot.type_search"), SearchElement::new),
+        createAddMenuItem(StudioBundle.get("subheader_slot.type_filter"), FilterElement::new),
+        createAddMenuItem(StudioBundle.get("subheader_slot.type_multi_selection"), MultiSelectionElement::new));
+  }
+
+  private MenuItem createAddMenuItem(String label, Supplier<BoxElement> factory) {
+    MenuItem item = new MenuItem(label);
+    item.setOnAction(event -> {
+      rows.add(factory.get());
+      rebuildRows();
+      notifyChanged();
+    });
+    return item;
   }
 
   private void rebuildRows() {
@@ -100,12 +112,9 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   }
 
   private void addRow(BoxElement element, int index, int rowCount) {
-    ComboBox<String> typeField = new ComboBox<>();
-    typeField.setId("subheaderSlotType-" + index);
-    typeField.setMaxWidth(Double.MAX_VALUE);
-    typeField.getItems().setAll(TYPE_OPTIONS);
-    setFieldValue(typeField, displayNameFor(element));
-    bindComboBox(typeField, (el, value) -> changeRowType(element, value));
+    Label typeLabel = new Label(displayNameFor(element));
+    typeLabel.setId("subheaderSlotType-" + index);
+    typeLabel.setMaxWidth(Double.MAX_VALUE);
 
     boolean isButton = element instanceof OverviewButtonLike;
     OverviewButtonLike button = isButton ? (OverviewButtonLike) element : null;
@@ -130,7 +139,7 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
       makeClickableToEdit(iconLabel, button);
     }
 
-    rowsGrid.addRow(index + 1, typeField, eventLabel, priorityLabel, destructiveLabel, iconLabel, createActionsBox(element, button, index, rowCount));
+    rowsGrid.addRow(index + 1, typeLabel, eventLabel, priorityLabel, destructiveLabel, iconLabel, createActionsBox(element, button, index, rowCount));
   }
 
   private void makeClickableToEdit(Label label, OverviewButtonLike button) {
@@ -153,33 +162,17 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     });
   }
 
-  private void changeRowType(BoxElement oldElement, String typeDisplayName) {
-    int index = rows.indexOf(oldElement);
-    if (index < 0) {
-      return;
-    }
-    BoxElement newElement = switch (typeDisplayName) {
-      case TYPE_SEARCH -> new SearchElement();
-      case TYPE_FILTER -> new FilterElement();
-      case TYPE_MULTI_SELECTION -> new MultiSelectionElement();
-      default -> new ButtonElement();
-    };
-    rows.set(index, newElement);
-    rebuildRows();
-    onChange.run();
-  }
-
   private static String displayNameFor(BoxElement element) {
     if (element instanceof SearchElement) {
-      return TYPE_SEARCH;
+      return StudioBundle.get("subheader_slot.type_search");
     }
     if (element instanceof FilterElement) {
-      return TYPE_FILTER;
+      return StudioBundle.get("subheader_slot.type_filter");
     }
     if (element instanceof MultiSelectionElement) {
-      return TYPE_MULTI_SELECTION;
+      return StudioBundle.get("subheader_slot.type_multi_selection");
     }
-    return TYPE_BUTTON;
+    return StudioBundle.get("subheader_slot.type_button");
   }
 
   private HBox createActionsBox(BoxElement element, OverviewButtonLike button, int index, int rowCount) {
@@ -194,12 +187,10 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
       }
     });
 
-    HBox actionsBox = new HBox(4.0, moveButtonsBox);
-    if (button != null) {
-      Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(button));
-      actionsBox.getChildren().add(editButton);
-    }
-    actionsBox.getChildren().add(deleteButton);
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(button));
+    editButton.setDisable(button == null);
+
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
   }

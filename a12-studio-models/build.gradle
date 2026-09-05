@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'antlr'
 }
 
 dependencies {
@@ -11,7 +12,18 @@ dependencies {
     api 'tools.jackson.core:jackson-databind:3.1.4'
     api 'tools.jackson.dataformat:jackson-dataformat-yaml:3.1.4'
 
+    // Query Model's filter/constraint language (QL.g4, ported from SME's moduleSupport/qmm) - see
+    // docs/sme-reference-comparison.md "Query Model" section. Pinned to the same 4.13.2 SME itself uses.
+    antlr 'org.antlr:antlr4:4.13.2'
+    // Generated lexer/parser classes are part of this module's public surface (consumers walk the
+    // parse tree), so the runtime is exposed transitively via api, same reasoning as the Jackson deps above.
+    api 'org.antlr:antlr4-runtime:4.13.2'
+
     testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+generateGrammarSource {
+    arguments += ['-visitor', '-package', 'de.a12.studio.models.querymodel.ql']
 }
