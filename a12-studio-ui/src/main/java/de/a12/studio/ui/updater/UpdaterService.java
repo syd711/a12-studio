@@ -24,11 +24,11 @@ public class UpdaterService {
   }
 
   public void downloadUpdate(String version) {
-    Updater.downloadUpdate(version, Updater.UI_ZIP);
+    Updater.downloadUpdate(version, Updater.STUDIO_ZIP);
   }
 
   public int getDownloadProgress() {
-    return Updater.getDownloadProgress(Updater.UI_ZIP, Updater.UI_ZIP_SIZE);
+    return Updater.getDownloadProgress(Updater.STUDIO_ZIP, Updater.STUDIO_ZIP_SIZE);
   }
 
   public void installUpdate(String oldVersion, String newVersion) throws IOException {

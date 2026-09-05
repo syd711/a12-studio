@@ -104,7 +104,7 @@ subprojects {
     apply plugin: 'java'
 
     group = 'de.a12.studio'
-    version = '2026.06-ext0-0.0.1'
+    version = '2026.06-ext0-0.0.2'
 
     // Plugin modules (identified by a plugin.json descriptor) also get the shadow plugin so
     // they can be built into standalone fat JARs for the root plugins/ folder, see

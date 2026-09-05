@@ -425,6 +425,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
       if (latestVersion != null) {
         Platform.runLater(() -> {
           newVersion = latestVersion;
+          updateBtn.setText("Version " + newVersion + " available");
           updateBtn.getTooltip().setText("Version " + newVersion + " available");
           updateBtn.setVisible(true);
         });

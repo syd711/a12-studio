@@ -28,8 +28,8 @@ public class Updater {
   private final static String LATEST_RELEASE_URL = "https://github.com/syd711/a12-studio/releases/latest";
   public static String LATEST_VERSION = null;
 
-  public final static String UI_ZIP = "A12-Studio.zip";
-  public final static long UI_ZIP_SIZE = 80 * 1000 * 1000;
+  public final static String STUDIO_ZIP = "A12-Studio.zip";
+  public final static long STUDIO_ZIP_SIZE = 80 * 1000 * 1000;
 
   private final static String DOWNLOAD_SUFFIX = ".bak";
 

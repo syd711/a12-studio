@@ -50,6 +50,18 @@
    <right>
       <HBox fx:id="menuBarRightPanel" alignment="CENTER_RIGHT" styleClass="dark-panel" BorderPane.alignment="CENTER">
          <children>
+
+             <Button fx:id="updateBtn" accessibleText="%update_available" contentDisplay="LEFT" graphicTextGap="6.0" managed="false" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button, update-available-button" visible="false">
+                 <graphic>
+                     <FontIcon iconLiteral="mdi2a-arrow-down-bold" iconSize="18" styleClass="toolbar-icon" />
+                 </graphic>
+                 <tooltip>
+                     <Tooltip text="%update_available" />
+                 </tooltip>
+               <HBox.margin>
+                  <Insets right="24.0" />
+               </HBox.margin>
+             </Button>
             <HBox alignment="CENTER_LEFT" spacing="3.0">
                <children>
                   <StackPane fx:id="deployBtnContainer" managed="false" visible="false">
@@ -97,15 +109,6 @@
                   <Insets right="6.0" />
                </HBox.margin>
             </HBox>
-
-             <Button fx:id="updateBtn" accessibleText="%update_available" managed="false" mnemonicParsing="false" onAction="#onUpdate" styleClass="menu-bar-button" visible="false">
-                 <graphic>
-                     <FontIcon iconColor="#03A905" iconLiteral="mdi2a-arrow-down-bold" iconSize="18" />
-                 </graphic>
-                 <tooltip>
-                     <Tooltip text="%update_available" />
-                 </tooltip>
-             </Button>
 
             <Button fx:id="searchBtn" accessibleText="%search_files" mnemonicParsing="false" onAction="#onSearch" styleClass="menu-bar-button">
                 <graphic>

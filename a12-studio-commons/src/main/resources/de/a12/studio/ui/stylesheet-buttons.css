@@ -152,6 +152,37 @@
 }
 
 /**
+ * Update available button (right panel) - dark green text variant of
+ * .menu-bar-button, sized to fit its "Version X available" label instead
+ * of being icon-only square.
+ */
+.update-available-button {
+    -fx-background-color: #1B5E20;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 0;
+    -fx-padding: 0 10px;
+    -fx-pref-width: -1;
+    -fx-pref-height: 34px;
+    -fx-min-width: -1;
+    -fx-min-height: 34px;
+    -fx-cursor: hand;
+    -fx-text-fill: white;
+}
+
+.update-available-button:hover {
+    -fx-background-color: derive(#1B5E20, 30%);
+}
+
+.update-available-button .label {
+    -fx-text-fill: white;
+}
+
+.update-available-button .toolbar-icon {
+    -fx-icon-color: white;
+}
+
+/**
  * Version menu button (right panel) - text variant of .menu-bar-button,
  * sized to fit its version label instead of being icon-only square.
  */

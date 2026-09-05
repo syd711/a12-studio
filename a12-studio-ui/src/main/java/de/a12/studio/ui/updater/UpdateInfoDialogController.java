@@ -4,9 +4,12 @@ import de.a12.studio.ui.components.DialogController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,7 +25,7 @@ import java.time.Duration;
 public class UpdateInfoDialogController implements DialogController {
 
   @FXML
-  private TextArea textArea;
+  private WebView webView;
 
   @FXML
   private Button updateBtn;
@@ -36,7 +39,8 @@ public class UpdateInfoDialogController implements DialogController {
   public void setData(Stage stage, String version) {
     this.stage = stage;
     this.version = version;
-    textArea.setText(downloadReleaseNotes(version));
+    webView.getEngine().setUserStyleSheetLocation(UpdateInfoDialogController.class.getResource("web-style.css").toString());
+    webView.getEngine().loadContent(renderReleaseNotesHtml(version));
   }
 
   @FXML
@@ -53,6 +57,12 @@ public class UpdateInfoDialogController implements DialogController {
   @Override
   public void onDialogCancel() {
     stage.close();
+  }
+
+  private static String renderReleaseNotesHtml(String version) {
+    Parser parser = Parser.builder().build();
+    Node document = parser.parse(downloadReleaseNotes(version));
+    return HtmlRenderer.builder().build().render(document);
   }
 
   private static String downloadReleaseNotes(String version) {
