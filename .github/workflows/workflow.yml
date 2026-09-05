@@ -206,6 +206,7 @@ jobs:
       - name: Build fat JARs and Windows EXE wrappers with Gradle
         run: |
           OUTPUT=$(./gradlew :a12-studio-ui:shadowJar :a12-studio-ui:createExe \
+                             :a12-studio-ui:stageWcfCli \
                              :a12-studio-server:bootJar :a12-studio-server:createExe 2>&1) || {
             echo "::error::$OUTPUT"
             exit 1
@@ -261,6 +262,8 @@ jobs:
           cp a12-studio-server/build/libs/a12-studio-server.jar   windows-artifacts/
           cp a12-studio-ui/build/launch4j/A12-Studio.exe          windows-artifacts/
           cp a12-studio-server/build/launch4j/A12-Studio-Server.exe windows-artifacts/
+          mkdir -p windows-artifacts/wcf-cli
+          cp Output/A12-Studio/wcf-cli/*.jar windows-artifacts/wcf-cli/
 
       - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
