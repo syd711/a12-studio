@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -111,7 +112,7 @@ public class PreviewAppProcess {
     try {
       PreviewAppInstallation installation = PreviewAppInstallation.resolve();
       File projectFolder = project.getFolder();
-      PreviewAppWorkspaceBundler.bundle(projectFolder);
+      stageConvertedBundle(installation, projectFolder);
 
       File newDbTempDir = Files.createTempDirectory("a12-studio-preview-app-").toFile();
 
@@ -142,6 +143,45 @@ public class PreviewAppProcess {
       setState(State.FAILED);
       String message = e.getMessage();
       runOnFx(() -> WidgetFactory.showAlert(Studio.stage, StudioBundle.get("preview_app_failed_to_launch"), message));
+    }
+  }
+
+  /**
+   * Refreshes {@code projectFolder/bundled/seed.tar.gz} for the server's initial "sme-workspace
+   * import" bootstrap, running every model through {@link ModelConversionService} first so the
+   * server never sees raw designer-time model JSON (which its kernel-generated validators reject -
+   * see {@link ModelConversionService}'s class doc). {@link PreviewAppWorkspaceBundler}'s
+   * tar-writing logic is reused unmodified, against a scratch copy of the project with converted
+   * models swapped in, so the real {@code models/} folder on disk is never touched; only the
+   * resulting {@code bundled/seed.tar.gz} is copied back into the real project folder, since the
+   * server locates it there via the {@code WORKSPACE_DIR} env var set below.
+   */
+  private void stageConvertedBundle(PreviewAppInstallation installation, File projectFolder) throws IOException, PreviewAppException {
+    File wcfCliDir = WcfCliInstallation.resolve();
+    File stagingWorkspace = Files.createTempDirectory("a12-studio-preview-app-staging-").toFile();
+    File conversionOutputDir = Files.createTempDirectory("a12-studio-preview-app-converted-").toFile();
+    try {
+      FileUtils.copyDirectory(projectFolder, stagingWorkspace);
+      File stagingBundledDir = new File(stagingWorkspace, "bundled");
+      if (stagingBundledDir.isDirectory()) {
+        FileUtils.deleteDirectory(stagingBundledDir);
+      }
+
+      File stagingModelsDir = new File(stagingWorkspace, "models");
+      File convertedModelsDir = ModelConversionService.convert(
+          installation.getJavaExecutable(), wcfCliDir, stagingModelsDir, conversionOutputDir, this::appendLog);
+      FileUtils.deleteDirectory(stagingModelsDir);
+      FileUtils.copyDirectory(convertedModelsDir, stagingModelsDir);
+
+      PreviewAppWorkspaceBundler.bundle(stagingWorkspace);
+
+      File realBundledDir = new File(projectFolder, "bundled");
+      FileUtils.forceMkdir(realBundledDir);
+      FileUtils.copyFile(new File(stagingBundledDir, "seed.tar.gz"), new File(realBundledDir, "seed.tar.gz"));
+    }
+    finally {
+      FileUtils.deleteDirectory(stagingWorkspace);
+      FileUtils.deleteDirectory(conversionOutputDir);
     }
   }
 
@@ -281,7 +321,10 @@ public class PreviewAppProcess {
     return (OSUtil.isWindows() ? "file:/" : "file://") + file.getAbsolutePath();
   }
 
-  private void appendLog(String line) {
+  // Package-private (rather than private) so PreviewAppDeployer can pipe ModelConversionService's
+  // subprocess output into the same log surface (PreviewAppLogWindow/PreviewAppConsoleController
+  // already display logLines) for its own live-redeploy conversion step.
+  void appendLog(String line) {
     runOnFx(() -> logLines.add(line));
   }
 

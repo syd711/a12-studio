@@ -14,8 +14,10 @@ import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -38,11 +40,13 @@ import java.util.zip.ZipOutputStream;
  * {@code <id>.json}, matching the model-id-equals-filename convention) to its {@code v2/models}
  * endpoint.
  *
- * <p>Every model file is zipped byte-for-byte as saved on disk, except Application Models: for
- * those, any {@code module-masterdetail} {@link ModelReference} in the header gets expanded into a
+ * <p>Every model's content is resolved as-saved-on-disk, except Application Models: for those,
+ * any {@code module-masterdetail} {@link ModelReference} in the header gets expanded into a
  * generated {@link Module} (see {@link MasterDetailModuleGenerator}) appended to a copy of {@code
  * content.modules} before serializing, mirroring SME's own {@code toFileContentForUpload} step -
- * the source model on disk (and any open editor tab) is never mutated.
+ * the source model on disk (and any open editor tab) is never mutated. That resolved content is
+ * then run through {@link ModelConversionService} (WCF -&gt; RMC conversion) before zipping - see
+ * {@link #buildConvertedModelsZip}.
  *
  * <p>Uses the Preview App's fixed local-only "admin"/"a12" account - the documented default
  * credentials for every Preview App user, with full deploy authorization (systemAdmin /
@@ -97,7 +101,7 @@ public class PreviewAppDeployer {
         return;
       }
 
-      byte[] zip = buildModelsZip(modelItems);
+      byte[] zip = buildConvertedModelsZip(modelItems);
 
       String apiBase = "http://localhost:" + PreviewAppInstallation.SERVER_PORT + "/api";
       HttpClient httpClient = HttpClient.newBuilder().connectTimeout(REQUEST_TIMEOUT).build();
@@ -139,6 +143,54 @@ public class PreviewAppDeployer {
       for (ProjectItem item : modelItems) {
         zipOut.putNextEntry(new ZipEntry(item.getFile().getName()));
         zipOut.write(modelFileContent(item, modelItems));
+        zipOut.closeEntry();
+      }
+    }
+    return bytes.toByteArray();
+  }
+
+  /**
+   * Like {@link #buildModelsZip(List)}, but every model is first run through {@link
+   * ModelConversionService} (WCF -&gt; RMC conversion, injecting the {@code __meta} metadata group)
+   * before zipping - the real Preview App server rejects raw designer-time model JSON when
+   * computing documents against it (see {@link ModelConversionService}'s class doc). Each item's
+   * content is first resolved via {@link #modelFileContent} (so the existing Application-Model /
+   * Master-Detail expansion still applies) and written to a scratch staging directory, since
+   * WcfCli converts a whole directory in one pass rather than individual files.
+   */
+  private static byte[] buildConvertedModelsZip(List<ProjectItem> modelItems) throws IOException, PreviewAppException {
+    File wcfCliDir = WcfCliInstallation.resolve();
+    File javaExecutable = PreviewAppInstallation.resolve().getJavaExecutable();
+
+    File stagingDir = Files.createTempDirectory("a12-studio-deploy-staging-").toFile();
+    File outputDir = Files.createTempDirectory("a12-studio-deploy-converted-").toFile();
+    try {
+      for (ProjectItem item : modelItems) {
+        Files.write(new File(stagingDir, item.getFile().getName()).toPath(), modelFileContent(item, modelItems));
+      }
+
+      File convertedModelsDir = ModelConversionService.convert(
+          javaExecutable, wcfCliDir, stagingDir, outputDir, line -> PreviewAppProcess.getInstance().appendLog(line));
+
+      return zipConvertedModels(convertedModelsDir, modelItems);
+    }
+    finally {
+      FileUtils.deleteDirectory(stagingDir);
+      FileUtils.deleteDirectory(outputDir);
+    }
+  }
+
+  private static byte[] zipConvertedModels(File convertedModelsDir, List<ProjectItem> modelItems) throws IOException {
+    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    try (ZipOutputStream zipOut = new ZipOutputStream(bytes)) {
+      for (ProjectItem item : modelItems) {
+        String fileName = item.getFile().getName();
+        File convertedFile = new File(convertedModelsDir, fileName);
+        if (!convertedFile.isFile()) {
+          throw new IOException("Model conversion did not produce an output file for \"" + fileName + "\".");
+        }
+        zipOut.putNextEntry(new ZipEntry(fileName));
+        zipOut.write(Files.readAllBytes(convertedFile.toPath()));
         zipOut.closeEntry();
       }
     }

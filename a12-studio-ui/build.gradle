@@ -28,6 +28,19 @@ javafx {
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
 }
 
+configurations {
+    // "EXTERNAL" bundling: resolved jars must stay loose files (never merged into a fat jar) so
+    // they can be staged as-is into a `wcf-cli/` folder and passed as a `-cp` argument to a
+    // separate `java` subprocess running WcfCli - mirrors the reference project template's own
+    // `wcfCli` configuration (project-template's root build.gradle).
+    wcfCli {
+        attributes {
+            attribute(org.gradle.api.attributes.Bundling.BUNDLING_ATTRIBUTE,
+                    objects.named(org.gradle.api.attributes.Bundling, org.gradle.api.attributes.Bundling.EXTERNAL))
+        }
+    }
+}
+
 dependencies {
     implementation project(':a12-studio-commons')
     implementation project(':a12-studio-plugin-manager')
@@ -46,6 +59,13 @@ dependencies {
     // intercepted before the shell's own reserved Snap Assist handling consumes it.
     implementation 'net.java.dev.jna:jna-platform:5.15.0'
     // Pure-Java Microsoft Access reader; no ODBC or native drivers needed.
+
+    // WCF -> RMC model conversion tool (injects the `__meta` metadata group every document model
+    // needs before a real a12 kernel server - e.g. the Preview App server - can compute/validate
+    // documents against it). Staged as loose jars (see `stageWcfCli` below), never on a12-studio's
+    // own compile/runtime classpath - it's invoked in a separate `java -cp ... WcfCli` subprocess.
+    wcfCli 'com.mgmtp.a12.dataservices.wcf:dataservices-wcf-cli:1.1.3'
+    wcfCli 'com.mgmtp.a12.rmc:conversion:0.5.1'
 
     testImplementation platform('org.junit:junit-bom:5.11.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -81,7 +101,15 @@ tasks.register('copyToOutput', Copy) {
     into "${rootDir}/Output/A12-Studio"
 }
 
-assemble.dependsOn copyToOutput
+// Stages the WCF-CLI + RMC conversion jars as loose files (not merged into shadowJar/a12-studio-ui.jar)
+// next to A12-Studio.exe, so PreviewAppProcess/PreviewAppDeployer can resolve them relative to
+// a12-studio's own install location at runtime and pass them as a `-cp` to a `WcfCli` subprocess.
+tasks.register('stageWcfCli', Copy) {
+    from configurations.wcfCli
+    into "${rootDir}/Output/A12-Studio/wcf-cli"
+}
+
+assemble.dependsOn copyToOutput, stageWcfCli
 
 tasks.register('prepareInstallerScript', Copy) {
     from 'src/main/resources/inno-installer-a12-studio-full.iss'
@@ -90,7 +118,7 @@ tasks.register('prepareInstallerScript', Copy) {
 }
 
 tasks.register('buildInstaller', Exec) {
-    dependsOn prepareInstallerScript, copyToOutput, ':a12-studio-server:copyToOutput', ':generateLicenses'
+    dependsOn prepareInstallerScript, copyToOutput, stageWcfCli, ':a12-studio-server:copyToOutput', ':generateLicenses'
     onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows() }
     commandLine 'ISCC.exe', layout.buildDirectory.file('installer/inno-installer-a12-studio-full.iss').get().asFile
 }

@@ -16,7 +16,7 @@
    <center>
       <VBox alignment="BASELINE_LEFT" maxWidth="600.0" BorderPane.alignment="TOP_LEFT">
          <children>
-            <Label fx:id="textLabel" styleClass="dialog-text" text="%label">
+            <Label fx:id="textLabel" maxWidth="800.0" prefWidth="600.0" styleClass="dialog-text" text="%label" wrapText="true">
                <font>
                   <Font size="18.0" />
                </font>
