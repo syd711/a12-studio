@@ -157,10 +157,17 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       overviewAccessibilityController.refresh();
     });
     overviewSearchAndFiltersController.setOnRelevanceChange(this::updateFilterModeDependentVisibility);
-    // The Multi-Selection panel's "exactly one Multi-Selection element in Sub header" validation depends on
-    // the Subheader panels' content, so re-check it whenever either slot changes.
-    subheaderMajorController.setOnChange(overviewMultiSelectionController::refresh);
-    subheaderMinorController.setOnChange(overviewMultiSelectionController::refresh);
+    // The Multi-Selection panel's "exactly one Multi-Selection element in Sub header" validation and the
+    // Search and Filters panel's "exactly one Search element in Sub header" validation both depend on the
+    // Subheader panels' content, so re-check them whenever either slot changes.
+    subheaderMajorController.setOnChange(() -> {
+      overviewMultiSelectionController.refresh();
+      overviewSearchAndFiltersController.refresh();
+    });
+    subheaderMinorController.setOnChange(() -> {
+      overviewMultiSelectionController.refresh();
+      overviewSearchAndFiltersController.refresh();
+    });
   }
 
   /**

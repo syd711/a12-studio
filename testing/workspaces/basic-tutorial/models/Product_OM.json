@@ -1,0 +1,108 @@
+{
+  "header": {
+    "id": "Product_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "de",
+        "text": "Einkaufsliste"
+      },
+      {
+        "locale": "en",
+        "text": "Shopping List"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "DM",
+        "modelType": "document",
+        "purpose": "document-model-for-overview",
+        "reference": "Product_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 11,
+      "filterConfiguration": {
+        "showFilterButton": false,
+        "showFilterBar": false,
+        "filterMode": null
+      }
+    },
+    "columns": [
+      {
+        "id": "column-068c0",
+        "width": 1.0,
+        "elementRef": "field_a8a3f"
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "delete",
+          "icon": {
+            "name": "delete"
+          },
+          "label": [
+            {
+              "locale": "de",
+              "text": "Löschen"
+            },
+            {
+              "locale": "en",
+              "text": "Delete"
+            }
+          ],
+          "destructive": true,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "button",
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "label": [
+            {
+              "locale": "de",
+              "text": "Hinzufügen"
+            },
+            {
+              "locale": "en",
+              "text": "Add"
+            }
+          ],
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

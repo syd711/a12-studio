@@ -27,4 +27,5 @@ config/*.properties
 **/*.gz
 /testing/workspaces/basic/bundled/seed.tar.gz
 /testing/workspaces/basic/logs/previewapp-server.log.*
-/testing/workspaces/empty_appgroups/logs/previewapp-server.log
+/testing/workspaces/basic-tutorial/logs/previewapp-server.log
+/.studio/

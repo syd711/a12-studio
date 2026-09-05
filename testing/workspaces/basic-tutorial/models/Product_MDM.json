@@ -1,0 +1,42 @@
+{
+  "header": {
+    "id": "Product_MDM",
+    "modelType": "module-masterdetail",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "de",
+        "text": "Meine Einkaufsliste"
+      },
+      {
+        "locale": "en",
+        "text": "My Shopping List"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "type": "overview",
+    "overviewModel": "Product_OM",
+    "formMapping": [
+      {
+        "documentModel": "Product_DM",
+        "formModel": "Product_FM"
+      }
+    ]
+  }
+}

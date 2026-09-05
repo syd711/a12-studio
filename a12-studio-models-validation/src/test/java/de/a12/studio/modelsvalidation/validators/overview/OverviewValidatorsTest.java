@@ -144,6 +144,24 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void searchElementValidatorReportsMissingElement() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewSearchElementValidator_missing_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewSearchElementValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("No search element is added"));
+  }
+
+  @Test
+  void searchElementValidatorReportsDuplicateElement() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewSearchElementValidator_duplicate_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewSearchElementValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("Only one search is allowed"));
+  }
+
+  @Test
   void pagingSizeValidatorReportsInvalidValue() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewPagingSizeValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewPagingSizeValidator().validate(model, TestModels.context(model));

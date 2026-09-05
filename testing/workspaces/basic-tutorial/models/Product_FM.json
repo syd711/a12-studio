@@ -1,0 +1,203 @@
+{
+  "header": {
+    "id": "Product_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "de",
+        "text": "Produkt"
+      },
+      {
+        "locale": "en",
+        "text": "Product"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Product_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Product_DM"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1",
+      "minorButtons": {
+        "button": []
+      },
+      "majorButtons": {
+        "button": []
+      }
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "minorButtons": {
+        "button": []
+      },
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-c4a1e",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-58f2b",
+            "name": "Save",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen-89aee",
+        "name": "Group",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "de",
+                "text": "Group"
+              },
+              {
+                "locale": "en",
+                "text": "Group"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid-d9575",
+            "name": "GroupControls",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row-e2e6f",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_d0cc5",
+                    "elementRef": "field_a8a3f"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "label": {
+            "type": "Multilingual",
+            "multilingualText": {
+              "text": [
+                {
+                  "locale": "de",
+                  "text": "Produkt"
+                },
+                {
+                  "locale": "en",
+                  "text": "Product"
+                }
+              ]
+            }
+          },
+          "elementRef": "field_a8a3f"
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {
+      "buttonLabels": {
+        "ADD": {
+          "text": [
+            {
+              "locale": "de",
+              "text": "Save"
+            }
+          ]
+        },
+        "COMMIT_ADD": {
+          "text": [
+            {
+              "locale": "de",
+              "text": "Save"
+            }
+          ]
+        },
+        "APPLY": {
+          "text": [
+            {
+              "locale": "de",
+              "text": "Save"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

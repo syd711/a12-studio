@@ -1,0 +1,19 @@
+{
+  "version": "1.0.0",
+  "general": {
+    "relationshipEngineMode": "legacy",
+    "showMetaDataInUIModels": true,
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "enforceModelSuffixes": true
+  },
+  "previewApp": {},
+  "settingsName": "settings.json",
+  "settingsType": "PROJECT_ROOT"
+}

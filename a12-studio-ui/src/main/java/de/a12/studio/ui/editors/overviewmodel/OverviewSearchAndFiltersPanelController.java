@@ -6,6 +6,7 @@ import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewSearchElementValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.StudioBundle;
@@ -100,6 +101,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       }
       ensureConfiguration().setShowFullTextSearch(newValue);
       commitHeaderChange();
+      refreshValidationError();
     });
 
     enableFilterField.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -194,16 +196,27 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
     refreshValidationError();
   }
 
-  /** {@link OverviewFilterModeRequiredValidator} keys its error off the model's raw {@code filterMode} field
+  /** Called by the owning editor whenever the Subheader panels change, since {@link
+   * OverviewSearchElementValidator}'s result also depends on whether a Search element is present there. */
+  public void refresh() {
+    refreshValidationError();
+  }
+
+  /** {@link OverviewFilterModeRequiredValidator} and {@link OverviewSearchElementValidator} both key their error
+   * off one of this panel's own fields (the model's raw {@code filterMode}/{@code showFullTextSearch} fields)
    * rather than a bound {@link de.a12.studio.models.documentmodel.Element}, so - same pattern as {@link
    * OverviewSortingPanelController}/{@link OverviewMultiSelectionPanelController} - this panel must query and
-   * display it itself. */
+   * display them itself. Filter Mode takes priority when both are present, since this panel's single error
+   * container can only show one message at a time. */
   private void refreshValidationError() {
     if (model == null) {
       return;
     }
     List<ModelValidationError> errors =
         Studio.getValidationService().validateElement(model, OverviewFilterModeRequiredValidator.ELEMENT_ID);
+    if (errors.isEmpty()) {
+      errors = Studio.getValidationService().validateElement(model, OverviewSearchElementValidator.ELEMENT_ID);
+    }
     if (errors.isEmpty()) {
       hideError();
     }

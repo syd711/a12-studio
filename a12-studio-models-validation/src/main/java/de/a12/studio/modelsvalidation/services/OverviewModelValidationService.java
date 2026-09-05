@@ -22,6 +22,7 @@ import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterSections
 import de.a12.studio.modelsvalidation.validators.overview.OverviewInitialSortingReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewMultiSelectionElementValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewPagingSizeValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewSearchElementValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewStylesValidator;
 
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public final class OverviewModelValidationService {
       new OverviewFilterSectionsValidator(),
       new OverviewFilterGroupsValidator(),
       new OverviewMultiSelectionElementValidator(),
+      new OverviewSearchElementValidator(),
       new OverviewPagingSizeValidator(),
       new OverviewInitialSortingReferenceValidator(),
       new OverviewStylesValidator()));

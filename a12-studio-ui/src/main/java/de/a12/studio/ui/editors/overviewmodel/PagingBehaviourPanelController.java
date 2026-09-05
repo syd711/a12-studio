@@ -85,9 +85,20 @@ public class PagingBehaviourPanelController extends AbstractPropertyEditor imple
       OverviewConfiguration configuration = model.getContent().getConfiguration();
       boolean infiniteScrolling = configuration != null && Boolean.TRUE.equals(configuration.getEnableInfiniteScroll());
       behaviourField.setValue(infiniteScrolling ? BEHAVIOUR_INFINITE_SCROLLING : BEHAVIOUR_PAGINATION);
-      pagingSizeField.getValueFactory().setValue(
-          configuration != null && configuration.getPagingSize() != null ? configuration.getPagingSize() : DEFAULT_PAGING_SIZE);
+      Integer pagingSize = configuration != null ? configuration.getPagingSize() : null;
+      pagingSizeField.getValueFactory().setValue(pagingSize != null ? pagingSize : DEFAULT_PAGING_SIZE);
       pagingSizeField.setDisable(infiniteScrolling);
+
+      // pagingSize is only meaningful (and only allowed to be null) for Infinite Scrolling - a paginated
+      // overview needs a concrete page size to query with. The spinner above already falls back to displaying
+      // DEFAULT_PAGING_SIZE when it's missing, but that's cosmetic only; without persisting it here, a model
+      // that never had this field explicitly set (e.g. hand-authored JSON, or an older model file predating
+      // this field) saves back out with a literal "pagingSize": null, which the Preview App's overview query
+      // can't handle.
+      if (!infiniteScrolling && pagingSize == null) {
+        ensureConfiguration().setPagingSize(DEFAULT_PAGING_SIZE);
+        commitHeaderChange();
+      }
     }
     finally {
       updatingFromModel = false;
