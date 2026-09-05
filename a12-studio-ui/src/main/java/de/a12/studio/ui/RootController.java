@@ -10,10 +10,8 @@ import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preferences.PreferencesController;
-import de.a12.studio.ui.previewapp.PreviewAppDeployer;
+import de.a12.studio.ui.previewapp.PreviewAppConsoleDockedController;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
-import de.a12.studio.ui.previewapp.PreviewAppProcess;
-import de.a12.studio.ui.previewapp.PreviewAppStatusMonitor;
 import de.a12.studio.ui.projecttree.ProjectTreeController;
 import de.a12.studio.ui.tabs.TabPaneController;
 import de.a12.studio.ui.util.StudioBundle;
@@ -21,16 +19,11 @@ import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -88,31 +81,7 @@ public class RootController implements Initializable, StudioEventListener {
   private SplitPane centerSplitPane;
 
   @FXML
-  private BorderPane consoleArea;
-
-  @FXML
-  private Button minimizeConsoleBtn;
-
-  @FXML
-  private TextArea dockedLogArea;
-
-  @FXML
-  private Button dockedDeployBtn;
-
-  @FXML
-  private ProgressIndicator dockedDeploySpinner;
-
-  @FXML
-  private Button dockedLaunchBtn;
-
-  @FXML
-  private Button dockedStopBtn;
-
-  @FXML
-  private Label dockedStateLabel;
-
-  @FXML
-  private Button undockBtn;
+  private PreviewAppConsoleDockedController consolePanelController;
 
   // ---
 
@@ -130,35 +99,12 @@ public class RootController implements Initializable, StudioEventListener {
       }
     });
 
-    // Wire docked console log area to the process.
-    PreviewAppProcess process = PreviewAppProcess.getInstance();
-    for (String line : process.getLogLines()) {
-      dockedLogArea.appendText(line + "\n");
-    }
-    process.getLogLines().addListener((ListChangeListener<String>) change -> {
-      while (change.next()) {
-        if (change.wasRemoved() && process.getLogLines().isEmpty()) {
-          dockedLogArea.clear();
-        }
-        if (change.wasAdded()) {
-          for (String line : change.getAddedSubList()) {
-            dockedLogArea.appendText(line + "\n");
-          }
-        }
-      }
-    });
-
-    updateDockedState(process.getState());
-    process.stateProperty().addListener((obs, oldState, newState) -> updateDockedState(newState));
-
-    // Docked deploy button follows the same deploy-enabled rules as the menu bar button.
-    PreviewAppStatusMonitor.getInstance().statusProperty().addListener(
-        (obs, oldStatus, newStatus) -> refreshDockedDeployButton(newStatus));
-    refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus());
+    consolePanelController.setOnMinimize(this::minimizeConsole);
+    consolePanelController.setOnUndock(this::undockConsole);
 
     // The console panel is only ever present in the SplitPane's items while docked and visible;
     // it starts out included in the FXML purely so FXMLLoader instantiates and injects it.
-    centerSplitPane.getItems().remove(consoleArea);
+    centerSplitPane.getItems().remove(consolePanelController.getRoot());
 
     // Restore the docked console panel's open/minimized state from the last session.
     if (LocalUISettings.getBoolean(LocalUISettings.CONSOLE_VISIBLE, false)) {
@@ -312,54 +258,6 @@ public class RootController implements Initializable, StudioEventListener {
     fileDropOverlay.setManaged(show);
   }
 
-  private void updateDockedState(PreviewAppProcess.State state) {
-    boolean running = state == PreviewAppProcess.State.RUNNING;
-    boolean busy = state == PreviewAppProcess.State.STARTING || state == PreviewAppProcess.State.STOPPING;
-    dockedLaunchBtn.setDisable(running || busy);
-    dockedStopBtn.setDisable(!running && !busy);
-    dockedStateLabel.setText(state.name());
-  }
-
-  private void refreshDockedDeployButton(PreviewAppStatusMonitor.Status status) {
-    dockedDeployBtn.setDisable(status != PreviewAppStatusMonitor.Status.RUNNING || PreviewAppDeployer.isDeploying());
-  }
-
-  // --- Docked toolbar actions ---
-
-  @FXML
-  private void onDockedLaunch() {
-    if (project != null) {
-      PreviewAppProcess.getInstance().start(project);
-    }
-  }
-
-  @FXML
-  private void onDockedStop() {
-    PreviewAppProcess.getInstance().stop();
-  }
-
-  @FXML
-  private void onDockedDeploy() {
-    if (project == null) return;
-    dockedDeployBtn.setDisable(true);
-    dockedDeploySpinner.setVisible(true);
-    PreviewAppDeployer.deploy(project, () -> {
-      dockedDeploySpinner.setVisible(false);
-      refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus());
-    });
-  }
-
-  @FXML
-  private void onUndockConsole() {
-    undockConsole();
-  }
-
-  @FXML
-  private void onMinimizeConsole() {
-    setConsolePanelVisible(false);
-    LocalUISettings.saveProperty(LocalUISettings.CONSOLE_VISIBLE, "false");
-  }
-
   // --- Dock / undock API ---
 
   /**
@@ -400,7 +298,13 @@ public class RootController implements Initializable, StudioEventListener {
     LocalUISettings.saveProperty(LocalUISettings.CONSOLE_VISIBLE, "true");
   }
 
+  private void minimizeConsole() {
+    setConsolePanelVisible(false);
+    LocalUISettings.saveProperty(LocalUISettings.CONSOLE_VISIBLE, "false");
+  }
+
   private void setConsolePanelVisible(boolean visible) {
+    BorderPane consoleArea = consolePanelController.getRoot();
     if (visible) {
       if (!centerSplitPane.getItems().contains(consoleArea)) {
         centerSplitPane.getItems().add(consoleArea);
@@ -431,6 +335,7 @@ public class RootController implements Initializable, StudioEventListener {
     this.mainSplitPane.setVisible(true);
     this.mainSplitPane.setManaged(true);
     this.project = event.getProject();
+    consolePanelController.setProject(project);
     double dividerPosition = project.getSettings().getUISettings().getDividerPosition();
     Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
   }
@@ -440,6 +345,7 @@ public class RootController implements Initializable, StudioEventListener {
     this.mainSplitPane.setVisible(false);
     this.mainSplitPane.setManaged(false);
     this.project = null;
+    consolePanelController.setProject(null);
   }
 
   public void setTitle(String s) {

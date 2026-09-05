@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -49,59 +42,7 @@
 
                         <!-- Docked console panel – added to the SplitPane's items only while docked and visible;
                              see RootController.setConsolePanelVisible(). -->
-                        <BorderPane fx:id="consoleArea" styleClass="console-panel" minHeight="100.0" prefHeight="220.0">
-                           <top>
-                              <ToolBar styleClass="console-toolbar" BorderPane.alignment="CENTER">
-                                 <items>
-                                    <StackPane>
-                                       <children>
-                                          <Button fx:id="dockedDeployBtn" accessibleText="%deploy_models" disable="true" mnemonicParsing="false" onAction="#onDockedDeploy" styleClass="menu-bar-button, deploy-models-button, preview-app-button">
-                                             <graphic>
-                                                <FontIcon iconLiteral="mdi2c-cloud-upload-outline" iconSize="18" styleClass="toolbar-icon" />
-                                             </graphic>
-                                             <tooltip><Tooltip text="%deploy_models" /></tooltip>
-                                          </Button>
-                                          <ProgressIndicator fx:id="dockedDeploySpinner" mouseTransparent="true" prefHeight="12.8" prefWidth="12.8" styleClass="deploy-spinner" visible="false" />
-                                       </children>
-                                    </StackPane>
-                                    <Button fx:id="dockedLaunchBtn" accessibleText="%launch_preview_app" mnemonicParsing="false" onAction="#onDockedLaunch" styleClass="menu-bar-button, launch-preview-app-button, preview-app-button">
-                                       <graphic>
-                                          <FontIcon iconLiteral="mdi2p-play" iconSize="18" styleClass="toolbar-icon" />
-                                       </graphic>
-                                       <tooltip><Tooltip text="%launch_preview_app" /></tooltip>
-                                    </Button>
-                                    <Button fx:id="dockedStopBtn" accessibleText="%stop_preview_app" disable="true" mnemonicParsing="false" onAction="#onDockedStop" styleClass="menu-bar-button, stop-preview-app-button, preview-app-button">
-                                       <graphic>
-                                          <FontIcon iconLiteral="mdi2s-stop" iconSize="18" styleClass="toolbar-icon" />
-                                       </graphic>
-                                       <tooltip><Tooltip text="%stop_preview_app" /></tooltip>
-                                    </Button>
-                                    <Label fx:id="dockedStateLabel" styleClass="console-state-label">
-                                       <HBox.margin>
-                                          <Insets left="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <!-- spacer -->
-                                    <Region HBox.hgrow="ALWAYS" />
-                                    <Button fx:id="minimizeConsoleBtn" accessibleText="%minimize_console" mnemonicParsing="false" onAction="#onMinimizeConsole" styleClass="menu-bar-button">
-                                       <graphic>
-                                          <FontIcon iconLiteral="mdi2w-window-minimize" iconSize="18" styleClass="toolbar-icon" />
-                                       </graphic>
-                                       <tooltip><Tooltip text="%minimize_console" /></tooltip>
-                                    </Button>
-                                    <Button fx:id="undockBtn" accessibleText="%undock_console" mnemonicParsing="false" onAction="#onUndockConsole" styleClass="menu-bar-button">
-                                       <graphic>
-                                          <FontIcon iconLiteral="mdi2d-dock-window" iconSize="18" styleClass="toolbar-icon" />
-                                       </graphic>
-                                       <tooltip><Tooltip text="%undock_console" /></tooltip>
-                                    </Button>
-                                 </items>
-                              </ToolBar>
-                           </top>
-                           <center>
-                              <TextArea fx:id="dockedLogArea" editable="false" wrapText="false" styleClass="console-text-area" BorderPane.alignment="CENTER" />
-                           </center>
-                        </BorderPane>
+                        <fx:include fx:id="consolePanel" source="previewapp/scene-preview-app-console-docked.fxml" />
                      </items>
                   </SplitPane>
                </center>
