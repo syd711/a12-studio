@@ -1,0 +1,48 @@
+{
+  "operator": "and",
+  "operands": [
+    {
+      "operator": "exact_match",
+      "field": "/Fields/sport",
+      "values": ["Football", "Basketball", "Tennis"],
+      "caseSensitive": false
+    },
+    {
+      "operator": "double_range",
+      "field": "/Fields/Price",
+      "from": 10.5,
+      "to": 3000.0
+    },
+    {
+      "operator": "date_range",
+      "field": "/Contract/SignedAt",
+      "from": "2020-01-01"
+    },
+    {
+      "operator": "date_range",
+      "field": "/Fields/DateRanges/FullDateRange",
+      "value": "2020-01-01",
+      "reverse": true
+    },
+    {
+      "operator": "date_range",
+      "field": "/Contract/ValidityPeriod",
+      "value": "2015-01-01/2020-12-31"
+    },
+    {
+      "operator": "datefragment_range",
+      "field": "/Fields/BirthdayMonthDay",
+      "from": "01-01",
+      "to": "06-30"
+    },
+    {
+      "operator": "simple_search",
+      "fields": ["/Fields/sport"],
+      "value": "basket"
+    },
+    {
+      "operator": "undefined_match",
+      "field": "/Fields/sport"
+    }
+  ]
+}

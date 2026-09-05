@@ -258,6 +258,72 @@ formatter (pretty-printing), and the function/operator registry (`functions.ts`'
 Java port — see the line-count breakdown above for relative sizing. None of that is wired into `QueryModelContent`
 or the editor UI yet; `filterDefinition` is still the old free-text field.
 
+**Status (2026-09-05): `Query.Operator` JSON model done.** Rather than reverse-engineer the exact wire format from
+SME's TypeScript alone, the authoritative source turned out to be the platform's own Data Services API
+documentation (`documentation/2606-06-doc/data_services-dataservices-documentation-src.md`, "Query Language"
+operator reference) plus a real fixture (`client/resources/input/models/example/models/person/Intern/
+QueryModeling/HighExperienceInterns_QeM.json` in the SME repo) — both give literal, unambiguous JSON examples for
+every operator, which is more reliable than inferring shapes from `emitter.ts`'s TS types. The result is
+`a12-studio-models/src/main/java/de/a12/studio/models/querymodel/operator/` — an `Operator` tagged union (10
+concrete subclasses: `And`/`Or`/`Not`/`ExactMatch`/`UndefinedMatch`/`DoubleRange`/`DateRange`/
+`DateFragmentRange`/`SimpleSearch`/`Has`) following the exact same `@JsonTypeInfo(use=NAME, property=..., visible=
+true)` + write-only discriminator convention as `documentmodel.FieldType`, keyed on `"operator"` instead of
+`"type"`. Notably, the model covers the **full** documented API shape (e.g. `exact_match`'s `values`/`caseSensitive`,
+`date_range`'s alternate `value`/`reverse` mode for `IDateRangeType` fields), not just the subset SME's Query
+Language grammar/emitter currently reaches — since hand-authored or kernel-produced JSON can use the whole surface,
+and the model's job is to round-trip whatever's on disk, not just what one compiler emits.
+
+One round-trip bug surfaced and was fixed the same way `overviewmodel.Column.width` was previously (see "Known
+issues" above): `double_range`'s `from`/`to` are backed by `JsonNode` (not `Double`) with `@JsonIgnore` `Double`
+convenience accessors, because real fixture data mixes plain-integer (`"from": 5`) and decimal (`"from": 5.0`)
+formatting for the same field — a `Double`-typed field coerces everything to the latter and silently rewrites the
+file on save. Four round-trip tests (`OperatorJsonRoundTripTest`) cover every operator using the real doc/fixture
+examples verbatim, including this exact `5` vs `5.0` case. `ExactMatchOperator.value` is a `JsonNode` (not
+`String`) for the same class of reason: a Number field's `==` produces a raw JSON number, not a stringified one
+(confirmed against `emitter.ts`'s `emitLiteralNode`, which only stringifies booleans, passing numbers through
+unconverted) — a `String`-typed field would have silently coerced every numeric equality into text.
+
+**Status (2026-09-05): emitter + formatter done for the full non-aggregation surface.** Added
+`QueryLanguageEmitter` (text → `Operator`) and `QueryLanguageFormatter` (`Operator` → text, combining SME's
+separate importer+formatter stages into one direct step since QL has no comments/whitespace worth preserving
+through an intermediate tree), both in `a12-studio-models/.../querymodel/ql/`. Together they cover the entire
+callable-function surface confirmed from `moduleSupport/qmm/src/internal/compiler/base/configuration.ts`'s
+`FunctionConfigMap` (the actual ground truth for what's user-typeable — most of SME's ~15 "functions" are
+internal-only synthetic dispatch tags for surface *operators* like `==`/`>=`/`and`, not things a user calls by
+name): `Has`, `Match`, `InRange` as callable identifiers, plus `Date`/`Time`/`DateTime`/`DateFragment`/`DateRange`
+as value constructors, alongside the `and`/`or`/`!`/`==`/`!=`/`>=`/`<=`/`~`/`!~` surface operators. Exact argument
+orders and formats (e.g. `Date(day, month, year)`, not `(year, month, day)`; `DateFragment`'s 1-or-2-arg
+magnitude-based format detection) were taken directly from `functions.ts`'s param resolvers, not guessed.
+
+Key design decision: **no binder/checker (no field-type resolution) was needed for correct emission.** SME's
+checker binds field paths to their Document Model type to disambiguate `double_range`/`date_range`/
+`datefragment_range` for `>=`/`<=`/`InRange` — but that disambiguation turns out to be fully determined by the
+*value's own syntax* already (a number literal vs. a `Date`/`Time`/`DateTime` call vs. a `DateFragment` call), so
+the Java emitter dispatches purely syntactically and gets the same result without needing a Document Model schema
+lookup at all. Field/function *validity* (does this field exist, is this target role real) is therefore not
+checked here — only syntactic well-formedness is; semantic validation is a separate, later concern (SME's own
+`checker.ts`/custom conditions) that would need real schema access and hasn't been ported.
+
+Two shapes the emitter can never produce have no clean QL surface syntax and are formatted with a documented,
+lossy fallback in `QueryLanguageFormatter` rather than failing: `exact_match` with a `values` list (expanded to an
+`or` of `==` comparisons) and a boolean-sourced `exact_match` value (rendered as a quoted string — indistinguishable
+from a genuine string value without field-type context). `DateRangeOperator`'s alternate `value`/`reverse` mode
+(for `IDateRangeType` fields) is formatted via `field == DateRange(from, to)`, inferred from the platform doc's
+interval-string example rather than confirmed against SME's emitter (which doesn't appear to wire this path at
+all in the code actually read) — flagged as the one part of this pass not independently verified against SME.
+
+149 tests pass in `a12-studio-models` (up from 6): `QueryLanguageGrammarTest` (12, grammar-only), 31 new emitter
+tests covering every function/operator combination against SME's own test/doc examples, and a 34-case
+`QueryLanguageFormatterRoundTripTest` proving `emit → format → emit` is lossless (structurally, not necessarily
+byte-identical text) for every construct — the actual correctness bar for an editor's save/reload cycle.
+
+**Remaining for Phase 3**: none of this is wired into `QueryModelContent` or the editor UI yet — `filterDefinition`
+is still the old single whole-query free-text field, and the tree still has no per-node constraint slot to attach
+these to (that's Phase 2, the editable graph tree, which hasn't started). Also still open: real semantic validation
+(field-exists, relationship/role-exists checks) once there's a schema to check against, and an editor UI component
+(even a plain `RichtextEditorController`-style text box wired to `QueryLanguageEmitter`/`Formatter` would work
+before any autocomplete is built).
+
 ### Proposed build order
 
 1. **Settings + validators** (small, no architecture risk): editable `targetDocumentModel`/`projectionName` panel;

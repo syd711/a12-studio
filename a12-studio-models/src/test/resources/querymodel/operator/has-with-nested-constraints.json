@@ -1,0 +1,24 @@
+{
+  "operator": "and",
+  "operands": [
+    {
+      "operator": "exact_match",
+      "field": "/BusinessPartner/Name",
+      "value": "Tomas"
+    },
+    {
+      "operator": "has",
+      "relationshipModel": "PolicyHolder",
+      "targetRole": "Contract",
+      "constraint": {
+        "operator": "exact_match",
+        "field": "/HomeInsurance/Insurer/Name",
+        "value": "ING"
+      },
+      "linkDocumentConstraint": {
+        "operator": "undefined_match",
+        "field": "/InsuranceLinkFields/TerminatedAt"
+      }
+    }
+  ]
+}

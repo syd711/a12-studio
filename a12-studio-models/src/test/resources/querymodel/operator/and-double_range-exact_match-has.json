@@ -1,0 +1,20 @@
+{
+  "operator": "and",
+  "operands": [
+    {
+      "operator": "double_range",
+      "field": "/Person/ExperienceInYears",
+      "from": 5
+    },
+    {
+      "operator": "exact_match",
+      "field": "/Person/ExperienceInYears_Proofing/ExperienceInYearssValueWasChecked",
+      "value": "true"
+    },
+    {
+      "operator": "has",
+      "relationshipModel": "PersonCompany",
+      "targetRole": "Company"
+    }
+  ]
+}

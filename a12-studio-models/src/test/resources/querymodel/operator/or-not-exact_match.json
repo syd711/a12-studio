@@ -1,0 +1,28 @@
+{
+  "operator": "and",
+  "operands": [
+    {
+      "operator": "or",
+      "operands": [
+        {
+          "operator": "exact_match",
+          "field": "/BusinessPartnerRoot/Industry",
+          "value": "Technology"
+        },
+        {
+          "operator": "exact_match",
+          "field": "/BusinessPartnerRoot/Industry",
+          "value": "Healthcare"
+        }
+      ]
+    },
+    {
+      "operator": "not",
+      "operand": {
+        "operator": "exact_match",
+        "field": "/BusinessPartnerRoot/Country",
+        "value": "Italy"
+      }
+    }
+  ]
+}
