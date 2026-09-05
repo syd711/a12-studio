@@ -1,9 +1,9 @@
 #!/bin/sh
 sleep 4
 echo "Unzipping jar..." >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1
-unzip -o '{{MAC_WRITE_PATH}}/a12-studio-ui-jar.zip' -d '{{MAC_WRITE_PATH}}_updatefolder' >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1
+unzip -o '{{MAC_WRITE_PATH}}/A12-Studio.zip' -d '{{MAC_WRITE_PATH}}_updatefolder' >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1
 echo "Removing zip..." >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1
-rm a12-studio-ui-jar.zip >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1
+rm A12-Studio.zip >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1
 echo "Closing app..." >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1
 killall A12-Studio >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1
 echo "Moving jar..." >> '{{MAC_WRITE_PATH}}Logs/a12-studio-ui.log' 2>&1

@@ -152,7 +152,7 @@ jobs:
       - name: Copy DMG for Upload
         working-directory: ./mac-build
         run: |
-          cp deploy-mac/A12-Studio-${{ steps.project.outputs.version }}.dmg A12-Studio-Client-MacOS-${{ matrix.arch }}.dmg
+          cp deploy-mac/A12-Studio-${{ steps.project.outputs.version }}.dmg A12-Studio-MacOS-${{ matrix.arch }}.dmg
 
       - name: Upload macOS Build Artifact
         uses: actions/upload-artifact@v4
@@ -160,7 +160,7 @@ jobs:
         with:
           name: macOS-build-${{ matrix.arch }}
           path: |
-            ./mac-build/A12-Studio-Client-MacOS-${{ matrix.arch }}.dmg
+            ./mac-build/A12-Studio-MacOS-${{ matrix.arch }}.dmg
 
       - name: Upload macOS JRE Artifact
         uses: actions/upload-artifact@v4
@@ -245,7 +245,7 @@ jobs:
       - name: Package Linux App Image as ZIP
         working-directory: ./linux-build
         run: |
-          zip -r A12-Studio-Client-linux-x64.zip A12-Studio/
+          zip -r A12-Studio-linux-x64.zip A12-Studio/
 
       - name: Upload Linux Build Artifact
         uses: actions/upload-artifact@v4
@@ -253,7 +253,7 @@ jobs:
         with:
           name: linux-build-x64
           path: |
-            ./linux-build/A12-Studio-Client-linux-x64.zip
+            ./linux-build/A12-Studio-linux-x64.zip
 
       - name: Collect Windows artifacts (JARs + EXE wrappers)
         run: |
@@ -270,6 +270,24 @@ jobs:
         with:
           name: windows-artifacts
           path: windows-artifacts/
+
+      - name: Create client update ZIP
+        # Consumed by Updater.downloadUpdate() for in-app self-updates on ALL platforms - the download
+        # URL/filename (Updater.UI_ZIP) has no per-OS variant, so one archive must serve all three:
+        # update-client-windows.bat unpacks both files in place, while update-client-macos.sh/
+        # update-client-linux.sh each cherry-pick only a12-studio-ui.jar and ignore the Windows exe.
+        run: |
+          mkdir -p update-zip
+          cp windows-artifacts/a12-studio-ui.jar update-zip/
+          cp windows-artifacts/A12-Studio.exe update-zip/
+          cd update-zip
+          zip -r ../A12-Studio.zip .
+
+      - name: Upload client update ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-update-zip
+          path: A12-Studio.zip
 
   ######################################################################################################################
   # Windows Packaging and Release
@@ -363,6 +381,12 @@ jobs:
           name: linux-build-x64
           path: ./Output/A12-Studio/
 
+      - name: Download client update ZIP
+        uses: actions/download-artifact@v4
+        with:
+          name: client-update-zip
+          path: ./Output/A12-Studio/
+
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -370,6 +394,7 @@ jobs:
           path: |
             ./Output/A12-Studio/A12-Studio-Full-Installer-*.exe
             ./Output/A12-Studio/A12-Studio.exe
+            ./Output/A12-Studio/A12-Studio.zip
 
       - name: Draft Release
         uses: softprops/action-gh-release@v3
@@ -381,9 +406,10 @@ jobs:
           files: |
             ./Output/A12-Studio/A12-Studio-Full-Installer-*.exe
             ./Output/A12-Studio/A12-Studio.exe
-            ./Output/A12-Studio/A12-Studio-Client-MacOS-arm64.dmg
-            ./Output/A12-Studio/A12-Studio-Client-MacOS-x64.dmg
-            ./Output/A12-Studio/A12-Studio-Client-linux-x64.zip
+            ./Output/A12-Studio/A12-Studio.zip
+            ./Output/A12-Studio/A12-Studio-MacOS-arm64.dmg
+            ./Output/A12-Studio/A12-Studio-MacOS-x64.dmg
+            ./Output/A12-Studio/A12-Studio-linux-x64.zip
             ./Output/A12-Studio/java-runtime-mac-x64.zip
             ./Output/A12-Studio/java-runtime-mac-arm64.zip
 

@@ -28,13 +28,8 @@ public class Updater {
   private final static String LATEST_RELEASE_URL = "https://github.com/syd711/a12-studio/releases/latest";
   public static String LATEST_VERSION = null;
 
-  public final static String SERVER_ZIP = "A12-Studio-Server.zip";
-  // Rough size estimate used only to render a download progress percentage; update once real release artifacts exist.
-  public final static long SERVER_ZIP_SIZE = 150 * 1000 * 1000;
-
   public final static String UI_ZIP = "A12-Studio.zip";
-  public final static String UI_JAR_ZIP = "a12-studio-ui-jar.zip";
-  public final static long UI_ZIP_SIZE = 100 * 1000 * 1000;
+  public final static long UI_ZIP_SIZE = 80 * 1000 * 1000;
 
   private final static String DOWNLOAD_SUFFIX = ".bak";
 
@@ -220,7 +215,7 @@ public class Updater {
         executor.executeCommandAsync();
       }
       else if (OSUtil.isLinux()) {
-        List<String> commands = List.of("./A12-Studio.sh");
+        List<String> commands = List.of("./bin/A12-Studio");
         SystemCommandExecutor executor = new SystemCommandExecutor(commands, false);
         executor.setDir(getWriteableBaseFolder());
         executor.executeCommandAsync();
