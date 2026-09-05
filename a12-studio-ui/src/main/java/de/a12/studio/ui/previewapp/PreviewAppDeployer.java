@@ -7,6 +7,7 @@ import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.PreviewAppSettings;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.models.util.MasterDetailModuleGenerator;
 import de.a12.studio.ui.Studio;
@@ -15,6 +16,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import tools.jackson.core.JacksonException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,6 +30,7 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -48,16 +51,15 @@ import java.util.zip.ZipOutputStream;
  * then run through {@link ModelConversionService} (WCF -&gt; RMC conversion) before zipping - see
  * {@link #buildConvertedModelsZip}.
  *
- * <p>Uses the Preview App's fixed local-only "admin"/"a12" account - the documented default
- * credentials for every Preview App user, with full deploy authorization (systemAdmin /
- * MODEL_MANAGE) - since the Preview App is a throwaway local testing tool, not a production
- * server, and SME itself relies on these same fixed credentials to deploy to it.
+ * <p>The target server URL and login credentials come from the project's {@link PreviewAppSettings}
+ * (configured in Preferences under Project Settings &gt; Preview Settings), defaulting to the Preview
+ * App's fixed local-only "admin"/"a12" account - the documented default credentials for every Preview
+ * App user, with full deploy authorization (systemAdmin / MODEL_MANAGE) - since the Preview App is a
+ * throwaway local testing tool, not a production server, and SME itself relies on these same fixed
+ * credentials to deploy to it.
  */
 @Slf4j
 public class PreviewAppDeployer {
-
-  private static final String DEPLOY_USERNAME = "admin";
-  private static final String DEPLOY_PASSWORD = "a12";
 
   private static final String LOGIN_TOKEN_HEADER = "access_token";
   private static final String AUTHORIZATION_HEADER = "Authorization";
@@ -101,12 +103,16 @@ public class PreviewAppDeployer {
         return;
       }
 
+      log.info("Deploying {} model file(s) to the Preview App server: {}", modelItems.size(),
+          modelItems.stream().map(item -> item.getFile().getName()).toList());
+
       byte[] zip = buildConvertedModelsZip(modelItems);
 
-      String apiBase = "http://localhost:" + PreviewAppInstallation.SERVER_PORT + "/api";
+      PreviewAppSettings previewAppSettings = project.getSettings().getProjectRootSettings().getPreviewApp();
+      String apiBase = previewAppSettings.getUrl();
       HttpClient httpClient = HttpClient.newBuilder().connectTimeout(REQUEST_TIMEOUT).build();
 
-      String token = login(httpClient, apiBase);
+      String token = login(httpClient, apiBase, previewAppSettings.getUsername(), previewAppSettings.getPassword());
       uploadModels(httpClient, apiBase, token, zip);
     }
     catch (Exception e) {
@@ -242,8 +248,27 @@ public class PreviewAppDeployer {
             "Application Model references unknown Master-Detail Module Model \"" + id + "\"."));
   }
 
-  private static String login(HttpClient httpClient, String apiBase) throws IOException, InterruptedException {
-    String body = "{\"username\":\"" + DEPLOY_USERNAME + "\",\"password\":\"" + DEPLOY_PASSWORD + "\"}";
+  /**
+   * Verifies that {@code apiBase} is reachable and {@code username}/{@code password} are accepted, for the
+   * Preview Settings panel's "Test" button. Throws on failure; the caller is responsible for reporting it.
+   */
+  public static void testConnection(String apiBase, String username, String password)
+      throws IOException, InterruptedException {
+    HttpClient httpClient = HttpClient.newBuilder().connectTimeout(REQUEST_TIMEOUT).build();
+    login(httpClient, apiBase, username, password);
+  }
+
+  private static String login(HttpClient httpClient, String apiBase, String username, String password)
+      throws IOException, InterruptedException {
+    Map<String, String> credentials = Map.of("username", username, "password", password);
+    String body;
+    try {
+      body = JsonSettings.objectMapper.writeValueAsString(credentials);
+    }
+    catch (JacksonException e) {
+      throw new IOException("Failed to encode login credentials: " + e.getMessage(), e);
+    }
+
     HttpRequest request = HttpRequest.newBuilder()
         .uri(URI.create(apiBase + "/user/local/login"))
         .timeout(REQUEST_TIMEOUT)

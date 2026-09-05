@@ -46,8 +46,12 @@ public final class ModelConversionService {
   // subprocess/classpath/error-handling logic here can be verified without the real vendor jars.
   static File convert(File javaExecutable, File wcfCliDir, File sourceModelsDir, File outputDir, String mainClass,
       Consumer<String> logSink) throws IOException, PreviewAppException {
+    log.info("Starting model conversion (WcfCli): source=\"{}\", output=\"{}\", wcfCliDir=\"{}\"",
+        sourceModelsDir.getAbsolutePath(), outputDir.getAbsolutePath(), wcfCliDir.getAbsolutePath());
+
     File conversionJar = findConversionJar(wcfCliDir);
     String classpath = buildClasspath(wcfCliDir);
+    log.debug("Using conversion jar \"{}\" with classpath: {}", conversionJar.getAbsolutePath(), classpath);
 
     ProcessBuilder processBuilder = new ProcessBuilder(
         javaExecutable.getAbsolutePath(),
@@ -65,12 +69,14 @@ public final class ModelConversionService {
       String line;
       while ((line = reader.readLine()) != null) {
         output.add(line);
+        log.debug("[WcfCli] {}", line);
         logSink.accept(line);
       }
     }
 
     int exitCode = waitFor(process);
     if (exitCode != 0) {
+      log.warn("Model conversion (WcfCli) failed with exit code {}", exitCode);
       throw new PreviewAppException("Model conversion (WcfCli) failed with exit code " + exitCode + ":\n"
           + String.join("\n", tail(output, 20)));
     }
@@ -81,6 +87,8 @@ public final class ModelConversionService {
           "Model conversion (WcfCli) reported success but produced no \"" + convertedModelsDir.getAbsolutePath()
               + "\" directory.");
     }
+    log.info("Model conversion (WcfCli) succeeded, converted models available at \"{}\"",
+        convertedModelsDir.getAbsolutePath());
     return convertedModelsDir;
   }
 

@@ -1,7 +1,9 @@
 package de.a12.studio.ui.preview;
 
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.models.projects.settings.PreviewSettings;
+import de.a12.studio.models.projects.settings.PreviewAppSettings;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.browsers.Browser;
 import org.jspecify.annotations.NonNull;
@@ -19,10 +21,17 @@ public class PreviewLauncher {
 
   /**
    * Used by the Application Model editor's Preview button: opens the preview URL in the browser configured via
-   * {@link PreviewSettings.BrowserType}.
+   * {@link PreviewAppSettings.BrowserType}.
    */
   public static void openPreview(@NonNull ProjectItem projectItem) {
-    openPreview(projectItem, url -> SystemUtil.openUrl(url, PreviewSettings.load().getBrowserType()));
+    openPreview(projectItem, url -> SystemUtil.openUrl(url, getPreviewAppSettings().getBrowserType()));
+  }
+
+  private static PreviewAppSettings getPreviewAppSettings() {
+    Project project = Studio.getCurrentProject();
+    return project != null
+        ? project.getSettings().getProjectRootSettings().getPreviewApp()
+        : new PreviewAppSettings();
   }
 
   /**

@@ -8,9 +8,11 @@ import de.a12.studio.dataservices.preview.PreviewApplicationDto;
 import de.a12.studio.dataservices.preview.PreviewSceneDto;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.models.projects.settings.PreviewSettings;
+import de.a12.studio.models.projects.settings.PreviewAppSettings;
 import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.ui.Studio;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -28,7 +30,7 @@ import java.util.regex.Pattern;
  * Embedded HTTP server backing the Application Model and Form Model wireframe previews: one shared static
  * HTML/JS shell ({@code preview.html} - it renders whichever of the two generic shapes its data response
  * carries, see the file's {@code render()}) polls a JSON data endpoint on {@link
- * PreviewSettings#getAutoRefreshDelayMillis()}, reading straight from the live in-memory {@link
+ * PreviewAppSettings#getAutoRefreshDelayMillis()}, reading straight from the live in-memory {@link
  * ApplicationModel}/{@link FormModel} held by the editor's {@link ProjectItem} (edits made via property
  * editors are already reflected there, so no explicit change notification is needed - see {@code
  * PreviewLauncher}).
@@ -131,7 +133,10 @@ public class PreviewServer {
       return;
     }
 
-    PreviewSettings settings = PreviewSettings.load();
+    Project project = Studio.getCurrentProject();
+    PreviewAppSettings settings = project != null
+        ? project.getSettings().getProjectRootSettings().getPreviewApp()
+        : new PreviewAppSettings();
     String html = shellTemplate
         .replace("__MODEL_ID__", modelId)
         .replace("__AUTO_REFRESH_ENABLED__", String.valueOf(settings.isAutoRefreshEnabled()))

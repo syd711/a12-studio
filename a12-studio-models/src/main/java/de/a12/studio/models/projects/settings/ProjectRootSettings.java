@@ -13,7 +13,7 @@ import java.io.File;
  * {
  *   "version": "1.0.0",
  *   "general": { ... },
- *   "previewApp": {}
+ *   "previewApp": { "url": "http://localhost:8082/api", "username": "admin", "password": "a12", ... }
  * }
  * </pre>
  *
@@ -27,8 +27,7 @@ public class ProjectRootSettings extends JsonSettings {
 
   private GeneralSettings general = new GeneralSettings();
 
-  // Retained as a raw Object so unknown future keys survive a round-trip without data loss.
-  private Object previewApp = new Object();
+  private PreviewAppSettings previewApp = new PreviewAppSettings();
 
   @Override
   public String getSettingsName() {
@@ -56,11 +55,11 @@ public class ProjectRootSettings extends JsonSettings {
     this.general = general;
   }
 
-  public Object getPreviewApp() {
+  public PreviewAppSettings getPreviewApp() {
     return previewApp;
   }
 
-  public void setPreviewApp(Object previewApp) {
+  public void setPreviewApp(PreviewAppSettings previewApp) {
     this.previewApp = previewApp;
   }
 

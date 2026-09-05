@@ -34,7 +34,6 @@
                                                 <Button fx:id="appGeneralSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAppGeneralSettings" styleClass="preference-button" text="%general" />
                                                 <Button fx:id="modelVersionBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onModelVersion" styleClass="preference-button" text="%model_version" />
                                                 <Button fx:id="a12InstallationBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onA12Installation" styleClass="preference-button" text="%a12_installation" />
-                                                <Button fx:id="previewSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPreviewSettings" styleClass="preference-button" text="%preview_settings" />
                                                 <Button fx:id="shortcutsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onShortcuts" styleClass="preference-button" text="%shortcuts" />
                                                 <Button fx:id="pluginsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPlugins" styleClass="preference-button" text="%plugins" />
                                        </children>
@@ -58,6 +57,7 @@
                                                 <Button fx:id="annotationSetsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onAnnotationSets" styleClass="preference-button" text="%annotation_sets" />
                                                 <Button fx:id="deploymentExclusionsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onDeploymentExclusions" styleClass="preference-button" text="%deployment_exclusions" />
                                                 <Button fx:id="validationSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onValidationSettings" styleClass="preference-button" text="%validation_settings" />
+                                                <Button fx:id="previewSettingsBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" onAction="#onPreviewSettings" styleClass="preference-button" text="%preview_settings" />
                                        </children>
                                     </VBox>
                                  </children>

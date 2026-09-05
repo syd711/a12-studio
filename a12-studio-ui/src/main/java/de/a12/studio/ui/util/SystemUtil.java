@@ -1,7 +1,7 @@
 package de.a12.studio.ui.util;
 
 
-import de.a12.studio.models.projects.settings.PreviewSettings;
+import de.a12.studio.models.projects.settings.PreviewAppSettings;
 import de.a12.studio.ui.Studio;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -223,8 +223,8 @@ public class SystemUtil {
    * @param url The URL to open.
    * @param browserType Which browser to launch the URL in.
    */
-  public static void openUrl(String url, PreviewSettings.BrowserType browserType) {
-    if (browserType == PreviewSettings.BrowserType.SYSTEM_DEFAULT) {
+  public static void openUrl(String url, PreviewAppSettings.BrowserType browserType) {
+    if (browserType == PreviewAppSettings.BrowserType.SYSTEM_DEFAULT) {
       openUrl(url);
       return;
     }
@@ -248,8 +248,8 @@ public class SystemUtil {
    * Firefox's {@code -new-window}) so the preview opens as its own window rather than a new tab of whatever
    * window is already frontmost - matching {@link de.a12.studio.ui.util.browsers.Browser#openUrl}.
    */
-  private static List<String> browserCommand(PreviewSettings.BrowserType browserType, String url) {
-    String newWindowFlag = browserType == PreviewSettings.BrowserType.FIREFOX ? "-new-window" : "--new-window";
+  private static List<String> browserCommand(PreviewAppSettings.BrowserType browserType, String url) {
+    String newWindowFlag = browserType == PreviewAppSettings.BrowserType.FIREFOX ? "-new-window" : "--new-window";
 
     if (isWindows()) {
       String executable = switch (browserType) {
