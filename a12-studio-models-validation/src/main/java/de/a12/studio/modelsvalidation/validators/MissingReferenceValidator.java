@@ -59,7 +59,7 @@ public final class MissingReferenceValidator implements ModelValidator {
       } else if (element instanceof ComputationElement computation) {
         if (hasMissingComputedField(computation, index)) {
           String path = index.getPath(computation);
-          result.add(error(model, computation.getId(), ElementProperty.GENERAL,
+          result.add(error(model, computation.getId(), ElementProperty.COMPUTATION_PROPERTIES,
               ValidationMessages.get("validation.missingReference.missingComputedField", path)));
         }
       } else if (element instanceof FieldElement field) {

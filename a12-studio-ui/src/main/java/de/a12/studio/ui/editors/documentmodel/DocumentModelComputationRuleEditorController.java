@@ -19,6 +19,15 @@ public class DocumentModelComputationRuleEditorController implements ElementEdit
   private GeneralInformationPanelController generalInformationController;
 
   @FXML
+  private TargetFieldPanelController computedFieldController;
+
+  @FXML
+  private ComputationAlternativesPanelController computationAlternativesController;
+
+  @FXML
+  private LocalizedTextPanelController errorMessageController;
+
+  @FXML
   private LocalizedTextPanelController descriptionInternalController;
 
   @FXML
@@ -31,11 +40,13 @@ public class DocumentModelComputationRuleEditorController implements ElementEdit
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    computedFieldController.configureComputedField();
+    errorMessageController.configureComputationErrorMessage();
     descriptionInternalController.configureInternal();
     descriptionExternalController.configureExternal();
 
-    propertyEditors = List.of(generalInformationController, descriptionInternalController,
-        descriptionExternalController, annotationsController);
+    propertyEditors = List.of(generalInformationController, computedFieldController, computationAlternativesController,
+        errorMessageController, descriptionInternalController, descriptionExternalController, annotationsController);
   }
 
   @Override

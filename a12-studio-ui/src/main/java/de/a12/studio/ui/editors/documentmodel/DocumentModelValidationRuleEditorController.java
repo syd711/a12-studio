@@ -1,10 +1,13 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
@@ -19,6 +22,18 @@ public class DocumentModelValidationRuleEditorController implements ElementEdito
   private GeneralInformationPanelController generalInformationController;
 
   @FXML
+  private RulePropertiesPanelController rulePropertiesController;
+
+  @FXML
+  private TargetFieldPanelController errorEntityController;
+
+  @FXML
+  private RichtextEditorController errorConditionController;
+
+  @FXML
+  private LocalizedTextPanelController errorMessageController;
+
+  @FXML
   private LocalizedTextPanelController descriptionInternalController;
 
   @FXML
@@ -31,16 +46,22 @@ public class DocumentModelValidationRuleEditorController implements ElementEdito
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    errorEntityController.configureRuleErrorEntity();
+    errorConditionController.configureCustom("errorCondition", StudioBundle.get("error_condition"));
+    errorMessageController.configureRuleErrorMessage();
     descriptionInternalController.configureInternal();
     descriptionExternalController.configureExternal();
 
-    propertyEditors = List.of(generalInformationController, descriptionInternalController,
+    propertyEditors = List.of(generalInformationController, rulePropertiesController, errorEntityController,
+        errorConditionController, errorMessageController, descriptionInternalController,
         descriptionExternalController, annotationsController);
   }
 
   @Override
   public void setElement(@NonNull Element element, @NonNull List<Element> ancestors) {
     generalInformationController.setAncestors(ancestors);
+    RuleElement rule = (RuleElement) element;
+    errorConditionController.setCustom(() -> rule.getRule().getErrorCondition(), value -> rule.getRule().setErrorCondition(value));
     boolean readOnly = isWithinAttachment(ancestors) || isWithinInclude(ancestors);
     propertyEditors.forEach(propertyEditor -> {
       propertyEditor.setElement(element);

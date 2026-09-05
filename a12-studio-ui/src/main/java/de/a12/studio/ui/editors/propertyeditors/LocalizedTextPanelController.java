@@ -5,8 +5,10 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.models.Label;
 import de.a12.studio.models.applicationmodel.Case;
 import de.a12.studio.models.applicationmodel.Module;
+import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.StringTypeOptions;
 import de.a12.studio.models.formmodel.Defaults;
@@ -118,6 +120,16 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   public void configureErrorMessages() {
     configure(LocalizedTextPanelController::getErrorMessages, LocalizedTextPanelController::getOrCreateErrorMessages,
         FIELD_KEY_ERROR_MESSAGES, StudioBundle.get("error_messages"));
+  }
+
+  /** Edits a {@link RuleElement}'s {@code Rule.errorMessage}. */
+  public void configureRuleErrorMessage() {
+    configure(el -> ((RuleElement) el).getRule().getErrorMessage(), "ruleErrorMessage", StudioBundle.get("error_messages"));
+  }
+
+  /** Edits a {@link ComputationElement}'s {@code Computation.errorMessage}. */
+  public void configureComputationErrorMessage() {
+    configure(el -> ((ComputationElement) el).getComputation().getErrorMessage(), "computationErrorMessage", StudioBundle.get("error_messages"));
   }
 
   public void configureExternal() {

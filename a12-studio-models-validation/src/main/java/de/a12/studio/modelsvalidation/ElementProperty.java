@@ -26,6 +26,12 @@ public final class ElementProperty {
   /** An Include group's referenced document model. */
   public static final String INCLUDE_REFERENCE = "includeReference";
 
+  /** A validation Rule's error entity/condition/code/severity. */
+  public static final String RULE_PROPERTIES = "ruleProperties";
+
+  /** A Computation's computed field and alternatives (precondition/operation). */
+  public static final String COMPUTATION_PROPERTIES = "computationProperties";
+
   private ElementProperty() {
   }
 }

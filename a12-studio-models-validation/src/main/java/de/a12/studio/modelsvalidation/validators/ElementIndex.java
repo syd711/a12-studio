@@ -248,6 +248,29 @@ public class ElementIndex {
     return resolveByNamePath(new ArrayList<>(path));
   }
 
+  /**
+   * The inverse of {@link #resolveRelativePath}: the relative-path string that, passed to that method with
+   * {@code from} as the referencing element, resolves back to {@code to} - e.g. {@code "../fieldName"} for a
+   * Rule/Computation reaching a sibling field. Used by the UI's target-element picker (Rule's
+   * errorEntityRelPath / Computation's computedFieldRelPath) to turn a user's tree selection into the stored
+   * relative-path string. Both elements must belong to this index's own model (not resolved through an
+   * Include).
+   */
+  public String relativePathTo(Element from, Element to) {
+    List<String> fromPath = ancestorNamesIncludingSelf(from);
+    List<String> toPath = ancestorNamesIncludingSelf(to);
+    int common = 0;
+    while (common < fromPath.size() && common < toPath.size() && fromPath.get(common).equals(toPath.get(common))) {
+      common++;
+    }
+    StringBuilder result = new StringBuilder();
+    for (int i = common; i < fromPath.size(); i++) {
+      result.append("../");
+    }
+    result.append(String.join("/", toPath.subList(common, toPath.size())));
+    return result.toString();
+  }
+
   private Optional<Element> resolveByNamePath(List<String> names) {
     if (names.isEmpty()) {
       return Optional.empty();

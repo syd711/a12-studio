@@ -20,8 +20,6 @@ public class GroupConfig {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String usageType;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String modelAlias;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String indexFieldName;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private IncludeConfig includeConfig;

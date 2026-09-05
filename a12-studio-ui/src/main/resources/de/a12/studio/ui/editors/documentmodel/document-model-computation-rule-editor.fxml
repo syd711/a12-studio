@@ -17,6 +17,15 @@
             <!-- General Information -->
             <fx:include fx:id="generalInformation" source="../propertyeditors/general-information-panel.fxml"/>
 
+            <!-- Computed Field (target field) -->
+            <fx:include fx:id="computedField" source="target-field-panel.fxml"/>
+
+            <!-- Computation Alternatives -->
+            <fx:include fx:id="computationAlternatives" source="computation-alternatives-panel.fxml"/>
+
+            <!-- Error Message -->
+            <fx:include fx:id="errorMessage" source="../propertyeditors/localized-text-panel.fxml"/>
+
             <!-- Description (Internal) -->
             <fx:include fx:id="descriptionInternal" source="../propertyeditors/localized-text-panel.fxml"/>
 

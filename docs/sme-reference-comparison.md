@@ -51,17 +51,27 @@ data model in `a12-studio-data-services/.../models/documentmodel/`).
 a12-studio's data classes (`GroupConfig`, `FieldElement`, `RuleElement`, `ComputationElement`, and all field-type
 classes: String/Number/Enumeration/Boolean/Confirm/Date/DateTime/Time/DateRange/DateFragment/Custom/TypeDef) mirror
 SME's schema (`commonDocumentModel/api/document/serializedDocumentModel.ts`) closely, including `usageType` on
-`GroupConfig` for attachment/multi-select groups and `modelAlias` for includes.
+`GroupConfig` for attachment/multi-select groups and `includeConfig` for includes (see the correction below —
+`modelAlias` is the *older*, superseded shape of this, not what a12-studio actually implements).
 
-SME's shape, for reference:
+SME's shape, for reference (note: SME's own `modelAlias?` shown below is itself the pre-kernel-A12K-4102 shape;
+current kernel versions use `includeConfig` instead, matching what a12-studio implements — see correction below):
 
 ```
 Model { header, content: { modelInfo, modelConfig, typeDefinitions?, modelRoot: { rootGroups: Group[] } } }
 Element = Group | Field | Rule | Computation   (discriminated by `type`)
 ```
 
-- **Group**: `elements?`, `repeatability`, `indexFieldName?`, `modelAlias?` (Include), `includeLevel`,
-  `excludeRules?`/`excludeComputations?`. Special `usageType` variants: `attachment` (fixed field set:
+**Correction (2026-09-05):** a12-studio previously also had a `GroupConfig.modelAlias` field alongside
+`includeConfig`, described here as "for includes" — that was wrong. Kernel changelog A12K-4102
+(`documentation/2606-06-doc/kernel-kernel-documentation-dev.md:2208-2215`) confirms a group's `modelAlias` was
+replaced by `includeConfig` (reference/excludeRules/excludeComputations/includeLevel all moved under it) in kernel
+DM version 28.6.0→29.0.0, with automatic migration; `modelAlias` is now ignored by the kernel entirely.
+`includeConfig` — which a12-studio already correctly implements — is the actual, current mechanism; the dead
+`GroupConfig.modelAlias` field has been removed.
+
+- **Group**: `elements?`, `repeatability`, `indexFieldName?`, `includeConfig?` (Include: reference,
+  `excludeRules?`/`excludeComputations?`, `includeLevel`). Special `usageType` variants: `attachment` (fixed field set:
   `original_filename`, `internal_filename`, `content`, `attachment_id`, `size`, `mime_type`, `category`,
   `description`, plus auto-created mutual-exclusivity rules), `multi-select` (repeatability forced to 999999,
   single `value` enum child).
@@ -78,7 +88,16 @@ Element = Group | Field | Rule | Computation   (discriminated by `type`)
 
 a12-studio's current editor: tree/detail split view (`DocumentModelElementsTreeController`), group vs. field
 detail editors, undo/redo via a `CommandStack`, search, `DeleteNodeCommand`, Settings + Type-Definitions dialogs.
-Condition validation/formatting already calls the same kernel APIs as SME.
+
+**Correction (2026-09-05):** this section previously claimed condition validation/formatting "already calls the
+same kernel APIs as SME" via Java `ValidationRuleService`/`ComputationRuleService` equivalents. Confirmed false
+by grep — no such services, no kernel dependency anywhere in `a12-studio-data-services`/`a12-studio-models`. The
+"Backend / kernel capability map" table below has the same correction applied to its "Condition/expression
+language validation & formatting" row. Practical effect: Rule/Computation condition text (`errorCondition`,
+`precondition`, `operation`) is edited as plain text with no semantic validation, the same way
+`QueryModelContent.filterDefinition` and `overviewmodel.Column.expression` already work via
+`RichtextEditorController` — not blocked on porting a condition-language grammar, but also not actually checked
+for validity beyond "non-blank".
 
 Missing or worth checking against SME (`commonDocumentModel/api/editor/*`):
 
@@ -116,25 +135,32 @@ and reference autocomplete for `Reference_1`-annotated fields.
 Comparing that generated surface field-by-field against a12-studio's hand-built panels surfaces gaps well below
 the granularity of the feature table above:
 
-**1. Rule and Computation elements are structurally creatable but functionally uneditable — the single biggest
-gap.** `document-model-validation-rule-editor.fxml`/`document-model-computation-rule-editor.fxml` only wire up the
-generic General Information/Description/Annotations panels. None of `RuleConfig`'s `errorEntityRelPath`,
-`errorCode`, `errorCondition`, `severity`, `errorMessage`, or `ComputationConfig`'s `computedFieldRelPath`,
-`computationAlternatives[]` (each with `precondition`/`operation`), `errorMessage` have any bound UI control. A
-user-created Rule gets only an auto-generated `errorCode` (`DocumentModelElementFactory.newRuleElement`) and is
-otherwise permanently empty. `BasicConsistencyValidator` correctly flags the missing fields as errors forever, but
-there is no UI path to ever fix them — Rule/Computation authoring is currently a dead end in the editor. SME's
-equivalent (`DomainRule.json`/`DomainComputation.json`) validates `errorCondition`/`precondition`/`operation` text
-via the same kernel condition-language check a12-studio already calls elsewhere (`ValidationRuleService`/
-`ComputationRuleService` per the top of this doc), so the condition-editing widget itself doesn't need to be
-invented from scratch — it needs to be wired into these two element editors.
+**1. DONE (2026-09-05).** Rule and Computation elements were structurally creatable but functionally uneditable —
+the single biggest gap found. `document-model-validation-rule-editor.fxml`/`document-model-computation-rule-editor.fxml`
+only wired up the generic General Information/Description/Annotations panels; none of `RuleConfig`'s
+`errorEntityRelPath`, `errorCode`, `errorCondition`, `severity`, `errorMessage`, or `ComputationConfig`'s
+`computedFieldRelPath`, `computationAlternatives[]` (each with `precondition`/`operation`), `errorMessage` had any
+bound UI control, so `BasicConsistencyValidator` correctly flagged the missing fields as errors forever with no UI
+path to ever fix them. Fixed: new `RulePropertiesPanelController` (errorCode read-only + severity),
+`TargetFieldPanelController` (a new shared "pick a field anywhere in the model" combo, computing the
+kernel's relative-path string via the new `ElementIndex.relativePathTo`, reused for both `errorEntityRelPath` and
+`computedFieldRelPath`), `ComputationAlternativesPanelController` (repeatable precondition/operation rows,
+following `AnnotationsPanelController`'s plain-Java dynamic-row pattern), and two new
+`LocalizedTextPanelController.configureRuleErrorMessage()`/`configureComputationErrorMessage()` methods for the
+per-language error text. `errorCondition`/`precondition`/`operation` are plain-text `RichtextEditorController`
+panels with no semantic validator (see the "Editor features" correction above — there's no condition-language
+backend to validate against). Two new `ElementProperty` tags (`RULE_PROPERTIES`/`COMPUTATION_PROPERTIES`) replace
+the previous `GENERAL` tag on these checks in `BasicConsistencyValidator`/`MissingReferenceValidator`, so their
+errors surface on the new panels instead of colliding with `GeneralInformationPanelController`'s own `GENERAL` tag.
 
-**2. Several field types have no data-type configuration panel at all.** `DataTypeConfigurationPanelController`
+**2. Still open. Several field types have no data-type configuration panel at all.** `DataTypeConfigurationPanelController`
 only branches on String/Number/DateFragment/DateRange/Custom/Enumeration
-(`DataTypeConfigurationPanelController.java:154-171`) — **Date, DateTime, Time, Confirm, and Unspecified field
+(`DataTypeConfigurationPanelController.java:154-171`) — **Date, DateTime, Time, and Confirm field
 types have zero option panels**. `Date`/`DateTime`/`Time`'s `format` (required per SME's `FORMAT_MISSING` rule)
 can't be set from the UI at all. `Confirm`'s `trueValue`/`falseValue` (SME: `TRUE_FALSE_EQUALS`/`TRUE_FALSE_INVALID`)
-likewise has no panel. `Unspecified` isn't even in the selectable `DATA_TYPES` list.
+likewise has no panel. (`Unspecified` is deliberately excluded from this list — see the plan file's Phase 3 note:
+kernel changelog A12K-3981 removed `IUnspecifiedType` entirely, auto-migrating existing fields to `String`, so no
+panel should be built for it.)
 
 **3. Several documented option fields exist on the data model but are unreachable from any panel**:
 `StringTypeOptions.noValueValidation` (only ever set programmatically for the attachment `content` field),
@@ -154,12 +180,10 @@ list when checked; unchecking it exposes no text field to type a replacement int
 field, which *is* editable) are entirely unexposed; grep confirms zero references to `ModelInfo`/`getModelInfo`
 anywhere in `a12-studio-ui`.
 
-**6. `GroupConfig.modelAlias` is a dead field** — no reader or writer anywhere in `a12-studio-ui` or
-`a12-studio-models`/validation. Includes are implemented via a separate `includeConfig` field instead. Needs a
-decision: either this is legacy/mis-modeled and should be removed, or it was intended to mirror SME's
-`modelAlias`-on-Group Include shape and `includeConfig` is the actual (differently-named) implementation of the
-same concept — worth a quick check before touching it either way, since CLAUDE.md's convention is to delete
-confirmed-dead code rather than leave it.
+**6. DONE (2026-09-05).** `GroupConfig.modelAlias` was a dead field — no reader or writer anywhere in
+`a12-studio-ui` or `a12-studio-models`/validation. Confirmed obsolete via kernel changelog A12K-4102 (see the
+correction in the "Data model" section above) rather than a mis-named `includeConfig` duplicate, so it was
+deleted outright rather than wired up.
 
 **Existing document-model validators** (`a12-studio-models-validation`, wired via `DocumentModelValidationService`,
 all run together on tree rebuild/save): `SchemaVersionValidator`, `DuplicateIdValidator`,
@@ -520,7 +544,7 @@ on its own:
 |---|---|---|
 | Rule contradiction / consistency (constraint solver) | `RuleContradictionCheckService` → `com.mgmtp.a12.tdg.lib.TestDataGenerator.checkModel(...)` | **Missing** — no `tdg` dependency |
 | Document model structural/consistency validation | `DMValidationService` (kernel `getElementProblems` + custom checks) | Partially present (`ValidationRuleService`, `ComputationRuleService` call the same kernel APIs) |
-| Condition/expression language validation & formatting | `ValidationRuleService`, `ComputationRuleService` (Kotlin) | Present — `documentmodel/validationrule`, `documentmodel/computationrule` (Java), same kernel calls |
+| Condition/expression language validation & formatting | `ValidationRuleService`, `ComputationRuleService` (Kotlin) | **Missing** (corrected 2026-09-05 — previously claimed present; no such Java services exist, no kernel dependency in this repo). `RuleConfig.errorCondition`/`ComputationAlternative.precondition`/`operation` are edited as plain text with no semantic validation — see the Document Model "Editor features" correction above |
 | Print rendering (PDF) | `PrintService` — PDFBox or legacy engine via `a12.print.engine.runtime` | Scaffolding present (`PrintService.java`, `DocumentModelResolver.java`, print-engine deps) but editor missing |
 | Document model expansion (includes/imports) | `ExpansionService` | Not yet confirmed — check `documentmodel/features` |
 | Combination Model expansion | `CombinationModelExpansionService` | Present — `services/combinationmodel/` |

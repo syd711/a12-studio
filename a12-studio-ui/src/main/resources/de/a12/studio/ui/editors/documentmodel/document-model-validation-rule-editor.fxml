@@ -17,6 +17,18 @@
             <!-- General Information -->
             <fx:include fx:id="generalInformation" source="../propertyeditors/general-information-panel.fxml"/>
 
+            <!-- Rule Properties (error code, severity) -->
+            <fx:include fx:id="ruleProperties" source="rule-properties-panel.fxml"/>
+
+            <!-- Error Entity (target field) -->
+            <fx:include fx:id="errorEntity" source="target-field-panel.fxml"/>
+
+            <!-- Error Condition -->
+            <fx:include fx:id="errorCondition" source="../propertyeditors/richtext-editor.fxml"/>
+
+            <!-- Error Message -->
+            <fx:include fx:id="errorMessage" source="../propertyeditors/localized-text-panel.fxml"/>
+
             <!-- Description (Internal) -->
             <fx:include fx:id="descriptionInternal" source="../propertyeditors/localized-text-panel.fxml"/>
 

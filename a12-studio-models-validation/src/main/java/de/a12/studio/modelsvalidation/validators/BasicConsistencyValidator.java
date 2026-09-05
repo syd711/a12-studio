@@ -95,15 +95,15 @@ public final class BasicConsistencyValidator implements ModelValidator {
   private static void checkRule(A12Model<?> model, RuleElement rule, List<ModelValidationError> errors) {
     var ruleConfig = rule.getRule();
     if (isBlank(ruleConfig.getErrorCode())) {
-      errors.add(error(model, rule.getId(), ElementProperty.GENERAL,
+      errors.add(error(model, rule.getId(), ElementProperty.RULE_PROPERTIES,
           ValidationMessages.get("validation.basicConsistency.emptyRuleErrorCode", rule.getId())));
     }
     if (isBlank(ruleConfig.getErrorCondition())) {
-      errors.add(error(model, rule.getId(), ElementProperty.GENERAL,
+      errors.add(error(model, rule.getId(), ElementProperty.RULE_PROPERTIES,
           ValidationMessages.get("validation.basicConsistency.emptyRuleErrorCondition", rule.getId())));
     }
     if (isBlank(ruleConfig.getErrorEntityRelPath())) {
-      errors.add(error(model, rule.getId(), ElementProperty.GENERAL,
+      errors.add(error(model, rule.getId(), ElementProperty.RULE_PROPERTIES,
           ValidationMessages.get("validation.basicConsistency.invalidRuleErrorEntity", rule.getId())));
     }
   }
@@ -111,12 +111,12 @@ public final class BasicConsistencyValidator implements ModelValidator {
   private static void checkComputation(A12Model<?> model, ComputationElement computation, List<ModelValidationError> errors) {
     var computationConfig = computation.getComputation();
     if (isBlank(computationConfig.getComputedFieldRelPath())) {
-      errors.add(error(model, computation.getId(), ElementProperty.GENERAL,
+      errors.add(error(model, computation.getId(), ElementProperty.COMPUTATION_PROPERTIES,
           ValidationMessages.get("validation.basicConsistency.invalidComputedField", computation.getId())));
     }
     if (computationConfig.getComputationAlternatives() != null
         && computationConfig.getComputationAlternatives().stream().anyMatch(a -> isBlank(a.getOperation()))) {
-      errors.add(error(model, computation.getId(), ElementProperty.GENERAL,
+      errors.add(error(model, computation.getId(), ElementProperty.COMPUTATION_PROPERTIES,
           ValidationMessages.get("validation.basicConsistency.emptyComputationOperation", computation.getId())));
     }
   }
