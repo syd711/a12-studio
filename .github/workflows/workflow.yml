@@ -207,7 +207,8 @@ jobs:
         run: |
           OUTPUT=$(./gradlew :a12-studio-ui:shadowJar :a12-studio-ui:createExe \
                              :a12-studio-ui:stageWcfCli \
-                             :a12-studio-server:bootJar :a12-studio-server:createExe 2>&1) || {
+                             :a12-studio-server:bootJar :a12-studio-server:createExe \
+                             buildPluginJars 2>&1) || {
             echo "::error::$OUTPUT"
             exit 1
           }
@@ -270,6 +271,15 @@ jobs:
         with:
           name: windows-artifacts
           path: windows-artifacts/
+
+      - name: Upload plugin JARs
+        # Consumed by the in-app plugin marketplace (marketplace.json's downloadUrl points at
+        # <repo>/releases/latest/download/<module>.jar for each plugin) - without these attached
+        # to the release, installing/updating a plugin 404s.
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-jars
+          path: plugins/
 
       - name: Create client update ZIP
         # Consumed by Updater.downloadUpdate() for in-app self-updates on ALL platforms - the download
@@ -387,6 +397,12 @@ jobs:
           name: client-update-zip
           path: ./Output/A12-Studio/
 
+      - name: Download plugin JARs
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-jars
+          path: ./Output/A12-Studio/plugins/
+
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -395,6 +411,7 @@ jobs:
             ./Output/A12-Studio/A12-Studio-Full-Installer-*.exe
             ./Output/A12-Studio/A12-Studio.exe
             ./Output/A12-Studio/A12-Studio.zip
+            ./Output/A12-Studio/plugins/*.jar
 
       - name: Draft Release
         uses: softprops/action-gh-release@v3
@@ -412,6 +429,7 @@ jobs:
             ./Output/A12-Studio/A12-Studio-linux-x64.zip
             ./Output/A12-Studio/java-runtime-mac-x64.zip
             ./Output/A12-Studio/java-runtime-mac-arm64.zip
+            ./Output/A12-Studio/plugins/*.jar
 
   ######################################################################################################################
   # Cleanup Old Workflow Runs
