@@ -17,15 +17,20 @@
 
 <BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreferencePluginsPanelController">
     <top>
-        <VBox BorderPane.alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER_LEFT">
             <children>
-                <Label styleClass="preference-title" text="%a12_studio_settings" />
-                <Label styleClass="preference-subtitle" text="%plugins" />
+                <VBox HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label styleClass="preference-title" text="%a12_studio_settings" />
+                        <Label styleClass="preference-subtitle" text="%plugins" />
+                    </children>
+                </VBox>
+                <Button fx:id="restartButton" managed="false" onAction="#onRestartClicked" styleClass="primary-button" text="%restart_now" visible="false" />
             </children>
             <BorderPane.margin>
-                <Insets bottom="12.0" left="12.0" top="12.0" />
+                <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
             </BorderPane.margin>
-        </VBox>
+        </HBox>
     </top>
     <center>
         <HBox spacing="0.0" BorderPane.alignment="TOP_LEFT">

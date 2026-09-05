@@ -28,3 +28,4 @@ config/*.properties
 /testing/workspaces/basic/logs/previewapp-server.log.*
 /testing/workspaces/basic-tutorial/logs/previewapp-server.log
 /.studio/
+*.jar.pending-delete

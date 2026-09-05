@@ -6,6 +6,8 @@ import de.a12.studio.plugin.manager.MarketplaceEntry;
 import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.components.ProgressDialog;
 import de.a12.studio.ui.components.ProgressResultModel;
+import de.a12.studio.ui.previewapp.PreviewAppProcess;
+import de.a12.studio.ui.updater.Updater;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.collections.FXCollections;
@@ -52,6 +54,7 @@ public class PreferencePluginsPanelController implements Initializable {
 
   @FXML private TextField searchField;
   @FXML private ListView<MarketplaceEntry> pluginListView;
+  @FXML private Button restartButton;
 
   @FXML private VBox detailPane;
   @FXML private VBox emptyDetailPane;
@@ -88,6 +91,7 @@ public class PreferencePluginsPanelController implements Initializable {
     statusLabel.setText("");
     progressIndicator.setVisible(false);
     showDetail(false);
+    showRestartButton(false);
 
     descriptionWebView.getEngine().setUserStyleSheetLocation(MarkdownRenderer.getStylesheetUrl());
 
@@ -201,6 +205,26 @@ public class PreferencePluginsPanelController implements Initializable {
   }
 
   // ---------------------------------------------------------------------------
+  // Restart button
+  // ---------------------------------------------------------------------------
+
+  private void showRestartButton(boolean show) {
+    restartButton.setVisible(show);
+    restartButton.setManaged(show);
+  }
+
+  @FXML
+  private void onRestartClicked() {
+    Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(getStage(),
+        StudioBundle.get("plugins.restart_confirm"), null, null, StudioBundle.get("restart_now"));
+    if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
+      return;
+    }
+    PreviewAppProcess.getInstance().stop();
+    Updater.restartClient();
+  }
+
+  // ---------------------------------------------------------------------------
   // Action button handler
   // ---------------------------------------------------------------------------
 
@@ -243,6 +267,7 @@ public class PreferencePluginsPanelController implements Initializable {
 
     if (result.isSuccess()) {
       setProgress(false, StudioBundle.get("plugins.install_restart_required", entry.getName()));
+      showRestartButton(true);
       pluginListView.refresh();
       if (selectedEntry != null) refreshActionButton(selectedEntry);
     }
@@ -277,6 +302,7 @@ public class PreferencePluginsPanelController implements Initializable {
 
     if (result.isSuccess()) {
       setProgress(false, StudioBundle.get("plugins.update_restart_required", entry.getName()));
+      showRestartButton(true);
       pluginListView.refresh();
       if (selectedEntry != null) refreshActionButton(selectedEntry);
     }
@@ -314,8 +340,10 @@ public class PreferencePluginsPanelController implements Initializable {
       return;
     }
 
+    PluginManager pluginManager = PluginManager.getInstance();
+
     // Clean up any staged update for this JAR so it isn't resurrected on next startup.
-    File pendingUpdate = PluginManager.getInstance().getPendingUpdateFile(jarFile.getName());
+    File pendingUpdate = pluginManager.getPendingUpdateFile(jarFile.getName());
     if (pendingUpdate.exists()) {
       try {
         Files.delete(pendingUpdate.toPath());
@@ -325,13 +353,40 @@ public class PreferencePluginsPanelController implements Initializable {
     }
 
     try {
+      // The JAR may still be open by this plugin's own URLClassLoader (running JVM), which
+      // locks the file on Windows. Try an immediate delete first (works when the plugin's
+      // classloader was never opened, e.g. it failed to load) before falling back to staging.
       Files.delete(jarFile.toPath());
       setProgress(false, StudioBundle.get("plugins.remove_restart_required", entry.getName()));
+      showRestartButton(true);
       pluginListView.refresh();
       if (selectedEntry != null) refreshActionButton(selectedEntry);
     } catch (IOException ex) {
-      log.error("Failed to delete plugin JAR '{}': {}", jarFile.getName(), ex.getMessage(), ex);
-      WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.remove_failed"), ex.getMessage());
+      stagePluginDeletion(pluginManager, jarFile, entry);
+    }
+  }
+
+  /**
+   * Records that {@code jarFile} must be deleted the next time the studio starts, instead of
+   * retrying the delete in this process. The current process's own {@link
+   * de.a12.studio.plugin.manager.LoadedPlugin#getClassLoader()} keeps the JAR open for the
+   * remainder of this run, so no retry here would ever succeed - only a future process that
+   * never opened the file can remove it.
+   */
+  private void stagePluginDeletion(@NonNull PluginManager pluginManager, @NonNull File jarFile,
+                                    @NonNull MarketplaceEntry entry) {
+    File marker = pluginManager.getPendingDeleteMarker(jarFile.getName());
+    try {
+      if (!marker.exists()) {
+        Files.createFile(marker.toPath());
+      }
+      setProgress(false, StudioBundle.get("plugins.remove_staged_restart_required", entry.getName()));
+      showRestartButton(true);
+      pluginListView.refresh();
+      if (selectedEntry != null) refreshActionButton(selectedEntry);
+    } catch (IOException markerEx) {
+      log.error("Failed to stage plugin JAR '{}' for deletion: {}", jarFile.getName(), markerEx.getMessage(), markerEx);
+      WidgetFactory.showAlert(getStage(), StudioBundle.get("plugins.remove_failed"), markerEx.getMessage());
     }
   }
 

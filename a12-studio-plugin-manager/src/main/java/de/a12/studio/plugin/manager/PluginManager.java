@@ -79,6 +79,13 @@ public class PluginManager {
   /** Suffix appended to a downloaded update JAR while its predecessor is still locked by the running JVM. */
   private static final String PENDING_UPDATE_SUFFIX = ".pending";
 
+  /**
+   * Suffix for a marker file placed next to a plugin JAR that should be deleted on the next
+   * startup, because it is still locked by the currently running JVM (its {@link URLClassLoader}
+   * keeps the file open) and cannot be deleted immediately.
+   */
+  private static final String PENDING_DELETE_SUFFIX = ".pending-delete";
+
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   /** The {@code plugins/} directory (may not exist yet). */
@@ -135,6 +142,7 @@ public class PluginManager {
       }
     }
 
+    applyPendingDeletes();
     applyPendingUpdates();
 
     File[] jars = pluginsDir.listFiles(f -> f.isFile() && f.getName().endsWith(".jar"));
@@ -185,6 +193,30 @@ public class PluginManager {
       }
       catch (IOException e) {
         log.warn("Failed to apply pending update for '{}': {}", targetName, e.getMessage(), e);
+      }
+    }
+  }
+
+  /**
+   * Deletes every plugin JAR that was marked for removal via {@link #getPendingDeleteMarker(String)}
+   * while a previous run of the studio still had it locked (see {@link #getPendingDeleteMarker(String)}).
+   * Runs before any plugin is loaded, so the JAR is guaranteed to be unlocked at this point.
+   */
+  private void applyPendingDeletes() {
+    File[] markers = pluginsDir.listFiles(f -> f.isFile() && f.getName().endsWith(PENDING_DELETE_SUFFIX));
+    if (markers == null) return;
+
+    for (File marker : markers) {
+      String targetName = marker.getName().substring(0,
+          marker.getName().length() - PENDING_DELETE_SUFFIX.length());
+      File target = new File(pluginsDir, targetName);
+      try {
+        Files.deleteIfExists(target.toPath());
+        Files.delete(marker.toPath());
+        log.info("Applied pending deletion for plugin JAR: {}", targetName);
+      }
+      catch (IOException e) {
+        log.warn("Failed to apply pending deletion for '{}': {}", targetName, e.getMessage(), e);
       }
     }
   }
@@ -557,6 +589,16 @@ public class PluginManager {
   @NonNull
   public File getPendingUpdateFile(@NonNull String jarFileName) {
     return new File(pluginsDir, jarFileName + PENDING_UPDATE_SUFFIX);
+  }
+
+  /**
+   * Returns the marker file whose presence flags the given plugin JAR file name for deletion on
+   * the next startup (see {@link #applyPendingDeletes()}). Used when the JAR cannot be deleted
+   * immediately because its {@link URLClassLoader} is still open in the running JVM.
+   */
+  @NonNull
+  public File getPendingDeleteMarker(@NonNull String jarFileName) {
+    return new File(pluginsDir, jarFileName + PENDING_DELETE_SUFFIX);
   }
 
   /**
