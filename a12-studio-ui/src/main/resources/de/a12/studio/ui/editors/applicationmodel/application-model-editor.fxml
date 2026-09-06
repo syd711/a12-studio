@@ -45,6 +45,7 @@
                            <children>
                               <fx:include fx:id="region" source="region-panel.fxml" />
                               <fx:include fx:id="subregions" source="subregions-panel.fxml" />
+                              <fx:include fx:id="defaultRegion" source="default-region-panel.fxml" />
                               <fx:include fx:id="layout" source="layout-panel.fxml" />
                               <fx:include fx:id="modules" source="modules-panel.fxml" />
                               <fx:include fx:id="activity" source="activity-panel.fxml" />

@@ -1,0 +1,43 @@
+{
+  "header": {
+    "id": "ApplicationViewAddValidator_missingModel_invalid",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "Mod1",
+        "flows": [
+          {
+            "name": "Flow1",
+            "scenes": [
+              {
+                "name": "SceneA",
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "SomeView",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Missing_OM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

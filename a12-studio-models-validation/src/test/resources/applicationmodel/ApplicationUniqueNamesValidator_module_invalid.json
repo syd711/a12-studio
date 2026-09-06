@@ -1,0 +1,24 @@
+{
+  "header": {
+    "id": "ApplicationUniqueNamesValidator_module_invalid",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "Mod1",
+        "flows": []
+      },
+      {
+        "name": "Mod1",
+        "flows": []
+      }
+    ]
+  }
+}

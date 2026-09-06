@@ -18,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -95,6 +96,9 @@ public class DirectiveDialogController implements DialogController {
   private TextArea configurationArea;
 
   @FXML
+  private CheckBox loadDataField;
+
+  @FXML
   private Button okButton;
 
   @FXML
@@ -145,6 +149,7 @@ public class DirectiveDialogController implements DialogController {
       }
       workingModels.addAll(viewAdd.getModels());
       configurationArea.setText(toText(viewAdd.getConfiguration()));
+      loadDataField.setSelected(Boolean.TRUE.equals(viewAdd.getLoadData()));
     } else {
       configurationArea.setText("{}");
     }
@@ -298,6 +303,7 @@ public class DirectiveDialogController implements DialogController {
       viewAdd.setConstraints(buildConstraints());
       viewAdd.getModels().addAll(workingModels);
       viewAdd.getConfiguration().putAll(configuration);
+      viewAdd.setLoadData(loadDataField.isSelected() ? Boolean.TRUE : null);
       return viewAdd;
     }
 

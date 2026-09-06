@@ -15,8 +15,8 @@ public class SceneChange {
 
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Directive> onEnter = new ArrayList<>();
-  // Cases never have onExit: they are mutually exclusive, so "another case following this one is active" can
-  // never be satisfied. Still modeled here since scenes reuse this same type for their own onExit directives.
+  // Both scenes and cases can carry onExit directives (run when the scene, or the active case within it,
+  // stops matching); this type is shared between the two.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Directive> onExit = new ArrayList<>();
 }

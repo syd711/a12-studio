@@ -7,7 +7,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Captures a deep, JSON-based clone of a {@link Case} before {@link CaseDialogController} lets its embedded
  * panels ({@link de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController} for the label, {@link
- * de.a12.studio.ui.editors.applicationmodel.SceneChangePanelController} for {@code onEnter}) mutate it live, so
+ * de.a12.studio.ui.editors.applicationmodel.SceneChangePanelController} for {@code sceneChange}) mutate it live, so
  * {@link #restore()} can undo those changes on Cancel. Unlike {@link MenuSnapshot}'s manual field-by-field
  * copy, this relies on {@link Case} (and everything it nests) being a plain Jackson bean, so a round-trip
  * through {@link JsonSettings#objectMapper} is enough to reconstruct every field, including the polymorphic

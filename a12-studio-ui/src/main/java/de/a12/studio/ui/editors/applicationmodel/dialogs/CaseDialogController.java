@@ -71,7 +71,7 @@ public class CaseDialogController implements DialogController {
 
     nameField.setText(caseObj.getName());
     labelController.setCase(caseObj);
-    sceneChangeController.bind(caseObj::getSceneChange, caseObj::setSceneChange, false);
+    sceneChangeController.bind(caseObj::getSceneChange, caseObj::setSceneChange, true);
   }
 
   void destroy() {

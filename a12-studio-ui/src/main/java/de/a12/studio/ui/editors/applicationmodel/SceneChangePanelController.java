@@ -34,9 +34,8 @@ import de.a12.studio.ui.util.StudioBundle;
  * non-inline-editable, reorderable (drag handle plus move up/down) row list (row = Type/Region/Name summary),
  * matching the SME reference's "On Enter"/"On Exit" tables. Same row-based layout as {@link
  * SubregionsPanelController}. Reused by both {@link de.a12.studio.ui.editors.applicationmodel.dialogs.SceneDialogController}
- * (where both lists apply) and {@link de.a12.studio.ui.editors.applicationmodel.dialogs.CaseDialogController}
- * (where only {@code onEnter} applies, see {@link de.a12.studio.models.applicationmodel.SceneChange}'s own
- * {@code onExit} javadoc), via {@link #bind}. Isn't wired through {@link
+ * and {@link de.a12.studio.ui.editors.applicationmodel.dialogs.CaseDialogController} (both lists apply to
+ * either), via {@link #bind}. Isn't wired through {@link
  * de.a12.studio.ui.editors.AbstractPropertyEditor} for the same reason as {@link
  * MatchConditionsPanelController}.
  */

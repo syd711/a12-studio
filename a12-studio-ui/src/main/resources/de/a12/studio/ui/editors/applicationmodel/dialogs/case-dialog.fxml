@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="600.0" minWidth="550.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="650.0" minWidth="550.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.applicationmodel.dialogs.CaseDialogController">
    <top>
       <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
@@ -33,7 +33,7 @@
                <!-- Label -->
                <fx:include fx:id="label" source="../../propertyeditors/localized-text-panel.fxml" />
 
-               <!-- Scene Change (onEnter only) -->
+               <!-- Scene Change -->
                <fx:include fx:id="sceneChange" source="../scene-change-panel.fxml" />
             </VBox>
          </content>

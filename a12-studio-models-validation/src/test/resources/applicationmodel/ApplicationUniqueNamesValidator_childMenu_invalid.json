@@ -1,0 +1,31 @@
+{
+  "header": {
+    "id": "ApplicationUniqueNamesValidator_childMenu_invalid",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "Mod1",
+        "menu": {
+          "name": "MainMenu",
+          "children": [
+            {
+              "name": "Child1"
+            },
+            {
+              "name": "Child1"
+            }
+          ]
+        },
+        "flows": []
+      }
+    ]
+  }
+}

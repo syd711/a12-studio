@@ -1,0 +1,23 @@
+{
+  "header": {
+    "id": "ApplicationUniqueNamesValidator_region_invalid",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [],
+    "region": {
+      "name": "APP",
+      "subRegions": [
+        {
+          "name": "APP"
+        }
+      ]
+    }
+  }
+}

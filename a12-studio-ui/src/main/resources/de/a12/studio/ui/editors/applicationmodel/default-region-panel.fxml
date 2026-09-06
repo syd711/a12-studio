@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%default_region" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.applicationmodel.DefaultRegionPanelController">
+ <BorderPane>
+ <center>
+  <VBox>
+    <children>
+      <Label styleClass="field-label" text="%region" />
+      <TextField fx:id="defaultRegionField" promptText="%comma_separated_region_path_e_g_app_content" prefWidth="250.0" />
+    </children>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

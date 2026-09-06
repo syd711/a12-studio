@@ -1,0 +1,41 @@
+{
+  "header": {
+    "id": "ApplicationSceneGraphValidator_unknownDefaultRegion_invalid",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "Mod1",
+        "flows": [
+          {
+            "name": "Flow1",
+            "scenes": [
+              {
+                "name": "SceneA",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "content"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "region": {
+      "name": "APP"
+    },
+    "defaultRegion": [
+      "MISSING"
+    ]
+  }
+}

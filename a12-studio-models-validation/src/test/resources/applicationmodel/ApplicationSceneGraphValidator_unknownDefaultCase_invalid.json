@@ -1,0 +1,41 @@
+{
+  "header": {
+    "id": "ApplicationSceneGraphValidator_unknownDefaultCase_invalid",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "Mod1",
+        "flows": [
+          {
+            "name": "Flow1",
+            "scenes": [
+              {
+                "name": "SceneA",
+                "defaultCase": "Missing",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "content"
+                  }
+                ],
+                "cases": [
+                  {
+                    "name": "CaseX"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

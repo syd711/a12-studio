@@ -50,6 +50,9 @@ public class ApplicationModelEditorController extends AbstractEditorController i
   private SubregionsPanelController subregionsController;
 
   @FXML
+  private DefaultRegionPanelController defaultRegionController;
+
+  @FXML
   private TabPane tabPane;
 
   private ApplicationModel model;
@@ -75,6 +78,7 @@ public class ApplicationModelEditorController extends AbstractEditorController i
     layoutController.setModel(applicationModel);
     regionController.setModel(applicationModel);
     subregionsController.setModel(applicationModel);
+    defaultRegionController.setModel(applicationModel);
 
     for (Module module : applicationModel.getContent().getModules()) {
       addModuleTab(module);

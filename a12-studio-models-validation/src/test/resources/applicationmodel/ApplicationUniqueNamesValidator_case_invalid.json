@@ -1,0 +1,37 @@
+{
+  "header": {
+    "id": "ApplicationUniqueNamesValidator_case_invalid",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "Mod1",
+        "flows": [
+          {
+            "name": "Flow1",
+            "scenes": [
+              {
+                "name": "Scene1",
+                "cases": [
+                  {
+                    "name": "Case1"
+                  },
+                  {
+                    "name": "Case1"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"type", "name", "constraints", "models", "configuration"})
+@JsonPropertyOrder({"type", "name", "constraints", "models", "configuration", "loadData"})
 public class ViewAddDirective extends Directive {
 
   // Name of the UI component to show in the view; resolved by looking up a matching UI component registered
@@ -24,6 +24,9 @@ public class ViewAddDirective extends Directive {
   private List<ModelDescriptor> models = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private Map<String, Object> configuration = new LinkedHashMap<>();
+  // Only required to load data when the view isn't backed by any A12 model in `models`.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean loadData;
 
   public ViewAddDirective() {
     setType(DirectiveType.VIEW_ADD);

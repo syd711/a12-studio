@@ -1,0 +1,44 @@
+{
+  "header": {
+    "id": "ApplicationSceneGraphValidator_matchConditionExactlyOne_invalid",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "Mod1",
+        "flows": [
+          {
+            "name": "Flow1",
+            "scenes": [
+              {
+                "name": "SceneBothSet",
+                "matchConditions": [
+                  {
+                    "key": "engine",
+                    "mustEqual": "content",
+                    "isSet": true
+                  }
+                ]
+              },
+              {
+                "name": "SceneNeitherSet",
+                "matchConditions": [
+                  {
+                    "key": "engine"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

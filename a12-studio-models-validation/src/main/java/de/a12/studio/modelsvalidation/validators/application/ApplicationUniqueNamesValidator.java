@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.Case;
 import de.a12.studio.models.applicationmodel.Flow;
+import de.a12.studio.models.applicationmodel.Menu;
 import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.models.applicationmodel.Region;
 import de.a12.studio.models.applicationmodel.Scene;
@@ -49,6 +50,10 @@ public final class ApplicationUniqueNamesValidator implements ModelValidator {
     return "content/scenes/" + sceneName + "/cases";
   }
 
+  public static String childMenuElementId(String parentMenuName) {
+    return "content/modules/menu/" + parentMenuName + "/children";
+  }
+
   @Override
   public List<ModelValidationError> validate(A12Model<?> model, ValidationContext context) {
     if (!(model instanceof ApplicationModel applicationModel)) {
@@ -88,7 +93,26 @@ public final class ApplicationUniqueNamesValidator implements ModelValidator {
       Set<String> regionNames = new HashSet<>();
       collectRegionNames(model, applicationModel.getContent().getRegion(), regionNames, errors);
     }
+
+    for (Module module : applicationModel.getContent().getModules()) {
+      if (module.getMenu() != null) {
+        checkChildMenuNames(model, module.getMenu(), errors);
+      }
+    }
     return errors;
+  }
+
+  private void checkChildMenuNames(A12Model<?> model, Menu menu, List<ModelValidationError> errors) {
+    Set<String> childNames = new HashSet<>();
+    for (Menu child : menu.getChildren()) {
+      if (child.getName() != null && !childNames.add(child.getName())) {
+        errors.add(error(model, childMenuElementId(menu.getName()),
+            ValidationMessages.get("validation.applicationUniqueNames.childMenu", child.getName())));
+      }
+    }
+    for (Menu child : menu.getChildren()) {
+      checkChildMenuNames(model, child, errors);
+    }
   }
 
   private void collectRegionNames(A12Model<?> model, Region region, Set<String> seen, List<ModelValidationError> errors) {

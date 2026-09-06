@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -131,6 +132,20 @@
                            <TextArea fx:id="configurationArea" prefRowCount="4" wrapText="true" />
                         </children>
                      </VBox>
+
+                     <HBox spacing="6.0">
+                        <children>
+                           <CheckBox fx:id="loadDataField" mnemonicParsing="false" text="%load_data_without_models" />
+                           <Label>
+                              <graphic>
+                                 <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                              </graphic>
+                              <tooltip>
+                                 <Tooltip prefWidth="300.0" text="%only_required_if_you_want_to_load_data_without_a12_models" wrapText="true" />
+                              </tooltip>
+                           </Label>
+                        </children>
+                     </HBox>
                   </children>
                </VBox>
             </VBox>

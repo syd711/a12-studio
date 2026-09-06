@@ -75,6 +75,12 @@ public final class ApplicationViewAddValidator implements ModelValidator {
               ValidationMessages.get("validation.applicationViewAdd.missingModel", descriptor.getName()),
               Severity.ERROR.name()));
         }
+        if (descriptor.getDocumentModel() != null && !descriptor.getDocumentModel().isBlank()
+            && context.findOtherModel(descriptor.getDocumentModel()) == null) {
+          errors.add(new ModelValidationError(model, ELEMENT_ID,
+              ValidationMessages.get("validation.applicationViewAdd.missingDocumentModel", descriptor.getDocumentModel()),
+              Severity.ERROR.name()));
+        }
       }
     }
   }
