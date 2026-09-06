@@ -137,6 +137,16 @@
                        </ScrollPane>
                    </content>
                </Tab>
+               <Tab text="%data_configuration">
+                   <content>
+                       <fx:include fx:id="dataConfiguration" source="data-configuration-panel.fxml" />
+                   </content>
+               </Tab>
+               <Tab text="%cleanup">
+                   <content>
+                       <fx:include fx:id="cleanup" source="cleanup-panel.fxml" />
+                   </content>
+               </Tab>
                <Tab text="%subheader_and_footer">
                    <content>
                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">

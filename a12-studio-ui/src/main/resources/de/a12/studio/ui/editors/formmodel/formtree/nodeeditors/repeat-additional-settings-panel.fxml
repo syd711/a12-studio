@@ -4,6 +4,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -35,6 +36,12 @@
                 <CheckBox fx:id="infiniteScrollingCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                 <Label styleClass="field-label" text="%readonly_presentation_field" GridPane.columnIndex="0" GridPane.rowIndex="7" />
                 <ComboBox fx:id="readonlyPresentationCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                <Label styleClass="field-label" text="%repeat_title_hidden" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                <CheckBox fx:id="titleHiddenCheckBox" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                <Label styleClass="field-label" text="%repeat_filter_expression" GridPane.columnIndex="0" GridPane.rowIndex="9" />
+                <TextField fx:id="filterExpressionField" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                <Label styleClass="field-label" text="%repeat_initial_sorting" GridPane.columnIndex="0" GridPane.rowIndex="10" />
+                <TextField fx:id="initialSortingField" GridPane.columnIndex="1" GridPane.rowIndex="10" />
                 <padding>
                     <Insets bottom="4.0" top="4.0" />
                 </padding>

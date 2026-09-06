@@ -16,6 +16,8 @@
                 <fx:include fx:id="placeholder" source="control-placeholder-panel.fxml" />
                 <fx:include fx:id="layout" source="control-layout-panel.fxml" />
                 <fx:include fx:id="additionalSettings" source="additional-settings-panel.fxml" />
+                <fx:include fx:id="externalEnumeration" source="external-enumeration-panel.fxml" />
+                <fx:include fx:id="dependentEnumeration" source="dependent-enumeration-panel.fxml" />
                 <fx:include fx:id="hideCondition" source="hide-condition-panel.fxml" />
                 <fx:include fx:id="accessibility" source="control-accessibility-panel.fxml" />
                 <fx:include fx:id="styles" source="../../styles-panel.fxml" />

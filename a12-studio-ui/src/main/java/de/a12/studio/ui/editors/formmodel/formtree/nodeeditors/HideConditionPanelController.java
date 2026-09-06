@@ -4,9 +4,12 @@ import de.a12.studio.models.documentmodel.BooleanFieldType;
 import de.a12.studio.models.documentmodel.ConfirmFieldType;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.EnumerationFieldType;
+import de.a12.studio.models.documentmodel.EnumerationValue;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.formmodel.HideCondition;
+import de.a12.studio.models.formmodel.HideConditionCase;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
@@ -14,6 +17,11 @@ import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListView;
+import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -22,22 +30,27 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * Edits the "Hide Condition" property of a form node (Section, Row, ControlGrid, Repeat, Control):
- * a pair of fields that together specify when the node should be hidden.
+ * a master Document Model field plus one or more trigger values, stored as {@link HideCondition}
+ * ({@code masterField} + a list of {@link HideConditionCase}). The node is hidden whenever the master
+ * field's current value matches any of the checked cases.
  * <ul>
- *   <li>{@code hideConditionField} — the id of a master field from the linked Document Model, offered as a
- *       combo-box populated from that model's Boolean/Confirm/Enumeration fields that are actually reachable
- *       from this node's position (see {@link MasterFieldScope}), mirroring the SME reference's
- *       {@code getMasterFields}/{@code collectCompatibleFields}.</li>
- *   <li>{@code hideConditionValue} — {@code "true"} (hide when the field is true) or
- *       {@code null} / "no value" (hide when the field has no value), offered as a fixed
- *       two-item combo-box.</li>
+ *   <li>{@code fieldCombo} — the id of a master field, offered from that model's Boolean/Confirm/Enumeration
+ *       fields that are actually reachable from this node's position (see {@link MasterFieldScope}), mirroring
+ *       the SME reference's {@code getMasterFields}/{@code collectCompatibleFields}.</li>
+ *   <li>{@code valueList} — a checklist of the values that are actually possible for the selected master
+ *       field's type: {@code "true"} + "(no value)" for Boolean/Confirm, or every declared enum literal +
+ *       "(no value)" for an Enumeration field. Checking an item adds/removes a {@link HideConditionCase} with
+ *       that value.</li>
  * </ul>
  * <p>
  * Does not extend {@link de.a12.studio.ui.editors.AbstractPropertyEditor} because it edits a
@@ -46,106 +59,178 @@ import java.util.function.Supplier;
  * {@link StudioEventManager#fireModelSavedEvent}, matching the pattern used by
  * non-element panels such as {@link de.a12.studio.ui.editors.formmodel.StylesPanelController}.
  * <p>
- * Call {@link #configure} once per node selection to bind this panel to the node's getters/setters
- * and repopulate the field combo for the given {@link MasterFieldScope}.
+ * Call {@link #configure} once per node selection to bind this panel to the node's hide-condition
+ * getter/setter and repopulate the field combo for the given {@link MasterFieldScope}.
  */
 public class HideConditionPanelController implements Initializable {
 
-  /** Displayed in the value combo to represent a stored {@code null} condition value. */
-  public static final String DISPLAY_NO_VALUE = "no value";
+  /** Display label for the synthetic "no value" case (stored as a {@code null} masterValue). */
+  public static final String DISPLAY_NO_VALUE = "(no value)";
   public static final String DISPLAY_TRUE = "true";
 
   @FXML
   private ComboBox<String> fieldCombo;
 
   @FXML
-  private ComboBox<String> valueCombo;
+  private ListView<String> valueList;
 
-  // Guards programmatic repopulation in configure() from being treated as user edits.
+  // Guards programmatic repopulation in configure()/rebuildValueList() from being treated as user edits.
   private boolean updatingFromModel;
 
-  // Getter/setter pair for hideConditionField on the currently bound form node.
-  private Supplier<String> fieldGetter;
-  private Consumer<String> fieldSetter;
+  private Supplier<HideCondition> getter;
+  private Consumer<HideCondition> setter;
+  private @Nullable ElementIndex elementIndex;
 
-  // Getter/setter pair for hideConditionValue on the currently bound form node.
-  private Supplier<String> valueGetter;
-  private Consumer<String> valueSetter;
+  // display value -> stored masterValue (null for "no value")
+  private final Map<String, String> displayToStoredValue = new LinkedHashMap<>();
+  private final Map<String, BooleanProperty> checkedProperties = new LinkedHashMap<>();
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    valueCombo.getItems().setAll(DISPLAY_TRUE, DISPLAY_NO_VALUE);
+    valueList.setCellFactory(CheckBoxListCell.forListView(this::checkedPropertyFor));
 
-    // Wire fieldCombo: a user selection writes through to the model and saves.
-    // Clearing the field also clears the value, since a value without a field is meaningless.
     fieldCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
-      if (updatingFromModel || fieldSetter == null) {
+      if (updatingFromModel || setter == null) {
         return;
       }
       String fieldValue = (newVal == null || newVal.isBlank()) ? null : newVal;
-      fieldSetter.accept(fieldValue);
       if (fieldValue == null) {
-        // Clear value silently so its listener does not fire an extra save.
-        updatingFromModel = true;
-        try {
-          valueCombo.setValue(null);
-        } finally {
-          updatingFromModel = false;
-        }
-        if (valueSetter != null) {
-          valueSetter.accept(null);
-        }
+        setter.accept(null);
+      } else {
+        HideCondition condition = new HideCondition();
+        condition.setMasterField(fieldValue);
+        setter.accept(condition);
       }
       commitChange();
-    });
-
-    // Wire valueCombo: "no value" display → null stored; "true" display → "true" stored.
-    valueCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
-      if (updatingFromModel || valueSetter == null) {
-        return;
-      }
-      valueSetter.accept(DISPLAY_NO_VALUE.equals(newVal) ? null : newVal);
-      commitChange();
+      rebuildValueList();
     });
   }
 
   /**
-   * Binds this panel to the hide-condition properties of a form node and repopulates the field combo from
+   * Binds this panel to the hide-condition property of a form node and repopulates the field combo from
    * {@code scope}. Must be called every time a new node is selected in the form tree.
    *
-   * @param fieldGetter   reads {@code hideConditionField} from the node
-   * @param fieldSetter   writes {@code hideConditionField} to the node
-   * @param valueGetter   reads {@code hideConditionValue} from the node
-   * @param valueSetter   writes {@code hideConditionValue} to the node
-   * @param elementIndex  index over the Document Model linked to the form, or {@code null} if none is linked
-   * @param scope         where in the Document Model to look for candidate master fields, see {@link MasterFieldScope}
+   * @param getter       reads the node's {@link HideCondition} (may be {@code null})
+   * @param setter       writes the node's {@link HideCondition} (may be called with {@code null})
+   * @param elementIndex index over the Document Model linked to the form, or {@code null} if none is linked
+   * @param scope        where in the Document Model to look for candidate master fields, see {@link MasterFieldScope}
    */
   public void configure(
-      @NonNull Supplier<String> fieldGetter,
-      @NonNull Consumer<String> fieldSetter,
-      @NonNull Supplier<String> valueGetter,
-      @NonNull Consumer<String> valueSetter,
+      @NonNull Supplier<HideCondition> getter,
+      @NonNull Consumer<HideCondition> setter,
       @Nullable ElementIndex elementIndex,
       @NonNull MasterFieldScope scope) {
 
-    this.fieldGetter = fieldGetter;
-    this.fieldSetter = fieldSetter;
-    this.valueGetter = valueGetter;
-    this.valueSetter = valueSetter;
+    this.getter = getter;
+    this.setter = setter;
+    this.elementIndex = elementIndex;
 
-    List<String> masterFieldIds = collectCompatibleMasterFieldIds(elementIndex, scope);
+    List<String> masterFieldIds = collectMasterFieldIds(elementIndex, scope, HideConditionPanelController::isCompatibleMasterFieldType);
 
     updatingFromModel = true;
     try {
       fieldCombo.getItems().setAll(masterFieldIds);
-      fieldCombo.setValue(fieldGetter.get());
-      String storedValue = valueGetter.get();
-      // Stored null → no selection; stored "true" → display "true".
-      // Any other stored value is also shown as DISPLAY_NO_VALUE for graceful degradation.
-      valueCombo.setValue(storedValue == null ? null
-          : (storedValue.equals("true") ? DISPLAY_TRUE : DISPLAY_NO_VALUE));
+      HideCondition current = getter.get();
+      fieldCombo.setValue(current == null ? null : current.getMasterField());
     } finally {
       updatingFromModel = false;
+    }
+    rebuildValueList();
+  }
+
+  private BooleanProperty checkedPropertyFor(String display) {
+    return checkedProperties.computeIfAbsent(display, d -> {
+      BooleanProperty property = new SimpleBooleanProperty(isChecked(d));
+      property.addListener((obs, oldVal, newVal) -> {
+        if (!updatingFromModel) {
+          onValueToggled(d, newVal);
+        }
+      });
+      return property;
+    });
+  }
+
+  private boolean isChecked(String display) {
+    HideCondition condition = getter == null ? null : getter.get();
+    if (condition == null) {
+      return false;
+    }
+    String stored = displayToStoredValue.get(display);
+    for (HideConditionCase c : condition.getCases()) {
+      if (valuesEqual(c.getMasterValue(), stored)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void onValueToggled(String display, boolean checked) {
+    HideCondition condition = getter.get();
+    if (condition == null) {
+      // Should not normally happen (a value can only be checked once a master field is selected), but guard
+      // against it defensively by creating one anchored to the currently selected field.
+      condition = new HideCondition();
+      condition.setMasterField(fieldCombo.getValue());
+      setter.accept(condition);
+    }
+    String stored = displayToStoredValue.get(display);
+    if (checked) {
+      boolean alreadyPresent = condition.getCases().stream()
+          .anyMatch(c -> valuesEqual(c.getMasterValue(), stored));
+      if (!alreadyPresent) {
+        HideConditionCase newCase = new HideConditionCase();
+        newCase.setMasterValue(stored);
+        condition.getCases().add(newCase);
+      }
+    } else {
+      condition.getCases().removeIf(c -> valuesEqual(c.getMasterValue(), stored));
+    }
+    commitChange();
+  }
+
+  private static boolean valuesEqual(@Nullable String a, @Nullable String b) {
+    return (a == null && b == null) || (a != null && a.equals(b));
+  }
+
+  /** Repopulates {@code valueList} with the values possible for the currently selected master field's type. */
+  private void rebuildValueList() {
+    displayToStoredValue.clear();
+    checkedProperties.clear();
+
+    HideCondition current = getter == null ? null : getter.get();
+    String masterFieldId = current == null ? null : current.getMasterField();
+
+    if (masterFieldId != null && elementIndex != null) {
+      ElementIndex index = elementIndex;
+      index.resolveElement(masterFieldId)
+          .filter(FieldElement.class::isInstance)
+          .map(FieldElement.class::cast)
+          .ifPresent(field -> populateDisplayValues(field, index));
+    }
+
+    updatingFromModel = true;
+    try {
+      valueList.getItems().setAll(displayToStoredValue.keySet());
+    } finally {
+      updatingFromModel = false;
+    }
+  }
+
+  private void populateDisplayValues(@NonNull FieldElement field, @NonNull ElementIndex index) {
+    if (field.getField() == null) {
+      return;
+    }
+    FieldType effectiveType = index.effectiveFieldType(field.getField().getFieldType());
+    if (effectiveType instanceof EnumerationFieldType enumType) {
+      if (enumType.getEnumerationType() != null) {
+        for (EnumerationValue value : enumType.getEnumerationType().getValues()) {
+          displayToStoredValue.put(value.getValue(), value.getValue());
+        }
+      }
+      displayToStoredValue.put(DISPLAY_NO_VALUE, null);
+    } else if (effectiveType instanceof BooleanFieldType || effectiveType instanceof ConfirmFieldType) {
+      displayToStoredValue.put(DISPLAY_TRUE, "true");
+      displayToStoredValue.put(DISPLAY_NO_VALUE, null);
     }
   }
 
@@ -207,7 +292,14 @@ public class HideConditionPanelController implements Initializable {
   private record CandidateField(FieldElement field, int distance) {
   }
 
-  private static List<String> collectCompatibleMasterFieldIds(@Nullable ElementIndex elementIndex, @NonNull MasterFieldScope scope) {
+  /**
+   * Collects the ids of every Document Model field reachable from {@code scope} whose effective type matches
+   * {@code typeFilter}, ordered nearest-first. Shared with other master-field pickers (e.g.
+   * {@link DependentEnumerationPanelController}) that need the same reachability algorithm but a different
+   * set of acceptable field types.
+   */
+  static List<String> collectMasterFieldIds(@Nullable ElementIndex elementIndex, @NonNull MasterFieldScope scope,
+      @NonNull BiPredicate<ElementIndex, FieldElement> typeFilter) {
     if (elementIndex == null || scope.unbound) {
       return List.of();
     }
@@ -216,7 +308,7 @@ public class HideConditionPanelController implements Initializable {
     List<CandidateField> candidates = new ArrayList<>();
     for (Element element : elementIndex.allElements()) {
       if (element == scope.anchor || !(element instanceof FieldElement field) || field.getField() == null
-          || !isCompatibleMasterFieldType(elementIndex, field)) {
+          || !typeFilter.test(elementIndex, field)) {
         continue;
       }
       List<Element> fieldPath = ancestorChainIncludingSelf(field, elementIndex);

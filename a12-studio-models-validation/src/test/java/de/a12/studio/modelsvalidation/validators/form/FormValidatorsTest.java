@@ -30,6 +30,10 @@ class FormValidatorsTest {
     return TestModels.load("/documentmodel/RefIncluded_DM.json", DocumentModel.class);
   }
 
+  private DocumentModel hideConditionMasterDm() {
+    return TestModels.load("/documentmodel/HideConditionMaster_DM.json", DocumentModel.class);
+  }
+
   @Test
   void documentModelReferenceValidatorReportsMissingReference() {
     FormModel model = load("FormDocumentModelReferenceValidator_invalid");
@@ -110,5 +114,60 @@ class FormValidatorsTest {
     // A single-cell row in a 2-column grid, and an offset-1 single-cell row in another 2-column grid: both
     // under-fill (or exactly fill, via offset) the defined columns rather than overflowing them.
     assertEquals(0, errors.size());
+  }
+
+  @Test
+  void hideConditionAtLeastOneCaseValidatorReportsEmptyCases() {
+    FormModel model = load("HideConditionAtLeastOneCaseValidator_invalid");
+    List<ModelValidationError> errors = new HideConditionAtLeastOneCaseValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("At least one hide condition value"));
+  }
+
+  @Test
+  void hideConditionSupportedValuesValidatorReportsUnsupportedValues() {
+    FormModel model = load("HideConditionSupportedValuesValidator_invalid");
+    List<ModelValidationError> errors = new HideConditionSupportedValuesValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, hideConditionMasterDm()));
+
+    // "maybe" isn't a valid Boolean hide value, and "c" isn't a declared value of the Status enum.
+    assertEquals(2, errors.size());
+  }
+
+  @Test
+  void dependentFieldMasterRequiredValidatorReportsMissingMaster() {
+    FormModel model = load("DependentFieldMasterRequiredValidator_invalid");
+    List<ModelValidationError> errors = new DependentFieldMasterRequiredValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("field_dependent"));
+  }
+
+  @Test
+  void dependentGroupMasterRequiredValidatorReportsMissingMaster() {
+    FormModel model = load("DependentGroupMasterRequiredValidator_invalid");
+    List<ModelValidationError> errors = new DependentGroupMasterRequiredValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("group_dependent"));
+  }
+
+  @Test
+  void dependentEnumerationMasterRequiredValidatorReportsMissingMaster() {
+    FormModel model = load("DependentEnumerationMasterRequiredValidator_invalid");
+    List<ModelValidationError> errors = new DependentEnumerationMasterRequiredValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("field_dependent_enum"));
+  }
+
+  @Test
+  void externalEnumerationSourceRequiredValidatorReportsMissingSource() {
+    FormModel model = load("ExternalEnumerationSourceRequiredValidator_invalid");
+    List<ModelValidationError> errors = new ExternalEnumerationSourceRequiredValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("field_external_enum"));
   }
 }

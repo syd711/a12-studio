@@ -52,8 +52,7 @@ public class FormNodeEditorControlGridPanelController {
     responsiveLayoutController.setControlGrid(grid);
     labelController.setCustom(grid::getTitle, grid::setTitle);
     hideConditionController.configure(
-        grid::getHideConditionField, grid::setHideConditionField,
-        grid::getHideConditionValue, grid::setHideConditionValue,
+        grid::getHideCondition, grid::setHideCondition,
         elementIndex, hideConditionScope);
     stylesController.setCustom(grid::getStyle, grid::getStyle);
     annotationsController.setCustom(grid::getAnnotations);

@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
@@ -14,8 +15,8 @@
             <VBox spacing="8.0">
                 <Label styleClass="field-label" text="%hide_condition_field" />
                 <ComboBox fx:id="fieldCombo" maxWidth="Infinity" />
-                <Label styleClass="field-label" text="%hide_condition_value" />
-                <ComboBox fx:id="valueCombo" maxWidth="Infinity" />
+                <Label styleClass="field-label" text="%hide_condition_values" />
+                <ListView fx:id="valueList" maxWidth="Infinity" prefHeight="110.0" />
                 <padding>
                     <Insets top="4.0" />
                 </padding>

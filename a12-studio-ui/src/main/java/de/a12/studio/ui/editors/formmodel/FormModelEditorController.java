@@ -11,6 +11,7 @@ import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.models.formmodel.Screen;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
@@ -115,6 +116,10 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private DocumentSourceTreeController documentSourceTreeController;
   @FXML
   private FormModelTreeController formModelTreeController;
+  @FXML
+  private DataConfigurationPanelController dataConfigurationController;
+  @FXML
+  private CleanupPanelController cleanupController;
 
   @FXML
   private SplitPane overviewSplitPane;
@@ -170,6 +175,17 @@ public class FormModelEditorController extends AbstractEditorController implemen
     documentSourceTreeController.load(documentModel, projectItem);
     formModelTreeController.setModel(formModel, documentModel, projectItem);
     formModelTreeController.setOnNodeSelected(this::onFormModelTreeNodeSelected);
+    ElementIndex elementIndex = resolveElementIndex(documentModel);
+    dataConfigurationController.setModel(formModel.getContent(), elementIndex);
+    cleanupController.setModel(formModel, elementIndex == null ? List.of() : List.of(elementIndex));
+  }
+
+  /** Mirrors {@link FormModelTreeController}'s own element index construction. */
+  private @Nullable ElementIndex resolveElementIndex(@Nullable DocumentModel documentModel) {
+    if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
+      return null;
+    }
+    return new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
   }
 
   /**

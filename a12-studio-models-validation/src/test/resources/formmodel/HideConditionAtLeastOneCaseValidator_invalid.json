@@ -1,0 +1,33 @@
+{
+  "header": {
+    "id": "HideConditionAtLeastOneCaseValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section1",
+            "name": "ConditionallyHiddenSection",
+            "hideCondition": {
+              "masterField": "field_bool",
+              "cases": []
+            },
+            "screenElements": []
+          }
+        ]
+      }
+    ]
+  }
+}

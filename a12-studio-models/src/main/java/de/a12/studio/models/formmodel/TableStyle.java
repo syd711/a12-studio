@@ -14,4 +14,9 @@ public class TableStyle {
   private Integer rowHeight;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer tableHeight;
+  // Card-view row height, used when the repeat renders as cards instead of a table (e.g. narrow breakpoints).
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer cardHeight;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer actionColumnWidth;
 }

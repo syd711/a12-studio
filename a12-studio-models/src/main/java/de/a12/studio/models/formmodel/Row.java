@@ -28,12 +28,9 @@ public class Row {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Annotation> annotations = new ArrayList<>();
 
-  // Hides this row when the referenced boolean field equals hideConditionValue.
-  // hideConditionField holds the document model field id; hideConditionValue is "true" or null (= "no value").
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String hideConditionField;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String hideConditionValue;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private HideCondition hideCondition;
 
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Cell> cell = new ArrayList<>();
 }

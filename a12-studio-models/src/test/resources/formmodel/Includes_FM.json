@@ -1,0 +1,46 @@
+{
+  "header": {
+    "id": "Includes_FM",
+    "modelType": "form",
+    "modelVersion": "37.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_130cc_controlgrid_248a7",
+            "name": "address-cg",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Address"
+                  }
+                ]
+              }
+            },
+            "includeId": "controlgrid_130cc",
+            "formModelRef": "IncludedModel",
+            "hostDocumentModelPath": "/Person/address",
+            "layout": {
+              "lg": "6-6"
+            },
+            "row": []
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -17,6 +17,7 @@
                 <fx:include fx:id="columnSettings" source="repeat-column-settings-panel.fxml" />
                 <fx:include fx:id="alignment" source="repeat-alignment-panel.fxml" />
                 <fx:include fx:id="additionalSettings" source="repeat-additional-settings-panel.fxml" />
+                <fx:include fx:id="rowActions" source="repeat-row-actions-panel.fxml" />
                 <fx:include fx:id="hideCondition" source="hide-condition-panel.fxml" />
                 <fx:include fx:id="styles" source="../../styles-panel.fxml" />
                 <fx:include fx:id="headerStyles" source="repeat-header-styles-panel.fxml" />

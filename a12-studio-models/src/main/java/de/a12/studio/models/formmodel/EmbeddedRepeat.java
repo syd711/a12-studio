@@ -15,6 +15,8 @@ public class EmbeddedRepeat extends AbstractRepeat {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private ControlGrid controlGrid;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private MultiFileUploadOptions multiFileUploadOptions;
 
   public EmbeddedRepeat() {
     setType(ScreenElementType.EMBEDDED_REPEAT);

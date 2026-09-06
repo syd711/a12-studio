@@ -6,16 +6,24 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.formmodel.AbstractRepeat;
+import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
+import de.a12.studio.models.formmodel.CustomCell;
+import de.a12.studio.models.formmodel.CustomScreenElement;
+import de.a12.studio.models.formmodel.ExpressionCell;
+import de.a12.studio.models.formmodel.ExpressionRepeatOverviewColumn;
+import de.a12.studio.models.formmodel.FieldBasedRepeatOverviewColumn;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.InlineRepeat;
 import de.a12.studio.models.formmodel.MultiColumnSection;
+import de.a12.studio.models.formmodel.RepeatOverviewColumn;
 import de.a12.studio.models.formmodel.Row;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.Section;
+import de.a12.studio.models.formmodel.TextCell;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
@@ -26,13 +34,19 @@ import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelControlle
 import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.MoveNodeCommand;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorButtonPanelPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorConfirmControlPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorCustomCellPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorCustomScreenElementPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRepeatPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRowPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorExpressionCellPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorRepeatOverviewColumnPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorScreenPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorSectionPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorTextCellPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.HideConditionPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -143,6 +157,30 @@ public class FormModelTreeController implements Initializable {
   private Node repeatEditor;
   @FXML
   private FormNodeEditorRepeatPanelController repeatEditorController;
+  @FXML
+  private Node textCellEditor;
+  @FXML
+  private FormNodeEditorTextCellPanelController textCellEditorController;
+  @FXML
+  private Node expressionCellEditor;
+  @FXML
+  private FormNodeEditorExpressionCellPanelController expressionCellEditorController;
+  @FXML
+  private Node repeatOverviewColumnEditor;
+  @FXML
+  private FormNodeEditorRepeatOverviewColumnPanelController repeatOverviewColumnEditorController;
+  @FXML
+  private Node customScreenElementEditor;
+  @FXML
+  private FormNodeEditorCustomScreenElementPanelController customScreenElementEditorController;
+  @FXML
+  private Node buttonPanelEditor;
+  @FXML
+  private FormNodeEditorButtonPanelPanelController buttonPanelEditorController;
+  @FXML
+  private Node customCellEditor;
+  @FXML
+  private FormNodeEditorCustomCellPanelController customCellEditorController;
 
   private ProjectItem projectItem;
   private FormModelContent content;
@@ -259,6 +297,13 @@ public class FormModelTreeController implements Initializable {
     boolean isConfirmControl = node instanceof Control && isConfirmField((Control) node);
     boolean isControl = node instanceof Control && !isConfirmControl;
     boolean isRepeat = node instanceof AbstractRepeat;
+    boolean isTextCell = node instanceof TextCell;
+    boolean isExpressionCell = node instanceof ExpressionCell;
+    // GenericRepeatOverviewColumn (unrecognized column type) stays read-only, like other Generic* fallbacks.
+    boolean isRepeatOverviewColumn = node instanceof FieldBasedRepeatOverviewColumn || node instanceof ExpressionRepeatOverviewColumn;
+    boolean isCustomScreenElement = node instanceof CustomScreenElement;
+    boolean isButtonPanel = node instanceof ButtonPanel;
+    boolean isCustomCell = node instanceof CustomCell;
 
     setVisible(rowEditor, isRow);
     setVisible(multiColumnSectionEditor, isMultiColumnSection);
@@ -268,8 +313,15 @@ public class FormModelTreeController implements Initializable {
     setVisible(controlEditor, isControl);
     setVisible(confirmControlEditor, isConfirmControl);
     setVisible(repeatEditor, isRepeat);
+    setVisible(textCellEditor, isTextCell);
+    setVisible(expressionCellEditor, isExpressionCell);
+    setVisible(repeatOverviewColumnEditor, isRepeatOverviewColumn);
+    setVisible(customScreenElementEditor, isCustomScreenElement);
+    setVisible(buttonPanelEditor, isButtonPanel);
+    setVisible(customCellEditor, isCustomCell);
     setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection
-        || isControlGrid || isControl || isConfirmControl || isRepeat));
+        || isControlGrid || isControl || isConfirmControl || isRepeat || isTextCell || isExpressionCell
+        || isRepeatOverviewColumn || isCustomScreenElement || isButtonPanel || isCustomCell));
 
     if (isRow) {
       rowEditorController.setRow((Row) node, elementIndex, containerHideConditionScope(selectedItem));
@@ -295,6 +347,26 @@ public class FormModelTreeController implements Initializable {
     else if (isRepeat) {
       repeatEditorController.setRepeat((AbstractRepeat) node, documentModel, content,
           elementIndex, containerHideConditionScope(selectedItem));
+    }
+    else if (isTextCell) {
+      textCellEditorController.setTextCell((TextCell) node);
+    }
+    else if (isExpressionCell) {
+      expressionCellEditorController.setExpressionCell((ExpressionCell) node);
+    }
+    else if (isRepeatOverviewColumn) {
+      repeatOverviewColumnEditorController.setColumn((RepeatOverviewColumn) node, elementIndex);
+    }
+    else if (isCustomScreenElement) {
+      customScreenElementEditorController.setCustomScreenElement((CustomScreenElement) node, elementIndex,
+          containerHideConditionScope(selectedItem));
+    }
+    else if (isButtonPanel) {
+      buttonPanelEditorController.setButtonPanel((ButtonPanel) node, elementIndex, screenIds(),
+          containerHideConditionScope(selectedItem));
+    }
+    else if (isCustomCell) {
+      customCellEditorController.setCustomCell((CustomCell) node);
     }
   }
 

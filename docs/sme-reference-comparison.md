@@ -410,6 +410,58 @@ validators are the sole source of truth here.
    priority #5, additiveDocumentModel/combinationModel are prerequisites for CDM). Don't start this before those
    land.
 
+**Status (2026-09-06): steps 1-6 done, all wire shapes verified against real SME fixtures, all data-model changes
+covered by round-trip tests.**
+
+- **Step 1**: `HideCondition`/`HideConditionCase` (`masterField`+`cases[]`) replaced the old single-value
+  `hideConditionField`/`hideConditionValue` on `ScreenElement`/`Row`/`Control`; `HideConditionPanelController`
+  reworked into a checklist whose value choices adapt to the master field's type (Boolean/Confirm/Enumeration).
+  `DependentEnumeration`/`ExternalEnumeration` (+ `formatting`/`secret`/`enableSelectAll`/`annotations`) added to
+  `FieldConfigEntry`, with new editor panels. All 5 "gap" validators from step 1 added, plus
+  `DependentFieldMasterRequired`/`DependentGroupMasterRequired`, all with fixtures/tests.
+- **Step 2**: `TextCell`/`ExpressionCell` editor panels added. `RepeatOverviewColumn` fields consolidated onto a
+  shared base (`label`, `filterExposition`, `pinDirection`, `icon`, `labelHidden`, `headerStyle`, `fixedWidth`,
+  `hideCondition`, `annotations`); new `ExpressionRepeatOverviewColumn` type (verified against a real fixture,
+  including its distinctive `name` field that `FieldBasedRepeatOverviewColumn` lacks). "Add Column" wired through
+  the tree's generic add/attach/detach/reorder commands (which needed two latent-bug fixes: they previously assumed
+  only `ControlGrid`/`Screen` could ever occupy a Repeat's single child slot). New column editor panel covers
+  label/width/sortable/filterable/preferred-sorting + type-specific fields; icon/pin-direction/per-column hide
+  condition still deferred (modeled, no UI yet).
+- **Step 3**: new **Data Configuration tab** — a flat table of every field/group config entry with reusable detail
+  editors (External Enumeration, Dependent Enumeration, and two new panels, **Dependent Field** and **Dependent
+  Group**, closing a gap bigger than originally scoped: `dependentField`/`dependentGroup` had **zero** editor UI
+  anywhere before this, not even a partial one). "Add Field"/"Add Group" let a field be configured before any
+  Control references it. `GroupConfigEntry.numberOfInitialRows` also exposed (previously unedited anywhere). New
+  **Cleanup tab** flags both dangling (field/group no longer exists in the DM) and orphaned (exists but unreferenced
+  by the tree) entries with "Clean All", backed by a new `FormReferences` utility.
+  `ExternalEnumerationPanelController`/`DependentEnumerationPanelController` were refactored to take a
+  `FieldConfigEntry` directly (not a `Control`) so the same panels serve both the per-node editor and this tab.
+- **Step 4**: `filterExpression`, `initialSorting`, `titleHidden` added to `AbstractRepeat` with UI. Real
+  `RowAction`/`RowActionGroup` added (rich, multi-action); the old single-slot type was renamed
+  `DefaultRowAction` to stop colliding with it and now correctly matches SME's `DefaultRowAction` shape
+  (`event`/`custom`/`hideButton`) instead of the richer one. New "Row Actions" table editor (event + scope; full
+  per-action `buttonStyling`/confirmation editing deferred). Per-repeat `confirmationTexts` override and
+  `TableStyle.cardHeight`/`actionColumnWidth` added, both with UI. `MultiFileUploadOptions` added to
+  `InlineRepeat`/`EmbeddedRepeat` only (matching SME's actual restriction) — modeled, no UI yet.
+- **Step 5** (originally planned last, done ahead of step 6 once its actual shape was found): **not** attempted as
+  a live resolve-and-expand feature — a real fixture (`client/resources/input/models/fmm/workspace/HostModel.json`)
+  showed SME expands an include at *author* time (copies the referenced subtree into this model's own `screens`
+  with rewritten ids) and keeps `includeId`/`formModelRef`/`hostDocumentModelPath` purely as provenance metadata,
+  not a live reference resolved at render time. So the scoped, correct fix was just adding those three fields to
+  `ScreenElement` for round-trip fidelity (verified against that fixture's exact shape) — a12-studio still has no
+  UI action that performs the copy-and-rewrite itself, which remains real future work, but the round-trip hazard
+  (silently dropping this data on load-then-save) is closed.
+- **Step 6**: `ButtonPanel` (new `ScreenElement`, addable inline in the screen tree, own button list reusing
+  `ToolbarButtonsPanelController`) and `CustomCell` (new `Cell` type) added, both with editor panels. While in this
+  area, also closed a pre-existing gap found by inspection: `CustomScreenElement` had **no editor pane at all**
+  (addable via the tree, but none of its inherited `ScreenElement` fields — name, label, hide condition, styles,
+  annotations — were editable afterward); it now has one.
+- **Found and fixed along the way**: a pre-existing round-trip bug unrelated to this work —
+  `Row.cell` lacked `@JsonInclude(NON_EMPTY)`, so an empty row's `[]` cell list was written back as an explicit
+  `"cell": []` instead of matching source files that omit it.
+- **Not done**: step 7 (`Binding`/`BindingRepeat`) — still correctly blocked on Relationship Model/CDM support per
+  the reasoning above; not attempted.
+
 ---
 
 ## Query Model

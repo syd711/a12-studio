@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.ButtonGroup;
 import de.a12.studio.models.formmodel.Cell;
@@ -362,7 +363,15 @@ class FormModelActions {
    */
   List<Object> siblingsOf(@NonNull FormElementViewModel item) {
     Object parent = item.getParentNode();
-    return parent == null ? topLevelSiblings() : childListOf(parent);
+    if (parent == null) {
+      return topLevelSiblings();
+    }
+    Object node = item.getNode();
+    if ((parent instanceof EmbeddedRepeat && node instanceof ControlGrid)
+        || (parent instanceof DetachedRepeat && node instanceof Screen)) {
+      return null;
+    }
+    return childListOf(parent);
   }
 
   @SuppressWarnings("unchecked")
@@ -396,6 +405,9 @@ class FormModelActions {
     if (parent instanceof Row row) {
       return (List<Object>) (List<?>) row.getCell();
     }
+    if (parent instanceof AbstractRepeat repeat) {
+      return (List<Object>) (List<?>) repeat.getRepeatOverviewColumn();
+    }
     return null;
   }
 
@@ -406,11 +418,11 @@ class FormModelActions {
    * already checked via {@link FormModelNodeTypes#canContain}/{@link FormModelNodeTypes#allowedChildTypes}).
    */
   Command createAttachCommand(@NonNull Object parent, @NonNull Object child) {
-    if (parent instanceof EmbeddedRepeat repeat) {
-      return new SetSingleChildCommand<>(repeat::setControlGrid, (ControlGrid) child, repeat.getControlGrid());
+    if (parent instanceof EmbeddedRepeat repeat && child instanceof ControlGrid grid) {
+      return new SetSingleChildCommand<>(repeat::setControlGrid, grid, repeat.getControlGrid());
     }
-    if (parent instanceof DetachedRepeat repeat) {
-      return new SetSingleChildCommand<>(repeat::setDetailScreen, (Screen) child, repeat.getDetailScreen());
+    if (parent instanceof DetachedRepeat repeat && child instanceof Screen screen) {
+      return new SetSingleChildCommand<>(repeat::setDetailScreen, screen, repeat.getDetailScreen());
     }
     List<Object> children = childListOf(parent);
     return children == null ? null : new AddNodeCommand(children, child, children.size());
@@ -426,10 +438,10 @@ class FormModelActions {
     if (parent == null) {
       return new DeleteNodeCommand(topLevelSiblings(), node);
     }
-    if (parent instanceof EmbeddedRepeat repeat) {
+    if (parent instanceof EmbeddedRepeat repeat && node instanceof ControlGrid) {
       return new SetSingleChildCommand<ControlGrid>(repeat::setControlGrid, null, repeat.getControlGrid());
     }
-    if (parent instanceof DetachedRepeat repeat) {
+    if (parent instanceof DetachedRepeat repeat && node instanceof Screen) {
       return new SetSingleChildCommand<Screen>(repeat::setDetailScreen, null, repeat.getDetailScreen());
     }
     List<Object> siblings = childListOf(parent);

@@ -1,12 +1,16 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
+import de.a12.studio.models.formmodel.CustomCell;
 import de.a12.studio.models.formmodel.CustomScreenElement;
 import de.a12.studio.models.formmodel.DetachedRepeat;
 import de.a12.studio.models.formmodel.EmbeddedRepeat;
 import de.a12.studio.models.formmodel.ExpressionCell;
+import de.a12.studio.models.formmodel.ExpressionRepeatOverviewColumn;
+import de.a12.studio.models.formmodel.FieldBasedRepeatOverviewColumn;
 import de.a12.studio.models.formmodel.InlineRepeat;
 import de.a12.studio.models.formmodel.MultiColumnSection;
 import de.a12.studio.models.formmodel.Row;
@@ -17,6 +21,7 @@ import de.a12.studio.models.formmodel.TextCell;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -40,12 +45,14 @@ final class FormModelNodeTypes {
       new ChildTypeDescriptor("Embedded Repeat", Icons.FORM_EMBEDDED_REPEAT, EmbeddedRepeat.class, FormModelElementFactory::newEmbeddedRepeat),
       new ChildTypeDescriptor("Detached Repeat", Icons.FORM_DETACHED_REPEAT, DetachedRepeat.class, FormModelElementFactory::newDetachedRepeat),
       new ChildTypeDescriptor("Custom Screen Element", Icons.FORM_CUSTOM_SCREEN_ELEMENT, CustomScreenElement.class,
-          FormModelElementFactory::newCustomScreenElement));
+          FormModelElementFactory::newCustomScreenElement),
+      new ChildTypeDescriptor("Button Panel", Icons.FORM_BUTTON_PANEL, ButtonPanel.class, FormModelElementFactory::newButtonPanel));
 
   private static final List<ChildTypeDescriptor> ROW_CHILD_TYPES = List.of(
       new ChildTypeDescriptor("Control", Icons.FORM_CONTROL, Control.class, FormModelElementFactory::newControl),
       new ChildTypeDescriptor("Text", Icons.FORM_TEXT_CELL, TextCell.class, FormModelElementFactory::newTextCell),
-      new ChildTypeDescriptor("Expression", Icons.FORM_EXPRESSION_CELL, ExpressionCell.class, FormModelElementFactory::newExpressionCell));
+      new ChildTypeDescriptor("Expression", Icons.FORM_EXPRESSION_CELL, ExpressionCell.class, FormModelElementFactory::newExpressionCell),
+      new ChildTypeDescriptor("Custom", Icons.FORM_CUSTOM_CELL, CustomCell.class, FormModelElementFactory::newCustomCell));
 
   private static final ChildTypeDescriptor ROW_TYPE =
       new ChildTypeDescriptor("Row", Icons.FORM_ROW, Row.class, FormModelElementFactory::newRow);
@@ -55,6 +62,12 @@ final class FormModelNodeTypes {
 
   private static final ChildTypeDescriptor DETAIL_SCREEN_TYPE =
       new ChildTypeDescriptor("Detail Screen", Icons.FORM_SCREEN, Screen.class, FormModelElementFactory::newScreen);
+
+  private static final List<ChildTypeDescriptor> REPEAT_OVERVIEW_COLUMN_CHILD_TYPES = List.of(
+      new ChildTypeDescriptor("Field Column", Icons.FORM_CONTROL, FieldBasedRepeatOverviewColumn.class,
+          FormModelElementFactory::newFieldBasedRepeatOverviewColumn),
+      new ChildTypeDescriptor("Expression Column", Icons.FORM_EXPRESSION_CELL, ExpressionRepeatOverviewColumn.class,
+          FormModelElementFactory::newExpressionRepeatOverviewColumn));
 
   private FormModelNodeTypes() {
   }
@@ -74,12 +87,25 @@ final class FormModelNodeTypes {
       return ROW_CHILD_TYPES;
     }
     if (node instanceof EmbeddedRepeat repeat) {
-      return repeat.getControlGrid() == null ? List.of(CONTROL_GRID_TYPE) : List.of();
+      if (repeat.getControlGrid() != null) {
+        return REPEAT_OVERVIEW_COLUMN_CHILD_TYPES;
+      }
+      List<ChildTypeDescriptor> types = new ArrayList<>(REPEAT_OVERVIEW_COLUMN_CHILD_TYPES);
+      types.add(CONTROL_GRID_TYPE);
+      return types;
     }
     if (node instanceof DetachedRepeat repeat) {
-      return repeat.getDetailScreen() == null ? List.of(DETAIL_SCREEN_TYPE) : List.of();
+      if (repeat.getDetailScreen() != null) {
+        return REPEAT_OVERVIEW_COLUMN_CHILD_TYPES;
+      }
+      List<ChildTypeDescriptor> types = new ArrayList<>(REPEAT_OVERVIEW_COLUMN_CHILD_TYPES);
+      types.add(DETAIL_SCREEN_TYPE);
+      return types;
     }
-    // InlineRepeat, CustomScreenElement, Control, TextCell, ExpressionCell: no children can be added.
+    if (node instanceof InlineRepeat) {
+      return REPEAT_OVERVIEW_COLUMN_CHILD_TYPES;
+    }
+    // CustomScreenElement, Control, TextCell, ExpressionCell, RepeatOverviewColumn: no children can be added.
     return List.of();
   }
 

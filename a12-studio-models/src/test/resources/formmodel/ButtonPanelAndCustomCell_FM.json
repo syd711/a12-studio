@@ -1,0 +1,70 @@
+{
+  "header": {
+    "id": "ButtonPanelAndCustomCell_FM",
+    "modelType": "form",
+    "modelVersion": "37.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "ButtonPanel",
+            "id": "buttonpanel_4f3a3",
+            "name": "bp",
+            "button": [
+              {
+                "type": "EVENT",
+                "id": "button_ad215",
+                "name": "button",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Button"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "event": "event_custom"
+              }
+            ]
+          },
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_1",
+            "name": "Grid",
+            "layout": {
+              "lg": "12"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_1",
+                "cell": [
+                  {
+                    "type": "CustomCell",
+                    "id": "customcell_1",
+                    "name": "custom-cell"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

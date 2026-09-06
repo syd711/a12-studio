@@ -1,0 +1,98 @@
+{
+  "header": {
+    "id": "HideConditionAndDependentEnumeration_FM",
+    "modelType": "form",
+    "modelVersion": "37.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section1",
+            "name": "ConditionallyHiddenSection",
+            "hideCondition": {
+              "masterField": "field_master_enum",
+              "cases": [
+                {
+                  "masterValue": "a"
+                },
+                {
+                  "masterValue": "b"
+                },
+                {
+                  "masterValue": null
+                }
+              ]
+            },
+            "screenElements": []
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "elementRef": "field_dependent_enum",
+          "dependentEnumeration": {
+            "masterField": "field_master_enum",
+            "constraint": [
+              {
+                "masterValue": "a",
+                "valueForMasterChange": "c",
+                "constraintValues": [
+                  {
+                    "value": "b"
+                  },
+                  {
+                    "value": "c"
+                  },
+                  {
+                    "value": "d"
+                  }
+                ]
+              },
+              {
+                "masterValue": null,
+                "constraintValues": []
+              }
+            ]
+          }
+        },
+        {
+          "elementRef": "field_external_enum",
+          "exposition": "AUTOCOMPLETE",
+          "externalEnumeration": {
+            "src": "https://invalid.example.com",
+            "customValuesAllowed": true,
+            "caseSensitive": true
+          }
+        },
+        {
+          "elementRef": "field_secret",
+          "secret": true,
+          "formatting": "AREA",
+          "enableSelectAll": true,
+          "annotations": [
+            {
+              "name": "roles",
+              "value": "admin"
+            }
+          ]
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}
+

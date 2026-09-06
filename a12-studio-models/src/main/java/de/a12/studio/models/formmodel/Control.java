@@ -52,11 +52,8 @@ public class Control extends Cell {
   private TextContainer placeholder;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private TextContainer accessibility;
-  // Hides this control when the referenced boolean field equals hideConditionValue.
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String hideConditionField;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String hideConditionValue;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private HideCondition hideCondition;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<de.a12.studio.models.Annotation> annotations = new ArrayList<>();
 

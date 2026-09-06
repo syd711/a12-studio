@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.Control;
+import de.a12.studio.models.formmodel.FieldConfigEntry;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
@@ -29,10 +30,15 @@ import org.jspecify.annotations.Nullable;
  *   <li><b>Additional Settings</b> ({@link AdditionalSettingsPanelController}) — initial value/exposition
  *       (model-wide {@code FieldConfigEntry}), message position, readonly, readonly presentation and
  *       required-field asterisk marking.</li>
- *   <li><b>Hide Condition</b> ({@link HideConditionPanelController}) — boolean field selector and condition
- *       value combo, populated from the linked Document Model's boolean fields. Note: {@link Control} does not
- *       extend {@link de.a12.studio.models.formmodel.ScreenElement}, so it carries its own
- *       {@code hideConditionField}/{@code hideConditionValue} pair (see {@code Control.java}).</li>
+ *   <li><b>External Enumeration</b> ({@link ExternalEnumerationPanelController}) — sources the bound field's
+ *       enum options from an external URL (model-wide {@code FieldConfigEntry}).</li>
+ *   <li><b>Dependent Enumeration</b> ({@link DependentEnumerationPanelController}) — constrains which of the
+ *       bound field's own enum values are offered based on a master field's value (model-wide
+ *       {@code FieldConfigEntry}).</li>
+ *   <li><b>Hide Condition</b> ({@link HideConditionPanelController}) — master field selector and a checklist
+ *       of trigger values, populated from the linked Document Model's Boolean/Confirm/Enumeration fields. Note:
+ *       {@link Control} does not extend {@link de.a12.studio.models.formmodel.ScreenElement}, so it carries its
+ *       own {@code hideCondition} property (see {@code Control.java}).</li>
  *   <li><b>Accessibility</b> ({@link ControlAccessibilityPanelController}) — checkbox keeping the label mandatory
  *       for screen readers while hiding it visually on screen, stored in
  *       {@link Control#getLabelHiddenButRead()}.</li>
@@ -56,6 +62,10 @@ public class FormNodeEditorControlPanelController {
   @FXML
   private AdditionalSettingsPanelController additionalSettingsController;
   @FXML
+  private ExternalEnumerationPanelController externalEnumerationController;
+  @FXML
+  private DependentEnumerationPanelController dependentEnumerationController;
+  @FXML
   private HideConditionPanelController hideConditionController;
   @FXML
   private ControlAccessibilityPanelController accessibilityController;
@@ -74,9 +84,12 @@ public class FormNodeEditorControlPanelController {
     placeholderController.setControl(control, content);
     layoutController.setControl(control);
     additionalSettingsController.setControl(control, elementIndex, content);
+    FieldConfigEntry fieldConfigEntry = FieldConfigEntryHelper.findOrCreate(control, content);
+    externalEnumerationController.setEntry(fieldConfigEntry);
+    dependentEnumerationController.setEntry(fieldConfigEntry, elementIndex,
+        HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(control.getElementRef(), elementIndex));
     hideConditionController.configure(
-        control::getHideConditionField, control::setHideConditionField,
-        control::getHideConditionValue, control::setHideConditionValue,
+        control::getHideCondition, control::setHideCondition,
         elementIndex, HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(control.getElementRef(), elementIndex));
     accessibilityController.setControl(control);
     stylesController.setCustom(control::getStyle, control::getStyle);

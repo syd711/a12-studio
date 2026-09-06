@@ -1,0 +1,59 @@
+{
+  "header": {
+    "id": "HideConditionSupportedValuesValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "HideConditionMaster_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section1",
+            "name": "BooleanHiddenSection",
+            "hideCondition": {
+              "masterField": "field_bool",
+              "cases": [
+                {
+                  "masterValue": "maybe"
+                }
+              ]
+            },
+            "screenElements": []
+          },
+          {
+            "type": "Section",
+            "id": "section2",
+            "name": "EnumHiddenSection",
+            "hideCondition": {
+              "masterField": "field_enum",
+              "cases": [
+                {
+                  "masterValue": "c"
+                }
+              ]
+            },
+            "screenElements": []
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "header": {
+    "id": "DependentGroupMasterRequiredValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [],
+    "groupConfiguration": {
+      "group": [
+        {
+          "groupRef": "group_dependent",
+          "dependentGroup": {
+            "case": [
+              {
+                "masterValue": "a",
+                "notRelevant": true
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

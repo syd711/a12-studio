@@ -8,6 +8,7 @@ public enum CellType {
   CONTROL("Control"),
   TEXT_CELL("TextCell"),
   EXPRESSION_CELL("ExpressionCell"),
+  CUSTOM_CELL("CustomCell"),
   // Falls back to this instead of throwing so unrecognized/future cell types (deserialized as
   // GenericCell, see Cell's defaultImpl) still load instead of failing the whole document.
   OTHER("Other");

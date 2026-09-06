@@ -1,11 +1,15 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
+import de.a12.studio.models.formmodel.CustomCell;
 import de.a12.studio.models.formmodel.CustomScreenElement;
 import de.a12.studio.models.formmodel.DetachedRepeat;
 import de.a12.studio.models.formmodel.EmbeddedRepeat;
 import de.a12.studio.models.formmodel.ExpressionCell;
+import de.a12.studio.models.formmodel.ExpressionRepeatOverviewColumn;
+import de.a12.studio.models.formmodel.FieldBasedRepeatOverviewColumn;
 import de.a12.studio.models.formmodel.InlineRepeat;
 import de.a12.studio.models.formmodel.MultiColumnSection;
 import de.a12.studio.models.formmodel.Row;
@@ -69,6 +73,20 @@ final class FormModelElementFactory {
     return element;
   }
 
+  static ButtonPanel newButtonPanel() {
+    ButtonPanel panel = new ButtonPanel();
+    panel.setId(generateId("buttonpanel"));
+    panel.setName("ButtonPanel");
+    return panel;
+  }
+
+  static CustomCell newCustomCell() {
+    CustomCell cell = new CustomCell();
+    cell.setId(generateId("customcell"));
+    cell.setName("CustomCell");
+    return cell;
+  }
+
   static InlineRepeat newInlineRepeat() {
     InlineRepeat repeat = new InlineRepeat();
     repeat.setId(generateId("inlinerepeat"));
@@ -126,5 +144,23 @@ final class FormModelElementFactory {
     cell.setId(generateId("expressioncell"));
     cell.setName("ExpressionCell");
     return cell;
+  }
+
+  static FieldBasedRepeatOverviewColumn newFieldBasedRepeatOverviewColumn() {
+    FieldBasedRepeatOverviewColumn column = new FieldBasedRepeatOverviewColumn();
+    column.setId(generateId("repeatoverviewcolumn"));
+    return column;
+  }
+
+  static FieldBasedRepeatOverviewColumn newFieldBasedRepeatOverviewColumn(String elementRef) {
+    FieldBasedRepeatOverviewColumn column = newFieldBasedRepeatOverviewColumn();
+    column.setElementRef(elementRef);
+    return column;
+  }
+
+  static ExpressionRepeatOverviewColumn newExpressionRepeatOverviewColumn() {
+    ExpressionRepeatOverviewColumn column = new ExpressionRepeatOverviewColumn();
+    column.setId(generateId("expressionrepeatoverviewcolumn"));
+    return column;
   }
 }

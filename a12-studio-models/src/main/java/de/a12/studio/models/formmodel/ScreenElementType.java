@@ -9,6 +9,7 @@ public enum ScreenElementType {
   MULTI_COLUMN_SECTION("MultiColumnSection"),
   CONTROL_GRID("ControlGrid"),
   CUSTOM_SCREEN_ELEMENT("CustomScreenElement"),
+  BUTTON_PANEL("ButtonPanel"),
   INLINE_REPEAT("InlineRepeat"),
   EMBEDDED_REPEAT("EmbeddedRepeat"),
   DETACHED_REPEAT("DetachedRepeat"),

@@ -24,4 +24,10 @@ public class DependentCase {
   // Populated by the confirm-field node editor's Dependencies tab tree selection.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<String> notRelevantNodes = new ArrayList<>();
+  // Field-only (a DependentGroup case never sets these): force the dependent field to this literal value...
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String value;
+  // ...or copy the current value of another field, when the master field changes to masterValue.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String fieldRef;
 }

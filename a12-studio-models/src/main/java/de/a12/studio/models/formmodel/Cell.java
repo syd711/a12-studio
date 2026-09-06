@@ -13,7 +13,8 @@ import lombok.Setter;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Control.class, name = "Control"),
     @JsonSubTypes.Type(value = TextCell.class, name = "TextCell"),
-    @JsonSubTypes.Type(value = ExpressionCell.class, name = "ExpressionCell")
+    @JsonSubTypes.Type(value = ExpressionCell.class, name = "ExpressionCell"),
+    @JsonSubTypes.Type(value = CustomCell.class, name = "CustomCell")
 })
 @Getter
 @Setter

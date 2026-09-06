@@ -65,8 +65,7 @@ public class FormNodeEditorConfirmControlPanelController {
     hintController.setControl(control, content);
     placeholderController.setControl(control, content);
     hideConditionController.configure(
-        control::getHideConditionField, control::setHideConditionField,
-        control::getHideConditionValue, control::setHideConditionValue,
+        control::getHideCondition, control::setHideCondition,
         elementIndex, HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(control.getElementRef(), elementIndex));
     accessibilityController.setControl(control);
     stylesController.setCustom(control::getStyle, control::getStyle);

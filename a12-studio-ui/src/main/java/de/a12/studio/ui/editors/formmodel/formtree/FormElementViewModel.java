@@ -1,9 +1,11 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
 import de.a12.studio.models.formmodel.AbstractRepeat;
+import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
+import de.a12.studio.models.formmodel.CustomCell;
 import de.a12.studio.models.formmodel.CustomScreenElement;
 import de.a12.studio.models.formmodel.DetachedRepeat;
 import de.a12.studio.models.formmodel.EmbeddedRepeat;
@@ -186,6 +188,9 @@ public class FormElementViewModel {
     if (node instanceof CustomScreenElement) {
       return "Custom Screen Element";
     }
+    if (node instanceof ButtonPanel) {
+      return "Button Panel";
+    }
     if (node instanceof Row) {
       return "Row";
     }
@@ -197,6 +202,9 @@ public class FormElementViewModel {
     }
     if (node instanceof ExpressionCell) {
       return "Expression";
+    }
+    if (node instanceof CustomCell) {
+      return "Custom";
     }
     if (node instanceof RepeatOverviewColumn) {
       return "Column";
@@ -229,6 +237,9 @@ public class FormElementViewModel {
     if (node instanceof CustomScreenElement) {
       return Icons.FORM_CUSTOM_SCREEN_ELEMENT;
     }
+    if (node instanceof ButtonPanel) {
+      return Icons.FORM_BUTTON_PANEL;
+    }
     if (node instanceof Row) {
       return Icons.FORM_ROW;
     }
@@ -240,6 +251,9 @@ public class FormElementViewModel {
     }
     if (node instanceof ExpressionCell) {
       return Icons.FORM_EXPRESSION_CELL;
+    }
+    if (node instanceof CustomCell) {
+      return Icons.FORM_CUSTOM_CELL;
     }
     if (node instanceof RepeatOverviewColumn) {
       return Icons.FORM_CONTROL;
@@ -276,7 +290,8 @@ public class FormElementViewModel {
         childNodes.add(detachedRepeat.getDetailScreen());
       }
     }
-    // CustomScreenElement, Control, TextCell, ExpressionCell, RepeatOverviewColumn: no children.
+    // CustomScreenElement, ButtonPanel, Control, TextCell, ExpressionCell, CustomCell, RepeatOverviewColumn:
+    // no children shown in this tree (ButtonPanel's own buttons are edited via a panel, not tree nodes).
 
     List<FormElementViewModel> children = new ArrayList<>();
     for (Object child : childNodes) {

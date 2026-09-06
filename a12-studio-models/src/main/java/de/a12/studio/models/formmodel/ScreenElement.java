@@ -19,6 +19,7 @@ import java.util.List;
     @JsonSubTypes.Type(value = MultiColumnSection.class, name = "MultiColumnSection"),
     @JsonSubTypes.Type(value = ControlGrid.class, name = "ControlGrid"),
     @JsonSubTypes.Type(value = CustomScreenElement.class, name = "CustomScreenElement"),
+    @JsonSubTypes.Type(value = ButtonPanel.class, name = "ButtonPanel"),
     @JsonSubTypes.Type(value = InlineRepeat.class, name = "InlineRepeat"),
     @JsonSubTypes.Type(value = EmbeddedRepeat.class, name = "EmbeddedRepeat"),
     @JsonSubTypes.Type(value = DetachedRepeat.class, name = "DetachedRepeat")
@@ -42,10 +43,21 @@ public abstract class ScreenElement {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Annotation> annotations = new ArrayList<>();
 
-  // Hides this element when the referenced boolean field equals hideConditionValue.
-  // hideConditionField holds the document model field id; hideConditionValue is "true" or null (= "no value").
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private HideCondition hideCondition;
+
+  // Transclusion provenance (SME's "Included" mixin): set when this node was copied in from another Form
+  // Model's screen tree rather than authored directly here. SME expands an include at author-time (copies
+  // the referenced subtree's nodes into this model's own screens with rewritten ids, keeping these three
+  // fields as provenance metadata) rather than resolving it live at render time - so modeling these fields
+  // is enough for round-trip fidelity even without a12-studio itself performing that expansion yet.
+  // includeId: the node's own id within formModelRef's tree (as opposed to this.id, its id in this model).
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String hideConditionField;
+  private String includeId;
+  // The Form Model this subtree was included from.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private String hideConditionValue;
+  private String formModelRef;
+  // Where in this model's own Document Model the included subtree's field/group references were remapped to.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String hostDocumentModelPath;
 }

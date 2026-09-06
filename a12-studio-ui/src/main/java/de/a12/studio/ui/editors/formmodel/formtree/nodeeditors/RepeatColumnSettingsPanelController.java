@@ -30,6 +30,12 @@ public class RepeatColumnSettingsPanelController implements Initializable {
   @FXML
   private Spinner<Integer> tableHeightSpinner;
 
+  @FXML
+  private Spinner<Integer> cardHeightSpinner;
+
+  @FXML
+  private Spinner<Integer> actionColumnWidthSpinner;
+
   private AbstractRepeat repeat;
   private boolean updatingFromModel;
 
@@ -54,6 +60,24 @@ public class RepeatColumnSettingsPanelController implements Initializable {
       ensureTableStyle().setTableHeight(val == null || val == 0 ? null : val);
       commitChange();
     });
+
+    cardHeightSpinner.setValueFactory(
+        new SpinnerValueFactory.IntegerSpinnerValueFactory(DEFAULT, MAX, DEFAULT));
+    cardHeightSpinner.setEditable(true);
+    cardHeightSpinner.valueProperty().addListener((obs, old, val) -> {
+      if (updatingFromModel || repeat == null) return;
+      ensureTableStyle().setCardHeight(val == null || val == 0 ? null : val);
+      commitChange();
+    });
+
+    actionColumnWidthSpinner.setValueFactory(
+        new SpinnerValueFactory.IntegerSpinnerValueFactory(DEFAULT, MAX, DEFAULT));
+    actionColumnWidthSpinner.setEditable(true);
+    actionColumnWidthSpinner.valueProperty().addListener((obs, old, val) -> {
+      if (updatingFromModel || repeat == null) return;
+      ensureTableStyle().setActionColumnWidth(val == null || val == 0 ? null : val);
+      commitChange();
+    });
   }
 
   public void setRepeat(@NonNull AbstractRepeat repeat) {
@@ -63,6 +87,8 @@ public class RepeatColumnSettingsPanelController implements Initializable {
       TableStyle ts = repeat.getTableStyle();
       rowHeightSpinner.getValueFactory().setValue(ts != null && ts.getRowHeight() != null ? ts.getRowHeight() : DEFAULT);
       tableHeightSpinner.getValueFactory().setValue(ts != null && ts.getTableHeight() != null ? ts.getTableHeight() : DEFAULT);
+      cardHeightSpinner.getValueFactory().setValue(ts != null && ts.getCardHeight() != null ? ts.getCardHeight() : DEFAULT);
+      actionColumnWidthSpinner.getValueFactory().setValue(ts != null && ts.getActionColumnWidth() != null ? ts.getActionColumnWidth() : DEFAULT);
     } finally {
       updatingFromModel = false;
     }

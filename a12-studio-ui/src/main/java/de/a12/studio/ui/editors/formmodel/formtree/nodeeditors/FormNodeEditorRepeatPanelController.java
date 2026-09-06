@@ -25,7 +25,11 @@ import org.jspecify.annotations.Nullable;
  *       from {@link de.a12.studio.models.formmodel.TableStyle}.</li>
  *   <li><b>Alignment</b> ({@link RepeatAlignmentPanelController}) — default horizontal alignment combo.</li>
  *   <li><b>Additional Settings</b> ({@link RepeatAdditionalSettingsPanelController}) — behavioural flags
- *       (enableAdd/Remove/Reorder/Copy/ColumnsResize, infiniteScrolling, readonlyPresentation, readonly).</li>
+ *       (enableAdd/Remove/Reorder/Copy/ColumnsResize, infiniteScrolling, readonlyPresentation, readonly,
+ *       titleHidden, filterExpression, initialSorting).</li>
+ *   <li><b>Row Actions</b> ({@link RepeatRowActionsPanelController}) — custom row action buttons
+ *       ({@link AbstractRepeat#getRowActionGroup()}), distinct from the single built-in
+ *       {@link AbstractRepeat#getDefaultRowAction()}.</li>
  *   <li><b>Hide Condition</b> ({@link HideConditionPanelController}) — inherited from
  *       {@link de.a12.studio.models.formmodel.ScreenElement}.</li>
  *   <li><b>Styles</b> ({@link StylesPanelController}) — body CSS style classes from
@@ -45,6 +49,7 @@ public class FormNodeEditorRepeatPanelController {
   @FXML private RepeatColumnSettingsPanelController columnSettingsController;
   @FXML private RepeatAlignmentPanelController alignmentController;
   @FXML private RepeatAdditionalSettingsPanelController additionalSettingsController;
+  @FXML private RepeatRowActionsPanelController rowActionsController;
   @FXML private HideConditionPanelController hideConditionController;
   @FXML private StylesPanelController stylesController;
   @FXML private RepeatHeaderStylesPanelController headerStylesController;
@@ -62,9 +67,9 @@ public class FormNodeEditorRepeatPanelController {
     columnSettingsController.setRepeat(repeat);
     alignmentController.setRepeat(repeat);
     additionalSettingsController.setRepeat(repeat);
+    rowActionsController.setRepeat(repeat);
     hideConditionController.configure(
-        repeat::getHideConditionField, repeat::setHideConditionField,
-        repeat::getHideConditionValue, repeat::setHideConditionValue,
+        repeat::getHideCondition, repeat::setHideCondition,
         elementIndex, hideConditionScope);
     stylesController.setCustom(repeat::getStyle, repeat::getStyle);
     headerStylesController.setRepeat(repeat);

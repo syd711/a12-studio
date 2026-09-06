@@ -75,6 +75,12 @@
                         <fx:include fx:id="controlEditor" source="nodeeditors/formnode-editor-control-panel.fxml" />
                         <fx:include fx:id="confirmControlEditor" source="nodeeditors/formnode-editor-confirm-control-panel.fxml" />
                         <fx:include fx:id="repeatEditor" source="nodeeditors/formnode-editor-repeat-panel.fxml" />
+                        <fx:include fx:id="textCellEditor" source="nodeeditors/formnode-editor-text-cell-panel.fxml" />
+                        <fx:include fx:id="expressionCellEditor" source="nodeeditors/formnode-editor-expression-cell-panel.fxml" />
+                        <fx:include fx:id="repeatOverviewColumnEditor" source="nodeeditors/formnode-editor-repeat-overview-column-panel.fxml" />
+                        <fx:include fx:id="customScreenElementEditor" source="nodeeditors/formnode-editor-custom-screen-element-panel.fxml" />
+                        <fx:include fx:id="buttonPanelEditor" source="nodeeditors/formnode-editor-button-panel-panel.fxml" />
+                        <fx:include fx:id="customCellEditor" source="nodeeditors/formnode-editor-custom-cell-panel.fxml" />
                     </children>
                 </StackPane>
             </items>

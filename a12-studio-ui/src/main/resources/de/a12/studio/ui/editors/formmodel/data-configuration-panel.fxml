@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<SplitPane dividerPositions="0.4" stylesheets="@/de/a12/studio/ui/stylesheet.css" styleClass="properties-panel"
+           xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="de.a12.studio.ui.editors.formmodel.DataConfigurationPanelController">
+    <items>
+        <VBox spacing="8.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                    <children>
+                        <ComboBox fx:id="addFieldCombo" promptText="%data_configuration_field_type" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                        <Button fx:id="addFieldButton" text="%dependent_enumeration_add" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                    <children>
+                        <ComboBox fx:id="addGroupCombo" promptText="%data_configuration_group_type" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                        <Button fx:id="addGroupButton" text="%dependent_enumeration_add" />
+                    </children>
+                </HBox>
+                <TableView fx:id="table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="elementColumn" text="%data_configuration_elements_column" prefWidth="180.0" />
+                        <TableColumn fx:id="typeColumn" text="%data_configuration_type_column" prefWidth="70.0" />
+                    </columns>
+                </TableView>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="6.0" top="10.0" />
+            </padding>
+        </VBox>
+        <StackPane>
+            <children>
+                <Label fx:id="noSelectionLabel" styleClass="placeholder-label" text="%data_configuration_no_selection" wrapText="true" />
+                <ScrollPane fx:id="fieldDetailPane" fitToWidth="true" hbarPolicy="NEVER">
+                    <content>
+                        <VBox spacing="12.0" styleClass="field-editor">
+                            <children>
+                                <fx:include fx:id="externalEnumeration" source="formtree/nodeeditors/external-enumeration-panel.fxml" />
+                                <fx:include fx:id="dependentEnumeration" source="formtree/nodeeditors/dependent-enumeration-panel.fxml" />
+                                <fx:include fx:id="dependentField" source="formtree/nodeeditors/dependent-field-panel.fxml" />
+                            </children>
+                            <padding>
+                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                            </padding>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+                <ScrollPane fx:id="groupDetailPane" fitToWidth="true" hbarPolicy="NEVER">
+                    <content>
+                        <VBox spacing="12.0" styleClass="field-editor">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label styleClass="field-label" text="%number_of_initial_rows" />
+                                        <TextField fx:id="numberOfInitialRowsField" />
+                                    </children>
+                                </VBox>
+                                <fx:include fx:id="dependentGroup" source="formtree/nodeeditors/dependent-group-panel.fxml" />
+                            </children>
+                            <padding>
+                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                            </padding>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </children>
+        </StackPane>
+    </items>
+</SplitPane>

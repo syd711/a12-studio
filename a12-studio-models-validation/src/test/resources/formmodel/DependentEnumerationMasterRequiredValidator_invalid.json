@@ -1,0 +1,34 @@
+{
+  "header": {
+    "id": "DependentEnumerationMasterRequiredValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "elementRef": "field_dependent_enum",
+          "dependentEnumeration": {
+            "constraint": [
+              {
+                "masterValue": "a",
+                "constraintValues": [
+                  {
+                    "value": "b"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css"
+            text="%repeat_row_actions" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.RepeatRowActionsPanelController">
+    <BorderPane>
+        <center>
+            <VBox spacing="8.0">
+                <children>
+                    <TableView fx:id="actionsTable" prefHeight="120.0">
+                        <columns>
+                            <TableColumn fx:id="eventColumn" text="%repeat_row_action_event_column" prefWidth="160.0" />
+                            <TableColumn fx:id="scopeColumn" text="%repeat_row_action_scope_column" prefWidth="200.0" />
+                        </columns>
+                    </TableView>
+                    <HBox spacing="8.0">
+                        <children>
+                            <Button fx:id="addButton" text="%dependent_enumeration_add" />
+                            <Button fx:id="removeButton" text="%dependent_enumeration_remove" />
+                        </children>
+                    </HBox>
+                </children>
+                <padding>
+                    <Insets top="4.0" />
+                </padding>
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

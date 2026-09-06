@@ -1,0 +1,97 @@
+{
+  "header": {
+    "id": "RepeatFeatures_FM",
+    "modelType": "form",
+    "modelVersion": "37.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "InlineRepeat",
+            "id": "inlinerepeat-1",
+            "groupRef": "group_1",
+            "filterExpression": "field_status == \"active\"",
+            "initialSorting": "column-1",
+            "titleHidden": true,
+            "confirmationTexts": {
+              "REMOVE": {
+                "title": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Confirm removal"
+                    }
+                  ]
+                }
+              }
+            },
+            "multiFileUploadOptions": {
+              "elementRef": "group_attachments",
+              "enableDownload": true,
+              "fileUploadButtonText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Upload"
+                  }
+                ]
+              }
+            },
+            "rowActionGroup": {
+              "action": [
+                {
+                  "buttonStyling": {
+                    "label": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "custom"
+                          }
+                        ]
+                      }
+                    },
+                    "icon": {
+                      "name": "local_gas_station"
+                    },
+                    "labelHidden": true
+                  },
+                  "event": "custom",
+                  "confirmation": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "really?"
+                      }
+                    ]
+                  },
+                  "scope": "ALWAYS"
+                }
+              ]
+            }
+          },
+          {
+            "type": "EmbeddedRepeat",
+            "id": "embeddedrepeat-1",
+            "groupRef": "group_2",
+            "defaultRowAction": {
+              "custom": true,
+              "event": "custom"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css"
+            text="%external_enumeration" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.ExternalEnumerationPanelController">
+    <BorderPane>
+        <center>
+            <VBox spacing="10.0">
+                <children>
+                    <VBox>
+                        <children>
+                            <Label styleClass="field-label" text="%external_enumeration_src" />
+                            <TextField fx:id="srcField" />
+                        </children>
+                    </VBox>
+                    <CheckBox fx:id="customValuesAllowedCheckBox" text="%external_enumeration_custom_values_allowed" />
+                    <CheckBox fx:id="caseSensitiveCheckBox" text="%external_enumeration_case_sensitive" />
+                </children>
+            </VBox>
+        </center>
+        <top>
+            <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml"
+                        BorderPane.alignment="CENTER" />
+        </top>
+    </BorderPane>
+</TitledPane>

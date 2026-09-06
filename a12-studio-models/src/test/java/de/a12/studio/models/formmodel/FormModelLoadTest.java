@@ -174,6 +174,148 @@ class FormModelLoadTest {
     assertEquals("static", reloaded.getContent().getAmountSuffix().getType());
   }
 
+  @Test
+  void loadsHideConditionAndDependentEnumerationFormModel() throws Exception {
+    FormModel model = load("/formmodel/HideConditionAndDependentEnumeration_FM.json");
+
+    Section section = (Section) model.getContent().getScreens().get(0).getScreenElements().get(0);
+    HideCondition hideCondition = section.getHideCondition();
+    assertEquals("field_master_enum", hideCondition.getMasterField());
+    assertEquals(3, hideCondition.getCases().size());
+    assertEquals("a", hideCondition.getCases().get(0).getMasterValue());
+    assertEquals("b", hideCondition.getCases().get(1).getMasterValue());
+    assertNull(hideCondition.getCases().get(2).getMasterValue());
+
+    FieldConfigEntry dependentEnumEntry = model.getContent().getFieldConfiguration().getField().get(0);
+    DependentEnumeration dependentEnumeration = dependentEnumEntry.getDependentEnumeration();
+    assertEquals("field_master_enum", dependentEnumeration.getMasterField());
+    assertEquals(2, dependentEnumeration.getConstraints().size());
+    DependentEnumerationConstraint constraintA = dependentEnumeration.getConstraints().get(0);
+    assertEquals("a", constraintA.getMasterValue());
+    assertEquals("c", constraintA.getValueForMasterChange());
+    assertEquals(3, constraintA.getConstraintValues().size());
+    assertEquals("b", constraintA.getConstraintValues().get(0).getValue());
+    assertNull(dependentEnumeration.getConstraints().get(1).getMasterValue());
+
+    FieldConfigEntry externalEnumEntry = model.getContent().getFieldConfiguration().getField().get(1);
+    ExternalEnumeration externalEnumeration = externalEnumEntry.getExternalEnumeration();
+    assertEquals("https://invalid.example.com", externalEnumeration.getSrc());
+    assertTrue(externalEnumeration.getCustomValuesAllowed());
+    assertTrue(externalEnumeration.getCaseSensitive());
+
+    FieldConfigEntry secretEntry = model.getContent().getFieldConfiguration().getField().get(2);
+    assertTrue(secretEntry.getSecret());
+    assertEquals("AREA", secretEntry.getFormatting());
+    assertTrue(secretEntry.getEnableSelectAll());
+    assertEquals(1, secretEntry.getAnnotations().size());
+
+    // Multi-value hide conditions and dependent/external enumeration must survive the round trip, including
+    // the explicit null masterValue cases.
+    String reserialized = MAPPER.writeValueAsString(model);
+    FormModel reloaded = MAPPER.readValue(reserialized, FormModel.class);
+    Section reloadedSection = (Section) reloaded.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals(3, reloadedSection.getHideCondition().getCases().size());
+    assertNull(reloadedSection.getHideCondition().getCases().get(2).getMasterValue());
+    assertNull(reloaded.getContent().getFieldConfiguration().getField().get(0)
+        .getDependentEnumeration().getConstraints().get(1).getMasterValue());
+  }
+
+  @Test
+  void loadsRepeatOverviewColumnsFormModel() throws Exception {
+    FormModel model = load("/formmodel/RepeatOverviewColumns_FM.json");
+
+    InlineRepeat repeat = (InlineRepeat) model.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals(2, repeat.getRepeatOverviewColumn().size());
+
+    ExpressionRepeatOverviewColumn expressionColumn =
+        (ExpressionRepeatOverviewColumn) repeat.getRepeatOverviewColumn().get(0);
+    assertEquals("expression1", expressionColumn.getName());
+    assertEquals("\"Hallo\"", expressionColumn.getExpression());
+    assertEquals(1, expressionColumn.getWidth());
+    assertEquals("ASC", expressionColumn.getPreferredSorting());
+    MultilingualText label = assertInstanceOf(MultilingualText.class, expressionColumn.getLabel());
+    assertEquals("Expression", label.getMultilingualText().getText().get(0).getText());
+
+    FieldBasedRepeatOverviewColumn fieldColumn =
+        (FieldBasedRepeatOverviewColumn) repeat.getRepeatOverviewColumn().get(1);
+    assertEquals("field_455f3", fieldColumn.getElementRef());
+    assertEquals(1, fieldColumn.getWidth());
+
+    String reserialized = MAPPER.writeValueAsString(model);
+    FormModel reloaded = MAPPER.readValue(reserialized, FormModel.class);
+    InlineRepeat reloadedRepeat = (InlineRepeat) reloaded.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals("expression1",
+        ((ExpressionRepeatOverviewColumn) reloadedRepeat.getRepeatOverviewColumn().get(0)).getName());
+  }
+
+  @Test
+  void loadsRepeatFeaturesFormModel() throws Exception {
+    FormModel model = load("/formmodel/RepeatFeatures_FM.json");
+
+    InlineRepeat inlineRepeat = (InlineRepeat) model.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals("field_status == \"active\"", inlineRepeat.getFilterExpression());
+    assertEquals("column-1", inlineRepeat.getInitialSorting());
+    assertTrue(inlineRepeat.getTitleHidden());
+    assertEquals("Confirm removal",
+        inlineRepeat.getConfirmationTexts().get("REMOVE").getTitle().getText().get(0).getText());
+    assertEquals("group_attachments", inlineRepeat.getMultiFileUploadOptions().getElementRef());
+    assertTrue(inlineRepeat.getMultiFileUploadOptions().getEnableDownload());
+
+    RowAction rowAction = inlineRepeat.getRowActionGroup().getAction().get(0);
+    assertEquals("custom", rowAction.getEvent());
+    assertEquals("ALWAYS", rowAction.getScope());
+    assertEquals("local_gas_station", rowAction.getButtonStyling().getIcon().getName());
+    assertEquals("really?", rowAction.getConfirmation().getText().get(0).getText());
+
+    EmbeddedRepeat embeddedRepeat = (EmbeddedRepeat) model.getContent().getScreens().get(0).getScreenElements().get(1);
+    assertTrue(embeddedRepeat.getDefaultRowAction().getCustom());
+    assertEquals("custom", embeddedRepeat.getDefaultRowAction().getEvent());
+
+    String reserialized = MAPPER.writeValueAsString(model);
+    FormModel reloaded = MAPPER.readValue(reserialized, FormModel.class);
+    InlineRepeat reloadedRepeat = (InlineRepeat) reloaded.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals("column-1", reloadedRepeat.getInitialSorting());
+    assertEquals(1, reloadedRepeat.getRowActionGroup().getAction().size());
+  }
+
+  @Test
+  void loadsButtonPanelAndCustomCellFormModel() throws Exception {
+    FormModel model = load("/formmodel/ButtonPanelAndCustomCell_FM.json");
+
+    ButtonPanel buttonPanel = (ButtonPanel) model.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals("bp", buttonPanel.getName());
+    assertEquals(1, buttonPanel.getButton().size());
+    EventButton eventButton = assertInstanceOf(EventButton.class, buttonPanel.getButton().get(0));
+    assertEquals("event_custom", eventButton.getEvent());
+
+    ControlGrid grid = (ControlGrid) model.getContent().getScreens().get(0).getScreenElements().get(1);
+    CustomCell customCell = (CustomCell) grid.getRow().get(0).getCell().get(0);
+    assertEquals("custom-cell", customCell.getName());
+    assertEquals(CellType.CUSTOM_CELL, customCell.getType());
+
+    String reserialized = MAPPER.writeValueAsString(model);
+    FormModel reloaded = MAPPER.readValue(reserialized, FormModel.class);
+    ButtonPanel reloadedPanel = (ButtonPanel) reloaded.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals(1, reloadedPanel.getButton().size());
+    ControlGrid reloadedGrid = (ControlGrid) reloaded.getContent().getScreens().get(0).getScreenElements().get(1);
+    assertInstanceOf(CustomCell.class, reloadedGrid.getRow().get(0).getCell().get(0));
+  }
+
+  @Test
+  void loadsIncludesFormModel() throws Exception {
+    FormModel model = load("/formmodel/Includes_FM.json");
+
+    ControlGrid grid = (ControlGrid) model.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals("controlgrid_130cc", grid.getIncludeId());
+    assertEquals("IncludedModel", grid.getFormModelRef());
+    assertEquals("/Person/address", grid.getHostDocumentModelPath());
+
+    String reserialized = MAPPER.writeValueAsString(model);
+    FormModel reloaded = MAPPER.readValue(reserialized, FormModel.class);
+    ControlGrid reloadedGrid = (ControlGrid) reloaded.getContent().getScreens().get(0).getScreenElements().get(0);
+    assertEquals("IncludedModel", reloadedGrid.getFormModelRef());
+  }
+
   private FormModel load(String resource) throws Exception {
     String json;
     try (InputStream in = getClass().getResourceAsStream(resource)) {

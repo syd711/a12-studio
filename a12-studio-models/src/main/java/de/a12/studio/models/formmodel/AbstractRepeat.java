@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 // Common fields shared by Inline, Embedded and Detached repeats, which all render one row per instance of
 // a repeatable Document Model group but differ in how the row detail is edited (inline, embedded, or in a
@@ -37,7 +39,21 @@ public abstract class AbstractRepeat extends ScreenElement {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private TableStyle tableStyle;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private RowAction defaultRowAction;
+  private DefaultRowAction defaultRowAction;
+  // Custom row action buttons, distinct from defaultRowAction (the built-in row-click behavior).
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private RowActionGroup rowActionGroup;
+  // A query-language expression filtering this repeat's rows, independent of any field/column filter.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String filterExpression;
+  // Id of the RepeatOverviewColumn this repeat is initially sorted by.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String initialSorting;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean titleHidden;
+  // Per-repeat override of the model-wide Defaults.confirmationTexts (e.g. "REMOVE").
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private Map<String, ConfirmationText> confirmationTexts = new LinkedHashMap<>();
   // Per-Repeat overrides for label, hint and placeholder (take precedence over GroupConfigEntry values).
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText label;

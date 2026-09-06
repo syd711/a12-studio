@@ -1,9 +1,6 @@
 package de.a12.studio.modelsvalidation.validators.form;
 
 import de.a12.studio.models.A12Model;
-import de.a12.studio.models.ModelReference;
-import de.a12.studio.models.ModelType;
-import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
@@ -49,7 +46,7 @@ public final class FormFieldReferenceValidator implements ModelValidator {
       return List.of();
     }
 
-    List<ElementIndex> indexes = referencedDocumentModelIndexes(model, context);
+    List<ElementIndex> indexes = FormDocumentModelIndexes.referencedDocumentModelIndexes(model, context);
     if (indexes.isEmpty()) {
       // Without a resolvable document model there is nothing to check against
       // (FormDocumentModelReferenceValidator already reports the missing reference).
@@ -134,29 +131,5 @@ public final class FormFieldReferenceValidator implements ModelValidator {
       return column.getId();
     }
     return ELEMENT_ID;
-  }
-
-  /**
-   * One {@link ElementIndex} per Document Model this Form Model references, each built with the project's
-   * other Document Models so an {@code elementRef} pointing into an {@code include}d model - a compound
-   * {@code "<includeGroupId>_<targetId>"} id whose target elements live entirely in the referenced model, not
-   * locally (see {@link ElementIndex#resolve}) - resolves correctly instead of being reported as missing.
-   */
-  private static List<ElementIndex> referencedDocumentModelIndexes(A12Model<?> model, ValidationContext context) {
-    List<ElementIndex> indexes = new ArrayList<>();
-    if (model.getModelReferences() == null) {
-      return indexes;
-    }
-    for (ModelReference reference : model.getModelReferences()) {
-      if (reference.getModelType() != ModelType.DOCUMENT) {
-        continue;
-      }
-      DocumentModel documentModel = context.findOtherDocumentModel(reference.getReference());
-      if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
-        continue;
-      }
-      indexes.add(new ElementIndex(documentModel, context.otherDocumentModels()));
-    }
-    return indexes;
   }
 }

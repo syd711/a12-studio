@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -38,6 +39,9 @@ public class RepeatAdditionalSettingsPanelController extends AbstractPropertyEdi
   @FXML private CheckBox enableColumnsResizeCheckBox;
   @FXML private CheckBox infiniteScrollingCheckBox;
   @FXML private ComboBox<String> readonlyPresentationCombo;
+  @FXML private CheckBox titleHiddenCheckBox;
+  @FXML private TextField filterExpressionField;
+  @FXML private TextField initialSortingField;
 
   private AbstractRepeat repeat;
 
@@ -55,6 +59,9 @@ public class RepeatAdditionalSettingsPanelController extends AbstractPropertyEdi
     bindCheckBox(enableColumnsResizeCheckBox, (el, val) -> repeat.setEnableColumnsResize(val ? Boolean.TRUE : null));
     bindCheckBox(infiniteScrollingCheckBox, (el, val) -> repeat.setInfiniteScrolling(val ? Boolean.TRUE : null));
     bindComboBox(readonlyPresentationCombo, (el, val) -> repeat.setReadonlyPresentation(val == null || val.isBlank() ? null : val));
+    bindCheckBox(titleHiddenCheckBox, (el, val) -> repeat.setTitleHidden(val ? Boolean.TRUE : null));
+    bindTextField(filterExpressionField, (el, val) -> repeat.setFilterExpression(val == null || val.isBlank() ? null : val));
+    bindTextField(initialSortingField, (el, val) -> repeat.setInitialSorting(val == null || val.isBlank() ? null : val));
   }
 
   public void setRepeat(@NonNull AbstractRepeat repeat) {
@@ -67,5 +74,8 @@ public class RepeatAdditionalSettingsPanelController extends AbstractPropertyEdi
     setFieldValue(enableColumnsResizeCheckBox, Boolean.TRUE.equals(repeat.getEnableColumnsResize()));
     setFieldValue(infiniteScrollingCheckBox, Boolean.TRUE.equals(repeat.getInfiniteScrolling()));
     setFieldValue(readonlyPresentationCombo, repeat.getReadonlyPresentation());
+    setFieldValue(titleHiddenCheckBox, Boolean.TRUE.equals(repeat.getTitleHidden()));
+    setFieldValue(filterExpressionField, repeat.getFilterExpression());
+    setFieldValue(initialSortingField, repeat.getInitialSorting());
   }
 }

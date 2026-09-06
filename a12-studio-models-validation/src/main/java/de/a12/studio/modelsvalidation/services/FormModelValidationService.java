@@ -12,11 +12,17 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.form.ControlGridLayoutValidator;
+import de.a12.studio.modelsvalidation.validators.form.DependentEnumerationMasterRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.form.DependentFieldMasterRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.form.DependentGroupMasterRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.form.ExternalEnumerationSourceRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormButtonScreenReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormSiblingNameUniquenessValidator;
+import de.a12.studio.modelsvalidation.validators.form.HideConditionAtLeastOneCaseValidator;
+import de.a12.studio.modelsvalidation.validators.form.HideConditionSupportedValuesValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +42,13 @@ public final class FormModelValidationService {
       new FormButtonScreenReferenceValidator(),
       new FormLayoutColumnSumValidator(),
       new FormSiblingNameUniquenessValidator(),
-      new ControlGridLayoutValidator()));
+      new ControlGridLayoutValidator(),
+      new HideConditionAtLeastOneCaseValidator(),
+      new HideConditionSupportedValuesValidator(),
+      new DependentFieldMasterRequiredValidator(),
+      new DependentGroupMasterRequiredValidator(),
+      new DependentEnumerationMasterRequiredValidator(),
+      new ExternalEnumerationSourceRequiredValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

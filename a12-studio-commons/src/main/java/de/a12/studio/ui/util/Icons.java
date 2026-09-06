@@ -90,6 +90,8 @@ public interface Icons {
   String FORM_EMBEDDED_REPEAT = "mdi2r-repeat-once";
   String FORM_DETACHED_REPEAT = "mdi2r-repeat-variant";
   String FORM_CUSTOM_SCREEN_ELEMENT = "mdi2p-puzzle-outline";
+  String FORM_BUTTON_PANEL = "mdi2g-gesture-tap-button";
+  String FORM_CUSTOM_CELL = "mdi2p-puzzle-outline";
 
   static String forModelType(ModelType modelType) {
     if (modelType == null) {
