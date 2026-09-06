@@ -234,39 +234,181 @@ still true.
 
 ---
 
-## Form Model — not started
+## Form Model
 
-`a12-studio-ui/.../editors/formmodel/` is currently **empty**. No JVM kernel library for form models exists in
-`build.gradle` yet — that's a prerequisite before any editor work here.
+*Analyzed 2026-09-06 (the previous version of this section, "Form Model — not started", was written before this
+module existed in a12-studio and is factually wrong — do not trust anything from before this date about Form Model).*
 
-SME's `formModel` module (`client/src/modules/formModel/`) is the largest module in the SME codebase. Key points to
-plan around:
+a12-studio's Form Model editor is **substantial, not empty**: 55 data-model classes
+(`a12-studio-models/.../formmodel/`), ~35 UI controllers/panels (`a12-studio-ui/.../editors/formmodel/`, tree +
+per-node-type editors + dialogs + a preview server), and 6 validators
+(`a12-studio-models-validation/.../validators/form/`). It covers the core Screen/Section/ControlGrid/Row/Control
+tree, field/group configuration with dependent-field/group hide-and-readonly rules, responsive (lg/md/sm) layout,
+repeats (Inline/Embedded/Detached), buttons, and a lightweight live preview. The gaps below are real but are gaps
+*within* a mature editor, not a from-scratch build.
 
-- **Data shape**: a normalized `DocumentGraph` (`{docs, links}` — flat, `docRef`-keyed elements with typed parent/child
-  `Link`s), not a naive nested tree. On disk it's the kernel's nested instance-document shape; conversion happens via
-  per-element-type mapping rules (`transformer/mapping/{ddg2json,json2ddg}.ts`).
-- **Element types** (16 kinds): `Screen`, `Section`, `MultiColumnSection`, `ControlGrid`, `Row`, `Control`, `TextCell`,
-  `ExpressionCell`, `CustomCell`/`CustomScreenElement`, `ButtonPanel`, `DetachedRepeat`, `EmbeddedRepeat`,
-  `InlineRepeat`, `BindingRepeat`, `Binding`, `*RepeatOverviewColumn`.
-- **Binding layer**: every `Control`/`Repeat` references a Document Model field/group via `elementRef`/`groupRef`;
-  presentation config (label, hint, dependent enum, readonly, etc.) lives centrally in
-  `fieldConfiguration`/`groupConfiguration` arrays on the form-model root, keyed by that reference — not duplicated
-  per screen usage.
-- **Self-hosting editor pattern**: editing an element (e.g. a `Control`) opens a small generated form driven by a
-  meta document+form model pair (e.g. `Control-Form`) — the editor is built using the same Form Engine the runtime
-  app uses.
-- **Editor tabs**: Screens (tree), Settings, Data Configuration (dependencies: dependent enums/fields/groups, hide
-  conditions), Cleanup (orphaned field/group config entries after DM changes elsewhere).
-- **Distinctive features**: live browser preview (postMessage-synced), repeat-type conversion
-  (Detached⇄Embedded⇄Inline⇄Binding), dependent controls (show/hide based on a master field), custom row actions,
-  responsive layout (per-breakpoint offset/span), style presets, includes (transclude a subtree from another form
-  model), Composed-Document-Model relationship bindings (`Binding`/`BindingRepeat`).
-- **Validation**: three layers — client-side kernel meta-model validation, ~20 hand-written custom conditions
-  (layout column-count consistency, dependent-enum/field/group master-field-required rules, CDM relationship
-  cardinality checks, hide-condition completeness), and a server-side structural consistency check between the form
-  model and its expanded document model (`/api/form-model/check-consistency`).
-- **Cross-module dependency**: hard dependency on Document Model (resolves/expands it via the DM module's own public
-  `api/`); `Binding`/`BindingRepeat` additionally depend on Relationship Model + Composed Document Model.
+### Element types & structural coverage
+
+| SME element/concept | a12-studio | Status |
+|---|---|---|
+| `Screen` | `Screen` | Has it, but missing `initiallyFocusedElementId` (SME validates this is only settable on the first screen) |
+| `Section` | `Section` | Has it (collapsible/initiallyCollapsed) |
+| `MultiColumnSection` | `MultiColumnSection` | Has it; flex layout UI (`FlexLayoutPanelController`) only exposes `lg`, not `md`/`sm` |
+| `ControlGrid` | `ControlGrid` | Has it (layout, verticalAlignment, readonly/readonlyPresentation) |
+| `Row` | `Row` | Has it |
+| `Control` | `Control` | Has most fields; missing `index` (SEMANTIC/NUMERIC search-indexing config) and `nameForTree` |
+| `TextCell` | `TextCell` | Data model has it (`decoration`, `content`); **no editor panel** — once added via the tree it can't be edited |
+| `ExpressionCell` | `ExpressionCell` | Data model has it (`expression`); **no editor panel**, same as TextCell |
+| `CustomCell` (a named custom-component cell inside a grid row) | — | **Absent** — unknown cell types fall back to a generic, unnamed placeholder, unlike `CustomScreenElement` which *is* a first-class type |
+| `CustomScreenElement` | `CustomScreenElement` | Has it; SME's variant also carries a `height` field a12-studio doesn't model |
+| `ButtonPanel` (a button bar addable as its own node *inside* the screen tree) | — | **Absent** — a12-studio only supports buttons in the model-level/per-screen header+footer boxes (`HeaderFooterBox`), never as an inline, addable screen-tree node |
+| `DetachedRepeat` / `EmbeddedRepeat` / `InlineRepeat` | same | Has it structurally; see "Repeats" below for field-level gaps |
+| `Binding` / `BindingRepeat` (CDM relationship-driven selector/repeat) | — | **Completely absent** — no class, no UI, no validator. Confirmed by grep: zero matches for "Binding" anywhere in `a12-studio-models/.../formmodel/` |
+| `FieldBasedRepeatOverviewColumn` | `FieldBasedRepeatOverviewColumn` | Data model present but **no "Add Column" UI and no editor panel at all** — existing columns render read-only in the tree; also missing `filterExposition`, `pinDirection`, `icon`, `labelHidden`, `headerStyle`, `fixedWidth`, and hide-condition support (SME's `RepeatOverviewColumnBase` includes `ConditionallyHidden`) |
+| `ExpressionRepeatOverviewColumn` (compute a column via expression instead of a field) | — | **Absent** — only field-based and generic-fallback column types exist |
+
+### Field/group configuration & the dependency system
+
+This is the area with the most concrete, well-defined gaps:
+
+- **`FieldConfigEntry`** (`a12-studio-models/.../formmodel/FieldConfigEntry.java`) has `label`, `placeholder`, `hint`,
+  `initialValue`, `suffix`, `exposition`, `readonly`, `dependentField`, `elementRef`. SME's `FieldConfigurationEntry`
+  additionally has: `enableSelectAll` (multi-select "select all" toggle), `formatting`, `secret` (password masking),
+  `annotations`, and — the two biggest ones — **`dependentEnumeration`** and **`externalEnumeration`**, each an
+  entire feature a12-studio has no representation of at all:
+  - `dependentEnumeration` (`DependentEnumeration`: `masterField` + `constraint[]`, each `{masterValue,
+    constraintValues[], valueForMasterChange}`) — constrains *which enum values* a dependent field may offer based
+    on a master field's value (distinct from `dependentField`'s readonly/notRelevant, which only affects visibility).
+  - `externalEnumeration` (`ExternalEnumeration`: `src`, `customValuesAllowed`, `caseSensitive`) — sources a field's
+    enum options from an external URL instead of the Document Model's own enum definition.
+  - `attachmentConfig` (`placeholderIcon`, `accept` MIME filter, `defaultAction` replace/download) — upload-field
+    presentation config, also entirely absent.
+- **`GroupConfigEntry`** is roughly at parity (`dependentGroup`, `groupRef`, `numberOfInitialRows`); a12-studio even
+  adds `label`/`hint`/`placeholder` fields SME keeps elsewhere — not a gap, just a modeling difference.
+- **Hide condition** (`ScreenElement.hideConditionField`/`hideConditionValue`,
+  `a12-studio-models/.../formmodel/ScreenElement.java`): a12-studio models exactly **one** trigger value per master
+  field. SME's `HideCondition` (`fmElements/types/hideCondition.ts`) is `{masterField, cases: HideConditionCase[]}`
+  — a list of trigger values. This matters concretely for Enum-typed master fields: SME can hide an element when the
+  master is any of several enum values, a12-studio can only match one. This is a structural data-model gap (not
+  just missing UI) — fixing it means changing `ScreenElement` from two scalar fields to a
+  `masterField`/`cases[]` shape, which is also what would let a12-studio implement SME's two hide-condition
+  validators (see below).
+- **`DependentField`**: present and matches closely (`masterField` + cases of `masterValue`/`notRelevant`/`readonly`),
+  but SME's `DependentFieldCase` additionally supports `value`/`fieldRef` — force a specific value, or copy one from
+  another field, when the master changes. a12-studio's `DependentCase` has no equivalent.
+- **`DependentGroup`**: at parity (`masterValue`/`notRelevant`/`readonly`).
+- **Dependent controls** (a control/group hiding *other* screen-tree nodes, SME's `dependentControls`/
+  `ScreenElementRef`): a12-studio implements the equivalent (`DependentCase.notRelevantNodes`) only for **Confirm-type
+  Controls**, via the dedicated `ConfirmDependenciesPanelController` Dependencies tab. SME's
+  `isPossibleDependentControlMaster` allows Boolean and Enumeration controls as masters too, not just Confirm — worth
+  checking whether that's a deliberate a12-studio scoping decision or an unaddressed gap before building on top of it.
+
+### Repeats
+
+SME's shared `RepeatBase` (`fmElements/types/detachedRepeat.ts`) has several fields `AbstractRepeat.java` doesn't:
+- **`filterExpression`** — a per-repeat filter expression. Completely missing (a12-studio only has per-node
+  `elementRef`/config, no repeat-level filter).
+- **`initialSorting`** — which overview column the repeat is initially sorted by. Missing (and its matching SME
+  validator, "a repeat's `initialSorting` column must itself be sortable", has no a12-studio equivalent since neither
+  side exists).
+- **`rowActionGroup`** — a list of custom row actions, each with its own `buttonStyling`, `event`, `confirmation`/
+  `confirmationDialogTitle`, and `scope`. a12-studio's `AbstractRepeat.defaultRowAction` is a single `RowAction{event}`
+  field with **no editor panel referencing it anywhere** — confirmed dead/unwired in the current UI. This is a real
+  feature gap, not just a naming difference.
+- **`titleHidden`** — missing.
+- **`confirmationTexts`** per-repeat override — a12-studio only has a model-level default (`Defaults.confirmationTexts`),
+  no per-repeat override.
+- **`MultiFileUploadOptions`** (attachment-repeat config: download toggle, upload description/button/helper text) —
+  entirely missing; relates to the `attachmentConfig` gap above.
+- **`TableStyle`**: SME's has `cardHeight`/`actionColumnWidth` in addition to `tableHeight`/`rowHeight`, which are all
+  a12-studio's `TableStyle` has.
+- **No repeat-type conversion** (Detached⇄Embedded⇄Inline⇄Binding) exists in the UI — converting requires
+  delete-and-recreate, confirmed by reading `FormModelActions`/`FormModelNodeTypes`.
+
+### Includes / transclusion — entirely absent
+
+SME's `ScreenElementBase` mixin (`fmElements/types/basicScreenElement.ts`) carries an `Included` mixin
+(`includeId`/`formModelRef`/`hostDocumentModelPath`) on **every** screen element type, letting a subtree be
+transcluded from another Form Model. a12-studio's `ScreenElement.java` has no equivalent fields at all — this isn't
+a missing panel, the data model itself can't represent an include on any node.
+
+### Model-level / editor-structure gaps
+
+- **No "Data Configuration" tab.** SME centralizes all dependent-enum/field/group and hide-condition authoring in one
+  tab with a fields tree, candidate-value pickers, and refactor-safe editing
+  (`editor.elements/dependencies/`, ~35 files). a12-studio spreads the equivalent across per-node panels only
+  (Hide Condition panel per node, Confirm Dependencies tab for Confirm controls) — there's no centralized place to
+  see/manage every dependent-enum or dependent-field rule in the model, and no authoring path at all for
+  `dependentEnumeration`/`externalEnumeration` since those don't exist yet.
+- **No "Cleanup" tab.** SME's `editor.cleanup/` flags `FieldConfigEntry`/`GroupConfigEntry` rows that no longer have
+  a live referencing screen node or a resolvable DM field/group (`isInconsistentEntry`), and offers a one-click
+  "Clean All". a12-studio's `FormFieldReferenceValidator` catches the same dangling-reference case but only as a
+  validation *error* — there is no UI action to prune it, so the user has to hand-edit JSON or delete-and-recreate.
+- **No structural consistency check** between the form model and its (possibly since-changed) document model. SME's
+  is a categorized `Problem[]` (INFO/WARNING/ERROR) background check — a12-studio doesn't need the server-side
+  architecture, but has no equivalent drift-detection pass of any kind today.
+- **No style-preset UI.** `FormModelContent.styles` (a model-level named style-class list) exists in the data model
+  but has no panel anywhere — grepped `getStyles()/setStyles(` in the UI module, only `overviewmodel`'s (unrelated)
+  controller uses those method names.
+- **Live preview is architecturally different, not just less complete.** a12-studio's `PreviewServer` renders an
+  explicitly-labeled "lightweight v1 wireframe" from the live in-memory model in an external browser tab. SME's
+  preview drives the actual Form Engine runtime via postMessage sync. This is a reasonable simplification given
+  a12-studio doesn't embed the Form Engine, but anyone relying on preview fidelity (e.g. to check real control
+  rendering, not just layout) should know it's a wireframe, not a rendering-accurate preview.
+
+### Validators — gap list
+
+a12-studio's 6 validators (`FormModelValidationService`) map onto a slice of SME's validation surface. SME combines
+declarative kernel meta-model rules (structural/type checks, not hand-written) with 21 hand-written "custom
+conditions" (`validation/customConditions/index.ts`) — a12-studio has no declarative meta-model layer, so its
+validators are the sole source of truth here.
+
+| a12-studio validator | Closest SME equivalent | Notes |
+|---|---|---|
+| `FormDocumentModelReferenceValidator` | `ValidDocumentModelReference` / `ValidDocumentModelMustBeSelected` | Roughly at parity |
+| `FormFieldReferenceValidator` | field-config-entry path validation in `validateFieldConfigEntries`/kernel rules | Roughly at parity for existence-checking; SME's version also validates against the DM's *current* type, not just presence |
+| `FormButtonScreenReferenceValidator` | (likely a declarative kernel rule, not a custom condition) | Present in a12-studio but **untested** — no fixture/test exists (`FormValidatorsTest` has no case for it) |
+| `FormLayoutColumnSumValidator` | `LayoutLgSumIsGreaterTwelveCustomCondition` | Matches (sum ≤ 12) |
+| `FormSiblingNameUniquenessValidator` | (likely a declarative kernel uniqueness rule) | No custom-condition equivalent found; probably fine as a12-studio-side logic since there's no kernel layer to duplicate |
+| `ControlGridLayoutValidator` | `InconsistentNumberOfColumnsCustomCondition` + kernel per-cell layout rules | a12-studio's version was reverse-engineered from a real fixture since the per-cell offset/span check isn't a custom condition in SME (kernel-declarative) |
+| — | `DependentEnumerationMasterRequired` / `DependentFieldMasterRequired` / `DependentGroupMasterRequired` | **Gap** — a12-studio has no validator ensuring `masterField` is set whenever a `dependentField`/`dependentGroup` block exists (and can't have one for `dependentEnumeration` since that field doesn't exist) |
+| — | `ExternalEnumerationSourceRequired` | N/A until `externalEnumeration` is modeled |
+| — | `DependentControlOptionsMustExistInFormModel(Editor)` | **Gap** — no validator catches a Confirm control's `notRelevantNodes` pointing at a since-deleted node |
+| — | `DependentControlsAtLeastOneOptionMustBeSelected(Editor)` | **Gap** — nothing requires at least one target node when dependent-controls is configured |
+| — | `DependentFieldAtLeastOneActionPerCaseMustBeSelectedCustomCondition` / `CaseValueIsUndefined` | **Gap** — nothing requires each dependent-field case to actually set readonly/notRelevant/value |
+| — | `InitialFocusedElementOnlyOnFirstScreen` | N/A — a12-studio has no `initiallyFocusedElementId` field to validate |
+| — | `AtLeastOneHideConditionCaseFilled` / `OnlySupportedHideConditionValuesPresent` | **Gap** — blocked on the hide-condition `cases[]` gap above; once that exists, needs a validator checking the chosen values are actually possible for the master field's type |
+| — | `SortableColumnCustomCondition` | N/A until `initialSorting` is modeled |
+| — | `DescendantOfHeterogeneous(ToMany)Relationship`, `InitialValueAndDescendantOfHeterogeneousToManyRelationship`, `InvalidBindingRepeatRepetitionAndMultiplicity` | N/A — all CDM/`Binding`-specific, blocked on that feature not existing |
+
+### Proposed build order
+
+1. **Hide-condition multi-value + dependent enumeration/external enumeration.** Highest-value cluster: fixes the
+   structural hide-condition gap (`masterField`+`cases[]`), and adds `dependentEnumeration`/`externalEnumeration` to
+   `FieldConfigEntry`. Unlocks 5 of the "gap" validators above in one pass (`DependentEnumerationMasterRequired`,
+   `ExternalEnumerationSourceRequired`, `AtLeastOneHideConditionCaseFilled`, `OnlySupportedHideConditionValuesPresent`,
+   plus makes `DependentFieldMasterRequired`/`DependentGroupMasterRequired` worth adding at the same time since
+   they're the same shape of rule).
+2. **Fill the three "can add but can't edit" holes**: `TextCell`/`ExpressionCell` editor panels, and
+   `RepeatOverviewColumn` "Add Column" + editor panel (including the missing `filterExposition`/`pinDirection`/
+   `icon`/`labelHidden`/`headerStyle`/`fixedWidth`/hide-condition fields, and a new `ExpressionRepeatOverviewColumn`
+   type). These are nodes users can already put in a form but can't configure — a correctness trap, not just a
+   missing nice-to-have.
+3. **Data Configuration tab + Cleanup tab.** Centralize dependent-field/group/enum and hide-condition authoring
+   (currently scattered per-node); add the one-click orphaned-config-entry cleanup SME has. Natural follow-on to
+   step 1 since it's the same underlying data this tab surfaces.
+4. **Repeat feature completion**: `filterExpression`, `initialSorting` (+ its validator), real `rowActionGroup`
+   (replacing the currently-dead `defaultRowAction`), `titleHidden`, per-repeat `confirmationTexts`,
+   `MultiFileUploadOptions`/`attachmentConfig`. Group these together since several share the attachment-field theme.
+5. **Includes/transclusion.** Cross-cutting (affects every `ScreenElement` type's data model plus load/save/resolve
+   flow) — needs a design pass before implementation, not a small add.
+6. **`ButtonPanel` screen element + `CustomCell` type.** Smaller, self-contained additions once the tree/editor
+   infrastructure changes above have landed.
+7. **`Binding`/`BindingRepeat` (CDM relationship-driven selector/repeat).** Lowest priority — by far the most
+   architecturally distinct piece, and hard-blocked on Relationship Model and Composed Document Model support,
+   neither of which a12-studio has yet (see the "Other model types" priority table below — relationshipModel is
+   priority #5, additiveDocumentModel/combinationModel are prerequisites for CDM). Don't start this before those
+   land.
 
 ---
 

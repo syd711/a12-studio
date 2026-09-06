@@ -123,7 +123,7 @@ public class EditorFactory {
         controller.load(item);
       }
       else if (item.getModel() instanceof CombinedDocumentModel) {
-        FXMLLoader loader = new FXMLLoader(CombinedDocumentModelEditorController.class.getResource("combination-model-editor.fxml"));
+        FXMLLoader loader = new FXMLLoader(CombinedDocumentModelEditorController.class.getResource("combined-document-model-editor.fxml"));
         loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         CombinedDocumentModelEditorController controller = loader.getController();
