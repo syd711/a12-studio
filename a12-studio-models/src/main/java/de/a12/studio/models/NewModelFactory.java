@@ -110,7 +110,15 @@ public class NewModelFactory {
     ModelType modelType = model.getModelType() != null ? model.getModelType() : ModelType.DOCUMENT;
     String fileName = applyNameHooks(parent, modelType, name);
     ProjectItem item = parent.createChildModel(fileName);
-    model.setId(ProjectItem.idFromFileName(item.getName()));
+    String id = ProjectItem.idFromFileName(item.getName());
+    model.setId(id);
+    if (model instanceof DocumentModel documentModel
+        && documentModel.getContent() != null
+        && documentModel.getContent().getModelInfo() != null) {
+      // Keep modelInfo.name in sync with header.id from the start, same as ProjectItem.renameTo/createCopy do
+      // afterward - relevant when the caller (e.g. an import wizard) already populated modelInfo itself.
+      documentModel.getContent().getModelInfo().setName(id);
+    }
     model.setModelType(modelType);
     model.setModelVersion(modelType.getCurrentVersion());
     item.setModel(model);

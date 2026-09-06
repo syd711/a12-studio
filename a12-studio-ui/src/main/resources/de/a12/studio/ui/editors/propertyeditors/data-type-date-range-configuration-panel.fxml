@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
@@ -46,8 +44,6 @@
       </columnConstraints>
       <rowConstraints>
         <RowConstraints />
-        <RowConstraints />
-        <RowConstraints />
       </rowConstraints>
 
       <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
@@ -56,21 +52,8 @@
       </VBox>
       <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
         <Label styleClass="field-label" text="%interpretation_of_year" />
-        <TextField fx:id="interpretationOfYearField" />
+        <ComboBox fx:id="interpretationOfYearComboBox" maxWidth="Infinity" />
       </VBox>
-      <VBox GridPane.columnIndex="0" GridPane.rowIndex="1">
-        <Label styleClass="field-label" text="%custom_format" />
-        <TextField fx:id="notInDCustomFormatField" />
-      </VBox>
-      <VBox GridPane.columnIndex="1" GridPane.rowIndex="1">
-        <Label styleClass="field-label" text="%custom_range_separator" />
-        <TextField fx:id="notInDCustomRangeSeparatorField" />
-      </VBox>
-      <CheckBox fx:id="youngerThan1900CheckBox" text="%younger_than_1900_check" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="2">
-        <GridPane.margin>
-          <Insets top="6.0" />
-        </GridPane.margin>
-      </CheckBox>
     </GridPane>
   </VBox>
  </center>

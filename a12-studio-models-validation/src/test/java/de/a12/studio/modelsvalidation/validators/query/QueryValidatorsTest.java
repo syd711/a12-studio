@@ -79,4 +79,22 @@ class QueryValidatorsTest {
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("Invalid filter expression"));
   }
+
+  @Test
+  void linkValidatorReportsUnknownRelationshipUnknownRoleAndMissingFieldRecursively() {
+    QueryModel model = TestModels.load("/querymodel/QueryLinkValidator_invalid.json", QueryModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    RelationshipModel personRef = TestModels.load("/relationshipmodel/PersonRef.json", RelationshipModel.class);
+    List<ModelValidationError> errors = new QueryLinkValidator().validate(model,
+        TestModels.contextWithOtherModels(model, refDm, personRef));
+
+    // (1) unknown relationship on the first link, (2) unknown role on the second, (3) a missing field on the
+    // third (valid) link, and (4) an unknown relationship on a link nested *under* that valid third link -
+    // proving a broken hop doesn't stop validation of hops nested under a resolved sibling.
+    assertEquals(4, errors.size());
+    assertTrue(errors.get(0).message().contains("NoSuchRelationship"));
+    assertTrue(errors.get(1).message().contains("WrongRole"));
+    assertTrue(errors.get(2).message().contains("/Root/DoesNotExist"));
+    assertTrue(errors.get(3).message().contains("AnotherNoSuchRelationship"));
+  }
 }

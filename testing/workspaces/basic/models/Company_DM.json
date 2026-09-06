@@ -98,7 +98,10 @@
                       ],
                       "Field": {
                         "fieldType": {
-                          "type": "StringType"
+                          "type": "DateRangeType",
+                          "DateRangeType": {
+                            "format": "yyyy"
+                          }
                         },
                         "label": [
                           {

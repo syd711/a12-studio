@@ -8,6 +8,7 @@ import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.RequirednessConfig;
 import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.StringTypeOptions;
@@ -120,6 +121,17 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
   public void configureErrorMessages() {
     configure(LocalizedTextPanelController::getErrorMessages, LocalizedTextPanelController::getOrCreateErrorMessages,
         FIELD_KEY_ERROR_MESSAGES, StudioBundle.get("error_messages"));
+  }
+
+  /**
+   * Edits a required {@link FieldElement}'s custom {@code requirednessConfig.errorMessage} - the message shown
+   * when {@link TypeDefinitionPanelController}'s "use default error messages" checkbox is unchecked. Visibility
+   * (only while that checkbox is unchecked and the field is actually required) is managed by
+   * {@link TypeDefinitionPanelController}, not by this panel itself.
+   */
+  public void configureRequirednessErrorMessage() {
+    configure(LocalizedTextPanelController::getRequirednessErrorMessage, LocalizedTextPanelController::getOrCreateRequirednessErrorMessage,
+        "requirednessErrorMessage", StudioBundle.get("error_messages"));
   }
 
   /** Edits a {@link RuleElement}'s {@code Rule.errorMessage}. */
@@ -544,6 +556,34 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
       return options.getErrorMessage();
     }
     return List.of();
+  }
+
+  private static List<Label> getRequirednessErrorMessage(Element element) {
+    RequirednessConfig requirednessConfig = getRequirednessConfig(element);
+    return requirednessConfig != null ? requirednessConfig.getErrorMessage() : List.of();
+  }
+
+  private static List<Label> getOrCreateRequirednessErrorMessage(Element element) {
+    if (element instanceof FieldElement fieldElement && fieldElement.getField() != null) {
+      RequirednessConfig requirednessConfig = fieldElement.getField().getRequirednessConfig();
+      if (requirednessConfig == null) {
+        // Shouldn't normally be reachable - this panel is only shown while the field is already required,
+        // i.e. requirednessConfig already exists - but guarded the same defensive way getOrCreateErrorMessages()
+        // handles a String field with no StringTypeOptions yet.
+        requirednessConfig = new RequirednessConfig();
+        requirednessConfig.setMode(RequirednessConfig.MODE_REQUIRED);
+        fieldElement.getField().setRequirednessConfig(requirednessConfig);
+      }
+      return requirednessConfig.getErrorMessage();
+    }
+    return List.of();
+  }
+
+  private static RequirednessConfig getRequirednessConfig(Element element) {
+    if (element instanceof FieldElement fieldElement && fieldElement.getField() != null) {
+      return fieldElement.getField().getRequirednessConfig();
+    }
+    return null;
   }
 
   private static Optional<StringTypeOptions> getStringTypeOptions(Element element) {

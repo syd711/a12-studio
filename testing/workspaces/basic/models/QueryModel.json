@@ -30,15 +30,7 @@
   "content": {
     "projectionName": "document",
     "targetDocumentModel": "Person_DM",
-    "fields": [
-      "/People/Addresses/Street",
-      "/People/Addresses/City",
-      "/People/Addresses/Country",
-      "/People/Addresses/PostalCode",
-      "/People/FirstName",
-      "/People/LastName",
-      "/People/PersonalData/Gender"
-    ],
+    "fields": [],
     "sort": [
       {
         "relationshipModel": "PersonCompany",

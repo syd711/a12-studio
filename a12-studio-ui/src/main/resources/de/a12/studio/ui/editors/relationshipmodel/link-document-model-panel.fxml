@@ -8,13 +8,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%link_document_model" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.relationshipmodel.LinkDocumentModelPanelController">
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%link_document_model" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.relationshipmodel.LinkDocumentModelPanelController">
  <BorderPane>
  <center>
   <VBox spacing="14.0">
     <children>
-      <ComboBox fx:id="linkDocumentModelField" editable="false" maxWidth="Infinity" />
+      <ComboBox fx:id="linkDocumentModelField" editable="false" />
       <HBox alignment="CENTER_LEFT" spacing="6.0">
         <children>
           <CheckBox fx:id="duplicatesAllowedField" mnemonicParsing="false" text="%duplicates_allowed" />

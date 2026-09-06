@@ -113,8 +113,10 @@
                                 <CheckBox fx:id="defaultErrorMessagesCheckbox" text="%use_default_error_messages" />
                             </children>
                         </HBox>
+                        <fx:include fx:id="requirednessErrorMessage" source="localized-text-panel.fxml" GridPane.columnSpan="4" GridPane.rowIndex="1" />
                         <rowConstraints>
                             <RowConstraints minHeight="10.0" />
+                            <RowConstraints />
                         </rowConstraints>
                     </GridPane>
                 </children>

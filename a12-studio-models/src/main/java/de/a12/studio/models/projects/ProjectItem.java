@@ -6,6 +6,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelFactory;
 import de.a12.studio.models.auth.AuthDocument;
 import de.a12.studio.models.auth.AuthFileFactory;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -194,7 +195,9 @@ public class ProjectItem {
     this.file = newFile;
 
     if (!isFolder() && model != null) {
-      model.setId(idFromFileName(newFile.getName()));
+      String newId = idFromFileName(newFile.getName());
+      model.setId(newId);
+      syncDocumentModelInfoName(model, newId);
       save();
     }
   }
@@ -211,6 +214,22 @@ public class ProjectItem {
   // Convention: a model's header/id always matches its filename without the ".json" suffix.
   public static String idFromFileName(String fileName) {
     return fileName.endsWith(".json") ? fileName.substring(0, fileName.length() - ".json".length()) : fileName;
+  }
+
+  /**
+   * A Document Model's {@code content.modelInfo.name} mirrors its own {@code header.id} in every fixture in
+   * this repo (e.g. {@code Company_DM.json}'s {@code modelInfo.name} is literally {@code "Company_DM"}) - it's
+   * set from the same name at creation time ({@code NewModelFactory.buildDocumentModel}) but, unlike {@code
+   * header.id}, was never kept in sync on rename/copy. Called alongside {@code model.setId(...)} in {@link
+   * #renameTo} and {@link #createCopy} for the same reason that method resyncs {@code header.id} - so the two
+   * don't silently drift apart the first time a Document Model is renamed or copied.
+   */
+  private static void syncDocumentModelInfoName(A12Model<?> model, String newId) {
+    if (model instanceof DocumentModel documentModel
+        && documentModel.getContent() != null
+        && documentModel.getContent().getModelInfo() != null) {
+      documentModel.getContent().getModelInfo().setName(newId);
+    }
   }
 
   /**
@@ -312,7 +331,9 @@ public class ProjectItem {
       parent.children.add(copy);
     }
     if (!copy.isFolder() && copy.model != null) {
-      copy.model.setId(idFromFileName(copyFile.getName()));
+      String newId = idFromFileName(copyFile.getName());
+      copy.model.setId(newId);
+      syncDocumentModelInfoName(copy.model, newId);
       copy.save();
     }
     return copy;

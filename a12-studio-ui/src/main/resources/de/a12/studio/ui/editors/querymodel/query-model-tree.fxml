@@ -37,6 +37,23 @@
                                 <Tooltip text="%collapse_all" />
                             </tooltip>
                         </Button>
+                        <Separator orientation="VERTICAL" />
+                        <Button fx:id="addRelationshipButton" accessibleText="%query_model_tree.add_relationship" mnemonicParsing="false" onAction="#onAddRelationshipButton" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2p-plus" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%query_model_tree.add_relationship" />
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="removeRelationshipButton" accessibleText="%query_model_tree.remove_relationship" mnemonicParsing="false" onAction="#onRemoveRelationshipButton" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2t-trash-can-outline" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%query_model_tree.remove_relationship" />
+                            </tooltip>
+                        </Button>
                     </items>
                 </ToolBar>
             </children>

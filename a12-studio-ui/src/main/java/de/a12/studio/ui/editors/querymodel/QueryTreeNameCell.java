@@ -33,7 +33,7 @@ class QueryTreeNameCell extends TreeTableCell<QueryTreeRow, String> {
       return;
     }
 
-    Node icon = row.getKind() == QueryTreeRow.Kind.TARGET_DOCUMENT_MODEL
+    Node icon = row.getKind() == QueryTreeRow.Kind.TARGET_DOCUMENT_MODEL || row.getKind() == QueryTreeRow.Kind.RELATIONSHIP_LINK
         ? WidgetFactory.createModelIcon(row.getIcon())
         : WidgetFactory.createIcon(row.getIcon());
     icon.getStyleClass().add("tree-icon");

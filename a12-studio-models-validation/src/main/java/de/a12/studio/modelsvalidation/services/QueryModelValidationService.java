@@ -14,6 +14,7 @@ import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.query.QueryFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.query.QueryFilterDefinitionSyntaxValidator;
+import de.a12.studio.modelsvalidation.validators.query.QueryLinkValidator;
 import de.a12.studio.modelsvalidation.validators.query.QueryPagingBoundsValidator;
 import de.a12.studio.modelsvalidation.validators.query.QueryRelationshipTraversalValidator;
 import de.a12.studio.modelsvalidation.validators.query.QuerySortFieldReferenceValidator;
@@ -38,6 +39,7 @@ public final class QueryModelValidationService {
       new QueryFieldReferenceValidator(),
       new QuerySortFieldReferenceValidator(),
       new QueryRelationshipTraversalValidator(),
+      new QueryLinkValidator(),
       new QueryPagingBoundsValidator(),
       new QueryFilterDefinitionSyntaxValidator()));
 

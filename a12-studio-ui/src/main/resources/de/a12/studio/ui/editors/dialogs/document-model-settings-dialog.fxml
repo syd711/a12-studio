@@ -69,6 +69,12 @@
 
                           <!-- Timezone -->
                           <fx:include fx:id="timezone" source="../propertyeditors/timezone-panel.fxml" />
+
+                          <!-- Decimal Separator / Condition Language (Document Model only) -->
+                          <fx:include fx:id="modelConfig" source="../propertyeditors/model-config-panel.fxml" />
+
+                          <!-- Immutable / Comment (Document Model only) -->
+                          <fx:include fx:id="modelInfo" source="../propertyeditors/model-info-panel.fxml" />
                       </VBox>
                   </content>
                <padding>

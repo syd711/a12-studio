@@ -23,6 +23,8 @@ import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DocumentUniquenessCriteriaPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.ModelConfigPanelController;
+import de.a12.studio.ui.editors.propertyeditors.ModelInfoPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModelReferencesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ModelSettingsNamePanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
@@ -89,6 +91,12 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   @FXML
   private TimezonePanelController timezoneController;
 
+  @FXML
+  private ModelConfigPanelController modelConfigController;
+
+  @FXML
+  private ModelInfoPanelController modelInfoController;
+
   // Shared by every property editor panel above so their comm/its are only persisted once #onSave is
   // triggered, rather than immediately as they would be outside of this dialog.
   private final PropertyEditorSaveMode.Deferred saveMode = new PropertyEditorSaveMode.Deferred();
@@ -126,6 +134,8 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     documentUniquenessCriteriaController.setSaveMode(saveMode);
     modelReferencesController.setSaveMode(saveMode);
     timezoneController.setSaveMode(saveMode);
+    modelConfigController.setSaveMode(saveMode);
+    modelInfoController.setSaveMode(saveMode);
 
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null && projectItem.getModel() != null) {
@@ -145,9 +155,15 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         documentUniquenessCriteriaController.setVisible(true);
         timezoneController.setModel(documentModel);
         timezoneController.setVisible(true);
+        modelConfigController.setModel(documentModel);
+        modelConfigController.setVisible(true);
+        modelInfoController.setModel(documentModel);
+        modelInfoController.setVisible(true);
       } else {
         documentUniquenessCriteriaController.setVisible(false);
         timezoneController.setVisible(false);
+        modelConfigController.setVisible(false);
+        modelInfoController.setVisible(false);
       }
       if (model instanceof OverviewModel overviewModel) {
         subtitlesController.setCustom(() -> ensureConfiguration(overviewModel).getSubtitle());
@@ -212,7 +228,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         annotationsController,
         documentUniquenessCriteriaController,
         modelReferencesController,
-        timezoneController);
+        timezoneController,
+        modelConfigController,
+        modelInfoController);
 
     Runnable updateErrorContainer = () -> {
       boolean anyError = panels.stream()

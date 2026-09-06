@@ -1,0 +1,42 @@
+{
+  "header": {
+    "id": "QueryLinkValidator_invalid",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Ref_DM",
+    "links": [
+      {
+        "relationshipModel": "NoSuchRelationship",
+        "targetRole": "X",
+        "fields": []
+      },
+      {
+        "relationshipModel": "PersonRef",
+        "targetRole": "WrongRole",
+        "fields": []
+      },
+      {
+        "relationshipModel": "PersonRef",
+        "targetRole": "RefSide",
+        "fields": [
+          "/Root/DoesNotExist"
+        ],
+        "links": [
+          {
+            "relationshipModel": "AnotherNoSuchRelationship",
+            "targetRole": "Y",
+            "fields": []
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -179,15 +179,25 @@ weren't independently confirmable from the documentation available in this repo 
 single unrelated `interpretationOfYear` mention in the QM filtering docs), so no enable/disable or cross-field
 validation logic was guessed at — the controls are always-editable with no gating.
 
-**4. `RequirednessConfig.errorMessage` (custom "this field is required" message) can be toggled off the default
-but never authored** — `TypeDefinitionPanelController`'s "use default error messages" checkbox only *clears* the
-list when checked; unchecking it exposes no text field to type a replacement into
-(`type-definition-panel.fxml:104-119`).
+**4. DONE (2026-09-06).** `RequirednessConfig.errorMessage` (custom "this field is required" message) could be
+toggled off the default but never authored — `TypeDefinitionPanelController`'s "use default error messages"
+checkbox only *cleared* the list when checked, with no text field to type a replacement into. Fixed via a new
+`LocalizedTextPanelController.configureRequirednessErrorMessage()`, embedded as an extra row in
+`type-definition-panel.fxml`'s existing `defaultErrorMessagesGrid`, visible only while the field is required, not
+a multi-select String choice, and the checkbox is unchecked.
 
-**5. Model-level fields with no UI**: `ModelConfig.decimalSeparator`, `ModelConfig.conditionLanguage`, and all of
-`DocumentModelContent.modelInfo` (`name`, `immutable`, `comment` — distinct from the header-level `description`
-field, which *is* editable) are entirely unexposed; grep confirms zero references to `ModelInfo`/`getModelInfo`
-anywhere in `a12-studio-ui`.
+**5. DONE (2026-09-06), with a correction.** `ModelConfig.decimalSeparator`/`conditionLanguage` and
+`DocumentModelContent.modelInfo` were entirely unexposed. Fixed `decimalSeparator`/`conditionLanguage` via a new
+`ModelConfigPanelController`, and `modelInfo.immutable`/`comment` via a new `ModelInfoPanelController`, both wired
+into `ModelSettingsDialog`/`document-model-settings-dialog.fxml` (Document Model only), following the same
+"model-header, not Element-bound" pattern as the existing `TimezonePanelController`. **`modelInfo.name` was
+deliberately NOT exposed as an editable field** — every fixture in this repo has it exactly equal to the model's
+own `header.id` (e.g. `Company_DM.json`'s `modelInfo.name` is literally `"Company_DM"`), which turned out to be
+because `NewModelFactory` sets it from the same name at creation time, but — unlike `header.id` itself —
+`ProjectItem.renameTo()`/`createCopy()` never kept it in sync afterward. That's a latent correctness bug, not a
+missing-field gap: exposing `modelInfo.name` as free text would let a user desync it further. Fixed the actual
+bug instead — both methods (and `NewModelFactory.createModelFromExisting()`) now sync `modelInfo.name` alongside
+`header.id`, with a regression test (`ProjectItemRoundTripTest.renameSyncsHeaderIdAndModelInfoName`).
 
 **6. DONE (2026-09-05).** `GroupConfig.modelAlias` was a dead field — no reader or writer anywhere in
 `a12-studio-ui` or `a12-studio-models`/validation. Confirmed obsolete via kernel changelog A12K-4102 (see the
@@ -465,23 +475,57 @@ it's still one whole-query expression, not yet a per-node constraint.
   for the future editable tree (Phase 2) — a simpler Document-Model list/combo picker will do instead, unlike
   SME's diagram-based one.
 
-**Still remaining**: the tree has no per-node constraint slot yet (`filterDefinition` is still one whole-query
-expression) — that's coupled to Phase 2, the editable graph tree with relationship-traversal nodes, which hasn't
-started. Real semantic validation of the *filter expression's own* field references (does `[/Foo/Bar]` inside a
-`filterDefinition` string actually exist) also isn't checked — only its syntax is; the sort/fields validators above
-check field-existence for those specific properties, but nothing yet parses `filterDefinition`'s field references
-out of the compiled `Operator` tree to check them the same way. Aggregation and reference/rename tracking are
-unchanged from the plan below.
+**Status (2026-09-06): Phase 2 (editable graph tree) done — the tree is no longer limited to one Document
+Model.** `content.links: List<QueryLink>` (new class, `a12-studio-models/.../querymodel/QueryLink.java`) is a
+recursive relationship-traversal hop: `relationshipModel`/`targetRole`, its own `fields` (scoped "In Result" list,
+just like `content.fields` but for that hop's own target Document Model), and nested `links` for multi-hop
+traversal. `constraint` (an `Operator`, per-node filtering) and `linkDocumentFields` are mapped so an existing
+file round-trips losslessly, but neither has editor UI yet - `constraint` is still Phase 3 (per-node filtering),
+and `linkDocumentFields` would need resolving the relationship's own link-document schema
+(`RelationshipModelContent.getLinkDocumentModel()`), which nothing in this editor does. The nested-`links`
+recursion shape was taken on trust from the original SME inventory pass rather than re-verified against SME's TS
+source in this session - flagged the same way the `date_range` `value`/`reverse` mode was earlier.
+
+- **Tree**: `QueryModelTreeController`/`QueryTreeRow` now render relationship-link rows (icon:
+  `Icons.PNG_MODEL_RELATIONSHIP`) alongside Document Model field/group rows, at any nesting depth. Each row
+  carries a `fieldsScope` - the specific `fields` list ("In Result" toggles read/write against `content.fields`
+  for the root and everything under it that isn't itself under a link, or that link's own `fields` otherwise) -
+  replacing the old hardcoded `content().getFields()` everywhere. An unresolved relationship/role (relationship
+  or role deleted elsewhere) renders as a childless, checkbox-less row instead of breaking the tree.
+- **Add/remove**: a row's context menu (right-click) and two new toolbar buttons offer "Add Relationship"
+  (target Document Model row or an existing relationship-link row - multi-hop) and "Remove Relationship"
+  (link rows only, with a confirmation prompt). `QueryTraversalOption` gained `optionsConnectedTo(projectItem,
+  documentModelId)` - scoped to relationships that actually declare that Document Model for some role (including
+  the same Document Model twice, for a legitimate self-referencing case like a hierarchy's Parent/Child) - unlike
+  the existing unscoped `options()` used by the Sort dialog, which still lists every relationship in the project
+  since it only needs *a* valid traversal, not one reachable from a specific node. The picker itself
+  (`QueryAddRelationshipDialogController`/`query-add-relationship-dialog.fxml`) is the plain combo box the user
+  asked for, not an ER diagram. No `CommandStack`/undo support was added for add/remove - consistent with the
+  rest of this editor (the "In Result" toggles have never had undo either), not a gap specific to this feature.
+- **Validators**: `QueryLinkValidator` recursively checks every link's relationship/role resolution (reusing the
+  same messages as `QueryRelationshipTraversalValidator`) and its `fields[]` paths against the resolved Document
+  Model - a broken hop doesn't stop validation of hops nested under a resolved sibling.
+- **Not manually verified in-app this session**: this is a real JavaFX desktop app with no browser/Electron
+  automation available and no project-specific run skill; `compileJava` succeeded (catches FXML wiring mistakes
+  like a bad `fx:id` at load time) and the data-model/validator layers have real tests, but the tree's actual
+  on-screen behavior (context menu, toolbar button enablement, nested rendering) has not been clicked through -
+  needs manual verification, e.g. against `testing/workspaces/basic` with a Relationship Model connected to a
+  Query Model's target Document Model.
+
+**Still remaining**: no per-node constraint slot yet (`filterDefinition` is still one whole-query expression on
+the root only, not attachable to a relationship-link node) - that's Phase 3, now unblocked by this tree work.
+Real semantic validation of the *filter expression's own* field references (does `[/Foo/Bar]` inside a
+`filterDefinition` string actually exist) also isn't checked - only its syntax is. Aggregation and reference/
+rename tracking are unchanged from the plan below.
 
 ### Proposed build order
 
-1. ~~**Settings + validators**~~ — done, see Status above.
-2. **Editable graph tree**: add/remove relationship-traversal nodes, scoped to relationships actually connected to
-   the selected node (not every relationship in the project, unlike today's `QueryTraversalOption.options()`); a
-   plain Document-Model list/combo for adding a root (not an ER diagram, per the scope note above).
+1. ~~**Settings + validators**~~ — done, see Status above (2026-09-05).
+2. ~~**Editable graph tree**~~ — done, see Status above (2026-09-06).
 3. **Per-node filtering**: give each graph node (not just the whole query) its own constraint, authored/validated
-   via the already-built `QueryLanguageEmitter`/`Formatter`. Autocomplete remains a separate follow-up once a
-   semantic (field-existence-aware) layer exists.
+   via the already-built `QueryLanguageEmitter`/`Formatter` and stored in `QueryLink.constraint` (already mapped
+   in the data model, just not editable yet). Autocomplete remains a separate follow-up once a semantic
+   (field-existence-aware) layer exists.
 4. **Aggregation** — only once it's confirmed the kernel path a12-studio would use actually supports an
    aggregation-mode query result; otherwise a documented non-goal.
 5. **Reference/rename tracking** — hook into whatever a12-studio's existing rename/move refactoring mechanism is

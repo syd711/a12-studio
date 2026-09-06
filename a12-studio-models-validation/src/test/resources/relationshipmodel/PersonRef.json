@@ -1,0 +1,30 @@
+{
+  "header": {
+    "id": "PersonRef",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": [
+      {
+        "role": "PersonSide",
+        "documentModel": "Person_DM",
+        "ordered": false,
+        "labels": []
+      },
+      {
+        "role": "RefSide",
+        "documentModel": "Ref_DM",
+        "ordered": false,
+        "labels": []
+      }
+    ]
+  }
+}

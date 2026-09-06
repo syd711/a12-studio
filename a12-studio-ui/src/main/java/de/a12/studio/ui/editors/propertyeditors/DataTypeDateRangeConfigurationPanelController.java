@@ -6,9 +6,9 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
@@ -22,11 +22,11 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 /**
- * {@code rangeSeparator}/{@code youngerThan1900Check}/{@code interpretationOfYear}/{@code notInDCustomFormat}/
- * {@code notInDCustomRangeSeparator} are exposed here as plain controls with no cross-field validity checks:
- * SME conditionally restricts some of these based on {@code format} (e.g. {@code youngerThan1900Check} only
- * applies when the format includes a year), but the exact conditions weren't independently confirmable from
- * the documentation available in this repo, so no enable/disable or validation logic was guessed at.
+ * {@code youngerThan1900Check}/{@code notInDCustomFormat}/{@code notInDCustomRangeSeparator} are SME
+ * "expert" properties that its own editor never lets the user add, change or remove (see
+ * {@code ExpertProps} in SME's {@code dateRange.ts}) - they round-trip if already present in a model's
+ * JSON but have no UI here either, matching {@code rangeSeparator}/{@code format}/{@code interpretationOfYear},
+ * which SME does expose.
  */
 public class DataTypeDateRangeConfigurationPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -42,7 +42,17 @@ public class DataTypeDateRangeConfigurationPanelController extends AbstractPrope
     FORMAT_LABELS.put(FORMAT_MONTH, "Only Month (" + FORMAT_MONTH + "/" + FORMAT_MONTH + ")");
     FORMAT_LABELS.put(FORMAT_DAY_MONTH_YEAR, "Day, Month and Year (" + FORMAT_DAY_MONTH_YEAR + "/" + FORMAT_DAY_MONTH_YEAR + ")");
     FORMAT_LABELS.put(FORMAT_MONTH_YEAR, "Only Month and Year (" + FORMAT_MONTH_YEAR + "/" + FORMAT_MONTH_YEAR + ")");
-    FORMAT_LABELS.put(FORMAT_DAY_MONTH, "Only Day and Month (" + FORMAT_DAY_MONTH + "/" + FORMAT_DAY_MONTH + ")");
+    FORMAT_LABELS.put(FORMAT_DAY_MONTH, "Only Day and Month (" + FORMAT_DAY_MONTH + ")");
+  }
+
+  private static final String INTERPRETATION_FROM = "FROM";
+  private static final String INTERPRETATION_TO = "TO";
+
+  private static final Map<String, String> INTERPRETATION_OF_YEAR_KEYS = new LinkedHashMap<>();
+  static {
+    INTERPRETATION_OF_YEAR_KEYS.put(null, "interpretation_of_year_standard");
+    INTERPRETATION_OF_YEAR_KEYS.put(INTERPRETATION_FROM, "interpretation_of_year_from");
+    INTERPRETATION_OF_YEAR_KEYS.put(INTERPRETATION_TO, "interpretation_of_year_to");
   }
 
   @FXML
@@ -52,16 +62,7 @@ public class DataTypeDateRangeConfigurationPanelController extends AbstractPrope
   private TextField rangeSeparatorField;
 
   @FXML
-  private TextField interpretationOfYearField;
-
-  @FXML
-  private TextField notInDCustomFormatField;
-
-  @FXML
-  private TextField notInDCustomRangeSeparatorField;
-
-  @FXML
-  private CheckBox youngerThan1900CheckBox;
+  private ComboBox<String> interpretationOfYearComboBox;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -84,12 +85,26 @@ public class DataTypeDateRangeConfigurationPanelController extends AbstractPrope
       }
     });
 
+    interpretationOfYearComboBox.getItems().addAll(INTERPRETATION_OF_YEAR_KEYS.keySet());
+    interpretationOfYearComboBox.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(String interpretationOfYear) {
+        return StudioBundle.get(INTERPRETATION_OF_YEAR_KEYS.get(interpretationOfYear));
+      }
+
+      @Override
+      public String fromString(String displayName) {
+        return INTERPRETATION_OF_YEAR_KEYS.entrySet().stream()
+            .filter(entry -> StudioBundle.get(entry.getValue()).equals(displayName))
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse(null);
+      }
+    });
+
     bindComboBox(formatComboBox, (element, value) -> withDateRangeTypeOptions(element, options -> options.setFormat(value == null || value.isEmpty() ? null : value)));
     bindTextField(rangeSeparatorField, (element, value) -> withDateRangeTypeOptions(element, options -> options.setRangeSeparator(blankToNull(value))));
-    bindTextField(interpretationOfYearField, (element, value) -> withDateRangeTypeOptions(element, options -> options.setInterpretationOfYear(blankToNull(value))));
-    bindTextField(notInDCustomFormatField, (element, value) -> withDateRangeTypeOptions(element, options -> options.setNotInDCustomFormat(blankToNull(value))));
-    bindTextField(notInDCustomRangeSeparatorField, (element, value) -> withDateRangeTypeOptions(element, options -> options.setNotInDCustomRangeSeparator(blankToNull(value))));
-    bindCheckBox(youngerThan1900CheckBox, (element, value) -> withDateRangeTypeOptions(element, options -> options.setYoungerThan1900Check(value ? true : null)));
+    bindComboBox(interpretationOfYearComboBox, (element, value) -> withDateRangeTypeOptions(element, options -> options.setInterpretationOfYear(value)));
   }
 
   @Override
@@ -111,10 +126,7 @@ public class DataTypeDateRangeConfigurationPanelController extends AbstractPrope
 
     setFieldValue(formatComboBox, format);
     setFieldValue(rangeSeparatorField, options != null && options.getRangeSeparator() != null ? options.getRangeSeparator() : "");
-    setFieldValue(interpretationOfYearField, options != null && options.getInterpretationOfYear() != null ? options.getInterpretationOfYear() : "");
-    setFieldValue(notInDCustomFormatField, options != null && options.getNotInDCustomFormat() != null ? options.getNotInDCustomFormat() : "");
-    setFieldValue(notInDCustomRangeSeparatorField, options != null && options.getNotInDCustomRangeSeparator() != null ? options.getNotInDCustomRangeSeparator() : "");
-    setFieldValue(youngerThan1900CheckBox, options != null && Boolean.TRUE.equals(options.getYoungerThan1900Check()));
+    setFieldValue(interpretationOfYearComboBox, options != null ? options.getInterpretationOfYear() : null);
   }
 
   @Override

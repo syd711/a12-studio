@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QueryModelLoadTest {
 
@@ -53,5 +54,38 @@ class QueryModelLoadTest {
   @Test
   void roundTripsQueryModel() throws Exception {
     ModelRoundTrip.assertRoundTrip(getClass(), "/querymodel/QueryModel.json", QueryModel.class);
+  }
+
+  @Test
+  void loadsQueryModelWithNestedLinks() throws Exception {
+    QueryModel model = ModelRoundTrip.load(getClass(), "/querymodel/QueryModelWithLinks.json", QueryModel.class);
+
+    QueryModelContent content = model.getContent();
+    assertEquals(1, content.getLinks().size());
+
+    QueryLink companyLink = content.getLinks().get(0);
+    assertEquals("PersonCompany", companyLink.getRelationshipModel());
+    assertEquals("Company", companyLink.getTargetRole());
+    assertEquals(1, companyLink.getMaxDepth());
+    assertEquals("/AdditionalFields/Position", companyLink.getLinkDocumentFields().get(0));
+    assertEquals("/Company/Addresses/AddressType", companyLink.getFields().get(0));
+
+    assertEquals(1, companyLink.getLinks().size());
+    QueryLink industryLink = companyLink.getLinks().get(0);
+    assertEquals("CompanyIndustry", industryLink.getRelationshipModel());
+    assertEquals("Industry", industryLink.getTargetRole());
+    assertEquals("/Industry/Name", industryLink.getFields().get(0));
+    assertNull(industryLink.getMaxDepth());
+    assertTrue(industryLink.getLinks().isEmpty());
+  }
+
+  @Test
+  void roundTripsQueryModelWithNestedLinks() throws Exception {
+    ModelRoundTrip.assertRoundTrip(getClass(), "/querymodel/QueryModelWithLinks.json", QueryModel.class);
+  }
+
+  @Test
+  void newQueryModelHasNoLinks() {
+    assertTrue(new QueryModelContent().getLinks().isEmpty());
   }
 }

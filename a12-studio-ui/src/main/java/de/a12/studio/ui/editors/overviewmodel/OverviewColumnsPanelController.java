@@ -3,8 +3,11 @@ package de.a12.studio.ui.editors.overviewmodel;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnHeaderLabelOrIconValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.overviewmodel.OverviewColumnOptions;
@@ -192,10 +195,34 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
     return model.getContent().getColumns();
   }
 
+  /**
+   * Reflects any {@link OverviewFieldReferenceValidator}/{@link OverviewColumnHeaderLabelOrIconValidator}
+   * problem still present among {@link #getColumns()} in this panel's own error container - the per-row inline
+   * styling in {@link #createFieldCell} flags exactly the same two conditions, but only this also drives
+   * {@link de.a12.studio.ui.util.TabErrorBadge}, so switching to another tab doesn't hide the fact that a
+   * column still has an unresolved reference or an accessibility problem. An unresolved reference (ERROR) is
+   * preferred over a missing label/icon (WARNING) when both are present.
+   */
+  private void refreshValidationError() {
+    List<ModelValidationError> errors = Studio.getValidationService().validate(model);
+    Optional<ModelValidationError> worst = errors.stream()
+        .filter(error -> OverviewFieldReferenceValidator.ELEMENT_ID.equals(error.elementId()))
+        .findFirst()
+        .or(() -> errors.stream()
+            .filter(error -> OverviewColumnHeaderLabelOrIconValidator.ELEMENT_ID.equals(error.elementId()))
+            .findFirst());
+    if (worst.isEmpty()) {
+      hideError();
+    } else {
+      showError(worst.get().severity(), worst.get().message());
+    }
+  }
+
   private void rebuildRows() {
     if (model == null) {
       return;
     }
+    refreshValidationError();
     columnRows.getChildren().clear();
 
     List<Column> columns = getColumns();

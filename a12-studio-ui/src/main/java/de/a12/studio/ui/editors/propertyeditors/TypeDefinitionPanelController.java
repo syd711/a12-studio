@@ -90,6 +90,9 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   private HBox defaultErrorMessagesBox;
 
   @FXML
+  private LocalizedTextPanelController requirednessErrorMessageController;
+
+  @FXML
   private HBox requiredParentBox;
 
   @FXML
@@ -182,6 +185,11 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     defaultErrorMessagesBox.visibleProperty().bind(requiredCheckBox.selectedProperty()
         .and(Bindings.createBooleanBinding(() -> !isMultiSelectStringDataType(), dataTypeComboBox.valueProperty())));
 
+    requirednessErrorMessageController.configureRequirednessErrorMessage();
+    requiredCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> updateRequirednessErrorMessageVisibility());
+    defaultErrorMessagesCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> updateRequirednessErrorMessageVisibility());
+    dataTypeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> updateRequirednessErrorMessageVisibility());
+
     bindCheckBox(globalCheckBox, (element, value) ->
         withFieldConfig(element, field -> field.setGlobal(value ? true : null)));
     bindCheckBox(transientCheckBox, (element, value) ->
@@ -270,6 +278,19 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
         requirednessConfig != null && RequirednessConfig.MODE_REQUIRED_IF_PARENT_FILLED.equals(requirednessConfig.getMode()));
     setFieldValue(defaultErrorMessagesCheckbox,
         requirednessConfig == null || requirednessConfig.getErrorMessage().isEmpty());
+    requirednessErrorMessageController.setElement(element);
+    updateRequirednessErrorMessageVisibility();
+  }
+
+  /**
+   * The custom requiredness error-message editor only makes sense while the field is actually required, isn't
+   * a multi-select String choice (which has no requiredness-relevant validation of its own - same reasoning as
+   * {@link #isMultiSelectStringDataType()}'s other use above), and the user has opted out of the default
+   * message via {@link #defaultErrorMessagesCheckbox}.
+   */
+  private void updateRequirednessErrorMessageVisibility() {
+    boolean visible = requiredCheckBox.isSelected() && !isMultiSelectStringDataType() && !defaultErrorMessagesCheckbox.isSelected();
+    requirednessErrorMessageController.setVisible(visible);
   }
 
   @Override

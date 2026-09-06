@@ -17,6 +17,11 @@ public class QueryModelContent {
   private String targetDocumentModel;
   private List<String> fields = new ArrayList<>();
 
+  // Relationship-traversal hops from the target Document Model (see QueryLink) - the tree's editable "graph"
+  // part, as opposed to fields/filterDefinition/sort/paging which all describe the target DM itself.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<QueryLink> links = new ArrayList<>();
+
   // The projection's DM-level filter expression, edited via RichtextEditorController (no query-engine grammar
   // is available in a12-studio to parse/validate a structured constraint, unlike SME's QueryElementDocument.
   // DocumentModel.constraint).
