@@ -10,3 +10,4 @@ Solve the following TODOs:
 - check dnd behaviour
 - check error handling when dropping from repeatable in regular group
 - check dnd of sections with multi select
+- check if trigger and dependency icons are visible
