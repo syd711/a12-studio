@@ -5,6 +5,8 @@ Solve the following TODOs:
 
 Commons:
 - Make the project tree collapsible.
+- move the deploy to a progressable in the footer
+- add a data download menu to the deploy button
 
 Form Models:
 - check detached and embedded repeats
@@ -17,3 +19,5 @@ Form Models:
 
 Application Model
 - move Model references up
+
+
