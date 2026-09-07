@@ -17,6 +17,9 @@ Form Models:
 - merge tabs of settings and control, note that only fields with values shows deps
 - check combobox for empty values
 
+Document Model:
+- Add Group to Document Model converter that creates a new document model and includes it.
+
 Application Model
 - move Model references up
 
