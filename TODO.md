@@ -9,3 +9,4 @@ Solve the following TODOs:
 - check detached and embedded repeats
 - check dnd behaviour
 - check error handling when dropping from repeatable in regular group
+- check dnd of sections with multi select
