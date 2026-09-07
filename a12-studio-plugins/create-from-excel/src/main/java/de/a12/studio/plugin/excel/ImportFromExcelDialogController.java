@@ -1,18 +1,11 @@
 package de.a12.studio.plugin.excel;
 
 import de.a12.studio.models.Locale;
-import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.components.ErrorContainerController;
+import de.a12.studio.ui.components.NewDocumentModelPanelController;
 import de.a12.studio.ui.components.StudioFileChooser;
-import de.a12.studio.ui.editors.PropertyEditorSaveMode;
-import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
-import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
-import de.a12.studio.ui.util.DocumentModelBuilder;
-import de.a12.studio.ui.util.FileUtils;
-import de.a12.studio.ui.util.ModelSuffixValidation;
-import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import java.util.ResourceBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -21,10 +14,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -61,16 +52,13 @@ public class ImportFromExcelDialogController implements DialogController {
   // FXML fields
   // -------------------------------------------------------------------------
 
-  @FXML private TextField filePathField;
+  @FXML private javafx.scene.control.TextField filePathField;
   @FXML private Button browseButton;
   @FXML private ListView<String> columnListView;
-  @FXML private TextField modelNameField;
-  @FXML private ComboBox<ProjectItem> locationCombo;
   @FXML private Button okButton;
   @FXML private Button cancelButton;
 
-  @FXML private LocalesPanelController localesController;
-  @FXML private RolesEditorPanelController rolesController;
+  @FXML private NewDocumentModelPanelController newDocumentModelPanelController;
   @FXML private ErrorContainerController errorContainerController;
 
   // -------------------------------------------------------------------------
@@ -95,22 +83,16 @@ public class ImportFromExcelDialogController implements DialogController {
 
   @FXML
   private void initialize() {
-    // Signals RolesEditorPanelController that it's embedded in a dialog, so it hides its "Edit Roles"
-    // button (this dialog builds the model on submit, outside the panel's own save flow, so
-    // Deferred#flush() is never called -- only isEmbeddedInDialog()'s side effect is needed here).
-    rolesController.setSaveMode(new PropertyEditorSaveMode.Deferred());
     columnListView.setMouseTransparent(true);
     columnListView.setFocusTraversable(false);
-
-    modelNameField.textProperty().addListener((obs, old, current) -> validate());
+    newDocumentModelPanelController.setOnChanged(this::validate);
   }
 
   private void validate() {
-    Optional<String> suffixError = targetFolder == null ? Optional.empty()
-        : ModelSuffixValidation.validate(targetFolder, ModelType.DOCUMENT, modelNameField.getText());
+    Optional<String> suffixError = newDocumentModelPanelController.getSuffixError();
     suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
     okButton.setDisable(currentExcelFile == null
-        || !FileUtils.isValidWindowsFilename(modelNameField.getText())
+        || !newDocumentModelPanelController.isValid()
         || suffixError.isPresent());
   }
 
@@ -134,7 +116,7 @@ public class ImportFromExcelDialogController implements DialogController {
 
   @FXML
   private void onDialogSubmit() {
-    if (currentExcelFile == null || modelNameField.getText().isBlank()) {
+    if (currentExcelFile == null || !newDocumentModelPanelController.isValid()) {
       return;
     }
     result = Optional.of(ButtonType.OK);
@@ -162,11 +144,11 @@ public class ImportFromExcelDialogController implements DialogController {
         Platform.runLater(() -> {
           currentExcelFile = file;
           filePathField.setText(file.getAbsolutePath());
-          if (modelNameField.getText().isBlank()) {
+          if (newDocumentModelPanelController.getModelName().isBlank()) {
             String fileName = file.getName();
             int dot = fileName.lastIndexOf('.');
             String baseName = dot > 0 ? fileName.substring(0, dot) : fileName;
-            modelNameField.setText(baseName + "_DM");
+            newDocumentModelPanelController.setModelName(baseName + "_DM");
           }
           currentColumns = columns;
           if (columns.isEmpty()) {
@@ -221,23 +203,21 @@ public class ImportFromExcelDialogController implements DialogController {
         (ImportFromExcelDialogController) stage.getUserData();
     controller.stage = stage;
     controller.targetFolder = targetFolder;
-    ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
-    controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
-    controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+    controller.newDocumentModelPanelController.init(targetFolder, null);
     WidgetFactory.installResizable(stage);
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
-      String modelName = controller.modelNameField.getText().trim();
-      ProjectItem folder = controller.locationCombo.getValue();
-      if (controller.currentExcelFile != null && !modelName.isBlank() && folder != null) {
+      String modelName = controller.newDocumentModelPanelController.getModelName();
+      ProjectItem folder = controller.newDocumentModelPanelController.getFolder();
+      if (controller.currentExcelFile != null && !modelName.isBlank()) {
         return Optional.of(new ExcelImportInput(
             controller.currentExcelFile,
             controller.currentColumns,
             modelName,
             folder,
-            controller.localesController.getLocales(),
-            controller.rolesController.getRoles()));
+            controller.newDocumentModelPanelController.getLocales(),
+            controller.newDocumentModelPanelController.getRoles()));
       }
     }
     return Optional.empty();
@@ -271,24 +251,22 @@ public class ImportFromExcelDialogController implements DialogController {
         (ImportFromExcelDialogController) stage.getUserData();
     controller.stage = stage;
     controller.targetFolder = targetFolder;
-    ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
-    controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
-    controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+    controller.newDocumentModelPanelController.init(targetFolder, null);
     controller.loadExcelFile(preloadFile);
     WidgetFactory.installResizable(stage);
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
-      String modelName = controller.modelNameField.getText().trim();
-      ProjectItem folder = controller.locationCombo.getValue();
-      if (controller.currentExcelFile != null && !modelName.isBlank() && folder != null) {
+      String modelName = controller.newDocumentModelPanelController.getModelName();
+      ProjectItem folder = controller.newDocumentModelPanelController.getFolder();
+      if (controller.currentExcelFile != null && !modelName.isBlank()) {
         return Optional.of(new ExcelImportInput(
             controller.currentExcelFile,
             controller.currentColumns,
             modelName,
             folder,
-            controller.localesController.getLocales(),
-            controller.rolesController.getRoles()));
+            controller.newDocumentModelPanelController.getLocales(),
+            controller.newDocumentModelPanelController.getRoles()));
       }
     }
     return Optional.empty();

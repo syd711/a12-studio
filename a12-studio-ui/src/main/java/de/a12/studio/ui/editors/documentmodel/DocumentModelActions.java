@@ -5,7 +5,9 @@ import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.OverviewModel;
@@ -20,10 +22,12 @@ import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogC
 import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.Result;
 import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController;
+import de.a12.studio.ui.editors.documentmodel.dialogs.MoveGroupDialogController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.Command;
 import de.a12.studio.ui.util.commandstack.CommandStack;
@@ -157,6 +161,17 @@ public class DocumentModelActions {
       items.add(overviewModelItem);
       items.add(new SeparatorMenuItem());
     }
+    // "Move..." is only offered for plain groups (GroupElements that don't have fixed children,
+    // already guaranteed by the outer hasFixedChildren guard). Attachments, multi-selects, and
+    // includes are also GroupElements but are excluded by that guard above.
+    if (element instanceof GroupElement groupElement && groupElement.getGroup() != null
+        && groupElement.getGroup().getIncludeConfig() == null
+        && groupElement.getGroup().getUsageType() == null) {
+      MenuItem moveItem = createMenuItem(StudioBundle.get("document_model_tree.move"), Icons.ARROW_UP);
+      moveItem.setOnAction(event -> onMoveGroup(groupElement));
+      items.add(moveItem);
+      items.add(new SeparatorMenuItem());
+    }
     MenuItem cutItem = createMenuItem(StudioBundle.get("document_model_tree.cut"), Icons.CUT);
     cutItem.setOnAction(event -> cutSelection());
     items.add(cutItem);
@@ -276,6 +291,137 @@ public class DocumentModelActions {
 
     commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), newElement, insertionPoint.index()));
     onModelChanged.accept(newElement);
+  }
+
+  /**
+   * Opens the Move Group dialog and, once confirmed, performs the move:
+   * <ol>
+   *   <li>Removes the {@code group} from this model's element list (root groups or its parent group's children).</li>
+   *   <li>Adds an include element in its place, referencing the target Document Model.</li>
+   *   <li>Appends the group at the end of the target Document Model's root groups.</li>
+   *   <li>Saves both models and fires save events so the tree refreshes.</li>
+   * </ol>
+   * When the user opts to create a new Document Model, the new model is created on disk first via
+   * {@link NewModelFactory#createModel}, then the group is transferred into its root.
+   */
+  @SuppressWarnings("unchecked")
+  private void onMoveGroup(@NonNull GroupElement group) {
+    Optional<MoveGroupDialogController.MoveTarget> targetOpt =
+        MoveGroupDialogController.show(Studio.stage, projectItem, group.getName());
+    if (targetOpt.isEmpty()) {
+      return;
+    }
+
+    MoveGroupDialogController.MoveTarget target = targetOpt.get();
+
+    // Resolve or create the target Document Model and its backing ProjectItem.
+    ProjectItem targetProjectItem;
+    DocumentModel targetDocumentModel;
+    try {
+      if (target instanceof MoveGroupDialogController.MoveTarget.ExistingModel existing) {
+        targetDocumentModel = existing.documentModel();
+        targetProjectItem = ProjectDocumentModels
+            .findProjectItemByModelId(targetDocumentModel.getId())
+            .orElse(null);
+        if (targetProjectItem == null) {
+          WidgetFactory.showAlert(Studio.stage,
+              StudioBundle.get("move_group_dialog.could_not_find_target_model"));
+          return;
+        }
+      } else {
+        MoveGroupDialogController.MoveTarget.NewModel newModel =
+            (MoveGroupDialogController.MoveTarget.NewModel) target;
+        targetProjectItem = NewModelFactory.createModel(
+            newModel.folder(), ModelType.DOCUMENT, newModel.modelName());
+        targetDocumentModel = (DocumentModel) targetProjectItem.getModel();
+        if (!newModel.locales().isEmpty()) {
+          targetDocumentModel.setLocales(newModel.locales());
+        }
+        if (!newModel.roles().isEmpty()) {
+          RolesEditorPanelController.applyRoles(targetDocumentModel, newModel.roles());
+        }
+      }
+    } catch (IOException e) {
+      WidgetFactory.showAlert(Studio.stage,
+          StudioBundle.get("move_group_dialog.could_not_create_model"), e.getMessage());
+      return;
+    }
+
+    // 1. Remove the group from the source model's element list.
+    TreeItem<ElementViewModel> groupTreeItem = findTreeItemForGroup(group);
+    List<? extends Element> sourceList = resolveSourceList(groupTreeItem);
+    if (sourceList == null) {
+      WidgetFactory.showAlert(Studio.stage,
+          StudioBundle.get("move_group_dialog.could_not_determine_source"));
+      return;
+    }
+    ((List<Element>) sourceList).remove(group);
+
+    // 2. Insert an include element in place of the removed group (appended after remaining siblings).
+    // Cross-model operations are not undoable, so we skip the command stack here.
+    GroupElement include = buildIncludeFor(group.getName(), targetDocumentModel.getId());
+    ((List<Element>) sourceList).add(include);
+
+    // 3. Append the group to the target model's root groups.
+    DocumentModelElementFactory.regenerateIds(group, targetDocumentModel.getContent().getModelRoot());
+    targetDocumentModel.getContent().getModelRoot().getRootGroups().add(group);
+
+    // 4. Save both models and fire events.
+    targetProjectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(targetProjectItem);
+
+    onModelChanged.accept(null);
+  }
+
+  /**
+   * Finds the tree item in the current tree that holds {@code group}, or {@code null} if not found.
+   */
+  private TreeItem<ElementViewModel> findTreeItemForGroup(@NonNull GroupElement group) {
+    return findTreeItemById(elementsTreeTable.getRoot(), group.getId());
+  }
+
+  private TreeItem<ElementViewModel> findTreeItemById(TreeItem<ElementViewModel> node, @NonNull String id) {
+    if (node == null) return null;
+    if (node.getValue() != null && id.equals(node.getValue().getElement().getId())) return node;
+    for (TreeItem<ElementViewModel> child : node.getChildren()) {
+      TreeItem<ElementViewModel> found = findTreeItemById(child, id);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the list that directly contains the group's element: either {@link ModelRoot#getRootGroups()}
+   * when the group is a top-level root group, or its parent group's element list otherwise.
+   */
+  private List<? extends Element> resolveSourceList(TreeItem<ElementViewModel> groupItem) {
+    if (groupItem == null) return null;
+    TreeItem<ElementViewModel> parentItem = groupItem.getParent();
+    if (parentItem == null || parentItem.getValue() == null) {
+      return modelRoot.getRootGroups();
+    }
+    Element parentElement = parentItem.getValue().getElement();
+    if (parentElement instanceof GroupElement parentGroup && parentGroup.getGroup() != null) {
+      return parentGroup.getGroup().getElements();
+    }
+    return null;
+  }
+
+  /**
+   * Creates a new include {@link GroupElement} referencing {@code targetModelId}, using {@code name}
+   * as its display name so the tree shows the original group's name after the move.
+   */
+  private GroupElement buildIncludeFor(@NonNull String name, @NonNull String targetModelId) {
+    GroupElement include = new GroupElement();
+    include.setId("ig-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8));
+    include.setName(name);
+    GroupConfig config = new GroupConfig();
+    config.setRepeatability(1);
+    IncludeConfig includeConfig = new IncludeConfig();
+    includeConfig.setReference(targetModelId);
+    config.setIncludeConfig(includeConfig);
+    include.setGroup(config);
+    return include;
   }
 
   /**

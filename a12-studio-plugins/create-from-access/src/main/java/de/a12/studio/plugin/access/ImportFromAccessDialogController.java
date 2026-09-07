@@ -1,18 +1,11 @@
 package de.a12.studio.plugin.access;
 
 import de.a12.studio.models.Locale;
-import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.components.ErrorContainerController;
+import de.a12.studio.ui.components.NewDocumentModelPanelController;
 import de.a12.studio.ui.components.StudioFileChooser;
-import de.a12.studio.ui.editors.PropertyEditorSaveMode;
-import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
-import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
-import de.a12.studio.ui.util.DocumentModelBuilder;
-import de.a12.studio.ui.util.FileUtils;
-import de.a12.studio.ui.util.ModelSuffixValidation;
-import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import java.util.ResourceBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -21,11 +14,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -64,17 +55,14 @@ public class ImportFromAccessDialogController implements DialogController {
   // FXML fields
   // -------------------------------------------------------------------------
 
-  @FXML private TextField filePathField;
+  @FXML private javafx.scene.control.TextField filePathField;
   @FXML private Button browseButton;
   @FXML private ListView<String> tableListView;
   @FXML private Label tableHintLabel;
-  @FXML private TextField modelNameField;
-  @FXML private ComboBox<ProjectItem> locationCombo;
   @FXML private Button okButton;
   @FXML private Button cancelButton;
 
-  @FXML private LocalesPanelController localesController;
-  @FXML private RolesEditorPanelController rolesController;
+  @FXML private NewDocumentModelPanelController newDocumentModelPanelController;
   @FXML private ErrorContainerController errorContainerController;
 
   // -------------------------------------------------------------------------
@@ -92,16 +80,6 @@ public class ImportFromAccessDialogController implements DialogController {
   /** Columns of the currently selected table, or empty if none selected yet. */
   private List<AccessImportService.ColumnInfo> currentColumns = List.of();
 
-  /**
-   * Whether {@link #modelNameField} still holds a value we auto-filled from the selected
-   * table name, as opposed to text the user typed themselves. While {@code true}, selecting a
-   * different table updates the field to match; once the user edits it manually, it is left alone.
-   */
-  private boolean modelNameAutoFilled = true;
-
-  /** Guard so the auto-fill listener update to {@link #modelNameField} isn't mistaken for a user edit. */
-  private boolean updatingModelNameProgrammatically;
-
   private final AccessImportService importService = new AccessImportService();
 
   // -------------------------------------------------------------------------
@@ -110,29 +88,13 @@ public class ImportFromAccessDialogController implements DialogController {
 
   @FXML
   private void initialize() {
-    // Signals RolesEditorPanelController that it's embedded in a dialog, so it hides its "Edit Roles"
-    // button (this dialog builds the model on submit, outside the panel's own save flow, so
-    // Deferred#flush() is never called -- only isEmbeddedInDialog()'s side effect is needed here).
-    rolesController.setSaveMode(new PropertyEditorSaveMode.Deferred());
     tableListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+    newDocumentModelPanelController.setOnChanged(this::validate);
 
-    // Populate model name field from the selected table name as a convenience default, and keep
-    // it in sync with the table selection until the user edits it manually.
-    modelNameField.textProperty().addListener((obs, old, current) -> {
-      if (!updatingModelNameProgrammatically) {
-        modelNameAutoFilled = false;
-      }
-      validate();
-    });
     tableListView.getSelectionModel().selectedItemProperty().addListener((obs, old, selected) -> {
       if (selected != null) {
         loadColumnsForTable(selected);
-        if (modelNameField.getText().isBlank() || modelNameAutoFilled) {
-          updatingModelNameProgrammatically = true;
-          modelNameField.setText(selected + "_DM");
-          updatingModelNameProgrammatically = false;
-          modelNameAutoFilled = true;
-        }
+        autoFillModelNameFromTable(selected);
       }
       validate();
     });
@@ -141,12 +103,11 @@ public class ImportFromAccessDialogController implements DialogController {
   // OK only enabled when: a file is chosen, a table is selected, a valid name is entered, and (when
   // "Enforce Model Suffixes" is on) the name carries the Document Model suffix.
   private void validate() {
-    Optional<String> suffixError = targetFolder == null ? Optional.empty()
-        : ModelSuffixValidation.validate(targetFolder, ModelType.DOCUMENT, modelNameField.getText());
+    Optional<String> suffixError = newDocumentModelPanelController.getSuffixError();
     suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
     okButton.setDisable(currentAccessFile == null
         || tableListView.getSelectionModel().isEmpty()
-        || !FileUtils.isValidWindowsFilename(modelNameField.getText())
+        || !newDocumentModelPanelController.isValid()
         || suffixError.isPresent());
   }
 
@@ -171,7 +132,7 @@ public class ImportFromAccessDialogController implements DialogController {
   @FXML
   private void onDialogSubmit() {
     String selectedTable = tableListView.getSelectionModel().getSelectedItem();
-    if (currentAccessFile == null || selectedTable == null || modelNameField.getText().isBlank()) {
+    if (currentAccessFile == null || selectedTable == null || !newDocumentModelPanelController.isValid()) {
       return;
     }
     result = Optional.of(ButtonType.OK);
@@ -225,6 +186,18 @@ public class ImportFromAccessDialogController implements DialogController {
     thread.start();
   }
 
+  /** Auto-fills the model name from the selected table when the name hasn't been manually edited. */
+  private String lastAutoFilledName = null;
+
+  private void autoFillModelNameFromTable(@NonNull String tableName) {
+    String suggested = tableName + "_DM";
+    if (newDocumentModelPanelController.isModelNameAutoFilled(lastAutoFilledName)
+        || newDocumentModelPanelController.getModelName().isBlank()) {
+      newDocumentModelPanelController.setModelName(suggested);
+      lastAutoFilledName = suggested;
+    }
+  }
+
   private void loadColumnsForTable(@NonNull String tableName) {
     if (currentAccessFile == null) {
       return;
@@ -265,25 +238,23 @@ public class ImportFromAccessDialogController implements DialogController {
         (ImportFromAccessDialogController) stage.getUserData();
     controller.stage = stage;
     controller.targetFolder = targetFolder;
-    ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
-    controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
-    controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+    controller.newDocumentModelPanelController.init(targetFolder, null);
     WidgetFactory.installResizable(stage);
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
       String tableName = controller.tableListView.getSelectionModel().getSelectedItem();
-      String modelName = controller.modelNameField.getText().trim();
-      ProjectItem folder = controller.locationCombo.getValue();
-      if (controller.currentAccessFile != null && tableName != null && !modelName.isBlank() && folder != null) {
+      String modelName = controller.newDocumentModelPanelController.getModelName();
+      ProjectItem folder = controller.newDocumentModelPanelController.getFolder();
+      if (controller.currentAccessFile != null && tableName != null && !modelName.isBlank()) {
         return Optional.of(new AccessImportInput(
             controller.currentAccessFile,
             tableName,
             controller.currentColumns,
             modelName,
             folder,
-            controller.localesController.getLocales(),
-            controller.rolesController.getRoles()));
+            controller.newDocumentModelPanelController.getLocales(),
+            controller.newDocumentModelPanelController.getRoles()));
       }
     }
     return Optional.empty();
@@ -317,26 +288,24 @@ public class ImportFromAccessDialogController implements DialogController {
         (ImportFromAccessDialogController) stage.getUserData();
     controller.stage = stage;
     controller.targetFolder = targetFolder;
-    ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
-    controller.localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
-    controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+    controller.newDocumentModelPanelController.init(targetFolder, null);
     controller.loadAccessFile(preloadFile);
     WidgetFactory.installResizable(stage);
     stage.showAndWait();
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
       String tableName = controller.tableListView.getSelectionModel().getSelectedItem();
-      String modelName = controller.modelNameField.getText().trim();
-      ProjectItem folder = controller.locationCombo.getValue();
-      if (controller.currentAccessFile != null && tableName != null && !modelName.isBlank() && folder != null) {
+      String modelName = controller.newDocumentModelPanelController.getModelName();
+      ProjectItem folder = controller.newDocumentModelPanelController.getFolder();
+      if (controller.currentAccessFile != null && tableName != null && !modelName.isBlank()) {
         return Optional.of(new AccessImportInput(
             controller.currentAccessFile,
             tableName,
             controller.currentColumns,
             modelName,
             folder,
-            controller.localesController.getLocales(),
-            controller.rolesController.getRoles()));
+            controller.newDocumentModelPanelController.getLocales(),
+            controller.newDocumentModelPanelController.getRoles()));
       }
     }
     return Optional.empty();
