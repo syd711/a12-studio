@@ -19,6 +19,7 @@ Form Models:
 
 Document Model:
 - Add Group to Document Model converter that creates a new document model and includes it.
+- Add Group to Document Model converter that moves groups to an existing document model.
 
 Application Model
 - move Model references up
