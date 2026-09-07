@@ -111,6 +111,10 @@ launch4j {
     headerType = 'gui'
     copyConfigurable = files()
     libraryDir = ''
+    // Reduce Sophos Intercept X "Lockdown" false positives:
+    // - Disable core dump generation (writing large crash files resembles ransomware behaviour)
+    // - Disallow self-attach via the Attach API (prevents Sophos from classifying the JVM as injecting into itself)
+    jvmOptions = ['-XX:-CreateCoredumpOnCrash', '-Djdk.attach.allowAttachSelf=false']
 }
 createExe.dependsOn shadowJar
 

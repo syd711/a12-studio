@@ -1,2 +1,4 @@
 --java-options "-Xmx512m"
 --java-options "--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED"
+--java-options "-XX:-CreateCoredumpOnCrash"
+--java-options "-Djdk.attach.allowAttachSelf=false"
