@@ -211,6 +211,16 @@ jobs:
           curl -L -o zulu21-fx-jre-linux-x64.tar.gz \
             https://cdn.azul.com/zulu/bin/zulu21.42.19-ca-fx-jre21.0.7-linux_x64.tar.gz
 
+      - name: Verify A12 credentials are set
+        run: |
+          if [ -z "${{ secrets.A12_USER }}" ]; then echo "::error::A12_USER secret is empty or not set"; exit 1; fi
+          if [ -z "${{ secrets.A12_TOKEN }}" ]; then echo "::error::A12_TOKEN secret is empty or not set"; exit 1; fi
+          echo "A12_USER is set (length: ${#A12_USER})"
+          echo "A12_TOKEN is set (length: ${#A12_TOKEN})"
+        env:
+          A12_USER: ${{ secrets.A12_USER }}
+          A12_TOKEN: ${{ secrets.A12_TOKEN }}
+
       - name: Build fat JARs and Windows EXE wrappers with Gradle
         env:
           A12_USER: ${{ secrets.A12_USER }}
