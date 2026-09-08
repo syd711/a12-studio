@@ -316,6 +316,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+    env:
+      CODESIGN_PFX_BASE64: ${{ secrets.CODESIGN_PFX_BASE64 }}
+      CODESIGN_PFX_PASSWORD: ${{ secrets.CODESIGN_PFX_PASSWORD }}
     steps:
       - name: Install Inno Setup
         run: choco install innosetup --yes
@@ -340,11 +343,8 @@ jobs:
           path: ./Output/A12-Studio/
 
       - name: Sign EXE wrappers
-        if: ${{ secrets.CODESIGN_PFX_BASE64 != '' }}
+        if: ${{ env.CODESIGN_PFX_BASE64 != '' }}
         shell: pwsh
-        env:
-          CODESIGN_PFX_BASE64:    ${{ secrets.CODESIGN_PFX_BASE64 }}
-          CODESIGN_PFX_PASSWORD:  ${{ secrets.CODESIGN_PFX_PASSWORD }}
         run: |
           # Decode the certificate
           $pfxPath = "$env:RUNNER_TEMP\codesign.pfx"
@@ -404,11 +404,8 @@ jobs:
           }
 
       - name: Sign Installer EXE
-        if: ${{ secrets.CODESIGN_PFX_BASE64 != '' }}
+        if: ${{ env.CODESIGN_PFX_BASE64 != '' }}
         shell: pwsh
-        env:
-          CODESIGN_PFX_BASE64:    ${{ secrets.CODESIGN_PFX_BASE64 }}
-          CODESIGN_PFX_PASSWORD:  ${{ secrets.CODESIGN_PFX_PASSWORD }}
         run: |
           $pfxPath = "$env:RUNNER_TEMP\codesign.pfx"
           [System.IO.File]::WriteAllBytes($pfxPath, [System.Convert]::FromBase64String($env:CODESIGN_PFX_BASE64))
