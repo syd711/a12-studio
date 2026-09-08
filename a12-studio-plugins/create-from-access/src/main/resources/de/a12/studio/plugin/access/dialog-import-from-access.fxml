@@ -14,6 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
+<?import javafx.scene.text.Font?>
 <BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="560.0"
             styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -62,7 +63,7 @@
          <!-- Model name, location, locales, roles (reusable panel) -->
          <fx:include fx:id="newDocumentModelPanel"
                      source="/de/a12/studio/ui/components/new-document-model-panel.fxml">
-            <VBox.margin><Insets top="14.0" /></VBox.margin>
+
          </fx:include>
       </VBox>
       </content>
