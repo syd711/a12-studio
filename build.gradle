@@ -120,27 +120,6 @@ subprojects {
         options.release = 21
     }
 
-    repositories {
-        exclusiveContent {
-            forRepository {
-                maven {
-                    name "mgmart"
-                    url 'https://artifacts.geta12.com/artifactory/a12-community-maven/'
-                    credentials {
-                        username = project.findProperty("a12User") ?: System.getenv("A12_USER") ?: ""
-                        password = project.findProperty("a12Token") ?: System.getenv("A12_TOKEN") ?: ""
-                    }
-                }
-            }
-            filter {
-                includeGroupByRegex "com\\.mgmtp\\.a12.*"
-            }
-        }
-
-        mavenCentral()
-        maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" }
-    }
-
     dependencies {
         // compileOnly (not implementation): these are compile-time-only nullness annotations,
         // never inspected via reflection at runtime, so there's no need to bundle them into any
