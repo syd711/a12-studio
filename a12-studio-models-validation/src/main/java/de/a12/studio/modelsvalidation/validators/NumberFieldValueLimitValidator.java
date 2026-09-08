@@ -6,6 +6,8 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.NumberFieldType;
+import de.a12.studio.models.documentmodel.NumberTypeOptions;
+import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
@@ -41,26 +43,41 @@ public final class NumberFieldValueLimitValidator implements ModelValidator {
         continue;
       }
       FieldType effectiveType = index.effectiveFieldType(field.getField().getFieldType());
-      if (!(effectiveType instanceof NumberFieldType numberFieldType) || numberFieldType.getNumberType() == null) {
-        continue;
+      if (effectiveType instanceof NumberFieldType numberFieldType && numberFieldType.getNumberType() != null) {
+        checkNumberType(model, field.getId(), numberFieldType.getNumberType(), errors);
       }
-      var numberType = numberFieldType.getNumberType();
-      int maxDecimalPlaces = numberType.getMaxFractionalDigits() == null ? 0 : numberType.getMaxFractionalDigits();
-      double maxAllowedValue = Math.pow(10.0, MAX_DIGITS - maxDecimalPlaces) - Math.pow(10.0, -maxDecimalPlaces);
-      if (numberType.getMaxValue() != null && numberType.getMaxValue() > maxAllowedValue) {
-        errors.add(new ModelValidationError(model, field.getId(), ElementProperty.DATA_TYPE,
-            ValidationMessages.get("validation.numberFieldValueLimit.maxExceeded", field.getId(), numberType.getMaxValue(),
-                printLimit(maxAllowedValue, maxDecimalPlaces)),
-            Severity.ERROR.name()));
-      }
-      if (numberType.getMinValue() != null && Math.abs(numberType.getMinValue()) > maxAllowedValue) {
-        errors.add(new ModelValidationError(model, field.getId(), ElementProperty.DATA_TYPE,
-            ValidationMessages.get("validation.numberFieldValueLimit.minExceeded", field.getId(), numberType.getMinValue(),
-                printLimit(maxAllowedValue, maxDecimalPlaces)),
-            Severity.ERROR.name()));
+    }
+
+    // A model's own type definitions aren't reachable through allElements() (they live in
+    // content.typeDefinitions, not the modelRoot tree) - a standalone Type Definition Model has no
+    // FieldElement anywhere, so without this second pass its own Number type definitions would never be
+    // checked at all until some other model's field happens to reference them.
+    if (documentModel.getContent().getTypeDefinitions() != null) {
+      for (TypeDefinition typeDefinition : documentModel.getContent().getTypeDefinitions()) {
+        if (typeDefinition.getFieldType() instanceof NumberFieldType numberFieldType && numberFieldType.getNumberType() != null) {
+          checkNumberType(model, typeDefinition.getId(), numberFieldType.getNumberType(), errors);
+        }
       }
     }
     return errors;
+  }
+
+  private static void checkNumberType(A12Model<?> model, String elementId, NumberTypeOptions numberType,
+      List<ModelValidationError> errors) {
+    int maxDecimalPlaces = numberType.getMaxFractionalDigits() == null ? 0 : numberType.getMaxFractionalDigits();
+    double maxAllowedValue = Math.pow(10.0, MAX_DIGITS - maxDecimalPlaces) - Math.pow(10.0, -maxDecimalPlaces);
+    if (numberType.getMaxValue() != null && numberType.getMaxValue() > maxAllowedValue) {
+      errors.add(new ModelValidationError(model, elementId, ElementProperty.DATA_TYPE,
+          ValidationMessages.get("validation.numberFieldValueLimit.maxExceeded", elementId, numberType.getMaxValue(),
+              printLimit(maxAllowedValue, maxDecimalPlaces)),
+          Severity.ERROR.name()));
+    }
+    if (numberType.getMinValue() != null && Math.abs(numberType.getMinValue()) > maxAllowedValue) {
+      errors.add(new ModelValidationError(model, elementId, ElementProperty.DATA_TYPE,
+          ValidationMessages.get("validation.numberFieldValueLimit.minExceeded", elementId, numberType.getMinValue(),
+              printLimit(maxAllowedValue, maxDecimalPlaces)),
+          Severity.ERROR.name()));
+    }
   }
 
   private static String printLimit(double value, int maxDecimalPlaces) {

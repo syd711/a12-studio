@@ -7,6 +7,7 @@ import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.RuleElement;
+import de.a12.studio.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
 
@@ -94,6 +95,14 @@ public class ElementViewModel {
     return element instanceof FieldElement fieldElement
         && fieldElement.getField() != null
         && fieldElement.getField().getRequirednessConfig() != null;
+  }
+
+  /** Mirrors SME's "TD" tree badge: this field's data type is a reference to a Type Definition rather than
+   * a plain base type. */
+  public boolean usesTypeDefinition() {
+    return element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() instanceof TypeDefFieldType;
   }
 
   public String getIcon() {

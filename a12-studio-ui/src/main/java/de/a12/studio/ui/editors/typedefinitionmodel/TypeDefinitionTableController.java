@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.typedefinitionmodel;
 
+import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -63,6 +64,11 @@ public class TypeDefinitionTableController implements Initializable {
   /** Applied to rows holding a transitively-included (read-only) type definition, styled in stylesheet.css. */
   private static final PseudoClass INCLUDED_ROW = PseudoClass.getPseudoClass("included");
 
+  /** Applied to rows holding an "included-imported" type definition (see {@link
+   * de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions.Entry}) - shown for information only,
+   * not usable in this model until imported directly, styled in stylesheet.css. */
+  private static final PseudoClass INCLUDED_IMPORTED_ROW = PseudoClass.getPseudoClass("included-imported");
+
   @FXML
   private SearchFieldController searchController;
 
@@ -80,6 +86,18 @@ public class TypeDefinitionTableController implements Initializable {
 
   @FXML
   private Button deleteImportButton;
+
+  @FXML
+  private Button addButton;
+
+  @FXML
+  private javafx.scene.control.Tooltip addButtonTooltip;
+
+  @FXML
+  private Button importButton;
+
+  @FXML
+  private javafx.scene.control.Tooltip importButtonTooltip;
 
   // The model this table is showing, and every other model in its project - both needed by Import/Delete
   // Import (which mutate model.getModelReferences()) and by TransitiveTypeDefinitions (which needs a
@@ -145,6 +163,25 @@ public class TypeDefinitionTableController implements Initializable {
         .toList();
     applyFilter(searchController.getText());
     deleteImportButton.setDisable(importReferences().isEmpty());
+    updateAddImportAvailability();
+  }
+
+  /**
+   * Mirrors SME's own mutual exclusivity ("It is not possible to mix local/included and imported Type
+   * Definitions in one model" - see {@code typeDefOverviewWithImport.tsx}'s {@code selectTypeDefinitionMode}):
+   * Add is disabled once an Import exists, Import is disabled once any local type definition exists.
+   */
+  private void updateAddImportAvailability() {
+    boolean hasImports = !importReferences().isEmpty();
+    boolean hasLocalTypeDefinitions = !typeDefinitions.isEmpty();
+
+    addButton.setDisable(hasImports);
+    addButtonTooltip.setText(hasImports ? StudioBundle.get("add_type_definition_disabled_import_present")
+        : StudioBundle.get("add_type_definition"));
+
+    importButton.setDisable(hasLocalTypeDefinitions);
+    importButtonTooltip.setText(hasLocalTypeDefinitions ? StudioBundle.get("import_type_definition_disabled_local_present")
+        : StudioBundle.get("import_all_type_definitions_from_a_type_definition_model"));
   }
 
   private String getSelectedId() {
@@ -194,6 +231,7 @@ public class TypeDefinitionTableController implements Initializable {
       protected void updateItem(TypeDefinitionRow item, boolean empty) {
         super.updateItem(item, empty);
         pseudoClassStateChanged(INCLUDED_ROW, !empty && item != null && !item.editable());
+        pseudoClassStateChanged(INCLUDED_IMPORTED_ROW, !empty && item != null && item.includedImported());
         setContextMenu(empty || item == null || !item.editable() ? null : createContextMenu(this));
       }
     });
@@ -221,6 +259,7 @@ public class TypeDefinitionTableController implements Initializable {
     searchController.clear();
     applyFilter(searchController.getText());
     selectRow(TypeDefinitionRow.own(typeDefinition));
+    updateAddImportAvailability();
     if (onItemAddedListener != null) {
       onItemAddedListener.run();
     }
@@ -254,10 +293,10 @@ public class TypeDefinitionTableController implements Initializable {
 
   /**
    * Every {@link TypeDefinitionModel} in the project that could still become a new Import: excludes ones
-   * already imported (a second Import of the same model would just be a no-op duplicate reference) and ones
+   * already imported (a second Import of the same model would just be a no-op duplicate reference), ones
    * that would close an import cycle (a TDM that already imports {@code model}, directly or transitively -
-   * see {@link TransitiveTypeDefinitions#importedModelIds}), mirroring SME's own picker filter in
-   * {@code importTypeDefsView.tsx} (locale compatibility aside, which a12-studio doesn't enforce here).
+   * see {@link TransitiveTypeDefinitions#importedModelIds}), and ones with incompatible locales, mirroring
+   * SME's own picker filter in {@code importTypeDefsView.tsx}.
    */
   private List<DocumentModel> importCandidates() {
     Set<String> alreadyImported = importReferences().stream().map(ModelReference::getReference).collect(Collectors.toSet());
@@ -265,8 +304,29 @@ public class TypeDefinitionTableController implements Initializable {
         .filter(TypeDefinitionModel.class::isInstance)
         .filter(candidate -> !alreadyImported.contains(candidate.getId()))
         .filter(candidate -> !TransitiveTypeDefinitions.importedModelIds(candidate, otherModels).contains(model.getId()))
+        .filter(this::hasCompatibleLocales)
         .sorted(Comparator.comparing(DocumentModel::getId))
         .toList();
+  }
+
+  /**
+   * A candidate must declare at least every locale {@code model} itself declares - otherwise a type
+   * definition's localized labels/error messages pulled in from it would be silently untranslated for a
+   * locale the importing model actually needs.
+   */
+  private boolean hasCompatibleLocales(@NonNull DocumentModel candidate) {
+    Set<String> modelLocales = localeCodes(model);
+    return modelLocales.isEmpty() || localeCodes(candidate).containsAll(modelLocales);
+  }
+
+  private static Set<String> localeCodes(DocumentModel documentModel) {
+    if (documentModel.getLocales() == null) {
+      return Set.of();
+    }
+    return documentModel.getLocales().stream()
+        .map(Locale::getCode)
+        .filter(code -> code != null && !code.isBlank())
+        .collect(Collectors.toSet());
   }
 
   /**
@@ -357,9 +417,14 @@ public class TypeDefinitionTableController implements Initializable {
       return;
     }
 
+    // Matches SME's own warning ("Fields using the type definition in the current model or in a document
+    // model including the current model will become invalid.") - deletion isn't blocked by usage-checking
+    // either way, same as SME.
     String message = itemsToDelete.size() > 1
-        ? "Delete " + itemsToDelete.size() + " type definitions?"
-        : "Delete this type definition?";
+        ? "Delete " + itemsToDelete.size() + " type definitions? Fields using them in this model, or in a "
+            + "document model including this model, will become invalid."
+        : "Delete this type definition? Fields using it in this model, or in a document model including "
+            + "this model, will become invalid.";
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, message, null, null, StudioBundle.get("delete"));
     if (result.isEmpty() || result.get() != ButtonType.OK) {
       return;
@@ -367,6 +432,7 @@ public class TypeDefinitionTableController implements Initializable {
 
     typeDefinitions.removeAll(itemsToDelete);
     applyFilter(searchController.getText());
+    updateAddImportAvailability();
     save();
   }
 

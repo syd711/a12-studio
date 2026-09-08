@@ -1,0 +1,59 @@
+{
+  "header": {
+    "id": "BasicConsistencyValidator_typeDefinitionDuplicateEnum",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "BasicConsistencyValidator_typeDefinitionDuplicateEnum",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_country",
+        "name": "Country",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "DE",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Germany"
+                  }
+                ]
+              },
+              {
+                "value": "DE",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Germany (duplicate)"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

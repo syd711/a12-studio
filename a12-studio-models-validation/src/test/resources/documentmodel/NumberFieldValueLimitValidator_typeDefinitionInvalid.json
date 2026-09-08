@@ -1,0 +1,40 @@
+{
+  "header": {
+    "id": "NumberFieldValueLimitValidator_typeDefinitionInvalid",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "NumberFieldValueLimitValidator_typeDefinitionInvalid",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_amount",
+        "name": "Amount",
+        "fieldType": {
+          "type": "NumberType",
+          "NumberType": {
+            "maxValue": 100000000000000000000
+          }
+        }
+      }
+    ]
+  }
+}

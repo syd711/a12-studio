@@ -10,18 +10,21 @@ import org.jspecify.annotations.NonNull;
  * (see {@link TransitiveTypeDefinitions}), shown read-only with {@code source} naming the mechanism and models
  * it travelled through so users can tell where it actually lives, {@code ownerModelId} - the last model in
  * that chain, i.e. the one whose {@code typeDefinitions} it's actually declared in - so it can be opened
- * directly, and {@code imported} distinguishing an Import (a Type Definition Model, removable only via
- * "Delete Import") from an Include (a regular Document Model, removable only by editing that Include).
+ * directly, {@code imported} distinguishing an Import (a Type Definition Model, removable only via
+ * "Delete Import") from an Include (a regular Document Model, removable only by editing that Include), and
+ * {@code includedImported} narrowing that further to the "merely informational" case (see {@link
+ * TransitiveTypeDefinitions.Entry}) - an included model's own import, shown but not directly usable in the
+ * current model until imported directly.
  */
 public record TypeDefinitionRow(@NonNull TypeDefinition typeDefinition, @NonNull String source, @NonNull String ownerModelId,
-                                 boolean imported, boolean editable) {
+                                 boolean imported, boolean includedImported, boolean editable) {
 
   public static TypeDefinitionRow own(@NonNull TypeDefinition typeDefinition) {
-    return new TypeDefinitionRow(typeDefinition, "", "", false, true);
+    return new TypeDefinitionRow(typeDefinition, "", "", false, false, true);
   }
 
   public static TypeDefinitionRow included(TransitiveTypeDefinitions.@NonNull Entry entry) {
-    String label = (entry.imported() ? "Import: " : "Include: ") + entry.sourcePath();
-    return new TypeDefinitionRow(entry.typeDefinition(), label, entry.ownerModelId(), entry.imported(), false);
+    String label = (entry.includedImported() ? "Included Import: " : entry.imported() ? "Import: " : "Include: ") + entry.sourcePath();
+    return new TypeDefinitionRow(entry.typeDefinition(), label, entry.ownerModelId(), entry.imported(), entry.includedImported(), false);
   }
 }

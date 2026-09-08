@@ -9,7 +9,7 @@ import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.RuleElement;
-import de.a12.studio.models.documentmodel.TypeDefFieldType;
+import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
@@ -58,37 +58,54 @@ public final class BasicConsistencyValidator implements ModelValidator {
         checkGroupIndexField(model, group, errors);
       }
     }
-    return errors;
-  }
 
-  private static void checkEnumerationOrTypeDef(A12Model<?> model, ElementIndex index, FieldElement field, List<ModelValidationError> errors) {
-    FieldType fieldType = field.getField().getFieldType();
-    if (fieldType instanceof EnumerationFieldType enumType && enumType.getEnumerationType() != null) {
-      Set<String> seenValues = new HashSet<>();
-      var values = enumType.getEnumerationType().getValues();
-      if (values != null) {
-        for (var value : values) {
-          if (value.getValue() != null && !seenValues.add(value.getValue())) {
-            errors.add(error(model, field.getId(), ElementProperty.DATA_TYPE,
-                ValidationMessages.get("validation.basicConsistency.duplicateEnumValue", field.getId(), value.getValue())));
-          }
-        }
-      }
-      Set<String> seenCategories = new HashSet<>();
-      var categories = enumType.getEnumerationType().getCategories();
-      if (categories != null) {
-        for (var category : categories) {
-          if (category.getName() != null && !seenCategories.add(category.getName())) {
-            errors.add(error(model, field.getId(), ElementProperty.DATA_TYPE,
-                ValidationMessages.get("validation.basicConsistency.duplicateEnumCategory", field.getId(), category.getName())));
-          }
+    // A model's own type definitions aren't reachable through allElements() (they live in
+    // content.typeDefinitions, not the modelRoot tree) - without this second pass, an Enumeration type
+    // definition's own duplicate value/category problems would never be caught until some other model's
+    // field happens to reference it. TypeDefType is deliberately not checked here: a type definition's own
+    // fieldType can never itself be a TypeDefType reference (the "Use Custom Type" option is hidden in the
+    // Type Definition Model's field editor - see TypeDefinitionPanelController.setCustomTypeDisabled()).
+    if (documentModel.getContent().getTypeDefinitions() != null) {
+      for (TypeDefinition typeDefinition : documentModel.getContent().getTypeDefinitions()) {
+        if (typeDefinition.getFieldType() instanceof EnumerationFieldType enumType && enumType.getEnumerationType() != null) {
+          checkEnumerationDuplicates(model, typeDefinition.getId(), enumType, errors);
         }
       }
     }
-    if (fieldType instanceof TypeDefFieldType typeDefType
-        && (typeDefType.getTypeDefType() == null || isBlank(typeDefType.getTypeDefType().getTypeDefinitionId()))) {
-      errors.add(error(model, field.getId(), ElementProperty.TYPE,
-          ValidationMessages.get("validation.basicConsistency.invalidTypeDefReference", field.getId())));
+    return errors;
+  }
+
+  /** {@code TypeDefFieldType}'s own reference-validity check moved to {@link MissingReferenceValidator}'s
+   * {@code hasMissingTypeDef}, which already covered both the blank-id and unresolved-id cases - this used to
+   * duplicate its blank-id half under a different message. */
+  private static void checkEnumerationOrTypeDef(A12Model<?> model, ElementIndex index, FieldElement field, List<ModelValidationError> errors) {
+    FieldType fieldType = field.getField().getFieldType();
+    if (fieldType instanceof EnumerationFieldType enumType && enumType.getEnumerationType() != null) {
+      checkEnumerationDuplicates(model, field.getId(), enumType, errors);
+    }
+  }
+
+  private static void checkEnumerationDuplicates(A12Model<?> model, String elementId, EnumerationFieldType enumType,
+      List<ModelValidationError> errors) {
+    Set<String> seenValues = new HashSet<>();
+    var values = enumType.getEnumerationType().getValues();
+    if (values != null) {
+      for (var value : values) {
+        if (value.getValue() != null && !seenValues.add(value.getValue())) {
+          errors.add(error(model, elementId, ElementProperty.DATA_TYPE,
+              ValidationMessages.get("validation.basicConsistency.duplicateEnumValue", elementId, value.getValue())));
+        }
+      }
+    }
+    Set<String> seenCategories = new HashSet<>();
+    var categories = enumType.getEnumerationType().getCategories();
+    if (categories != null) {
+      for (var category : categories) {
+        if (category.getName() != null && !seenCategories.add(category.getName())) {
+          errors.add(error(model, elementId, ElementProperty.DATA_TYPE,
+              ValidationMessages.get("validation.basicConsistency.duplicateEnumCategory", elementId, category.getName())));
+        }
+      }
     }
   }
 

@@ -7,6 +7,8 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.models.documentmodel.StringTypeOptions;
+import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
@@ -44,36 +46,50 @@ public final class StringPatternErrorMessageValidator implements ModelValidator 
         continue;
       }
       FieldType effectiveType = index.effectiveFieldType(field.getField().getFieldType());
-      if (!(effectiveType instanceof StringFieldType stringFieldType) || stringFieldType.getStringType() == null) {
-        continue;
+      if (effectiveType instanceof StringFieldType stringFieldType && stringFieldType.getStringType() != null) {
+        checkStringType(model, field.getId(), stringFieldType.getStringType(), requiredLocales, errors);
       }
-      var stringType = stringFieldType.getStringType();
-      String pattern = stringType.getPattern();
-      if (pattern == null || pattern.isEmpty()) {
-        continue;
-      }
+    }
 
-      List<Label> errorMessage = stringType.getErrorMessage();
-      Set<String> coveredLocales = coveredLocales(errorMessage);
-
-      if (requiredLocales.isEmpty()) {
-        // No locales declared on the model — fall back to: at least one entry must exist.
-        if (coveredLocales.isEmpty()) {
-          errors.add(new ModelValidationError(model, field.getId(), ElementProperty.ERROR_MESSAGE,
-              ValidationMessages.get("validation.stringPatternErrorMessage.missing", pattern), Severity.ERROR.name()));
-        }
-      } else {
-        // Report each locale that is missing a non-blank error message entry.
-        for (String locale : requiredLocales) {
-          if (!coveredLocales.contains(locale)) {
-            errors.add(new ModelValidationError(model, field.getId(), ElementProperty.ERROR_MESSAGE,
-                ValidationMessages.get("validation.stringPatternErrorMessage.missingLocale", pattern, locale),
-                Severity.ERROR.name()));
-          }
+    // See the equivalent comment in NumberFieldValueLimitValidator: a model's own type definitions aren't
+    // reachable through allElements(), so without this second pass a String type definition's pattern/error
+    // message consistency would never be checked until some other model's field references it.
+    if (documentModel.getContent().getTypeDefinitions() != null) {
+      for (TypeDefinition typeDefinition : documentModel.getContent().getTypeDefinitions()) {
+        if (typeDefinition.getFieldType() instanceof StringFieldType stringFieldType && stringFieldType.getStringType() != null) {
+          checkStringType(model, typeDefinition.getId(), stringFieldType.getStringType(), requiredLocales, errors);
         }
       }
     }
     return errors;
+  }
+
+  private static void checkStringType(A12Model<?> model, String elementId, StringTypeOptions stringType,
+      Set<String> requiredLocales, List<ModelValidationError> errors) {
+    String pattern = stringType.getPattern();
+    if (pattern == null || pattern.isEmpty()) {
+      return;
+    }
+
+    List<Label> errorMessage = stringType.getErrorMessage();
+    Set<String> coveredLocales = coveredLocales(errorMessage);
+
+    if (requiredLocales.isEmpty()) {
+      // No locales declared on the model — fall back to: at least one entry must exist.
+      if (coveredLocales.isEmpty()) {
+        errors.add(new ModelValidationError(model, elementId, ElementProperty.ERROR_MESSAGE,
+            ValidationMessages.get("validation.stringPatternErrorMessage.missing", pattern), Severity.ERROR.name()));
+      }
+    } else {
+      // Report each locale that is missing a non-blank error message entry.
+      for (String locale : requiredLocales) {
+        if (!coveredLocales.contains(locale)) {
+          errors.add(new ModelValidationError(model, elementId, ElementProperty.ERROR_MESSAGE,
+              ValidationMessages.get("validation.stringPatternErrorMessage.missingLocale", pattern, locale),
+              Severity.ERROR.name()));
+        }
+      }
+    }
   }
 
   private static Set<String> coveredLocales(List<Label> errorMessage) {

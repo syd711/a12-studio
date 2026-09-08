@@ -73,6 +73,8 @@ public interface Icons {
   String ELEMENT_ATTACHMENT = "mdi2a-attachment";
   String ELEMENT_ANNOTATION = "mdi2a-alpha-a-box-outline";
   String ELEMENT_REQUIRED = "mdi2a-asterisk-circle-outline";
+  /** Badge for a field whose data type is a reference to a Type Definition (see SME's "TD" tree icon). */
+  String ELEMENT_TYPE_DEFINITION_REFERENCE = "mdi2a-alpha-t-box-outline";
 
   String ELEMENT_VALIDATION_RULE = "mdi2a-alpha-v-circle";
   String ELEMENT_EXPRESSION = "mdi2e-epsilon";

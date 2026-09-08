@@ -22,6 +22,10 @@
 
       <!-- Data Type Configuration -->
       <fx:include fx:id="dataTypeConfiguration" source="../propertyeditors/data-type-configuration-panel.fxml" />
+
+      <!-- Error Messages (String pattern only - Enumeration has its own, embedded in the Data Type
+           Configuration panel) -->
+      <fx:include fx:id="errorMessages" source="../propertyeditors/localized-text-panel.fxml" />
     </VBox>
   </content>
 </ScrollPane>

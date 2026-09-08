@@ -94,6 +94,24 @@ class TransitiveTypeDefinitionsTest {
     assertEquals("Currency", resolved.get(0).typeDefinition().getName());
     assertEquals("Currency_TDM", resolved.get(0).sourcePath());
     assertTrue(resolved.get(0).imported());
+    assertFalse(resolved.get(0).includedImported(), "A model's own direct Import is directly usable, not merely informational");
+  }
+
+  /**
+   * SME shows a type definition as "included-imported" (grey, informational only) when an included model
+   * itself imports a Type Definition Model - it isn't usable in the current model until imported directly.
+   */
+  @Test
+  void flagsATypeDefinitionAsIncludedImportedWhenAnIncludedModelItselfImportsIt() {
+    DocumentModel tdm = tdmWithTypeDefinitions("Currency_TDM", typeDef("typedef_currency", "Currency"));
+    DocumentModel includedModel = modelWithImports("Invoice_DM", "Currency_TDM");
+    DocumentModel model = modelWithIncludes("Company_DM", "Invoice_DM");
+
+    List<TransitiveTypeDefinitions.Entry> resolved = TransitiveTypeDefinitions.resolve(model, List.of(includedModel, tdm));
+
+    assertEquals(1, resolved.size());
+    assertTrue(resolved.get(0).imported());
+    assertTrue(resolved.get(0).includedImported());
   }
 
   @Test

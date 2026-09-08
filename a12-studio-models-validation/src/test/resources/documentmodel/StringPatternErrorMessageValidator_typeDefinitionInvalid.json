@@ -1,0 +1,40 @@
+{
+  "header": {
+    "id": "StringPatternErrorMessageValidator_typeDefinitionInvalid",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "StringPatternErrorMessageValidator_typeDefinitionInvalid",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_code",
+        "name": "Code",
+        "fieldType": {
+          "type": "StringType",
+          "StringType": {
+            "pattern": "[0-9]{4}"
+          }
+        }
+      }
+    ]
+  }
+}

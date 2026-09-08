@@ -54,6 +54,11 @@
     </TitledPane>
 
     <CheckBox fx:id="alphabeticalSortingCheckBox" text="%alphabetical_sorting" />
+
+    <VBox fx:id="errorMessageBox" spacing="8.0">
+      <CheckBox fx:id="useDefaultErrorMessagesCheckBox" text="%use_default_error_messages" />
+      <fx:include fx:id="errorMessage" source="localized-text-panel.fxml" />
+    </VBox>
   </VBox>
  </center>
  <top>

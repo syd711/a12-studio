@@ -7,6 +7,8 @@ import de.a12.studio.models.applicationmodel.Case;
 import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.EnumerationFieldType;
+import de.a12.studio.models.documentmodel.EnumerationTypeOptions;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.RequirednessConfig;
 import de.a12.studio.models.documentmodel.RuleElement;
@@ -120,6 +122,13 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
   public void configureErrorMessages() {
     configure(LocalizedTextPanelController::getErrorMessages, LocalizedTextPanelController::getOrCreateErrorMessages,
+        FIELD_KEY_ERROR_MESSAGES, StudioBundle.get("error_messages"));
+  }
+
+  /** Edits an {@link EnumerationFieldType}'s {@code EnumerationTypeOptions.errorMessage} - the String-field
+   * equivalent, {@link StringTypeOptions#getErrorMessage()}, is edited via {@link #configureErrorMessages()}. */
+  public void configureEnumerationErrorMessage() {
+    configure(LocalizedTextPanelController::getEnumerationErrorMessages, LocalizedTextPanelController::getOrCreateEnumerationErrorMessages,
         FIELD_KEY_ERROR_MESSAGES, StudioBundle.get("error_messages"));
   }
 
@@ -556,6 +565,34 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
       return options.getErrorMessage();
     }
     return List.of();
+  }
+
+  private static List<Label> getEnumerationErrorMessages(Element element) {
+    EnumerationTypeOptions options = getEnumerationTypeOptions(element).orElse(null);
+    return options != null ? options.getErrorMessage() : List.of();
+  }
+
+  private static List<Label> getOrCreateEnumerationErrorMessages(Element element) {
+    if (element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() instanceof EnumerationFieldType enumerationFieldType) {
+      EnumerationTypeOptions options = enumerationFieldType.getEnumerationType();
+      if (options == null) {
+        options = new EnumerationTypeOptions();
+        enumerationFieldType.setEnumerationType(options);
+      }
+      return options.getErrorMessage();
+    }
+    return List.of();
+  }
+
+  private static Optional<EnumerationTypeOptions> getEnumerationTypeOptions(Element element) {
+    if (element instanceof FieldElement fieldElement
+        && fieldElement.getField() != null
+        && fieldElement.getField().getFieldType() instanceof EnumerationFieldType enumerationFieldType) {
+      return Optional.ofNullable(enumerationFieldType.getEnumerationType());
+    }
+    return Optional.empty();
   }
 
   private static List<Label> getRequirednessErrorMessage(Element element) {

@@ -73,12 +73,27 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
   @FXML
   private CheckBox alphabeticalSortingCheckBox;
 
+  @FXML
+  private CheckBox useDefaultErrorMessagesCheckBox;
+
+  @FXML
+  private LocalizedTextPanelController errorMessageController;
+
   private ProjectItem projectItem;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);
     bindCheckBox(alphabeticalSortingCheckBox, (element, value) -> withEnumerationTypeOptions(element, options -> options.setAlphabeticalSorting(value ? true : null)));
+
+    errorMessageController.configureEnumerationErrorMessage();
+    bindCheckBox(useDefaultErrorMessagesCheckBox, (element, value) -> withEnumerationTypeOptions(element, options -> {
+      options.setUseDefaultErrorMessages(value ? null : false);
+      if (value) {
+        options.getErrorMessage().clear();
+      }
+    }));
+    useDefaultErrorMessagesCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> updateErrorMessageVisibility());
   }
 
   @Override
@@ -88,8 +103,17 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
 
     EnumerationTypeOptions options = getEnumerationFieldType(element).map(EnumerationFieldType::getEnumerationType).orElse(null);
     setFieldValue(alphabeticalSortingCheckBox, options != null && Boolean.TRUE.equals(options.getAlphabeticalSorting()));
+    setFieldValue(useDefaultErrorMessagesCheckBox, options == null || !Boolean.FALSE.equals(options.getUseDefaultErrorMessages()));
+    errorMessageController.setElement(element);
+    updateErrorMessageVisibility();
     rebuildCategoryRows();
     rebuildEnumerationValuesGrid();
+  }
+
+  /** Mirrors {@code TypeDefinitionPanelController.updateRequirednessErrorMessageVisibility()}: the custom
+   * per-locale editor only makes sense while the user has opted out of the kernel's default message. */
+  private void updateErrorMessageVisibility() {
+    errorMessageController.setVisible(!useDefaultErrorMessagesCheckBox.isSelected());
   }
 
   @Override

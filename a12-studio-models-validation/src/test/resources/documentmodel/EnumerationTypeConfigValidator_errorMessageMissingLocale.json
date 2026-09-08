@@ -1,0 +1,64 @@
+{
+  "header": {
+    "id": "EnumerationTypeConfigValidator_errorMessageMissingLocale",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "EnumerationTypeConfigValidator_errorMessageMissingLocale",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_country",
+        "name": "Country",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "DE",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Germany"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Deutschland"
+                  }
+                ]
+              }
+            ],
+            "useDefaultErrorMessages": false,
+            "errorMessage": [
+              {
+                "locale": "en",
+                "text": "Please pick a valid country."
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

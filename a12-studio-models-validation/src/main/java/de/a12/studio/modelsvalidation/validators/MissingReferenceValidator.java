@@ -1,6 +1,7 @@
 package de.a12.studio.modelsvalidation.validators;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -11,6 +12,7 @@ import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.documentmodel.TypeDefFieldType;
+import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
@@ -33,6 +35,13 @@ import java.util.stream.Collectors;
  */
 public final class MissingReferenceValidator implements ModelValidator {
 
+  /**
+   * Not a real element id (see {@link MissingLocaleValidator#ELEMENT_ID} for why a stable placeholder is
+   * needed): backs the "Import target itself has a broken import chain" check below, a header-level problem
+   * with no single element to blame.
+   */
+  private static final String TRANSITIVE_IMPORT_ELEMENT_ID = "header/modelReferences/typeDefinitions";
+
   @Override
   public List<ModelValidationError> validate(A12Model<?> model, ValidationContext context) {
     if (!(model instanceof DocumentModel documentModel)) {
@@ -41,6 +50,19 @@ public final class MissingReferenceValidator implements ModelValidator {
 
     ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
     List<ModelValidationError> result = new ArrayList<>();
+
+    for (TypeDefinition duplicate : getDuplicateNamedTypeDefinitions(documentModel)) {
+      result.add(error(model, duplicate.getId(), ElementProperty.GENERAL,
+          ValidationMessages.get("validation.missingReference.duplicateTypeDefinitionName", duplicate.getId(), duplicate.getName())));
+    }
+    for (ModelReference reference : importReferences(documentModel)) {
+      DocumentModel imported = resolveOtherModel(reference.getReference(), context.otherDocumentModels());
+      if (imported != null && TransitiveTypeDefinitions.hasUnresolvedImportChain(imported, context.otherDocumentModels())) {
+        result.add(new ModelValidationError(model, TRANSITIVE_IMPORT_ELEMENT_ID,
+            ValidationMessages.get("validation.missingReference.transitiveImportBroken", imported.getId()), Severity.ERROR.name()));
+      }
+    }
+
     for (Element element : index.allElements()) {
       if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
         String groupPath = index.getPath(groupElement);
@@ -68,9 +90,13 @@ public final class MissingReferenceValidator implements ModelValidator {
           result.add(error(model, field.getId(), ElementProperty.DATA_TYPE,
               ValidationMessages.get("validation.missingReference.tooFewEnumValues", path)));
         }
-        if (hasMissingTypeDef(field, index)) {
+        TypeDefStatus typeDefStatus = typeDefStatus(field, index);
+        if (typeDefStatus == TypeDefStatus.NOT_SPECIFIED) {
           result.add(error(model, field.getId(), ElementProperty.TYPE,
               ValidationMessages.get("validation.missingReference.missingTypeDefinition", path)));
+        } else if (typeDefStatus == TypeDefStatus.DOES_NOT_EXIST) {
+          result.add(error(model, field.getId(), ElementProperty.TYPE,
+              ValidationMessages.get("validation.missingReference.invalidTypeDefinition", path)));
         }
       }
     }
@@ -133,6 +159,35 @@ public final class MissingReferenceValidator implements ModelValidator {
     return result;
   }
 
+  /**
+   * Every one of {@code documentModel}'s own type definitions whose name collides with another of its own type
+   * definitions - mirrors SME's {@code TYPE_DEF_NAME_DUPLICATED} rule (see {@code DomainTypedef.json}'s
+   * {@code DefaultDuplicateTypeDefName} custom condition), which only compares a model's own, non-included,
+   * non-imported type definitions against each other. {@code getTypeDefinitions()} already only ever holds
+   * this model's own list - anything inherited via Include/Import lives in the owning model's own list instead
+   * (see {@link TransitiveTypeDefinitions}) - so no extra filtering is needed here.
+   */
+  private static Set<TypeDefinition> getDuplicateNamedTypeDefinitions(DocumentModel documentModel) {
+    List<TypeDefinition> typeDefinitions = documentModel.getContent().getTypeDefinitions();
+    if (typeDefinitions == null) {
+      return Set.of();
+    }
+    Set<TypeDefinition> result = new LinkedHashSet<>();
+    typeDefinitions.stream().collect(Collectors.groupingBy(TypeDefinition::getName)).values().stream()
+        .filter(group -> group.size() > 1)
+        .forEach(result::addAll);
+    return result;
+  }
+
+  /** The model's header references of purpose {@link ModelReference#PURPOSE_TYPE_DEFINITIONS} ("Import"). */
+  private static List<ModelReference> importReferences(DocumentModel model) {
+    List<ModelReference> references = model.getModelReferences();
+    if (references == null) {
+      return List.of();
+    }
+    return references.stream().filter(ref -> ModelReference.PURPOSE_TYPE_DEFINITIONS.equals(ref.getPurpose())).toList();
+  }
+
   private static boolean hasMissingComputedField(ComputationElement computation, ElementIndex index) {
     String relPath = computation.getComputation() == null ? null : computation.getComputation().getComputedFieldRelPath();
     if (relPath == null || relPath.isBlank()) {
@@ -161,14 +216,18 @@ public final class MissingReferenceValidator implements ModelValidator {
     return null;
   }
 
-  private static boolean hasMissingTypeDef(FieldElement field, ElementIndex index) {
+  /** Mirrors SME's two distinct rules: {@code A12_TYPE_DEFINITION_MISSING} ("must be specified", no id set at
+   * all) vs. {@code A12_TYPE_DEFINITION_INVALID} ("does not exist", an id set but unresolvable). */
+  private enum TypeDefStatus { OK, NOT_SPECIFIED, DOES_NOT_EXIST }
+
+  private static TypeDefStatus typeDefStatus(FieldElement field, ElementIndex index) {
     if (field.getField() == null || !(field.getField().getFieldType() instanceof TypeDefFieldType typeDefFieldType)) {
-      return false;
+      return TypeDefStatus.OK;
     }
     String typeDefId = typeDefFieldType.getTypeDefType() == null ? null : typeDefFieldType.getTypeDefType().getTypeDefinitionId();
     if (typeDefId == null || typeDefId.isBlank()) {
-      return true;
+      return TypeDefStatus.NOT_SPECIFIED;
     }
-    return index.effectiveFieldType(typeDefFieldType) == null;
+    return index.effectiveFieldType(typeDefFieldType) == null ? TypeDefStatus.DOES_NOT_EXIST : TypeDefStatus.OK;
   }
 }

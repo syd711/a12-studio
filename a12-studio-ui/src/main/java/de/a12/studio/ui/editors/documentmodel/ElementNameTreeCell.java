@@ -109,6 +109,12 @@ class ElementNameTreeCell extends TreeTableCell<ElementViewModel, String> {
       Tooltip.install(requiredIcon, WidgetFactory.createTooltip(StudioBundle.get("required_element")));
       graphic.getChildren().add(requiredIcon);
     }
+    if (viewModel.usesTypeDefinition()) {
+      Node typeDefinitionIcon = WidgetFactory.createIcon(Icons.ELEMENT_TYPE_DEFINITION_REFERENCE);
+      typeDefinitionIcon.getStyleClass().addAll("tree-icon", "tree-icon-badge");
+      Tooltip.install(typeDefinitionIcon, WidgetFactory.createTooltip(StudioBundle.get("field_uses_type_definition")));
+      graphic.getChildren().add(typeDefinitionIcon);
+    }
 
     setText(null);
     setGraphic(graphic);

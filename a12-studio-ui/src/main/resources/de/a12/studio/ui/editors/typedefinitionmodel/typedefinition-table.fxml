@@ -14,12 +14,12 @@
     <top>
         <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
             <items>
-                <Button mnemonicParsing="false" onAction="#onAdd" styleClass="secondary-button" text="%add_type_definition">
+                <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="secondary-button" text="%add_type_definition">
                     <graphic>
                         <FontIcon iconColor="#FFFFFF" iconLiteral="mdi2p-plus" iconSize="18" />
                     </graphic>
 
-                    <tooltip><Tooltip text="%add_type_definition" /></tooltip>
+                    <tooltip><Tooltip fx:id="addButtonTooltip" text="%add_type_definition" /></tooltip>
                 </Button>
                 <Button layoutX="169.0" layoutY="11.0" mnemonicParsing="false" onAction="#onDelete" styleClass="delete-button">
                     <tooltip>
@@ -30,9 +30,9 @@
                     </graphic>
                 </Button>
                 <Separator layoutX="412.0" layoutY="10.0" orientation="VERTICAL" />
-                <Button mnemonicParsing="false" onAction="#onImport" styleClass="secondary-button" text="%import">
+                <Button fx:id="importButton" mnemonicParsing="false" onAction="#onImport" styleClass="secondary-button" text="%import">
                     <tooltip>
-                        <Tooltip text="%import_all_type_definitions_from_a_type_definition_model" />
+                        <Tooltip fx:id="importButtonTooltip" text="%import_all_type_definitions_from_a_type_definition_model" />
                     </tooltip>
                <graphic>
                   <FontIcon iconLiteral="mdi2p-package-variant-closed-plus" iconSize="18" />

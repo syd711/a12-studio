@@ -49,11 +49,15 @@ public final class TransitiveTypeDefinitions {
   /**
    * One type definition inherited transitively: {@code ownerModelId} is the model whose own {@code
    * typeDefinitions} it's declared in, {@code sourcePath} is the full chain of models it travelled through to
-   * get here (ending in {@code ownerModelId}), and {@code imported} says whether it arrived via an Import
+   * get here (ending in {@code ownerModelId}), {@code imported} says whether it arrived via an Import
    * reference (a {@link TypeDefinitionModel} owns it) rather than an Include (a regular {@link DocumentModel}
-   * owns it).
+   * owns it), and {@code includedImported} narrows that further: true when the chain starts with an Include
+   * and ends with an Import - a model this model includes that itself imports a Type Definition Model. SME
+   * shows these "merely displayed to explain their content" (grey, informational) rather than directly usable
+   * in the current model - using one still requires importing that Type Definition Model directly.
    */
-  public record Entry(TypeDefinition typeDefinition, String ownerModelId, String sourcePath, boolean imported) {
+  public record Entry(TypeDefinition typeDefinition, String ownerModelId, String sourcePath, boolean imported,
+                       boolean includedImported) {
   }
 
   /**
@@ -65,7 +69,7 @@ public final class TransitiveTypeDefinitions {
     List<Entry> found = new ArrayList<>();
     Deque<String> path = new ArrayDeque<>();
     path.addLast(model.getId());
-    collect(model, otherModels, path, found);
+    collect(model, otherModels, path, new ArrayDeque<>(), found);
 
     Map<String, Entry> byTypeDefId = new LinkedHashMap<>();
     for (Entry entry : found) {
@@ -96,7 +100,36 @@ public final class TransitiveTypeDefinitions {
     }
   }
 
-  private static void collect(DocumentModel model, List<DocumentModel> otherModels, Deque<String> path, List<Entry> result) {
+  /**
+   * True if {@code model}'s own Import graph - not {@code model}'s direct Import references themselves (those
+   * are already checked by {@link de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator}),
+   * but every Import reference reachable transitively from {@code model} - has a broken edge somewhere.
+   * Callers use this on an already-resolved Import target to detect the case SME calls "transitive imports
+   * missing": model A imports B, B imports C, C was deleted - opening A alone shows nothing wrong via a
+   * direct-reference check on A, since A's own reference to B still resolves fine, but A's effective type
+   * definitions are incomplete because of the break further down B's own chain.
+   */
+  public static boolean hasUnresolvedImportChain(@NonNull DocumentModel model, @NonNull List<DocumentModel> otherModels) {
+    Set<String> visited = new LinkedHashSet<>();
+    visited.add(model.getId());
+    return hasUnresolvedImportChain(model, otherModels, visited);
+  }
+
+  private static boolean hasUnresolvedImportChain(DocumentModel model, List<DocumentModel> otherModels, Set<String> visited) {
+    for (ModelReference reference : importReferences(model)) {
+      DocumentModel imported = resolveReference(reference.getReference(), otherModels);
+      if (imported == null) {
+        return true;
+      }
+      if (visited.add(imported.getId()) && hasUnresolvedImportChain(imported, otherModels, visited)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static void collect(DocumentModel model, List<DocumentModel> otherModels, Deque<String> path,
+      Deque<Boolean> edgeIsImport, List<Entry> result) {
     for (Element element : new ElementIndex(model).allElements()) {
       if (!(element instanceof GroupElement groupElement) || groupElement.getGroup() == null) {
         continue;
@@ -105,20 +138,21 @@ public final class TransitiveTypeDefinitions {
       if (includeConfig == null) {
         continue;
       }
-      visit(resolveReference(includeConfig.getReference(), otherModels), otherModels, path, result);
+      visit(resolveReference(includeConfig.getReference(), otherModels), otherModels, path, edgeIsImport, result, false);
     }
 
     for (ModelReference reference : importReferences(model)) {
-      visit(resolveReference(reference.getReference(), otherModels), otherModels, path, result);
+      visit(resolveReference(reference.getReference(), otherModels), otherModels, path, edgeIsImport, result, true);
     }
   }
 
   /**
    * Both an Include and an Import are, from here, just an edge to another model whose own type definitions
    * (and further edges) need to be pulled in - the only difference is what {@link #collect} looked at to find
-   * the edge, so both funnel through this one recursion step.
+   * the edge ({@code isImportEdge}), so both funnel through this one recursion step.
    */
-  private static void visit(DocumentModel target, List<DocumentModel> otherModels, Deque<String> path, List<Entry> result) {
+  private static void visit(DocumentModel target, List<DocumentModel> otherModels, Deque<String> path,
+      Deque<Boolean> edgeIsImport, List<Entry> result, boolean isImportEdge) {
     // A missing reference is already surfaced by MissingReferenceValidator; a reference back onto a model
     // already on this branch of the path is a cycle and must not be followed further.
     if (target == null || path.contains(target.getId())) {
@@ -126,16 +160,23 @@ public final class TransitiveTypeDefinitions {
     }
 
     String sourcePath = sourcePath(path, target.getId());
+    // "included-imported" (see Entry's doc): the chain that reached target started with an Include and this,
+    // its last edge, is an Import - i.e. an included model that itself imports a Type Definition Model.
+    boolean includedImported = target instanceof TypeDefinitionModel && isImportEdge
+        && !(edgeIsImport.isEmpty() ? isImportEdge : edgeIsImport.peekFirst());
+
     List<TypeDefinition> ownTypeDefinitions = target.getContent().getTypeDefinitions();
     if (ownTypeDefinitions != null) {
       boolean imported = target instanceof TypeDefinitionModel;
       for (TypeDefinition typeDefinition : ownTypeDefinitions) {
-        result.add(new Entry(typeDefinition, target.getId(), sourcePath, imported));
+        result.add(new Entry(typeDefinition, target.getId(), sourcePath, imported, includedImported));
       }
     }
 
     path.addLast(target.getId());
-    collect(target, otherModels, path, result);
+    edgeIsImport.addLast(isImportEdge);
+    collect(target, otherModels, path, edgeIsImport, result);
+    edgeIsImport.removeLast();
     path.removeLast();
   }
 

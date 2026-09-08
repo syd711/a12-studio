@@ -1,0 +1,40 @@
+{
+  "header": {
+    "id": "StringTypeConfigValidator_typeDefinitionInvalid",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "StringTypeConfigValidator_typeDefinitionInvalid",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_email",
+        "name": "Email",
+        "fieldType": {
+          "type": "StringType",
+          "StringType": {
+            "pattern": "[a-z+"
+          }
+        }
+      }
+    ]
+  }
+}

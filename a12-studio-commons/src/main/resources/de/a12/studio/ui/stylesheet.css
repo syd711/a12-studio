@@ -391,6 +391,16 @@
     -fx-text-fill: -fx-text-muted;
 }
 
+/**
+ * Type definitions table: rows for an "included-imported" definition - one an included model itself pulled
+ * in via Import - shown for information only (see TransitiveTypeDefinitions.Entry.includedImported and SME's
+ * own grey-background treatment for the same case); not directly usable in this model until imported directly.
+ */
+.table-row-cell:included-imported,
+.table-row-cell:included-imported .table-cell {
+    -fx-background-color: -fx-panel-color;
+}
+
 .preview-app-status-icon.status-stopped {
     -fx-icon-color: -fx-error-bg;
 }

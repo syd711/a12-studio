@@ -412,6 +412,12 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
 
     List<DocumentModel> otherModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
     for (TransitiveTypeDefinitions.Entry entry : TransitiveTypeDefinitions.resolve(documentModel, otherModels)) {
+      // "Included-imported" type definitions (an included model's own Import) are shown in the Type
+      // Definitions table for information only - SME: "merely displayed to explain their content"; they
+      // aren't usable by a field in this model until this model imports that Type Definition Model directly.
+      if (entry.includedImported()) {
+        continue;
+      }
       String id = entry.typeDefinition().getId();
       if (!excludedId.equals(id)) {
         labels.putIfAbsent(id, entry.ownerModelId() + "_" + entry.typeDefinition().getName());
