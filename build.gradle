@@ -126,6 +126,10 @@ subprojects {
                 maven {
                     name "mgmart"
                     url 'https://artifacts.geta12.com/artifactory/a12-community-maven/'
+                    credentials {
+                        username = System.getenv("A12_USER") ?: project.findProperty("a12User") ?: ""
+                        password = System.getenv("A12_TOKEN") ?: project.findProperty("a12Token") ?: ""
+                    }
                 }
             }
             filter {
