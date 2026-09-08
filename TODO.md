@@ -18,8 +18,12 @@ Form Models:
 - check combobox for empty values
 
 Document Model:
-- Add Group to Document Model converter that creates a new document model and includes it.
-- Add Group to Document Model converter that moves groups to an existing document model.
+- Rename verschieben mit ...
+- check field init for new validation rules
+- check white space in rule names and other name fields
+- check references in error messages using the $$ notation
+- Check the tree update after moving groups or creating validation rules
+- Check validation rules for repeatable groups and field not filled. kcp3
 
 Application Model
 - move Model references up
