@@ -15,7 +15,8 @@ Form Models:
 - check dnd of sections with multi select
 - check if trigger and dependency icons are visible
 - merge tabs of settings and control, note that only fields with values shows deps
-- check combobox for empty values
+- check combobox for empty values so that these can be resetted
+- for rules, initialize the name field based on the field or group 
 
 Document Model:
 - Rename verschieben mit ...
