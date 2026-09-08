@@ -1,0 +1,38 @@
+{
+  "header": {
+    "id": "PersonCompanyCombination_CDM",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "reference": "Person_DM"
+      },
+      {
+        "modelType": "document",
+        "reference": "Company_DM"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "Person_DM",
+    "CombinationSteps": [
+      {
+        "type": "Addition",
+        "AdditiveModel": {
+          "dmId": "Company_DM"
+        }
+      }
+    ]
+  }
+}

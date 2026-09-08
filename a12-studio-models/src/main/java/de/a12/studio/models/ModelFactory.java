@@ -12,6 +12,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
@@ -65,6 +66,7 @@ public class ModelFactory {
         case MAPPING -> JsonSettings.objectMapper.treeToValue(root, MappingModel.class);
         case QUERY -> JsonSettings.objectMapper.treeToValue(root, QueryModel.class);
         case STRUCTURALMAPPING -> JsonSettings.objectMapper.treeToValue(root, StructuralMappingModel.class);
+        case SELECTION -> JsonSettings.objectMapper.treeToValue(root, SelectionModel.class);
         default -> {
           log.warn("Model type '{}' of '{}' is not supported yet", modelType, projectItem.getPath());
           yield null;

@@ -44,6 +44,19 @@ public class TargetModelPanelController implements Initializable {
   private Runnable onChange = () -> {
   };
 
+  // Every existing caller (Mapping's Target, Query's target document model) requires a value, so this stays
+  // true by default; a Combined Document Model's Base Model is genuinely optional (no "missing" rule exists
+  // for it in SME), so that caller opts out via setRequired(false).
+  private boolean required = true;
+
+  /**
+   * Whether an empty selection is itself a validation error. Must be called before {@link #load}, since {@link
+   * #load} immediately re-validates.
+   */
+  public void setRequired(boolean required) {
+    this.required = required;
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resources) {
     targetModelField.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -98,7 +111,7 @@ public class TargetModelPanelController implements Initializable {
   }
 
   private void validate() {
-    if (targetModelField.getValue() == null) {
+    if (required && targetModelField.getValue() == null) {
       errorContainerController.show("ERROR", "A Target Model must be selected.");
     }
     else {

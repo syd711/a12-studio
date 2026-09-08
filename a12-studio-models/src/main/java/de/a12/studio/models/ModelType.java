@@ -26,9 +26,10 @@ public enum ModelType {
   // integrationTest/cypress/testData/models/omm/refactoring/OverviewModelRefactoring_QM.json (modelType
   // "query", so a genuine Query Model despite its own file's "OverviewModelRefactoring" name) uses "_QM".
   // Left as "QM" (not changed to "QeM") since the evidence contradicts itself rather than confirming one
-  // convention over the other.
+  // convention over the other. SELECTION's "SeM" is the suffix documented in this repo's CLAUDE.md Model
+  // Types table, not a best-effort guess.
   APPLICATION("application", "Application Model", "AM"),
-  COMBINATION("combination", "Combination Model", "CDM"),
+  COMBINATION("combination", "Combined Document Model", "CDM"),
   CONTENT("content", "Content Model", "CM"),
   DOCUMENT("document", "Document Model", "DM"),
   FORM("form", "Form Model", "FM"),
@@ -38,6 +39,7 @@ public enum ModelType {
   PRINT("print", "Print Model", "PM"),
   QUERY("query", "Query Model", "QM"),
   RELATIONSHIP("relationship", "Relationship Model", "RM"),
+  SELECTION("selection", "Selection Model", "SeM"),
   STRUCTURALMAPPING("structuralmapping", "Structural Mapping Model", "SMM"),
   TREE("tree", "Tree Model", "TM"),
   TYPEDEFINITION("typedefinition", "Type Definition Model", "TDM");

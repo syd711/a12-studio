@@ -234,6 +234,36 @@ still true.
 
 ---
 
+## Combined Document Model
+
+*Built 2026-09-08.*
+
+a12-studio's Combined Document Model editor (`a12-studio-ui/.../editors/combineddocumentmodel/`, data model in
+`a12-studio-models/.../combineddocumentmodel/`) now edits both fields SME defines in
+`resources/models/combinationModel/DomainCombination.json`: an optional **Base Model** (`content.baseModelId`,
+a Document Model reference reused via `TargetModelPanelController`, now made optional via `setRequired(false)`
+since — unlike Mapping's Target — SME has no "missing" rule for it) and the ordered **Combination Steps**
+(`content.CombinationSteps[]`, `CombinationStepsPanelController` + an add/edit dialog), each an `Addition` /
+`Selection` / `DecorationForFields` / `DecorationForGroups` step referencing an Additive/Selection/Decoration
+model. The dialog's Type-driven field enabling mirrors SME's `CombinationEditor.json` `dependentField` rules, so
+a step built through the UI can't violate them.
+
+Validation (`de.a12.studio.modelsvalidation.validators.combination`, wired into `CombinationModelValidationService`)
+ports all 7 structural `Rule`s from `DomainCombination.json`'s `CombinationSteps` group (missing/not-allowed per
+step type, duplicate additive model) plus the generic `HeaderModelReferenceValidator` for invalid references —
+**not** ported: base/step loop detection (SME's `CombModelReferenceHelper`), the full DM-expansion + SMT
+rule-contradiction pass, and the "Validate model up to this step" row action, none of which have any backing
+implementation in a12-studio (see the Backend/kernel capability map above — `CombinationModelExpansionService`
+does not exist in this repo).
+
+A Combination Step's Selection Model reference (`SelectionModel.smId`) needed a real, project-aware picker, but
+a12-studio had no `ModelType.SELECTION` at all. Added a minimal stub (`ModelType.SELECTION`, an empty
+`SelectionModel`/`SelectionModelContent`, `model-versions.json` entry with `enabled: false`) — same shape as the
+existing `PrintModel` precedent (loadable/referenceable project-wide, but opens "not supported yet" until a real
+editor exists, still priority #6 below).
+
+---
+
 ## Form Model
 
 *Analyzed 2026-09-06 (the previous version of this section, "Form Model — not started", was written before this
@@ -740,10 +770,10 @@ document, serialize back to JSON (occasionally YAML) on save.
 |---|---|---|
 | 1 | **structuralMappingModel** | Kernel lib present (`kernel-md-structuralmapping-tool`); `SmmService`/`AddFieldMappingDto` scaffolding exists in `a12-studio-data-services`. SME's editor: source-tree/target-tree drag&drop field mapper, resolution-strategy editor for conflicts. Foundational — referenced by mappingModel and combinationModel. |
 | 2 | **mappingModel** | Depends on structuralMappingModel + additiveDocumentModel; scaffolding exists (`SMEMappingModelService`, `MappingModelComputationDto`, `StructuralMappingModelGenerationDto`). ETL-style: source DM(s) + target DM + optional precomputation, driven by a referenced SMM. |
-| 3 | **combinationModel** | Kernel lib present (`kernel-md-combination-model`); `CombinationModelExpansionService` scaffolding exists. Composes a base DM + ordered `CombinationStep`s (Addition/Selection/Decoration) referencing Additive/Selection models — multi-step tabbed editor with live preview. |
+| 3 | **combinationModel** | **Structural editor + validators built 2026-09-08** (see dedicated section above) — fields and the 7 structural `Rule`s are ported; DM-expansion/SMT validation and loop detection are not, since no kernel expansion service exists in this repo despite the "combination model" kernel lib being present. |
 | 4 | **additiveDocumentModel** | Kernel lib present (`kernel-md-join`) but no dedicated data model/editor yet. Hard dependency of both mappingModel and combinationModel — needed before those are fully usable. Overlay editing mode: elements are included/overwritten/purely-additive relative to a base DM. |
 | 5 | **relationshipModel** | No current scaffolding, but foundational — link, masterDetailModel, treeModel, modelGraphDiagram, and formModel's `Binding`/`BindingRepeat` all reference it. |
-| 6 | **selectionModel** | Needed by combinationModel; reusable filter/subset spec over DM data. |
+| 6 | **selectionModel** | Needed by combinationModel; reusable filter/subset spec over DM data. A minimal stub (`ModelType.SELECTION`, empty `SelectionModel`/`SelectionModelContent`, `enabled: false`) was added 2026-09-08 so Combination Steps could reference Selection Models by id — no editor yet, same "referenceable but opens 'not supported yet'" state as `printModel`. |
 | 7 | **printModel** | Kernel libs present (`print-engine-api/runtime`); `PrintService`/`DocumentModelResolver`/`PrintParameters` scaffolding exists. Most editor-complex of the print family — relies on an external print-engine component library for the layout canvas. Backend renders PDF only (PDFBox or legacy engine), no HTML path. |
 | 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. `print-typesetting` lib already present; no dedicated model/service for either exists yet. |
 | 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model (don't confuse with Document Model itself). |
@@ -755,7 +785,7 @@ document, serialize back to JSON (occasionally YAML) on save.
 
 - **appModel** — overall application structure: navigation, module registration, entry screens.
 - **attachment** — binary/file attachments (images, PDFs); opaque content, type inferred from directory location.
-- **combinationModel** — see priority table.
+- **combinationModel** — see dedicated section above / priority table.
 - **common** — shared UI/support module, not a model type.
 - **contentModel** — CMS-like page/content layout; backed by an external content-engine package; experimental.
 - **data** — manages the `data/` directory structure and workspace seed metadata; not itself an editable model.
@@ -794,7 +824,7 @@ on its own:
 | Condition/expression language validation & formatting | `ValidationRuleService`, `ComputationRuleService` (Kotlin) | **Missing** (corrected 2026-09-05 — previously claimed present; no such Java services exist, no kernel dependency in this repo). `RuleConfig.errorCondition`/`ComputationAlternative.precondition`/`operation` are edited as plain text with no semantic validation — see the Document Model "Editor features" correction above |
 | Print rendering (PDF) | `PrintService` — PDFBox or legacy engine via `a12.print.engine.runtime` | Scaffolding present (`PrintService.java`, `DocumentModelResolver.java`, print-engine deps) but editor missing |
 | Document model expansion (includes/imports) | `ExpansionService` | Not yet confirmed — check `documentmodel/features` |
-| Combination Model expansion | `CombinationModelExpansionService` | Present — `services/combinationmodel/` |
+| Combination Model expansion | `CombinationModelExpansionService` | **Missing** (corrected 2026-09-08 — previously claimed present; no such service, or `services/combinationmodel/` directory, exists in this repo). The Combined Document Model editor built 2026-09-08 only validates the structural rules from `DomainCombination.json` (missing/not-allowed/duplicate references per step); DM expansion, rule-contradiction/SMT solving, loop detection and the "Validate model up to this step" action all still depend on this |
 | Additive Model join | `AdditiveModelController` (`kernel-md-join`) | Dependency present, service scaffolding not yet confirmed |
 | Selection Model join/validate | `SelectionModelController` | Not yet present |
 | Structural Mapping Model consistency | `StructuralMappingModelService` (`SmmService`) | Present — `services/structuralmappingmodel/` |

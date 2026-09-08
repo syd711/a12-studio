@@ -38,6 +38,8 @@ import de.a12.studio.models.relationshipmodel.LinkConstraints;
 import de.a12.studio.models.relationshipmodel.Multiplicity;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModelContent;
+import de.a12.studio.models.selectionmodel.SelectionModel;
+import de.a12.studio.models.selectionmodel.SelectionModelContent;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModelContent;
 import de.a12.studio.models.treemodel.ExpansionStrategy;
@@ -180,6 +182,7 @@ public class NewModelFactory {
       case MAPPING -> buildMappingModel(locales);
       case QUERY -> buildQueryModel(locales);
       case STRUCTURALMAPPING -> buildStructuralMappingModel(locales);
+      case SELECTION -> buildSelectionModel(locales);
     };
   }
 
@@ -430,6 +433,15 @@ public class NewModelFactory {
   private static StructuralMappingModel buildStructuralMappingModel(List<Locale> locales) {
     StructuralMappingModel model = new StructuralMappingModel();
     model.setContent(new StructuralMappingModelContent());
+    model.setLocales(locales);
+    return model;
+  }
+
+  // Deliberately as empty as SelectionModelContent itself - there is no Selection Model editor yet (see
+  // ModelType#SELECTION), so a newly created one has nothing to populate beyond its header.
+  private static SelectionModel buildSelectionModel(List<Locale> locales) {
+    SelectionModel model = new SelectionModel();
+    model.setContent(new SelectionModelContent());
     model.setLocales(locales);
     return model;
   }

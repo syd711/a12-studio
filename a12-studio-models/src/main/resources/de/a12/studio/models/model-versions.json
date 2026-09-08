@@ -10,6 +10,7 @@
   "printtypesettings":  { "version": "3.2.0",  "enabled": false },
   "module-masterdetail":{ "version": "1.0.0",  "enabled": true  },
   "relationship":       { "version": "4.0.0",  "enabled": true  },
+  "selection":          { "version": "0.1.0",  "enabled": false },
   "application":        { "version": "6.0.0",  "enabled": true  },
   "content":            { "version": "0.8.0",  "enabled": true  },
   "combination":        { "version": "1.0.0",  "enabled": true  },

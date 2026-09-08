@@ -3,6 +3,7 @@ package de.a12.studio.modelsvalidation;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
@@ -14,6 +15,7 @@ import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.services.ApplicationModelValidationService;
+import de.a12.studio.modelsvalidation.services.CombinationModelValidationService;
 import de.a12.studio.modelsvalidation.services.ContentModelValidationService;
 import de.a12.studio.modelsvalidation.services.DocumentModelValidationService;
 import de.a12.studio.modelsvalidation.services.FormModelValidationService;
@@ -49,6 +51,7 @@ public class ValidationService {
   private final ContentModelValidationService contentModelValidationService = new ContentModelValidationService();
   private final MasterDetailModelValidationService masterDetailModelValidationService = new MasterDetailModelValidationService();
   private final QueryModelValidationService queryModelValidationService = new QueryModelValidationService();
+  private final CombinationModelValidationService combinationModelValidationService = new CombinationModelValidationService();
 
   public ValidationService(Project project) {
     this.project = project;
@@ -68,6 +71,7 @@ public class ValidationService {
       case ContentModel contentModel -> contentModelValidationService.validate(contentModel, context);
       case MasterDetailModel masterDetailModel -> masterDetailModelValidationService.validate(masterDetailModel, context);
       case QueryModel queryModel -> queryModelValidationService.validate(queryModel, context);
+      case CombinedDocumentModel combinedDocumentModel -> combinationModelValidationService.validate(combinedDocumentModel, context);
       default -> List.of();
     };
   }
@@ -85,6 +89,7 @@ public class ValidationService {
       case CONTENT -> contentModelValidationService.addValidator(validator);
       case MASTERDETAIL -> masterDetailModelValidationService.addValidator(validator);
       case QUERY -> queryModelValidationService.addValidator(validator);
+      case COMBINATION -> combinationModelValidationService.addValidator(validator);
     }
   }
 
@@ -101,6 +106,7 @@ public class ValidationService {
       case CONTENT -> contentModelValidationService.removeValidator(validator);
       case MASTERDETAIL -> masterDetailModelValidationService.removeValidator(validator);
       case QUERY -> queryModelValidationService.removeValidator(validator);
+      case COMBINATION -> combinationModelValidationService.removeValidator(validator);
     }
   }
 

@@ -64,6 +64,7 @@ public interface Icons {
   String PNG_MODEL_COMBINATION = "/de/a12/studio/ui/icons/Model-Transformer.png";
   String PNG_MODEL_MAPPING = "/de/a12/studio/ui/icons/Model-Graph-Diagram.png";
   String PNG_MODEL_QUERY = "/de/a12/studio/ui/icons/Model-Document_SCDM.png";
+  String PNG_MODEL_SELECTION = "/de/a12/studio/ui/icons/Model-Document_SCDM.png";
 
   String ELEMENT_MULTI_SELECT = "mdi2c-checkbox-multiple-marked-outline";
   String ELEMENT_INCLUDE = "mdi2l-link";
@@ -115,6 +116,7 @@ public interface Icons {
       case MAPPING -> PNG_MODEL_MAPPING;
       case QUERY -> PNG_MODEL_QUERY;
       case STRUCTURALMAPPING -> PNG_MODEL_STRUCTURALMAPPING;
+      case SELECTION -> PNG_MODEL_SELECTION;
     };
   }
 }
