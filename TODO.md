@@ -15,11 +15,16 @@ Form Models:
 - check dnd of sections with multi select
 - check if trigger and dependency icons are visible
 - merge tabs of settings and control, note that only fields with values shows deps
-- check combobox for empty values
+- check combobox for empty values so that these can be resetted
+- for rules, initialize the name field based on the field or group 
 
 Document Model:
-- Add Group to Document Model converter that creates a new document model and includes it.
-- Add Group to Document Model converter that moves groups to an existing document model.
+- Rename verschieben mit ...
+- check field init for new validation rules
+- check white space in rule names and other name fields
+- check references in error messages using the $$ notation
+- Check the tree update after moving groups or creating validation rules
+- Check validation rules for repeatable groups and field not filled. kcp3
 
 Application Model
 - move Model references up

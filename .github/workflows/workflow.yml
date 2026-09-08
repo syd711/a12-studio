@@ -62,6 +62,9 @@ jobs:
           curl -L -o ${{ matrix.jre_bundle }} https://cdn.azul.com/zulu/bin/${{ matrix.jre_bundle }}
 
       - name: Build fat JAR with Gradle
+        env:
+          ORG_GRADLE_PROJECT_a12User: ${{ secrets.A12_USER }}
+          ORG_GRADLE_PROJECT_a12Token: ${{ secrets.A12_TOKEN }}
         run: ./gradlew :a12-studio-ui:shadowJar
 
       - name: Prepare Java Runtime
@@ -209,6 +212,9 @@ jobs:
             https://cdn.azul.com/zulu/bin/zulu21.42.19-ca-fx-jre21.0.7-linux_x64.tar.gz
 
       - name: Build fat JARs and Windows EXE wrappers with Gradle
+        env:
+          ORG_GRADLE_PROJECT_a12User: ${{ secrets.A12_USER }}
+          ORG_GRADLE_PROJECT_a12Token: ${{ secrets.A12_TOKEN }}
         run: |
           OUTPUT=$(./gradlew :a12-studio-ui:shadowJar :a12-studio-ui:createExe \
                              :a12-studio-ui:stageWcfCli \

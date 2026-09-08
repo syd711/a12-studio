@@ -11,3 +11,25 @@ include 'a12-studio-plugins:create-from-excel'
 include 'a12-studio-plugins:application-groups'
 include 'a12-studio-plugins:project-packager'
 include 'a12-studio-plugin-manager'
+
+dependencyResolutionManagement {
+    repositories {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name "mgmart"
+                    url 'https://artifacts.geta12.com/artifactory/a12-community-maven/'
+                    credentials {
+                        username = providers.gradleProperty("a12User").getOrElse(System.getenv("A12_USER") ?: "")
+                        password = providers.gradleProperty("a12Token").getOrElse(System.getenv("A12_TOKEN") ?: "")
+                    }
+                }
+            }
+            filter {
+                includeGroupByRegex "com\\.mgmtp\\.a12.*"
+            }
+        }
+        mavenCentral()
+        maven { url "https://build.shibboleth.net/nexus/content/repositories/releases/" }
+    }
+}
