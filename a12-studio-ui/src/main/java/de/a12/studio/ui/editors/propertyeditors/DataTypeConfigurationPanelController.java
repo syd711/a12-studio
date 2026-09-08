@@ -173,6 +173,28 @@ confirmLoader.setResources(StudioBundle.getBundle());
     customConfigurationController.hideLengthGrid();
   }
 
+  /**
+   * Every sub-panel loaded in {@link #initialize} self-registers with {@link
+   * de.a12.studio.ui.events.StudioEventManager} (see {@link AbstractPropertyEditor#initialize}) and gets
+   * {@code setElement} called on it regardless of which one is actually shown (see {@link #setElement}), so
+   * all 8 must be torn down here too - without this override, only this dispatcher panel itself was ever
+   * unregistered, leaking 8 stale listener instances every time an owning editor (e.g. {@code
+   * TypeDefinitionModelFieldEditorController}) reloads a fresh field editor, as it does on every row
+   * selection.
+   */
+  @Override
+  public void destroy() {
+    super.destroy();
+    stringConfigurationController.destroy();
+    numberConfigurationController.destroy();
+    dateFragmentConfigurationController.destroy();
+    dateRangeConfigurationController.destroy();
+    customConfigurationController.destroy();
+    enumerationConfigurationController.destroy();
+    dateConfigurationController.destroy();
+    confirmConfigurationController.destroy();
+  }
+
   @Override
   public void setElement(@NonNull Element element) {
     super.setElement(element);

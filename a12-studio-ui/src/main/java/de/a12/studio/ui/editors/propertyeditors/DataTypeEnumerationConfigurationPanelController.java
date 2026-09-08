@@ -121,6 +121,16 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
     return ElementProperty.DATA_TYPE;
   }
 
+  /** {@code errorMessageController} self-registers with {@code StudioEventManager} independently of this
+   * panel (see {@link AbstractPropertyEditor#initialize}) and must be unregistered too, or it leaks a stale
+   * listener every time an owning editor reloads a fresh field editor (see {@link
+   * DataTypeConfigurationPanelController#destroy()}, the same issue at the level above this one). */
+  @Override
+  public void destroy() {
+    super.destroy();
+    errorMessageController.destroy();
+  }
+
   @Override
   public void localesChanged(@NonNull LocalesChangedEvent event) {
     if (event.getItem().equals(projectItem)) {

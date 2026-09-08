@@ -349,6 +349,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
     if (projectItem == null) {
       return;
     }
+    log.debug("[commitChange] {}.{} triggered a save", getClass().getSimpleName(), field.getId());
     saveMode.commit(projectItem);
     applyValidationResult(field, validateElement(projectItem));
     StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
@@ -364,6 +365,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
     if (projectItem == null) {
       return;
     }
+    log.debug("[commitChange] {} (structural, element={}) triggered a save", getClass().getSimpleName(), element == null ? null : element.getId());
     saveMode.commit(projectItem);
     if (element == null) {
       return;

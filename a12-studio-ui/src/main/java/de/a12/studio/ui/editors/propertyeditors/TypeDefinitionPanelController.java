@@ -140,6 +140,16 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     this.ancestors = ancestors;
   }
 
+  /** {@code requirednessErrorMessageController} self-registers with {@code StudioEventManager}
+   * independently of this panel (see {@link AbstractPropertyEditor#initialize}) and must be unregistered
+   * too, or it leaks a stale listener every time an owning editor reloads a fresh field editor (see {@link
+   * DataTypeConfigurationPanelController#destroy()} for the same issue one level down). */
+  @Override
+  public void destroy() {
+    super.destroy();
+    requirednessErrorMessageController.destroy();
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     super.initialize(url, resourceBundle);

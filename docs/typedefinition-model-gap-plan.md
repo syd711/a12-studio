@@ -152,6 +152,42 @@ unrelated Windows file-lock on a stale `a12-studio-ui/build/resources/main/.../M
 re-run it after closing whatever has that file open (a running app instance, most likely) if a full
 cross-module regression pass is wanted.
 
+## Bug found post-implementation: listener leak in the field editor panels (2026-09-08)
+
+User reported an endless save loop in the Type Definition Model editor (repeating
+`refresh() from TreeView` → `badge shown ERROR` → `Saved` roughly every 600ms, indefinitely).
+
+Root cause investigation: `DataTypeConfigurationPanelController` (the dispatcher that swaps between the
+7 per-basetype config sub-panels) loads all 7 sub-panel FXMLs once in `initialize()` and calls `setElement()`
+on **all of them** on every selection, regardless of which one is actually shown - but never overrode
+`destroy()` to tear them down, so only the dispatcher itself was ever unregistered from
+`StudioEventManager`. Since `TypeDefintionModelEditorController` rebuilds the whole field-editor FXML tree
+from scratch on every row selection (`loadEditor()`), and additionally reloads-and-reselects on every save
+of its own model (`modelSaved()` → `projectItem.reload()` + `loadModel()`, a pattern unique to this editor,
+called out in `AbstractEditorController`'s own javadoc), every such cycle leaked 7 stale
+`AbstractPropertyEditor` listener instances. This was **pre-existing** (not introduced by this session's
+work), but Phase 2's new nested `errorMessageController` inside `DataTypeEnumerationConfigurationPanelController`
+added an 8th leaked instance per cycle, and `TypeDefinitionPanelController`'s pre-existing nested
+`requirednessErrorMessageController` had the identical gap.
+
+Could not conclusively prove via static analysis alone that this leak is *the* cause of the observed save
+loop (a leaked panel's own `modelSaved()`/`elementValidated()` handlers are read-only - they call
+`refreshValidationState()`, not `commitChange()` - so the leak explains unbounded listener/memory growth for
+certain, but the exact mechanism turning that into a *save* loop wasn't nailed down with certainty).
+
+Fixed regardless (a real bug on its own merits):
+- [x] `DataTypeConfigurationPanelController.destroy()` now cascades to its 7 sub-panels
+- [x] `DataTypeEnumerationConfigurationPanelController.destroy()` now cascades to `errorMessageController`
+- [x] `TypeDefinitionPanelController.destroy()` now cascades to `requirednessErrorMessageController`
+      (pre-existing gap, same class of bug, fixed for consistency)
+- [x] Added `log.debug("[commitChange] ...")` diagnostics in `AbstractPropertyEditor.commitChange(Node)`/
+      `commitChange()` naming the controller class + field id, so if the loop recurs after this fix, the
+      next capture (enable debug logging) pinpoints the exact trigger instead of requiring another round of
+      static-analysis guessing.
+
+**If the loop still occurs after this fix**: enable debug logging and reproduce; the new `[commitChange]`
+lines will show exactly which control/panel keeps re-firing on every cycle - that's the next concrete lead.
+
 ## Deferred / not attempted (candidates for a future session)
 
 - String — duplicate error-message locales (SME's `ERROR_MESSAGE_LANGUAGES_DUPLICATE`)
