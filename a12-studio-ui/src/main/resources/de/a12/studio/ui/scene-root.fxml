@@ -44,7 +44,7 @@
                                                 <FontIcon iconLiteral="mdi2f-file-tree" iconSize="24" styleClass="toolbar-icon" />
                                              </graphic>
                                              <tooltip>
-                                                <Tooltip text="Project View" />
+                                                <Tooltip text="%project_view" />
                                              </tooltip>
                                           </ToggleButton>
                                           <ToggleButton fx:id="bookmarksToggle" styleClass="activity-bar-button" selected="false" mnemonicParsing="false" onAction="#onBookmarksToggle">

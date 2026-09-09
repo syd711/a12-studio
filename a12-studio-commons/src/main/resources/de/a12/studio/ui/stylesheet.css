@@ -565,3 +565,15 @@
     -fx-font-size: 11px;
     -fx-fill: -fx-text-color-secondary;
 }
+
+#bookmarkList .list-cell:filled:selected,
+#bookmarkList .list-cell:filled:selected:focused,
+#bookmarkList .list-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+}
+
+#bookmarkList .list-cell:filled:selected .bookmark-cell-name,
+#bookmarkList .list-cell:filled:selected .bookmark-cell-path {
+    -fx-fill: -fx-text-color-inverse;
+}

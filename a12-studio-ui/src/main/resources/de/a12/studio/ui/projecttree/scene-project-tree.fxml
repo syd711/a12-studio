@@ -61,7 +61,7 @@
                       <Separator orientation="VERTICAL" />
                       <Button fx:id="collapseProjectViewButton" accessibleText="%collapse_project_view" mnemonicParsing="false" onAction="#onCollapseProjectView" styleClass="default-button">
                           <graphic>
-                              <FontIcon iconLiteral="mdi2p-panel-left-close" iconSize="18" styleClass="toolbar-icon" />
+                              <FontIcon iconLiteral="mdi2w-window-minimize" iconSize="18" styleClass="toolbar-icon" />
                           </graphic>
                           <tooltip>
                               <Tooltip text="%collapse_project_view" />

@@ -33,6 +33,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -60,7 +61,7 @@ public class RootController implements Initializable, StudioEventListener {
   private MenuBarController menuBarController;
 
   @FXML
-  private Node projectTree;
+  private Pane projectTree;
 
   @FXML
   private ProjectTreeController projectTreeController;
@@ -424,6 +425,7 @@ public class RootController implements Initializable, StudioEventListener {
         bookmarksPanelRoot = loader.load();
         bookmarksPanelController = loader.getController();
         bookmarksPanelController.setOnOpenBookmark(this::openBookmark);
+        bookmarksPanelController.setCollapseProjectViewCallback(this::collapseProjectView);
       } catch (Exception e) {
         log.error("Failed to load bookmarks panel", e);
       }
