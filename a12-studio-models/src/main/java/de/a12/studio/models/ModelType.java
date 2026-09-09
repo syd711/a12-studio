@@ -34,7 +34,7 @@ public enum ModelType {
   DOCUMENT("document", "Document Model", "DM"),
   FORM("form", "Form Model", "FM"),
   MAPPING("mapping", "Mapping Model", "MM"),
-  MASTERDETAIL("module-masterdetail", "Master-Detail Model", "MDM"),
+  MASTERDETAIL("module-masterdetail", "Main-Detail Model", "MDM"),
   OVERVIEW("overview", "Overview Model", "OM"),
   PRINT("print", "Print Model", "PM"),
   QUERY("query", "Query Model", "QM"),

@@ -124,6 +124,39 @@ class MasterDetailModuleGeneratorTest {
     assertEquals("Product_TrM", masterView.get("models").get(0).get("name").asString());
   }
 
+  @Test
+  void generatesRelationshipAndLinkDocumentEditorScenesForTreeType() {
+    MasterDetailModelContent content = new MasterDetailModelContent();
+    content.setType("tree");
+    content.setTreeModel("Company_TM");
+    content.setFormMapping(List.of());
+    content.setRelationshipEditors(List.of(formMapping("Employee_DM", "Employee_FM")));
+    content.setLinkDocumentEditors(List.of(formMapping("LinkFields_DM", "LinkFields_FM")));
+
+    MasterDetailModel masterDetailModel = new MasterDetailModel();
+    masterDetailModel.setContent(content);
+
+    Module module = MasterDetailModuleGenerator.createModule("Company_MDM", masterDetailModel);
+
+    JsonNode scenes = JsonSettings.objectMapper.valueToTree(module).get("flows").get(0).get("scenes");
+    // Master scene, then one relationship-editor scene, then one link-document-editor scene.
+    assertEquals(3, scenes.size());
+
+    JsonNode relationshipScene = scenes.get(1);
+    assertEquals("Company_MDM_Relationship_Employee_DM", relationshipScene.get("name").asString());
+    assertEquals("relationship", relationshipScene.get("matchConditions").get(0).get("mustEqual").asString());
+    assertEquals("Employee_DM", relationshipScene.get("matchConditions").get(2).get("mustEqual").asString());
+    JsonNode relationshipViewAdd = relationshipScene.get("sceneChange").get("onEnter").get(0);
+    assertEquals("MODAL", relationshipViewAdd.get("region").get(0).asString());
+    assertEquals("Employee_FM", relationshipViewAdd.get("models").get(0).get("name").asString());
+
+    JsonNode linkScene = scenes.get(2);
+    assertEquals("Company_MDM_Link_LinkFields_DM", linkScene.get("name").asString());
+    assertEquals("tree", linkScene.get("matchConditions").get(0).get("mustEqual").asString());
+    assertEquals(true, linkScene.get("matchConditions").get(2).get("isSet").asBoolean());
+    assertEquals("LinkFields_DM", linkScene.get("matchConditions").get(3).get("mustEqual").asString());
+  }
+
   private static MasterDetailModel overviewTypeModel(List<Label> labels, List<FormMapping> formMapping, Integer formWidth) {
     MasterDetailModelContent content = new MasterDetailModelContent();
     content.setType("overview");

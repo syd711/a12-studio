@@ -12,9 +12,13 @@ import java.util.Map;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"type", "name", "constraints", "models", "configuration", "loadData"})
+@JsonPropertyOrder({"type", "region", "name", "constraints", "models", "configuration", "loadData"})
 public class ViewAddDirective extends Directive {
 
+  // The named region(s) of the current layout to add the view to, e.g. ["MODAL"] to pop the view up instead
+  // of placing it in the layout's regular regions; unset means the layout's default region for this view.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<String> region = new ArrayList<>();
   // Name of the UI component to show in the view; resolved by looking up a matching UI component registered
   // in the application code (e.g. "OverviewEngine", "FormEngine", "TreeEngine").
   private String name;

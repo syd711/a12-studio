@@ -36,8 +36,13 @@ class MasterDetailValidatorsTest {
     MasterDetailModel model = TestModels.load("/masterdetailmodel/MasterDetailReferenceValidator_tree_invalid.json", MasterDetailModel.class);
     List<ModelValidationError> errors = new MasterDetailReferenceValidator().validate(model, TestModels.context(model));
 
-    // Missing tree model + missing document model + missing form model in the mapping.
-    assertEquals(3, errors.size());
+    // Missing tree model + missing document/form model in each of formMapping, relationshipEditors and
+    // linkDocumentEditors (2 errors per list).
+    assertEquals(7, errors.size());
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Missing_Rel_DM")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Missing_Rel_FM")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Missing_Link_DM")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Missing_Link_FM")));
   }
 
   @Test

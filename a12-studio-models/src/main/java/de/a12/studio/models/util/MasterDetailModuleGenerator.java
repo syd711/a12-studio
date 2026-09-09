@@ -58,6 +58,18 @@ public final class MasterDetailModuleGenerator {
     for (FormMapping mapping : content.getFormMapping()) {
       flow.getScenes().add(createDetailScene(id, type, mapping, content.getFormWidth()));
     }
+    if (TYPE_TREE.equals(type)) {
+      if (content.getRelationshipEditors() != null) {
+        for (FormMapping mapping : content.getRelationshipEditors()) {
+          flow.getScenes().add(createRelationshipEditorScene(id, mapping));
+        }
+      }
+      if (content.getLinkDocumentEditors() != null) {
+        for (FormMapping mapping : content.getLinkDocumentEditors()) {
+          flow.getScenes().add(createLinkDocumentEditorScene(id, mapping));
+        }
+      }
+    }
 
     Module module = new Module();
     module.setName(id + "Module");
@@ -107,6 +119,43 @@ public final class MasterDetailModuleGenerator {
     scene.setSceneChange(sceneChange(null,
         viewAdd("FormEngine", constraints, modelDescriptor("form", mapping.getFormModel(), mapping.getDocumentModel()))));
     return scene;
+  }
+
+  /** SME: {@code createRelationshipEditorScene} — pops up the child relationship binding form for {@code mapping}'s Document Model. */
+  private static Scene createRelationshipEditorScene(String id, FormMapping mapping) {
+    Scene scene = new Scene();
+    scene.setName(id + "_Relationship_" + mapping.getDocumentModel());
+    scene.setDescription("Child relationship editor for " + id + ": " + mapping.getDocumentModel());
+    scene.setPriorScene(id + "Overview");
+    scene.setMatchConditions(List.of(
+        mustEqual("engine", "relationship"),
+        isSet("instance", true),
+        mustEqual("model", mapping.getDocumentModel())));
+    scene.setSceneChange(sceneChange(null, modalViewAdd(mapping.getFormModel())));
+    return scene;
+  }
+
+  /** SME: {@code createLinkDocumentEditorScene} — pops up the "Additional Link Fields" form for {@code mapping}'s link Document Model. */
+  private static Scene createLinkDocumentEditorScene(String id, FormMapping mapping) {
+    Scene scene = new Scene();
+    scene.setName(id + "_Link_" + mapping.getDocumentModel());
+    scene.setDescription("Link fields editor for " + id + ": " + mapping.getDocumentModel());
+    scene.setPriorScene(id + "Overview");
+    scene.setMatchConditions(List.of(
+        mustEqual("engine", TYPE_TREE),
+        isSet("instance", true),
+        isSet("linkForm", true),
+        mustEqual("model", mapping.getDocumentModel())));
+    scene.setSceneChange(sceneChange(null, modalViewAdd(mapping.getFormModel())));
+    return scene;
+  }
+
+  private static ViewAddDirective modalViewAdd(String formModel) {
+    ViewAddDirective directive = new ViewAddDirective();
+    directive.setName("FormEngine");
+    directive.setRegion(List.of("MODAL"));
+    directive.setModels(List.of(modelDescriptor("form", formModel, null)));
+    return directive;
   }
 
   private static RegionClearDirective regionClear() {

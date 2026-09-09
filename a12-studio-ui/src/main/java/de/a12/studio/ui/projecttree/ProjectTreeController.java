@@ -132,6 +132,16 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     refreshNode(event.getItem().getModel());
   }
 
+  @Override
+  public void bookmarksChanged(@NonNull BookmarksChangedEvent event) {
+    // The "Lesezeichen"/bookmark context menu item's label and icon are computed from bookmark state
+    // when ProjectTreeContextMenu.create() runs, but that only happens on TreeCell.updateItem() - see
+    // the comment in refreshNode() about TreeView#refresh() being the only reliable way to force that.
+    if (project != null) {
+      projectTree.refresh();
+    }
+  }
+
   /**
    * Revalidates {@code model} plus every other model in the project, and redraws the tree if any of their
    * error sets actually changed as a result - not just {@code model}'s own. Several validators consult other

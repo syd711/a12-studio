@@ -17,6 +17,18 @@
         "documentModel": "Missing_DM",
         "formModel": "Missing_FM"
       }
+    ],
+    "relationshipEditors": [
+      {
+        "documentModel": "Missing_Rel_DM",
+        "formModel": "Missing_Rel_FM"
+      }
+    ],
+    "linkDocumentEditors": [
+      {
+        "documentModel": "Missing_Link_DM",
+        "formModel": "Missing_Link_FM"
+      }
     ]
   }
 }

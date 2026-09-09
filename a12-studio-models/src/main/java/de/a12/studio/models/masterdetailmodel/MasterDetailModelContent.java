@@ -23,4 +23,11 @@ public class MasterDetailModelContent {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer formWidth;
   private List<FormMapping> formMapping = new ArrayList<>();
+  // Tree-type only (mirrors SME's MasterDetailTree.relationshipEditors/linkDocumentEditors): null for
+  // "overview"-type files so they stay byte-for-byte unchanged, an empty/populated list once the type is
+  // "tree" (SME serializes an explicit "[]" rather than omitting the key in that case).
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private List<FormMapping> relationshipEditors;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private List<FormMapping> linkDocumentEditors;
 }

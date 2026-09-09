@@ -45,7 +45,23 @@ public final class MasterDetailReferenceValidator implements ModelValidator {
           ValidationMessages.get("validation.masterDetailReference.treeNotFound", treeModel), Severity.ERROR.name()));
     }
 
-    for (FormMapping mapping : masterDetailModel.getContent().getFormMapping()) {
+    errors.addAll(validateMappings(model, context, masterDetailModel.getContent().getFormMapping()));
+    if (masterDetailModel.getContent().getRelationshipEditors() != null) {
+      errors.addAll(validateMappings(model, context, masterDetailModel.getContent().getRelationshipEditors()));
+    }
+    if (masterDetailModel.getContent().getLinkDocumentEditors() != null) {
+      errors.addAll(validateMappings(model, context, masterDetailModel.getContent().getLinkDocumentEditors()));
+    }
+    return errors;
+  }
+
+  /**
+   * Shared by {@code content.formMapping} and, for a tree-type module, {@code content.relationshipEditors}/
+   * {@code content.linkDocumentEditors} — every one of them is a plain Document Model / Form Model mapping.
+   */
+  private List<ModelValidationError> validateMappings(A12Model<?> model, ValidationContext context, List<FormMapping> mappings) {
+    List<ModelValidationError> errors = new ArrayList<>();
+    for (FormMapping mapping : mappings) {
       if (mapping.getDocumentModel() != null && !mapping.getDocumentModel().isBlank()
           && context.findOtherDocumentModel(mapping.getDocumentModel()) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
