@@ -355,3 +355,13 @@
     -fx-icon-color: #c0392b !important;
     -fx-fill: #c0392b !important;
 }
+/**
+ * ToggleButton selected state for action-button / default-button (e.g. bookmark toggle in editor toolbar).
+ */
+.action-button:selected, .default-button:selected {
+    -fx-background-color: derive(-fx-panel-color, -10%);
+}
+
+.action-button:selected .toolbar-icon, .default-button:selected .toolbar-icon {
+    -fx-icon-color: -fx-accent-color;
+}

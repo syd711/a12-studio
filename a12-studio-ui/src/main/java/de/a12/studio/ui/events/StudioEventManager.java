@@ -124,6 +124,13 @@ public class StudioEventManager {
     }
   }
 
+  public void fireBookmarksChangedEvent() {
+    BookmarksChangedEvent event = new BookmarksChangedEvent();
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.bookmarksChanged(event);
+    }
+  }
+
   public void fireTabSelectionChangedEvent(ProjectItem projectItem) {
     TabSelectionChangedEvent event = new TabSelectionChangedEvent(projectItem);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {

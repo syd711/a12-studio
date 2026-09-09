@@ -7,6 +7,9 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
@@ -52,6 +55,16 @@
                           </graphic>
                           <tooltip>
                               <Tooltip text="%collapse_all_project_tree" />
+                          </tooltip>
+                      </Button>
+                      <Region HBox.hgrow="ALWAYS" />
+                      <Separator orientation="VERTICAL" />
+                      <Button fx:id="collapseProjectViewButton" accessibleText="%collapse_project_view" mnemonicParsing="false" onAction="#onCollapseProjectView" styleClass="default-button">
+                          <graphic>
+                              <FontIcon iconLiteral="mdi2p-panel-left-close" iconSize="18" styleClass="toolbar-icon" />
+                          </graphic>
+                          <tooltip>
+                              <Tooltip text="%collapse_project_view" />
                           </tooltip>
                       </Button>
                   </items>

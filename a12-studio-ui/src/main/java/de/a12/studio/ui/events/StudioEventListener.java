@@ -58,4 +58,8 @@ public interface StudioEventListener {
   default void tabSelectionChanged(@NonNull TabSelectionChangedEvent event) {
 
   }
+
+  default void bookmarksChanged(@NonNull BookmarksChangedEvent event) {
+
+  }
 }

@@ -552,3 +552,16 @@
     -fx-font-size: 12px;
     -fx-text-fill: -fx-text-muted;
 }
+
+/* -----------------------------------------------------------------------
+ * Bookmark list cells
+ * --------------------------------------------------------------------- */
+.bookmark-cell-name {
+    -fx-font-size: 13px;
+    -fx-fill: -fx-text-color;
+}
+
+.bookmark-cell-path {
+    -fx-font-size: 11px;
+    -fx-fill: -fx-text-color-secondary;
+}

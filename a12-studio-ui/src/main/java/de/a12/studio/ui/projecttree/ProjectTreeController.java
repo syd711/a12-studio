@@ -58,6 +58,18 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private Map<String, List<ModelValidationError>> validationErrorsByPath = new HashMap<>();
   private final Map<Button, IProjectToolbarButtonContribution> pluginToolbarButtons = new LinkedHashMap<>();
   private Separator pluginToolbarSeparator;
+  private Runnable collapseProjectViewCallback;
+
+  public void setCollapseProjectViewCallback(Runnable callback) {
+    this.collapseProjectViewCallback = callback;
+  }
+
+  @FXML
+  private void onCollapseProjectView() {
+    if (collapseProjectViewCallback != null) {
+      collapseProjectViewCallback.run();
+    }
+  }
 
   @FXML
   private void onExpandAll() {
