@@ -135,12 +135,15 @@ public class RootController implements Initializable, StudioEventListener {
 
     // Restore which side panel (Project View / Bookmarks) was open in the last session. The panel
     // itself is shown later, once a project is open (see projectOpened()) - here we only restore
-    // the toggle button selection so projectOpened() knows which panel to show.
+    // the toggle button selection so projectOpened() knows which panel to show. Both toggles must
+    // be explicitly set (not just the selected one) since projectViewToggle defaults to
+    // selected="true" in scene-root.fxml, which would otherwise stick around for a saved
+    // "bookmarks"/"none" state. A null sidePanel (first launch, nothing saved yet) leaves the
+    // FXML defaults - project view expanded - untouched.
     String sidePanel = LocalUISettings.getString(LocalUISettings.SIDE_PANEL);
-    if ("bookmarks".equals(sidePanel)) {
-      bookmarksToggle.setSelected(true);
-    } else if ("project".equals(sidePanel)) {
-      projectViewToggle.setSelected(true);
+    if (sidePanel != null) {
+      projectViewToggle.setSelected("project".equals(sidePanel));
+      bookmarksToggle.setSelected("bookmarks".equals(sidePanel));
     }
 
     // Install file-drop handlers on the root stack so the overlay covers the entire window.

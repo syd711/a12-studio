@@ -18,7 +18,7 @@
         <VBox BorderPane.alignment="CENTER">
             <ToolBar prefHeight="40.0" prefWidth="200.0">
                 <items>
-                    <Button accessibleText="%bookmark_rename" mnemonicParsing="false"
+                    <Button fx:id="renameButton" accessibleText="%bookmark_rename" mnemonicParsing="false"
                             onAction="#onRename" styleClass="default-button">
                         <graphic>
                             <FontIcon iconLiteral="mdi2r-rename-box" iconSize="18" styleClass="toolbar-icon" />
@@ -27,7 +27,7 @@
                             <Tooltip text="%bookmark_rename" />
                         </tooltip>
                     </Button>
-                    <Button accessibleText="%bookmark_delete" mnemonicParsing="false"
+                    <Button fx:id="deleteButton" accessibleText="%bookmark_delete" mnemonicParsing="false"
                             onAction="#onDelete" styleClass="default-button">
                         <graphic>
                             <FontIcon iconLiteral="mdi2d-delete-outline" iconSize="18" styleClass="toolbar-icon" />
@@ -37,7 +37,6 @@
                         </tooltip>
                     </Button>
                     <Region HBox.hgrow="ALWAYS" />
-                    <Separator orientation="VERTICAL" />
                     <Button fx:id="collapseProjectViewButton" accessibleText="%collapse_project_view" mnemonicParsing="false"
                             onAction="#onCollapseProjectView" styleClass="default-button">
                         <graphic>

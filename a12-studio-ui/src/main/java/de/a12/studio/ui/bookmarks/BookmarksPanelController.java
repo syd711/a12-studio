@@ -8,6 +8,7 @@ import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -32,6 +33,12 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
 
   @FXML
   private ListView<Bookmark> bookmarkList;
+
+  @FXML
+  private Button renameButton;
+
+  @FXML
+  private Button deleteButton;
 
   private Consumer<Bookmark> onOpenBookmark;
   private Runnable collapseProjectViewCallback;
@@ -67,6 +74,8 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
         onDelete();
       }
     });
+    renameButton.disableProperty().bind(bookmarkList.getSelectionModel().selectedItemProperty().isNull());
+    deleteButton.disableProperty().bind(bookmarkList.getSelectionModel().selectedItemProperty().isNull());
     refresh();
     StudioEventManager.getInstance().addListener(this);
   }

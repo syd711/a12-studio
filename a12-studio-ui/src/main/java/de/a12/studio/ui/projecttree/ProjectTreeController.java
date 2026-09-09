@@ -360,7 +360,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       return;
     }
     pluginToolbarSeparator = new Separator(Orientation.VERTICAL);
-    projectToolbar.getItems().add(projectToolbar.getItems().size() -3, pluginToolbarSeparator);
+    projectToolbar.getItems().add(projectToolbar.getItems().size() -1, pluginToolbarSeparator);
     for (IProjectToolbarButtonContribution contribution : contributions) {
       Button button = new Button();
       button.setMnemonicParsing(false);
@@ -376,7 +376,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
           contribution.execute(getStage(), project);
         }
       });
-      projectToolbar.getItems().add(projectToolbar.getItems().size() -3, button);
+      projectToolbar.getItems().add(projectToolbar.getItems().size() -2, button);
       pluginToolbarButtons.put(button, contribution);
     }
     refreshPluginToolbarButtonVisibility();
