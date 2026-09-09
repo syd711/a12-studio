@@ -52,3 +52,39 @@
 .tool-bar.panel-toolbar .search-field {
     -fx-background-color: white;
 }
+
+/**
+ * Activity bar – narrow vertical toolbar to the left of the main split pane.
+ */
+.activity-bar {
+    -fx-background-color: -fx-chrome-bg;
+    -fx-border-color: transparent -fx-border-subtle transparent transparent;
+    -fx-border-width: 0 1px 0 0;
+    -fx-padding: 6px 4px;
+    -fx-spacing: 4px;
+}
+
+.activity-bar-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-border-width: 0;
+    -fx-pref-width: 36px;
+    -fx-pref-height: 36px;
+    -fx-min-width: 36px;
+    -fx-min-height: 36px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.activity-bar-button:hover {
+    -fx-background-color: derive(-fx-chrome-bg, -8%);
+}
+
+.activity-bar-button:selected {
+    -fx-background-color: derive(-fx-chrome-bg, -14%);
+}
+
+.activity-bar-button:selected .toolbar-icon {
+    -fx-icon-color: -fx-accent-color;
+}

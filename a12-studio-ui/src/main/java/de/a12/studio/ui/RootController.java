@@ -23,7 +23,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -55,6 +57,9 @@ public class RootController implements Initializable, StudioEventListener {
   private MenuBarController menuBarController;
 
   @FXML
+  private Node projectTree;
+
+  @FXML
   private ProjectTreeController projectTreeController;
 
   @FXML
@@ -71,6 +76,9 @@ public class RootController implements Initializable, StudioEventListener {
 
   @FXML
   private VBox fileDropZone;
+
+  @FXML
+  private ToggleButton projectViewToggle;
 
   // --- Docked console panel ---
 
@@ -98,6 +106,8 @@ public class RootController implements Initializable, StudioEventListener {
         project.getSettings().getUISettings().save();
       }
     });
+
+    projectTreeController.setCollapseProjectViewCallback(this::collapseProjectView);
 
     consolePanelController.setOnMinimize(this::minimizeConsole);
     consolePanelController.setOnUndock(this::undockConsole);
@@ -328,6 +338,32 @@ public class RootController implements Initializable, StudioEventListener {
     }
   }
 
+  // --- Project view toggle ---
+
+  private void collapseProjectView() {
+    projectViewToggle.setSelected(false);
+    setProjectViewVisible(false);
+  }
+
+  @FXML
+  private void onProjectViewToggle() {
+    setProjectViewVisible(projectViewToggle.isSelected());
+  }
+
+  private void setProjectViewVisible(boolean visible) {
+    if (visible) {
+      if (!mainSplitPane.getItems().contains(projectTree)) {
+        mainSplitPane.getItems().add(0, projectTree);
+        double dividerPosition = project != null
+            ? project.getSettings().getUISettings().getDividerPosition()
+            : 0.3;
+        Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
+      }
+    } else {
+      mainSplitPane.getItems().remove(projectTree);
+    }
+  }
+
   // --- Project lifecycle ---
 
   @Override
@@ -336,6 +372,10 @@ public class RootController implements Initializable, StudioEventListener {
     this.mainSplitPane.setManaged(true);
     this.project = event.getProject();
     consolePanelController.setProject(project);
+    // Ensure project tree panel matches current toggle state
+    if (projectViewToggle.isSelected() && !mainSplitPane.getItems().contains(projectTree)) {
+      mainSplitPane.getItems().add(0, projectTree);
+    }
     double dividerPosition = project.getSettings().getUISettings().getDividerPosition();
     Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
   }
