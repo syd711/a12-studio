@@ -95,6 +95,7 @@ abstract public class AbstractEditorController implements StudioEventListener {
 
     if (fileToolbarButtonsController != null) {
       fileToolbarButtonsController.setFileSupplier(() -> projectItem.getFile());
+      fileToolbarButtonsController.setProjectItemSupplier(() -> this.projectItem);
     }
 
     if (settingsToolbarButtonController != null) {

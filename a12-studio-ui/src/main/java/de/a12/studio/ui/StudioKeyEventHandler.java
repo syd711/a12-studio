@@ -29,6 +29,7 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
    * shortcut is added to {@link #handle(KeyEvent)}, add a matching entry here.
    */
   public static final List<Shortcut> SHORTCUTS = List.of(
+      new Shortcut(StudioBundle.get("ctrl_b"), StudioBundle.get("toggle_bookmarks_view")),
       new Shortcut(StudioBundle.get("ctrl_n"), StudioBundle.get("new_project")),
       new Shortcut(StudioBundle.get("ctrl_o"), StudioBundle.get("open_project")),
       new Shortcut(StudioBundle.get("ctrl_s"), StudioBundle.get("save_the_active_model")),
@@ -81,7 +82,11 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       return;
     }
 
-    if (ke.getCode() == KeyCode.U && ke.isAltDown() && ke.isControlDown()) {
+    if (ke.getCode() == KeyCode.B && ke.isControlDown()) {
+      Studio.getRootController().toggleBookmarks();
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.U && ke.isAltDown() && ke.isControlDown()) {
       Dialogs.openUpdateInfoDialog(StudioVersion.get());
       ke.consume();
     }

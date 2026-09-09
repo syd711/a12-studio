@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
@@ -22,4 +24,13 @@
             <Tooltip text="%open_model_folder" />
         </tooltip>
     </Button>
+    <Separator />
+    <ToggleButton fx:id="bookmarkButton" mnemonicParsing="false" onAction="#onToggleBookmark" styleClass="action-button">
+        <graphic>
+            <FontIcon iconLiteral="mdi2b-bookmark-outline" iconSize="18" styleClass="toolbar-icon" />
+        </graphic>
+        <tooltip>
+            <Tooltip text="%toggle_bookmark" />
+        </tooltip>
+    </ToggleButton>
 </VBox>

@@ -47,6 +47,14 @@
                                                 <Tooltip text="Project View" />
                                              </tooltip>
                                           </ToggleButton>
+                                          <ToggleButton fx:id="bookmarksToggle" styleClass="activity-bar-button" selected="false" mnemonicParsing="false" onAction="#onBookmarksToggle">
+                                             <graphic>
+                                                <FontIcon iconLiteral="mdi2b-bookmark-multiple-outline" iconSize="24" styleClass="toolbar-icon" />
+                                             </graphic>
+                                             <tooltip>
+                                                <Tooltip text="%bookmarks" />
+                                             </tooltip>
+                                          </ToggleButton>
                                        </items>
                                     </ToolBar>
                                     <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" visible="false" managed="false" HBox.hgrow="ALWAYS">

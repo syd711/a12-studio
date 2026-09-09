@@ -9,6 +9,9 @@ import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.bookmarks.Bookmark;
+import de.a12.studio.ui.bookmarks.BookmarkService;
+import de.a12.studio.ui.bookmarks.BookmarksPanelController;
 import de.a12.studio.ui.preferences.PreferencesController;
 import de.a12.studio.ui.previewapp.PreviewAppConsoleDockedController;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
@@ -79,6 +82,13 @@ public class RootController implements Initializable, StudioEventListener {
 
   @FXML
   private ToggleButton projectViewToggle;
+
+  @FXML
+  private ToggleButton bookmarksToggle;
+
+  // Lazily loaded bookmarks panel
+  private Parent bookmarksPanelRoot;
+  private BookmarksPanelController bookmarksPanelController;
 
   // --- Docked console panel ---
 
@@ -342,26 +352,100 @@ public class RootController implements Initializable, StudioEventListener {
 
   private void collapseProjectView() {
     projectViewToggle.setSelected(false);
-    setProjectViewVisible(false);
+    bookmarksToggle.setSelected(false);
+    removeSidePanel();
   }
 
   @FXML
   private void onProjectViewToggle() {
-    setProjectViewVisible(projectViewToggle.isSelected());
+    if (projectViewToggle.isSelected()) {
+      bookmarksToggle.setSelected(false);
+      showSidePanel(projectTree);
+    } else {
+      removeSidePanel();
+    }
+  }
+
+  @FXML
+  private void onBookmarksToggle() {
+    if (bookmarksToggle.isSelected()) {
+      projectViewToggle.setSelected(false);
+      showSidePanel(getBookmarksPanelRoot());
+    } else {
+      removeSidePanel();
+    }
+  }
+
+  /** Toggle bookmarks panel from keyboard shortcut (CTRL+B). */
+  public void toggleBookmarks() {
+    boolean show = !bookmarksToggle.isSelected();
+    bookmarksToggle.setSelected(show);
+    projectViewToggle.setSelected(false);
+    if (show) {
+      showSidePanel(getBookmarksPanelRoot());
+    } else {
+      removeSidePanel();
+    }
+  }
+
+  private void showSidePanel(Parent panel) {
+    if (!mainSplitPane.getItems().contains(panel)) {
+      // Remove any currently shown side panel first
+      removeSidePanel();
+      mainSplitPane.getItems().add(0, panel);
+      double pos = project != null
+          ? project.getSettings().getUISettings().getDividerPosition()
+          : 0.3;
+      Platform.runLater(() -> mainSplitPane.setDividerPositions(pos));
+    }
+  }
+
+  private void removeSidePanel() {
+    mainSplitPane.getItems().remove(projectTree);
+    if (bookmarksPanelRoot != null) {
+      mainSplitPane.getItems().remove(bookmarksPanelRoot);
+    }
   }
 
   private void setProjectViewVisible(boolean visible) {
     if (visible) {
-      if (!mainSplitPane.getItems().contains(projectTree)) {
-        mainSplitPane.getItems().add(0, projectTree);
-        double dividerPosition = project != null
-            ? project.getSettings().getUISettings().getDividerPosition()
-            : 0.3;
-        Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
-      }
+      showSidePanel(projectTree);
     } else {
-      mainSplitPane.getItems().remove(projectTree);
+      removeSidePanel();
     }
+  }
+
+  private Parent getBookmarksPanelRoot() {
+    if (bookmarksPanelRoot == null) {
+      try {
+        FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("bookmarks/scene-bookmarks-panel.fxml"),
+            StudioBundle.getBundle());
+        bookmarksPanelRoot = loader.load();
+        bookmarksPanelController = loader.getController();
+        bookmarksPanelController.setOnOpenBookmark(this::openBookmark);
+      } catch (Exception e) {
+        log.error("Failed to load bookmarks panel", e);
+      }
+    }
+    return bookmarksPanelRoot;
+  }
+
+  private void openBookmark(Bookmark bookmark) {
+    if (project == null) return;
+    ProjectItem item = findItemByPath(project.getRoot(), bookmark.getPath());
+    if (item != null) {
+      StudioEventManager.getInstance().fireModelOpenEvent(item);
+    }
+  }
+
+  private ProjectItem findItemByPath(ProjectItem node, String path) {
+    if (path.equals(node.getPath())) return node;
+    for (ProjectItem child : node.getChildren()) {
+      ProjectItem found = findItemByPath(child, path);
+      if (found != null) return found;
+    }
+    return null;
   }
 
   // --- Project lifecycle ---
@@ -372,9 +456,11 @@ public class RootController implements Initializable, StudioEventListener {
     this.mainSplitPane.setManaged(true);
     this.project = event.getProject();
     consolePanelController.setProject(project);
-    // Ensure project tree panel matches current toggle state
-    if (projectViewToggle.isSelected() && !mainSplitPane.getItems().contains(projectTree)) {
-      mainSplitPane.getItems().add(0, projectTree);
+    // Ensure the active side panel is shown
+    if (projectViewToggle.isSelected()) {
+      showSidePanel(projectTree);
+    } else if (bookmarksToggle.isSelected() && bookmarksPanelRoot != null) {
+      showSidePanel(bookmarksPanelRoot);
     }
     double dividerPosition = project.getSettings().getUISettings().getDividerPosition();
     Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));

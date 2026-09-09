@@ -30,6 +30,7 @@ abstract public class AbstractAuthFileEditorController implements StudioEventLis
 
     if (fileToolbarButtonsController != null) {
       fileToolbarButtonsController.setFileSupplier(() -> projectItem.getFile());
+      fileToolbarButtonsController.setProjectItemSupplier(() -> this.projectItem);
     }
 
     StudioEventManager.getInstance().addListener(this);
