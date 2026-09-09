@@ -7,6 +7,7 @@ import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.ModelReferenceRewriter;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
+import de.a12.studio.ui.bookmarks.BookmarkService;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController;
@@ -184,6 +185,10 @@ public class ProjectTreeMenuActions {
     else if (item.getModel() != null) {
       result.add(item);
     }
+  }
+
+  void onToggleBookmark(@NonNull ProjectItem item) {
+    BookmarkService.getInstance().toggle(item);
   }
 
   void onCreateCopy(@NonNull ProjectItem item) {

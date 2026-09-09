@@ -3,6 +3,7 @@ package de.a12.studio.ui.bookmarks;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
  * Singleton that manages the list of bookmarked project items.
  * Bookmarks are persisted via {@link LocalUISettings} as JSON.
  */
+@Slf4j
 public class BookmarkService {
 
   private static final String KEY = "bookmarks";
@@ -96,6 +98,7 @@ public class BookmarkService {
 
   private void save(@NonNull List<Bookmark> bookmarks) {
     LocalUISettings.saveJsonProperty(KEY, bookmarks);
+    log.info("Saved {} bookmark(s) to {}", bookmarks.size(), LocalUISettings.getPropertiesFile().getAbsolutePath());
     StudioEventManager.getInstance().fireBookmarksChangedEvent();
   }
 }

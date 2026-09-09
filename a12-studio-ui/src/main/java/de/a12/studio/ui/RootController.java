@@ -133,6 +133,16 @@ public class RootController implements Initializable, StudioEventListener {
       setConsolePanelVisible(true);
     }
 
+    // Restore which side panel (Project View / Bookmarks) was open in the last session. The panel
+    // itself is shown later, once a project is open (see projectOpened()) - here we only restore
+    // the toggle button selection so projectOpened() knows which panel to show.
+    String sidePanel = LocalUISettings.getString(LocalUISettings.SIDE_PANEL);
+    if ("bookmarks".equals(sidePanel)) {
+      bookmarksToggle.setSelected(true);
+    } else if ("project".equals(sidePanel)) {
+      projectViewToggle.setSelected(true);
+    }
+
     // Install file-drop handlers on the root stack so the overlay covers the entire window.
     installFileDropHandlers();
   }
@@ -355,6 +365,7 @@ public class RootController implements Initializable, StudioEventListener {
     projectViewToggle.setSelected(false);
     bookmarksToggle.setSelected(false);
     removeSidePanel();
+    saveSidePanelState();
   }
 
   @FXML
@@ -365,6 +376,7 @@ public class RootController implements Initializable, StudioEventListener {
     } else {
       removeSidePanel();
     }
+    saveSidePanelState();
   }
 
   @FXML
@@ -375,6 +387,7 @@ public class RootController implements Initializable, StudioEventListener {
     } else {
       removeSidePanel();
     }
+    saveSidePanelState();
   }
 
   /** Toggle bookmarks panel from keyboard shortcut (CTRL+B). */
@@ -387,6 +400,13 @@ public class RootController implements Initializable, StudioEventListener {
     } else {
       removeSidePanel();
     }
+    saveSidePanelState();
+  }
+
+  /** Persists which side panel (Project View / Bookmarks / none) is currently shown, so it can be restored on next startup. */
+  private void saveSidePanelState() {
+    String state = projectViewToggle.isSelected() ? "project" : bookmarksToggle.isSelected() ? "bookmarks" : "none";
+    LocalUISettings.saveProperty(LocalUISettings.SIDE_PANEL, state);
   }
 
   private void showSidePanel(Parent panel) {
@@ -461,8 +481,8 @@ public class RootController implements Initializable, StudioEventListener {
     // Ensure the active side panel is shown
     if (projectViewToggle.isSelected()) {
       showSidePanel(projectTree);
-    } else if (bookmarksToggle.isSelected() && bookmarksPanelRoot != null) {
-      showSidePanel(bookmarksPanelRoot);
+    } else if (bookmarksToggle.isSelected()) {
+      showSidePanel(getBookmarksPanelRoot());
     }
     double dividerPosition = project.getSettings().getUISettings().getDividerPosition();
     Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));

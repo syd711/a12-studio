@@ -33,6 +33,13 @@ public class LocalUISettings {
   /** Whether the docked preview app console panel is shown (vs. minimized); see RootController. */
   public static final String CONSOLE_VISIBLE = "consoleVisible";
 
+  /** Which side panel (Project View / Bookmarks) is shown in the main window: "project", "bookmarks", or "none"; see RootController. */
+  public static final String SIDE_PANEL = "sidePanel";
+
+  public static File getPropertiesFile() {
+    return propertiesFile;
+  }
+
   private static PropertiesStore store;
 
   private static List<LocalSettingsChangeListener> listeners;

@@ -53,7 +53,7 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    bookmarkList.setCellFactory(lv -> new BookmarkCell(this::deleteBookmark));
+    bookmarkList.setCellFactory(lv -> new BookmarkCell(this::openBookmark, this::deleteBookmark));
     bookmarkList.setOnMouseClicked(event -> {
       if (event.getClickCount() == 2) {
         Bookmark selected = bookmarkList.getSelectionModel().getSelectedItem();
@@ -100,11 +100,26 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
   private void onDelete() {
     Bookmark selected = bookmarkList.getSelectionModel().getSelectedItem();
     if (selected == null) return;
-    deleteBookmark(selected);
+
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(getStage(),
+        StudioBundle.get("confirm_delete_bookmark", selected.getDisplayName()), null, null, StudioBundle.get("bookmark_delete"));
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+      deleteBookmark(selected);
+    }
   }
 
   private void deleteBookmark(@NonNull Bookmark bookmark) {
     BookmarkService.getInstance().delete(bookmark);
+  }
+
+  private void openBookmark(@NonNull Bookmark bookmark) {
+    if (onOpenBookmark != null) {
+      onOpenBookmark.accept(bookmark);
+    }
+  }
+
+  private Stage getStage() {
+    return (Stage) bookmarkList.getScene().getWindow();
   }
 
   // -----------------------------------------------------------------------
@@ -116,9 +131,11 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
     private final Text nameText = new Text();
     private final Text pathText = new Text();
     private final TextFlow flow;
+    private final Consumer<Bookmark> onOpen;
     private final Consumer<Bookmark> onDelete;
 
-    BookmarkCell(Consumer<Bookmark> onDelete) {
+    BookmarkCell(Consumer<Bookmark> onOpen, Consumer<Bookmark> onDelete) {
+      this.onOpen = onOpen;
       this.onDelete = onDelete;
       nameText.getStyleClass().add("bookmark-cell-name");
       pathText.getStyleClass().add("bookmark-cell-path");
@@ -143,12 +160,18 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
     }
 
     private ContextMenu createContextMenu(Bookmark bookmark) {
+      FontIcon openIcon = WidgetFactory.createIcon(Icons.OPEN_IN_NEW);
+      openIcon.getStyleClass().add("menu-icon");
+      MenuItem openItem = new MenuItem(StudioBundle.get("open"), openIcon);
+      openItem.setOnAction(event -> onOpen.accept(bookmark));
+
       FontIcon deleteIcon = WidgetFactory.createIcon(Icons.TRASH);
       deleteIcon.getStyleClass().add("menu-icon");
       MenuItem deleteItem = new MenuItem(StudioBundle.get("delete"), deleteIcon);
       deleteItem.setOnAction(event -> onDelete.accept(bookmark));
+
       ContextMenu contextMenu = new ContextMenu();
-      contextMenu.getItems().add(deleteItem);
+      contextMenu.getItems().addAll(openItem, deleteItem);
       return contextMenu;
     }
   }

@@ -41,7 +41,7 @@
                                        <items>
                                           <ToggleButton fx:id="projectViewToggle" styleClass="activity-bar-button" selected="true" mnemonicParsing="false" onAction="#onProjectViewToggle">
                                              <graphic>
-                                                <FontIcon iconLiteral="mdi2f-file-tree" iconSize="24" styleClass="toolbar-icon" />
+                                                <FontIcon iconLiteral="mdi2f-file-tree" iconSize="18" styleClass="toolbar-icon" />
                                              </graphic>
                                              <tooltip>
                                                 <Tooltip text="%project_view" />
@@ -49,7 +49,7 @@
                                           </ToggleButton>
                                           <ToggleButton fx:id="bookmarksToggle" styleClass="activity-bar-button" selected="false" mnemonicParsing="false" onAction="#onBookmarksToggle">
                                              <graphic>
-                                                <FontIcon iconLiteral="mdi2b-bookmark-multiple-outline" iconSize="24" styleClass="toolbar-icon" />
+                                                <FontIcon iconLiteral="mdi2b-bookmark-multiple-outline" iconSize="18" styleClass="toolbar-icon" />
                                              </graphic>
                                              <tooltip>
                                                 <Tooltip text="%bookmarks" />

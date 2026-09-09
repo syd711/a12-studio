@@ -2,6 +2,7 @@ package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
 import de.a12.studio.plugin.manager.PluginManager;
+import de.a12.studio.ui.bookmarks.BookmarkService;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.ModelType;
@@ -80,6 +81,12 @@ class ProjectTreeContextMenu {
     open.setDisable(viewModel.isFolder());
     open.setOnAction(event -> actions.onOpenItem(viewModel));
 
+    boolean isBookmarked = !viewModel.isFolder() && BookmarkService.getInstance().isBookmarked(projectItem);
+    MenuItem bookmark = new MenuItem(StudioBundle.get(isBookmarked ? "bookmark_delete" : "bookmark"));
+    bookmark.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(isBookmarked ? "mdi2b-bookmark" : "mdi2b-bookmark-outline")));
+    bookmark.setDisable(projectItem.isRoot() || viewModel.isFolder() || viewModel.isSettings() || viewModel.isAuthFile());
+    bookmark.setOnAction(event -> actions.onToggleBookmark(projectItem));
+
     MenuItem rename = new MenuItem(StudioBundle.get("rename"));
     rename.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     rename.setOnAction(event -> actions.onRenameItem(projectItem));
@@ -99,7 +106,7 @@ class ProjectTreeContextMenu {
     delete.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     delete.setOnAction(event -> actions.onDeleteItem(projectItem));
 
-    return new ContextMenu(newMenu, open, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
+    return new ContextMenu(newMenu, open, bookmark, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
   }
 
   private static Node withMenuIconStyle(@NonNull Node icon) {

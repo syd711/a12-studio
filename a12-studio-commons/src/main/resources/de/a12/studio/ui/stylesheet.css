@@ -557,7 +557,7 @@
  * Bookmark list cells
  * --------------------------------------------------------------------- */
 .bookmark-cell-name {
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
     -fx-fill: -fx-text-color;
 }
 
