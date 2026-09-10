@@ -25,8 +25,16 @@ Document Model:
 - check references in error messages using the $$ notation
 - Check the tree update after moving groups or creating validation rules
 - Check validation rules for repeatable groups and field not filled. kcp3
+- Validate: Document Models that should be connected via a Relationship must possess only one root group each. 
 
 Application Model
 - move Model references up
 
+Additive Document Model:
+There's no dedicated ADDITIVE model type — additive models referenced in CombinationStep.additiveModel are plain DocumentModels (via DocumentModelIdRef). The superTypes annotation can be placed on those to declare their relationship. So "additive document model" in the CDM context just means a regular DM used as an additive step — the heterogeneity panel already covers it since it shows on DocumentModel. No separate handling needed; what's missing is just a TODO note to verify the filter also covers those DMs if someone opens their settings.
 
+One note on the "additive document model" concern: there's no separate model type for it — a CDM's additive steps reference plain DocumentModels via DocumentModelIdRef. The superTypes annotation can legitimately live on those DMs (declaring upward parentage), and the filter in AnnotationsPanelController already covers all DocumentModel instances. The TODO captures the one thing worth manually verifying: that when such a DM is opened standalone in its own editor tab, the raw annotations panel correctly hides the heterogeneity annotations there too — which it should, since the filter keys off model instanceof DocumentModel, not off how the model is being used in a CDM.
+
+Relationship Models:
+The Link Document Model reference and the checkbox "Duplicable" are only active for n:n Relationships. The Relationship Model Editor shows a warning if a 1:n or 1:1 Relationship Model has a Link Document Model or Duplicable set. 
+The labels which can be maintained for the Relationship Model are currently not used in the default UI for Relationships. => Hide them in the settings.
