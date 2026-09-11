@@ -4,9 +4,11 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.plugin.manager.IFileDropHandler;
 import de.a12.studio.plugin.manager.PluginManager;
+import de.a12.studio.models.projects.settings.VersionControlSettings;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
+import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.bookmarks.Bookmark;
@@ -20,6 +22,8 @@ import de.a12.studio.ui.tabs.TabPaneController;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
+import de.a12.studio.ui.versioncontrol.GitService;
+import de.a12.studio.ui.versioncontrol.VersioncontrolPanelController;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -91,9 +95,16 @@ public class RootController implements Initializable, StudioEventListener {
   @FXML
   private ToggleButton bookmarksToggle;
 
+  @FXML
+  private ToggleButton versioncontrolToggle;
+
   // Lazily loaded bookmarks panel
   private Parent bookmarksPanelRoot;
   private BookmarksPanelController bookmarksPanelController;
+
+  // Lazily loaded versioncontrol panel
+  private Parent versioncontrolPanelRoot;
+  private VersioncontrolPanelController versioncontrolPanelController;
 
   // --- Docked console panel ---
 
@@ -148,6 +159,7 @@ public class RootController implements Initializable, StudioEventListener {
     if (sidePanel != null) {
       projectViewToggle.setSelected("project".equals(sidePanel));
       bookmarksToggle.setSelected("bookmarks".equals(sidePanel));
+      versioncontrolToggle.setSelected("versioncontrol".equals(sidePanel));
     }
 
     // Install file-drop handlers on the root stack so the overlay covers the entire window.
@@ -371,6 +383,7 @@ public class RootController implements Initializable, StudioEventListener {
   private void collapseProjectView() {
     projectViewToggle.setSelected(false);
     bookmarksToggle.setSelected(false);
+    versioncontrolToggle.setSelected(false);
     removeSidePanel();
     saveSidePanelState();
   }
@@ -379,6 +392,7 @@ public class RootController implements Initializable, StudioEventListener {
   private void onProjectViewToggle() {
     if (projectViewToggle.isSelected()) {
       bookmarksToggle.setSelected(false);
+      versioncontrolToggle.setSelected(false);
       showSidePanel(projectTree);
     } else {
       removeSidePanel();
@@ -390,7 +404,20 @@ public class RootController implements Initializable, StudioEventListener {
   private void onBookmarksToggle() {
     if (bookmarksToggle.isSelected()) {
       projectViewToggle.setSelected(false);
+      versioncontrolToggle.setSelected(false);
       showSidePanel(getBookmarksPanelRoot());
+    } else {
+      removeSidePanel();
+    }
+    saveSidePanelState();
+  }
+
+  @FXML
+  private void onVersioncontrolToggle() {
+    if (versioncontrolToggle.isSelected()) {
+      projectViewToggle.setSelected(false);
+      bookmarksToggle.setSelected(false);
+      showSidePanel(getVersioncontrolPanelRoot());
     } else {
       removeSidePanel();
     }
@@ -402,6 +429,7 @@ public class RootController implements Initializable, StudioEventListener {
     boolean show = !bookmarksToggle.isSelected();
     bookmarksToggle.setSelected(show);
     projectViewToggle.setSelected(false);
+    versioncontrolToggle.setSelected(false);
     if (show) {
       showSidePanel(getBookmarksPanelRoot());
     } else {
@@ -410,9 +438,12 @@ public class RootController implements Initializable, StudioEventListener {
     saveSidePanelState();
   }
 
-  /** Persists which side panel (Project View / Bookmarks / none) is currently shown, so it can be restored on next startup. */
+  /** Persists which side panel (Project View / Bookmarks / Versioncontrol / none) is currently shown, so it can be restored on next startup. */
   private void saveSidePanelState() {
-    String state = projectViewToggle.isSelected() ? "project" : bookmarksToggle.isSelected() ? "bookmarks" : "none";
+    String state = projectViewToggle.isSelected() ? "project"
+        : bookmarksToggle.isSelected() ? "bookmarks"
+        : versioncontrolToggle.isSelected() ? "versioncontrol"
+        : "none";
     LocalUISettings.saveProperty(LocalUISettings.SIDE_PANEL, state);
   }
 
@@ -432,6 +463,9 @@ public class RootController implements Initializable, StudioEventListener {
     mainSplitPane.getItems().remove(projectTree);
     if (bookmarksPanelRoot != null) {
       mainSplitPane.getItems().remove(bookmarksPanelRoot);
+    }
+    if (versioncontrolPanelRoot != null) {
+      mainSplitPane.getItems().remove(versioncontrolPanelRoot);
     }
   }
 
@@ -468,6 +502,24 @@ public class RootController implements Initializable, StudioEventListener {
     }
   }
 
+  private Parent getVersioncontrolPanelRoot() {
+    if (versioncontrolPanelRoot == null) {
+      try {
+        FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("versioncontrol/scene-versioncontrol-panel.fxml"),
+            StudioBundle.getBundle());
+        versioncontrolPanelRoot = loader.load();
+        versioncontrolPanelController = loader.getController();
+        versioncontrolPanelController.setCollapseProjectViewCallback(this::collapseProjectView);
+        // Lazily loaded, so it may have missed the ProjectOpenedEvent for an already-open project.
+        versioncontrolPanelController.setProject(project);
+      } catch (Exception e) {
+        log.error("Failed to load versioncontrol panel", e);
+      }
+    }
+    return versioncontrolPanelRoot;
+  }
+
   private ProjectItem findItemByPath(ProjectItem node, String path) {
     if (path.equals(node.getPath())) return node;
     for (ProjectItem child : node.getChildren()) {
@@ -487,11 +539,14 @@ public class RootController implements Initializable, StudioEventListener {
     this.mainSplitPane.setManaged(true);
     this.project = event.getProject();
     consolePanelController.setProject(project);
+    updateVersioncontrolToggleAvailability();
     // Ensure the active side panel is shown
     if (projectViewToggle.isSelected()) {
       showSidePanel(projectTree);
     } else if (bookmarksToggle.isSelected()) {
       showSidePanel(getBookmarksPanelRoot());
+    } else if (versioncontrolToggle.isSelected()) {
+      showSidePanel(getVersioncontrolPanelRoot());
     }
     double dividerPosition = project.getSettings().getUISettings().getDividerPosition();
     Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
@@ -505,6 +560,33 @@ public class RootController implements Initializable, StudioEventListener {
     this.mainSplitPane.setManaged(false);
     this.project = null;
     consolePanelController.setProject(null);
+    versioncontrolToggle.setVisible(false);
+    versioncontrolToggle.setManaged(false);
+  }
+
+  /**
+   * Shows the Versioncontrol activity-bar toggle only when the open project sits inside a git
+   * repository and support hasn't been explicitly disabled in Preferences. Collapses the panel
+   * if it was showing and just became unavailable.
+   */
+  private void updateVersioncontrolToggleAvailability() {
+    boolean available = project != null
+        && GitService.isGitRepository(project.getFolder())
+        && VersionControlSettings.load().isEnabled();
+    versioncontrolToggle.setVisible(available);
+    versioncontrolToggle.setManaged(available);
+    if (!available && versioncontrolToggle.isSelected()) {
+      versioncontrolToggle.setSelected(false);
+      removeSidePanel();
+      saveSidePanelState();
+    }
+  }
+
+  @Override
+  public void settingsChanged(@NonNull SettingsChangedEvent event) {
+    if (event.getSettings() instanceof VersionControlSettings) {
+      updateVersioncontrolToggleAvailability();
+    }
   }
 
   public void setTitle(String s) {

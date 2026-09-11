@@ -2,6 +2,7 @@ package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ModelValidationError;
@@ -67,11 +68,24 @@ public class ProjectItemViewModel {
     if (isSettings() || isAuthFile()) {
       return null; // handled separately in cell (FontIcon, not ImageView)
     }
+    if (isAdditiveDocumentModel()) {
+      return Icons.PNG_MODEL_DOCUMENT_ADDITIVE;
+    }
     ModelType modelType = getModelType();
     if (modelType == null) {
       return null;
     }
     return Icons.forModelType(modelType);
+  }
+
+  /**
+   * Whether this item's model is an {@link AdditiveDocumentModel}, i.e. a Document Model whose header
+   * carries the "additive-document" annotation - shown with a distinct icon ({@link #getIconPath}) and
+   * tooltip ({@code ProjectTreeCell#installModelTypeTooltip}) even though {@link #getModelType()} still
+   * reports plain {@link ModelType#DOCUMENT} (Additive Document Model has no {@link ModelType} of its own).
+   */
+  public boolean isAdditiveDocumentModel() {
+    return projectItem.getModel() instanceof AdditiveDocumentModel;
   }
 
   public ModelType getModelType() {

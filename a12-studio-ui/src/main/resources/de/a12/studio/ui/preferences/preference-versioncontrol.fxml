@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.preferences.PreferenceVersioncontrolController">
+    <top>
+        <VBox BorderPane.alignment="CENTER_LEFT">
+            <children>
+                <Label styleClass="preference-title" text="%a12_studio_settings" />
+                <Label styleClass="preference-subtitle" text="%versioncontrol" />
+            </children>
+            <BorderPane.margin>
+                <Insets bottom="12.0" left="12.0" top="12.0" />
+            </BorderPane.margin>
+        </VBox>
+    </top>
+    <center>
+        <VBox spacing="6.0" BorderPane.alignment="TOP_LEFT">
+            <children>
+                <Label styleClass="field-label" text="%versioncontrol" />
+                <CheckBox fx:id="enabledCheckBox" text="%enable_versioncontrol_support" />
+            </children>
+            <padding>
+                <Insets left="12.0" right="12.0" top="8.0" />
+            </padding>
+        </VBox>
+    </center>
+</BorderPane>

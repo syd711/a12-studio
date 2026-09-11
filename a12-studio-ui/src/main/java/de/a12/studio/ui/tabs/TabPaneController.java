@@ -1,6 +1,7 @@
 package de.a12.studio.ui.tabs;
 
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.EditorFactory;
@@ -182,6 +183,9 @@ public class TabPaneController implements Initializable, StudioEventListener {
     if (model instanceof TypeDefinitionModel) {
       applyModelTabStyle(tab, ModelType.TYPEDEFINITION);
     }
+    else if (model instanceof AdditiveDocumentModel) {
+      applyModelTabStyle(tab, ModelType.DOCUMENT, Icons.PNG_MODEL_DOCUMENT_ADDITIVE);
+    }
     else if (model != null) {
       applyModelTabStyle(tab, model.getModelType());
     }
@@ -225,7 +229,17 @@ public class TabPaneController implements Initializable, StudioEventListener {
    * stays inert when the preference is off.
    */
   private void applyModelTabStyle(@NonNull Tab tab, @NonNull ModelType modelType) {
-    tab.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
+    applyModelTabStyle(tab, modelType, Icons.forModelType(modelType));
+  }
+
+  /**
+   * Same as {@link #applyModelTabStyle(Tab, ModelType)}, but with an explicit icon path instead of the one
+   * {@link Icons#forModelType} derives from {@code modelType} alone - used for an {@link
+   * AdditiveDocumentModel}, which is still a {@link ModelType#DOCUMENT} (so keeps that type's "colorful
+   * studio" tint) but shows a distinct icon.
+   */
+  private void applyModelTabStyle(@NonNull Tab tab, @NonNull ModelType modelType, String iconPath) {
+    tab.setGraphic(WidgetFactory.createModelIcon(iconPath));
     tab.getStyleClass().add("model-tab-" + modelType.name().toLowerCase());
   }
 

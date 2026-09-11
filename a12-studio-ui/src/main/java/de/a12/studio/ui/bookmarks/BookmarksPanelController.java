@@ -13,7 +13,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
@@ -95,14 +94,12 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
     Bookmark selected = bookmarkList.getSelectionModel().getSelectedItem();
     if (selected == null) return;
 
-    TextInputDialog dialog = new TextInputDialog(selected.getDisplayName());
-    dialog.setTitle(StudioBundle.get("bookmark_rename"));
-    dialog.setHeaderText(null);
-    dialog.setContentText(StudioBundle.get("bookmark_rename_prompt"));
-    Optional<String> result = dialog.showAndWait();
-    result.filter(name -> !name.isBlank()).ifPresent(name -> {
+    String title = StudioBundle.get("bookmark_rename");
+    String name = WidgetFactory.showInputDialog(getStage(), title, title, StudioBundle.get("bookmark_rename_prompt"), null,
+        selected.getDisplayName());
+    if (name != null && !name.isBlank()) {
       BookmarkService.getInstance().rename(selected, name.trim());
-    });
+    }
   }
 
   @FXML

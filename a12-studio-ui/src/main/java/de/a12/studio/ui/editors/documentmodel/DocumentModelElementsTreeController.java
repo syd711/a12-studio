@@ -1,11 +1,15 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
@@ -16,7 +20,9 @@ import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.AdditiveDocumentModels;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.CommandStack;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -68,6 +74,12 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private ToolBar modelTreeToolbarBar;
 
   @FXML
+  private ToolBar additiveToolbarBar;
+
+  @FXML
+  private CheckBox additiveElementsOnlyCheckBox;
+
+  @FXML
   private Button undoButton;
 
   @FXML
@@ -107,6 +119,24 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   // children from the Document Model it references (see ElementViewModel#getChildren).
   private List<DocumentModel> otherDocumentModels = List.of();
 
+  // Whether the loaded model is an AdditiveDocumentModel, and (if so) the base Document Model it adds
+  // onto - resolved once per #load via a reverse lookup across Combination Models in the project, see
+  // AdditiveDocumentModels. Null whenever this isn't an Additive Document Model, or no Combination Model
+  // uses it yet.
+  private boolean additive;
+  private DocumentModel referenceBaseModel;
+
+  // A synthetic, non-persisted Include-shaped GroupElement standing in for referenceBaseModel's own root
+  // content, injected as the tree's first top-level row so its elements are shown read-only for editing
+  // context (hidden instead when additiveElementsOnlyCheckBox is checked) - see #applyFilter and
+  // #buildBaseModelNode. Reusing the real Include machinery (ElementViewModel#getChildren resolves an
+  // Include's children from otherDocumentModels, and every read-only/fixed-children check already treats
+  // an Include's descendants as belonging to another model) means this needs no separate "foreign element"
+  // plumbing of its own - only a handful of call sites below additionally exclude the synthetic node
+  // *itself* (identity-compared) from being selected/cut/renamed/dropped-onto, since - unlike a real
+  // Include a user placed - it has no backing entry in modelRoot to actually mutate.
+  private GroupElement baseModelNode;
+
   private final CommandStack commandStack = new CommandStack();
 
   private DocumentModelActions documentModelActions;
@@ -130,9 +160,11 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     this.projectItem = projectItem;
     this.modelRoot = modelRoot;
     this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    resolveAdditiveState();
     this.documentModelActions =
         new DocumentModelActions(projectItem, modelRoot, commandStack, elementsTreeTable, this::onModelChanged);
     documentModelActions.setStartRenameCallback(this::startRenameOnSelectedCell);
+    documentModelActions.setBaseModelNode(baseModelNode);
     modelTreeAddButton.getItems().addAll(documentModelActions.createAddMenuItems());
     applyFilter(searchController.getText());
     updateEditingButtonsState();
@@ -166,15 +198,79 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    * Model other than this one is saved elsewhere, e.g. an Included model's field was renamed/removed while
    * this tree is open, or the pool of models an Include group could resolve into changed - mirrors {@link
    * de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController}'s equivalent handling for a Form
-   * Model's linked Document Model. Registers itself directly rather than going through {@link
+   * Model's linked Document Model. Also refreshes when a Combination Model is saved elsewhere and this
+   * model is additive, since that's what determines {@link #referenceBaseModel} (see {@link
+   * AdditiveDocumentModels#findBaseModel}). Registers itself directly rather than going through {@link
    * de.a12.studio.ui.editors.AbstractEditorController}, same as this class's other event handling above.
    */
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
-    if (projectItem != null && !event.getItem().equals(projectItem) && event.getItem().getModel() instanceof DocumentModel) {
+    if (projectItem == null || event.getItem().equals(projectItem)) {
+      return;
+    }
+    A12Model<?> savedModel = event.getItem().getModel();
+    if (savedModel instanceof DocumentModel || (additive && savedModel instanceof CombinedDocumentModel)) {
       this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+      resolveAdditiveState();
+      documentModelActions.setBaseModelNode(baseModelNode);
       applyFilter(searchController.getText());
     }
+  }
+
+  /**
+   * Determines whether the loaded model is an {@link AdditiveDocumentModel} and, if so, resolves {@link
+   * #referenceBaseModel} and rebuilds {@link #baseModelNode}; toggles the second toolbar's visibility and
+   * the checkbox's availability accordingly. Called once from {@link #load} and again from {@link
+   * #modelSaved} whenever the reverse lookup it depends on may have changed.
+   */
+  private void resolveAdditiveState() {
+    this.additive = projectItem.getModel() instanceof AdditiveDocumentModel;
+    additiveToolbarBar.setVisible(additive);
+    additiveToolbarBar.setManaged(additive);
+    if (!additive) {
+      this.referenceBaseModel = null;
+      this.baseModelNode = null;
+      return;
+    }
+    this.referenceBaseModel = AdditiveDocumentModels
+        .findBaseModel(projectItem, (DocumentModel) projectItem.getModel())
+        .orElse(null);
+    this.baseModelNode = buildBaseModelNode();
+    additiveElementsOnlyCheckBox.setDisable(referenceBaseModel == null);
+    additiveElementsOnlyCheckBox.setSelected(false);
+    additiveElementsOnlyCheckBox.setTooltip(referenceBaseModel == null
+        ? WidgetFactory.createTooltip(StudioBundle.get("document_model_tree.additive_elements_only_no_base_model"))
+        : WidgetFactory.createTooltip(StudioBundle.get("document_model_tree.additive_elements_only")));
+  }
+
+  /**
+   * A synthetic, non-persisted Include-shaped {@link GroupElement} standing in for {@link
+   * #referenceBaseModel}'s own root content (see the {@link #baseModelNode} field javadoc), or {@code null}
+   * if no base model was resolved.
+   */
+  private GroupElement buildBaseModelNode() {
+    if (referenceBaseModel == null) {
+      return null;
+    }
+    GroupElement node = new GroupElement();
+    node.setId("__additive_base_model__" + referenceBaseModel.getId());
+    node.setName(StudioBundle.get("document_model_tree.base_model_node"));
+    GroupConfig config = new GroupConfig();
+    IncludeConfig includeConfig = new IncludeConfig();
+    includeConfig.setReference(referenceBaseModel.getId());
+    config.setIncludeConfig(includeConfig);
+    node.setGroup(config);
+    return node;
+  }
+
+  /**
+   * Whether {@code element} is the synthetic {@link #baseModelNode} itself (identity, not id, compared).
+   * Public so {@link DocumentModelEditorController} can keep it out of the real element property editors
+   * (it looks like a real Include to them, e.g. {@code DocumentModelIncludeEditorController}, but has no
+   * backing entry anywhere to actually persist an edit against).
+   */
+  public boolean isBaseModelNode(Element element) {
+    return baseModelNode != null && element == baseModelNode;
   }
 
   public List<Element> getAncestors(@NonNull Element element) {
@@ -192,8 +288,15 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return ancestors;
   }
 
+  /**
+   * Never descends into {@link #baseModelNode}'s subtree: those elements belong to {@link
+   * #referenceBaseModel}'s own file and keep its ids, which could collide with this model's own (the same
+   * pre-existing, accepted risk a real Include's resolved children already carry, see {@link
+   * ElementViewModel#getChildren}). Every legitimate id lookup here is for one of this model's own
+   * elements, so skipping that subtree avoids ever matching the wrong one.
+   */
   private TreeItem<ElementViewModel> findTreeItem(TreeItem<ElementViewModel> treeItem, @NonNull String elementId) {
-    if (treeItem == null) {
+    if (treeItem == null || (treeItem.getValue() != null && isBaseModelNode(treeItem.getValue().getElement()))) {
       return null;
     }
     if (treeItem.getValue() != null && elementId.equals(treeItem.getValue().getElement().getId())) {
@@ -261,6 +364,12 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
     String term = filter == null ? "" : filter.trim().toLowerCase();
     TreeItem<ElementViewModel> root = new TreeItem<>();
+    if (baseModelNode != null && !additiveElementsOnlyCheckBox.isSelected()) {
+      TreeItem<ElementViewModel> baseItem = term.isEmpty() ? toTreeItem(baseModelNode) : toFilteredTreeItem(baseModelNode, term);
+      if (baseItem != null) {
+        root.getChildren().add(baseItem);
+      }
+    }
     for (GroupElement group : modelRoot.getRootGroups()) {
       TreeItem<ElementViewModel> treeItem = term.isEmpty() ? toTreeItem(group) : toFilteredTreeItem(group, term);
       if (treeItem != null) {
@@ -305,6 +414,10 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
   private void markErrors(@NonNull TreeItem<ElementViewModel> treeItem, @NonNull Map<String, List<String>> errorMessagesById) {
     if (treeItem.getValue() != null) {
+      // referenceBaseModel's own elements aren't part of this model's validation (or its content at all).
+      if (isBaseModelNode(treeItem.getValue().getElement())) {
+        return;
+      }
       treeItem.getValue().setErrorMessages(errorMessagesById.getOrDefault(treeItem.getValue().getElement().getId(), List.of()));
     }
     for (TreeItem<ElementViewModel> child : treeItem.getChildren()) {
@@ -416,7 +529,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    */
   private void startRenameOnSelectedCell() {
     TreeItem<ElementViewModel> selected = elementsTreeTable.getSelectionModel().getSelectedItem();
-    if (selected == null || selected.getValue() == null) {
+    if (selected == null || selected.getValue() == null || isBaseModelNode(selected.getValue().getElement())) {
       return;
     }
     int rowIndex = elementsTreeTable.getRow(selected);
@@ -466,7 +579,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
 
     pause.setOnFinished(event -> {
       ElementViewModel item = row.getItem();
-      if (!row.isEmpty() && item != null && !hasFixedChildrenAncestor(item.getElement())) {
+      if (!row.isEmpty() && item != null && !hasFixedChildrenAncestor(item.getElement()) && !isBaseModelNode(item.getElement())) {
         // Select the row first so startRenameOnSelectedCell finds the right item.
         elementsTreeTable.getSelectionModel().clearSelection();
         elementsTreeTable.getSelectionModel().select(row.getTreeItem());
@@ -496,7 +609,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         return;
       }
       ElementViewModel item = row.getItem();
-      if (row.isEmpty() || item == null || hasFixedChildrenAncestor(item.getElement())) {
+      if (row.isEmpty() || item == null || hasFixedChildrenAncestor(item.getElement()) || isBaseModelNode(item.getElement())) {
         return;
       }
       elementsTreeTable.getSelectionModel().clearSelection();
@@ -519,7 +632,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     // DocumentModelActions#resolveInsertionPointForAdd).
     boolean hasElementSelected = selected != null && selected.getValue() != null;
     boolean nothingSelected = selected == null;
-    boolean fixedChildrenAncestor = hasElementSelected && hasFixedChildrenAncestor(selected.getValue().getElement());
+    boolean fixedChildrenAncestor = hasElementSelected
+        && (hasFixedChildrenAncestor(selected.getValue().getElement()) || isBaseModelNode(selected.getValue().getElement()));
     boolean withinFixedChildrenGroup = hasElementSelected && isWithinFixedChildrenGroup(selected.getValue().getElement());
     boolean hasClipboardContent = documentModelActions != null && documentModelActions.hasClipboardContent();
     // An empty tree has no selection either, but Group/Attachment/Multi-Select/Include can still be added
@@ -592,7 +706,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    */
   private DropPosition resolveDropPosition(@NonNull TreeItem<ElementViewModel> dragged, @NonNull TreeItem<ElementViewModel> target,
                                             double relativeY, double rowHeight) {
-    if (isSameOrDescendant(target, dragged)) {
+    if (isSameOrDescendant(target, dragged) || isBaseModelNode(target.getValue().getElement())) {
       return null;
     }
 
@@ -688,7 +802,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private void setupRowDragAndDrop(@NonNull TreeTableRow<ElementViewModel> row) {
     row.setOnDragDetected(event -> {
       if (row.isEmpty() || row.getTreeItem() == null || row.getTreeItem().getValue() == null
-          || hasFixedChildrenAncestor(row.getTreeItem().getValue().getElement())) {
+          || hasFixedChildrenAncestor(row.getTreeItem().getValue().getElement())
+          || isBaseModelNode(row.getTreeItem().getValue().getElement())) {
         return;
       }
       draggedTreeItem = row.getTreeItem();
@@ -811,6 +926,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     updateEditingButtonsState();
     updateUndoRedoState();
     searchController.setOnSearch(this::applyFilter);
+    additiveElementsOnlyCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> applyFilter(searchController.getText()));
 
     elementsTreeTable.setShowRoot(true);
     elementsTreeTable.setPlaceholder(WidgetFactory.createDefaultLabel("Add a new document element to the tree."));
@@ -836,7 +952,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         @Override
         protected void updateItem(ElementViewModel item, boolean empty) {
           super.updateItem(item, empty);
-          boolean fixedChildLeaf = !empty && item != null && hasFixedChildrenAncestor(item.getElement());
+          boolean fixedChildLeaf = !empty && item != null
+              && (hasFixedChildrenAncestor(item.getElement()) || isBaseModelNode(item.getElement()));
           if (fixedChildLeaf) {
             if (!getStyleClass().contains("fixed-child-row")) {
               getStyleClass().add("fixed-child-row");
@@ -865,7 +982,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
           event.consume();
           return;
         }
-        if (hasFixedChildrenAncestor(item.getElement())) {
+        if (hasFixedChildrenAncestor(item.getElement()) || isBaseModelNode(item.getElement())) {
           return;
         }
         documentModelActions.createContextMenu(item.getElement()).show(row, event.getScreenX(), event.getScreenY());

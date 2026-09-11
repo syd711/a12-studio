@@ -158,12 +158,15 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       return;
     }
 
+    long startTime = System.currentTimeMillis();
     List<ProjectItem> modelItems = new ArrayList<>();
     collectModelItems(project.getRoot(), modelItems);
     boolean changed = false;
     for (ProjectItem item : modelItems) {
       changed |= refreshItemIfChanged(item);
     }
+    log.info("Validated {} model(s) in {}ms after change to '{}'", modelItems.size(),
+        System.currentTimeMillis() - startTime, model.getId());
 
     // TreeView has no API to redraw a single row: TreeItem.setValue() fires TreeItem.valueChangedEvent(),
     // but TreeView's internal listener only reacts to events that derive from

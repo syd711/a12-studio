@@ -7,6 +7,7 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ModelTypeLabels;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -188,7 +189,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       String iconPath = item.getIconPath();
       if (iconPath != null) {
         ImageView modelIcon = WidgetFactory.createModelIcon(iconPath);
-        installModelTypeTooltip(modelIcon, item.getModelType());
+        installModelTypeTooltip(modelIcon, item);
         setGraphic(modelIcon);
       }
       else {
@@ -199,8 +200,10 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     }
   }
 
-  private static void installModelTypeTooltip(Node modelIcon, ModelType modelType) {
-    String displayName = ModelTypeLabels.getDisplayName(modelType);
+  private static void installModelTypeTooltip(Node modelIcon, ProjectItemViewModel item) {
+    String displayName = item.isAdditiveDocumentModel()
+        ? StudioBundle.get("model_type_name.AdM")
+        : ModelTypeLabels.getDisplayName(item.getModelType());
     if (!displayName.isEmpty()) {
       Tooltip.install(modelIcon, WidgetFactory.createTooltip(displayName));
     }

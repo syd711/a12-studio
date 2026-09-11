@@ -55,6 +55,14 @@
                                                 <Tooltip text="%bookmarks" />
                                              </tooltip>
                                           </ToggleButton>
+                                          <ToggleButton fx:id="versioncontrolToggle" styleClass="activity-bar-button" selected="false" visible="false" managed="false" mnemonicParsing="false" onAction="#onVersioncontrolToggle">
+                                             <graphic>
+                                                <FontIcon iconLiteral="mdi2s-source-branch" iconSize="18" styleClass="toolbar-icon" />
+                                             </graphic>
+                                             <tooltip>
+                                                <Tooltip text="%versioncontrol" />
+                                             </tooltip>
+                                          </ToggleButton>
                                        </items>
                                     </ToolBar>
                                     <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" visible="false" managed="false" HBox.hgrow="ALWAYS">

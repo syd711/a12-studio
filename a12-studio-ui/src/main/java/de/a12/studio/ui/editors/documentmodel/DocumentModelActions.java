@@ -88,10 +88,23 @@ public class DocumentModelActions {
   private Runnable startRenameCallback;
 
   /**
+   * The synthetic, non-persisted "Base Model" node the tree controller injects for an Additive Document
+   * Model (see {@code DocumentModelElementsTreeController#baseModelNode}), or {@code null} otherwise.
+   * Excluded (by identity) from Cut/Copy/Delete's selection here for the same reason a real Include's
+   * resolved children already are (see {@link #hasFixedChildrenAncestor}): it has no backing entry in
+   * {@link #modelRoot} to actually mutate.
+   */
+  private Element baseModelNode;
+
+  /**
    * Sets the callback that triggers inline rename on the currently selected cell.
    */
   public void setStartRenameCallback(@NonNull Runnable callback) {
     this.startRenameCallback = callback;
+  }
+
+  public void setBaseModelNode(Element baseModelNode) {
+    this.baseModelNode = baseModelNode;
   }
 
   /**
@@ -660,7 +673,7 @@ public class DocumentModelActions {
   private List<Element> selectionForClipboard() {
     List<TreeItem<ElementViewModel>> selection =
         new ArrayList<>(elementsTreeTable.getSelectionModel().getSelectedItems());
-    selection.removeIf(this::hasFixedChildrenAncestor);
+    selection.removeIf(item -> hasFixedChildrenAncestor(item) || isBaseModelNode(item));
     List<Element> elements = new ArrayList<>();
     for (TreeItem<ElementViewModel> treeItem : topLevelSelection(selection)) {
       elements.add(treeItem.getValue().getElement());
@@ -719,8 +732,9 @@ public class DocumentModelActions {
     // An Include's resolved children (see ElementViewModel#getChildren) belong to the referenced Document
     // Model's own element lists, not this model's - deleting one would silently mutate that other model's
     // in-memory graph instead of this one, so they're skipped here regardless of how the deletion was
-    // triggered (toolbar button, Delete key, context menu).
-    selection.removeIf(this::hasFixedChildrenAncestor);
+    // triggered (toolbar button, Delete key, context menu). The synthetic base-model node itself is
+    // skipped for the same reason (see #baseModelNode).
+    selection.removeIf(item -> hasFixedChildrenAncestor(item) || isBaseModelNode(item));
     for (TreeItem<ElementViewModel> treeItem : topLevelSelection(selection)) {
       Command command = createDeleteCommand(treeItem);
       if (command != null) {
@@ -740,6 +754,10 @@ public class DocumentModelActions {
       parent = parent.getParent();
     }
     return false;
+  }
+
+  private boolean isBaseModelNode(@NonNull TreeItem<ElementViewModel> treeItem) {
+    return baseModelNode != null && treeItem.getValue() != null && treeItem.getValue().getElement() == baseModelNode;
   }
 
   private List<TreeItem<ElementViewModel>> topLevelSelection(@NonNull List<TreeItem<ElementViewModel>> selection) {

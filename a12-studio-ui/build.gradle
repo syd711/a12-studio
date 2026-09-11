@@ -64,6 +64,8 @@ dependencies {
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0'
     implementation 'org.kordamp.ikonli:ikonli-bootstrapicons-pack:12.4.0'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.7'
+    // Versioncontrol sidebar view: reads/commits/reverts git changes in-process (no shell-out).
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r'
     // Renders the downloaded RELEASE_NOTES.md as HTML for display in the update-info dialog's WebView.
     implementation 'org.commonmark:commonmark:0.24.0'
     // Windows-only: low-level keyboard hook so Win+Left/Right window snapping can be

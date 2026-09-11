@@ -26,6 +26,7 @@ public abstract class JsonSettings {
     ANNOTATION,
     PROJECT_ROOT,
     A12_INSTALLATION,
+    VERSION_CONTROL,
     /** Used by plugin-owned settings classes (e.g. a12-studio-plugins/application-groups). */
     PLUGIN
   }

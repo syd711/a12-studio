@@ -55,6 +55,9 @@ public class PreferencesController implements Initializable {
   private Button shortcutsBtn;
 
   @FXML
+  private Button versioncontrolSettingsBtn;
+
+  @FXML
   private Button pluginsBtn;
 
   @FXML
@@ -156,6 +159,11 @@ public class PreferencesController implements Initializable {
   @FXML
   private void onShortcuts() {
     showPage(shortcutsBtn, "preference-shortcuts.fxml");
+  }
+
+  @FXML
+  private void onVersioncontrolSettings() {
+    showPage(versioncontrolSettingsBtn, "preference-versioncontrol.fxml");
   }
 
   @FXML

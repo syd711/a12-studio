@@ -42,6 +42,8 @@ public interface Icons {
   String PLAY = "mdi2p-play";
   String STOP = "mdi2s-stop";
   String CONSOLE = "mdi2c-console";
+  String GIT_BRANCH = "mdi2s-source-branch";
+  String GIT_COMMIT = "mdi2s-source-commit";
   String SCENE = "mdi2m-movie-open";
   String FLOW = "mdi2a-arrow-bottom-right-bold-box";
   String SERVER = "mdi2s-server";
@@ -50,6 +52,9 @@ public interface Icons {
   String ELEMENT_GROUP = "mdi2f-folder-outline";
   // PNG assets (in de/a12/studio/ui/icons), not Ikonli glyph literals like the constants above.
   String PNG_MODEL_DOCUMENT = "/de/a12/studio/ui/icons/Model-Document.png";
+  // A Document Model whose header carries the "additive-document" annotation (see AdditiveDocumentModel);
+  // not chosen by forModelType below, which is keyed purely on ModelType and can't see that annotation.
+  String PNG_MODEL_DOCUMENT_ADDITIVE = "/de/a12/studio/ui/icons/Model-Document-Additive.png";
   String PNG_MODEL_FORM = "/de/a12/studio/ui/icons/Model-Form.png";
   String PNG_MODEL_OVERVIEW = "/de/a12/studio/ui/icons/Model-Overview.png";
   String PNG_MODEL_RELATIONSHIP = "/de/a12/studio/ui/icons/Model-Relationship.png";

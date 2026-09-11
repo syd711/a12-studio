@@ -85,6 +85,13 @@ public class DocumentModelEditorController extends AbstractEditorController impl
     }
 
     Element selected = selectedElements.get(0);
+    // The synthetic "Base Model" node an Additive Document Model's tree injects for editing context (see
+    // DocumentModelElementsTreeController#baseModelNode) looks like a real Include to groupEditorFxml, but
+    // has no backing entry in this model's content to persist an edit against - show nothing instead.
+    if (elementsTreeController.isBaseModelNode(selected)) {
+      editorContainer.setCenter(null);
+      return;
+    }
     String editorFxml;
     if (selected instanceof GroupElement groupElement) {
       editorFxml = groupEditorFxml(groupElement);

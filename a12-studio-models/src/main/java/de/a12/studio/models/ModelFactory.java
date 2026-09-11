@@ -1,6 +1,7 @@
 package de.a12.studio.models;
 
 import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.contentmodel.ContentModel;
@@ -32,6 +33,10 @@ public class ModelFactory {
   // header annotation, so a plain modelType lookup can't tell them apart from a regular DocumentModel.
   private static final String TD_ONLY_ANNOTATION = "tdonly";
 
+  // Additive Document Models likewise have no modelType of their own (still "document"); they are
+  // DocumentModels flagged with this header annotation instead. See AdditiveDocumentModel's javadoc.
+  private static final String ADDITIVE_DOCUMENT_ANNOTATION = "additive-document";
+
   @Nullable
   public static A12Model<?> load(@NonNull ProjectItem projectItem) {
     if (projectItem.isFolder() || !projectItem.getName().toLowerCase().endsWith(".json")) {
@@ -52,7 +57,16 @@ public class ModelFactory {
       }
       return switch (modelType) {
         case DOCUMENT -> {
-          Class<? extends DocumentModel> targetClass = isTypeDefinitionOnly(root) ? TypeDefinitionModel.class : DocumentModel.class;
+          Class<? extends DocumentModel> targetClass;
+          if (isTypeDefinitionOnly(root)) {
+            targetClass = TypeDefinitionModel.class;
+          }
+          else if (isAdditiveDocument(root)) {
+            targetClass = AdditiveDocumentModel.class;
+          }
+          else {
+            targetClass = DocumentModel.class;
+          }
           yield JsonSettings.objectMapper.treeToValue(root, targetClass);
         }
         case OVERVIEW -> JsonSettings.objectMapper.treeToValue(root, OverviewModel.class);
@@ -82,8 +96,16 @@ public class ModelFactory {
   }
 
   private static boolean isTypeDefinitionOnly(@NonNull JsonNode root) {
+    return hasAnnotation(root, TD_ONLY_ANNOTATION);
+  }
+
+  private static boolean isAdditiveDocument(@NonNull JsonNode root) {
+    return hasAnnotation(root, ADDITIVE_DOCUMENT_ANNOTATION);
+  }
+
+  private static boolean hasAnnotation(@NonNull JsonNode root, @NonNull String annotationName) {
     for (JsonNode annotation : root.path("header").path("annotations")) {
-      if (TD_ONLY_ANNOTATION.equals(annotation.path("name").asString(null))
+      if (annotationName.equals(annotation.path("name").asString(null))
           && "true".equals(annotation.path("value").asString(null))) {
         return true;
       }
