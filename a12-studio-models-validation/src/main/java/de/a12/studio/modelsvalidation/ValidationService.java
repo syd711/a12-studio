@@ -11,6 +11,7 @@ import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.projects.Project;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
@@ -62,7 +63,34 @@ public class ValidationService {
 
   /** Every validation problem found in {@code model}, depending on its concrete type. */
   public List<ModelValidationError> validate(A12Model<?> model) {
-    ValidationContext context = buildContext(model);
+    return dispatch(model, buildContext(model));
+  }
+
+  /**
+   * Validates {@code model} using a caller-supplied {@code allModels} (every model in the project, this one
+   * included) instead of walking the project tree to collect it. {@link #validate(A12Model)} rebuilds that
+   * list from scratch via {@link ProjectModels#getOtherDocumentModels}/{@link ProjectModels#getOtherModels} on
+   * every call, which costs O(n) tree walks; a caller revalidating every model in the project at once (see
+   * {@code ProjectTreeController#refreshNode}) would otherwise pay O(n) walks per model, i.e. O(n^2) walks
+   * overall. Collect {@code allModels} once (a single tree walk) and reuse it across all n calls instead.
+   */
+  public List<ModelValidationError> validate(A12Model<?> model, ProjectItem item, List<A12Model<?>> allModels) {
+    List<DocumentModel> otherDocumentModels = new ArrayList<>();
+    List<A12Model<?>> otherModels = new ArrayList<>();
+    for (A12Model<?> other : allModels) {
+      if (other == model) {
+        continue;
+      }
+      otherModels.add(other);
+      if (other instanceof DocumentModel documentModel) {
+        otherDocumentModels.add(documentModel);
+      }
+    }
+    ValidationContext context = new ValidationContext(project, item, otherDocumentModels, otherModels, model);
+    return dispatch(model, context);
+  }
+
+  private List<ModelValidationError> dispatch(A12Model<?> model, ValidationContext context) {
     return switch (model) {
       case DocumentModel documentModel -> documentModelValidationService.validate(documentModel, context);
       case OverviewModel overviewModel -> overviewModelValidationService.validate(overviewModel, context);
@@ -157,6 +185,6 @@ public class ValidationService {
 
   private ValidationContext buildContext(A12Model<?> model) {
     return new ValidationContext(project, ProjectModels.findItem(project, model),
-        ProjectModels.getOtherDocumentModels(project, model), ProjectModels.getOtherModels(project, model));
+        ProjectModels.getOtherDocumentModels(project, model), ProjectModels.getOtherModels(project, model), model);
   }
 }

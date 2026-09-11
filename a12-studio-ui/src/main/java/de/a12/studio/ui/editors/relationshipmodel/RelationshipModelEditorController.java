@@ -3,18 +3,27 @@ package de.a12.studio.ui.editors.relationshipmodel;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.relationshipmodel.dialogs.Dialogs;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ButtonType;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -95,5 +104,39 @@ public class RelationshipModelEditorController extends AbstractEditorController 
   @Override
   public @NonNull ModelType getModelType() {
     return ModelType.RELATIONSHIP;
+  }
+
+  /**
+   * Generates a Document Model per entity into a user-chosen folder, mirroring SME's relationship model
+   * "Generate Document Models" action (see {@link RelationshipDocumentModelGenerator}). Any Document Model
+   * previously generated for this relationship - found project-wide by id, regardless of which folder it was
+   * generated into - is deleted and regenerated after the user confirms.
+   */
+  @FXML
+  private void onGenerateDocumentModels(ActionEvent event) {
+    Optional<ProjectItem> folder = Dialogs.showGenerateDocumentModelsFolder(Studio.stage, projectItem.getParent());
+    if (folder.isEmpty()) {
+      return;
+    }
+
+    try {
+      RelationshipDocumentModelGenerator.validate(model, projectItem);
+
+      List<ProjectItem> existing = RelationshipDocumentModelGenerator.findExistingGeneratedModels(model.getId(), projectItem);
+      if (!existing.isEmpty()) {
+        String existingNames = existing.stream().map(ProjectItem::getName).reduce((a, b) -> a + "\n" + b).orElse("");
+        Optional<ButtonType> result = WidgetFactory.showYesNoConfirmation(Studio.stage,
+            StudioBundle.get("generate_document_models_overwrite_confirm"), existingNames);
+        if (result.isEmpty() || result.get() != ButtonType.YES) {
+          return;
+        }
+        RelationshipDocumentModelGenerator.deleteAll(existing);
+      }
+
+      RelationshipDocumentModelGenerator.generate(model, projectItem, folder.get());
+    }
+    catch (IllegalStateException | IOException e) {
+      WidgetFactory.showAlert(Studio.stage, e.getMessage());
+    }
   }
 }

@@ -298,8 +298,10 @@ public class FileSearchDialogController implements DialogController {
 
     ProjectItem item = itemsByFile.get(file);
     if (item != null && item.getModel() != null) {
-      project.getSettings().getUISettings().addOpenedFile(item.getPath());
-      project.getSettings().getUISettings().save();
+      if (item.isModelSupported()) {
+        project.getSettings().getUISettings().addOpenedFile(item.getPath());
+        project.getSettings().getUISettings().save();
+      }
       StudioEventManager.getInstance().fireModelOpenEvent(item);
     }
     stage.close();

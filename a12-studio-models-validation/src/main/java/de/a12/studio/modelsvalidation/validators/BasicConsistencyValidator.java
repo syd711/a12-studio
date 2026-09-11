@@ -37,7 +37,7 @@ public final class BasicConsistencyValidator implements ModelValidator {
       return List.of();
     }
 
-    ElementIndex index = new ElementIndex(documentModel);
+    ElementIndex index = context.elementIndex();
     List<ModelValidationError> errors = new ArrayList<>();
     for (Element element : index.allElements()) {
       if (isBlank(element.getId())) {

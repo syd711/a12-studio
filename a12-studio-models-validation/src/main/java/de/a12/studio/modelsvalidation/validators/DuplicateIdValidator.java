@@ -26,7 +26,7 @@ public final class DuplicateIdValidator implements ModelValidator {
       return List.of();
     }
 
-    ElementIndex index = new ElementIndex(documentModel);
+    ElementIndex index = context.elementIndex();
     Map<String, List<Element>> byId = new HashMap<>();
     for (Element element : index.allElements()) {
       if (element.getId() != null) {

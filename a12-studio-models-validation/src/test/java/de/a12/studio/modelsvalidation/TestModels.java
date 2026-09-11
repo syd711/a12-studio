@@ -31,17 +31,17 @@ public final class TestModels {
 
   /** A context without any sibling models; the item name defaults to "&lt;model id&gt;.json". */
   public static ValidationContext context(A12Model<?> model) {
-    return context(model.getId() + ".json", List.of(), List.of());
+    return context(model, model.getId() + ".json", List.of(), List.of());
   }
 
   /** A context whose project item carries the given file name (for the id/filename rule). */
   public static ValidationContext contextWithFileName(String fileName) {
-    return context(fileName, List.of(), List.of());
+    return context(null, fileName, List.of(), List.of());
   }
 
   /** A context with sibling document models (also listed among the generic other models). */
   public static ValidationContext contextWithDocumentModels(A12Model<?> model, DocumentModel... documentModels) {
-    return context(model.getId() + ".json", List.of(documentModels), List.of(documentModels));
+    return context(model, model.getId() + ".json", List.of(documentModels), List.of(documentModels));
   }
 
   /** A context with arbitrary sibling models (document models filtered out of them automatically). */
@@ -50,10 +50,11 @@ public final class TestModels {
         .filter(other -> other instanceof DocumentModel)
         .map(other -> (DocumentModel) other)
         .toList();
-    return context(model.getId() + ".json", documentModels, List.of(otherModels));
+    return context(model, model.getId() + ".json", documentModels, List.of(otherModels));
   }
 
-  public static ValidationContext context(String fileName, List<DocumentModel> otherDocumentModels, List<A12Model<?>> otherModels) {
-    return new ValidationContext(null, new ProjectItem(new File(fileName)), otherDocumentModels, otherModels);
+  public static ValidationContext context(A12Model<?> model, String fileName, List<DocumentModel> otherDocumentModels,
+      List<A12Model<?>> otherModels) {
+    return new ValidationContext(null, new ProjectItem(new File(fileName)), otherDocumentModels, otherModels, model);
   }
 }

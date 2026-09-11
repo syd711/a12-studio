@@ -18,13 +18,13 @@
                     <VBox spacing="6.0">
                         <children>
                             <Label styleClass="field-label" text="%selected_items_overview_model"/>
-                            <ComboBox fx:id="selectedItemsField" editable="false" maxWidth="Infinity"/>
+                            <ComboBox fx:id="selectedItemsField" editable="false" />
                         </children>
                     </VBox>
                     <VBox spacing="6.0">
                         <children>
                             <Label styleClass="field-label" text="%link_form_model"/>
-                            <ComboBox fx:id="linkFormModelField" editable="false" maxWidth="Infinity"/>
+                            <ComboBox fx:id="linkFormModelField" editable="false" />
                         </children>
                     </VBox>
                     <VBox spacing="6.0">

@@ -178,9 +178,10 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       long startTime = System.currentTimeMillis();
       List<ProjectItem> modelItems = new ArrayList<>();
       collectModelItems(currentProject.getRoot(), modelItems);
+      List<A12Model<?>> allModels = modelItems.stream().map(ProjectItem::getModel).toList();
       Map<String, List<ModelValidationError>> errorsByPath = new HashMap<>();
       for (ProjectItem item : modelItems) {
-        List<ModelValidationError> errors = validateItem(item);
+        List<ModelValidationError> errors = validateItem(item, allModels);
         if (!errors.isEmpty()) {
           errorsByPath.put(item.getPath(), errors);
         }
@@ -210,9 +211,9 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private record ValidationSnapshot(int modelCount, Map<String, List<ModelValidationError>> errorsByPath, long durationMs) {
   }
 
-  private List<ModelValidationError> validateItem(@NonNull ProjectItem projectItem) {
+  private List<ModelValidationError> validateItem(@NonNull ProjectItem projectItem, @NonNull List<A12Model<?>> allModels) {
     try {
-      return Studio.getValidationService().validate(projectItem.getModel());
+      return Studio.getValidationService().validate(projectItem.getModel(), projectItem, allModels);
     }
     catch (Exception e) {
       log.warn("Failed to validate '{}': {}", projectItem.getPath(), e.getMessage(), e);
@@ -269,10 +270,11 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private Map<String, List<ModelValidationError>> validateAllModels(@NonNull Project project) {
     List<ProjectItem> modelItems = new ArrayList<>();
     collectModelItems(project.getRoot(), modelItems);
+    List<A12Model<?>> allModels = modelItems.stream().map(ProjectItem::getModel).toList();
 
     Map<String, List<ModelValidationError>> validationErrorsByPath = new HashMap<>();
     for (ProjectItem item : modelItems) {
-      List<ModelValidationError> errors = validateItem(item);
+      List<ModelValidationError> errors = validateItem(item, allModels);
       if (!errors.isEmpty()) {
         validationErrorsByPath.put(item.getPath(), errors);
       }
@@ -387,7 +389,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       return;
     }
     if (!viewModel.isFolder() && (viewModel.hasModel() || viewModel.hasAuthFile())) {
-      if (project != null) {
+      if (project != null && viewModel.getProjectItem().isModelSupported()) {
         project.getSettings().getUISettings().addOpenedFile(viewModel.getProjectItem().getPath());
         project.getSettings().getUISettings().save();
       }

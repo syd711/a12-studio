@@ -66,4 +66,8 @@ public interface StudioEventListener {
   default void bookmarksChanged(@NonNull BookmarksChangedEvent event) {
 
   }
+
+  default void gitStatusChanged(@NonNull GitStatusChangedEvent event) {
+
+  }
 }

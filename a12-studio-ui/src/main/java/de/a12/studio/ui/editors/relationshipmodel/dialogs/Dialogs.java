@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.relationshipmodel.dialogs;
 
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
 import de.a12.studio.models.relationshipmodel.LinkConstraints;
 import de.a12.studio.models.relationshipmodel.Multiplicity;
@@ -7,6 +8,7 @@ import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,5 +48,23 @@ public class Dialogs {
 
     stage.showAndWait();
     return controller.isConfirmed();
+  }
+
+  /**
+   * Opens the target-folder picker for {@link
+   * de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController#onGenerateDocumentModels}, a
+   * plain Location combo reusing {@link de.a12.studio.ui.util.ProjectModelFolders#configureLocationCombo}, the
+   * same folder chooser as the "New Model" dialog.
+   */
+  public static Optional<ProjectItem> showGenerateDocumentModelsFolder(Stage owner, @NonNull ProjectItem targetFolder) {
+    FXMLLoader fxmlLoader = new FXMLLoader(GenerateDocumentModelsDialogController.class.getResource("generate-document-models-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("generate-document-models-dialog", fxmlLoader, owner, StudioBundle.get("generate_document_models"));
+    GenerateDocumentModelsDialogController controller = (GenerateDocumentModelsDialogController) stage.getUserData();
+    controller.init(stage, targetFolder);
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.getResult();
   }
 }

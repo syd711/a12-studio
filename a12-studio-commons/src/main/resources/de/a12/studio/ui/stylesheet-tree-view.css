@@ -321,6 +321,18 @@
 }
 
 /*
+ * The project tree's item name is rendered via a Label set as the cell's graphic (see
+ * ProjectTreeCell), not as the cell's own text, so -fx-text-fill on the .tree-cell rule
+ * above never reaches it - same situation as #elementsTreeTable's/#flowsTree's/#tree's
+ * .tree-cell-name-label overrides above.
+ */
+#projectTree .tree-cell:filled:selected .tree-cell-name-label,
+#projectTree .tree-cell:filled:selected:focused .tree-cell-name-label,
+#projectTree .tree-cell:filled:selected:hover .tree-cell-name-label {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+/*
  * Highlights the folder currently under the cursor during a project tree drag-and-drop move.
  * Uses the vivid accent color (rather than the softer selection color) so it reads as distinct
  * from the currently selected row even when the drop target happens to also be selected.

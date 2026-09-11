@@ -58,6 +58,7 @@ public interface Icons {
   String PNG_MODEL_FORM = "/de/a12/studio/ui/icons/Model-Form.png";
   String PNG_MODEL_OVERVIEW = "/de/a12/studio/ui/icons/Model-Overview.png";
   String PNG_MODEL_RELATIONSHIP = "/de/a12/studio/ui/icons/Model-Relationship.png";
+  String PNG_MODEL_RELATIONSHIP_UI = "/de/a12/studio/ui/icons/Model-Relationship-UI.png";
   String PNG_MODEL_APPLICATION = "/de/a12/studio/ui/icons/Model-App.png";
   String PNG_MODEL_CONTENT = "/de/a12/studio/ui/icons/Model-Content.png";
   String PNG_MODEL_TYPE_DEFINITION = "/de/a12/studio/ui/icons/Model-Type-Definition.png";
@@ -111,7 +112,7 @@ public interface Icons {
       case FORM -> PNG_MODEL_FORM;
       case OVERVIEW -> PNG_MODEL_OVERVIEW;
       case RELATIONSHIP -> PNG_MODEL_RELATIONSHIP;
-      case RELATIONSHIPUI -> PNG_MODEL_RELATIONSHIP;
+      case RELATIONSHIPUI -> PNG_MODEL_RELATIONSHIP_UI;
       case APPLICATION -> PNG_MODEL_APPLICATION;
       case CONTENT -> PNG_MODEL_CONTENT;
       case TYPEDEFINITION -> PNG_MODEL_TYPE_DEFINITION;

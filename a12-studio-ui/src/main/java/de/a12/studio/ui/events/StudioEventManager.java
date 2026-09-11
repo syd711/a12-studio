@@ -144,4 +144,16 @@ public class StudioEventManager {
       listener.tabSelectionChanged(event);
     }
   }
+
+  /**
+   * Fired after a commit or revert completes, from wherever it was triggered (the Versioncontrol
+   * panel or an editor's own Commit/Revert toolbar buttons), so every open surface showing git
+   * change state - the panel's tree and each editor's toolbar buttons - refreshes together.
+   */
+  public void fireGitStatusChangedEvent() {
+    GitStatusChangedEvent event = new GitStatusChangedEvent();
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.gitStatusChanged(event);
+    }
+  }
 }

@@ -44,7 +44,7 @@ public final class AttachmentGroupValidator implements ModelValidator {
       return List.of();
     }
 
-    ElementIndex index = new ElementIndex(documentModel);
+    ElementIndex index = context.elementIndex();
     boolean german = documentModel.getContent().getModelConfig() != null
         && documentModel.getContent().getModelConfig().getConditionLanguage() != null
         && "de".equalsIgnoreCase(documentModel.getContent().getModelConfig().getConditionLanguage().getCode());

@@ -69,6 +69,10 @@
 .tab-pane.colorful-studio .tab.model-tab-relationship { -fx-background-color: -fx-model-color-relationship-bright; }
 .tab-pane.colorful-studio .tab.model-tab-relationship:selected { -fx-background-color: -fx-model-color-relationship-bright; -fx-border-color: -fx-model-color-relationship; }
 
+/* Relationship UI Model (RuM) reuses the Relationship Model's (ReM) color - same domain concept. */
+.tab-pane.colorful-studio .tab.model-tab-relationshipui { -fx-background-color: -fx-model-color-relationship-bright; }
+.tab-pane.colorful-studio .tab.model-tab-relationshipui:selected { -fx-background-color: -fx-model-color-relationship-bright; -fx-border-color: -fx-model-color-relationship; }
+
 .tab-pane.colorful-studio .tab.model-tab-application { -fx-background-color: -fx-model-color-application-bright; }
 .tab-pane.colorful-studio .tab.model-tab-application:selected { -fx-background-color: -fx-model-color-application-bright; -fx-border-color: -fx-model-color-application; }
 

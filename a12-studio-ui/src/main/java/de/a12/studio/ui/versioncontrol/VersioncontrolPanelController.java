@@ -3,6 +3,8 @@ package de.a12.studio.ui.versioncontrol;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.VersionControlSettings;
+import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.events.GitStatusChangedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
@@ -69,7 +71,6 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   private final VersionControlSettings settings = VersionControlSettings.load();
 
   private Project project;
-  private GitService gitService;
   private List<GitChangedFile> currentChangedFiles = List.of();
   private boolean updatingCommitMessageField = false;
 
@@ -180,8 +181,6 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
    */
   public void setProject(Project project) {
     this.project = project;
-    closeGitService();
-    gitService = project == null ? null : GitService.openForProjectFolder(project.getFolder()).orElse(null);
 
     updatingCommitMessageField = true;
     commitMessageField.setText(project == null
@@ -195,7 +194,6 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   @Override
   public void projectClosed(@NonNull ProjectClosedEvent event) {
     this.project = null;
-    closeGitService();
     currentChangedFiles = List.of();
     setTreeRoot(null);
     updateActionButtons();
@@ -206,11 +204,9 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     refresh();
   }
 
-  private void closeGitService() {
-    if (gitService != null) {
-      gitService.close();
-      gitService = null;
-    }
+  @Override
+  public void gitStatusChanged(@NonNull GitStatusChangedEvent event) {
+    refresh();
   }
 
   // -------------------------------------------------------------------------
@@ -223,6 +219,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   }
 
   private void refresh() {
+    GitService gitService = Studio.getGitService();
     if (gitService == null || project == null) {
       currentChangedFiles = List.of();
       setTreeRoot(null);
@@ -348,6 +345,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
 
   @FXML
   private void onRevert() {
+    GitService gitService = Studio.getGitService();
     if (gitService == null) {
       return;
     }
@@ -386,6 +384,8 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
    * place - see {@link de.a12.studio.ui.tabs.TabPaneController#modelReverted}). Finally, {@link
    * #projectRefreshCallback} reloads the project tree itself, the same way it already does after a
    * delete/rename/move, so structural changes (files added or removed by the revert) show up too.
+   * The tail {@link StudioEventManager#fireGitStatusChangedEvent} refreshes this panel itself (via
+   * {@link #gitStatusChanged}) as well as any open editor's Commit/Revert toolbar buttons.
    */
   private void onRevertCompleted(@NonNull List<GitChangedFile> files) {
     if (project != null) {
@@ -406,11 +406,12 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
         projectRefreshCallback.run();
       }
     }
-    refresh();
+    StudioEventManager.getInstance().fireGitStatusChangedEvent();
   }
 
   @FXML
   private void onCommit() {
+    GitService gitService = Studio.getGitService();
     if (gitService == null) {
       return;
     }
@@ -428,7 +429,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
             throw new RuntimeException(e);
           }
         })
-        .thenLater(this::refresh)
+        .thenLater(() -> StudioEventManager.getInstance().fireGitStatusChangedEvent())
         .onErrorLater(ex -> {
           log.error("Failed to commit", ex);
           WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_commit_failed"), ex.getMessage());

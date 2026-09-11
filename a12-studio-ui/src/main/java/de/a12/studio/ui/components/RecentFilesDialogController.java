@@ -154,8 +154,10 @@ public class RecentFilesDialogController implements DialogController {
       return;
     }
 
-    project.getSettings().getUISettings().addOpenedFile(item.getPath());
-    project.getSettings().getUISettings().save();
+    if (item.isModelSupported()) {
+      project.getSettings().getUISettings().addOpenedFile(item.getPath());
+      project.getSettings().getUISettings().save();
+    }
     StudioEventManager.getInstance().fireModelOpenEvent(item);
     stage.close();
   }

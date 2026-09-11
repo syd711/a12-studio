@@ -34,7 +34,7 @@ public final class EnumerationValuesValidator implements ModelValidator {
     }
 
     List<ModelValidationError> errors = new ArrayList<>();
-    ElementIndex index = new ElementIndex(documentModel);
+    ElementIndex index = context.elementIndex();
     for (Element element : index.allElements()) {
       if (!(element instanceof FieldElement field) || field.getField() == null
           || !(field.getField().getFieldType() instanceof EnumerationFieldType enumerationFieldType)) {

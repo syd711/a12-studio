@@ -21,6 +21,7 @@ import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preview.PreviewServer;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
+import de.a12.studio.ui.versioncontrol.GitService;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -55,6 +56,7 @@ public class Studio extends Application implements StudioEventListener {
   private static RootController rootController;
   private static Project currentProject;
   private static ValidationService validationService;
+  private static GitService gitService;
   private static WindowsSnapHook windowsSnapHook;
 
   @Override
@@ -199,6 +201,16 @@ public class Studio extends Application implements StudioEventListener {
     return validationService;
   }
 
+  /**
+   * The single {@link GitService} instance for the currently open project, shared by the
+   * Versioncontrol panel and every open editor's Commit/Revert toolbar buttons so they don't each
+   * hold their own JGit {@code Repository} handle. {@code null} if no project is open or the
+   * project isn't inside a git working copy.
+   */
+  public static GitService getGitService() {
+    return gitService;
+  }
+
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
     // Set before anything else: Studio registers as a listener before the FXML (and its nested
@@ -208,6 +220,7 @@ public class Studio extends Application implements StudioEventListener {
     // error badge).
     currentProject = event.getProject();
     validationService = new ValidationService(currentProject);
+    gitService = GitService.openForProjectFolder(currentProject.getFolder()).orElse(null);
     for (IModelValidatorContribution contribution : PluginManager.getInstance().getModelValidatorContributions()) {
       ModelValidator validator = contribution.createValidator();
       for (ModelType modelType : contribution.getModelTypes()) {
@@ -224,6 +237,10 @@ public class Studio extends Application implements StudioEventListener {
   public void projectClosed(@NonNull ProjectClosedEvent event) {
     currentProject = null;
     validationService = null;
+    if (gitService != null) {
+      gitService.close();
+      gitService = null;
+    }
     stage.setTitle("A12 Studio - " + StudioVersion.get());
     rootController.setTitle("A12 Studio - " + StudioVersion.get());
   }

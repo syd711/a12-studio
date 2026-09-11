@@ -117,6 +117,17 @@ public class ProjectItem {
     return file.isDirectory();
   }
 
+  /**
+   * Returns {@code false} for a model whose {@link de.a12.studio.models.ModelType} is marked
+   * {@code "enabled": false} in {@code model-versions.json} - i.e. one the UI's editor factory would
+   * refuse to open with a "not supported yet" message. Lets callers that persist or restore the set of
+   * open editor tabs skip such items up front instead of round-tripping through a failed editor-creation
+   * attempt.
+   */
+  public boolean isModelSupported() {
+    return model == null || model.getModelType() == null || model.getModelType().isEnabled();
+  }
+
   public String getName() {
     return file.getName();
   }

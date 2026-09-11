@@ -35,6 +35,23 @@
             <Tooltip text="%toggle_bookmark" />
         </tooltip>
     </ToggleButton>
+    <Separator fx:id="versioncontrolSeparator" />
+    <Button fx:id="commitButton" disable="true" mnemonicParsing="false" onAction="#onCommit" styleClass="action-button">
+        <graphic>
+            <FontIcon iconLiteral="mdi2s-source-commit" iconSize="18" />
+        </graphic>
+        <tooltip>
+            <Tooltip text="%versioncontrol_commit" />
+        </tooltip>
+    </Button>
+    <Button fx:id="revertButton" disable="true" mnemonicParsing="false" onAction="#onRevert" styleClass="action-button">
+        <graphic>
+            <FontIcon iconLiteral="mdi2u-undo" iconSize="18" />
+        </graphic>
+        <tooltip>
+            <Tooltip text="%versioncontrol_revert" />
+        </tooltip>
+    </Button>
     <Separator fx:id="deploySeparator" />
     <StackPane fx:id="deployModelContainer">
         <children>

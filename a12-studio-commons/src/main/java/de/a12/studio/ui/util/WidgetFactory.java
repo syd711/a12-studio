@@ -7,6 +7,7 @@ import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.components.DialogHeaderController;
 import de.a12.studio.ui.components.InputDialogController;
 import de.a12.studio.ui.components.OutputDialogController;
+import de.a12.studio.ui.components.TextAreaInputDialogController;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -602,5 +603,18 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     OutputDialogController controller = (OutputDialogController) stage.getUserData();
     controller.initDialog(stage, innerTitle, description, defaultValue);
     stage.showAndWait();
+  }
+
+  public static String showTextAreaInputDialog(Stage owner, String dialogTitle, String innerTitle, String description, String defaultValue) {
+    Stage stage = createDialogStage(null, TextAreaInputDialogController.class, owner, dialogTitle, "dialog-textarea-input.fxml");
+    TextAreaInputDialogController controller = (TextAreaInputDialogController) stage.getUserData();
+    controller.initDialog(stage, innerTitle, description, defaultValue);
+    stage.showAndWait();
+    Optional<ButtonType> result = controller.getResult();
+    if (result.get().equals(ButtonType.OK)) {
+      return controller.getText();
+    }
+
+    return null;
   }
 }

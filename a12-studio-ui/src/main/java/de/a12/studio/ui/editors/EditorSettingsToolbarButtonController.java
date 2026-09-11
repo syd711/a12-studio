@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors;
 
 import de.a12.studio.ui.editors.dialogs.Dialogs;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Tooltip;
@@ -19,8 +20,6 @@ import java.util.function.Supplier;
  */
 @Slf4j
 public class EditorSettingsToolbarButtonController {
-
-  private static final String DEFAULT_SETTINGS_TOOLTIP = "Model Settings";
 
   @FXML
   private Tooltip settingsButtonTooltip;
@@ -48,6 +47,6 @@ public class EditorSettingsToolbarButtonController {
     List<String> issues = issuesSupplier != null ? issuesSupplier.get() : List.of();
 
     settingsErrorBadge.setVisible(!issues.isEmpty());
-    settingsButtonTooltip.setText(issues.isEmpty() ? DEFAULT_SETTINGS_TOOLTIP : String.join("\n\n", issues));
+    settingsButtonTooltip.setText(issues.isEmpty() ? StudioBundle.get("model_settings_tooltip") : String.join("\n\n", issues));
   }
 }

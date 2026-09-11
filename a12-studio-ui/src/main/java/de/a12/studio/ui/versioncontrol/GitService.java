@@ -78,14 +78,7 @@ public class GitService implements AutoCloseable {
     Status status = git.status().call();
     Path projectPath = projectFolder.toPath();
 
-    Map<String, ChangeStatus> statusByRepoPath = new LinkedHashMap<>();
-    collect(statusByRepoPath, status.getAdded(), ChangeStatus.NEW);
-    collect(statusByRepoPath, status.getUntracked(), ChangeStatus.NEW);
-    collect(statusByRepoPath, status.getModified(), ChangeStatus.MODIFIED);
-    collect(statusByRepoPath, status.getChanged(), ChangeStatus.MODIFIED);
-    collect(statusByRepoPath, status.getRemoved(), ChangeStatus.DELETED);
-    collect(statusByRepoPath, status.getMissing(), ChangeStatus.DELETED);
-    collect(statusByRepoPath, status.getConflicting(), ChangeStatus.CONFLICTING);
+    Map<String, ChangeStatus> statusByRepoPath = classifyStatus(status);
 
     List<GitChangedFile> result = new ArrayList<>();
     for (Map.Entry<String, ChangeStatus> entry : statusByRepoPath.entrySet()) {
@@ -101,6 +94,41 @@ public class GitService implements AutoCloseable {
       result.add(new GitChangedFile(file, relativePath, entry.getValue()));
     }
     return result;
+  }
+
+  /**
+   * Returns {@code file}'s outstanding git change, if any - the single-file counterpart to {@link
+   * #getChangedProjectFiles}, used by the per-editor toolbar's Commit/Revert buttons to decide
+   * whether the currently open file has anything to act on. The status query is scoped to just
+   * {@code file}'s repo-relative path, so it stays cheap to call on every tab switch/save, unlike
+   * a full {@link #getChangedProjectFiles} scan.
+   */
+  @NonNull
+  public Optional<GitChangedFile> getChangedFile(@NonNull File projectFolder, @NonNull File file) throws GitAPIException {
+    if (!isModelFileName(file.getName())) {
+      return Optional.empty();
+    }
+    String repoRelativePath = toRepoRelativePath(file);
+    Status status = git.status().addPath(repoRelativePath).call();
+    ChangeStatus changeStatus = classifyStatus(status).get(repoRelativePath);
+    if (changeStatus == null) {
+      return Optional.empty();
+    }
+    String relativePath = projectFolder.toPath().relativize(file.toPath()).toString().replace('\\', '/');
+    return Optional.of(new GitChangedFile(file, relativePath, changeStatus));
+  }
+
+  @NonNull
+  private Map<String, ChangeStatus> classifyStatus(@NonNull Status status) {
+    Map<String, ChangeStatus> statusByRepoPath = new LinkedHashMap<>();
+    collect(statusByRepoPath, status.getAdded(), ChangeStatus.NEW);
+    collect(statusByRepoPath, status.getUntracked(), ChangeStatus.NEW);
+    collect(statusByRepoPath, status.getModified(), ChangeStatus.MODIFIED);
+    collect(statusByRepoPath, status.getChanged(), ChangeStatus.MODIFIED);
+    collect(statusByRepoPath, status.getRemoved(), ChangeStatus.DELETED);
+    collect(statusByRepoPath, status.getMissing(), ChangeStatus.DELETED);
+    collect(statusByRepoPath, status.getConflicting(), ChangeStatus.CONFLICTING);
+    return statusByRepoPath;
   }
 
   /** Adds each path not already present, in priority order: CONFLICTING > DELETED > MODIFIED > NEW. */

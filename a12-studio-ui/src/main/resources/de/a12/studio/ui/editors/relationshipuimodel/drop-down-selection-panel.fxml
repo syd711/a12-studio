@@ -17,13 +17,13 @@
                     <VBox spacing="6.0">
                         <children>
                             <Label styleClass="field-label" text="%available_items_query_model"/>
-                            <ComboBox fx:id="availableItemsQueryField" editable="false" maxWidth="Infinity"/>
+                            <ComboBox fx:id="availableItemsQueryField" editable="false" />
                         </children>
                     </VBox>
                     <VBox spacing="6.0">
                         <children>
                             <Label styleClass="field-label" text="%selected_item_query_model"/>
-                            <ComboBox fx:id="selectedItemQueryField" editable="false" maxWidth="Infinity"/>
+                            <ComboBox fx:id="selectedItemQueryField" editable="false" />
                         </children>
                     </VBox>
                     <VBox spacing="6.0">

@@ -51,12 +51,10 @@ public class EditorFactory {
     try {
       // Check whether the model type is enabled before opening an editor.
       // Types marked enabled=false in model-versions.json are not yet supported.
-      if (item.getModel() != null && item.getModel().getModelType() != null) {
-        if (!item.getModel().getModelType().isEnabled()) {
-          WidgetFactory.showAlert(Studio.stage,
-              StudioBundle.get("model_not_supported_yet", ModelTypeLabels.getDisplayName(item.getModel().getModelType())));
-          return null;
-        }
+      if (!item.isModelSupported()) {
+        WidgetFactory.showAlert(Studio.stage,
+            StudioBundle.get("model_not_supported_yet", ModelTypeLabels.getDisplayName(item.getModel().getModelType())));
+        return null;
       }
 
       Parent content = null;

@@ -129,7 +129,7 @@ public final class ProjectDocumentModels {
    */
   public static void openModelInEditor(@NonNull ProjectItem item) {
     Project project = Studio.getCurrentProject();
-    if (project != null) {
+    if (project != null && item.isModelSupported()) {
       project.getSettings().getUISettings().addOpenedFile(item.getPath());
       project.getSettings().getUISettings().save();
     }

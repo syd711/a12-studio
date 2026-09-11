@@ -89,7 +89,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
       // otherwise never find a match for edits made through a restored tab, permanently missing its
       // validation-error updates.
       ProjectItem item = file.exists() ? project.getRoot().findByPath(path) : null;
-      if (item != null) {
+      if (item != null && item.isModelSupported()) {
         open(item);
         if (path.equals(selectedFile)) {
           tabPane.getSelectionModel().select(tabPane.getTabs().get(tabPane.getTabs().size() - 1));

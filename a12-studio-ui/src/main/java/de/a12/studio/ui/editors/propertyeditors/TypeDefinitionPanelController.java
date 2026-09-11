@@ -28,6 +28,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import lombok.extern.slf4j.Slf4j;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -50,6 +51,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
+@Slf4j
 public class TypeDefinitionPanelController extends AbstractPropertyEditor implements Initializable {
 
   private static final String TYPE_STRING = "String";
@@ -264,7 +266,9 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   public void setElement(@NonNull Element element) {
     super.setElement(element);
 
+    long labelsStart = System.currentTimeMillis();
     typeDefinitionLabelsById = collectAvailableTypeDefinitionLabels(element.getId());
+    log.info("      collectAvailableTypeDefinitionLabels in {}ms", System.currentTimeMillis() - labelsStart);
     setComboBoxItems(dataTypeCombo, List.copyOf(typeDefinitionLabelsById.keySet()));
 
     dataTypeComboBox.getItems().setAll(availableDataTypes());

@@ -303,6 +303,13 @@
     -fx-background-color: transparent;
 }
 
+.shortcut-section-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size: 13px;
+    -fx-padding: 14 0 4 0;
+}
+
 .shortcut-key {
     -fx-font-family: monospace;
     -fx-font-size: 13px;

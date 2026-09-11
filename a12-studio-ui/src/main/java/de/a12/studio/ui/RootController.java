@@ -424,17 +424,33 @@ public class RootController implements Initializable, StudioEventListener {
     saveSidePanelState();
   }
 
-  /** Toggle bookmarks panel from keyboard shortcut (CTRL+B). */
-  public void toggleBookmarks() {
-    boolean show = !bookmarksToggle.isSelected();
-    bookmarksToggle.setSelected(show);
+  /** Opens/shows the project tree side panel from keyboard shortcut (F3). */
+  public void showProjectTree() {
+    projectViewToggle.setSelected(true);
+    bookmarksToggle.setSelected(false);
+    versioncontrolToggle.setSelected(false);
+    showSidePanel(projectTree);
+    saveSidePanelState();
+  }
+
+  /** Opens/shows the bookmarks side panel from keyboard shortcut (F4). */
+  public void showBookmarksView() {
+    bookmarksToggle.setSelected(true);
     projectViewToggle.setSelected(false);
     versioncontrolToggle.setSelected(false);
-    if (show) {
-      showSidePanel(getBookmarksPanelRoot());
-    } else {
-      removeSidePanel();
+    showSidePanel(getBookmarksPanelRoot());
+    saveSidePanelState();
+  }
+
+  /** Opens/shows the version control side panel from keyboard shortcut (F5), a no-op if it's currently unavailable. */
+  public void showVersionControlView() {
+    if (!versioncontrolToggle.isVisible()) {
+      return;
     }
+    versioncontrolToggle.setSelected(true);
+    projectViewToggle.setSelected(false);
+    bookmarksToggle.setSelected(false);
+    showSidePanel(getVersioncontrolPanelRoot());
     saveSidePanelState();
   }
 

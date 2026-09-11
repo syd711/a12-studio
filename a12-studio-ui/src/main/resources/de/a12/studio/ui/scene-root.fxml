@@ -60,7 +60,7 @@
                                                 <FontIcon iconLiteral="mdi2s-source-branch" iconSize="18" styleClass="toolbar-icon" />
                                              </graphic>
                                              <tooltip>
-                                                <Tooltip text="%versioncontrol" />
+                                                <Tooltip text="%versioncontrol_tooltip" />
                                              </tooltip>
                                           </ToggleButton>
                                        </items>

@@ -12,12 +12,14 @@ import de.a12.studio.ui.editors.propertyeditors.TypeDefinitionPanelController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TitledPane;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+@Slf4j
 public class DocumentModelFieldEditorController implements ElementEditorController, Initializable {
 
   @FXML
@@ -86,8 +88,10 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
     dataTypeConfigurationController.setAncestors(ancestors);
     boolean readOnly = isWithinAttachment(ancestors) || isWithinInclude(ancestors);
     propertyEditors.forEach(propertyEditor -> {
+      long panelStart = System.currentTimeMillis();
       propertyEditor.setElement(element);
       propertyEditor.setEditorDisabled(readOnly);
+      log.info("    bound {} in {}ms", propertyEditor.getClass().getSimpleName(), System.currentTimeMillis() - panelStart);
     });
     updateErrorMessagesVisibility();
   }

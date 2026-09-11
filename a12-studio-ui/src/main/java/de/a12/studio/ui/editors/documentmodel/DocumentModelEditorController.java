@@ -21,6 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+@Slf4j
 public class DocumentModelEditorController extends AbstractEditorController implements Initializable {
   private static final String MAIN_DIVIDER_ID = "mainDivider";
 
@@ -74,6 +76,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   }
 
   private void onElementSelectionChanged(@NonNull List<Element> selectedElements) {
+    long startTime = System.currentTimeMillis();
     if (currentElementEditorController != null) {
       currentElementEditorController.destroy();
       currentElementEditorController = null;
@@ -107,6 +110,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
     }
     Node node = loadEditor(editorFxml, selected);
     editorContainer.setCenter(node);
+    log.info("Rendered '{}' for element '{}' in {}ms", editorFxml, selected.getId(), System.currentTimeMillis() - startTime);
   }
 
   /**
@@ -130,13 +134,17 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   private Node loadEditor(@NonNull String fxml, @NonNull Element selected) {
     try {
+      long loadStart = System.currentTimeMillis();
       FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-loader.setResources(StudioBundle.getBundle());
+      loader.setResources(StudioBundle.getBundle());
       Node node = loader.load();
+      long loadDuration = System.currentTimeMillis() - loadStart;
+      long bindStart = System.currentTimeMillis();
       if (loader.getController() instanceof ElementEditorController elementEditorController) {
         elementEditorController.setElement(selected, elementsTreeController.getAncestors(selected));
         currentElementEditorController = elementEditorController;
       }
+      log.info("  loaded '{}' (fxml {}ms, bind {}ms)", fxml, loadDuration, System.currentTimeMillis() - bindStart);
       return node;
     }
     catch (IOException e) {

@@ -199,14 +199,14 @@ confirmLoader.setResources(StudioBundle.getBundle());
   public void setElement(@NonNull Element element) {
     super.setElement(element);
 
-    stringConfigurationController.setElement(element);
-    numberConfigurationController.setElement(element);
-    dateFragmentConfigurationController.setElement(element);
-    dateRangeConfigurationController.setElement(element);
-    customConfigurationController.setElement(element);
-    enumerationConfigurationController.setElement(element);
-    dateConfigurationController.setElement(element);
-    confirmConfigurationController.setElement(element);
+    timed("string", () -> stringConfigurationController.setElement(element));
+    timed("number", () -> numberConfigurationController.setElement(element));
+    timed("dateFragment", () -> dateFragmentConfigurationController.setElement(element));
+    timed("dateRange", () -> dateRangeConfigurationController.setElement(element));
+    timed("custom", () -> customConfigurationController.setElement(element));
+    timed("enumeration", () -> enumerationConfigurationController.setElement(element));
+    timed("date", () -> dateConfigurationController.setElement(element));
+    timed("confirm", () -> confirmConfigurationController.setElement(element));
     if (isStringFieldType(element) && isMultiSelectParent()) {
       // A multi-select group's String choices have no configurable properties of their own.
       content.getChildren().setAll(List.of());
@@ -230,6 +230,15 @@ confirmLoader.setResources(StudioBundle.getBundle());
       content.getChildren().setAll(List.of());
     }
     setEditorVisible(!content.getChildren().isEmpty());
+  }
+
+  private void timed(String label, Runnable action) {
+    long start = System.currentTimeMillis();
+    action.run();
+    long duration = System.currentTimeMillis() - start;
+    if (duration > 0) {
+      log.info("      {} sub-panel setElement in {}ms", label, duration);
+    }
   }
 
   private static boolean isStringFieldType(Element element) {

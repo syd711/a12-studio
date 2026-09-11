@@ -4,23 +4,16 @@
 - Field and model name validation: The name of the Combined Document Model. It needs to fulfill certain conventions: Only letters, digits, hyphens, underscores and periods are allowed. Furthermore, the name of the model must not start with "xml" and must be at most 100 characters long.
 - Add a drag handler for the items in C:\workspace\a12-studio\a12-studio-ui\src\main\resources\de\a12\studio\ui\editors\overviewmodel\dialogs\filter-items-panel.fxml
 - Why are not all rows editable for C:\workspace\a12-studio\a12-studio-ui\src\main\resources\de\a12\studio\ui\editors\overviewmodel\subheader-slot-panel.fxml. For C:\workspace\a12-studio\testing\workspaces\basic\models\Company_OM.json all rows are editable in the SME.
-- Add tooltips to the model icons with the model type name
-- Fixed the project tree text color to white if the node is selected.
+
 
 # Git-Support:
-For the github support, add commit and revert buttons to the actions toolbar. Make sure that the buttons are only enabled when the file has outgoing changes. On commit, provide a dialog with textarea where the user can enter a commit. Initialize the textarea with the existing value from the version control view commit message text area.
+
 
 # Relationhip-UI:
-For the relationhip-ui model type in a12-studio-models/src/main/resources/de/a12/studio/models/model-versions.json, create a new editor with property fields.
-Take the icon a12-studio-ui/src/main/resources/de/a12/studio/ui/icons/Model-Relationship.png and convert the square into a circle, keeping the same colors, the black border and the letter and save the icon Model-Relationship-UI.png in the same folder.
-Use this new icon for model in the project tree. Take a look at the SME how the editor looks like and what additional validators are needed.
-Take your time, create a plan and implement it.
+
 
 # Shortcuts:
-Fix shortcuts: Use F3 to open or show the project tree, use F4 to open or show the bookmarks view, use F5 to open or show the version control view. Use CTRL+B to toggle the bookmark state of the active workarea tab.
-Add the shortcut CTRL+P to open the model preferences dialog of the active tab. add the shortcut CTRL+D to deploy the model of the active tab (if supported).
-Add the shortcut CTRL+SHIFT+D to deploy the workspace. Update the tooltips of all these buttons and show the shortcut as additional info.
-Update the shortcut list. group shortcuts for general shortcuts and editor based shortcuts.
+
 
 # Form Models:
 - check detached and embedded repeats
@@ -54,9 +47,9 @@ The Context only needs to be selected if the Additive Document Model is referenc
 
 
 # Relationship Models:
-- The Link Document Model reference and the checkbox "Duplicable" are only active for n:n Relationships. The Relationship Model Editor shows a warning if a 1:n or 1:1 Relationship Model has a Link Document Model or Duplicable set. 
+- The Link Document Model reference and the checkbox "Duplicable" are only active for n:n Relationships. The Relationship Model Editor should show a warning if a 1:n or 1:1 Relationship Model has a Link Document Model or Duplicable set. Check the SME against this. 
 - The labels which can be maintained for the Relationship Model are currently not used in the default UI for Relationships. => Hide them in the settings.
-- Add "Generete Document Models" button if not already there.
+- 
 
 # Composed Document Models
 - Add separate property editor for cdm.queryRoot property

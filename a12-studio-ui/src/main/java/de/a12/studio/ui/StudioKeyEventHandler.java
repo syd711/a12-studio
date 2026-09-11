@@ -1,9 +1,12 @@
 package de.a12.studio.ui;
 
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.ui.bookmarks.BookmarkService;
 import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.components.RecentFilesDialogController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.previewapp.PreviewAppDeployer;
 import de.a12.studio.ui.updater.Dialogs;
 import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.StudioBundle;
@@ -16,37 +19,51 @@ import javafx.stage.Stage;
 import java.util.List;
 
 /**
- * Global keyboard shortcuts for the main studio window: saving the active model, resizing the
+ * Global keyboard shortcuts for the main studio window: saving the active model, toggling the
+ * activity-bar side panels, opening the active tab's model settings/deploying it, resizing the
  * window to fixed presets, snapping/maximizing the window with Win+arrow keys, and opening the
  * release notes dialog.
  */
 public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
 
-  public record Shortcut(String keys, String description) {}
+  public enum Category { GENERAL, EDITOR }
+
+  public record Shortcut(String keys, String description, Category category) {}
 
   /**
    * Single source of truth for the shortcuts shown in Preferences > Shortcuts. Whenever a new
-   * shortcut is added to {@link #handle(KeyEvent)}, add a matching entry here.
+   * shortcut is added to {@link #handle(KeyEvent)}, add a matching entry here. {@link
+   * Category#GENERAL} shortcuts work regardless of which (if any) tab is active; {@link
+   * Category#EDITOR} shortcuts act on the currently active workarea tab.
    */
   public static final List<Shortcut> SHORTCUTS = List.of(
-      new Shortcut(StudioBundle.get("ctrl_b"), StudioBundle.get("toggle_bookmarks_view")),
-      new Shortcut(StudioBundle.get("ctrl_n"), StudioBundle.get("new_project")),
-      new Shortcut(StudioBundle.get("ctrl_o"), StudioBundle.get("open_project")),
-      new Shortcut(StudioBundle.get("ctrl_s"), StudioBundle.get("save_the_active_model")),
-      new Shortcut(StudioBundle.get("ctrl_w"), StudioBundle.get("close_the_selected_tab")),
-      new Shortcut(StudioBundle.get("ctrl_tab"), StudioBundle.get("select_the_next_tab")),
-      new Shortcut(StudioBundle.get("ctrl_shift_tab"), StudioBundle.get("select_the_previous_tab")),
-      new Shortcut(StudioBundle.get("ctrl_alt_p"), StudioBundle.get("open_preferences")),
-      new Shortcut(StudioBundle.get("ctrl_shift_n"), StudioBundle.get("search_files")),
-      new Shortcut(StudioBundle.get("ctrl_shift_f"), StudioBundle.get("find_in_files")),
-      new Shortcut(StudioBundle.get("ctrl_e"), StudioBundle.get("recent_files")),
-      new Shortcut(StudioBundle.get("ctrl_alt_u"), StudioBundle.get("show_update_info")),
-      new Shortcut(StudioBundle.get("ctrl_alt_h"), StudioBundle.get("resize_window_to_1920x1080")),
-      new Shortcut(StudioBundle.get("ctrl_alt_w"), StudioBundle.get("resize_window_to_2560x1440")),
-      new Shortcut(StudioBundle.get("win_left"), StudioBundle.get("snap_window_to_the_left_half_of_the_screen")),
-      new Shortcut(StudioBundle.get("win_right"), StudioBundle.get("snap_window_to_the_right_half_of_the_screen")),
-      new Shortcut(StudioBundle.get("win_up"), StudioBundle.get("maximize_the_window")),
-      new Shortcut(StudioBundle.get("win_down"), StudioBundle.get("restore_then_minimize_the_window"))
+      // --- General ---
+      new Shortcut(StudioBundle.get("ctrl_n"), StudioBundle.get("new_project"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_o"), StudioBundle.get("open_project"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("f3"), StudioBundle.get("show_the_project_tree"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("f4"), StudioBundle.get("show_the_bookmarks_view"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("f5"), StudioBundle.get("show_the_version_control_view"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_shift_n"), StudioBundle.get("search_files"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_shift_f"), StudioBundle.get("find_in_files"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_e"), StudioBundle.get("recent_files"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_shift_d"), StudioBundle.get("deploy_the_workspace"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_alt_p"), StudioBundle.get("open_preferences"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_alt_u"), StudioBundle.get("show_update_info"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_alt_h"), StudioBundle.get("resize_window_to_1920x1080"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_alt_w"), StudioBundle.get("resize_window_to_2560x1440"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("win_left"), StudioBundle.get("snap_window_to_the_left_half_of_the_screen"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("win_right"), StudioBundle.get("snap_window_to_the_right_half_of_the_screen"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("win_up"), StudioBundle.get("maximize_the_window"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("win_down"), StudioBundle.get("restore_then_minimize_the_window"), Category.GENERAL),
+
+      // --- Editor (acts on the active workarea tab) ---
+      new Shortcut(StudioBundle.get("ctrl_b"), StudioBundle.get("toggle_the_bookmark_state_of_the_active_tab"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("ctrl_s"), StudioBundle.get("save_the_active_model"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("ctrl_p"), StudioBundle.get("open_model_settings_of_the_active_tab"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("ctrl_d"), StudioBundle.get("deploy_the_active_model"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("ctrl_w"), StudioBundle.get("close_the_selected_tab"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("ctrl_tab"), StudioBundle.get("select_the_next_tab"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("ctrl_shift_tab"), StudioBundle.get("select_the_previous_tab"), Category.EDITOR)
   );
 
   private final Stage stage;
@@ -82,8 +99,23 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       return;
     }
 
-    if (ke.getCode() == KeyCode.B && ke.isControlDown()) {
-      Studio.getRootController().toggleBookmarks();
+    if (ke.getCode() == KeyCode.F3) {
+      Studio.getRootController().showProjectTree();
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.F4) {
+      Studio.getRootController().showBookmarksView();
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.F5) {
+      Studio.getRootController().showVersionControlView();
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.B && ke.isControlDown()) {
+      ProjectItem projectItem = Studio.getSelectedProjectItem();
+      if (projectItem != null) {
+        BookmarkService.getInstance().toggle(projectItem);
+      }
       ke.consume();
     }
     else if (ke.getCode() == KeyCode.U && ke.isAltDown() && ke.isControlDown()) {
@@ -103,6 +135,28 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       if (projectItem != null) {
         projectItem.save();
         StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
+      }
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.P && ke.isControlDown() && !ke.isAltDown()) {
+      if (Studio.getSelectedProjectItem() != null) {
+        de.a12.studio.ui.editors.dialogs.Dialogs.openSettings();
+      }
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.D && ke.isControlDown() && ke.isShiftDown()) {
+      Project project = Studio.getCurrentProject();
+      if (project != null && project.getSettings().getProjectRootSettings().getPreviewApp().isEnabled()) {
+        PreviewAppDeployer.deploy(project, null);
+      }
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.D && ke.isControlDown()) {
+      ProjectItem projectItem = Studio.getSelectedProjectItem();
+      Project project = Studio.getCurrentProject();
+      if (projectItem != null && project != null
+          && project.getSettings().getProjectRootSettings().getPreviewApp().isEnabled()) {
+        PreviewAppDeployer.deploySingle(project, projectItem, null);
       }
       ke.consume();
     }
