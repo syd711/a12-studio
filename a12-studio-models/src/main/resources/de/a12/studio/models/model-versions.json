@@ -11,7 +11,7 @@
   "module-masterdetail":{ "version": "1.0.0",  "enabled": true,  "suffix": "MDM" },
   "relationship":       { "version": "4.0.0",  "enabled": true,  "suffix": "RM"  },
   "relationship-ui":    { "version": "2.0.0",  "enabled": true,  "suffix": "Ru"  },
-  "selection":          { "version": "2.1.0",  "enabled": false, "suffix": "SEM" },
+  "selection":          { "version": "2.0.0",  "enabled": false, "suffix": "SEM" },
   "application":        { "version": "6.0.0",  "enabled": true,  "suffix": "AM"  },
   "content":            { "version": "0.8.0",  "enabled": true,  "suffix": "CM"  },
   "combination":        { "version": "1.0.0",  "enabled": true,  "suffix": "CDM" },

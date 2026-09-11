@@ -4,6 +4,7 @@ import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
 import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.bookmarks.BookmarkService;
 import de.a12.studio.ui.util.ModelTypeLabels;
+import de.a12.studio.ui.util.OSUtil;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.ModelType;
@@ -79,13 +80,19 @@ class ProjectTreeContextMenu {
     newMenu.getItems().add(newFolder);
 
     MenuItem open = new MenuItem(StudioBundle.get("open"));
-    open.setDisable(viewModel.isFolder());
+    open.setVisible(!viewModel.isFolder());
     open.setOnAction(event -> actions.onOpenItem(viewModel));
+
+    MenuItem openInFileManager = new MenuItem(StudioBundle.get(openInFileManagerKey()));
+    openInFileManager.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.FOLDER_OPEN_OUTLINE)));
+    openInFileManager.setVisible(viewModel.isFolder());
+    openInFileManager.setOnAction(event -> actions.onOpenInFileManager(projectItem));
 
     boolean isBookmarked = !viewModel.isFolder() && BookmarkService.getInstance().isBookmarked(projectItem);
     MenuItem bookmark = new MenuItem(StudioBundle.get(isBookmarked ? "bookmark_delete" : "bookmark"));
     bookmark.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(isBookmarked ? "mdi2b-bookmark" : "mdi2b-bookmark-outline")));
-    bookmark.setDisable(projectItem.isRoot() || viewModel.isFolder() || viewModel.isSettings() || viewModel.isAuthFile());
+    bookmark.setVisible(!viewModel.isFolder());
+    bookmark.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     bookmark.setOnAction(event -> actions.onToggleBookmark(projectItem));
 
     MenuItem rename = new MenuItem(StudioBundle.get("rename"));
@@ -94,6 +101,7 @@ class ProjectTreeContextMenu {
 
     MenuItem createCopy = new MenuItem(StudioBundle.get("create_copy"));
     createCopy.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.COPY)));
+    createCopy.setVisible(!viewModel.isFolder());
     createCopy.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     createCopy.setOnAction(event -> actions.onCreateCopy(projectItem));
 
@@ -107,7 +115,21 @@ class ProjectTreeContextMenu {
     delete.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     delete.setOnAction(event -> actions.onDeleteItem(projectItem));
 
-    return new ContextMenu(newMenu, open, bookmark, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
+    return new ContextMenu(newMenu, open, openInFileManager, bookmark, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
+  }
+
+  /**
+   * Picks the bundle key naming this OS's file browser ("Explorer" on Windows, "Finder" on macOS,
+   * a generic "File Manager" wording on Linux where the actual application varies by desktop environment).
+   */
+  private static String openInFileManagerKey() {
+    if (OSUtil.isMac()) {
+      return "open_in_finder";
+    }
+    if (OSUtil.isLinux()) {
+      return "open_in_file_manager";
+    }
+    return "open_in_explorer";
   }
 
   private static Node withMenuIconStyle(@NonNull Node icon) {

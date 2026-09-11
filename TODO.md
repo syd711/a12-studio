@@ -5,10 +5,13 @@ Solve the following TODOs:
 - Add tooltips to the model icons with the model type name
 
 Commons:
-- Make the project tree collapsible.
 - move the deploy to a progressable in the footer
 - add a data download menu to the deploy button
 - Field and model name validation: The name of the Combined Document Model. It needs to fulfill certain conventions: Only letters, digits, hyphens, underscores and periods are allowed. Furthermore, the name of the model must not start with "xml" and must be at most 100 characters long.
+
+Git-Support:
+
+
 
 Form Models:
 - check detached and embedded repeats

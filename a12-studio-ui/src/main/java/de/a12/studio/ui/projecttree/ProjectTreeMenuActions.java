@@ -15,6 +15,7 @@ import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController.NewModelInp
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.zip.ZipUtil;
 import javafx.scene.control.ButtonType;
@@ -199,6 +200,10 @@ public class ProjectTreeMenuActions {
     catch (IOException e) {
       showError(StudioBundle.get("could_not_copy_item", item.getName()), e);
     }
+  }
+
+  void onOpenInFileManager(@NonNull ProjectItem item) {
+    SystemUtil.openFolder(item.getFile());
   }
 
   void onZipFolder(@NonNull ProjectItem item) {
