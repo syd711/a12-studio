@@ -23,6 +23,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -263,7 +264,6 @@ public class TabPaneController implements Initializable, StudioEventListener {
       return;
     }
     tab.setContent(content);
-    installDoubleClickHandler(tab);
   }
 
   /**
@@ -289,20 +289,41 @@ public class TabPaneController implements Initializable, StudioEventListener {
     tab.getStyleClass().add("model-tab-" + modelType.name().toLowerCase());
   }
 
-  private void installDoubleClickHandler(@NonNull Tab tab) {
-    Platform.runLater(() -> {
-      Node tabNode = tab.getTabPane();
-      if (tabNode != null) {
-        tabNode.setOnMouseClicked(event -> {
-          if (event.getClickCount() == 2) {
-            ProjectItem projectItem = (ProjectItem) tab.getUserData();
-            if (projectItem != null) {
-              StudioEventManager.getInstance().fireModelFocusRequestedEvent(projectItem);
-            }
-          }
-        });
+  /**
+   * Double-clicking a tab's header (not its content - see {@link #isTabHeaderClick}) reveals that tab's
+   * model in the project tree, same as the project tree toolbar's "select active model" button fires via
+   * {@link StudioEventManager#fireModelFocusRequestedEvent}. Wired once on the shared
+   * {@link #tabPane} rather than per-tab: a per-tab {@code setOnMouseClicked} on {@code tab.getTabPane()}
+   * (the previous approach) targets the same underlying TabPane node for every tab, so each newly opened
+   * tab silently overwrote the previous tab's handler and only the most-recently-opened tab's double-click
+   * ever worked. By the time a double click's second click is dispatched, tab-header selection has already
+   * switched to the clicked tab, so reading {@link #getSelectedProjectItem()} at that point always reflects
+   * the tab actually under the pointer.
+   */
+  private void installTabHeaderDoubleClickHandler() {
+    tabPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+      if (event.getClickCount() == 2 && isTabHeaderClick(event)) {
+        ProjectItem projectItem = getSelectedProjectItem();
+        if (projectItem != null) {
+          StudioEventManager.getInstance().fireModelFocusRequestedEvent(projectItem);
+        }
       }
     });
+  }
+
+  /**
+   * True if {@code event} landed inside the TabPane's header strip (the row of tab labels) rather than the
+   * selected tab's content below it - the default {@code TabPaneSkin} puts the header row in a node styled
+   * "tab-header-area", a sibling of (not an ancestor shared with) the content area, so walking up from the
+   * clicked node and finding that style class unambiguously means the header, not the editor, was clicked.
+   */
+  private boolean isTabHeaderClick(@NonNull MouseEvent event) {
+    for (Node node = event.getPickResult().getIntersectedNode(); node != null; node = node.getParent()) {
+      if (node.getStyleClass().contains("tab-header-area")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void onTabClosed(@NonNull Tab tab) {
@@ -378,6 +399,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
     tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> onSelectionChanged(newTab));
     tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> updateEmptyState());
     updateEmptyState();
+    installTabHeaderDoubleClickHandler();
 
     boolean enabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
     applyColorfulStudioSetting(enabled);

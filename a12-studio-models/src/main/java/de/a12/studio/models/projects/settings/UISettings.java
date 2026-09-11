@@ -13,11 +13,17 @@ public class UISettings extends JsonSettings {
 
   static final String SETTINGS_FILE_NAME = "ui-settings.json";
 
+  /** Cap for {@link #recentFiles}; see {@link #addRecentFile(String)}. */
+  public static final int MAX_RECENT_FILES = 20;
+
   private double dividerPosition = 0.3;
 
   private List<String> openedFiles = new ArrayList<>();
 
   private String selectedFile;
+
+  /** Most-recently-edited files, most recent first, capped at {@link #MAX_RECENT_FILES}. Backs the "Recent Files" palette (Ctrl+E). */
+  private List<String> recentFiles = new ArrayList<>();
 
   @Override
   public String getSettingsName() {
@@ -60,6 +66,26 @@ public class UISettings extends JsonSettings {
 
   public void setSelectedFile(String selectedFile) {
     this.selectedFile = selectedFile;
+  }
+
+  public List<String> getRecentFiles() {
+    return recentFiles;
+  }
+
+  public void setRecentFiles(List<String> recentFiles) {
+    this.recentFiles = recentFiles;
+  }
+
+  public void addRecentFile(@NonNull String path) {
+    recentFiles.remove(path);
+    recentFiles.add(0, path);
+    while (recentFiles.size() > MAX_RECENT_FILES) {
+      recentFiles.remove(recentFiles.size() - 1);
+    }
+  }
+
+  public void removeRecentFile(@NonNull String path) {
+    recentFiles.remove(path);
   }
 
   public static UISettings load() {

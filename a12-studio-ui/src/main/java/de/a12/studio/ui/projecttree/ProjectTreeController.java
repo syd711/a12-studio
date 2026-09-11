@@ -86,6 +86,14 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     reloadProject();
   }
 
+  @FXML
+  private void onSelectActiveModel() {
+    ProjectItem item = Studio.getSelectedProjectItem();
+    if (item != null) {
+      revealItem(item);
+    }
+  }
+
   /**
    * Reloads the whole project from disk (fresh {@link ProjectItem} tree + revalidation) and
    * redraws it. Public so other panels that make out-of-band filesystem changes - e.g. {@link

@@ -8,10 +8,13 @@
 # Git-Support:
 
 
-# Relationhip-UI:
+# Relationship-UI:
 
 
 # Shortcuts:
+
+# Rule Editor
+
 
 
 # Form Models:

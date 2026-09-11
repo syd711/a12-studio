@@ -57,6 +57,15 @@
                               <Tooltip text="%collapse_all_project_tree" />
                           </tooltip>
                       </Button>
+                      <Separator orientation="VERTICAL" />
+                      <Button accessibleText="%select_active_model_project_tree" mnemonicParsing="false" onAction="#onSelectActiveModel" styleClass="default-button">
+                          <graphic>
+                              <FontIcon iconLiteral="mdi2t-target" iconSize="18" styleClass="toolbar-icon" />
+                          </graphic>
+                          <tooltip>
+                              <Tooltip text="%select_active_model_project_tree" />
+                          </tooltip>
+                      </Button>
                       <Region HBox.hgrow="ALWAYS" />
                       <Button fx:id="collapseProjectViewButton" accessibleText="%collapse_project_view" mnemonicParsing="false" onAction="#onCollapseProjectView" styleClass="default-button">
                           <graphic>
