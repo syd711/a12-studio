@@ -291,6 +291,18 @@
 }
 
 /*
+ * The project tree's item name is rendered via a Label set as the cell's graphic (see
+ * ProjectTreeCell), not as the cell's own text - so an item's name and its icon can carry
+ * separate tooltips (item name/validation errors on the text, model type on the icon). The
+ * .tree-cell.model-missing/.validation-error rules above never reach that child Label, so it
+ * needs its own explicit restatement here, mirroring .tree-cell-name-label.validation-error.
+ */
+.tree-cell-name-label.model-missing {
+    -fx-text-fill: -fx-text-color-disabled;
+    -fx-font-style: italic;
+}
+
+/*
  * ID-scoped overrides for the plain project TreeView (fx:id="projectTree").
  * Uses a softer, more muted blue than the vivid accent color used elsewhere.
  */

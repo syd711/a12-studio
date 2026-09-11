@@ -440,7 +440,7 @@ public class LocalizedTextPanelController extends AbstractPropertyEditor {
 
     int row = 1;
     for (Locale locale : getModelLocales()) {
-      javafx.scene.control.Label localeLabel = new javafx.scene.control.Label(locale.getCode());
+      javafx.scene.control.Label localeLabel = new javafx.scene.control.Label(java.util.Locale.forLanguageTag(locale.getCode()).getDisplayName());
       TextInputControl field = createLocaleField(fieldKey + "-" + locale.getCode());
       field.setMaxWidth(Double.MAX_VALUE);
       bindLocaleField(field, (el, value) -> setLocaleText(locale.getCode(), value));

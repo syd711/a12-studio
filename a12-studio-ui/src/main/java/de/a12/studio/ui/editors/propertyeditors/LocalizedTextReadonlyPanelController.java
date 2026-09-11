@@ -71,7 +71,7 @@ public class LocalizedTextReadonlyPanelController extends AbstractPropertyEditor
 
     int row = FIRST_DATA_ROW;
     for (Locale locale : getModelLocales()) {
-      javafx.scene.control.Label localeLabel = new javafx.scene.control.Label(locale.getCode());
+      javafx.scene.control.Label localeLabel = new javafx.scene.control.Label(java.util.Locale.forLanguageTag(locale.getCode()).getDisplayName());
       localeLabel.getStyleClass().add("readonly-table-cell");
       javafx.scene.control.Label valueLabel = new javafx.scene.control.Label();
       valueLabel.getStyleClass().add("readonly-table-cell");

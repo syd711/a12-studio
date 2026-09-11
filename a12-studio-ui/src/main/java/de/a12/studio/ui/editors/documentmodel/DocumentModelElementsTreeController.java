@@ -273,9 +273,16 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return baseModelNode != null && element == baseModelNode;
   }
 
+  /**
+   * Looked up by identity (see {@link #findTreeItemByIdentity}), not id, so this also resolves correctly for
+   * an element nested under {@link #baseModelNode} - whose descendants come from {@link #referenceBaseModel}'s
+   * own file and may reuse this model's ids - so that callers like the property editors' {@code isWithinInclude}
+   * read-only check see {@link #baseModelNode} among the ancestors of its preview fields, same as they would
+   * for a real Include group's resolved children.
+   */
   public List<Element> getAncestors(@NonNull Element element) {
     List<Element> ancestors = new ArrayList<>();
-    TreeItem<ElementViewModel> treeItem = findTreeItem(elementsTreeTable.getRoot(), element.getId());
+    TreeItem<ElementViewModel> treeItem = findTreeItemByIdentity(elementsTreeTable.getRoot(), element);
     if (treeItem == null) {
       return ancestors;
     }
@@ -304,6 +311,28 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     }
     for (TreeItem<ElementViewModel> child : treeItem.getChildren()) {
       TreeItem<ElementViewModel> found = findTreeItem(child, elementId);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Identity-based counterpart to {@link #findTreeItem}: {@code ==} can never be ambiguous the way an id
+   * lookup could be (see that method's javadoc), so this is safe to use for elements nested under {@link
+   * #baseModelNode} too, unlike {@link #findTreeItem} which deliberately skips that subtree. Used by {@link
+   * #getAncestors} only - every other lookup here is id-based, for this model's own elements.
+   */
+  private TreeItem<ElementViewModel> findTreeItemByIdentity(TreeItem<ElementViewModel> treeItem, @NonNull Element element) {
+    if (treeItem == null) {
+      return null;
+    }
+    if (treeItem.getValue() != null && treeItem.getValue().getElement() == element) {
+      return treeItem;
+    }
+    for (TreeItem<ElementViewModel> child : treeItem.getChildren()) {
+      TreeItem<ElementViewModel> found = findTreeItemByIdentity(child, element);
       if (found != null) {
         return found;
       }

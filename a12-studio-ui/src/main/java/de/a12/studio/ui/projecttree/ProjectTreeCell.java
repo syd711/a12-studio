@@ -9,7 +9,9 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -20,6 +22,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -131,7 +134,6 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       return;
     }
 
-    setText(item.getDisplayName());
     boolean locked = isLockedFolder(item);
     boolean missingModel = !item.isFolder() && !item.hasModel() && !item.isSettings() && !item.isAuthFile();
     setContextMenu(missingModel ? null : contextMenuFactory.create(item));
@@ -144,24 +146,33 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       getStyleClass().remove("model-missing");
     }
 
+    Label nameLabel = new Label(item.getDisplayName());
+    nameLabel.getStyleClass().add("tree-cell-name-label");
+    if (missingModel || locked) {
+      nameLabel.getStyleClass().add("model-missing");
+    }
+
     List<ModelValidationError> validationErrors = item.getValidationErrors();
     boolean hasError = validationErrors.stream().anyMatch(error -> Severity.ERROR.name().equals(error.severity()));
     if (validationErrors.isEmpty()) {
       getStyleClass().remove("validation-error");
-      setTooltip(WidgetFactory.createTooltip(item.getDisplayName()));
+      Tooltip.install(nameLabel, WidgetFactory.createTooltip(item.getDisplayName()));
     }
     else {
       if (hasError) {
         if (!getStyleClass().contains("validation-error")) {
           getStyleClass().add("validation-error");
         }
+        nameLabel.getStyleClass().add("validation-error");
       }
       else {
         getStyleClass().remove("validation-error");
       }
       String messages = validationErrors.stream().map(error -> "• " + error.message()).collect(Collectors.joining("\n"));
-      setTooltip(WidgetFactory.createTooltip(item.getDisplayName() + "\n" + messages));
+      Tooltip.install(nameLabel, WidgetFactory.createTooltip(item.getDisplayName() + "\n" + messages));
     }
+
+    Node nodeIcon;
     if (item.isFolder()) {
       boundTreeItem = getTreeItem();
       if (locked) {
@@ -172,32 +183,37 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       }
       icon.setIconSize(18);
       boundTreeItem.expandedProperty().addListener(expandedListener);
-      setGraphic(icon);
+      nodeIcon = icon;
     }
     else if (item.isSettings()) {
       icon.setIconSize(18);
       icon.setIconLiteral(Icons.COG_OUTLINE);
-      setGraphic(icon);
+      nodeIcon = icon;
     }
     else if (item.isAuthFile()) {
       icon.setIconSize(18);
       icon.setIconLiteral(item.getProjectItem().getAuthDocument() instanceof RolesDocument
           ? Icons.ACCOUNT_KEY_OUTLINE : Icons.ACCOUNT_MULTIPLE_OUTLINE);
-      setGraphic(icon);
+      nodeIcon = icon;
     }
     else {
       String iconPath = item.getIconPath();
       if (iconPath != null) {
         ImageView modelIcon = WidgetFactory.createModelIcon(iconPath);
         installModelTypeTooltip(modelIcon, item);
-        setGraphic(modelIcon);
+        nodeIcon = modelIcon;
       }
       else {
         icon.setIconSize(18);
         icon.setIconLiteral(Icons.FILE_OUTLINE);
-        setGraphic(icon);
+        nodeIcon = icon;
       }
     }
+
+    HBox graphic = new HBox(4, nodeIcon, nameLabel);
+    graphic.setAlignment(Pos.CENTER_LEFT);
+    setText(null);
+    setGraphic(graphic);
   }
 
   private static void installModelTypeTooltip(Node modelIcon, ProjectItemViewModel item) {

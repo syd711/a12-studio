@@ -5,7 +5,6 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ModelValidationError;
-import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
@@ -152,56 +151,86 @@ public class ProjectTreeController implements Initializable, StudioEventListener
    * model ids), so fixing (or introducing) an error in one document can change what's reported against a
    * completely different one. There's no cheap way to know in advance which other models actually reference
    * {@code model} without re-running their validators, so this simply revalidates all of them.
+   *
+   * <p>Validation runs off the JavaFX Application Thread via {@link JFXFuture} - with hundreds of models this
+   * can take the better part of a second, and running it inline (as this used to) freezes the UI on every
+   * save/delete.
    */
   public void refreshNode(@NonNull A12Model<?> model) {
     if (project == null || findTreeItem(projectTree.getRoot(), model) == null) {
       return;
     }
 
-    long startTime = System.currentTimeMillis();
-    List<ProjectItem> modelItems = new ArrayList<>();
-    collectModelItems(project.getRoot(), modelItems);
-    boolean changed = false;
-    for (ProjectItem item : modelItems) {
-      changed |= refreshItemIfChanged(item);
-    }
-    log.info("Validated {} model(s) in {}ms after change to '{}'", modelItems.size(),
-        System.currentTimeMillis() - startTime, model.getId());
+    Project currentProject = project;
+    JFXFuture.supplyAsync(() -> {
+      long startTime = System.currentTimeMillis();
+      List<ProjectItem> modelItems = new ArrayList<>();
+      collectModelItems(currentProject.getRoot(), modelItems);
+      Map<String, List<ModelValidationError>> errorsByPath = new HashMap<>();
+      for (ProjectItem item : modelItems) {
+        List<ModelValidationError> errors = validateItem(item);
+        if (!errors.isEmpty()) {
+          errorsByPath.put(item.getPath(), errors);
+        }
+      }
+      return new ValidationSnapshot(modelItems.size(), errorsByPath, System.currentTimeMillis() - startTime);
+    }).thenAcceptLater(snapshot -> {
+      if (this.project != currentProject) {
+        return;
+      }
+      boolean changed = applyValidationSnapshot(snapshot.errorsByPath());
+      log.info("Validated {} model(s) in {}ms after change to '{}'", snapshot.modelCount(), snapshot.durationMs(),
+          model.getId());
 
-    // TreeView has no API to redraw a single row: TreeItem.setValue() fires TreeItem.valueChangedEvent(),
-    // but TreeView's internal listener only reacts to events that derive from
-    // TreeItem.expandedItemCountChangeEvent() (structural changes - children added/removed, branch
-    // expanded/collapsed), so a plain value change is silently ignored and never triggers a layout pass or
-    // re-invokes TreeCell.updateItem(). TreeView#refresh() is the only reliable way to get changed rows
-    // redrawn, so it's used here - but only when something actually changed, to avoid rebuilding every
-    // visible cell on every keystroke.
-    if (changed) {
-      projectTree.refresh();
-    }
+      // TreeView has no API to redraw a single row: TreeItem.setValue() fires TreeItem.valueChangedEvent(),
+      // but TreeView's internal listener only reacts to events that derive from
+      // TreeItem.expandedItemCountChangeEvent() (structural changes - children added/removed, branch
+      // expanded/collapsed), so a plain value change is silently ignored and never triggers a layout pass or
+      // re-invokes TreeCell.updateItem(). TreeView#refresh() is the only reliable way to get changed rows
+      // redrawn, so it's used here - but only when something actually changed, to avoid rebuilding every
+      // visible cell on every keystroke.
+      if (changed) {
+        projectTree.refresh();
+      }
+    });
   }
 
-  private boolean refreshItemIfChanged(@NonNull ProjectItem projectItem) {
-    List<ModelValidationError> errors;
+  private record ValidationSnapshot(int modelCount, Map<String, List<ModelValidationError>> errorsByPath, long durationMs) {
+  }
+
+  private List<ModelValidationError> validateItem(@NonNull ProjectItem projectItem) {
     try {
-      errors = Studio.getValidationService().validate(projectItem.getModel());
+      return Studio.getValidationService().validate(projectItem.getModel());
     }
     catch (Exception e) {
       log.warn("Failed to validate '{}': {}", projectItem.getPath(), e.getMessage(), e);
-      errors = List.of(new ModelValidationError(projectItem.getModel(), null, "Failed to parse document: " + e.getMessage(), "ERROR"));
+      return List.of(new ModelValidationError(projectItem.getModel(), null, "Failed to parse document: " + e.getMessage(), "ERROR"));
     }
+  }
 
-    List<ModelValidationError> previous = validationErrorsByPath.getOrDefault(projectItem.getPath(), List.of());
-    if (errors.equals(previous)) {
-      return false;
+  /**
+   * Merges a freshly computed error-by-path snapshot into {@link #validationErrorsByPath}, returning whether
+   * anything actually changed (added, removed, or altered) so the caller only pays for a tree redraw when needed.
+   */
+  private boolean applyValidationSnapshot(@NonNull Map<String, List<ModelValidationError>> newErrorsByPath) {
+    boolean changed = false;
+    Set<String> paths = new HashSet<>(validationErrorsByPath.keySet());
+    paths.addAll(newErrorsByPath.keySet());
+    for (String path : paths) {
+      List<ModelValidationError> previous = validationErrorsByPath.get(path);
+      List<ModelValidationError> next = newErrorsByPath.get(path);
+      if (Objects.equals(previous, next)) {
+        continue;
+      }
+      changed = true;
+      if (next == null) {
+        validationErrorsByPath.remove(path);
+      }
+      else {
+        validationErrorsByPath.put(path, next);
+      }
     }
-
-    if (errors.isEmpty()) {
-      validationErrorsByPath.remove(projectItem.getPath());
-    }
-    else {
-      validationErrorsByPath.put(projectItem.getPath(), errors);
-    }
-    return true;
+    return changed;
   }
 
   private void collectModelItems(@NonNull ProjectItem item, @NonNull List<ProjectItem> result) {
@@ -229,19 +258,11 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     List<ProjectItem> modelItems = new ArrayList<>();
     collectModelItems(project.getRoot(), modelItems);
 
-    ValidationService validationService = Studio.getValidationService();
     Map<String, List<ModelValidationError>> validationErrorsByPath = new HashMap<>();
     for (ProjectItem item : modelItems) {
-      try {
-        List<ModelValidationError> errors = validationService.validate(item.getModel());
-        if (!errors.isEmpty()) {
-          validationErrorsByPath.put(item.getPath(), errors);
-        }
-      }
-      catch (Exception e) {
-        log.warn("Failed to validate '{}': {}", item.getPath(), e.getMessage(), e);
-        validationErrorsByPath.put(item.getPath(),
-            List.of(new ModelValidationError(item.getModel(), null, "Failed to parse document: " + e.getMessage(), "ERROR")));
+      List<ModelValidationError> errors = validateItem(item);
+      if (!errors.isEmpty()) {
+        validationErrorsByPath.put(item.getPath(), errors);
       }
     }
 
