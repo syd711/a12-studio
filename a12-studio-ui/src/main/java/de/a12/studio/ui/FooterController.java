@@ -12,12 +12,14 @@ import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.events.TabSelectionChangedEvent;
+import de.a12.studio.ui.previewapp.PreviewAppDeployer;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
 import de.a12.studio.ui.previewapp.PreviewAppStatusMonitor;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import org.apache.commons.io.FileUtils;
 import org.jspecify.annotations.NonNull;
@@ -70,6 +72,12 @@ public class FooterController implements Initializable, StudioEventListener {
   @FXML
   private FontIcon previewAppStatusIcon;
 
+  @FXML
+  private HBox deployProgressStatus;
+
+  @FXML
+  private Separator deployProgressSeparator;
+
   private ProjectItem currentItem;
 
   private boolean projectOpen;
@@ -84,6 +92,17 @@ public class FooterController implements Initializable, StudioEventListener {
     monitor.start();
     updatePreviewAppStatus(monitor.getStatus());
     monitor.statusProperty().addListener((observable, oldStatus, newStatus) -> updatePreviewAppStatus(newStatus));
+
+    updateDeployProgressVisibility(PreviewAppDeployer.isDeploying());
+    PreviewAppDeployer.deployingProperty().addListener(
+        (observable, wasDeploying, isDeploying) -> updateDeployProgressVisibility(isDeploying));
+  }
+
+  private void updateDeployProgressVisibility(boolean deploying) {
+    deployProgressStatus.setVisible(deploying);
+    deployProgressStatus.setManaged(deploying);
+    deployProgressSeparator.setVisible(deploying);
+    deployProgressSeparator.setManaged(deploying);
   }
 
   @Override

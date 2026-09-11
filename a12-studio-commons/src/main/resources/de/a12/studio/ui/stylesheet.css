@@ -412,8 +412,17 @@
     -fx-icon-color: -fx-error-bg;
 }
 
-.deploy-spinner {
-    -fx-background-color: transparent;
+.footer-progress-bar {
+    -fx-pref-height: 10px;
+}
+
+.footer-progress-bar > .bar {
+    -fx-background-insets: 0;
+    -fx-padding: 4px;
+}
+
+.footer-progress-bar > .track {
+    -fx-background-insets: 0;
 }
 /**
  * Plugin Manager – master-detail panel styles

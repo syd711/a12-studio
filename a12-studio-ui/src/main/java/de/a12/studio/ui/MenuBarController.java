@@ -33,7 +33,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -73,9 +72,6 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private Button deployBtn;
-
-  @FXML
-  private ProgressIndicator deploySpinner;
 
   @FXML
   private Button launchPreviewAppBtn;
@@ -305,11 +301,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
       return;
     }
     deployBtn.setDisable(true);
-    deploySpinner.setVisible(true);
-    PreviewAppDeployer.deploy(project, () -> {
-      deploySpinner.setVisible(false);
-      refreshDeployButtonState(PreviewAppStatusMonitor.getInstance().getStatus());
-    });
+    PreviewAppDeployer.deploy(project, () -> refreshDeployButtonState(PreviewAppStatusMonitor.getInstance().getStatus()));
   }
 
   @FXML

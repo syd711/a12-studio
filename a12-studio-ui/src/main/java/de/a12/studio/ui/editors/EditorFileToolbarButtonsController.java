@@ -23,7 +23,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -72,9 +71,6 @@ public class EditorFileToolbarButtonsController implements Initializable, Studio
 
   @FXML
   private Tooltip deployModelBtnTooltip;
-
-  @FXML
-  private ProgressIndicator deployModelSpinner;
 
   private Supplier<File> fileSupplier;
   private Supplier<ProjectItem> projectItemSupplier;
@@ -207,9 +203,7 @@ public class EditorFileToolbarButtonsController implements Initializable, Studio
       return;
     }
     deployModelBtn.setDisable(true);
-    deployModelSpinner.setVisible(true);
     PreviewAppDeployer.deploySingle(project, item, () -> {
-      deployModelSpinner.setVisible(false);
       hasPendingChanges = false;
       updateDeployButton();
     });
@@ -238,7 +232,7 @@ public class EditorFileToolbarButtonsController implements Initializable, Studio
           ? StudioBundle.get("deploy_model_excluded_tooltip")
           : StudioBundle.get("deploy_model"));
     }
-    deployModelBtn.setDisable(item == null || excluded || !hasPendingChanges);
+    deployModelBtn.setDisable(item == null || excluded || !hasPendingChanges || PreviewAppDeployer.isDeploying());
   }
 
   // -------------------------------------------------------------------------

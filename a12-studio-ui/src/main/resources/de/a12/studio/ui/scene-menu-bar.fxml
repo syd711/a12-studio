@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
@@ -74,7 +73,6 @@
                                 <Tooltip text="%deploy_models" />
                             </tooltip>
                         </Button>
-                        <ProgressIndicator fx:id="deploySpinner" mouseTransparent="true" prefHeight="14.4" prefWidth="14.4" styleClass="deploy-spinner" visible="false" />
                      </children>
                      <HBox.margin>
                         <Insets right="6.0" />

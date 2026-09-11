@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 
@@ -33,9 +32,6 @@ public class PreviewAppConsoleDockedController implements Initializable {
 
   @FXML
   private Button dockedDeployBtn;
-
-  @FXML
-  private ProgressIndicator dockedDeploySpinner;
 
   @FXML
   private Button dockedLaunchBtn;
@@ -107,11 +103,7 @@ public class PreviewAppConsoleDockedController implements Initializable {
   private void onDockedDeploy() {
     if (project == null) return;
     dockedDeployBtn.setDisable(true);
-    dockedDeploySpinner.setVisible(true);
-    PreviewAppDeployer.deploy(project, () -> {
-      dockedDeploySpinner.setVisible(false);
-      refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus());
-    });
+    PreviewAppDeployer.deploy(project, () -> refreshDockedDeployButton(PreviewAppStatusMonitor.getInstance().getStatus()));
   }
 
   @FXML

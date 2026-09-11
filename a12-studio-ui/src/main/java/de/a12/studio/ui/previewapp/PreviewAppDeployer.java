@@ -14,6 +14,8 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import tools.jackson.core.JacksonException;
@@ -71,13 +73,32 @@ public class PreviewAppDeployer {
 
   private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(30);
 
-  private static volatile boolean deploying;
+  /**
+   * Whether a deploy (whole-project or single-model) is currently running - drives every "Deploy"
+   * button's disabled state plus the footer's "Deploying Models..." progress bar. A JavaFX property
+   * (rather than a plain flag) so the footer can react live regardless of which button started the
+   * deploy; always mutated on the FX thread, see {@link #setDeploying}.
+   */
+  private static final SimpleBooleanProperty deploying = new SimpleBooleanProperty(false);
 
   private PreviewAppDeployer() {
   }
 
   public static boolean isDeploying() {
+    return deploying.get();
+  }
+
+  public static ReadOnlyBooleanProperty deployingProperty() {
     return deploying;
+  }
+
+  private static void setDeploying(boolean value) {
+    if (Platform.isFxApplicationThread()) {
+      deploying.set(value);
+    }
+    else {
+      Platform.runLater(() -> deploying.set(value));
+    }
   }
 
   /**
@@ -100,10 +121,10 @@ public class PreviewAppDeployer {
    * given, runs on the FX thread once the deploy attempt (success or failure) has completed.
    */
   public static void deploy(Project project, Runnable onFinished) {
-    if (deploying) {
+    if (isDeploying()) {
       return;
     }
-    deploying = true;
+    setDeploying(true);
 
     Thread deployThread = new Thread(() -> doDeploy(project, onFinished), "Preview App Deploy");
     deployThread.setDaemon(true);
@@ -134,7 +155,7 @@ public class PreviewAppDeployer {
       showAlert(StudioBundle.get("deploy_models_failed"), e.getMessage());
     }
     finally {
-      deploying = false;
+      setDeploying(false);
       if (onFinished != null) {
         Platform.runLater(onFinished);
       }
@@ -149,10 +170,10 @@ public class PreviewAppDeployer {
    * FX thread once the deploy attempt (success or failure) has completed.
    */
   public static void deploySingle(Project project, ProjectItem item, Runnable onFinished) {
-    if (deploying) {
+    if (isDeploying()) {
       return;
     }
-    deploying = true;
+    setDeploying(true);
 
     Thread deployThread = new Thread(() -> doDeploySingle(project, item, onFinished), "Preview App Deploy Single");
     deployThread.setDaemon(true);
@@ -183,7 +204,7 @@ public class PreviewAppDeployer {
       showAlert(StudioBundle.get("deploy_model_failed"), e.getMessage());
     }
     finally {
-      deploying = false;
+      setDeploying(false);
       if (onFinished != null) {
         Platform.runLater(onFinished);
       }
