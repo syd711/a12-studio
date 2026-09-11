@@ -16,15 +16,13 @@ import de.a12.studio.ui.previewapp.PreviewAppDeployer;
 import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.SystemUtil;
-import de.a12.studio.ui.util.WidgetFactory;
-import de.a12.studio.ui.versioncontrol.ChangeStatus;
 import de.a12.studio.ui.versioncontrol.GitChangedFile;
 import de.a12.studio.ui.versioncontrol.GitService;
+import de.a12.studio.ui.versioncontrol.VersionControlActions;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleButton;
@@ -38,8 +36,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
@@ -308,32 +304,7 @@ public class EditorFileToolbarButtonsController implements Initializable, Studio
     if (file == null || gitService == null || project == null) {
       return;
     }
-
-    VersionControlSettings settings = VersionControlSettings.load();
-    String defaultMessage = settings.getLastCommitMessages().getOrDefault(project.getFolder().getAbsolutePath(), "");
-    String message = WidgetFactory.showTextAreaInputDialog(getStage(), StudioBundle.get("versioncontrol_commit"),
-        StudioBundle.get("versioncontrol_commit_message_prompt"), StudioBundle.get("commit_file_description", file.relativePath()),
-        defaultMessage);
-    if (message == null || message.isBlank()) {
-      return;
-    }
-    String trimmedMessage = message.trim();
-    settings.getLastCommitMessages().put(project.getFolder().getAbsolutePath(), trimmedMessage);
-    settings.save();
-
-    JFXFuture.runAsync(() -> {
-          try {
-            gitService.stageAndCommit(List.of(file), trimmedMessage);
-          }
-          catch (GitAPIException ex) {
-            throw new RuntimeException(ex);
-          }
-        })
-        .thenLater(() -> StudioEventManager.getInstance().fireGitStatusChangedEvent())
-        .onErrorLater(ex -> {
-          log.error("Failed to commit '{}'", file.file(), ex);
-          WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_commit_failed"), ex.getMessage());
-        });
+    VersionControlActions.commit(getStage(), project, gitService, file);
   }
 
   @FXML
@@ -344,44 +315,7 @@ public class EditorFileToolbarButtonsController implements Initializable, Studio
     if (file == null || gitService == null || item == null) {
       return;
     }
-
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(getStage(),
-        StudioBundle.get("confirm_revert_file", file.relativePath()), null, null, StudioBundle.get("versioncontrol_revert"));
-    if (result.isEmpty() || result.get() != ButtonType.OK) {
-      return;
-    }
-
-    JFXFuture.runAsync(() -> {
-          try {
-            gitService.revert(List.of(file));
-          }
-          catch (GitAPIException ex) {
-            throw new RuntimeException(ex);
-          }
-        })
-        .thenLater(() -> onRevertCompleted(item, file))
-        .onErrorLater(ex -> {
-          log.error("Failed to revert '{}'", file.file(), ex);
-          WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_revert_failed"), ex.getMessage());
-        });
-  }
-
-  /**
-   * Mirrors {@link de.a12.studio.ui.versioncontrol.VersioncontrolPanelController}'s own
-   * post-revert handling: a {@link ChangeStatus#NEW} file was deleted by the revert, so it's
-   * treated like any other deletion (closes this tab); every other file was checked out from
-   * HEAD, so {@link ProjectItem#reload()} picks up its new content and {@link
-   * StudioEventManager#fireModelRevertedEvent} lets this tab's editor rebuild from it.
-   */
-  private void onRevertCompleted(@NonNull ProjectItem item, @NonNull GitChangedFile file) {
-    if (file.status() == ChangeStatus.NEW) {
-      StudioEventManager.getInstance().fireModelDeletedEvent(item);
-    }
-    else {
-      item.reload();
-      StudioEventManager.getInstance().fireModelRevertedEvent(item);
-    }
-    StudioEventManager.getInstance().fireGitStatusChangedEvent();
+    VersionControlActions.revert(getStage(), gitService, item, file);
   }
 
   private Stage getStage() {

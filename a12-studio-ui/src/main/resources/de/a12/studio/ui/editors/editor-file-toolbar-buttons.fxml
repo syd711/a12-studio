@@ -41,7 +41,7 @@
             <FontIcon iconLiteral="mdi2s-source-commit" iconSize="18" />
         </graphic>
         <tooltip>
-            <Tooltip text="%versioncontrol_commit" />
+            <Tooltip text="%commit_model_tooltip" />
         </tooltip>
     </Button>
     <Button fx:id="revertButton" disable="true" mnemonicParsing="false" onAction="#onRevert" styleClass="action-button">
@@ -49,7 +49,7 @@
             <FontIcon iconLiteral="mdi2u-undo" iconSize="18" />
         </graphic>
         <tooltip>
-            <Tooltip text="%versioncontrol_revert" />
+            <Tooltip text="%revert_model_tooltip" />
         </tooltip>
     </Button>
     <Separator fx:id="deploySeparator" />

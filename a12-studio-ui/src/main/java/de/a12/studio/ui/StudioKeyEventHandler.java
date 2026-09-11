@@ -2,6 +2,7 @@ package de.a12.studio.ui;
 
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.VersionControlSettings;
 import de.a12.studio.ui.bookmarks.BookmarkService;
 import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.components.RecentFilesDialogController;
@@ -9,12 +10,18 @@ import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.previewapp.PreviewAppDeployer;
 import de.a12.studio.ui.updater.Dialogs;
 import de.a12.studio.ui.util.FXResizeHelper;
+import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.StudioVersion;
+import de.a12.studio.ui.versioncontrol.GitChangedFile;
+import de.a12.studio.ui.versioncontrol.GitService;
+import de.a12.studio.ui.versioncontrol.VersionControlActions;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 import java.util.List;
 
@@ -24,6 +31,7 @@ import java.util.List;
  * window to fixed presets, snapping/maximizing the window with Win+arrow keys, and opening the
  * release notes dialog.
  */
+@Slf4j
 public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
 
   public enum Category { GENERAL, EDITOR }
@@ -61,6 +69,8 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut(StudioBundle.get("ctrl_s"), StudioBundle.get("save_the_active_model"), Category.EDITOR),
       new Shortcut(StudioBundle.get("ctrl_p"), StudioBundle.get("open_model_settings_of_the_active_tab"), Category.EDITOR),
       new Shortcut(StudioBundle.get("ctrl_d"), StudioBundle.get("deploy_the_active_model"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("ctrl_shift_c"), StudioBundle.get("commit_the_active_model"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("ctrl_shift_z"), StudioBundle.get("revert_the_active_model"), Category.EDITOR),
       new Shortcut(StudioBundle.get("ctrl_w"), StudioBundle.get("close_the_selected_tab"), Category.EDITOR),
       new Shortcut(StudioBundle.get("ctrl_tab"), StudioBundle.get("select_the_next_tab"), Category.EDITOR),
       new Shortcut(StudioBundle.get("ctrl_shift_tab"), StudioBundle.get("select_the_previous_tab"), Category.EDITOR)
@@ -160,6 +170,14 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       }
       ke.consume();
     }
+    else if (ke.getCode() == KeyCode.C && ke.isControlDown() && ke.isShiftDown()) {
+      triggerCommit();
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.Z && ke.isControlDown() && ke.isShiftDown()) {
+      triggerRevert();
+      ke.consume();
+    }
     else if (ke.getCode() == KeyCode.W && ke.isControlDown()) {
       Studio.closeSelectedTab();
       ke.consume();
@@ -217,5 +235,45 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
   private void resize(double width, double height) {
     stage.setWidth(width);
     stage.setHeight(height);
+  }
+
+  private void triggerCommit() {
+    withChangedFileOfActiveTab((project, gitService, item, file) ->
+        VersionControlActions.commit(stage, project, gitService, file));
+  }
+
+  private void triggerRevert() {
+    withChangedFileOfActiveTab((project, gitService, item, file) ->
+        VersionControlActions.revert(stage, gitService, item, file));
+  }
+
+  /**
+   * Resolves the active tab's outstanding git change (if any) and hands it to {@code action} -
+   * mirroring what {@link de.a12.studio.ui.editors.EditorFileToolbarButtonsController}'s
+   * Commit/Revert buttons already have cached as {@code currentChangedFile}, since this shortcut
+   * has no such per-tab cache of its own to read from.
+   */
+  private void withChangedFileOfActiveTab(ChangedFileAction action) {
+    ProjectItem item = Studio.getSelectedProjectItem();
+    Project project = Studio.getCurrentProject();
+    GitService gitService = Studio.getGitService();
+    if (item == null || project == null || gitService == null || !VersionControlSettings.load().isEnabled()) {
+      return;
+    }
+    JFXFuture.supplyAsync(() -> {
+          try {
+            return gitService.getChangedFile(project.getFolder(), item.getFile());
+          }
+          catch (GitAPIException ex) {
+            throw new RuntimeException(ex);
+          }
+        })
+        .thenAcceptLater(changedFile -> changedFile.ifPresent(file -> action.accept(project, gitService, item, file)))
+        .onErrorLater(ex -> log.error("Failed to check git status for '{}'", item.getFile(), ex));
+  }
+
+  @FunctionalInterface
+  private interface ChangedFileAction {
+    void accept(Project project, GitService gitService, ProjectItem item, GitChangedFile file);
   }
 }

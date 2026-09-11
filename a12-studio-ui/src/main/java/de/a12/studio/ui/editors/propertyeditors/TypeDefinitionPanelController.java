@@ -44,6 +44,7 @@ import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -271,8 +272,10 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
     log.info("      collectAvailableTypeDefinitionLabels in {}ms", System.currentTimeMillis() - labelsStart);
     setComboBoxItems(dataTypeCombo, List.copyOf(typeDefinitionLabelsById.keySet()));
 
-    dataTypeComboBox.getItems().setAll(availableDataTypes());
-    dataTypeComboBox.getItems().add(0, "");
+    List<String> dataTypeItems = new ArrayList<>();
+    dataTypeItems.add("");
+    dataTypeItems.addAll(availableDataTypes());
+    setComboBoxItems(dataTypeComboBox, dataTypeItems);
     checkboxesGrid.setVisible(!checkboxesGridDisabled && !isMultiSelectParent());
 
     Optional<FieldConfig> fieldConfig = getFieldConfig(element);
