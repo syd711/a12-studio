@@ -1,0 +1,18 @@
+{
+  "entities": [
+    {
+      "docRef": "PersonEmployee_Cm/e3be806d-96a0-4705-a40e-b57520b4163b",
+      "modelName": "PersonEmployee_Cm",
+      "role": "Person",
+      "roleOrder": "1783096094230"
+    },
+    {
+      "docRef": "Team_Dc/e76190d1-81d0-4f13-b84f-c1e41ad13d0b",
+      "modelName": "Team_Dc",
+      "role": "Team",
+      "roleOrder": "1783096094230"
+    }
+  ],
+  "linkDocumentDocRef": "TeamPerson_LinkFields_Dc/a56def97-893b-49ea-86d5-5e98efdb3e05",
+  "relationshipModel": "TeamPerson_Re"
+}

@@ -1,0 +1,12 @@
+{
+  "document": {
+    "Skill": {
+      "Skill": "System Design"
+    },
+    "Remuneration": {
+      "Factor": 4
+    }
+  },
+  "documentModelName": "Skill_Dc",
+  "locale": "en"
+}

@@ -1,0 +1,98 @@
+{
+  "header": {
+    "id": "PersonSkills_Re",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Skill",
+        "reference": "Skill_Dc"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Person",
+        "reference": "Person_Dc"
+      },
+      {
+        "purpose": "Link Document model",
+        "modelType": "document",
+        "alias": "Link Model",
+        "reference": "PersonSkills_LinkFields_Cm"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [
+      {
+        "locale": "de"
+      },
+      {
+        "locale": "en"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "ordered": false,
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 15
+          }
+        },
+        "labels": [
+          {
+            "locale": "de",
+            "text": "Fähigkeit"
+          },
+          {
+            "locale": "en",
+            "text": "Skill"
+          }
+        ],
+        "role": "Skill",
+        "documentModel": "Skill_Dc"
+      },
+      {
+        "ordered": false,
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 999999
+          }
+        },
+        "labels": [
+          {
+            "locale": "de",
+            "text": "Person"
+          },
+          {
+            "locale": "en",
+            "text": "Person"
+          }
+        ],
+        "role": "Person",
+        "documentModel": "Person_Dc"
+      }
+    ],
+    "linkDocumentModel": "PersonSkills_LinkFields_Cm"
+  }
+}

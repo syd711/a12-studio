@@ -1,0 +1,15 @@
+{
+  "document": {
+    "HR": {
+      "Acknowledged": true
+    },
+    "Status": {
+      "AcquiredAt": "mgm elearning",
+      "Expierience": "Few",
+      "ExpierienceAsNumber": 1,
+      "Proficiency": "Advanced",
+      "ProficiencyAsNumber": 2
+    }
+  },
+  "documentModelName": "PersonSkills_LinkFields_Cm"
+}

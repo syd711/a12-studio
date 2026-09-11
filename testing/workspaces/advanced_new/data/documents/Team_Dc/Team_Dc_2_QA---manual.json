@@ -1,0 +1,10 @@
+{
+  "document": {
+    "Team": {
+      "TeamName": "QA - manual",
+      "Location": "Cologne"
+    }
+  },
+  "documentModelName": "Team_Dc",
+  "locale": "en"
+}

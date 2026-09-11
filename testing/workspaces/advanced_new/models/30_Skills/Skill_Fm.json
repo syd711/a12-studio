@@ -1,0 +1,236 @@
+{
+  "header": {
+    "id": "Skill_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Skill_Dc",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Skill_Dc"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "PersonSkills_Person_Ru"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "Button_for_Screen_for_group_68290",
+            "name": "Skill",
+            "target": "Screen_for_group_68290",
+            "scope": "ALWAYS"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "Button_for_Screen_for_abc6a6767a60488754aace2accb73824_group_8f4b1",
+            "name": "__meta",
+            "target": "Screen_for_abc6a6767a60488754aace2accb73824_group_8f4b1",
+            "scope": "ALWAYS"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_8e79d",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "de",
+                      "text": "Schließen"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Close"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_bec77",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Submit"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "outlined"
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "Screen_for_group_68290",
+        "name": "Skill",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "de",
+                "text": "Skill"
+              },
+              {
+                "locale": "en",
+                "text": "Skill"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "ControlGrid_for_group_68290",
+            "name": "Skill_Controls",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "de",
+                    "text": "Fähigkeit"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Skill"
+                  }
+                ]
+              }
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "Row_for_field_fb17f",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_field_fb17f",
+                    "elementRef": "field_fb17f"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "ControlGrid",
+            "id": "ControlGrid_for_group_7e382",
+            "name": "Remuneration_Controls",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "de",
+                    "text": "Vergütung"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Remuneration"
+                  }
+                ]
+              }
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "Row_for_field_02bd4",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_field_02bd4",
+                    "elementRef": "field_02bd4"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Screen_for_abc6a6767a60488754aace2accb73824_group_8f4b1",
+        "name": "Persons",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "de",
+                "text": "Personen mit dieser Fähigkeit"
+              },
+              {
+                "locale": "en",
+                "text": "Persons with this Skill"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "relationshipuimodel_7b5eb",
+            "reference": "PersonSkills_Person_Ru"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

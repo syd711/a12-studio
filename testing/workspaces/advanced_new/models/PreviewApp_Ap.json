@@ -1,0 +1,1525 @@
+{
+  "header": {
+    "id": "PreviewApp_Ap",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Advanced New Modeling"
+      },
+      {
+        "locale": "de",
+        "text": "Advanced New Modeling"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modules": [
+      {
+        "name": "WelcomeModule",
+        "menu": {
+          "name": "welcome",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Welcome"
+            },
+            {
+              "locale": "de",
+              "text": "Willkommen"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "name": "WelcomePage",
+              "menuEntry": "welcome"
+            },
+            "withoutData": true
+          }
+        },
+        "flows": [
+          {
+            "name": "welcomeFlow",
+            "scenes": [
+              {
+                "name": "Show_WelcomePage_Ct",
+                "matchConditions": [
+                  {
+                    "key": "name",
+                    "mustEqual": "WelcomePage"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "welcome"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ContentEngine",
+                      "models": [
+                        {
+                          "modelType": "content",
+                          "name": "WelcomePage_Ct"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "PersonModule",
+        "menu": {
+          "name": "AllPersons",
+          "label": [
+            {
+              "locale": "en",
+              "text": "People"
+            },
+            {
+              "locale": "de",
+              "text": "Personen"
+            }
+          ],
+          "children": [
+            {
+              "name": "AllPersons",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "All Persons"
+                },
+                {
+                  "locale": "de",
+                  "text": "Alle Personen"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "Person_Dc",
+                  "menuEntry": "AllPersons"
+                }
+              }
+            },
+            {
+              "name": "PersonByType",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "by Type"
+                },
+                {
+                  "locale": "de",
+                  "text": "nach Typ"
+                }
+              ],
+              "children": [
+                {
+                  "name": "OnlyEmployees",
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Employee"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Mitarbeiter"
+                    }
+                  ],
+                  "initialActivity": {
+                    "descriptor": {
+                      "model": "PersonEmployee_Cm",
+                      "menuEntry": "OnlyEmployees"
+                    }
+                  }
+                },
+                {
+                  "name": "OnlyFreelancer",
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Freelancer"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Freiberufler"
+                    }
+                  ],
+                  "initialActivity": {
+                    "descriptor": {
+                      "model": "PersonFreelancer_Cm",
+                      "menuEntry": "OnlyFreelancer"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PersonsWithFulltimeContract_UnassignedToTeam",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Fulltime but unassigned"
+                },
+                {
+                  "locale": "de",
+                  "text": "Vollzeit aber nicht zugeordnet"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "Person_Dc",
+                  "menuEntry": "PersonsWithFulltimeContract_UnassignedToTeam"
+                }
+              }
+            }
+          ]
+        },
+        "flows": [
+          {
+            "name": "AllPersonsFlow",
+            "scenes": [
+              {
+                "name": "Show_Person_OM_for_Person_Dc",
+                "description": "Overview type: overview",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Person_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "AllPersons"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewEngine",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Person_Ov"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonEmployee_FM_for_PersonEmployee_Cm",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonEmployee_Cm"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "AllPersons"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonEmployee_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonFreelancer_FM_for_PersonFreelancer_Cm",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonFreelancer_Cm"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "AllPersons"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonFreelancer_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "OnlyEmployeesFlow",
+            "scenes": [
+              {
+                "name": "Show_PersonEmployee_OM_for_PersonEmployee_Cm",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonEmployee_Cm"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "OnlyEmployees"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "PersonEmployee_Ov"
+                        }
+                      ],
+                      "name": "OverviewEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonEmployee_FM_for_PersonEmployee_Cm",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonEmployee_Cm"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "OnlyEmployees"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonEmployee_Fm"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "OnlyFreelancerFlow",
+            "scenes": [
+              {
+                "name": "Show_PersonFreelancer_OM_for_PersonFreelancer_Cm",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonFreelancer_Cm"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "OnlyFreelancer"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "PersonFreelancer_Ov"
+                        }
+                      ],
+                      "name": "OverviewEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonFreelancer_FM_for_PersonFreelancer_Cm",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonFreelancer_Cm"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "OnlyFreelancer"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonFreelancer_Fm"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "PersonsWithFulltimeContract_UnassignedToTeamFlow",
+            "scenes": [
+              {
+                "name": "Show_PersonsWithFulltimeContract_UnassignedToTeam_OM_for_Person_Dc",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Person_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "PersonsWithFulltimeContract_UnassignedToTeam"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "PersonsWithFulltimeContract_UnassignedToTeam_Ov"
+                        }
+                      ],
+                      "name": "OverviewEngine"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonEmployee_FM_for_PersonEmployee_Cm",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonEmployee_Cm"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "PersonsWithFulltimeContract_UnassignedToTeam"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonEmployee_Fm"
+                        }
+                      ],
+                      "name": "FormEngine"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonFreelancer_FM_for_PersonFreelancer_Cm",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonFreelancer_Cm"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "PersonsWithFulltimeContract_UnassignedToTeam"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonFreelancer_Fm"
+                        }
+                      ],
+                      "name": "FormEngine"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "TeamModule",
+        "menu": {
+          "name": "TeamModule",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Teams"
+            },
+            {
+              "locale": "de",
+              "text": "Teams"
+            }
+          ],
+          "children": [
+            {
+              "name": "AddNewTeam",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Create new Team"
+                },
+                {
+                  "locale": "de",
+                  "text": "Erstelle neues Team"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "Team_Dc",
+                  "engine": "FormEngine",
+                  "instance": "__NEW__",
+                  "menuEntry": "AddNewTeam"
+                }
+              }
+            },
+            {
+              "name": "TeamAsTree",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Teams as Tree"
+                },
+                {
+                  "locale": "de",
+                  "text": "Teams als Tree"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "Team_Dc",
+                  "menuEntry": "TeamAsTree"
+                }
+              }
+            },
+            {
+              "name": "TeamsAsList",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Teams as List"
+                },
+                {
+                  "locale": "de",
+                  "text": "Teams als Liste"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "Team_Dc",
+                  "menuEntry": "TeamsAsList"
+                }
+              }
+            }
+          ]
+        },
+        "flows": [
+          {
+            "name": "TeamAsTreeFlow",
+            "scenes": [
+              {
+                "name": "Show_Team_TM_for_Team_Dc",
+                "description": "Overview type: tree",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Team_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "TreeEngine",
+                      "models": [
+                        {
+                          "modelType": "tree",
+                          "name": "Team_Tr"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_TeamBindings_FM_for_Team_DM_ToEditLinks",
+                "description": "Child relationship editor for TeamTreeModule: Team_Dc",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Team_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  },
+                  {
+                    "key": "engine",
+                    "mustEqual": "relationship"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Team_Relationships_Fm"
+                        }
+                      ],
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_TeamPerson_LinkFields_FM_for_TeamPerson_LinkFields_Dc",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "TeamPerson_LinkFields_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "TeamPerson_LinkFields_Fm"
+                        }
+                      ],
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Team_AddNew_FM_for_Team_Dc",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Team_Dc"
+                  },
+                  {
+                    "key": "instance",
+                    "mustEqual": "__NEW__"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Team_AddNew_Fm"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Team_FM_for_Team_Dc",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Team_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Team_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonEmployee_AddNew_FM_for_PersonEmployee_Cm",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonEmployee_Cm"
+                  },
+                  {
+                    "key": "instance",
+                    "mustEqual": "__NEW__"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonEmployee_AddNew_Fm"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonEmployee_FM_for_PersonEmployee_Cm",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonEmployee_Cm"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonEmployee_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonFreelancer_AddNew_FM_for_PersonFreelancer_Cm",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonFreelancer_Cm"
+                  },
+                  {
+                    "key": "instance",
+                    "mustEqual": "__NEW__"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonFreelancer_AddNew_Fm"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonFreelancer_FM_for_PersonFreelancer_Cm",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonFreelancer_Cm"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamAsTree"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonFreelancer_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "TeamsAsListFlow",
+            "scenes": [
+              {
+                "name": "Show_Team_OM_for_Team_Dc",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Team_Dc"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamsAsList"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Team_Ov"
+                        }
+                      ],
+                      "name": "OverviewEngine"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Team_FM_for_Team_Dc",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Team_Dc"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "TeamsAsList"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Team_Fm"
+                        }
+                      ],
+                      "name": "FormEngine"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "AddNewTeamFlow",
+            "scenes": [
+              {
+                "name": "Show_Team_FM_for_Team_Dc",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Team_Dc"
+                  },
+                  {
+                    "key": "instance",
+                    "mustEqual": "__NEW__"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "AddNewTeam"
+                  },
+                  {
+                    "key": "engine",
+                    "mustEqual": "FormEngine"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "Stack"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Team_Fm"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "CountryModule",
+        "menu": {
+          "name": "CountryModule",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Countries"
+            },
+            {
+              "locale": "de",
+              "text": "Länder"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "model": "Country_Dc",
+              "menuEntry": "CountryModule"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "CountryModuleFlow",
+            "scenes": [
+              {
+                "name": "Show_Country_TM_for_Country_Dc",
+                "description": "Overview type: tree",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Country_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "CountryModule"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "TreeEngine",
+                      "models": [
+                        {
+                          "modelType": "tree",
+                          "name": "Country_Tr"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Country_FM_for_Country_Dc",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "Country_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "CountryModule"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Country_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_City_FM_for_City_Dc",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "City_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "CountryModule"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "City_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonEmployee_FM_for_PersonEmployee_Cm",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonEmployee_Cm"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "CountryModule"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonEmployee_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_PersonFreelancer_FM_for_PersonFreelancer_Cm",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "PersonFreelancer_Cm"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "CountryModule"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "PersonFreelancer_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "CityModule",
+        "menu": {
+          "name": "CityModule",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Cities"
+            },
+            {
+              "locale": "de",
+              "text": "Städte"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "model": "City_Dc",
+              "menuEntry": "CityModule"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "CityModuleFlow",
+            "scenes": [
+              {
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "OverviewEngine",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "City_Ov"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "name": "Show_City_OM_for_City_Dc",
+                "description": "Overview type: overview",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "City_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "CityModule"
+                  }
+                ]
+              },
+              {
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "City_Fm"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "name": "Show_City_FM_for_City_Dc",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "model",
+                    "mustEqual": "City_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "CityModule"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "SkillsModule",
+        "menu": {
+          "name": "Skills",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Skills"
+            },
+            {
+              "locale": "de",
+              "text": "Fähigkeiten"
+            }
+          ],
+          "children": [
+            {
+              "name": "Skills",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "All Skills"
+                },
+                {
+                  "locale": "de",
+                  "text": "Alle Fähigkeiten"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "menuEntry": "Skills"
+                }
+              }
+            }
+          ]
+        },
+        "flows": [
+          {
+            "name": "SkillsFlow",
+            "scenes": [
+              {
+                "name": "Show_Available_Skills_OvM",
+                "matchConditions": [
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Skills"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "All_Skills_Ov"
+                        }
+                      ],
+                      "name": "OverviewEngine"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Skill_FM_for_Skill_Dc",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Skill_Dc"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Skills"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Skill_Fm"
+                        }
+                      ],
+                      "name": "FormEngine"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "layout": {
+            "name": "MasterDetail"
+          }
+        },
+        {
+          "name": "SIDEBAR",
+          "layout": {
+            "name": "Null"
+          }
+        },
+        {
+          "name": "MODAL",
+          "layout": {
+            "name": "Stack"
+          }
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "initialActivity": {
+      "descriptor": {
+        "name": "WelcomePage",
+        "menuEntry": "welcome"
+      },
+      "withoutData": true
+    }
+  }
+}

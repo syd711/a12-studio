@@ -1,0 +1,18 @@
+{
+  "entities": [
+    {
+      "modelName": "Skill_Dc",
+      "docRef": "Skill_Dc/5fa7a50b-862d-4c1e-b28f-7da83ef89975",
+      "role": "Skill",
+      "roleOrder": "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssst"
+    },
+    {
+      "modelName": "PersonEmployee_Cm",
+      "docRef": "PersonEmployee_Cm/e3be806d-96a0-4705-a40e-b57520b4163b",
+      "role": "Person",
+      "roleOrder": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssr"
+    }
+  ],
+  "relationshipModel": "PersonSkills_Re",
+  "linkDocumentDocRef": "PersonSkills_LinkFields_Cm/1a408031-c87e-42e1-a7a3-b19ede2e766a"
+}

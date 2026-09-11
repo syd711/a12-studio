@@ -1,0 +1,39 @@
+{
+  "document": {
+    "Person": {
+      "FirstName": "Viola",
+      "LastName": "Ward",
+      "MainLocation": "Nuremberg",
+      "Photo": {
+        "attachment_id": "c383edf1-aba9-4564-9722-ea64f78dcafa",
+        "internal_filename": "stockimages_people_8.jpg",
+        "original_filename": "stockimages_people_8.jpg",
+        "mime_type": "image/jpeg"
+      },
+      "PersonalData": {
+        "Gender": "FEMALE",
+        "PlaceOfBirth": "New Ottoport",
+        "Nationality": "Barbados"
+      },
+      "Addresses": [
+        {
+          "Street": "73332 Sheldon Avenue",
+          "City": "Schwerin",
+          "Country": "Tanzania, United Republic of",
+          "PostalCode": "15755"
+        },
+        {
+          "Street": "445 Margaret Branch",
+          "City": "Bad Mathis",
+          "Country": "Turkmenistan",
+          "PostalCode": "66712"
+        }
+      ],
+      "PersonID": "P2",
+      "Type": "Employee",
+      "Name": "Viola Ward"
+    }
+  },
+  "documentModelName": "PersonEmployee_Cm",
+  "locale": "en"
+}

@@ -1,0 +1,43 @@
+{
+  "header": {
+    "id": "CountryCity_Country_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "availableItems",
+        "modelType": "overview",
+        "reference": "CountryCity_Country_AvailableItems_Ov"
+      },
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "CountryCity_Country_SelectedItems_Ov"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "DualPaneSelection",
+      "availableItemsOverviewModel": "CountryCity_Country_AvailableItems_Ov",
+      "selectedItemsOverviewModel": "CountryCity_Country_SelectedItems_Ov"
+    },
+    "relationshipName": "CountryCity_Re",
+    "targetRole": "Country"
+  }
+}

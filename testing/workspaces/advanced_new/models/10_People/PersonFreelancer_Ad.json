@@ -1,0 +1,87 @@
+{
+  "header": {
+    "id": "PersonFreelancer_Ad",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Freelancer"
+      },
+      {
+        "locale": "de",
+        "text": "Freiberufler"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "additive-document",
+        "value": "true"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "PersonFreelancer_Ad",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_37d58",
+          "name": "Person",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Computation",
+                "id": "computation_8272b",
+                "name": "TypeComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Type",
+                  "computationAlternatives": [
+                    {
+                      "operation": "\"Freelancer\"",
+                      "precondition": "AtLeastOneFieldFilled(FirstName, LastName)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of TypeComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of TypeComp"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

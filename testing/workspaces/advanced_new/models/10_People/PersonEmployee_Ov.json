@@ -1,0 +1,438 @@
+{
+  "header": {
+    "id": "PersonEmployee_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Employees"
+      },
+      {
+        "locale": "de",
+        "text": "Mitarbeiter"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "PersonEmployee_Cm"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "newFilterConfiguration": {
+        "filterSelector": {
+          "viewMode": "overlay",
+          "initialVisibility": "hide",
+          "searchBar": {
+            "enabled": false
+          },
+          "showSetFiltersOnly": {
+            "enabled": true,
+            "value": false
+          },
+          "trigger": {
+            "enabled": true,
+            "value": {
+              "labelHidden": true,
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Filter"
+                },
+                {
+                  "locale": "de",
+                  "text": "Filter"
+                }
+              ],
+              "icon": {
+                "name": "filter_list",
+                "theme": "filled"
+              }
+            }
+          }
+        },
+        "joinOperator": {
+          "enabled": true,
+          "value": "and"
+        },
+        "invert": {
+          "enabled": true,
+          "value": false
+        },
+        "filterGroups": [
+          {
+            "id": "filter-group-cf7bd",
+            "name": "Name",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Name"
+              },
+              {
+                "locale": "de",
+                "text": "Name"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-ef51b",
+                "type": "string",
+                "options": {
+                  "fieldId": "field_99c3b",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              },
+              {
+                "id": "filter-item-75f3b",
+                "type": "string",
+                "options": {
+                  "fieldId": "field_4ae85",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "filter-group-184f5",
+            "name": "Personal Information",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Personal Information"
+              },
+              {
+                "locale": "de",
+                "text": "Persönliche Informationen"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-99c57",
+                "type": "date",
+                "options": {
+                  "fieldId": "3ebb47b738ad9c6e3c36113ff04df00d_F7",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "ranges": [
+                    {
+                      "option": "fromTo",
+                      "default": true,
+                      "enabled": true
+                    },
+                    {
+                      "option": "fromOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "toOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "exact",
+                      "enabled": true
+                    }
+                  ],
+                  "periods": [
+                    {
+                      "option": "date",
+                      "default": true,
+                      "enabled": true
+                    },
+                    {
+                      "option": "year",
+                      "enabled": true
+                    },
+                    {
+                      "option": "yearMonth",
+                      "enabled": true
+                    },
+                    {
+                      "option": "month",
+                      "enabled": false
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "filter-item-3f23f",
+                "type": "string",
+                "options": {
+                  "fieldId": "3ebb47b738ad9c6e3c36113ff04df00d_F9",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "filter-group-7fb3c",
+            "name": "Education",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Education"
+              },
+              {
+                "locale": "de",
+                "text": "Ausbildung"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-a1c78",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "PhD only"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "PhD"
+                  }
+                ],
+                "icon": {
+                  "name": "school",
+                  "theme": "outlined"
+                },
+                "collapsed": true,
+                "type": "query",
+                "options": {
+                  "operator": {
+                    "operator": "exact_match",
+                    "field": "/Person/Education/Degree",
+                    "value": "PhD"
+                  },
+                  "enabled": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              },
+              {
+                "id": "filter-item-ae360",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Has a Skill"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Hat eine Fähigkeit"
+                  }
+                ],
+                "collapsed": true,
+                "type": "query",
+                "options": {
+                  "operator": {
+                    "operator": "has",
+                    "relationshipModel": "PersonSkills_Re",
+                    "targetRole": "Skill"
+                  },
+                  "enabled": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "initialSorting": [
+        {
+          "idref": "column-5bd25"
+        },
+        {
+          "idref": "column-5847d"
+        }
+      ],
+      "showRowCount": true
+    },
+    "columns": [
+      {
+        "id": "column-c3b30",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Profile Picture"
+          },
+          {
+            "locale": "de",
+            "text": "Profilbild"
+          }
+        ],
+        "width": 1,
+        "elementRef": "group_bc062",
+        "sortable": false,
+        "attachmentDisplayMode": "preview"
+      },
+      {
+        "id": "column-5bd25",
+        "width": 1,
+        "elementRef": "field_99c3b",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-5847d",
+        "width": 1,
+        "elementRef": "field_4ae85",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-3eb14",
+        "width": 1,
+        "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F7",
+        "sortable": false
+      },
+      {
+        "id": "column-d37d5",
+        "width": 1,
+        "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F9",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "event_delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "button",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Add"
+            },
+            {
+              "locale": "de",
+              "text": "Hinzufügen"
+            }
+          ],
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

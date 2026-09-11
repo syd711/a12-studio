@@ -1,0 +1,174 @@
+{
+  "header": {
+    "id": "TeamPerson_LinkFields_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Link Person with Team"
+      },
+      {
+        "locale": "de",
+        "text": "Verbindung des Mitarbeiters mit dem Team"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "TeamPerson_LinkFields_Dc",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "TeamPerson_LinkFields_Dc"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-9c826",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-f4f10",
+            "name": "ok",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "OK"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "OK"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid-f6693",
+            "name": "CG1",
+            "layout": {
+              "lg": "6-6"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row-5cfba",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-772b8",
+                    "elementRef": "field_04443"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_dc101",
+                    "elementRef": "field_4e53f"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_529b0",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_0aedb",
+                    "elementRef": "field_df93a"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_5183c",
+                    "elementRef": "field_13b10"
+                  }
+                ]
+              }
+            ],
+            "verticalAlignment": "BOTTOM"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "%"
+              },
+              {
+                "locale": "de",
+                "text": "%"
+              }
+            ]
+          },
+          "elementRef": "field_4e53f"
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "header": {
+    "id": "PersonFreelancer_Cm",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Freelancer"
+      },
+      {
+        "locale": "de",
+        "text": "Freiberufler"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "superTypes",
+        "value": "Person_Dc"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+		"purpose" :"combination-base",	
+        "reference": "Person_Dc"
+      },
+      {
+        "modelType": "additive-document",
+		"purpose" :"combination-addition",
+        "reference": "PersonFreelancer_Ad"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "Person_Dc",
+    "CombinationSteps": [
+      {
+        "type": "Addition",
+        "AdditiveModel": {
+          "dmId": "PersonFreelancer_Ad"
+        }
+      }
+    ]
+  }
+}

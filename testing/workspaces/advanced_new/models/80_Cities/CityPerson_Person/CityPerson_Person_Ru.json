@@ -1,0 +1,37 @@
+{
+  "header": {
+    "id": "CityPerson_Person_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "CityPerson_Person_Ru_SelectedItems_Ov"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "TableList",
+      "selectedItemsOverviewModel": "CityPerson_Person_Ru_SelectedItems_Ov"
+    },
+    "relationshipName": "CityPerson_Re",
+    "targetRole": "Person"
+  }
+}

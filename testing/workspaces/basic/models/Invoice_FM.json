@@ -47,22 +47,10 @@
       }
     ],
     "subHeaderBox": {
-      "id": "subHeaderBox1",
-      "minorButtons": {
-        "button": []
-      },
-      "majorButtons": {
-        "button": []
-      }
+      "id": "subHeaderBox1"
     },
     "footerBox": {
-      "id": "footerBox1",
-      "minorButtons": {
-        "button": []
-      },
-      "majorButtons": {
-        "button": []
-      }
+      "id": "footerBox1"
     },
     "screens": [
       {
@@ -205,6 +193,11 @@
                         "cell": [
                           {
                             "type": "Control",
+                            "id": "control_c0a67",
+                            "elementRef": "include_7c34e_field_fbf75"
+                          },
+                          {
+                            "type": "Control",
                             "id": "control_89f6d",
                             "elementRef": "include_7c34e_group_8bd8d"
                           }
@@ -245,19 +238,7 @@
                       {
                         "type": "Row",
                         "id": "row_ab734",
-                        "name": "<Row>",
-                        "cell": []
-                      },
-                      {
-                        "type": "Row",
-                        "id": "row-26c29",
-                        "cell": [
-                          {
-                            "type": "Control",
-                            "id": "control-90d47",
-                            "elementRef": "F107"
-                          }
-                        ]
+                        "name": "<Row>"
                       }
                     ],
                     "verticalAlignment": "BOTTOM"
@@ -1975,15 +1956,6 @@
           "initialValue": "false",
           "exposition": "CHECKBOX",
           "elementRef": "include_7c34e_field_9b3e4"
-        },
-        {
-          "elementRef": "include_7c34e_field_fbf75"
-        },
-        {
-          "elementRef": "include_7c34e_group_8bd8d"
-        },
-        {
-          "elementRef": "include_7c34e_field_126a1"
         }
       ]
     },

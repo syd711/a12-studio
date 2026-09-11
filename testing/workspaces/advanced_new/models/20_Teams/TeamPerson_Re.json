@@ -1,0 +1,100 @@
+{
+  "header": {
+    "id": "TeamPerson_Re",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Person",
+        "reference": "Person_Dc"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Team",
+        "reference": "Team_Dc"
+      },
+      {
+        "purpose": "Link Document model",
+        "modelType": "document",
+        "alias": "Link Model",
+        "reference": "TeamPerson_LinkFields_Dc"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": true,
+    "linkDocumentModel": "TeamPerson_LinkFields_Dc",
+    "labels": [
+      {
+        "locale": "de",
+        "text": null
+      },
+      {
+        "locale": "en",
+        "text": null
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "role": "Person",
+        "documentModel": "Person_Dc",
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "de",
+            "text": null
+          },
+          {
+            "locale": "en",
+            "text": null
+          }
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 99
+          }
+        }
+      },
+      {
+        "role": "Team",
+        "documentModel": "Team_Dc",
+        "ordered": true,
+        "labels": [
+          {
+            "locale": "de",
+            "text": null
+          },
+          {
+            "locale": "en",
+            "text": null
+          }
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 999
+          }
+        }
+      }
+    ]
+  }
+}

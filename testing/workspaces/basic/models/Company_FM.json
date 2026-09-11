@@ -55,9 +55,6 @@
   "content": {
     "subHeaderBox": {
       "id": "subHeaderBox1",
-      "minorButtons": {
-        "button": []
-      },
       "majorButtons": {
         "button": [
           {
@@ -115,9 +112,6 @@
     },
     "footerBox": {
       "id": "footerBox1",
-      "minorButtons": {
-        "button": []
-      },
       "majorButtons": {
         "button": [
           {
@@ -736,13 +730,7 @@
         ]
       }
     ],
-    "fieldConfiguration": {
-      "field": [
-        {
-          "elementRef": "field_16af2"
-        }
-      ]
-    },
+    "fieldConfiguration": {},
     "groupConfiguration": {},
     "defaults": {}
   }

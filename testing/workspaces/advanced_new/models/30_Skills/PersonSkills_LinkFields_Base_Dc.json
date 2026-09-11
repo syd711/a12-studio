@@ -1,0 +1,155 @@
+{
+  "header": {
+    "id": "PersonSkills_LinkFields_Base_Dc",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "CommonFieldDefinitions_Td",
+        "modelType": "document",
+        "purpose": "typeDefinitions",
+        "reference": "CommonFieldDefinitions_Td"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "PersonSkills_LinkFields_Base_Dc",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_7d3ee",
+          "name": "Status",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_d1198",
+                "name": "AcquiredAt",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Wo Erlernt?"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Acquired At?"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_42656",
+                "name": "Proficiency",
+                "Field": {
+                  "fieldType": {
+                    "type": "TypeDefType",
+                    "TypeDefType": {
+                      "typeDefinitionId": "typedef_98129633-2fe5-4e23-8d9b-20e0517b5c47"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Level"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Proficiency"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_fa543",
+                "name": "Expierience",
+                "Field": {
+                  "fieldType": {
+                    "type": "TypeDefType",
+                    "TypeDefType": {
+                      "typeDefinitionId": "typedef_244d7741-cef4-483d-9eb3-3a775b35d810"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Erfahrungs-Stufe"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Expierience-Level"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_a8bfd",
+          "name": "HR",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_6e685",
+                "name": "Acknowledged",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "Anerkannt?"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Acknowledged?"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "header": {
+    "id": "PersonTeamAssignment_Ru_SelectedItems_Ov_Qe",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Person_Dc"
+      },
+      {
+        "modelType": "relationship",
+        "alias": "RM",
+        "purpose": "relationship-model-for-query",
+        "reference": "TeamPerson_Re"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Person_Dc",
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    },
+    "exclude": true,
+    "fields": [],
+    "constraint": {
+      "operator": "exact_match",
+      "field": "/__meta/docRef",
+      "value": "${Person_Dc, [/__meta/docRef]}"
+    },
+    "links": [
+      {
+        "relationshipModel": "TeamPerson_Re",
+        "targetRole": "Team",
+        "constraint": {
+          "operator": "has",
+          "relationshipModel": "TeamPerson_Re",
+          "targetRole": "Person",
+          "constraint": {
+            "operator": "exact_match",
+            "field": "/__meta/docRef",
+            "value": "${Person_Dc, [/__meta/docRef]}"
+          }
+        },
+        "maxDepth": 1,
+        "fields": [
+          "/Team/TeamName",
+          "/Team/Location"
+        ],
+        "linkDocumentFields": [
+          "/LinkFields/Position",
+          "/LinkFields/TimeShare"
+        ]
+      }
+    ]
+  }
+}

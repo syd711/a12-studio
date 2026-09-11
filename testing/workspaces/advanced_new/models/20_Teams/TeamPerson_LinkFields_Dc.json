@@ -1,0 +1,238 @@
+{
+  "header": {
+    "id": "TeamPerson_LinkFields_Dc",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Person"
+      },
+      {
+        "locale": "de",
+        "text": "Leute"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "TeamPerson_LinkFields_Dc",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_88e30",
+          "name": "LinkFields",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_04443",
+                "name": "Position",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Position"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Position"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_df93a",
+                "name": "StartDate",
+                "Field": {
+                  "fieldType": {
+                    "type": "DateType",
+                    "DateType": {
+                      "format": "yyyy-MM-dd"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Start Date"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Beginn"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_13b10",
+                "name": "EndDate",
+                "Field": {
+                  "fieldType": {
+                    "type": "DateType",
+                    "DateType": {
+                      "format": "yyyy-MM-dd"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "End Date"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ende"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_4e53f",
+                "name": "TimeShare",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "maxFractionalDigits": 1,
+                      "minValue": 10,
+                      "maxValue": 100,
+                      "trait": "percent"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Time Share"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Zeitanteil"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_05075",
+                "name": "IsCurrentMemberOfTeam",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Is currently a Member of the Team"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ist aktuell Mitglied des Teams"
+                    }
+                  ],
+                  "transient": true
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_671d0",
+                "name": "IsCurrentMemberOfTeamComp",
+                "Computation": {
+                  "computedFieldRelPath": "../IsCurrentMemberOfTeam",
+                  "computationAlternatives": [
+                    {
+                      "operation": "True",
+                      "precondition": "[StartDate] <= Today\r\nand\r\n(FieldNotFilled(EndDate) or [EndDate]>= Today)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of IsCurrentMemberOfTeamComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of IsCurrentMemberOfTeamComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_b69ec",
+                "name": "WorkCapacityContribution",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Work Capacity Contribution"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Arbeitszeit Beitrag"
+                    }
+                  ],
+                  "transient": true
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_a06e0",
+                "name": "EndDateMustBeAfterStartDate",
+                "Rule": {
+                  "errorEntityRelPath": "../EndDate",
+                  "errorCode": "Error rule_a06e0",
+                  "errorCondition": "AllFieldsFilled(StartDate,EndDate)\r\nand\r\n[EndDate]<[StartDate]",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "$EndDate$ must be after $StartDate$ ."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "$EndDate$ muss nach dem $StartDate$ sein."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

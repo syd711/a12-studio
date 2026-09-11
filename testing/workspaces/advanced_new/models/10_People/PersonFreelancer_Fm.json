@@ -1,0 +1,266 @@
+{
+  "header": {
+    "id": "PersonFreelancer_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Freelancers"
+      },
+      {
+        "locale": "de",
+        "text": "Freiberufler"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "PersonFreelancer_Cm",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "PersonFreelancer_Cm"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "PersonSkills_Skills_Ru"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "PersonTeamAssignment_TableWithEditModal_Ru"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "PersonCity_City"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-1d74a",
+            "name": "cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-fff74",
+            "name": "save",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-90d3d",
+            "name": "Freelancer",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Personal Data"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Daten zur Person"
+                  }
+                ]
+              }
+            },
+            "collapsible": true,
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-e8dce",
+                "name": "CG",
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-76618",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-bd868",
+                        "elementRef": "field_99c3b"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-5628d",
+                        "elementRef": "field_4ae85"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row_01fec",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_202f7",
+                        "elementRef": "field_9ec18"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "BOTTOM"
+              },
+              {
+                "type": "CustomScreenElement",
+                "id": "relationshipuimodel_42717",
+                "reference": "PersonCity_City"
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_8b82d",
+            "name": "Skills",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Skills"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Fähigkeiten"
+                  }
+                ]
+              }
+            },
+            "collapsible": true,
+            "screenElements": [
+              {
+                "type": "CustomScreenElement",
+                "id": "relationshipuimodel_2ef54",
+                "reference": "PersonSkills_Skills_Ru"
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_f23a0",
+            "name": "TeamAssignments",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Team Assignments"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Teamzuordnungen"
+                  }
+                ]
+              }
+            },
+            "collapsible": true,
+            "screenElements": [
+              {
+                "type": "CustomScreenElement",
+                "id": "relationshipuimodel_0ddfd",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Team Assignments"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Teamzuordnungen"
+                      }
+                    ]
+                  }
+                },
+                "reference": "PersonTeamAssignment_TableWithEditModal_Ru"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

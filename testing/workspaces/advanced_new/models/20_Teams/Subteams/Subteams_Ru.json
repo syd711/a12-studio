@@ -1,0 +1,43 @@
+{
+  "header": {
+    "id": "Subteams_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "availableItems",
+        "modelType": "overview",
+        "reference": "Subteams_Ru_AvailableItems_Ov"
+      },
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "Subteams_Ru_SelectedItems_Ov"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "DualPaneSelection",
+      "availableItemsOverviewModel": "Subteams_Ru_AvailableItems_Ov",
+      "selectedItemsOverviewModel": "Subteams_Ru_SelectedItems_Ov"
+    },
+    "relationshipName": "TeamTeam_Re",
+    "targetRole": "Child"
+  }
+}

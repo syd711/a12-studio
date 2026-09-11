@@ -1,0 +1,11 @@
+{
+  "document": {
+    "LinkFields": {
+      "Position": "Team Lead",
+      "StartDate": "2025-02-01",
+      "TimeShare": 20
+    }
+  },
+  "documentModelName": "TeamPerson_LinkFields_Dc",
+  "locale": "en"
+}

@@ -1,0 +1,18 @@
+{
+  "entities": [
+    {
+      "docRef": "Team_Dc/390b9042-4415-49c6-9d3c-51091b717519",
+      "modelName": "Team_Dc",
+      "role": "Parent",
+      "roleOrder": "1783096308326"
+    },
+    {
+      "docRef": "Team_Dc/e76190d1-81d0-4f13-b84f-c1e41ad13d0b",
+      "modelName": "Team_Dc",
+      "role": "Child",
+      "roleOrder": "1783096308326"
+    }
+  ],
+  "linkDocumentDocRef": null,
+  "relationshipModel": "TeamTeam_Re"
+}

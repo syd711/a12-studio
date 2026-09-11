@@ -1,0 +1,135 @@
+{
+  "header": {
+    "id": "PersonSkills_NumberConversion_Dc",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "PersonSkills_NumberConversion_Dc",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_65b73",
+          "name": "DecorationFragment",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_9319a",
+                "name": "Field",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "Any",
+                          "label": [
+                            {
+                              "locale": "de",
+                              "text": "Any"
+                            },
+                            {
+                              "locale": "en",
+                              "text": "Any"
+                            }
+                          ]
+                        }
+                      ],
+                      "categories": [
+                        {
+                          "name": "AsNumber",
+                          "values": [
+                            "0"
+                          ],
+                          "description": ""
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_b78ab",
+                "name": "FieldAsNumber",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "zeroNotAllowed": true
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "de",
+                      "text": "HelperField"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "HelperField"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_21f5d",
+                "name": "FieldAsNumber_Comp",
+                "Computation": {
+                  "computedFieldRelPath": "../FieldAsNumber",
+                  "computationAlternatives": [
+                    {
+                      "operation": "FieldValueAsNumber(Field->AsNumber)",
+                      "precondition": "FieldFilled(Field)"
+                    }
+                  ],
+                  "errorCodesToSuppress": [
+                    "MVK_INVALID_COMPARE_DEC_PLACES"
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of FieldAsNumber_Comp"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of FieldAsNumber_Comp"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

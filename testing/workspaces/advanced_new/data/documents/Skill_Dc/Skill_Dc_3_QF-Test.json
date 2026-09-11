@@ -1,0 +1,12 @@
+{
+  "document": {
+    "Skill": {
+      "Skill": "QF-Test"
+    },
+    "Remuneration": {
+      "Factor": 5
+    }
+  },
+  "documentModelName": "Skill_Dc",
+  "locale": "en"
+}

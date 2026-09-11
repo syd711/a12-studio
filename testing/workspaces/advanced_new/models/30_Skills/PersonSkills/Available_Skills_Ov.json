@@ -1,0 +1,258 @@
+{
+  "header": {
+    "id": "Available_Skills_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Skill_Dc"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 50,
+      "newFilterConfiguration": {
+        "filterSelector": {
+          "viewMode": "overlay",
+          "initialVisibility": "hide",
+          "searchBar": {
+            "enabled": false
+          },
+          "showSetFiltersOnly": {
+            "enabled": false
+          },
+          "trigger": {
+            "enabled": true,
+            "value": {
+              "icon": {
+                "name": "filter_list",
+                "theme": "rounded"
+              }
+            }
+          }
+        },
+        "joinOperator": {
+          "enabled": true,
+          "value": "and"
+        },
+        "invert": {
+          "enabled": true,
+          "value": false
+        },
+        "filterGroups": [
+          {
+            "id": "filter-group-89fb6",
+            "name": "Skill",
+            "label": [
+              {
+                "locale": "de",
+                "text": "Fähigkeit"
+              },
+              {
+                "locale": "en",
+                "text": "Skill"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-98a02",
+                "type": "string",
+                "options": {
+                  "fieldId": "field_fb17f",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              },
+              {
+                "id": "filter-item-ebd3d",
+                "type": "number",
+                "options": {
+                  "fieldId": "field_02bd4",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "ranges": [
+                    {
+                      "option": "fromTo",
+                      "default": true,
+                      "enabled": true
+                    },
+                    {
+                      "option": "fromOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "toOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "exact",
+                      "enabled": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "filter-group-9cef3",
+            "name": "RelationshipBasedFilters",
+            "filterItems": [
+              {
+                "id": "filter-item-c78f8",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Hochqualifizierte Verfügbar"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Highly Qualified Persons Available"
+                  }
+                ],
+                "icon": {
+                  "name": "school",
+                  "theme": "rounded"
+                },
+                "type": "query",
+                "options": {
+                  "operator": {
+                    "operator": "has",
+                    "relationshipModel": "PersonSkills_Re",
+                    "targetRole": "Person",
+                    "linkDocumentConstraint": {
+                      "operator": "and",
+                      "operands": [
+                        {
+                          "operator": "exact_match",
+                          "field": "/HR/Acknowledged",
+                          "value": "true"
+                        },
+                        {
+                          "operator": "double_range",
+                          "field": "/Status/ProficiencyAsNumber",
+                          "from": 2
+                        }
+                      ]
+                    }
+                  },
+                  "enabled": {
+                    "enabled": true,
+                    "value": false
+                  }
+                },
+                "description": [
+                  {
+                    "locale": "de",
+                    "text": "Es gibt mindestens eine Person, die diese Fähigkeit auf mindestens Fortgeschrittenem Niveau beherrscht."
+                  },
+                  {
+                    "locale": "en",
+                    "text": "There is at least one person how has this skill with at least Advanced level."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "columns": [
+      {
+        "id": "column-bf796",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_fb17f",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-f7ba0",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_02bd4",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "destructive": false,
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "de",
+              "text": "Fähigkeit verknüpfen"
+            },
+            {
+              "locale": "en",
+              "text": "Link Skill"
+            }
+          ],
+          "event": "event_add_link",
+          "labelHidden": true,
+          "primary": false
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

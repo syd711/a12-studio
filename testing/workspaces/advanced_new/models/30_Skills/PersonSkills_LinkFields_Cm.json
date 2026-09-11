@@ -1,0 +1,56 @@
+{
+  "header": {
+    "id": "PersonSkills_LinkFields_Cm",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+		"purpose" :"combination-base",
+        
+        "reference": "PersonSkills_LinkFields_Base_Dc"
+      },
+      {
+        "modelType": "selection",
+		"purpose" :"combination-selection",
+        
+        "reference": "PersonSkills_NumberConversion_Se"
+      },
+      {
+        "modelType": "document",
+		"purpose" :"combination-decoration",
+        
+        "reference": "PersonSkills_NumberConversion_Dc"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "PersonSkills_LinkFields_Base_Dc",
+    "CombinationSteps": [
+      {
+        "type": "DecorationForFields",
+        "SelectionModel": {
+          "smId": "PersonSkills_NumberConversion_Se"
+        },
+        "DecorationModel": {
+          "dmId": "PersonSkills_NumberConversion_Dc"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "header": {
+    "id": "TeamTeam_Re",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Parent",
+        "reference": "Team_Dc"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Child",
+        "reference": "Team_Dc"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "linkDocumentModel": null,
+    "labels": [
+      {
+        "locale": "de",
+        "text": ""
+      },
+      {
+        "locale": "en",
+        "text": ""
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "role": "Parent",
+        "documentModel": "Team_Dc",
+        "ordered": true,
+        "labels": [
+          {
+            "locale": "de",
+            "text": "Gehört zu"
+          },
+          {
+            "locale": "en",
+            "text": "Belongs to"
+          }
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        }
+      },
+      {
+        "role": "Child",
+        "documentModel": "Team_Dc",
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "de",
+            "text": "Sub-teams"
+          },
+          {
+            "locale": "en",
+            "text": "Sub-teams"
+          }
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 99
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "document": {
+    "Person": {
+      "FirstName": "Ervin",
+      "LastName": "Pourŏs",
+      "PersonalData": {
+        "DateOfBirth": "2024-02-14",
+        "PlaceOfBirth": "Jacobsonside",
+        "Nationality": "Viet Nam"
+      },
+      "Addresses": [
+        {
+          "Street": "6732 Foster Crescent",
+          "City": "Hamburg",
+          "Country": "Estonia",
+          "PostalCode": "20001"
+        }
+      ],
+      "Phones": [
+        {
+          "Type": "WORK"
+        },
+        {
+          "PhoneNumber": "738-454-5879",
+          "Type": "MOBILE"
+        },
+        {
+          "PhoneNumber": "1-072-245-4109",
+          "Type": "WORK"
+        }
+      ],
+      "Education": [
+        {
+          "SchoolName": "University of Toronto",
+          "StartDate": "2000-02-29",
+          "EndDate": "2000-02-29"
+        }
+      ],
+      "Photo": {
+        "attachment_id": "2c115142-e8b8-4ac7-a01b-dc6c7685c7fa",
+        "original_filename": "stockimages_people_20.jpg",
+        "internal_filename": "stockimages_people_20.jpg",
+        "mime_type": "image/jpeg"
+      },
+      "PersonID": "P4",
+      "Type": "Employee",
+      "Name": "Ervin Pourŏs"
+    }
+  },
+  "documentModelName": "PersonEmployee_Cm",
+  "locale": "en"
+}

@@ -1,0 +1,52 @@
+{
+  "header": {
+    "id": "RequiredSkillsForTeamAssignment_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "de",
+        "text": "Benötigte Fähigkeiten"
+      },
+      {
+        "locale": "en",
+        "text": "Required Skills"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "availableItems",
+        "modelType": "overview",
+        "reference": "Available_Skills_Ov"
+      },
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "RequiredSkillsForTeamAssignment_SelectedItems_Ov"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "DualPaneSelection",
+      "availableItemsOverviewModel": "Available_Skills_Ov",
+      "selectedItemsOverviewModel": "RequiredSkillsForTeamAssignment_SelectedItems_Ov"
+    },
+    "relationshipName": "TeamSkills_Re",
+    "targetRole": "Skill"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "document": {
+    "LinkFields": {
+      "Position": "Tester",
+      "StartDate": "2023-01-01",
+      "TimeShare": 70,
+      "EndDate": "2025-01-31"
+    }
+  },
+  "documentModelName": "TeamPerson_LinkFields_Dc",
+  "locale": "en"
+}

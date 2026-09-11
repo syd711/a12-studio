@@ -1,0 +1,58 @@
+{
+  "header": {
+    "id": "PersonEmployee_Cm",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Employee"
+      },
+      {
+        "locale": "de",
+        "text": "Angestellte*r"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "superTypes",
+        "value": "Person_Dc"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+		"purpose" :"combination-base",
+        "reference": "Person_Dc"
+      },
+      {
+        "modelType": "additive-document",
+		"purpose" :"combination-addition",
+        "reference": "PersonEmployee_Ad"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "Person_Dc",
+    "CombinationSteps": [
+      {
+        "type": "Addition",
+        "AdditiveModel": {
+          "dmId": "PersonEmployee_Ad"
+        }
+      }
+    ]
+  }
+}

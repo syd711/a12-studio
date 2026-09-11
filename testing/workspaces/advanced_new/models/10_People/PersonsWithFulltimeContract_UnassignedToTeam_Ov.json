@@ -1,0 +1,115 @@
+{
+  "header": {
+    "id": "PersonsWithFulltimeContract_UnassignedToTeam_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Fulltime but unassigned"
+      },
+      {
+        "locale": "de",
+        "text": "Vollzeit aber nicht zugeordnet"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "PersonsWithFulltimeContract_UnassignedToTeam_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50,
+      "subtitle": [
+        {
+          "locale": "en",
+          "text": "Persons that have a Contract with at least 30h per Week, but no Team assignment"
+        },
+        {
+          "locale": "de",
+          "text": "Personen welche einen Vertrag mit mindestens 30h pro Woche haben, aber keinem Team zugeordnet sind"
+        }
+      ]
+    },
+    "columns": [
+      {
+        "id": "column-89e1d",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_99c3b",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-093cb",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_4ae85",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-f45b7",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_285d3",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

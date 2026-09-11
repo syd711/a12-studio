@@ -1,0 +1,58 @@
+{
+  "header": {
+    "id": "PersonSkills_Skills_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "de",
+        "text": "Erworbene Fähigkeiten"
+      },
+      {
+        "locale": "en",
+        "text": "Acquired Skills"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "availableItems",
+        "modelType": "overview",
+        "reference": "Available_Skills_Ov"
+      },
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "PersonSkills_Skills_SelectedItems_Ov"
+      },
+      {
+        "purpose": "link",
+        "modelType": "form",
+        "reference": "PersonSkills_LinkFields_Fm"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "DualPaneSelection",
+      "linkFormModel": "PersonSkills_LinkFields_Fm",
+      "selectedItemsOverviewModel": "PersonSkills_Skills_SelectedItems_Ov",
+      "availableItemsOverviewModel": "Available_Skills_Ov"
+    },
+    "relationshipName": "PersonSkills_Re",
+    "targetRole": "Skill"
+  }
+}

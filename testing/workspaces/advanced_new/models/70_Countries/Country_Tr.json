@@ -1,0 +1,883 @@
+{
+  "header": {
+    "id": "Country_Tr",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Countries and their cities"
+      },
+      {
+        "locale": "de",
+        "text": "Länder und deren Städte"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM1",
+        "reference": "Country_Dc"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM2",
+        "reference": "City_Dc"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM3",
+        "reference": "Person_Dc"
+      },
+      {
+        "purpose": "relationship-model-for-tree",
+        "modelType": "relationship",
+        "alias": "RM1",
+        "reference": "CountryCity_Re"
+      },
+      {
+        "purpose": "relationship-model-for-tree",
+        "modelType": "relationship",
+        "alias": "RM2",
+        "reference": "CityPerson_Re"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "multiSelection": {
+        "clearConfirmation": {
+          "enabled": true
+        },
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "buttons": [
+          {
+            "label": [
+              {
+                "locale": "en",
+                "text": "Copy"
+              },
+              {
+                "locale": "de",
+                "text": "Kopieren"
+              }
+            ],
+            "icon": {
+              "name": "content_copy"
+            },
+            "id": "button-15174",
+            "event": "event_copy_nodes",
+            "destructive": false,
+            "primary": false
+          },
+          {
+            "label": [
+              {
+                "locale": "en",
+                "text": "Cut"
+              },
+              {
+                "locale": "de",
+                "text": "Ausschneiden"
+              }
+            ],
+            "icon": {
+              "name": "content_cut"
+            },
+            "id": "button-82eb7",
+            "event": "event_cut_nodes",
+            "destructive": false,
+            "primary": false
+          },
+          {
+            "icon": {
+              "name": "content_paste"
+            },
+            "id": "button-60b25",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Paste"
+              },
+              {
+                "locale": "de",
+                "text": "Einfügen"
+              }
+            ],
+            "event": "event_paste",
+            "destructive": false,
+            "primary": false
+          },
+          {
+            "label": [
+              {
+                "locale": "en",
+                "text": "Delete"
+              },
+              {
+                "locale": "de",
+                "text": "Löschen"
+              }
+            ],
+            "icon": {
+              "name": "delete"
+            },
+            "id": "button-eeec0",
+            "event": "event_delete_nodes",
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Confirm deletion"
+                },
+                {
+                  "locale": "de",
+                  "text": "Löschen bestätigen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Are you sure you want to delete the selected item?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Soll der ausgewählte Eintrag wirklich gelöscht werden?"
+                }
+              ]
+            },
+            "destructive": false,
+            "primary": false
+          }
+        ]
+      },
+      "dnd": {
+        "onDrag": {
+          "expandHoveredNode": true
+        }
+      },
+      "hierarchicalColumnRef": "column-e0c52",
+      "rootRef": "crc-e02bc",
+      "enableVirtualScroll": true,
+      "actionColumnWidth": 1,
+      "wholeTreeExpansion": true,
+      "expansionStrategy": {
+        "initialExpansion": {
+          "type": "all_levels",
+          "affectedNodeRefs": [
+            "node-ecae3"
+          ]
+        },
+        "type": "level_by_level",
+        "pageSize": 5
+      },
+      "virtualRoot": {
+        "label": [
+          {
+            "locale": "en",
+            "text": "Countries"
+          },
+          {
+            "locale": "de",
+            "text": "Länder"
+          }
+        ],
+        "actions": [],
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Main_Context_Add",
+              "type": "add",
+              "actions": [
+                {
+                  "type": "insert",
+                  "documentModelRef": "Country_Dc",
+                  "icon": {
+                    "name": "add"
+                  },
+                  "useLabelFromDocumentModel": false,
+                  "useTitleFromDocumentModel": false,
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Add Country"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Land hinzufügen"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Main_Context_Paste",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_paste",
+                  "icon": {
+                    "name": "content_paste"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Paste"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Einfügen"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "rowHeight": 50
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        },
+        {
+          "type": "expand_all_popup"
+        },
+        {
+          "label": [
+            {
+              "locale": "en",
+              "text": "Add country"
+            },
+            {
+              "locale": "de",
+              "text": "Land hinzufügen"
+            }
+          ],
+          "icon": {
+            "name": "add"
+          },
+          "id": "button-d4a55",
+          "event": "event_add_root_node",
+          "type": "button",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "columns": [
+      {
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "width": 3,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-e0c52",
+        "name": "Name",
+        "alignment": {
+          "header": {
+            "vertical": "middle"
+          },
+          "content": {
+            "vertical": "middle"
+          }
+        }
+      },
+      {
+        "label": [
+          {
+            "locale": "en",
+            "text": "Flag"
+          },
+          {
+            "locale": "de",
+            "text": "Flagge"
+          }
+        ],
+        "width": 1,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-bd941",
+        "name": "Flag",
+        "alignment": {
+          "header": {
+            "vertical": "middle"
+          },
+          "content": {
+            "vertical": "middle"
+          }
+        }
+      },
+      {
+        "label": [
+          {
+            "locale": "en",
+            "text": "Inhabitants (in Mil.)"
+          },
+          {
+            "locale": "de",
+            "text": "Einwohner (in Mio.)"
+          }
+        ],
+        "width": 1,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-718d3",
+        "name": "Inhabitants",
+        "alignment": {
+          "header": {
+            "vertical": "middle"
+          },
+          "content": {
+            "vertical": "middle"
+          }
+        }
+      },
+      {
+        "label": [
+          {
+            "locale": "en",
+            "text": "Area (in km²)"
+          },
+          {
+            "locale": "de",
+            "text": "Fläche (in km²)"
+          }
+        ],
+        "width": 1,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-72caf",
+        "name": "Area",
+        "alignment": {
+          "header": {
+            "vertical": "middle"
+          },
+          "content": {
+            "vertical": "middle"
+          }
+        }
+      },
+      {
+        "width": 1,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-f7ea9",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Languages"
+          },
+          {
+            "locale": "de",
+            "text": "Sprachen"
+          }
+        ],
+        "name": "Languages"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "node-ecae3",
+        "documentModelRef": "Country_Dc",
+        "columns": [
+          {
+            "columnRef": "column-e0c52",
+            "elementRef": "field_6544a"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-bd941",
+            "elementRef": "group_71d22"
+          },
+          {
+            "columnRef": "column-718d3",
+            "elementRef": "field_6eb9e"
+          },
+          {
+            "columnRef": "column-72caf",
+            "elementRef": "field_5e8c2"
+          },
+          {
+            "configuration": {
+              "multiSelectDisplayMode": "comma_separated"
+            },
+            "columnRef": "column-f7ea9",
+            "elementRef": "group_780e9"
+          }
+        ],
+        "childRelationshipConfigurations": [
+          {
+            "id": "crc-e02bc",
+            "relationshipModelRef": "CountryCity_Re",
+            "parentRole": "Country"
+          }
+        ],
+        "actions": [],
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Add_Node",
+              "actions": [
+                {
+                  "type": "insert",
+                  "position": "as_child",
+                  "documentModelRef": "City_Dc",
+                  "icon": {
+                    "name": "add"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Add City"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Stadt hinzufügen"
+                    }
+                  ]
+                }
+              ],
+              "type": "add"
+            },
+            {
+              "name": "Change_Data",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_copy_node_and_children",
+                  "icon": {
+                    "name": "content_copy"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Copy"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kopieren"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_cut_node",
+                  "icon": {
+                    "name": "content_cut"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Cut"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ausschneiden"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_paste",
+                  "icon": {
+                    "name": "content_paste"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Paste"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Einfügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Löschen"
+                    }
+                  ],
+                  "confirmation": {
+                    "title": [
+                      {
+                        "locale": "en",
+                        "text": "Confirm deletion"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Löschen bestätigen"
+                      }
+                    ],
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Are you sure you want to delete the selected item?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Soll der ausgewählte Eintrag wirklich gelöscht werden?"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "id": "node-87cd5",
+        "documentModelRef": "City_Dc",
+        "columns": [
+          {
+            "columnRef": "column-e0c52",
+            "elementRef": "field_11f0f"
+          },
+          {
+            "columnRef": "column-718d3",
+            "elementRef": "field_d22d3"
+          },
+          {
+            "columnRef": "column-72caf",
+            "elementRef": "field_1d1e6"
+          }
+        ],
+        "actions": [],
+        "childRelationshipConfigurations": [
+          {
+            "id": "crc-4d49a",
+            "relationshipModelRef": "CityPerson_Re",
+            "parentRole": "City",
+            "columns": []
+          }
+        ],
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Add_Node",
+              "actions": [
+                {
+                  "type": "insert",
+                  "position": "as_child",
+                  "documentModelRef": "PersonEmployee_Cm",
+                  "icon": {
+                    "name": "add"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Add Employee"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Mitarbeiter hinzufügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "insert",
+                  "position": "as_child",
+                  "documentModelRef": "PersonFreelancer_Cm",
+                  "icon": {
+                    "name": "add"
+                  },
+                  "useLabelFromDocumentModel": false,
+                  "useTitleFromDocumentModel": false,
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Add Freelancer"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Freiberufler hinzufügen"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Change_Data",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_copy_node_and_children",
+                  "icon": {
+                    "name": "content_copy"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Copy"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kopieren"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_cut_node",
+                  "icon": {
+                    "name": "content_cut"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Cut"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ausschneiden"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_paste",
+                  "icon": {
+                    "name": "content_paste"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Paste"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Einfügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_paste_above",
+                  "icon": {
+                    "name": "insert_above",
+                    "theme": "custom"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Paste above"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Darüber einfügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_paste_below",
+                  "icon": {
+                    "name": "insert_below",
+                    "theme": "custom"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Paste below"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Darunter einfügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Löschen"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "id": "node-b7dda",
+        "documentModelRef": "Person_Dc",
+        "columns": [
+          {
+            "columnRef": "column-e0c52",
+            "elementRef": "field_46375"
+          }
+        ],
+        "actions": [],
+        "childRelationshipConfigurations": [],
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Change_data",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_copy_node",
+                  "icon": {
+                    "name": "content_copy"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Copy"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kopieren"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_cut_node",
+                  "icon": {
+                    "name": "content_cut"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Cut"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ausschneiden"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_paste_above",
+                  "icon": {
+                    "name": "insert_above",
+                    "theme": "custom"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Paste above"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Darüber einfügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_paste_below",
+                  "icon": {
+                    "name": "insert_below",
+                    "theme": "custom"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Paste below"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Darunter einfügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete",
+                    "theme": "outlined"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Löschen"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      }
+    ]
+  }
+}

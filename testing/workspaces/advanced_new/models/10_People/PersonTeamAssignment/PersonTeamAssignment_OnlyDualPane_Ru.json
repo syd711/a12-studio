@@ -1,0 +1,80 @@
+{
+  "header": {
+    "id": "PersonTeamAssignment_OnlyDualPane_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "availableItems",
+        "modelType": "overview",
+        "reference": "PersonTeamAssignment_Ru_AvailableItems_Ov"
+      },
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "PersonTeamAssignment_Ru_SelectedItems_Ov"
+      },
+      {
+        "purpose": "link",
+        "modelType": "form",
+        "reference": "TeamPerson_LinkFields_Fm"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "DualPaneSelection",
+      "linkFormModel": "TeamPerson_LinkFields_Fm",
+      "selectedItemsOverviewModel": "PersonTeamAssignment_Ru_SelectedItems_Ov",
+      "height": "300",
+      "availableItemsOverviewModel": "PersonTeamAssignment_Ru_AvailableItems_Ov",
+      "buttons": [
+        {
+          "destructive": false,
+          "icon": {
+            "name": "edit_note",
+            "theme": "rounded"
+          },
+          "event": "event_open_edit_modal",
+          "label": [
+            {
+              "locale": "de",
+              "text": "Teamzuweisungen anpassen"
+            },
+            {
+              "locale": "en",
+              "text": "Edit Team Assignments"
+            }
+          ],
+          "description": [
+            {
+              "locale": "de",
+              "text": "Öffnet einen Dialog, um Teamzuordnungen anpassen zu können"
+            },
+            {
+              "locale": "en",
+              "text": "Opens a dialog to edit the team assignments of this person"
+            }
+          ]
+        }
+      ]
+    },
+    "relationshipName": "TeamPerson_Re",
+    "targetRole": "Team"
+  }
+}

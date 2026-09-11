@@ -1,0 +1,94 @@
+{
+  "header": {
+    "id": "CountryCity_Re",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Country",
+        "reference": "Country_Dc"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "City",
+        "reference": "City_Dc"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "linkDocumentModel": null,
+    "labels": [
+      {
+        "locale": "en",
+        "text": null
+      },
+      {
+        "locale": "de",
+        "text": null
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "role": "Country",
+        "documentModel": "Country_Dc",
+        "ordered": true,
+        "labels": [
+          {
+            "locale": "en",
+            "text": ""
+          },
+          {
+            "locale": "de",
+            "text": ""
+          }
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 2
+          }
+        }
+      },
+      {
+        "role": "City",
+        "documentModel": "City_Dc",
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": ""
+          },
+          {
+            "locale": "de",
+            "text": ""
+          }
+        ],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
+      }
+    ]
+  }
+}

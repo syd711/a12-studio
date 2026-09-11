@@ -1,0 +1,175 @@
+{
+  "header": {
+    "id": "PersonSkills_Person_Ru_SelectedItems_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "PersonSkills_Person_Ru_SelectedItems_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50
+    },
+    "columns": [
+      {
+        "id": "column_16950",
+        "width": 1,
+        "styles": {},
+        "elementRef": "group_bc062",
+        "sortable": false
+      },
+      {
+        "id": "column_95c1e",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_285d3",
+        "sortable": false
+      },
+      {
+        "id": "column_75547",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_99c3b",
+        "sortable": false
+      },
+      {
+        "id": "column_86895",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_4ae85",
+        "sortable": false
+      },
+      {
+        "id": "column_04886",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_42656",
+        "sortable": false,
+        "linkReferences": [
+          {
+            "relationship": "PersonSkills_Re",
+            "targetRole": "Skill",
+            "type": "LINK"
+          }
+        ]
+      },
+      {
+        "id": "column_3c71d",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_fa543",
+        "sortable": false,
+        "linkReferences": [
+          {
+            "relationship": "PersonSkills_Re",
+            "targetRole": "Skill",
+            "type": "LINK"
+          }
+        ]
+      },
+      {
+        "id": "column_c3468",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_6e685",
+        "sortable": false,
+        "linkReferences": [
+          {
+            "relationship": "PersonSkills_Re",
+            "targetRole": "Skill",
+            "type": "LINK"
+          }
+        ]
+      },
+      {
+        "id": "column_1fc94",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_d1198",
+        "sortable": false,
+        "linkReferences": [
+          {
+            "relationship": "PersonSkills_Re",
+            "targetRole": "Skill",
+            "type": "LINK"
+          }
+        ]
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "labelHidden": true,
+          "event": "event_delete_link",
+          "icon": {
+            "name": "remove_circle"
+          },
+          "primary": false
+        },
+        {
+          "labelHidden": true,
+          "event": "event_restore_link",
+          "icon": {
+            "name": "add_circle"
+          },
+          "primary": false
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

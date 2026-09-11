@@ -1,0 +1,18 @@
+{
+  "entities": [
+    {
+      "docRef": "Skill_Dc/bcb7f111-d141-4035-933c-5e3cd6acf658",
+      "modelName": "Skill_Dc",
+      "role": "Skill",
+      "roleOrder": "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssst"
+    },
+    {
+      "docRef": "Team_Dc/3295db40-49dc-4b17-a18e-bfbba4c1c36f",
+      "modelName": "Team_Dc",
+      "role": "Team",
+      "roleOrder": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssr"
+    }
+  ],
+  "linkDocumentDocRef": null,
+  "relationshipModel": "TeamSkills_Re"
+}

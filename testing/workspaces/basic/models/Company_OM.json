@@ -29,115 +29,14 @@
     ],
     "modelReferences": [
       {
-        "alias": "DM",
-        "modelType": "document",
         "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
         "reference": "Company_DM"
       }
     ]
   },
   "content": {
-    "configuration": {
-      "enableFilter": true,
-      "showFullTextSearch": true,
-      "pagingSize": 10,
-      "showRowCount": true,
-      "filterConfiguration": {
-        "showFilterButton": null,
-        "showFilterBar": null,
-        "filterMode": "custom_filter"
-      },
-      "newFilterConfiguration": {
-        "filterSelector": {
-          "viewMode": "overlay",
-          "initialVisibility": "hide",
-          "searchBar": {
-            "enabled": false,
-            "value": null
-          },
-          "showSetFiltersOnly": {
-            "enabled": false,
-            "value": null
-          },
-          "trigger": {
-            "enabled": true,
-            "value": {}
-          }
-        },
-        "joinOperator": {
-          "enabled": false,
-          "value": null
-        },
-        "invert": {
-          "enabled": true,
-          "value": false
-        },
-        "filterGroups": [
-          {
-            "id": "filter-group-045b0",
-            "name": "Name",
-            "label": [
-              {
-                "locale": "en",
-                "text": "Name"
-              },
-              {
-                "locale": "de",
-                "text": "Name"
-              }
-            ],
-            "filterItems": [
-              {
-                "id": "filter-item-95c06",
-                "type": "string",
-                "options": {
-                  "fieldId": "field_67684",
-                  "invert": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "empty": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "caseSensitive": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "exactMatch": {
-                    "enabled": true,
-                    "value": false
-                  }
-                }
-              },
-              {
-                "id": "filter-item-13b70",
-                "type": "string",
-                "options": {
-                  "fieldId": "field_16af2",
-                  "invert": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "empty": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "caseSensitive": {
-                    "enabled": true,
-                    "value": false
-                  },
-                  "exactMatch": {
-                    "enabled": true,
-                    "value": false
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    },
     "columns": [
       {
         "id": "column-08f11",
@@ -151,7 +50,7 @@
             "text": "Logo"
           }
         ],
-        "width": 1.0,
+        "width": 1,
         "elementRef": "group_8e00a",
         "sortable": false
       },
@@ -207,10 +106,6 @@
       "leftSlot": [
         {
           "type": "button",
-          "event": "add",
-          "icon": {
-            "name": "add"
-          },
           "label": [
             {
               "locale": "en",
@@ -221,12 +116,10 @@
               "text": "Neu"
             }
           ],
-          "destructive": false,
-          "primary": false
-        },
-        {
-          "type": "button",
-          "event": null,
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
           "destructive": false,
           "primary": false
         }
@@ -237,15 +130,6 @@
         },
         {
           "type": "filter"
-        },
-        {
-          "type": "search"
-        },
-        {
-          "type": "button",
-          "event": null,
-          "destructive": null,
-          "primary": null
         }
       ]
     },
@@ -253,13 +137,95 @@
       "leftSlot": [],
       "rightSlot": []
     },
-    "contextMenu": {
-      "groups": [
-        {
-          "name": "group-d1c8b",
-          "actions": []
-        }
-      ]
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "showRowCount": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "custom_list",
+        "fields": [
+          {
+            "fieldId": "field_67684"
+          },
+          {
+            "fieldId": "field_16af2"
+          },
+          {
+            "fieldId": "field_94860"
+          },
+          {
+            "fieldId": "field_3fcb8"
+          },
+          {
+            "fieldId": "field_2f4c1"
+          }
+        ],
+        "sectionData": [
+          {
+            "id": "section-e83d1",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Name"
+              },
+              {
+                "locale": "de",
+                "text": "Name"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "field_67684"
+              },
+              {
+                "fieldId": "field_16af2"
+              }
+            ]
+          },
+          {
+            "id": "section-c4b02",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Address Type"
+              },
+              {
+                "locale": "de",
+                "text": "Addresstyp"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "field_94860"
+              }
+            ]
+          },
+          {
+            "id": "section-bbfef",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Location"
+              },
+              {
+                "locale": "de",
+                "text": "Ort"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "field_3fcb8"
+              },
+              {
+                "fieldId": "field_2f4c1"
+              }
+            ]
+          }
+        ]
+      }
     }
   }
 }

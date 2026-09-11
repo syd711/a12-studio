@@ -1,0 +1,95 @@
+{
+  "header": {
+    "id": "CityPerson_Person_Ru_SelectedItems_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "CityPerson_Person_Ru_SelectedItems_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_with_meta"
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50
+    },
+    "columns": [
+      {
+        "id": "column_263a0",
+        "width": 1,
+        "styles": {},
+        "elementRef": "group_bc062",
+        "sortable": false
+      },
+      {
+        "id": "column_c24fb",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_46375",
+        "sortable": false
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "labelHidden": true,
+          "event": "event_delete_link",
+          "icon": {
+            "name": "remove_circle"
+          },
+          "destructive": false,
+          "primary": false
+        },
+        {
+          "labelHidden": true,
+          "event": "event_restore_link",
+          "icon": {
+            "name": "add_circle"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

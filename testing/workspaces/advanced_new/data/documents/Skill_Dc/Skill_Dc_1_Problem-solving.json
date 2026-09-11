@@ -1,0 +1,12 @@
+{
+  "document": {
+    "Skill": {
+      "Skill": "Problem-solving"
+    },
+    "Remuneration": {
+      "Factor": 1
+    }
+  },
+  "documentModelName": "Skill_Dc",
+  "locale": "en"
+}

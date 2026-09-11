@@ -1,0 +1,520 @@
+{
+  "header": {
+    "id": "Team_Tr",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Teams and assigned Person"
+      },
+      {
+        "locale": "de",
+        "text": "Teams und zugeordnete Personen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM1",
+        "reference": "Team_Dc"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM2",
+        "reference": "Person_Dc"
+      },
+      {
+        "purpose": "relationship-model-for-tree",
+        "modelType": "relationship",
+        "alias": "RM1",
+        "reference": "TeamPerson_Re"
+      },
+      {
+        "purpose": "relationship-model-for-tree",
+        "modelType": "relationship",
+        "alias": "RM2",
+        "reference": "TeamTeam_Re"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "dnd": {
+        "onDrag": {
+          "expandHoveredNode": false
+        }
+      },
+      "rootRef": "crc-d29e43",
+      "hierarchicalColumnRef": "column-23eade",
+      "wholeTreeExpansion": true,
+      "enableColumnsResize": true,
+      "enableVirtualScroll": true,
+      "actionColumnWidth": 1,
+      "expansionStrategy": {
+        "type": "tree",
+        "expansionDepths": [
+          {
+            "maxDepth": 5,
+            "relationshipModel": "TeamTeam_Re"
+          },
+          {
+            "maxDepth": 1,
+            "relationshipModel": "TeamPerson_Re"
+          }
+        ]
+      },
+      "rowHeight": 49
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "expand_all_popup"
+        },
+        {
+          "label": [
+            {
+              "locale": "en",
+              "text": "add team"
+            },
+            {
+              "locale": "de",
+              "text": "team hinzufügen"
+            }
+          ],
+          "icon": {
+            "name": "add"
+          },
+          "id": "button-026dc",
+          "event": "event_add_root_node",
+          "type": "button",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "columns": [
+      {
+        "id": "column-23eade",
+        "name": "Name",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "width": 2,
+        "alignment": {
+          "header": {
+            "horizontal": "left",
+            "vertical": "middle"
+          },
+          "content": {
+            "horizontal": "left",
+            "vertical": "middle"
+          }
+        },
+        "pinDirection": "left",
+        "fixedWidth": false
+      },
+      {
+        "id": "column-d29e42",
+        "name": "Image",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Image"
+          },
+          {
+            "locale": "de",
+            "text": "Bild"
+          }
+        ],
+        "width": 1,
+        "fixedWidth": true,
+        "alignment": {
+          "header": {
+            "horizontal": "left",
+            "vertical": "middle"
+          },
+          "content": {
+            "horizontal": "left",
+            "vertical": "middle"
+          }
+        }
+      },
+      {
+        "id": "column-esd312",
+        "name": "Position",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Position"
+          },
+          {
+            "locale": "de",
+            "text": "Position"
+          }
+        ],
+        "width": 1,
+        "fixedWidth": true,
+        "alignment": {
+          "header": {
+            "horizontal": "left",
+            "vertical": "middle"
+          },
+          "content": {
+            "horizontal": "left",
+            "vertical": "middle"
+          }
+        }
+      },
+      {
+        "id": "column-2d231s",
+        "name": "Location",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Location"
+          },
+          {
+            "locale": "de",
+            "text": "Standort"
+          }
+        ],
+        "width": 1,
+        "alignment": {
+          "header": {
+            "horizontal": "left",
+            "vertical": "middle"
+          },
+          "content": {
+            "horizontal": "left",
+            "vertical": "middle"
+          }
+        },
+        "pinDirection": "right",
+        "fixedWidth": false
+      }
+    ],
+    "nodes": [
+      {
+        "id": "node-12feda",
+        "documentModelRef": "Team_Dc",
+        "columns": [
+          {
+            "columnRef": "column-23eade",
+            "elementRef": "field_c9ad3"
+          },
+          {
+            "columnRef": "column-2d231s",
+            "elementRef": "field_c2497"
+          }
+        ],
+        "childRelationshipConfigurations": [
+          {
+            "id": "crc-d29e42",
+            "columns": [
+              {
+                "columnRef": "column-esd312",
+                "elementRef": "field_04443"
+              }
+            ],
+            "relationshipModelRef": "TeamPerson_Re",
+            "parentRole": "Team"
+          },
+          {
+            "id": "crc-d29e43",
+            "relationshipModelRef": "TeamTeam_Re",
+            "parentRole": "Parent"
+          }
+        ],
+        "icon": {
+          "name": "group"
+        },
+        "actions": [
+          {
+            "primary": false,
+            "destructive": false,
+            "type": "insert",
+            "position": "as_child",
+            "icon": {
+              "name": "add"
+            },
+            "description": [
+              {
+                "locale": "en",
+                "text": "Insert child"
+              },
+              {
+                "locale": "de",
+                "text": "\"Child\" hinzufügen"
+              }
+            ]
+          },
+          {
+            "primary": false,
+            "destructive": false,
+            "type": "event",
+            "event": "event_add_link",
+            "icon": {
+              "name": "link"
+            },
+            "description": [
+              {
+                "locale": "en",
+                "text": "Add link"
+              },
+              {
+                "locale": "de",
+                "text": "Link hinzufügen"
+              }
+            ]
+          }
+        ],
+        "contextMenu": {
+          "groups": [
+            {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "General"
+                },
+                {
+                  "locale": "de",
+                  "text": "Allgemein"
+                }
+              ],
+              "name": "Deletion",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete team"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Team löschen"
+                    }
+                  ],
+                  "confirmation": {
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Do you really want to delete this team?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Möchten Sie dieses Team wirklich löschen?"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_link",
+                  "icon": {
+                    "name": "link_off"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Remove from team"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aus Team entfernen"
+                    }
+                  ],
+                  "confirmation": {
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Do you really want to remove the link to this team?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Möchten Sie die Verbindung zu diesem Team wirklich löschen?"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Sub tree"
+                },
+                {
+                  "locale": "de",
+                  "text": "Strukturunterbaum"
+                }
+              ],
+              "name": "SubTree",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_expand_sub_tree",
+                  "icon": {
+                    "name": "unfold_more"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Expand"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ausklappen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_collapse_sub_tree",
+                  "icon": {
+                    "name": "unfold_less"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Collapse"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Einklappen"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "configuration": {
+          "dnd": true
+        }
+      },
+      {
+        "id": "node-3d8f9s",
+        "documentModelRef": "Person_Dc",
+        "columns": [
+          {
+            "columnRef": "column-d29e42",
+            "elementRef": "group_bc062",
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            }
+          },
+          {
+            "columnRef": "column-23eade",
+            "elementRef": "field_46375"
+          }
+        ],
+        "childRelationshipConfigurations": [],
+        "icon": {
+          "name": "person"
+        },
+        "actions": [
+          {
+            "primary": false,
+            "destructive": false,
+            "type": "event",
+            "event": "event_delete_node",
+            "icon": {
+              "name": "delete"
+            },
+            "description": [
+              {
+                "locale": "en",
+                "text": "Delete person"
+              },
+              {
+                "locale": "de",
+                "text": "Person löschen"
+              }
+            ],
+            "confirmation": {
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Do you really want to delete this person?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Möchten Sie diese Person wirklich löschen?"
+                }
+              ]
+            }
+          },
+          {
+            "primary": false,
+            "destructive": false,
+            "type": "event",
+            "event": "event_delete_link",
+            "icon": {
+              "name": "link_off"
+            },
+            "description": [
+              {
+                "locale": "en",
+                "text": "Remove link to person"
+              },
+              {
+                "locale": "de",
+                "text": "Verbindung zur Person entfernen"
+              }
+            ],
+            "confirmation": {
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Do you really want to remove the link to this person?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Möchten Sie die Verbindung dieser Person wirklich löschen?"
+                }
+              ]
+            }
+          }
+        ],
+        "configuration": {
+          "dnd": true
+        }
+      }
+    ]
+  }
+}

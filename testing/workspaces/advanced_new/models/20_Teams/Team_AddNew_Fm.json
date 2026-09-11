@@ -1,0 +1,339 @@
+{
+  "header": {
+    "id": "Team_AddNew_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Create a new Team"
+      },
+      {
+        "locale": "de",
+        "text": "Ein neues Team erstellen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Team_Dc",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Team_Dc"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "ParentTeam_Ru"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "RequiredSkillsForTeamAssignment_Ru"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1",
+      "minorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_778e9",
+            "name": "Team",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Team"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Team"
+                    }
+                  ]
+                }
+              }
+            },
+            "target": "screen_d3058",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_b26bd",
+            "name": "ParentTeam",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Parent Team"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Übergeordnetes Team"
+                    }
+                  ]
+                }
+              }
+            },
+            "target": "screen_50a69",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_ef632",
+            "name": "RequiredSkills",
+            "target": "screen_3090c",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "minorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_9a7a2",
+            "name": "cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "cancel",
+                "theme": "outlined"
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen_d3058",
+        "name": "Data",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Team"
+              },
+              {
+                "locale": "de",
+                "text": "Team"
+              }
+            ]
+          }
+        },
+        "footerBox": {
+          "id": "headerfooter_0b98f",
+          "majorButtons": {
+            "button": [
+              {
+                "type": "NAVIGATION",
+                "id": "button_452d0",
+                "name": "next",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Next"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Weiter"
+                        }
+                      ]
+                    }
+                  },
+                  "priority": "PRIMARY"
+                },
+                "target": "#next",
+                "validation": "partial",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_42af8",
+            "name": "CG",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_e88c0",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_3f2ee",
+                    "elementRef": "field_c9ad3"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_037f0",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_15c71",
+                    "elementRef": "field_c2497"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "screen_50a69",
+        "name": "ParentTeam",
+        "footerBox": {
+          "id": "headerfooter_02099",
+          "majorButtons": {
+            "button": [
+              {
+                "type": "NAVIGATION",
+                "id": "button_a921f",
+                "name": "Next",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Next"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Weiter"
+                        }
+                      ]
+                    }
+                  },
+                  "priority": "PRIMARY"
+                },
+                "target": "#next",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "relationshipuimodel_4eb37",
+            "reference": "ParentTeam_Ru"
+          }
+        ]
+      },
+      {
+        "id": "screen_3090c",
+        "name": "RequiredSkills",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Required Skills"
+              },
+              {
+                "locale": "de",
+                "text": "Vorausgesetzte Fähigkeiten"
+              }
+            ]
+          }
+        },
+        "footerBox": {
+          "id": "headerfooter_c4dab",
+          "majorButtons": {
+            "button": [
+              {
+                "type": "EVENT",
+                "id": "button_81278",
+                "name": "Next",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Add Team"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Team hinzufügen"
+                        }
+                      ]
+                    }
+                  },
+                  "priority": "PRIMARY"
+                },
+                "event": "event_submit",
+                "validation": "full",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "relationshipuimodel_b1308",
+            "reference": "RequiredSkillsForTeamAssignment_Ru"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

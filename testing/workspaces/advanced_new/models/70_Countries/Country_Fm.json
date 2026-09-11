@@ -1,0 +1,288 @@
+{
+  "header": {
+    "id": "Country_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Country"
+      },
+      {
+        "locale": "de",
+        "text": "Land"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Country_Dc",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Country_Dc"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-424ef",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-21d5f",
+            "name": "Save",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid-2db75",
+            "name": "CG1",
+            "layout": {
+              "lg": "4-4-4"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row-40e2e",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-86f31",
+                    "elementRef": "group_71d22"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row-e9fa6",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-25349",
+                    "elementRef": "field_6544a"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control-eeb2c",
+                    "elementRef": "group_780e9"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row-3cd41",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-2548c",
+                    "elementRef": "field_6eb9e"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control-cef15",
+                    "elementRef": "field_5e8c2"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control-3725a",
+                    "readonly": true,
+                    "elementRef": "field_b60d0"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row-6f9ff",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-4ac99",
+                    "elementRef": "field_6b91f"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control-535d1",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_dbf7e"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row-06a3f",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-caae0",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_32362"
+                  }
+                ]
+              }
+            ],
+            "verticalAlignment": "TOP"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "label": {
+            "type": "Multilingual",
+            "multilingualText": {
+              "text": [
+                {
+                  "locale": "en",
+                  "text": "Flag"
+                },
+                {
+                  "locale": "de",
+                  "text": "Flagge"
+                }
+              ]
+            }
+          },
+          "elementRef": "group_71d22",
+          "attachmentConfig": {
+            "placeholderIcon": "image"
+          }
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Mil"
+              },
+              {
+                "locale": "de",
+                "text": "Mio"
+              }
+            ]
+          },
+          "elementRef": "field_6eb9e"
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "km²"
+              },
+              {
+                "locale": "de",
+                "text": "km²"
+              }
+            ]
+          },
+          "elementRef": "field_5e8c2"
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Inh./km²"
+              },
+              {
+                "locale": "de",
+                "text": "Einw./km²"
+              }
+            ]
+          },
+          "elementRef": "field_b60d0"
+        },
+        {
+          "exposition": "AREA",
+          "elementRef": "field_32362"
+        },
+        {
+          "exposition": "FULL",
+          "elementRef": "field_6b91f"
+        },
+        {
+          "exposition": "INLINE",
+          "elementRef": "field_dbf7e"
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

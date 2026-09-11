@@ -1,0 +1,15 @@
+{
+  "document": {
+    "HR": {
+      "Acknowledged": true
+    },
+    "Status": {
+      "AcquiredAt": "previous employer",
+      "Expierience": "Much",
+      "ExpierienceAsNumber": 3,
+      "Proficiency": "Advanced",
+      "ProficiencyAsNumber": 2
+    }
+  },
+  "documentModelName": "PersonSkills_LinkFields_Cm"
+}

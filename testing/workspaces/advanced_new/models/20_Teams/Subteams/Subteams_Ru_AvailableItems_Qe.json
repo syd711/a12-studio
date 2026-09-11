@@ -1,0 +1,59 @@
+{
+  "header": {
+    "id": "Subteams_Ru_AvailableItems_Qe",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Team_Dc"
+      },
+      {
+        "modelType": "relationship",
+        "alias": "RM",
+        "purpose": "relationship-model-for-query",
+        "reference": "TeamTeam_Re"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Team_Dc",
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    },
+    "fields": [
+      "/Team/TeamName",
+      "/Team/Location"
+    ],
+    "links": [
+      {
+        "relationshipModel": "TeamTeam_Re",
+        "targetRole": "Parent",
+        "constraint": {
+          "operator": "exact_match",
+          "field": "/__meta/docRef",
+          "value": "${Team_Dc, [/__meta/docRef]}"
+        },
+        "linkDocumentFields": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "header": {
+    "id": "Teammembers_Ru_AvailableItems_Qe",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "description": "Lists only Persons with the required Skills that are HR-Approved and in the right Proficiency-Level",
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Person_Dc"
+      },
+      {
+        "modelType": "relationship",
+        "alias": "RM",
+        "purpose": "relationship-model-for-query",
+        "reference": "TeamPerson_Re"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Person_Dc",
+    "constraint": {
+      "operator": "has",
+      "relationshipModel": "PersonSkills_Re",
+      "targetRole": "Skill",
+      "constraint": {
+        "operator": "has",
+        "relationshipModel": "TeamSkills_Re",
+        "targetRole": "Team",
+        "constraint": {
+          "operator": "exact_match",
+          "field": "/__meta/docRef",
+          "value": "${Team_Dc, [/__meta/docRef]}"
+        }
+      },
+      "linkDocumentConstraint": {
+        "operator": "exact_match",
+        "field": "/HR/Acknowledged",
+        "value": "true"
+      }
+    },
+    "fields": [
+      "/Person/FirstName",
+      "/Person/LastName",
+      "/Person/Type"
+    ],
+    "links": [
+      {
+        "relationshipModel": "TeamPerson_Re",
+        "targetRole": "Team",
+        "linkDocumentFields": [],
+        "constraint": {
+          "operator": "exact_match",
+          "field": "/__meta/docRef",
+          "value": "${Team_Dc, [/__meta/docRef]}"
+        }
+      }
+    ],
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    }
+  }
+}

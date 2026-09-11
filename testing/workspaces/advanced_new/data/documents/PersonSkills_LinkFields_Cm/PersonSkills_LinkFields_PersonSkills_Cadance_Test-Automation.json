@@ -1,0 +1,12 @@
+{
+  "document": {
+    "Status": {
+      "AcquiredAt": "Other Employer",
+      "Expierience": "Some",
+      "ExpierienceAsNumber": 2,
+      "Proficiency": "Advanced",
+      "ProficiencyAsNumber": 2
+    }
+  },
+  "documentModelName": "PersonSkills_LinkFields_Cm"
+}

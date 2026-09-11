@@ -1,0 +1,11 @@
+{
+  "document": {
+    "Team": {
+      "Location": "Bamberg",
+      "ProficiencyLevel": "Basic",
+      "TeamName": "QA"
+    }
+  },
+  "documentModelName": "Team_Dc",
+  "locale": "en"
+}

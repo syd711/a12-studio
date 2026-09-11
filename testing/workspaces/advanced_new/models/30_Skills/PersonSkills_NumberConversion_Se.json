@@ -1,0 +1,28 @@
+{
+  "header": {
+    "modelType": "selection",
+    "modelVersion": "2.0.0",
+    "id": "PersonSkills_NumberConversion_Se",
+    "annotations": []
+  },
+  "content": {
+    "Data": {
+      "Default": "Selected",
+      "Selected": [],
+      "Unselected": [
+        {
+          "path": "/Status/AcquiredAt"
+        },
+        {
+          "path": "/HR/Acknowledged"
+        }
+      ]
+    },
+    "Computation": {
+      "Default": "Unselected"
+    },
+    "Validation": {
+      "Default": "Unselected"
+    }
+  }
+}

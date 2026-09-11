@@ -1,0 +1,319 @@
+{
+  "header": {
+    "id": "Team_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Team"
+      },
+      {
+        "locale": "de",
+        "text": "Team"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Team_Dc",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Team_Dc"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "RequiredSkillsForTeamAssignment_Ru"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "Teammembers_Ru"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "ParentTeam_Ru"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1",
+      "minorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_39b6f",
+            "name": "Screen1",
+            "target": "screen1",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_fbfc5",
+            "name": "TeamHierarchy",
+            "target": "screen_2e708",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-413af",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-51388",
+            "name": "Save",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen1",
+        "name": "Screen1",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Team"
+              },
+              {
+                "locale": "de",
+                "text": "Team"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-19ae4",
+            "name": "Details",
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-d6695",
+                "name": "CG1",
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-34f42",
+                    "name": "R1",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-f67b2",
+                        "elementRef": "field_c9ad3"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-d4d28",
+                        "elementRef": "field_c2497"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row_420e8",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_f3dba",
+                        "elementRef": "field_c69ec"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "BOTTOM"
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_09fbd",
+            "name": "Skills",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Required Skills"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Vorausgesetzte Fähigkeiten"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "CustomScreenElement",
+                "id": "relationshipuimodel_02642",
+                "reference": "RequiredSkillsForTeamAssignment_Ru"
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_010db",
+            "name": "TeamMembers",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Teammembers"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Teammitglieder"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_19822",
+                "name": "cgInfo",
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_dbee1",
+                    "cell": [
+                      {
+                        "type": "TextCell",
+                        "id": "textcell_20077",
+                        "name": "SelectSkillsFirst",
+                        "decoration": "INFO",
+                        "content": {
+                          "text": [
+                            {
+                              "locale": "en",
+                              "text": "Select the appropriate Skills for this team and save it first."
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Zuerst müssen die für dieses Team notwendigen Skills ausgewählt und die Daten gespeichert werden."
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "CustomScreenElement",
+                "id": "relationshipuimodel_e69bb",
+                "reference": "Teammembers_Ru"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "screen_2e708",
+        "name": "TeamHierarchy",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Team Hierarchy"
+              },
+              {
+                "locale": "de",
+                "text": "Teamhierarchie"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "relationshipuimodel_6a185",
+            "reference": "ParentTeam_Ru"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

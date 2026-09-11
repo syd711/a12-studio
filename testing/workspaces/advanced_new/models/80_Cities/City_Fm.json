@@ -1,0 +1,807 @@
+{
+  "header": {
+    "id": "City_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "City"
+      },
+      {
+        "locale": "de",
+        "text": "Stadt"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "City_Dc",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "City_Dc"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "CountryCity_Country_Ru"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "CityPerson_Person_Ru"
+      }
+    ]
+  },
+  "content": {
+    "styles": [
+      {
+        "name": "h_hidden"
+      }
+    ],
+    "subHeaderBox": {
+      "id": "subHeaderBox1",
+      "minorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_1e15c",
+            "name": "Screen1",
+            "target": "screen1",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_f33b9",
+            "name": "PeopleLivingInThisCity",
+            "target": "screen_83475",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-4d505",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button-907b7",
+            "name": "Save",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen1",
+        "name": "City",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "City"
+              },
+              {
+                "locale": "de",
+                "text": "Stadt"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-ef6b5",
+            "name": "S1",
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-1af38",
+                "name": "CG1",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "General Information"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Allgemeine Informationen"
+                      }
+                    ]
+                  }
+                },
+                "layout": {
+                  "lg": "4-4-4"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-29a6e",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-5c050",
+                        "elementRef": "field_11f0f"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-b9432",
+                        "style": [
+                          {
+                            "name": "h_hidden"
+                          }
+                        ],
+                        "readonly": true,
+                        "elementRef": "field_14f2d",
+                        "dependentControls": {
+                          "screenElement": [
+                            {
+                              "idref": "controlgrid-cd706",
+                              "masterValue": "true"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_c9108",
+                        "elementRef": "group_ad6f5"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-b2d86",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-22fce",
+                        "elementRef": "field_d22d3"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-0853f",
+                        "elementRef": "field_1d1e6"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-9593e",
+                        "readonly": true,
+                        "elementRef": "field_7b4b8"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row_1ae9e",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_02c85",
+                        "elementRef": "field_e3498"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "TOP"
+              },
+              {
+                "type": "CustomScreenElement",
+                "id": "relationshipuimodel_53cf6",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Is in the following Countries"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Liegt in den folgenden Ländern"
+                      }
+                    ]
+                  }
+                },
+                "hideCondition": {
+                  "masterField": "field_14f2d",
+                  "cases": [
+                    {
+                      "masterValue": null
+                    }
+                  ]
+                },
+                "reference": "CountryCity_Country_Ru"
+              },
+              {
+                "type": "DetachedRepeat",
+                "id": "detachedrepeat-82c7f",
+                "name": "DetachedRepeatDistricts",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Districts"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Bezirke"
+                      }
+                    ]
+                  }
+                },
+                "repeatOverviewColumn": [
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-3eb09",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "field_eaea0"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-a354d",
+                    "width": 0.8,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "field_86441"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-64c72",
+                    "width": 0.8,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "field_a8e1a"
+                  },
+                  {
+                    "type": "ExpressionRepeatOverviewColumn",
+                    "id": "expressionrepeatoverviewcolumn-9b9ce",
+                    "label": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Heading"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Überschrift"
+                          }
+                        ]
+                      }
+                    },
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "name": "Exp_heading",
+                    "expression": "\"### \"[Name]\" \""
+                  },
+                  {
+                    "type": "ExpressionRepeatOverviewColumn",
+                    "id": "expressionrepeatoverviewcolumn-0e923",
+                    "label": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Italic"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Kursiv"
+                          }
+                        ]
+                      }
+                    },
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "name": "Exp_italic",
+                    "expression": "(en:\"has\", de: \"hat\") \"\n*\"[Inhabitants]\"* \n\" (en:\"inhabitants\", de: \"Einwohner\") \n\",\""
+                  },
+                  {
+                    "type": "ExpressionRepeatOverviewColumn",
+                    "id": "expressionrepeatoverviewcolumn-b8033",
+                    "label": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Strikethrough"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Durchgestrichen"
+                          }
+                        ]
+                      }
+                    },
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "name": "Exp_strikethrough",
+                    "expression": "(en:\" an area of\", de: \" eine Fläche von\")  \n\" ~~\"[Area]\"~~  \""
+                  },
+                  {
+                    "type": "ExpressionRepeatOverviewColumn",
+                    "id": "expressionrepeatoverviewcolumn-7bc87",
+                    "label": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Bold"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Fett"
+                          }
+                        ]
+                      }
+                    },
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "name": "Exp_bold",
+                    "expression": "(en:\" and a density of\", de: \" und eine Bevölerungsdichte von\")\"\n**\"[Density]\"** \"\n(en:\" inh/km²\", de: \" Einw./km²\")"
+                  },
+                  {
+                    "type": "ExpressionRepeatOverviewColumn",
+                    "id": "expressionrepeatoverviewcolumn-dd6c8",
+                    "label": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Unordered list"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Unsortierte Liste"
+                          }
+                        ]
+                      }
+                    },
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "name": "Exp_ul",
+                    "expression": "\" #### \"\ncase [HelperNumberOfPeople] =\"0\" {\n\t\t(en: \"No famous People from \", de: \"Keine berühmeten Personen aus \") [Name]\n}\ncase [HelperNumberOfPeople] !=\"0\" {\t\n\t\"Famous People from \"[Name]\": \t\"\n\tkontext(FamousPeople) {\n\t\t\t\"\t\" \n\t\t\t\t\n\t\t\t\"*\t\"[Name]\n\t}\n}"
+                  },
+                  {
+                    "type": "ExpressionRepeatOverviewColumn",
+                    "id": "expressionrepeatoverviewcolumn-85338",
+                    "label": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "Ordered List"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Sortierte Liste"
+                          }
+                        ]
+                      }
+                    },
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "name": "Ext_ol",
+                    "expression": "\" #### \"\ncase [HelperNumberOfSights]\t=\"0\"{\n\t\t(en: \"No sights in \", de: \"Keine Sehenswürdigkeiten in \") [Name]\n} \ncase [HelperNumberOfSights]\t!=\"0\" {\n\t\"Sights in \"[Name]\": \t\"\n\tkontext(Sights) {\n\t\t\t\"\t\" \n\t\t\t\t\n\t\t\t\"1.\t\"[Name]\n\t}\n}"
+                  }
+                ],
+                "groupRef": "group_c28f9",
+                "enableAdd": true,
+                "enableRemove": true,
+                "enableReorder": false,
+                "enableCopy": false,
+                "enableColumnsResize": true,
+                "defaultRowAction": {
+                  "event": "edit"
+                },
+                "detailScreen": {
+                  "id": "screen-bb456",
+                  "name": "DetachedRepeatDistrictsDetailScreen",
+                  "screenElements": [
+                    {
+                      "type": "ControlGrid",
+                      "id": "controlgrid-c0324",
+                      "name": "CG",
+                      "layout": {
+                        "lg": "4-4-4"
+                      },
+                      "row": [
+                        {
+                          "type": "Row",
+                          "id": "row-4e38e",
+                          "cell": [
+                            {
+                              "type": "Control",
+                              "id": "control-8eb1b",
+                              "elementRef": "field_eaea0"
+                            },
+                            {
+                              "type": "Control",
+                              "id": "control-8d2e7",
+                              "elementRef": "field_86441"
+                            },
+                            {
+                              "type": "Control",
+                              "id": "control-60530",
+                              "elementRef": "field_a8e1a"
+                            }
+                          ]
+                        }
+                      ],
+                      "verticalAlignment": "TOP"
+                    },
+                    {
+                      "type": "InlineRepeat",
+                      "id": "inlinerepeat-192ee",
+                      "name": "InlineRepeatFamousPeople",
+                      "repeatOverviewColumn": [
+                        {
+                          "type": "FieldBasedRepeatOverviewColumn",
+                          "id": "fieldbasedrepeatoverviewcolumn-f71b6",
+                          "label": {
+                            "type": "Expression",
+                            "expressionText": "case[Name]=\"\" {\n\t(en:\"Famous People \",de:\"Berühmte Personen \")\n\t}\ncase[Name]!=\"\" {\n\t(en: \"Famous People from \", \n\tde: \"Berühmte Personen aus \") [Name]\n}"
+                          },
+                          "width": 1,
+                          "sortable": false,
+                          "filterable": false,
+                          "preferredSorting": "ASC",
+                          "elementRef": "field_f7ff7"
+                        }
+                      ],
+                      "groupRef": "group_72f3b",
+                      "enableAdd": true,
+                      "enableRemove": true
+                    },
+                    {
+                      "type": "InlineRepeat",
+                      "id": "inlinerepeat-a9256",
+                      "name": "InlineRepeatSights",
+                      "title": {
+                        "type": "Expression",
+                        "expressionText": "case[Name]=\"\" {\n\t(en:\"Sights \",de:\"Sehenswürdigkeiten \")\n\t}\ncase[Name]!=\"\" {\n\t(en: \"Sights in \", \n\tde: \"Sehenswürdigkeiten in \") [Name]\n}"
+                      },
+                      "repeatOverviewColumn": [
+                        {
+                          "type": "FieldBasedRepeatOverviewColumn",
+                          "id": "fieldbasedrepeatoverviewcolumn-b0714",
+                          "width": 1,
+                          "sortable": false,
+                          "filterable": false,
+                          "preferredSorting": "ASC",
+                          "elementRef": "field_7af60"
+                        },
+                        {
+                          "type": "FieldBasedRepeatOverviewColumn",
+                          "id": "fieldbasedrepeatoverviewcolumn-222ab",
+                          "width": 1,
+                          "sortable": false,
+                          "filterable": false,
+                          "preferredSorting": "ASC",
+                          "elementRef": "field_87f4b"
+                        },
+                        {
+                          "type": "FieldBasedRepeatOverviewColumn",
+                          "id": "fieldbasedrepeatoverviewcolumn-95d68",
+                          "width": 1,
+                          "sortable": false,
+                          "filterable": false,
+                          "preferredSorting": "ASC",
+                          "elementRef": "field_47091"
+                        }
+                      ],
+                      "groupRef": "group_543a6",
+                      "enableAdd": true,
+                      "enableRemove": true,
+                      "enableReorder": false,
+                      "enableCopy": false
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-cd706",
+                "name": "CG2",
+                "title": {
+                  "type": "Expression",
+                  "expressionText": "kontext(City){\n\tcase[City]!=\"\" {\n\t\t(en: \"Districts in \", de: \"Bezirke in \") [City]\n\t}\n}"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-15c92",
+                    "cell": [
+                      {
+                        "type": "ExpressionCell",
+                        "id": "expressioncell-d97a2",
+                        "name": "ExpressionText",
+                        "expression": "kontext(City){\n\tcase[City]!=\"\" {\n\t\t(en: \"The city of \", de: \"Die Stadt \") \t[City]\n\t\t(en: \" has the \tfollowing districts: \", de: \" hat die \tfolgenden Bezirke: \")\n\t\tkontext(Districts){\n\t\t\tcase[Name]!=\"\" {\n\t\t\t\t\"\t\"\n\t\t\t\t\n\t\t\t\t\"1. \"[Name] \n\t\t\t}\n\t\t}\n\t}\n}"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "TOP"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "screen_83475",
+        "name": "PeopleLivingInThisCity",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Persons Living Here"
+              },
+              {
+                "locale": "de",
+                "text": "Hier Lebende Personen"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_1c530",
+            "name": "cgInfo",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_200bc",
+                "cell": [
+                  {
+                    "type": "TextCell",
+                    "id": "textcell_93705",
+                    "hideCondition": {
+                      "masterField": "field_14f2d",
+                      "cases": [
+                        {
+                          "masterValue": "true"
+                        }
+                      ]
+                    },
+                    "name": "InfoNoName",
+                    "decoration": "INFO",
+                    "content": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Please give a name to this City first."
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bitte vergeben Sie zunächst einen Namen für die Stadt."
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "CustomScreenElement",
+            "id": "relationshipuimodel_dd775",
+            "title": {
+              "type": "Expression",
+              "expressionText": "(en: \"People living in \", de: \"Personen, die in \" ) \nkontext(City){[City]}\n(de: \" wohnen:\", en: \":\")"
+            },
+            "hideCondition": {
+              "masterField": "field_14f2d",
+              "cases": [
+                {
+                  "masterValue": null
+                }
+              ]
+            },
+            "reference": "CityPerson_Person_Ru"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "km²"
+              },
+              {
+                "locale": "de",
+                "text": "km²"
+              }
+            ]
+          },
+          "elementRef": "field_1d1e6"
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "P/km²"
+              },
+              {
+                "locale": "de",
+                "text": "P/km²"
+              }
+            ]
+          },
+          "elementRef": "field_7b4b8"
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Mil"
+              },
+              {
+                "locale": "de",
+                "text": "Mio"
+              }
+            ]
+          },
+          "elementRef": "field_d22d3"
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "km²"
+              },
+              {
+                "locale": "de",
+                "text": "km²"
+              }
+            ]
+          },
+          "elementRef": "field_a8e1a"
+        },
+        {
+          "label": {
+            "type": "Expression",
+            "expressionText": "case[Name]=\"\" {\n\t(en:\"Famous People \",de:\"Berühmte Personen \")\n\t}\ncase[Name]!=\"\" {\n\t(en: \"Famous People from \", \n\tde: \"Berühmte Personen aus \") [Name]\n}"
+          },
+          "elementRef": "field_f7ff7"
+        },
+        {
+          "label": {
+            "type": "Multilingual",
+            "multilingualText": {
+              "text": [
+                {
+                  "locale": "en",
+                  "text": "Picture of the city"
+                },
+                {
+                  "locale": "de",
+                  "text": "Bild der Stadt"
+                }
+              ]
+            }
+          },
+          "elementRef": "group_ad6f5"
+        }
+      ]
+    },
+    "groupConfiguration": {
+      "group": [
+        {
+          "dependentGroup": {
+            "masterField": "field_69593",
+            "case": [
+              {
+                "masterValue": "false",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "group_c28f9"
+        }
+      ]
+    },
+    "defaults": {}
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "document": {
+    "Person": {
+      "FirstName": "Marco",
+      "LastName": "Lockman",
+      "PersonID": "P9",
+      "Type": "Freelancer",
+      "Name": "Marco Lockman"
+    }
+  },
+  "documentModelName": "PersonFreelancer_Cm",
+  "locale": "en"
+}

@@ -1,0 +1,91 @@
+{
+  "header": {
+    "id": "PersonContract_Re",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Person",
+        "reference": "Person_Dc"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Contract",
+        "reference": "Contract_Dc"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [
+      {
+        "locale": "en"
+      },
+      {
+        "locale": "de"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "ordered": true,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Person"
+          },
+          {
+            "locale": "de",
+            "text": "Person"
+          }
+        ],
+        "role": "Person",
+        "documentModel": "Person_Dc",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        }
+      },
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Contracts"
+          },
+          {
+            "locale": "de",
+            "text": "Verträge"
+          }
+        ],
+        "role": "Contract",
+        "documentModel": "Contract_Dc",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 99
+          }
+        }
+      }
+    ]
+  }
+}

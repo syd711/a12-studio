@@ -1,0 +1,49 @@
+{
+  "document": {
+    "Person": {
+      "FirstName": "Lucas",
+      "LastName": "Skiles",
+      "MainLocation": "Da Nang",
+      "Photo": {
+        "attachment_id": "ec648970-9d46-4b60-9da5-7399a624fccf",
+        "internal_filename": "stockimages_people_21.jpg",
+        "original_filename": "stockimages_people_21.jpg",
+        "mime_type": "image/jpeg"
+      },
+      "PersonalData": {
+        "Gender": "MALE",
+        "DateOfBirth": "2024-02-29",
+        "PlaceOfBirth": "Ellischester",
+        "Nationality": "Azerbaijan"
+      },
+      "Addresses": [
+        {
+          "Street": "06215 Reginald Trace",
+          "City": "Ulm",
+          "Country": "Gabon",
+          "PostalCode": "89002"
+        }
+      ],
+      "Phones": [
+        {
+          "PhoneNumber": "(890) 697-0313",
+          "Type": "MOBILE"
+        }
+      ],
+      "Education": [
+        {
+          "SchoolName": "Columbia University",
+          "Degree": "Master",
+          "Major": "Chemistry",
+          "StartDate": "2024-02-29",
+          "EndDate": "2000-02-29"
+        }
+      ],
+      "PersonID": "P1",
+      "Type": "Employee",
+      "Name": "Lucas Skiles"
+    }
+  },
+  "documentModelName": "PersonEmployee_Cm",
+  "locale": "en"
+}

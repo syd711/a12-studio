@@ -1,0 +1,83 @@
+{
+  "document": {
+    "Person": {
+      "FirstName": "Joshua",
+      "LastName": "Weimann",
+      "MainLocation": "Berlin",
+      "PersonalData": {
+        "Gender": "MALE",
+        "DateOfBirth": "1980-01-01",
+        "PlaceOfBirth": "Britniville",
+        "Nationality": "Yemen"
+      },
+      "Addresses": [
+        {
+          "Street": "7896 Omer Forks",
+          "City": "Lake Shermanchester",
+          "Country": "Burkina Faso",
+          "PostalCode": "99002"
+        },
+        {
+          "Street": "2803 Hipolito Skyway",
+          "City": "Sorayaburg",
+          "Country": "Marshall Islands",
+          "PostalCode": "75090"
+        },
+        {
+          "Street": "745 Augusta Fort",
+          "City": "Erfurt",
+          "Country": "Botswana",
+          "PostalCode": "01001"
+        }
+      ],
+      "Phones": [
+        {
+          "PhoneNumber": "1-305-890-1129 x4374",
+          "Type": "WORK"
+        },
+        {
+          "PhoneNumber": "742-893-3702",
+          "Type": "WORK"
+        },
+        {
+          "PhoneNumber": "887.131.2049",
+          "Type": "MOBILE"
+        }
+      ],
+      "Education": [
+        {
+          "SchoolName": "University of Edinburgh",
+          "Degree": "PhD",
+          "Major": "Psychology",
+          "StartDate": "2024-01-01",
+          "EndDate": "1980-01-01"
+        },
+        {
+          "SchoolName": "Imperial College London",
+          "Degree": "PhD",
+          "Major": "Philosophy",
+          "StartDate": "2000-01-01",
+          "EndDate": "2000-01-01"
+        },
+        {
+          "SchoolName": "ETH Zurich",
+          "Degree": "Diploma",
+          "Major": "Biology",
+          "StartDate": "1980-01-01",
+          "EndDate": "2024-01-01"
+        }
+      ],
+      "Photo": {
+        "attachment_id": "0f3d5ebe-f9ab-4737-bd3e-ca684b6136d8",
+        "original_filename": "stockimages_people_10.jpg",
+        "internal_filename": "stockimages_people_10.jpg",
+        "mime_type": "image/jpeg"
+      },
+      "PersonID": "P6",
+      "Type": "Employee",
+      "Name": "Joshua Weimann"
+    }
+  },
+  "documentModelName": "PersonEmployee_Cm",
+  "locale": "en"
+}

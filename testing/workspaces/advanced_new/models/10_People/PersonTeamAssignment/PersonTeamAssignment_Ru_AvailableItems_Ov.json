@@ -1,0 +1,96 @@
+{
+  "header": {
+    "id": "PersonTeamAssignment_Ru_AvailableItems_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "PersonTeamAssignment_Ru_AvailableItems_Ov_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50
+    },
+    "columns": [
+      {
+        "id": "column_42fcd",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_c9ad3",
+        "sortable": false
+      },
+      {
+        "id": "column_317ab",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_c2497",
+        "sortable": false
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "labelHidden": true,
+          "event": "event_add_link",
+          "icon": {
+            "name": "add"
+          },
+          "primary": false
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

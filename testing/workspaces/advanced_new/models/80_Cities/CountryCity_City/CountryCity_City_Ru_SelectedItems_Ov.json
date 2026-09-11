@@ -1,0 +1,105 @@
+{
+  "header": {
+    "id": "CountryCity_City_Ru_SelectedItems_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "CountryCity_City_Ru_SelectedItems_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50
+    },
+    "columns": [
+      {
+        "id": "column_530f9",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_11f0f",
+        "sortable": false
+      },
+      {
+        "id": "column_2208a",
+        "width": 1,
+        "styles": {},
+        "elementRef": "group_ad6f5",
+        "sortable": false
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "labelHidden": true,
+          "event": "event_delete_link",
+          "icon": {
+            "name": "remove_circle"
+          },
+          "primary": false
+        },
+        {
+          "labelHidden": true,
+          "event": "event_restore_link",
+          "icon": {
+            "name": "add_circle"
+          },
+          "primary": false
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

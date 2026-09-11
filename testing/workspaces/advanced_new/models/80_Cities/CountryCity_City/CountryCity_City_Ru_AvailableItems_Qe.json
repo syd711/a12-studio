@@ -1,0 +1,59 @@
+{
+  "header": {
+    "id": "CountryCity_City_Ru_AvailableItems_Qe",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "City_Dc"
+      },
+      {
+        "modelType": "relationship",
+        "alias": "RM",
+        "purpose": "relationship-model-for-query",
+        "reference": "CountryCity_Re"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "City_Dc",
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    },
+    "fields": [
+      "/City/City",
+      "/City/Inhabitants"
+    ],
+    "links": [
+      {
+        "relationshipModel": "CountryCity_Re",
+        "targetRole": "Country",
+        "constraint": {
+          "operator": "exact_match",
+          "field": "/__meta/docRef",
+          "value": "${Country_Dc, [/__meta/docRef]}"
+        },
+        "linkDocumentFields": []
+      }
+    ]
+  }
+}

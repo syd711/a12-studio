@@ -1,0 +1,347 @@
+{
+  "header": {
+    "id": "PersonSkills_LinkFields_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "PersonSkills_LinkFields_Cm",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "PersonSkills_LinkFields_Cm"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "Button_for_Screen_for_group_7d3ee",
+            "name": "Status",
+            "target": "Screen_for_group_7d3ee",
+            "scope": "ALWAYS"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "Button_for_Screen_for_group_a8bfd",
+            "name": "HR",
+            "target": "Screen_for_group_a8bfd",
+            "scope": "ALWAYS"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_821ce",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_ae963",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    },
+                    {
+                      "locale": "en",
+                      "text": "Submit"
+                    }
+                  ]
+                }
+              }
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "Screen_for_group_7d3ee",
+        "name": "Status",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "de",
+                "text": "Status"
+              },
+              {
+                "locale": "en",
+                "text": "Status"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "ControlGrid_for_group_7d3ee",
+            "name": "Status_Controls",
+            "layout": {
+              "lg": "6-6"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "Row_for_field_d1198",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_field_d1198",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_d1198"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "Row_for_field_42656",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_field_42656",
+                    "elementRef": "field_42656"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_2d6e9",
+                    "elementRef": "field_fa543"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Screen_for_group_a8bfd",
+        "name": "HR",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "de",
+                "text": "HR"
+              },
+              {
+                "locale": "en",
+                "text": "HR"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "ControlGrid_for_group_a8bfd",
+            "name": "HR_Controls",
+            "row": [
+              {
+                "type": "Row",
+                "id": "Row_for_field_6e685",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_field_6e685",
+                    "elementRef": "field_6e685"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Screen_for_abc6a6767a60488754aace2accb73824_group_8f4b1",
+        "name": "__meta",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Meta"
+              },
+              {
+                "locale": "de",
+                "text": "Meta"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "ControlGrid_for_abc6a6767a60488754aace2accb73824_group_8f4b1",
+            "name": "__meta_Controls",
+            "row": [
+              {
+                "type": "Row",
+                "id": "Row_for_abc6a6767a60488754aace2accb73824_field_1169c",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_abc6a6767a60488754aace2accb73824_field_1169c",
+                    "readonly": true,
+                    "elementRef": "abc6a6767a60488754aace2accb73824_field_1169c"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "Row_for_abc6a6767a60488754aace2accb73824_field_cfb40",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_abc6a6767a60488754aace2accb73824_field_cfb40",
+                    "readonly": true,
+                    "elementRef": "abc6a6767a60488754aace2accb73824_field_cfb40"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "Row_for_abc6a6767a60488754aace2accb73824_field_17e3b",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_abc6a6767a60488754aace2accb73824_field_17e3b",
+                    "readonly": true,
+                    "elementRef": "abc6a6767a60488754aace2accb73824_field_17e3b"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "Row_for_abc6a6767a60488754aace2accb73824_field_cdaf9",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_abc6a6767a60488754aace2accb73824_field_cdaf9",
+                    "readonly": true,
+                    "elementRef": "abc6a6767a60488754aace2accb73824_field_cdaf9"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "Row_for_abc6a6767a60488754aace2accb73824_field_65672",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_abc6a6767a60488754aace2accb73824_field_65672",
+                    "readonly": true,
+                    "elementRef": "abc6a6767a60488754aace2accb73824_field_65672"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "Row_for_abc6a6767a60488754aace2accb73824_field_1fa32",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_abc6a6767a60488754aace2accb73824_field_1fa32",
+                    "readonly": true,
+                    "elementRef": "abc6a6767a60488754aace2accb73824_field_1fa32"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "Row_for_abc6a6767a60488754aace2accb73824_field_5cd66",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "Control_for_abc6a6767a60488754aace2accb73824_field_5cd66",
+                    "readonly": true,
+                    "elementRef": "abc6a6767a60488754aace2accb73824_field_5cd66"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "Section_for_abc6a6767a60488754aace2accb73824_group_4c9a1",
+            "name": "extensions",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Extensions"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Erweiterungen"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

@@ -1,0 +1,755 @@
+{
+  "header": {
+    "id": "City_Dc",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "City"
+      },
+      {
+        "locale": "de",
+        "text": "Stadt"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "City_Dc",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_bf577",
+          "name": "City",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_11f0f",
+                "name": "City",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "City"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Stadt"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_14f2d",
+                "name": "HelperCity",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    },
+                    {
+                      "locale": "de",
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_0de19",
+                "name": "HelperCityComp",
+                "Computation": {
+                  "computedFieldRelPath": "../HelperCity",
+                  "computationAlternatives": [
+                    {
+                      "operation": "True",
+                      "precondition": "FieldFilled(City)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of HelperCityComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of HelperCityComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_d22d3",
+                "name": "Inhabitants",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Inhabitants"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Einwohner"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_1d1e6",
+                "name": "Area",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "minFractionalDigits": 2,
+                      "maxFractionalDigits": 2
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Area"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Fläche"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_7b4b8",
+                "name": "Density",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "maxFractionalDigits": 2
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Density"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bevölkerungsdichte"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_fb11a",
+                "name": "DensityComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Density",
+                  "computationAlternatives": [
+                    {
+                      "operation": "RoundDown([Inhabitants] * 1000000 / [Area], 2)",
+                      "precondition": "FieldFilled(Inhabitants) AND FieldFilled(Area)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of DensityComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of DensityComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_69593",
+                "name": "HelperDistrict",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    },
+                    {
+                      "locale": "de",
+                      "text": ""
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_bf5dd",
+                "name": "HelperDistrictComp",
+                "Computation": {
+                  "computedFieldRelPath": "../HelperDistrict",
+                  "computationAlternatives": [
+                    {
+                      "operation": "True",
+                      "precondition": "FieldFilled(City)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of HelperDistrictComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of HelperDistrictComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_e3498",
+                "name": "Mayor",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Mayor"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bürgermeister*in"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_ad6f5",
+                "name": "Picture",
+                "Group": {
+                  "repeatability": 1,
+                  "usageType": "attachment",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_9bd4c",
+                      "name": "original_filename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_6a551",
+                      "name": "internal_filename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_592d8",
+                      "name": "content",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true,
+                            "noValueValidation": true
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_0121d",
+                      "name": "attachment_id",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_afeaf",
+                      "name": "size",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_08928",
+                      "name": "mime_type",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_9e23c",
+                      "name": "category",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_43193",
+                      "name": "description",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_a200b",
+                      "name": "AttachmentInternalFilenameRequired",
+                      "Rule": {
+                        "errorEntityRelPath": "../internal_filename",
+                        "errorCode": "Error rule_a200b",
+                        "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_fd0ec",
+                      "name": "AttachmentMimeTypeRequired",
+                      "Rule": {
+                        "errorEntityRelPath": "../mime_type",
+                        "errorCode": "Error rule_fd0ec",
+                        "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_54458",
+                      "name": "AttachmentIdOrContentFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../content",
+                        "errorCode": "Error rule_54458",
+                        "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_53e4e",
+                      "name": "SizeOfContentFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../content",
+                        "errorCode": "Error rule_53e4e",
+                        "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: If the content is filled, the size must be also filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: If the content is filled, the size must be also filled."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_c28f9",
+                "name": "Districts",
+                "Group": {
+                  "repeatability": 20,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_eaea0",
+                      "name": "Name",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Name of the District"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Name des Bezirks"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_86441",
+                      "name": "Inhabitants",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Inhabitants"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Einwohner"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_a8e1a",
+                      "name": "Area",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Area (in km²)"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Fläche (in km²)"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_29598",
+                      "name": "Density",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "maxFractionalDigits": 2
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Density"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bevölkerungsdichte"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_c0141",
+                      "name": "DensityComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../Density",
+                        "computationAlternatives": [
+                          {
+                            "operation": "RoundDown([Inhabitants] / [Area], 2)",
+                            "precondition": "FieldFilled(Inhabitants) AND FieldFilled(Area)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of DensityComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of DensityComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_72f3b",
+                      "name": "FamousPeople",
+                      "Group": {
+                        "repeatability": 10,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_f7ff7",
+                            "name": "Name",
+                            "annotations": [
+                              {
+                                "name": "indexed",
+                                "value": "false"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Famous People"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Bekannte Personen"
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_c535e",
+                      "name": "HelperNumberOfPeople",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_3ad5a",
+                      "name": "HelperNumberOfPeopleComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../HelperNumberOfPeople",
+                        "computationAlternatives": [
+                          {
+                            "operation": "NumberOfFilledGroups(FamousPeople*)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of HelperNumberOfPeopleComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of HelperNumberOfPeopleComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_543a6",
+                      "name": "Sights",
+                      "Group": {
+                        "repeatability": 20,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_7af60",
+                            "name": "Name",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Name"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Name"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_87f4b",
+                            "name": "VisitorVolume",
+                            "Field": {
+                              "fieldType": {
+                                "type": "NumberType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Visitor Volume (per Year)"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Besucheraufkommen (pro Jahr)"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_47091",
+                            "name": "ConstructionDate",
+                            "Field": {
+                              "fieldType": {
+                                "type": "DateType",
+                                "DateType": {
+                                  "format": "yyyy-MM-dd"
+                                }
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Construction Date"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Errichtungsdatum"
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_d8b57",
+                      "name": "HelperNumberOfSights",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_7eeb7",
+                      "name": "HelperNumberOfSightsComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../HelperNumberOfSights",
+                        "computationAlternatives": [
+                          {
+                            "operation": "NumberOfFilledGroups(Sights*)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of HelperNumberOfSightsComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of HelperNumberOfSightsComp"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

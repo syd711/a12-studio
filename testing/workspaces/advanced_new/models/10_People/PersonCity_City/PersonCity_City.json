@@ -1,0 +1,53 @@
+{
+  "header": {
+    "id": "PersonCity_City",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Lives in"
+      },
+      {
+        "locale": "de",
+        "text": "Wohnt in"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "availableItemsQuery",
+        "modelType": "query",
+        "reference": "PersonCity_City_AvailableItems_Qe"
+      },
+      {
+        "purpose": "selectedItemQuery",
+        "modelType": "query",
+        "reference": "PersonCity_City_SelectedItems_Qe"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "DropDownSelection",
+      "availableItemsQueryModel": "PersonCity_City_AvailableItems_Qe",
+      "selectedItemQueryModel": "PersonCity_City_SelectedItems_Qe",
+      "elementRef": "field_11f0f"
+    },
+    "relationshipName": "CityPerson_Re",
+    "targetRole": "City"
+  }
+}

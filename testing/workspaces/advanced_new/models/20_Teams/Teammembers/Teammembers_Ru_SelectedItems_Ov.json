@@ -1,0 +1,126 @@
+{
+  "header": {
+    "id": "Teammembers_Ru_SelectedItems_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "Teammembers_Ru_SelectedItems_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50
+    },
+    "columns": [
+      {
+        "id": "column_a70e8",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_46375",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "linkReferences": [
+          {
+            "relationship": "TeamPerson_Re",
+            "targetRole": "Person",
+            "type": "CHILD"
+          }
+        ]
+      },
+      {
+        "id": "column_0cffa",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_04443",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "linkReferences": [
+          {
+            "relationship": "TeamPerson_Re",
+            "targetRole": "Person",
+            "type": "LINK"
+          }
+        ]
+      },
+      {
+        "id": "column_89727",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_4e53f",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "linkReferences": [
+          {
+            "relationship": "TeamPerson_Re",
+            "targetRole": "Person",
+            "type": "LINK"
+          }
+        ]
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "labelHidden": true,
+          "event": "event_delete_link",
+          "icon": {
+            "name": "remove_circle"
+          },
+          "destructive": false,
+          "primary": false
+        },
+        {
+          "labelHidden": true,
+          "event": "event_restore_link",
+          "icon": {
+            "name": "add_circle"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

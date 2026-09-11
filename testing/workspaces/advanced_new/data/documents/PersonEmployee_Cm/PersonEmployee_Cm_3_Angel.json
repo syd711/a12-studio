@@ -1,0 +1,68 @@
+{
+  "document": {
+    "Person": {
+      "FirstName": "Angel",
+      "LastName": "Wyman",
+      "MainLocation": "Leipzig",
+      "PersonalData": {
+        "Gender": "DIVERSE",
+        "DateOfBirth": "2000-02-29",
+        "PlaceOfBirth": "Runolfssonhaven",
+        "Nationality": "Uzbekistan"
+      },
+      "Addresses": [
+        {
+          "Street": "588 Reilly Flat",
+          "City": "Oldenburg",
+          "Country": "South Sudan",
+          "PostalCode": "17495"
+        },
+        {
+          "Street": "430 Ratke Rapids",
+          "City": "North Jackie",
+          "Country": "Cuba"
+        },
+        {
+          "Street": "53685 Pollich Streets",
+          "City": "Port Helen",
+          "Country": "San Marino",
+          "PostalCode": "06811"
+        }
+      ],
+      "Phones": [
+        {
+          "PhoneNumber": "944.906.7623",
+          "Type": "MOBILE"
+        },
+        {
+          "PhoneNumber": "1-882-856-9516"
+        }
+      ],
+      "Education": [
+        {
+          "SchoolName": "Imperial College London",
+          "Degree": "Diploma",
+          "Major": "Dance",
+          "StartDate": "2024-02-14"
+        },
+        {
+          "SchoolName": "The University of Queensland",
+          "Degree": "PhD",
+          "Major": "Communications",
+          "StartDate": "2024-02-29"
+        }
+      ],
+      "Photo": {
+        "attachment_id": "a2020e14-d784-43c1-8ae6-73f9452e1004",
+        "original_filename": "stockimages_people_19.jpg",
+        "internal_filename": "stockimages_people_19.jpg",
+        "mime_type": "image/jpeg"
+      },
+      "PersonID": "P3",
+      "Type": "Employee",
+      "Name": "Angel Wyman"
+    }
+  },
+  "documentModelName": "PersonEmployee_Cm",
+  "locale": "en"
+}

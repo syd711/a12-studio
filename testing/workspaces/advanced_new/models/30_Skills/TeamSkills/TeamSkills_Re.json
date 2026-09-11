@@ -1,0 +1,92 @@
+{
+  "header": {
+    "id": "TeamSkills_Re",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Skill",
+        "reference": "Skill_Dc"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Team",
+        "reference": "Team_Dc"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [
+      {
+        "locale": "de"
+      },
+      {
+        "locale": "en"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "ordered": false,
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 5
+          }
+        },
+        "labels": [
+          {
+            "locale": "de",
+            "text": "Benötigte Fähigkeit"
+          },
+          {
+            "locale": "en",
+            "text": "Needed Skill"
+          }
+        ],
+        "role": "Skill",
+        "documentModel": "Skill_Dc"
+      },
+      {
+        "ordered": false,
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 999
+          }
+        },
+        "labels": [
+          {
+            "locale": "de",
+            "text": "Team"
+          },
+          {
+            "locale": "en",
+            "text": "Team"
+          }
+        ],
+        "role": "Team",
+        "documentModel": "Team_Dc"
+      }
+    ],
+    "linkDocumentModel": null
+  }
+}

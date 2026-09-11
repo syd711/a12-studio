@@ -1,0 +1,57 @@
+roles:
+  - name: modeler
+    description: >-
+      Role, which can create, edit and deploy models from SME and test them
+      end-to-end.
+    accessRights:
+      - DOCUMENT_DELETE
+      - DOCUMENT_MULTI_DELETE
+      - DOCUMENT_EXPORT
+      - MODEL_MANAGE
+      - DOCUMENT_UPDATE
+      - DOCUMENT_CREATE
+      - ATTACHMENT_UPLOAD
+      - DOCUMENT_READ
+      - QUERY
+      - DOCUMENT_LIST
+      - DOCUMENT_PARTIAL_UPDATE
+  - name: tester
+    description: Role, which can create, edit and delete Documents in the end application.
+    accessRights:
+      - DOCUMENT_DELETE
+      - DOCUMENT_MULTI_DELETE
+      - DOCUMENT_EXPORT
+      - MODEL_READ
+      - DOCUMENT_UPDATE
+      - DOCUMENT_CREATE
+      - ATTACHMENT_UPLOAD
+      - DOCUMENT_READ
+      - QUERY
+      - DOCUMENT_LIST
+      - DOCUMENT_PARTIAL_UPDATE
+  - name: reviewer
+    description: Role, which can only read Documents in the end application.
+    accessRights:
+      - MODEL_READ
+      - DOCUMENT_READ
+      - QUERY
+      - DOCUMENT_LIST
+  - name: systemAdmin
+    description: Role without restrictions.
+    accessRights:
+      - TASK_COMPLETE
+      - SEND_MESSAGE
+      - TASK_ASSIGN
+      - DOCUMENT_EXPORT
+      - MODEL_MANAGE
+      - START_PROCESS
+      - DOCUMENT_PARTIAL_UPDATE
+      - DOCUMENT_DELETE
+      - DOCUMENT_MULTI_DELETE
+      - DOCUMENT_UPDATE
+      - DOCUMENT_CREATE
+      - ATTACHMENT_UPLOAD
+      - DOCUMENT_READ
+      - QUERY
+      - DOCUMENT_LIST
+      - GET_PROCESS_VARIABLE_UPDATES

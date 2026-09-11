@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "general": {
+    "relationshipEngineMode": "new",
+    "showMetaDataInUIModels": true,
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "exclusions": []
+  },
+  "previewApp": {}
+}

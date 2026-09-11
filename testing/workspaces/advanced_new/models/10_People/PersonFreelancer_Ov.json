@@ -1,0 +1,283 @@
+{
+  "header": {
+    "id": "PersonFreelancer_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Freelancers"
+      },
+      {
+        "locale": "de",
+        "text": "Freiberufler"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "PersonFreelancer_Cm"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "newFilterConfiguration": {
+        "filterSelector": {
+          "viewMode": "overlay",
+          "initialVisibility": "hide",
+          "searchBar": {
+            "enabled": false
+          },
+          "showSetFiltersOnly": {
+            "enabled": false
+          },
+          "trigger": {
+            "enabled": true,
+            "value": {
+              "labelHidden": true,
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Filter"
+                },
+                {
+                  "locale": "de",
+                  "text": "Filter"
+                }
+              ],
+              "icon": {
+                "name": "filter_list",
+                "theme": "filled"
+              }
+            }
+          }
+        },
+        "joinOperator": {
+          "enabled": true,
+          "value": "and"
+        },
+        "invert": {
+          "enabled": true,
+          "value": false
+        },
+        "filterGroups": [
+          {
+            "id": "filter-group-15869",
+            "name": "Name",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Name"
+              },
+              {
+                "locale": "de",
+                "text": "Name"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-0c084",
+                "type": "string",
+                "options": {
+                  "fieldId": "field_99c3b",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              },
+              {
+                "id": "filter-item-3f849",
+                "type": "string",
+                "options": {
+                  "fieldId": "field_4ae85",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "filter-group-be050",
+            "name": "Details",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Contract Details"
+              },
+              {
+                "locale": "de",
+                "text": "Vertragsdetails"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-aa8fd",
+                "collapsed": true,
+                "type": "number",
+                "options": {
+                  "fieldId": "field_8938c",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "ranges": [
+                    {
+                      "option": "fromTo",
+                      "default": true,
+                      "enabled": true
+                    },
+                    {
+                      "option": "fromOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "toOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "exact",
+                      "enabled": true
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "showRowCount": true
+    },
+    "columns": [
+      {
+        "id": "column-b3874",
+        "width": 1,
+        "elementRef": "field_99c3b"
+      },
+      {
+        "id": "column-ff533",
+        "width": 1,
+        "elementRef": "field_4ae85"
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "button",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Add"
+            },
+            {
+              "locale": "de",
+              "text": "Hinzufügen"
+            }
+          ],
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

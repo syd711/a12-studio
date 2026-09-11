@@ -1,0 +1,78 @@
+{
+  "header": {
+    "id": "CityPerson_Person_Ru_SelectedItems_Qe",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Person_Dc"
+      },
+      {
+        "modelType": "relationship",
+        "alias": "RM",
+        "purpose": "relationship-model-for-query",
+        "reference": "CityPerson_Re"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Person_Dc",
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    },
+    "fields": [
+      "/Person/Photo/original_filename",
+      "/Person/Photo/internal_filename",
+      "/Person/Photo/content",
+      "/Person/Photo/attachment_id",
+      "/Person/Photo/size",
+      "/Person/Photo/mime_type",
+      "/Person/Photo/category",
+      "/Person/Photo/description",
+      "/Person/Name"
+    ],
+    "constraint": {
+      "operator": "has",
+      "relationshipModel": "CityPerson_Re",
+      "targetRole": "City",
+      "constraint": {
+        "operator": "exact_match",
+        "field": "/__meta/docRef",
+        "value": "${City_Dc, [/__meta/docRef]}"
+      },
+      "maxDepth": 1
+    },
+    "links": [
+      {
+        "relationshipModel": "CityPerson_Re",
+        "targetRole": "City",
+        "maxDepth": 1,
+        "constraint": {
+          "operator": "exact_match",
+          "field": "/__meta/docRef",
+          "value": "${City_Dc, [/__meta/docRef]}"
+        },
+        "linkDocumentFields": []
+      }
+    ]
+  }
+}

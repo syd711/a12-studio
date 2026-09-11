@@ -1,0 +1,159 @@
+{
+  "header": {
+    "id": "PersonSkills_Skills_SelectedItems_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "PersonSkills_Skills_SelectedItems_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50
+    },
+    "columns": [
+      {
+        "id": "column_496ba",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_fb17f",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column_ca665",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_02bd4",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column_1af29",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_42656",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "linkReferences": [
+          {
+            "relationship": "PersonSkills_Re",
+            "targetRole": "Person",
+            "type": "LINK"
+          }
+        ]
+      },
+      {
+        "id": "column_673ae",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_6e685",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "linkReferences": [
+          {
+            "relationship": "PersonSkills_Re",
+            "targetRole": "Person",
+            "type": "LINK"
+          }
+        ]
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "labelHidden": true,
+          "event": "event_delete_link",
+          "icon": {
+            "name": "remove_circle"
+          },
+          "destructive": false,
+          "primary": false
+        },
+        {
+          "labelHidden": true,
+          "event": "event_restore_link",
+          "icon": {
+            "name": "add_circle"
+          },
+          "destructive": false,
+          "primary": false
+        },
+        {
+          "icon": {
+            "name": "apk_document",
+            "theme": "outlined"
+          },
+          "label": [
+            {
+              "locale": "de",
+              "text": "Editiere Bewertung"
+            },
+            {
+              "locale": "en",
+              "text": "Edit Acknowledgement"
+            }
+          ],
+          "event": "event_edit_link_document",
+          "labelHidden": true,
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "header": {
+    "id": "PersonFreelancer_AddNew_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Add new Freelancer"
+      },
+      {
+        "locale": "de",
+        "text": "Neuen Freiberufler hinzufügen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "PersonFreelancer_Cm",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "PersonFreelancer_Cm"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "PersonSkills_Skills_Ru"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox"
+    },
+    "footerBox": {
+      "id": "footerBox",
+      "minorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_c1ee3",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      },
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_2bdda",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Add Freelancer"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Freiberufler hinzufügen"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen-92775",
+        "name": "Freelancer",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_18fc1",
+            "name": "Data",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Personal Data"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Daten zur Person"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-120f6",
+                "name": "PersonControls",
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-60100",
+                    "name": "Row-60100",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-e7565",
+                        "elementRef": "field_99c3b"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-083c6",
+                        "elementRef": "field_4ae85"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row_db812",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_fd4f9",
+                        "elementRef": "field_9ec18"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_44d4e",
+            "name": "Skills",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Skills"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Fähigkeiten"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "CustomScreenElement",
+                "id": "relationshipuimodel_1c356",
+                "reference": "PersonSkills_Skills_Ru"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

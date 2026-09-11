@@ -1,0 +1,78 @@
+{
+  "header": {
+    "id": "CountryCity_Country_SelectedItems_Qe",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Country_Dc"
+      },
+      {
+        "modelType": "relationship",
+        "alias": "RM",
+        "purpose": "relationship-model-for-query",
+        "reference": "CountryCity_Re"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Country_Dc",
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    },
+    "fields": [
+      "/Country/Flag/original_filename",
+      "/Country/Flag/internal_filename",
+      "/Country/Flag/content",
+      "/Country/Flag/attachment_id",
+      "/Country/Flag/size",
+      "/Country/Flag/mime_type",
+      "/Country/Flag/category",
+      "/Country/Flag/description",
+      "/Country/Country"
+    ],
+    "constraint": {
+      "operator": "has",
+      "relationshipModel": "CountryCity_Re",
+      "targetRole": "City",
+      "constraint": {
+        "operator": "exact_match",
+        "field": "/__meta/docRef",
+        "value": "${City_Dc, [/__meta/docRef]}"
+      },
+      "maxDepth": 1
+    },
+    "links": [
+      {
+        "relationshipModel": "CountryCity_Re",
+        "targetRole": "City",
+        "maxDepth": 1,
+        "constraint": {
+          "operator": "exact_match",
+          "field": "/__meta/docRef",
+          "value": "${City_Dc, [/__meta/docRef]}"
+        },
+        "linkDocumentFields": []
+      }
+    ]
+  }
+}

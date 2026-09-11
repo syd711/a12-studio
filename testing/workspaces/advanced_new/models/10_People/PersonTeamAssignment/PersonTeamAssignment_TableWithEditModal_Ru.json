@@ -1,0 +1,134 @@
+{
+  "header": {
+    "id": "PersonTeamAssignment_TableWithEditModal_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "PersonTeamAssignment_Ru_SelectedItems_Ov"
+      },
+      {
+        "purpose": "link",
+        "modelType": "form",
+        "reference": "TeamPerson_LinkFields_Fm"
+      },
+      {
+        "purpose": "availableItemsInEditModal",
+        "modelType": "overview",
+        "reference": "PersonTeamAssignment_Ru_AvailableItems_Ov"
+      },
+      {
+        "purpose": "selectedItemsInEditModal",
+        "modelType": "overview",
+        "reference": "PersonTeamAssignment_Ru_SelectedItems_Ov"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "TableList",
+      "linkFormModel": "TeamPerson_LinkFields_Fm",
+      "selectedItemsOverviewModel": "PersonTeamAssignment_Ru_SelectedItems_Ov",
+      "height": "300",
+      "buttons": [
+        {
+          "destructive": false,
+          "icon": {
+            "name": "edit_note",
+            "theme": "rounded"
+          },
+          "event": "event_open_edit_modal",
+          "label": [
+            {
+              "locale": "de",
+              "text": "Teamzuweisungen anpassen"
+            },
+            {
+              "locale": "en",
+              "text": "Edit Team Assignments"
+            }
+          ],
+          "description": [
+            {
+              "locale": "de",
+              "text": "Öffnet einen Dialog, um Teamzuordnungen anpassen zu können"
+            },
+            {
+              "locale": "en",
+              "text": "Opens a dialog to edit the team assignments of this person"
+            }
+          ]
+        },
+        {
+          "destructive": true,
+          "event": "event_cancel_edit_modal",
+          "label": [
+            {
+              "locale": "de",
+              "text": "Abbrechen"
+            },
+            {
+              "locale": "en",
+              "text": "Cancel"
+            }
+          ]
+        },
+        {
+          "destructive": false,
+          "icon": {
+            "name": "check",
+            "theme": "rounded"
+          },
+          "event": "event_submit_edit_modal",
+          "label": [
+            {
+              "locale": "de",
+              "text": "Speichern"
+            },
+            {
+              "locale": "en",
+              "text": "Save"
+            }
+          ]
+        }
+      ],
+      "editConfiguration": {
+        "dialogTitle": [
+          {
+            "locale": "de",
+            "text": "Welchen Teams ist die Person zugeordnet?"
+          },
+          {
+            "locale": "en",
+            "text": "To which teams is this person assigned?"
+          }
+        ],
+        "availableItemsOverviewModel": "PersonTeamAssignment_Ru_AvailableItems_Ov",
+        "selectedItemsOverviewModel": "PersonTeamAssignment_Ru_SelectedItems_Ov",
+        "dialogMaxHeight": "80%",
+        "height": "80%",
+        "dialogMaxWidth": "1000",
+        "dialogWidth": "80%"
+      }
+    },
+    "relationshipName": "TeamPerson_Re",
+    "targetRole": "Team"
+  }
+}

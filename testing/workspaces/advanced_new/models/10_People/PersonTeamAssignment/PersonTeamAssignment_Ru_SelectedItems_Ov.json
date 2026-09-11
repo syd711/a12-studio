@@ -1,0 +1,189 @@
+{
+  "header": {
+    "id": "PersonTeamAssignment_Ru_SelectedItems_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "PersonTeamAssignment_Ru_SelectedItems_Ov_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50
+    },
+    "columns": [
+      {
+        "id": "column_e29c0",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_c9ad3",
+        "sortable": false,
+        "linkReferences": [
+          {
+            "relationship": "TeamPerson_Re",
+            "targetRole": "Team",
+            "type": "CHILD"
+          }
+        ]
+      },
+      {
+        "id": "column_90bc3",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_c2497",
+        "sortable": false,
+        "linkReferences": [
+          {
+            "relationship": "TeamPerson_Re",
+            "targetRole": "Team",
+            "type": "CHILD"
+          }
+        ]
+      },
+      {
+        "id": "column_676ea",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_04443",
+        "sortable": false,
+        "linkReferences": [
+          {
+            "relationship": "TeamPerson_Re",
+            "targetRole": "Team",
+            "type": "LINK"
+          }
+        ]
+      },
+      {
+        "id": "column_24673",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_4e53f",
+        "sortable": false,
+        "linkReferences": [
+          {
+            "relationship": "TeamPerson_Re",
+            "targetRole": "Team",
+            "type": "LINK"
+          }
+        ]
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "labelHidden": true,
+          "event": "event_delete_link",
+          "icon": {
+            "name": "remove_circle"
+          },
+          "destructive": true,
+          "label": [
+            {
+              "locale": "de",
+              "text": "Teamzuordnung lösen"
+            },
+            {
+              "locale": "en",
+              "text": "Remove team assignment"
+            }
+          ],
+          "primary": false
+        },
+        {
+          "labelHidden": true,
+          "event": "event_restore_link",
+          "icon": {
+            "name": "add_circle"
+          },
+          "destructive": false,
+          "label": [
+            {
+              "locale": "de",
+              "text": "Teamzuordnung wiederherstellen"
+            },
+            {
+              "locale": "en",
+              "text": "Restore team assignment"
+            }
+          ],
+          "primary": false
+        },
+        {
+          "destructive": false,
+          "icon": {
+            "name": "edit_square",
+            "theme": "outlined"
+          },
+          "label": [
+            {
+              "locale": "de",
+              "text": "Eigenschaften der Teamzuordnung bearbeiten"
+            },
+            {
+              "locale": "en",
+              "text": "Edit team assignment properties"
+            }
+          ],
+          "event": "event_edit_link_document",
+          "labelHidden": true,
+          "primary": true
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

@@ -1,0 +1,304 @@
+{
+  "header": {
+    "id": "Contract_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Contract"
+      },
+      {
+        "locale": "de",
+        "text": "Vertrag"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Contract_Dc",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Contract_Dc"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox"
+    },
+    "footerBox": {
+      "id": "footerBox",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_4cba2",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_9c616",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen-768bc",
+        "name": "Contract",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid-1126d",
+            "name": "Contract_Controls",
+            "layout": {
+              "lg": "6-6"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_261c7",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_84743",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_c3110"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row-6c1fb",
+                "name": "row-6c1fb",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-ad20e",
+                    "elementRef": "field_565e6"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control-ee728",
+                    "elementRef": "field_8f6df"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row-924de",
+                "name": "row-924de",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-f559c",
+                    "elementRef": "field_235b0"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_4a025",
+                    "elementRef": "field_6eada"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "InlineRepeat",
+            "id": "inlinerepeat_5d9d9",
+            "name": "Remarks_Repeat",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Internal Remarks"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Interne Vermerke"
+                  }
+                ]
+              }
+            },
+            "repeatOverviewColumn": [
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "fieldbasedrepeatoverviewcolumn_e409e",
+                "elementRef": "field_0f9c1"
+              },
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "fieldbasedrepeatoverviewcolumn_67fe4",
+                "width": 1,
+                "elementRef": "field_e0b0b"
+              },
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "fieldbasedrepeatoverviewcolumn_315df",
+                "elementRef": "field_fa27b"
+              }
+            ],
+            "groupRef": "group_7f8c7",
+            "enableAdd": true,
+            "enableRemove": true
+          },
+          {
+            "type": "InlineRepeat",
+            "id": "inlinerepeat_b09b6",
+            "name": "Documents_Repeat",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Attached Documents"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Verknüpfte Dokumente"
+                  }
+                ]
+              }
+            },
+            "repeatOverviewColumn": [
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "fieldbasedrepeatoverviewcolumn_ae432",
+                "elementRef": "group_7c8d7"
+              }
+            ],
+            "groupRef": "group_8509a",
+            "enableAdd": true,
+            "enableRemove": true,
+            "enableReorder": true,
+            "multiFileUpload": true,
+            "multiFileUploadOptions": {
+              "elementRef": "group_7c8d7",
+              "enableDownload": true,
+              "fileUploadDescription": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Click or Drop Documents Here"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Hier Klicken oder Dokumente per Drag&Drop Hinzufügen"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "h"
+              },
+              {
+                "locale": "de",
+                "text": "h"
+              }
+            ]
+          },
+          "elementRef": "field_235b0"
+        },
+        {
+          "initialValue": "HR",
+          "elementRef": "field_e0b0b"
+        },
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "€"
+              },
+              {
+                "locale": "de",
+                "text": "€"
+              }
+            ]
+          },
+          "elementRef": "field_6eada"
+        }
+      ]
+    },
+    "groupConfiguration": {
+      "group": [
+        {
+          "groupRef": "group_7f8c7",
+          "numberOfInitialRows": 1
+        }
+      ]
+    },
+    "defaults": {}
+  }
+}

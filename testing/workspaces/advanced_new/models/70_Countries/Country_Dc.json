@@ -1,0 +1,731 @@
+{
+  "header": {
+    "id": "Country_Dc",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Country"
+      },
+      {
+        "locale": "de",
+        "text": "Land"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Country_Dc",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_49e76",
+          "name": "Country",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_6544a",
+                "name": "Country",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Country"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Land"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_71d22",
+                "name": "Flag",
+                "Group": {
+                  "repeatability": 1,
+                  "usageType": "attachment",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_e72d5",
+                      "name": "original_filename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_b167f",
+                      "name": "internal_filename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_93033",
+                      "name": "content",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true,
+                            "noValueValidation": true
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_0f0ba",
+                      "name": "attachment_id",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_3e713",
+                      "name": "size",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_bdfb0",
+                      "name": "mime_type",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_c69d2",
+                      "name": "category",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_181e3",
+                      "name": "description",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_ee8c7",
+                      "name": "AttachmentInternalFilenameRequired",
+                      "Rule": {
+                        "errorEntityRelPath": "../internal_filename",
+                        "errorCode": "Errorrule_ee8c7",
+                        "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_2b480",
+                      "name": "AttachmentMimeTypeRequired",
+                      "Rule": {
+                        "errorEntityRelPath": "../mime_type",
+                        "errorCode": "Errorrule_2b480",
+                        "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_3e331",
+                      "name": "AttachmentIdOrContentFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../content",
+                        "errorCode": "Errorrule_3e331",
+                        "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_e60f8",
+                      "name": "SizeOfContentFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../content",
+                        "errorCode": "Errorrule_e60f8",
+                        "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: If the content is filled, the size must be also filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: If the content is filled, the size must be also filled."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_780e9",
+                "name": "SpokenLanguages",
+                "Group": {
+                  "repeatability": 999999,
+                  "usageType": "multi-select",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_20bf1",
+                      "name": "Value",
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "1",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "English"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Englisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "2",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Chinese"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Chinesisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "3",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Spanish"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Spanisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "4",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "French"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Französisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "5",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Russian"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Russisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "6",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Portuguese"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Portugiesisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "7",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "German"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Deutsch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "8",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Japanese"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Japanisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "9",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Turkish"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Türkisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "10",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Vietnamese"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Vietnamesisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "11",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Italian"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Italienisch"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "12",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Other"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Sonstige"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Spoken Languages"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Gesprochene Sprachen"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_6eb9e",
+                "name": "Inhabitants",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Inhabitants"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Einwohner"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_5e8c2",
+                "name": "Area",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "minFractionalDigits": 2,
+                      "maxFractionalDigits": 2
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Area"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Fläche"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_b60d0",
+                "name": "Density",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "maxFractionalDigits": 2
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Density"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bevölkerungsdichte"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_cdadb",
+                "name": "DensityComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Density",
+                  "computationAlternatives": [
+                    {
+                      "operation": "RoundDown([Inhabitants] * 1000000 / [Area], 2)",
+                      "precondition": "FieldFilled(Inhabitants) AND FieldFilled(Area)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of DensityComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of DensityComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_6b91f",
+                "name": "Continent",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "Asia",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Asia"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Asien"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "Africa",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Africa"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Afrika"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "Europe",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Europe"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Europa"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "NAmerica",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "North America"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Nordamerika"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "SAmerica",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "South America"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Südamerika"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "Australia",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Australia/ Oceania"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Australien/ Ozeanien"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Continent"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kontinent"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_32362",
+                "name": "Description",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "lineBreaksPermitted": true
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Description"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Beschreibung"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_dbf7e",
+                "name": "Government",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "monarchy",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Monarchy"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Monarchie"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "republic",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Republic"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Republik"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "dictatorship",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Dictatorship"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Diktatur"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Form of Government"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Staatsform"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

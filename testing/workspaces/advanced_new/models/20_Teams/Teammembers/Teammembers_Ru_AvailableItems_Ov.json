@@ -1,0 +1,105 @@
+{
+  "header": {
+    "id": "Teammembers_Ru_AvailableItems_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "de",
+        "text": "Personen mit benötigten Fähigkeiten"
+      },
+      {
+        "locale": "en",
+        "text": "Persons with required Skills"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "query-model-for-overview",
+        "modelType": "query",
+        "alias": "QM",
+        "reference": "Teammembers_Ru_AvailableItems_Qe"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 50
+    },
+    "columns": [
+      {
+        "id": "column_2a824",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_99c3b",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column_eb4bb",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_4ae85",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column_cd5b5",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_285d3",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "rowActionGroup": {
+      "actions": [
+        {
+          "labelHidden": true,
+          "event": "event_add_link",
+          "icon": {
+            "name": "add"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

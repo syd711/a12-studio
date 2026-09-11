@@ -1,0 +1,900 @@
+{
+  "header": {
+    "id": "PersonEmployee_AddNew_Fm",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Add new Employee"
+      },
+      {
+        "locale": "de",
+        "text": "Neuen Mitarbeiter hinzufügen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "PersonEmployee_Cm",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "PersonEmployee_Cm"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "PersonSkills_Skills_Ru"
+      },
+      {
+        "purpose": "relationship-ui",
+        "modelType": "relationship-ui",
+        "reference": "PersonTeamAssignment_OnlyDualPane_Ru"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1",
+      "minorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_13d87",
+            "name": "PersonalData",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Personal Data"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Stammdaten"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "class",
+                "theme": "outlined"
+              }
+            },
+            "target": "screen1",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_9c827",
+            "name": "Contact",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Contact"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kontakt"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "message",
+                "theme": "outlined"
+              }
+            },
+            "target": "screen_77b27",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_fd2e6",
+            "name": "Education",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Education"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bildungshistorie"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "school",
+                "theme": "outlined"
+              }
+            },
+            "target": "screen_6dfe7",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_4c46b",
+            "name": "TeamAssignment",
+            "buttonStyling": {
+              "icon": {
+                "name": "group",
+                "theme": "rounded"
+              }
+            },
+            "target": "screen_8564e",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "minorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button-5415b",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "priority": "SECONDARY",
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen1",
+        "name": "PersonalData",
+        "footerBox": {
+          "id": "headerfooter_e9b0a",
+          "majorButtons": {
+            "button": [
+              {
+                "type": "NAVIGATION",
+                "id": "button_a3432",
+                "name": "Next",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Next"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Weiter"
+                        }
+                      ]
+                    }
+                  },
+                  "priority": "PRIMARY"
+                },
+                "target": "#next",
+                "validation": "partial",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "MultiColumnSection",
+            "id": "multicolumnsection-c3749",
+            "name": "PersonalData",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Personal Data"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Persönliche Daten"
+                  }
+                ]
+              }
+            },
+            "layout": {
+              "lg": "2-10",
+              "md": "2-10"
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_0127f",
+                "name": "CGPhoto",
+                "layout": {
+                  "lg": "12"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_6f5d8",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-27cff",
+                        "elementRef": "group_bc062"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-5fb0d",
+                "name": "CG1",
+                "layout": {
+                  "lg": "3-3-3-3",
+                  "md": "6-6-6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-f9158",
+                    "name": "R1",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-8f102",
+                        "elementRef": "field_99c3b"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-3cecb",
+                        "elementRef": "field_4ae85"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-f12a7",
+                        "label": {
+                          "type": "Multilingual",
+                          "multilingualText": {
+                            "text": [
+                              {
+                                "locale": "en",
+                                "text": "Gender"
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Geschlecht"
+                              }
+                            ]
+                          }
+                        },
+                        "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F6"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-fd741",
+                        "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F9"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-8b57e",
+                    "name": "R2",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-65fe4",
+                        "datePickerConfig": {
+                          "minYear": -70,
+                          "maxYear": -18,
+                          "absolute": false,
+                          "preselectionYear": -34
+                        },
+                        "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F7"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control-a64e6",
+                        "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F8"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row-a6104",
+                    "name": "R3",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_7943a",
+                        "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_field_86a6c"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_d26f8",
+                        "elementRef": "field_9ec18"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "BOTTOM"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "screen_77b27",
+        "name": "Contact",
+        "footerBox": {
+          "id": "headerfooter_2a7af",
+          "majorButtons": {
+            "button": [
+              {
+                "type": "NAVIGATION",
+                "id": "button_100a3",
+                "name": "Next",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Next"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Weiter"
+                        }
+                      ]
+                    }
+                  },
+                  "priority": "PRIMARY"
+                },
+                "target": "#next",
+                "validation": "partial",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-045d1",
+            "name": "SectionAddress",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Address"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Adresse"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "EmbeddedRepeat",
+                "id": "embeddedrepeat-3b672",
+                "name": "EmbeddedRepeatAddresses",
+                "repeatOverviewColumn": [
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-997b0",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F12"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-a695d",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F13"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-c2200",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F15"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-84c4a",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F14"
+                  }
+                ],
+                "groupRef": "3ebb47b738ad9c6e3c36113ff04df00d_G10",
+                "enableAdd": true,
+                "enableRemove": true,
+                "enableReorder": false,
+                "enableCopy": false,
+                "controlGrid": {
+                  "type": "ControlGrid",
+                  "id": "controlgrid-b3ea3",
+                  "name": "CG",
+                  "layout": {
+                    "lg": "6-6"
+                  },
+                  "row": [
+                    {
+                      "type": "Row",
+                      "id": "row-cdc9b",
+                      "cell": [
+                        {
+                          "type": "Control",
+                          "id": "control-37b64",
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F12"
+                        },
+                        {
+                          "type": "Control",
+                          "id": "control-f037d",
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F13"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Row",
+                      "id": "row-b6b4a",
+                      "cell": [
+                        {
+                          "type": "Control",
+                          "id": "control-18b21",
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F15"
+                        },
+                        {
+                          "type": "Control",
+                          "id": "control-1bd08",
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F14"
+                        }
+                      ]
+                    }
+                  ],
+                  "verticalAlignment": "BOTTOM"
+                }
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section-b1ca8",
+            "name": "Phone",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "de",
+                    "text": "Telefon"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Phone"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "InlineRepeat",
+                "id": "inlinerepeat-ce0ab",
+                "name": "InlineRepeatPhones",
+                "repeatOverviewColumn": [
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-bb467",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F17"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-1f124",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F18"
+                  }
+                ],
+                "groupRef": "3ebb47b738ad9c6e3c36113ff04df00d_G16",
+                "enableAdd": true,
+                "enableRemove": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "screen_6dfe7",
+        "name": "Education",
+        "footerBox": {
+          "id": "headerfooter_b079f",
+          "majorButtons": {
+            "button": [
+              {
+                "type": "NAVIGATION",
+                "id": "button_bba2b",
+                "name": "Next",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Next"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Weiter"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "target": "#next",
+                "validation": "partial",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section-c9761",
+            "name": "Education",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Education"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Ausbildung"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "EmbeddedRepeat",
+                "id": "embeddedrepeat-98e5f",
+                "name": "EmbeddedRepeatEducation",
+                "repeatOverviewColumn": [
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-8aa90",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F20"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-c6f56",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F21"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-8c5af",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F22"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-5a1c5",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "datePickerConfig": {
+                      "minYear": -50,
+                      "maxYear": 0,
+                      "absolute": false,
+                      "preselectionYear": -10
+                    },
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F23"
+                  },
+                  {
+                    "type": "FieldBasedRepeatOverviewColumn",
+                    "id": "fieldbasedrepeatoverviewcolumn-d5032",
+                    "width": 1,
+                    "sortable": false,
+                    "filterable": false,
+                    "preferredSorting": "ASC",
+                    "datePickerConfig": {
+                      "minYear": -50,
+                      "maxYear": 0,
+                      "absolute": false,
+                      "preselectionYear": -5
+                    },
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F24"
+                  }
+                ],
+                "groupRef": "3ebb47b738ad9c6e3c36113ff04df00d_G19",
+                "enableAdd": true,
+                "enableRemove": true,
+                "enableReorder": false,
+                "enableCopy": false,
+                "controlGrid": {
+                  "type": "ControlGrid",
+                  "id": "controlgrid-16f54",
+                  "name": "CG",
+                  "layout": {
+                    "lg": "6-6"
+                  },
+                  "row": [
+                    {
+                      "type": "Row",
+                      "id": "row-40465",
+                      "cell": [
+                        {
+                          "type": "Control",
+                          "id": "control-1dabe",
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F20"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Row",
+                      "id": "row-960ac",
+                      "cell": [
+                        {
+                          "type": "Control",
+                          "id": "control-52243",
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F21"
+                        },
+                        {
+                          "type": "Control",
+                          "id": "control-aea03",
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F22"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "Row",
+                      "id": "row-551df",
+                      "cell": [
+                        {
+                          "type": "Control",
+                          "id": "control-fc2bd",
+                          "datePickerConfig": {
+                            "minYear": -50,
+                            "maxYear": 0,
+                            "absolute": false,
+                            "preselectionYear": -10
+                          },
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F23"
+                        },
+                        {
+                          "type": "Control",
+                          "id": "control-834e6",
+                          "datePickerConfig": {
+                            "minYear": -50,
+                            "maxYear": 0,
+                            "absolute": false,
+                            "preselectionYear": -5
+                          },
+                          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F24"
+                        }
+                      ]
+                    }
+                  ],
+                  "verticalAlignment": "TOP"
+                },
+                "defaultRowAction": {
+                  "event": "edit"
+                }
+              }
+            ]
+          },
+          {
+            "type": "CustomScreenElement",
+            "id": "relationshipuimodel_88c2b",
+            "reference": "PersonSkills_Skills_Ru"
+          }
+        ]
+      },
+      {
+        "id": "screen_8564e",
+        "name": "TeamAssignment",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Team Assignments"
+              },
+              {
+                "locale": "de",
+                "text": "Teamzuordnungen"
+              }
+            ]
+          }
+        },
+        "footerBox": {
+          "id": "headerfooter_541d2",
+          "majorButtons": {
+            "button": [
+              {
+                "type": "EVENT",
+                "id": "button_82d00",
+                "name": "Submit",
+                "buttonStyling": {
+                  "label": {
+                    "type": "Multilingual",
+                    "multilingualText": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Add Employee"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Mitarbeiter hinzufügen"
+                        }
+                      ]
+                    }
+                  },
+                  "icon": {
+                    "name": "save",
+                    "theme": "outlined"
+                  },
+                  "priority": "PRIMARY"
+                },
+                "event": "event_submit",
+                "validation": "full",
+                "scope": "HIDDEN_IN_READONLY_MODE"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "relationshipuimodel_e689c",
+            "reference": "PersonTeamAssignment_OnlyDualPane_Ru"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "label": {
+            "type": "Multilingual",
+            "multilingualText": {
+              "text": [
+                {
+                  "locale": "en",
+                  "text": "Profile Picture"
+                },
+                {
+                  "locale": "de",
+                  "text": "Profilbild"
+                }
+              ]
+            }
+          },
+          "elementRef": "group_bc062",
+          "attachmentConfig": {
+            "placeholderIcon": "image"
+          }
+        },
+        {
+          "exposition": "COMPACT",
+          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F6"
+        },
+        {
+          "exposition": "AUTOCOMPLETE",
+          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_field_86a6c"
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {
+      "buttonLabels": {
+        "ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "Add"
+            },
+            {
+              "locale": "de",
+              "text": "Hinzufügen"
+            }
+          ]
+        },
+        "CANCEL": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "Cancel"
+            },
+            {
+              "locale": "de",
+              "text": "Abbrechen"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

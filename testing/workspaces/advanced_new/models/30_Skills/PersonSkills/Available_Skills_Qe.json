@@ -1,0 +1,86 @@
+{
+  "header": {
+    "id": "Available_Skills_Qe",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Skill_Dc"
+      },
+      {
+        "modelType": "relationship",
+        "alias": "RM",
+        "purpose": "relationship-model-for-query",
+        "reference": "PersonSkills_Re"
+      },
+      {
+        "modelType": "relationship",
+        "alias": "RM",
+        "purpose": "relationship-model-for-query",
+        "reference": "TeamSkills_Re"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Skill_Dc",
+    "links": [
+      {
+        "relationshipModel": "PersonSkills_Re",
+        "targetRole": "Person",
+        "linkDocumentFields": [
+          "/__meta/docRef",
+          "/__meta/modelReference",
+          "/__meta/modelVersion",
+          "/__meta/creator",
+          "/__meta/createdAt",
+          "/__meta/modifier",
+          "/__meta/modifiedAt"
+        ],
+        "constraint": {
+          "operator": "exact_match",
+          "field": "/__meta/docRef",
+          "value": "${Person_Dc, [/__meta/docRef]}"
+        },
+        "fields": [
+          "/__meta/docRef"
+        ]
+      },
+      {
+        "relationshipModel": "TeamSkills_Re",
+        "targetRole": "Team",
+        "constraint": {
+          "operator": "exact_match",
+          "field": "/__meta/docRef",
+          "value": "${Team_Dc, [/__meta/docRef]}"
+        },
+        "fields": [
+          "/__meta/docRef"
+        ],
+        "maxDepth": 1
+      }
+    ],
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    }
+  }
+}

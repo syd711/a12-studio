@@ -1,0 +1,83 @@
+{
+  "header": {
+    "id": "PersonsWithFulltimeContract_UnassignedToTeam_Qe",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "description": "List all Persons that have a Contract with more than 30h but that are not linked to a Team",
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Person_Dc"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Person_Dc",
+    "constraint": {
+      "operator": "and",
+      "operands": [
+        {
+          "operator": "has",
+          "relationshipModel": "PersonContract_Re",
+          "targetRole": "Contract",
+          "constraint": {
+            "operator": "double_range",
+            "field": "/Contract/WeeklyWorkhours",
+            "from": 30
+          }
+        },
+        {
+          "operator": "not",
+          "operand": {
+            "operator": "has",
+            "relationshipModel": "TeamPerson_Re",
+            "targetRole": "Team"
+          }
+        }
+      ]
+    },
+    "fields": [
+      "/Person/FirstName",
+      "/Person/LastName",
+      "/Person/Type",
+      "/Person/Photo/original_filename",
+      "/Person/Photo/internal_filename",
+      "/Person/Photo/content",
+      "/Person/Photo/attachment_id",
+      "/Person/Photo/size",
+      "/Person/Photo/mime_type",
+      "/Person/Photo/category",
+      "/Person/Photo/description"
+    ],
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    },
+    "sort": [
+      {
+        "direction": "ASC",
+        "nullHandling": "NULLS_FIRST",
+        "ignoreCase": true,
+        "field": "/Person/LastName"
+      }
+    ]
+  }
+}

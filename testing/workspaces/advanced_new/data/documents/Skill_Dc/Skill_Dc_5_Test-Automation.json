@@ -1,0 +1,12 @@
+{
+  "document": {
+    "Skill": {
+      "Skill": "Test Automation"
+    },
+    "Remuneration": {
+      "Factor": 3
+    }
+  },
+  "documentModelName": "Skill_Dc",
+  "locale": "en"
+}
