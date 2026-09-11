@@ -1,6 +1,6 @@
 {
-  "targetFolder": "",
-  "enabled": false,
+  "targetFolder": "C:\\temp",
+  "enabled": true,
   "settingsName": "project-packager-settings.json",
   "settingsType": "PLUGIN"
 }

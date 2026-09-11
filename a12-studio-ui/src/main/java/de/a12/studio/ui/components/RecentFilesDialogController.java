@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Headerless "recent files" palette (Ctrl+E): lists the files edited during the current session,
- * most recently edited first, backed by {@link RecentEditsTracker}'s in-memory (never persisted)
- * history. The list is rebuilt fresh every time the dialog opens, so it always reflects the
- * latest edits rather than a stored snapshot.
+ * Headerless "recent files" palette (Ctrl+E): lists the most recently edited files, most recently
+ * edited first, backed by {@link RecentEditsTracker}'s history, which is persisted across
+ * sessions via the user's UI settings. The list is rebuilt fresh every time the dialog opens, so
+ * it always reflects the latest edits rather than a stale snapshot.
  */
 public class RecentFilesDialogController implements DialogController {
 
