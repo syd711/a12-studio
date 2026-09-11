@@ -1,5 +1,5 @@
-# Release Notes 2026.06-ext0-0.0.1
+# Release Notes 2026.06-ext0-0.0.6
 
 ## Changes
 
-- **Plugins**: Fixed plugin download URLs.
+- **Version Control**: Initial commit.
