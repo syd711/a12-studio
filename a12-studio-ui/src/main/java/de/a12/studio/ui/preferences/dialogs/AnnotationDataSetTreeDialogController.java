@@ -6,6 +6,7 @@ import de.a12.studio.models.projects.settings.annotations.AnnotationFieldSet;
 import de.a12.studio.models.projects.settings.annotations.AnnotationHeaderSet;
 import de.a12.studio.models.projects.settings.annotations.AnnotationModelSet;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -198,7 +199,7 @@ public class AnnotationDataSetTreeDialogController implements DialogController {
       return NO_MODEL_TYPE_LABEL;
     }
     try {
-      return ModelType.valueOf(modelTypeKey).getDisplayName();
+      return ModelTypeLabels.getDisplayName(ModelType.valueOf(modelTypeKey));
     }
     catch (IllegalArgumentException e) {
       return modelTypeKey;

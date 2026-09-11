@@ -1,10 +1,14 @@
 package de.a12.studio.ui.projecttree;
 
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import javafx.beans.value.ChangeListener;
+import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
@@ -177,6 +181,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
       String iconPath = item.getIconPath();
       if (iconPath != null) {
         ImageView modelIcon = WidgetFactory.createModelIcon(iconPath);
+        installModelTypeTooltip(modelIcon, item.getModelType());
         setGraphic(modelIcon);
       }
       else {
@@ -184,6 +189,13 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
         icon.setIconLiteral(Icons.FILE_OUTLINE);
         setGraphic(icon);
       }
+    }
+  }
+
+  private static void installModelTypeTooltip(Node modelIcon, ModelType modelType) {
+    String displayName = ModelTypeLabels.getDisplayName(modelType);
+    if (!displayName.isEmpty()) {
+      Tooltip.install(modelIcon, WidgetFactory.createTooltip(displayName));
     }
   }
 

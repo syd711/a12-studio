@@ -13,6 +13,7 @@ import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -200,10 +201,10 @@ public class DirectiveDialogController implements DialogController {
     modelTypeField.setId("directiveModelType-" + index);
     modelTypeField.setMaxWidth(Double.MAX_VALUE);
     for (ModelType modelType : ModelType.values()) {
-      modelTypeField.getItems().add(modelType.getDisplayName());
+      modelTypeField.getItems().add(ModelTypeLabels.getDisplayName(modelType));
     }
     if (descriptor.getModelType() != null) {
-      modelTypeField.setValue(descriptor.getModelType().getDisplayName());
+      modelTypeField.setValue(ModelTypeLabels.getDisplayName(descriptor.getModelType()));
     }
     modelTypeField.valueProperty().addListener((observable, oldValue, newValue) -> descriptor.setModelType(modelTypeByDisplayName(newValue)));
 
@@ -264,7 +265,7 @@ public class DirectiveDialogController implements DialogController {
       return null;
     }
     for (ModelType modelType : ModelType.values()) {
-      if (modelType.getDisplayName().equals(displayName)) {
+      if (ModelTypeLabels.getDisplayName(modelType).equals(displayName)) {
         return modelType;
       }
     }

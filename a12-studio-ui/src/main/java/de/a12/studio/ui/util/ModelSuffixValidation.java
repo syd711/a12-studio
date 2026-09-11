@@ -36,6 +36,6 @@ public final class ModelSuffixValidation {
     if (name.trim().endsWith(expectedSuffix)) {
       return Optional.empty();
     }
-    return Optional.of(StudioBundle.get("validation.enforce_model_suffix", modelType.getDisplayName(), expectedSuffix));
+    return Optional.of(StudioBundle.get("validation.enforce_model_suffix", ModelTypeLabels.getDisplayName(modelType), expectedSuffix));
   }
 }

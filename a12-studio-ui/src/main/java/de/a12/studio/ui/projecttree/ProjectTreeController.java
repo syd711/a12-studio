@@ -11,6 +11,7 @@ import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.JFXFuture;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
@@ -413,7 +414,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     for (ModelType modelType : ModelType.values()) {
       if (modelType == ModelType.DOCUMENT) {
         // Document Model gets a submenu with import options.
-        Menu documentMenu = new Menu(modelType.getDisplayName());
+        Menu documentMenu = new Menu(ModelTypeLabels.getDisplayName(modelType));
         documentMenu.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
 
         MenuItem createBlank = new MenuItem(StudioBundle.get("new_document_model.create_blank"));
@@ -446,7 +447,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
         }
       }
       else {
-        MenuItem modelItem = new MenuItem(modelType.getDisplayName());
+        MenuItem modelItem = new MenuItem(ModelTypeLabels.getDisplayName(modelType));
         modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
         modelItem.setOnAction(event -> onNewModel(modelType));
         newButton.getItems().add(modelItem);

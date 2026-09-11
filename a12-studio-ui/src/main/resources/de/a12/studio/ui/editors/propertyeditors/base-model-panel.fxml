@@ -13,7 +13,7 @@
         <center>
          <HBox alignment="CENTER_LEFT" spacing="6.0" BorderPane.alignment="CENTER">
             <children>
-                  <ComboBox fx:id="targetModelField" editable="false" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                  <ComboBox fx:id="targetModelField" editable="false" maxWidth="Infinity" />
                   <Button fx:id="editReferenceButton" mnemonicParsing="false" onAction="#onEditReference" styleClass="default-button">
                     <graphic>
                       <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" />

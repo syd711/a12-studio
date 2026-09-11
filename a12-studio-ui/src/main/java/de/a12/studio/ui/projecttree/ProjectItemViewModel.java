@@ -67,16 +67,22 @@ public class ProjectItemViewModel {
     if (isSettings() || isAuthFile()) {
       return null; // handled separately in cell (FontIcon, not ImageView)
     }
+    ModelType modelType = getModelType();
+    if (modelType == null) {
+      return null;
+    }
+    return Icons.forModelType(modelType);
+  }
+
+  public ModelType getModelType() {
     A12Model<?> model = projectItem.getModel();
     if (model == null) {
       return null;
     }
-
     if (model instanceof TypeDefinitionModel) {
-      return Icons.forModelType(ModelType.TYPEDEFINITION);
+      return ModelType.TYPEDEFINITION;
     }
-
-    return Icons.forModelType(model.getModelType());
+    return model.getModelType();
   }
 
   public List<ProjectItemViewModel> getChildren() {

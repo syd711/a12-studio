@@ -9,6 +9,7 @@ import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.ModelSuffixValidation;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
@@ -90,7 +91,7 @@ public class NewModelDialogController implements DialogController {
     typeComboBox.setConverter(new StringConverter<>() {
       @Override
       public String toString(ModelType modelType) {
-        return modelType == null ? "" : modelType.getDisplayName();
+        return ModelTypeLabels.getDisplayName(modelType);
       }
 
       @Override

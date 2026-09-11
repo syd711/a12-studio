@@ -32,6 +32,7 @@ import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorControl
 import de.a12.studio.ui.editors.structuralmappingmodel.StructuralMappingModelEditorController;
 import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -51,7 +52,7 @@ public class EditorFactory {
       if (item.getModel() != null && item.getModel().getModelType() != null) {
         if (!item.getModel().getModelType().isEnabled()) {
           WidgetFactory.showAlert(Studio.stage,
-              StudioBundle.get("model_not_supported_yet", item.getModel().getModelType().getDisplayName()));
+              StudioBundle.get("model_not_supported_yet", ModelTypeLabels.getDisplayName(item.getModel().getModelType())));
           return null;
         }
       }

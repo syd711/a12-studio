@@ -3,6 +3,7 @@ package de.a12.studio.ui.projecttree;
 import de.a12.studio.plugin.manager.ICreateItemMenuEntry;
 import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.bookmarks.BookmarkService;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.ModelType;
@@ -32,7 +33,7 @@ class ProjectTreeContextMenu {
     for (ModelType modelType : ModelType.values()) {
       if (modelType == ModelType.DOCUMENT) {
         // Replace the plain Document Model entry with a submenu that offers additional import options.
-        Menu documentMenu = new Menu(modelType.getDisplayName());
+        Menu documentMenu = new Menu(ModelTypeLabels.getDisplayName(modelType));
         documentMenu.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
 
         MenuItem createBlank = new MenuItem(StudioBundle.get("new_document_model.create_blank"));
@@ -65,7 +66,7 @@ class ProjectTreeContextMenu {
         }
       }
       else {
-        MenuItem modelItem = new MenuItem(modelType.getDisplayName());
+        MenuItem modelItem = new MenuItem(ModelTypeLabels.getDisplayName(modelType));
         modelItem.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
         modelItem.setOnAction(event -> actions.onCreateNewModel(projectItem, modelType));
         newMenu.getItems().add(modelItem);

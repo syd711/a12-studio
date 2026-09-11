@@ -171,9 +171,9 @@ public class CombinationStepsPanelController extends AbstractPropertyEditor {
     FontIcon dragHandle = RowFactory.createDragHandle();
 
     Label typeLabel = createRowLabel(displayName(step.getType()), "combinationStepType-" + index, 180.0, step);
-    Label additiveLabel = createRowLabel(nullToEmpty(dmIdOf(step.getAdditiveModel())), "combinationStepAdditive-" + index, 180.0, step);
-    Label selectionLabel = createRowLabel(nullToEmpty(smIdOf(step.getSelectionModel())), "combinationStepSelection-" + index, 180.0, step);
-    Label decorationLabel = createRowLabel(nullToEmpty(dmIdOf(step.getDecorationModel())), "combinationStepDecoration-" + index, 180.0, step);
+    Label additiveLabel = createRowLabel(nullToDash(dmIdOf(step.getAdditiveModel())), "combinationStepAdditive-" + index, 180.0, step);
+    Label selectionLabel = createRowLabel(nullToDash(smIdOf(step.getSelectionModel())), "combinationStepSelection-" + index, 180.0, step);
+    Label decorationLabel = createRowLabel(nullToDash(dmIdOf(step.getDecorationModel())), "combinationStepDecoration-" + index, 180.0, step);
 
     HBox row = new HBox(10.0, dragHandle, typeLabel, additiveLabel, selectionLabel, decorationLabel, createActionsBox(step, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
@@ -202,8 +202,8 @@ public class CombinationStepsPanelController extends AbstractPropertyEditor {
     };
   }
 
-  private static String nullToEmpty(String value) {
-    return value != null ? value : "";
+  private static String nullToDash(String value) {
+    return value != null ? value : "–";
   }
 
   private Label createRowLabel(String text, String id, double width, CombinationStep step) {

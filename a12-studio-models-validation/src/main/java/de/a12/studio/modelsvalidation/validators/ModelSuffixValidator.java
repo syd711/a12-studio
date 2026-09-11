@@ -5,6 +5,7 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.settings.GeneralSettings;
 import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.modelsvalidation.ModelTypeMessages;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -50,7 +51,7 @@ public final class ModelSuffixValidator implements ModelValidator {
     }
 
     return List.of(new ModelValidationError(model, ELEMENT_ID,
-        ValidationMessages.get("validation.modelSuffix.mismatch", modelType.getDisplayName(), expectedSuffix),
+        ValidationMessages.get("validation.modelSuffix.mismatch", ModelTypeMessages.getDisplayName(modelType), expectedSuffix),
         Severity.ERROR.name()));
   }
 }

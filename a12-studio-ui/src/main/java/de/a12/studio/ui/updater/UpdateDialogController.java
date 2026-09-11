@@ -1,6 +1,7 @@
 package de.a12.studio.ui.updater;
 
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.StudioVersion;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -39,7 +40,7 @@ public class UpdateDialogController implements DialogController {
     this.stage = stage;
 
     String currentVersion = StudioVersion.get();
-    updateLabel.setText("Downloading version " + newVersion + "...");
+    updateLabel.setText(StudioBundle.get("updater.downloading_version", newVersion));
     startUpdate(currentVersion, newVersion);
   }
 
@@ -63,7 +64,7 @@ public class UpdateDialogController implements DialogController {
             }
 
             Platform.runLater(() -> {
-              updateLabel.setText("Installing update...");
+              updateLabel.setText(StudioBundle.get("updater.installing_update"));
               updateProgress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
             });
 

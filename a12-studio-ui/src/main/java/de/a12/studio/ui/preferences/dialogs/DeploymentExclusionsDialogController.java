@@ -4,6 +4,7 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.auth.AuthFileType;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -189,7 +190,7 @@ public class DeploymentExclusionsDialogController implements DialogController {
     typeFilterButton.getItems().add(new SeparatorMenuItem());
 
     for (ModelType type : ModelType.values()) {
-      CheckMenuItem item = new CheckMenuItem(type.getDisplayName());
+      CheckMenuItem item = new CheckMenuItem(ModelTypeLabels.getDisplayName(type));
       item.setSelected(true);
       item.selectedProperty().addListener((obs, oldVal, newVal) -> {
         if (newVal) {

@@ -1,6 +1,7 @@
 package de.a12.studio.ui.preferences;
 
 import de.a12.studio.models.ModelType;
+import de.a12.studio.ui.util.ModelTypeLabels;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -26,7 +27,7 @@ public class PreferenceModelVersionPanelController implements Initializable {
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     modelNameColumn.setCellValueFactory(cell ->
-        new SimpleStringProperty(cell.getValue().getDisplayName()));
+        new SimpleStringProperty(ModelTypeLabels.getDisplayName(cell.getValue())));
 
     modelVersionColumn.setCellValueFactory(cell ->
         new SimpleStringProperty(cell.getValue().getCurrentVersion()));

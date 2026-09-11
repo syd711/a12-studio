@@ -264,7 +264,7 @@ public class Studio extends Application implements StudioEventListener {
     String expectedVersion = model.getModelType().getCurrentVersion();
     if (!expectedVersion.equals(model.getModelVersion())) {
       incompatibleModels.add(
-          model.getId() + " (" + model.getModelType().getDisplayName() + "): expected " + expectedVersion + ", found "
+          model.getId() + " (" + ModelTypeLabels.getDisplayName(model.getModelType()) + "): expected " + expectedVersion + ", found "
               + model.getModelVersion());
     }
   }
