@@ -394,3 +394,13 @@
     -fx-padding: 1 4 1 4;
     -fx-pref-height: 22;
 }
+
+/*
+ * Empty-state label shown over a plain TreeView in place of a Control's built-in
+ * "placeholder" property, which TreeView (unlike TableView/TreeTableView) does not have -
+ * see the Versioncontrol panel's changes tree (VersioncontrolPanelController).
+ */
+.versioncontrol-placeholder {
+    -fx-text-fill: -fx-text-faint;
+    -fx-font-size: 13.5px;
+}

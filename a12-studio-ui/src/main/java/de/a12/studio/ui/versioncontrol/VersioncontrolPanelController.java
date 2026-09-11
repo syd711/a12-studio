@@ -11,19 +11,19 @@ import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -44,13 +44,10 @@ import java.util.ResourceBundle;
 public class VersioncontrolPanelController implements Initializable, StudioEventListener {
 
   @FXML
-  private TreeTableView<VersioncontrolTreeNode> changesTree;
+  private TreeView<VersioncontrolTreeNode> changesTree;
 
   @FXML
-  private TreeTableColumn<VersioncontrolTreeNode, Boolean> checkColumn;
-
-  @FXML
-  private TreeTableColumn<VersioncontrolTreeNode, String> nameColumn;
+  private Label noChangesLabel;
 
   @FXML
   private Button refreshButton;
@@ -90,36 +87,27 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    checkColumn.setCellValueFactory(param -> {
-      VersioncontrolTreeNode node = param.getValue().getValue();
-      if (node == null) {
-        return new SimpleBooleanProperty(false);
-      }
-      return checkedByPath.computeIfAbsent(node.getRelativePath(), p -> new SimpleBooleanProperty(false));
-    });
-    checkColumn.setCellFactory(col -> new TreeTableCell<>() {
+    changesTree.setCellFactory(view -> new TreeCell<>() {
       private final CheckBox checkBox = new CheckBox();
+      private final Label nameLabel = new Label();
+      private final HBox graphic = new HBox(4, checkBox, nameLabel);
 
       {
         checkBox.setFocusTraversable(false);
+        graphic.setAlignment(Pos.CENTER_LEFT);
         checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
-          if (isEmpty() || getTreeTableRow().getTreeItem() == null) {
+          if (isEmpty() || getTreeItem() == null) {
             return;
           }
-          setCheckedRecursive(getTreeTableRow().getTreeItem(), newVal);
+          setCheckedRecursive(getTreeItem(), newVal);
           updateActionButtons();
         });
       }
 
       @Override
-      protected void updateItem(Boolean value, boolean empty) {
-        super.updateItem(value, empty);
-        if (empty || value == null) {
-          setGraphic(null);
-          return;
-        }
-        VersioncontrolTreeNode node = getTreeTableRow() == null ? null : getTreeTableRow().getItem();
-        if (node == null) {
+      protected void updateItem(VersioncontrolTreeNode node, boolean empty) {
+        super.updateItem(node, empty);
+        if (empty || node == null) {
           setGraphic(null);
           return;
         }
@@ -127,31 +115,16 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
         checkBox.selectedProperty().unbind();
         checkBox.setSelected(prop.get());
         prop.addListener((o, ov, nv) -> checkBox.setSelected(nv));
-        setGraphic(checkBox);
-      }
-    });
 
-    nameColumn.setCellValueFactory(param -> {
-      VersioncontrolTreeNode node = param.getValue().getValue();
-      return new ReadOnlyStringWrapper(node == null ? "" : node.getDisplayName());
-    });
-    nameColumn.setCellFactory(col -> new TreeTableCell<>() {
-      @Override
-      protected void updateItem(String value, boolean empty) {
-        super.updateItem(value, empty);
-        VersioncontrolTreeNode node = getTreeTableRow() == null ? null : getTreeTableRow().getItem();
-        if (empty || node == null) {
-          setText(null);
-          setGraphic(null);
-          return;
-        }
-        setText(value);
-        setGraphic(node.isFolder() ? WidgetFactory.createIcon(Icons.FOLDER_OUTLINE) : statusIcon(node.getChangedFile().status()));
+        nameLabel.setText(node.getDisplayName());
+        graphic.getChildren().setAll(checkBox,
+            node.isFolder() ? WidgetFactory.createIcon(Icons.FOLDER_OUTLINE) : statusIcon(node.getChangedFile().status()),
+            nameLabel);
+        setGraphic(graphic);
       }
     });
 
     changesTree.setShowRoot(true);
-    changesTree.setPlaceholder(new Label(StudioBundle.get("versioncontrol_no_changes")));
 
     commitMessageField.textProperty().addListener((obs, oldVal, newVal) -> {
       updateActionButtons();
@@ -212,7 +185,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     this.project = null;
     closeGitService();
     currentChangedFiles = List.of();
-    changesTree.setRoot(null);
+    setTreeRoot(null);
     updateActionButtons();
   }
 
@@ -240,7 +213,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   private void refresh() {
     if (gitService == null || project == null) {
       currentChangedFiles = List.of();
-      changesTree.setRoot(null);
+      setTreeRoot(null);
       updateActionButtons();
       return;
     }
@@ -262,10 +235,28 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
 
   private void populateTree(List<GitChangedFile> changedFiles) {
     this.currentChangedFiles = changedFiles;
-    TreeItem<VersioncontrolTreeNode> root = buildTree(changedFiles);
-    changesTree.setRoot(root);
-    expandAll(root);
+    if (changedFiles.isEmpty()) {
+      // buildTree() would otherwise still produce a root folder node with no children - a tree
+      // consisting only of folders, with no actual changed files - which should show the
+      // "no changes" placeholder instead of an empty tree.
+      setTreeRoot(null);
+    }
+    else {
+      TreeItem<VersioncontrolTreeNode> root = buildTree(changedFiles);
+      expandAll(root);
+      setTreeRoot(root);
+    }
     updateActionButtons();
+  }
+
+  /**
+   * Sets the changes tree's root and toggles {@link #noChangesLabel} to fill in for
+   * {@link TreeView}'s lack of a built-in "placeholder" property (unlike TableView/TreeTableView).
+   */
+  private void setTreeRoot(TreeItem<VersioncontrolTreeNode> root) {
+    changesTree.setRoot(root);
+    noChangesLabel.setVisible(root == null);
+    noChangesLabel.setManaged(root == null);
   }
 
   private TreeItem<VersioncontrolTreeNode> buildTree(List<GitChangedFile> changedFiles) {
