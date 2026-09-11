@@ -218,13 +218,6 @@ public class Studio extends Application implements StudioEventListener {
     String studioVersion = StudioVersion.get();
     stage.setTitle("A12 Studio - " + studioVersion + " - " + currentProject.getName());
     rootController.setTitle("A12 Studio - " + studioVersion + " - " + currentProject.getName() + " (" + currentProject.getRoot().getPath() + ")");
-
-    boolean b = checkModelVersions(currentProject);
-
-//    if (!b) {
-//      PreviewAppProcess.getInstance().stop();
-//      StudioEventManager.getInstance().fireProjectClosedEvent(currentProject);
-//    }
   }
 
   @Override
@@ -235,17 +228,25 @@ public class Studio extends Application implements StudioEventListener {
     rootController.setTitle("A12 Studio - " + StudioVersion.get());
   }
 
-  private static boolean checkModelVersions(Project project) {
+  /**
+   * Package-private so {@link OpenProjectProgressModel} can run this check before the project-open
+   * event is dispatched, canceling the open outright instead of racing other listeners that may
+   * already be reacting to {@link ProjectOpenedEvent}.
+   * <p>
+   * Only collects/logs the incompatibility - does not show any UI itself, so the caller can close
+   * the progress dialog first and show the error message afterwards, rather than popping an alert
+   * on top of a still-visible progress dialog.
+   *
+   * @return the first incompatible model's description, or {@code null} if all models are compatible
+   */
+  static String checkModelVersions(Project project) {
     List<String> incompatibleModels = new ArrayList<>();
     collectIncompatibleModels(project.getRoot(), incompatibleModels);
     if (incompatibleModels.isEmpty()) {
-      return true;
+      return null;
     }
     incompatibleModels.forEach(log::warn);
-
-    WidgetFactory.showAlert(stage,
-        StudioBundle.get("incompatible_model_versions_found"), "Wrong Version: " + incompatibleModels.get(0));
-    return false;
+    return incompatibleModels.get(0);
   }
 
   private static void collectIncompatibleModels(ProjectItem item, List<String> incompatibleModels) {

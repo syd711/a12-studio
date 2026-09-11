@@ -1,0 +1,50 @@
+{
+  "header": {
+    "id": "Teammembers_DualPane_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "availableItems",
+        "modelType": "overview",
+        "reference": "Teammembers_Ru_AvailableItems_Ov"
+      },
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "Teammembers_Ru_SelectedItems_Ov"
+      },
+      {
+        "purpose": "link",
+        "modelType": "form",
+        "reference": "TeamPerson_LinkFields_Fm"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "DualPaneSelection",
+      "selectedItemsOverviewModel": "Teammembers_Ru_SelectedItems_Ov",
+      "linkFormModel": "TeamPerson_LinkFields_Fm",
+      "height": "400",
+      "availableItemsOverviewModel": "Teammembers_Ru_AvailableItems_Ov"
+    },
+    "relationshipName": "TeamPerson_Re",
+    "targetRole": "Person"
+  }
+}

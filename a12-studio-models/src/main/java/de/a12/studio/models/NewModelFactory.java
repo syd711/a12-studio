@@ -38,6 +38,8 @@ import de.a12.studio.models.relationshipmodel.LinkConstraints;
 import de.a12.studio.models.relationshipmodel.Multiplicity;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModelContent;
+import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
+import de.a12.studio.models.relationshipuimodel.RelationshipUiModelContent;
 import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.selectionmodel.SelectionModelContent;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
@@ -175,6 +177,7 @@ public class NewModelFactory {
       case APPLICATION -> buildApplicationModel();
       case MASTERDETAIL -> buildMasterDetailModel();
       case RELATIONSHIP -> buildRelationshipModel(locales);
+      case RELATIONSHIPUI -> buildRelationshipUiModel(locales);
       case CONTENT -> buildContentModel(locales);
       case PRINT -> buildPrintModel(name, locales);
       case TREE -> buildTreeModel(locales);
@@ -336,6 +339,16 @@ public class NewModelFactory {
     constraints.setMultiplicity(multiplicity);
     entity.setLinkConstraints(constraints);
     return entity;
+  }
+
+  // No component is preselected - the editor's "Component Type" panel creates the concrete subtype (Dual
+  // Pane / Table List / Dropdown) once the user picks one, mirroring how RelationshipModel starts with empty
+  // entities to fill in rather than a prebuilt shape.
+  private static RelationshipUiModel buildRelationshipUiModel(List<Locale> locales) {
+    RelationshipUiModel model = new RelationshipUiModel();
+    model.setContent(new RelationshipUiModelContent());
+    model.setLocales(locales);
+    return model;
   }
 
   private static ContentModel buildContentModel(List<Locale> locales) {

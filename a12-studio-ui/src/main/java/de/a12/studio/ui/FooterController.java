@@ -1,8 +1,10 @@
 package de.a12.studio.ui;
 
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.models.projects.settings.AiSettings;
+import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
 import de.a12.studio.ui.events.ProjectOpenedEvent;
@@ -89,12 +91,17 @@ public class FooterController implements Initializable, StudioEventListener {
     if (event.getSettings().getSettingsType().equals(AiSettings.SettingsType.A12_INSTALLATION)) {
       refreshPreviewAppStatusVisibility();
     }
+    if (event.getSettings().getSettingsType().equals(ProjectRootSettings.SettingsType.PROJECT_ROOT)) {
+      refreshPreviewAppStatusVisibility();
+    }
   }
 
   private void refreshPreviewAppStatusVisibility() {
     String installationPath = A12Settings.load().getInstallationPath();
+    Project project = Studio.getCurrentProject();
     boolean visible = projectOpen && installationPath != null
-        && A12Settings.isValidInstallationFolder(new File(installationPath));
+        && A12Settings.isValidInstallationFolder(new File(installationPath))
+        && project != null && project.getSettings().getProjectRootSettings().getPreviewApp().isEnabled();
     previewAppStatus.setVisible(visible);
     previewAppStatus.setManaged(visible);
   }

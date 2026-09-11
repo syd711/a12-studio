@@ -13,6 +13,7 @@ import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.services.ApplicationModelValidationService;
 import de.a12.studio.modelsvalidation.services.CombinationModelValidationService;
@@ -24,6 +25,7 @@ import de.a12.studio.modelsvalidation.services.OverviewModelValidationService;
 import de.a12.studio.modelsvalidation.services.PrintModelValidationService;
 import de.a12.studio.modelsvalidation.services.QueryModelValidationService;
 import de.a12.studio.modelsvalidation.services.RelationshipModelValidationService;
+import de.a12.studio.modelsvalidation.services.RelationshipUiModelValidationService;
 import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
@@ -46,6 +48,7 @@ public class ValidationService {
   private final FormModelValidationService formModelValidationService = new FormModelValidationService();
   private final ApplicationModelValidationService applicationModelValidationService = new ApplicationModelValidationService();
   private final RelationshipModelValidationService relationshipModelValidationService = new RelationshipModelValidationService();
+  private final RelationshipUiModelValidationService relationshipUiModelValidationService = new RelationshipUiModelValidationService();
   private final TreeModelValidationService treeModelValidationService = new TreeModelValidationService();
   private final PrintModelValidationService printModelValidationService = new PrintModelValidationService();
   private final ContentModelValidationService contentModelValidationService = new ContentModelValidationService();
@@ -66,6 +69,7 @@ public class ValidationService {
       case FormModel formModel -> formModelValidationService.validate(formModel, context);
       case ApplicationModel applicationModel -> applicationModelValidationService.validate(applicationModel, context);
       case RelationshipModel relationshipModel -> relationshipModelValidationService.validate(relationshipModel, context);
+      case RelationshipUiModel relationshipUiModel -> relationshipUiModelValidationService.validate(relationshipUiModel, context);
       case TreeModel treeModel -> treeModelValidationService.validate(treeModel, context);
       case PrintModel printModel -> printModelValidationService.validate(printModel, context);
       case ContentModel contentModel -> contentModelValidationService.validate(contentModel, context);
@@ -84,6 +88,7 @@ public class ValidationService {
       case FORM -> formModelValidationService.addValidator(validator);
       case APPLICATION -> applicationModelValidationService.addValidator(validator);
       case RELATIONSHIP -> relationshipModelValidationService.addValidator(validator);
+      case RELATIONSHIPUI -> relationshipUiModelValidationService.addValidator(validator);
       case TREE -> treeModelValidationService.addValidator(validator);
       case PRINT -> printModelValidationService.addValidator(validator);
       case CONTENT -> contentModelValidationService.addValidator(validator);
@@ -101,6 +106,7 @@ public class ValidationService {
       case FORM -> formModelValidationService.removeValidator(validator);
       case APPLICATION -> applicationModelValidationService.removeValidator(validator);
       case RELATIONSHIP -> relationshipModelValidationService.removeValidator(validator);
+      case RELATIONSHIPUI -> relationshipUiModelValidationService.removeValidator(validator);
       case TREE -> treeModelValidationService.removeValidator(validator);
       case PRINT -> printModelValidationService.removeValidator(validator);
       case CONTENT -> contentModelValidationService.removeValidator(validator);

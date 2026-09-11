@@ -27,6 +27,15 @@ public class ModelReference {
   // A Query Model's reference to the Document Model it projects fields from, matching QueryModel.json's
   // modelReferences entry.
   public static final String PURPOSE_DOCUMENT_MODEL_FOR_QUERY = "document-model-for-query";
+  // A Relationship UI Model's references to the Overview/Query/Form Models its component configuration
+  // points at, matching real fixtures (e.g. Teammembers_Ru.json, ParentTeam_Ru.json) exactly.
+  public static final String PURPOSE_RELATIONSHIP_UI_AVAILABLE_ITEMS = "availableItems";
+  public static final String PURPOSE_RELATIONSHIP_UI_SELECTED_ITEMS = "selectedItems";
+  public static final String PURPOSE_RELATIONSHIP_UI_LINK = "link";
+  public static final String PURPOSE_RELATIONSHIP_UI_AVAILABLE_ITEMS_IN_EDIT_MODAL = "availableItemsInEditModal";
+  public static final String PURPOSE_RELATIONSHIP_UI_SELECTED_ITEMS_IN_EDIT_MODAL = "selectedItemsInEditModal";
+  public static final String PURPOSE_RELATIONSHIP_UI_AVAILABLE_ITEMS_QUERY = "availableItemsQuery";
+  public static final String PURPOSE_RELATIONSHIP_UI_SELECTED_ITEM_QUERY = "selectedItemQuery";
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String alias;

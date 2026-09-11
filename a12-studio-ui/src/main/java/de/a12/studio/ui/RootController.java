@@ -33,6 +33,7 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -50,6 +51,9 @@ import java.util.ResourceBundle;
 public class RootController implements Initializable, StudioEventListener {
   @FXML
   private StackPane main;
+
+  @FXML
+  private HBox projectBar;
 
   @FXML
   private SplitPane mainSplitPane;
@@ -477,6 +481,8 @@ public class RootController implements Initializable, StudioEventListener {
 
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
+    this.projectBar.setVisible(true);
+    this.projectBar.setManaged(true);
     this.mainSplitPane.setVisible(true);
     this.mainSplitPane.setManaged(true);
     this.project = event.getProject();
@@ -493,6 +499,8 @@ public class RootController implements Initializable, StudioEventListener {
 
   @Override
   public void projectClosed(@NonNull ProjectClosedEvent event) {
+    this.projectBar.setVisible(false);
+    this.projectBar.setManaged(false);
     this.mainSplitPane.setVisible(false);
     this.mainSplitPane.setManaged(false);
     this.project = null;

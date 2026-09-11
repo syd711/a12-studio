@@ -1,0 +1,44 @@
+{
+  "header": {
+    "id": "ParentTeam_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "availableItemsQuery",
+        "modelType": "query",
+        "reference": "ParentTeam_AvailableItems_Qe"
+      },
+      {
+        "purpose": "selectedItemQuery",
+        "modelType": "query",
+        "reference": "ParentTeam_SelectedItem_Qe"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "DropDownSelection",
+      "availableItemsQueryModel": "ParentTeam_AvailableItems_Qe",
+      "selectedItemQueryModel": "ParentTeam_SelectedItem_Qe",
+      "elementRef": "field_c9ad3"
+    },
+    "relationshipName": "TeamTeam_Re",
+    "targetRole": "Parent"
+  }
+}

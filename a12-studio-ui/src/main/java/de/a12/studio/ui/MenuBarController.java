@@ -12,6 +12,7 @@ import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.models.projects.settings.AiSettings;
+import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import de.a12.studio.ui.events.SettingsChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -48,6 +49,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import de.a12.studio.ui.util.StudioBundle;
@@ -120,8 +122,24 @@ public class MenuBarController implements Initializable, StudioEventListener {
   private void openProject(File file) {
     LocalUISettings.saveProject(file);
 
+    // One dialog for loading the project, a second one for restoring its previously open tabs -
+    // see OpenProjectProgressModel/RestoreTabsProgressModel javadoc for why the latch is created
+    // and handed over here rather than owned by either model outright.
+    CountDownLatch tabsRestoredLatch = new CountDownLatch(1);
+    OpenProjectProgressModel openProjectModel = new OpenProjectProgressModel(
+        file, loadedProject -> project = loadedProject, tabsRestoredLatch);
+    ProgressDialog.createProgressDialog(Studio.stage, openProjectModel);
+
+    if (!openProjectModel.isSuccessful()) {
+      // Shown only now, after the progress dialog has already closed, so the error never appears
+      // on top of a still-visible progress dialog.
+      WidgetFactory.showAlert(Studio.stage,
+          StudioBundle.get("incompatible_model_versions_found"), openProjectModel.getError());
+      return;
+    }
+
     ProgressDialog.createProgressDialog(Studio.stage,
-        new OpenProjectProgressModel(file, loadedProject -> project = loadedProject, () -> {
+        new RestoreTabsProgressModel(tabsRestoredLatch, () -> {
           refreshRecentProjectsMenu();
           refreshProjectDependentButtons();
         }));
@@ -340,7 +358,8 @@ public class MenuBarController implements Initializable, StudioEventListener {
   private void refreshPreviewAppButtonsVisibility() {
     String installationPath = A12Settings.load().getInstallationPath();
     boolean visible = project != null && installationPath != null
-        && A12Settings.isValidInstallationFolder(new File(installationPath));
+        && A12Settings.isValidInstallationFolder(new File(installationPath))
+        && project.getSettings().getProjectRootSettings().getPreviewApp().isEnabled();
     deployBtnContainer.setVisible(visible);
     deployBtnContainer.setManaged(visible);
     launchPreviewAppBtn.setVisible(visible);
@@ -369,6 +388,9 @@ public class MenuBarController implements Initializable, StudioEventListener {
       refreshClaudeConsoleButton((AiSettings) event.getSettings());
     }
     if (event.getSettings().getSettingsType().equals(AiSettings.SettingsType.A12_INSTALLATION)) {
+      refreshPreviewAppButtonsVisibility();
+    }
+    if (event.getSettings().getSettingsType().equals(ProjectRootSettings.SettingsType.PROJECT_ROOT)) {
       refreshPreviewAppButtonsVisibility();
     }
   }

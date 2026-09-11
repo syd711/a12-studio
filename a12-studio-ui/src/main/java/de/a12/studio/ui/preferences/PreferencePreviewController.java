@@ -4,6 +4,7 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.settings.PreviewAppSettings;
 import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.previewapp.PreviewAppDeployer;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -15,12 +16,19 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class PreferencePreviewController implements Initializable {
+
+  @FXML
+  private CheckBox enabledCheckBox;
+
+  @FXML
+  private VBox previewFieldsContainer;
 
   @FXML
   private TextField urlField;
@@ -55,6 +63,15 @@ public class PreferencePreviewController implements Initializable {
 
     rootSettings = project.getSettings().getProjectRootSettings();
     settings = rootSettings.getPreviewApp();
+
+    enabledCheckBox.setSelected(settings.isEnabled());
+    previewFieldsContainer.setDisable(!settings.isEnabled());
+    enabledCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      settings.setEnabled(newValue);
+      rootSettings.save();
+      previewFieldsContainer.setDisable(!newValue);
+      StudioEventManager.getInstance().fireSettingsChangedEvent(rootSettings);
+    });
 
     urlField.setText(settings.getUrl());
     urlField.textProperty().addListener((observable, oldValue, newValue) -> {

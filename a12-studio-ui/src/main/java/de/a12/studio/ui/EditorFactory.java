@@ -13,6 +13,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
@@ -29,6 +30,7 @@ import de.a12.studio.ui.editors.maindetailmodel.MainDetailModelEditorController;
 import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
 import de.a12.studio.ui.editors.querymodel.QueryModelEditorController;
 import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController;
+import de.a12.studio.ui.editors.relationshipuimodel.RelationshipUiModelEditorController;
 import de.a12.studio.ui.editors.structuralmappingmodel.StructuralMappingModelEditorController;
 import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
@@ -107,6 +109,13 @@ public class EditorFactory {
         loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         RelationshipModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof RelationshipUiModel) {
+        FXMLLoader loader = new FXMLLoader(RelationshipUiModelEditorController.class.getResource("relationship-ui-model-editor.fxml"));
+        loader.setResources(StudioBundle.getBundle());
+        content = loader.load();
+        RelationshipUiModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getModel() instanceof ContentModel) {

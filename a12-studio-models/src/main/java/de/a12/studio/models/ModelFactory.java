@@ -12,6 +12,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.treemodel.TreeModel;
@@ -59,6 +60,7 @@ public class ModelFactory {
         case FORM -> JsonSettings.objectMapper.treeToValue(root, FormModel.class);
         case MASTERDETAIL -> JsonSettings.objectMapper.treeToValue(root, MasterDetailModel.class);
         case RELATIONSHIP -> JsonSettings.objectMapper.treeToValue(root, RelationshipModel.class);
+        case RELATIONSHIPUI -> JsonSettings.objectMapper.treeToValue(root, RelationshipUiModel.class);
         case CONTENT -> JsonSettings.objectMapper.treeToValue(root, ContentModel.class);
         case PRINT -> JsonSettings.objectMapper.treeToValue(root, PrintModel.class);
         case TREE -> JsonSettings.objectMapper.treeToValue(root, TreeModel.class);

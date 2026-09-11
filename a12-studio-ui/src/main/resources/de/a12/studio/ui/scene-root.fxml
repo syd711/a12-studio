@@ -35,7 +35,7 @@
                                     <Label text="%open_project_from_the_menu" BorderPane.alignment="CENTER" />
                                  </center>
                               </BorderPane>
-                              <HBox>
+                              <HBox fx:id="projectBar" visible="false" managed="false">
                                  <children>
                                     <ToolBar fx:id="activityBar" styleClass="activity-bar" orientation="VERTICAL">
                                        <items>

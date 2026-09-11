@@ -1,0 +1,134 @@
+{
+  "header": {
+    "id": "Teammembers_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "Teammembers_Ru_SelectedItems_Ov"
+      },
+      {
+        "purpose": "link",
+        "modelType": "form",
+        "reference": "TeamPerson_LinkFields_Fm"
+      },
+      {
+        "purpose": "availableItemsInEditModal",
+        "modelType": "overview",
+        "reference": "Teammembers_Ru_AvailableItems_Ov"
+      },
+      {
+        "purpose": "selectedItemsInEditModal",
+        "modelType": "overview",
+        "reference": "Teammembers_Ru_SelectedItems_Ov"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "TableList",
+      "selectedItemsOverviewModel": "Teammembers_Ru_SelectedItems_Ov",
+      "linkFormModel": "TeamPerson_LinkFields_Fm",
+      "height": "400",
+      "buttons": [
+        {
+          "event": "event_open_edit_modal",
+          "icon": {
+            "name": "edit",
+            "theme": "outlined"
+          },
+          "primary": false,
+          "labelHidden": true,
+          "label": [
+            {
+              "locale": "de",
+              "text": "Teamzuordnungen bearbeiten"
+            },
+            {
+              "locale": "en",
+              "text": "Edit team assignments"
+            }
+          ]
+        },
+        {
+          "event": "event_cancel_edit_modal",
+          "primary": false,
+          "destructive": true,
+          "label": [
+            {
+              "locale": "de",
+              "text": "Abbrechen"
+            },
+            {
+              "locale": "en",
+              "text": "Cancel"
+            }
+          ]
+        },
+        {
+          "event": "event_submit_edit_modal",
+          "icon": {
+            "name": "check",
+            "theme": "outlined"
+          },
+          "primary": true,
+          "label": [
+            {
+              "locale": "de",
+              "text": "Speichern"
+            },
+            {
+              "locale": "en",
+              "text": "Save"
+            }
+          ],
+          "description": [
+            {
+              "locale": "de",
+              "text": "Zuordnungen speichern"
+            },
+            {
+              "locale": "en",
+              "text": "Save Assignments"
+            }
+          ]
+        }
+      ],
+      "editConfiguration": {
+        "selectedItemsOverviewModel": "Teammembers_Ru_SelectedItems_Ov",
+        "availableItemsOverviewModel": "Teammembers_Ru_AvailableItems_Ov",
+        "dialogWidth": "90%",
+        "dialogTitle": [
+          {
+            "locale": "de",
+            "text": "Welche Personen sind diesem Team zugeorndet?"
+          },
+          {
+            "locale": "en",
+            "text": "Which persons are assigned to this team?"
+          }
+        ],
+        "dialogMaxWidth": "1200"
+      }
+    },
+    "relationshipName": "TeamPerson_Re",
+    "targetRole": "Person"
+  }
+}

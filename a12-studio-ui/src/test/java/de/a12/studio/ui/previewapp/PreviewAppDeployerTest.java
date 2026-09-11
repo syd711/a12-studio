@@ -121,6 +121,30 @@ class PreviewAppDeployerTest {
         .getMessage().contains("Product_MDM"));
   }
 
+  /**
+   * Mirrors {@link PreviewAppDeployer#deploySingle} deploying only the Application Model open in an
+   * editor: the zip must contain just that one model, but its Master-Detail reference must still
+   * resolve against the other project models supplied as reference context.
+   */
+  @Test
+  void deployingOnlyOneItemStillResolvesReferencesFromTheWiderProject(@TempDir File dir) throws Exception {
+    File amFile = writeModel(dir, "PreviewApp_AM.json", PREVIEW_APP_AM);
+    File mdmFile = writeModel(dir, "Product_MDM.json", PRODUCT_MDM);
+    File omFile = writeModel(dir, "Product_OM.json", PRODUCT_OM);
+
+    ProjectItem amItem = new ProjectItem(amFile);
+    List<ProjectItem> referenceContext = List.of(amItem, new ProjectItem(mdmFile), new ProjectItem(omFile));
+
+    byte[] zip = PreviewAppDeployer.buildModelsZip(List.of(amItem), referenceContext);
+    Map<String, byte[]> entries = readZipEntries(zip);
+
+    assertEquals(1, entries.size(), "only the deployed item, not the whole reference context, should be zipped");
+    JsonNode deployedAm = JsonMapper.shared().readTree(entries.get("PreviewApp_AM.json"));
+    JsonNode modules = deployedAm.get("content").get("modules");
+    assertEquals(2, modules.size(), "the Master-Detail reference must still resolve against the reference context");
+    assertEquals("Product_MDMModule", modules.get(1).get("name").asString());
+  }
+
   private interface ThrowingRunnable {
     void run() throws Exception;
   }

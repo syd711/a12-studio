@@ -13,6 +13,8 @@ public class PreviewAppSettings {
     EDGE
   }
 
+  private boolean enabled = true;
+
   private BrowserType browserType = BrowserType.SYSTEM_DEFAULT;
 
   private boolean autoRefreshEnabled = true;
@@ -24,6 +26,14 @@ public class PreviewAppSettings {
   private String username = "admin";
 
   private String password = "a12";
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
 
   public BrowserType getBrowserType() {
     return browserType;

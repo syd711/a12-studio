@@ -26,38 +26,47 @@
     <center>
         <VBox spacing="6.0" BorderPane.alignment="TOP_LEFT">
             <children>
-                <Label styleClass="field-label" text="%preview_app_url" />
-                <HBox alignment="CENTER_LEFT" spacing="6.0">
-                    <children>
-                        <TextField fx:id="urlField" prefWidth="280.0" />
-                        <Button fx:id="testConnectionButton" mnemonicParsing="false" onAction="#onTestConnection" text="%test_connection" />
-                    </children>
-                </HBox>
+                <CheckBox fx:id="enabledCheckBox" text="%preview_app_enabled" />
 
-                <VBox spacing="6.0">
+                <VBox fx:id="previewFieldsContainer" spacing="6.0">
                     <children>
-                        <Label styleClass="field-label" text="%username" />
-                        <TextField fx:id="usernameField" prefWidth="200.0" />
-                        <Label styleClass="field-label" text="%password" />
-                        <PasswordField fx:id="passwordField" prefWidth="200.0" />
-                    </children>
-                    <VBox.margin>
-                        <Insets top="6.0" />
-                    </VBox.margin>
-                </VBox>
+                        <Label styleClass="field-label" text="%preview_app_url" />
+                        <HBox alignment="CENTER_LEFT" spacing="6.0">
+                            <children>
+                                <TextField fx:id="urlField" prefWidth="280.0" />
+                                <Button fx:id="testConnectionButton" mnemonicParsing="false" onAction="#onTestConnection" text="%test_connection" />
+                            </children>
+                        </HBox>
 
-                <Label styleClass="field-label" text="%browser">
-                    <VBox.margin>
-                        <Insets top="12.0" />
-                    </VBox.margin>
-                </Label>
-                <ComboBox fx:id="browserTypeCombo" prefWidth="200.0" />
+                        <VBox spacing="6.0">
+                            <children>
+                                <Label styleClass="field-label" text="%username" />
+                                <TextField fx:id="usernameField" prefWidth="200.0" />
+                                <Label styleClass="field-label" text="%password" />
+                                <PasswordField fx:id="passwordField" prefWidth="200.0" />
+                            </children>
+                            <VBox.margin>
+                                <Insets top="6.0" />
+                            </VBox.margin>
+                        </VBox>
 
-                <VBox spacing="6.0">
-                    <children>
-                        <CheckBox fx:id="autoRefreshCheckBox" text="%automatically_refresh_the_preview" />
-                        <Label styleClass="field-label" text="%refresh_delay_ms" />
-                        <TextField fx:id="autoRefreshDelayField" prefWidth="120.0" />
+                        <Label styleClass="field-label" text="%browser">
+                            <VBox.margin>
+                                <Insets top="12.0" />
+                            </VBox.margin>
+                        </Label>
+                        <ComboBox fx:id="browserTypeCombo" prefWidth="200.0" />
+
+                        <VBox spacing="6.0">
+                            <children>
+                                <CheckBox fx:id="autoRefreshCheckBox" text="%automatically_refresh_the_preview" />
+                                <Label styleClass="field-label" text="%refresh_delay_ms" />
+                                <TextField fx:id="autoRefreshDelayField" prefWidth="120.0" />
+                            </children>
+                            <VBox.margin>
+                                <Insets top="12.0" />
+                            </VBox.margin>
+                        </VBox>
                     </children>
                     <VBox.margin>
                         <Insets top="12.0" />

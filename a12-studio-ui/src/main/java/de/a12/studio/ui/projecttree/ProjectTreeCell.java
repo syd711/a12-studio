@@ -4,6 +4,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ModelTypeLabels;
 import javafx.beans.value.ChangeListener;
@@ -143,13 +144,19 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
     }
 
     List<ModelValidationError> validationErrors = item.getValidationErrors();
+    boolean hasError = validationErrors.stream().anyMatch(error -> Severity.ERROR.name().equals(error.severity()));
     if (validationErrors.isEmpty()) {
       getStyleClass().remove("validation-error");
       setTooltip(WidgetFactory.createTooltip(item.getDisplayName()));
     }
     else {
-      if (!getStyleClass().contains("validation-error")) {
-        getStyleClass().add("validation-error");
+      if (hasError) {
+        if (!getStyleClass().contains("validation-error")) {
+          getStyleClass().add("validation-error");
+        }
+      }
+      else {
+        getStyleClass().remove("validation-error");
       }
       String messages = validationErrors.stream().map(error -> "• " + error.message()).collect(Collectors.joining("\n"));
       setTooltip(WidgetFactory.createTooltip(item.getDisplayName() + "\n" + messages));

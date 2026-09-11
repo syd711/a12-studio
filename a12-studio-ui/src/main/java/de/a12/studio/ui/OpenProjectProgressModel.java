@@ -18,22 +18,46 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 /**
- * Loads a {@link Project} from disk on a background thread, fires the project-open event on the
- * FX thread and waits for tabs to finish restoring before letting the progress dialog close.
+ * Loads a {@link Project} from disk on a background thread and fires the project-open event on the
+ * FX thread. Shown in its own progress dialog, separate from {@link RestoreTabsProgressModel}, so
+ * "loading the project" and "restoring previously open tabs" each get their own progress bar instead
+ * of one dialog silently covering both phases.
+ * <p>
+ * Registers the listener {@link RestoreTabsProgressModel} waits on for {@link TabsRestoredEvent}
+ * itself, before firing the project-open event - tab restoration (see
+ * {@link de.a12.studio.ui.tabs.TabPaneController#projectOpened}) can start synchronously as part of
+ * that same event dispatch and may even finish restoring (e.g. a project with no open tabs) before
+ * the caller gets around to creating the second progress dialog. Handing over an already-registered
+ * {@link CountDownLatch} means that race is harmless: a completed restore just counts the latch down
+ * early, and {@link RestoreTabsProgressModel}'s {@code await()} returns immediately instead of
+ * hanging.
  */
 @Slf4j
 class OpenProjectProgressModel extends ProgressModel<Void> {
 
   private final File file;
   private final Consumer<Project> onProjectLoaded;
-  private final Runnable onFinalize;
+  private final CountDownLatch tabsRestoredLatch;
   private boolean done = false;
+  private String incompatibleModelError;
 
-  OpenProjectProgressModel(File file, Consumer<Project> onProjectLoaded, Runnable onFinalize) {
+  OpenProjectProgressModel(File file, Consumer<Project> onProjectLoaded, CountDownLatch tabsRestoredLatch) {
     super(StudioBundle.get("opening_project"));
     this.file = file;
     this.onProjectLoaded = onProjectLoaded;
-    this.onFinalize = onFinalize;
+    this.tabsRestoredLatch = tabsRestoredLatch;
+  }
+
+  /**
+   * {@code false} if the project failed to load (e.g. an incompatible model version was found), in
+   * which case no project-open event was fired and {@link #getError()} describes why.
+   */
+  boolean isSuccessful() {
+    return incompatibleModelError == null;
+  }
+
+  String getError() {
+    return incompatibleModelError;
   }
 
   @Override
@@ -74,36 +98,41 @@ class OpenProjectProgressModel extends ProgressModel<Void> {
     for (IProjectOpenedListener listener : PluginManager.getInstance().getProjectOpenedListeners()) {
       listener.onProjectOpened(project);
     }
-    onProjectLoaded.accept(project);
 
-    // Block this background thread until the project has actually finished opening on the FX thread:
-    // both synchronous projectOpened listener dispatch (tree built, etc.) and TabPaneController's
-    // asynchronous, pulse-yielding tab restoration (see TabPaneController.restoreNextTab - it defers each
-    // tab's Scene Graph construction to its own Platform.runLater so this dialog's indeterminate animation
-    // keeps rendering, rather than freezing solid for the whole restore). Only TabsRestoredEvent marks that
-    // as actually done, so the progress dialog - which closes as soon as processNext() returns - doesn't
-    // hide before the editor is actually shown.
-    CountDownLatch projectOpenedLatch = new CountDownLatch(1);
+    // Checked here, before anything is notified that the project opened, so a failed check cancels
+    // the open outright - no listener ever sees ProjectOpenedEvent for this project, so none of them
+    // have state to unwind. The caller shows the resulting error only after this dialog has closed.
+    incompatibleModelError = Studio.checkModelVersions(project);
+    if (incompatibleModelError != null) {
+      return;
+    }
+
+    // Registered before the event fires (see class javadoc) so a same-pulse restore can't finish
+    // before something is listening for it.
     StudioEventListener tabsRestoredListener = new StudioEventListener() {
       @Override
       public void tabsRestored(@NonNull TabsRestoredEvent event) {
         StudioEventManager.getInstance().removeListener(this);
-        projectOpenedLatch.countDown();
+        tabsRestoredLatch.countDown();
       }
     };
     StudioEventManager.getInstance().addListener(tabsRestoredListener);
+
+    CountDownLatch eventDispatchedLatch = new CountDownLatch(1);
     Platform.runLater(() -> {
       try {
+        onProjectLoaded.accept(project);
         StudioEventManager.getInstance().fireProjectOpenEvent(project);
       }
       catch (Exception e) {
         log.error("Error dispatching project-open event: {}", e.getMessage(), e);
-        StudioEventManager.getInstance().removeListener(tabsRestoredListener);
-        projectOpenedLatch.countDown();
+      }
+      finally {
+        eventDispatchedLatch.countDown();
       }
     });
     try {
-      projectOpenedLatch.await();
+      eventDispatchedLatch.await();
     }
     catch (InterruptedException e) {
       Thread.currentThread().interrupt();
@@ -113,11 +142,6 @@ class OpenProjectProgressModel extends ProgressModel<Void> {
   @Override
   public boolean hasNext() {
     return !done;
-  }
-
-  @Override
-  public void finalizeModel(ProgressResultModel progressResultModel) {
-    onFinalize.run();
   }
 
 }

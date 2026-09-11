@@ -1,0 +1,37 @@
+{
+  "header": {
+    "id": "PersonSkills_Person_Ru",
+    "modelType": "relationship-ui",
+    "modelVersion": "2.0.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "selectedItems",
+        "modelType": "overview",
+        "reference": "PersonSkills_Person_Ru_SelectedItems_Ov"
+      }
+    ]
+  },
+  "content": {
+    "component": {
+      "componentType": "TableList",
+      "selectedItemsOverviewModel": "PersonSkills_Person_Ru_SelectedItems_Ov"
+    },
+    "relationshipName": "PersonSkills_Re",
+    "targetRole": "Person"
+  }
+}

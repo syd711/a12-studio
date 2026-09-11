@@ -17,8 +17,9 @@ public enum ModelType {
 
   // Filename suffix per the a12 platform's "Standardized Name" naming convention
   // (documentation/2606-06-doc/overall-model_naming_conventions.md), confirmed by real fixtures for
-  // AM/CM/DM/FM/OM/PM/MDM/TDM. COMBINATION/MAPPING/QUERY/RELATIONSHIP/STRUCTURALMAPPING have no
-  // documented or fixture-confirmed convention; CDM/MM/QM/RM/SMM in model-versions.json are a
+  // AM/CM/DM/FM/OM/PM/MDM/TDM/Ru (Ru: all 12 "*_Ru.json" files under
+  // testing/workspaces/advanced_new/models). COMBINATION/MAPPING/QUERY/RELATIONSHIP/STRUCTURALMAPPING have
+  // no documented or fixture-confirmed convention; CDM/MM/QM/RM/SMM in model-versions.json are a
   // best-effort, collision-free scheme consistent with the confirmed ones (SMM is also the literal
   // abbreviation the a12 kernel uses for Structural Mapping Model, see
   // kernel-kernel-documentation-dev.md's "_SMM_..." annotation name).
@@ -40,6 +41,7 @@ public enum ModelType {
   PRINT("print"),
   QUERY("query"),
   RELATIONSHIP("relationship"),
+  RELATIONSHIPUI("relationship-ui"),
   SELECTION("selection"),
   STRUCTURALMAPPING("structuralmapping"),
   TREE("tree"),
@@ -100,9 +102,9 @@ public enum ModelType {
 
   /**
    * Returns {@code null} (instead of throwing) for a {@code value} not among the ones declared here, e.g.
-   * a real a12 platform model type (Relationship UI Model's {@code "relationship-ui"}, Additive Document
-   * Model's {@code "additive-document"}, Selection Model's {@code "selection"}) that a12-studio has no
-   * editor for yet. This is deliberately lenient: {@link de.a12.studio.models.ModelReference#modelType} is
+   * a real a12 platform model type (Additive Document Model's {@code "additive-document"}, Composed
+   * Document Model's {@code "composed-document"}) that a12-studio has no editor for yet. This is
+   * deliberately lenient: {@link de.a12.studio.models.ModelReference#modelType} is
    * routinely a reference to a model of a type a12-studio can't open, and callers already null-check it
    * (e.g. {@code HeaderModelReferenceValidator}) — throwing here would otherwise fail deserialization of the
    * whole containing model (a Form/Combined Document Model, say) just because one unrelated reference in its

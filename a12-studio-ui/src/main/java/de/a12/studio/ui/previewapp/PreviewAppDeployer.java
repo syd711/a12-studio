@@ -57,6 +57,10 @@ import java.util.zip.ZipOutputStream;
  * App user, with full deploy authorization (systemAdmin / MODEL_MANAGE) - since the Preview App is a
  * throwaway local testing tool, not a production server, and SME itself relies on these same fixed
  * credentials to deploy to it.
+ *
+ * <p>{@link #deploy} uploads every (non-excluded) model in the project; {@link #deploySingle} instead
+ * uploads only one {@link ProjectItem} - used by an editor's own "Deploy" toolbar button, which targets
+ * just the model currently open rather than the whole project.
  */
 @Slf4j
 public class PreviewAppDeployer {
@@ -74,6 +78,21 @@ public class PreviewAppDeployer {
 
   public static boolean isDeploying() {
     return deploying;
+  }
+
+  /**
+   * Whether {@code item} sits on {@code project}'s deployment exclusion list, either directly or
+   * because an ancestor folder does (matching {@link #collectModelItems}'s subtree-skip semantics).
+   */
+  public static boolean isDeploymentExcluded(ProjectItem item, Project project) {
+    Set<String> excludedPaths = Set.copyOf(
+        project.getSettings().getProjectRootSettings().getGeneral().getDeploymentExclusions());
+    for (ProjectItem current = item; current != null; current = current.getParent()) {
+      if (excludedPaths.contains(current.getPath())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -108,12 +127,7 @@ public class PreviewAppDeployer {
 
       byte[] zip = buildConvertedModelsZip(modelItems);
 
-      PreviewAppSettings previewAppSettings = project.getSettings().getProjectRootSettings().getPreviewApp();
-      String apiBase = previewAppSettings.getUrl();
-      HttpClient httpClient = HttpClient.newBuilder().connectTimeout(REQUEST_TIMEOUT).build();
-
-      String token = login(httpClient, apiBase, previewAppSettings.getUsername(), previewAppSettings.getPassword());
-      uploadModels(httpClient, apiBase, token, zip);
+      uploadToPreviewApp(project, zip);
     }
     catch (Exception e) {
       log.error("Failed to deploy models to the Preview App server: {}", e.getMessage(), e);
@@ -125,6 +139,64 @@ public class PreviewAppDeployer {
         Platform.runLater(onFinished);
       }
     }
+  }
+
+  /**
+   * Bundles and uploads only {@code item} (not the whole project) on a background thread - the target
+   * of an editor's own "Deploy" toolbar button. Other project models are still made available as
+   * reference context (e.g. so an Application Model's Master-Detail module references still resolve),
+   * but only {@code item} itself ends up in the uploaded zip. {@code onFinished}, if given, runs on the
+   * FX thread once the deploy attempt (success or failure) has completed.
+   */
+  public static void deploySingle(Project project, ProjectItem item, Runnable onFinished) {
+    if (deploying) {
+      return;
+    }
+    deploying = true;
+
+    Thread deployThread = new Thread(() -> doDeploySingle(project, item, onFinished), "Preview App Deploy Single");
+    deployThread.setDaemon(true);
+    deployThread.start();
+  }
+
+  private static void doDeploySingle(Project project, ProjectItem item, Runnable onFinished) {
+    try {
+      if (isDeploymentExcluded(item, project)) {
+        showAlert(StudioBundle.get("deploy_model_excluded"));
+        return;
+      }
+
+      Set<String> excludedPaths = Set.copyOf(
+          project.getSettings().getProjectRootSettings().getGeneral().getDeploymentExclusions());
+      List<ProjectItem> referenceContext = new ArrayList<>();
+      collectModelItems(project.getRoot(), excludedPaths, referenceContext);
+
+      log.info("Deploying model file \"{}\" to the Preview App server", item.getFile().getName());
+
+      byte[] zip = buildConvertedModelsZip(List.of(item), referenceContext);
+
+      uploadToPreviewApp(project, zip);
+    }
+    catch (Exception e) {
+      log.error("Failed to deploy model \"{}\" to the Preview App server: {}", item.getFile().getName(),
+          e.getMessage(), e);
+      showAlert(StudioBundle.get("deploy_model_failed"), e.getMessage());
+    }
+    finally {
+      deploying = false;
+      if (onFinished != null) {
+        Platform.runLater(onFinished);
+      }
+    }
+  }
+
+  private static void uploadToPreviewApp(Project project, byte[] zip) throws IOException, InterruptedException {
+    PreviewAppSettings previewAppSettings = project.getSettings().getProjectRootSettings().getPreviewApp();
+    String apiBase = previewAppSettings.getUrl();
+    HttpClient httpClient = HttpClient.newBuilder().connectTimeout(REQUEST_TIMEOUT).build();
+
+    String token = login(httpClient, apiBase, previewAppSettings.getUsername(), previewAppSettings.getPassword());
+    uploadModels(httpClient, apiBase, token, zip);
   }
 
   private static void collectModelItems(ProjectItem item, Set<String> excludedPaths, List<ProjectItem> out) {
@@ -144,11 +216,22 @@ public class PreviewAppDeployer {
   // Package-private (rather than private) so PreviewAppDeployerTest can exercise it directly against a
   // hand-built list of ProjectItems, without needing a full Project/ProjectSettings fixture.
   static byte[] buildModelsZip(List<ProjectItem> modelItems) throws IOException {
+    return buildModelsZip(modelItems, modelItems);
+  }
+
+  /**
+   * Like {@link #buildModelsZip(List)}, but only {@code itemsToZip} end up in the returned zip;
+   * {@code referenceContext} (which may be a superset including {@code itemsToZip}) is used purely to
+   * resolve cross-model references (e.g. an Application Model's Master-Detail module) - the target
+   * scenario for {@link #deploySingle}, where only the active editor's model is uploaded but other
+   * project models must still be available to resolve against.
+   */
+  static byte[] buildModelsZip(List<ProjectItem> itemsToZip, List<ProjectItem> referenceContext) throws IOException {
     ByteArrayOutputStream bytes = new ByteArrayOutputStream();
     try (ZipOutputStream zipOut = new ZipOutputStream(bytes)) {
-      for (ProjectItem item : modelItems) {
+      for (ProjectItem item : itemsToZip) {
         zipOut.putNextEntry(new ZipEntry(item.getFile().getName()));
-        zipOut.write(modelFileContent(item, modelItems));
+        zipOut.write(modelFileContent(item, referenceContext));
         zipOut.closeEntry();
       }
     }
@@ -165,20 +248,27 @@ public class PreviewAppDeployer {
    * WcfCli converts a whole directory in one pass rather than individual files.
    */
   private static byte[] buildConvertedModelsZip(List<ProjectItem> modelItems) throws IOException, PreviewAppException {
+    return buildConvertedModelsZip(modelItems, modelItems);
+  }
+
+  /** Like {@link #buildConvertedModelsZip(List)}, with the same itemsToZip/referenceContext split as
+   *  {@link #buildModelsZip(List, List)} - see that method's doc. */
+  private static byte[] buildConvertedModelsZip(List<ProjectItem> itemsToZip, List<ProjectItem> referenceContext)
+      throws IOException, PreviewAppException {
     File wcfCliDir = WcfCliInstallation.resolve();
     File javaExecutable = PreviewAppInstallation.resolve().getJavaExecutable();
 
     File stagingDir = Files.createTempDirectory("a12-studio-deploy-staging-").toFile();
     File outputDir = Files.createTempDirectory("a12-studio-deploy-converted-").toFile();
     try {
-      for (ProjectItem item : modelItems) {
-        Files.write(new File(stagingDir, item.getFile().getName()).toPath(), modelFileContent(item, modelItems));
+      for (ProjectItem item : itemsToZip) {
+        Files.write(new File(stagingDir, item.getFile().getName()).toPath(), modelFileContent(item, referenceContext));
       }
 
       File convertedModelsDir = ModelConversionService.convert(
           javaExecutable, wcfCliDir, stagingDir, outputDir, line -> PreviewAppProcess.getInstance().appendLog(line));
 
-      return zipConvertedModels(convertedModelsDir, modelItems);
+      return zipConvertedModels(convertedModelsDir, itemsToZip);
     }
     finally {
       FileUtils.deleteDirectory(stagingDir);
