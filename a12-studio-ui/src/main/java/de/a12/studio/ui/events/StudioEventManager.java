@@ -78,6 +78,13 @@ public class StudioEventManager {
     }
   }
 
+  public void fireModelRevertedEvent(@NonNull ProjectItem projectItem) {
+    ModelRevertedEvent event = new ModelRevertedEvent(projectItem);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.modelReverted(event);
+    }
+  }
+
   public void fireModelSavedEvent(@NonNull ProjectItem projectItem) {
     ModelSaveEvent event = new ModelSaveEvent(projectItem);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {

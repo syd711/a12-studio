@@ -187,17 +187,39 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   }
 
   /**
+   * Runs {@code action} (typically a whole {@code setElement}/{@code setControl}-style repopulation method)
+   * with the "updating from model" guard held for its entire duration, not just around each individual {@link
+   * #setFieldValue}/{@link #setComboBoxItems} call it makes. Needed whenever repopulation does more than call
+   * those helpers - e.g. toggling {@code ComboBox.setEditable(...)}, which can itself make JavaFX commit an
+   * editable combo's current editor text into its value property (see {@code
+   * AdditionalSettingsPanelController.configureInitialValueCombo}) - so every such side effect is suppressed
+   * as one atomic update instead of leaving gaps between the individual field writes where a JavaFX-internal
+   * commit could still reach {@link #bindComboBox}/{@link #bindTextField} etc. unguarded. Reentrant: nests
+   * cleanly with the individual helpers above and with itself, restoring the previous flag value instead of
+   * unconditionally clearing it, so an outer {@code updateFromModel} call isn't prematurely ended by an inner
+   * {@link #setFieldValue} call's own try/finally.
+   */
+  protected void updateFromModel(@NonNull Runnable action) {
+    withModelUpdate(action);
+  }
+
+  private void withModelUpdate(@NonNull Runnable action) {
+    boolean previous = updatingFromModel;
+    updatingFromModel = true;
+    try {
+      action.run();
+    } finally {
+      updatingFromModel = previous;
+    }
+  }
+
+  /**
    * Sets a text field's value without triggering the save/validation cycle registered by {@link
    * #bindTextField}. Property editors should use this (instead of {@code textField.setText(...)}) whenever
    * they repopulate a field from the model, e.g. in {@link #setElement}.
    */
   protected void setFieldValue(@NonNull TextField textField, String value) {
-    updatingFromModel = true;
-    try {
-      textField.setText(value);
-    } finally {
-      updatingFromModel = false;
-    }
+    withModelUpdate(() -> textField.setText(value));
   }
 
   /**
@@ -206,12 +228,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
    * whenever they repopulate a field from the model, e.g. in {@link #setElement}.
    */
   protected void setFieldValue(@NonNull CheckBox checkBox, boolean value) {
-    updatingFromModel = true;
-    try {
-      checkBox.setSelected(value);
-    } finally {
-      updatingFromModel = false;
-    }
+    withModelUpdate(() -> checkBox.setSelected(value));
   }
 
   /**
@@ -220,12 +237,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
    * whenever they repopulate a field from the model, e.g. in {@link #setElement}.
    */
   protected void setFieldValue(@NonNull ComboBox<String> comboBox, String value) {
-    updatingFromModel = true;
-    try {
-      comboBox.setValue(value);
-    } finally {
-      updatingFromModel = false;
-    }
+    withModelUpdate(() -> comboBox.setValue(value));
   }
 
   /**
@@ -234,12 +246,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
    * they repopulate a field from the model, e.g. in {@link #setElement}.
    */
   protected void setFieldValue(@NonNull TextArea textArea, String value) {
-    updatingFromModel = true;
-    try {
-      textArea.setText(value);
-    } finally {
-      updatingFromModel = false;
-    }
+    withModelUpdate(() -> textArea.setText(value));
   }
 
   /**
@@ -248,12 +255,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
    * whenever they repopulate a field from the model, e.g. in {@link #setElement}.
    */
   protected void setFieldValue(@NonNull Spinner<Integer> spinner, String value) {
-    updatingFromModel = true;
-    try {
-      spinner.getEditor().setText(value);
-    } finally {
-      updatingFromModel = false;
-    }
+    withModelUpdate(() -> spinner.getEditor().setText(value));
   }
 
   /**
@@ -309,12 +311,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
    * the model's actual value.
    */
   protected void setComboBoxItems(@NonNull ComboBox<String> comboBox, @NonNull List<String> items) {
-    updatingFromModel = true;
-    try {
-      comboBox.getItems().setAll(items);
-    } finally {
-      updatingFromModel = false;
-    }
+    withModelUpdate(() -> comboBox.getItems().setAll(items));
   }
 
   /**

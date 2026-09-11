@@ -34,39 +34,57 @@ import java.util.Optional;
  */
 public class MoveGroupDialogController implements DialogController {
 
-  /** Sealed result type — exactly one variant is non-null after the dialog is confirmed. */
+  /**
+   * Sealed result type — exactly one variant is non-null after the dialog is confirmed.
+   */
   public sealed interface MoveTarget permits MoveTarget.ExistingModel, MoveTarget.NewModel {
 
-    /** The user picked an existing Document Model as the target. */
-    record ExistingModel(@NonNull DocumentModel documentModel) implements MoveTarget {}
+    /**
+     * The user picked an existing Document Model as the target.
+     */
+    record ExistingModel(@NonNull DocumentModel documentModel) implements MoveTarget {
+    }
 
-    /** The user wants a brand-new Document Model. */
+    /**
+     * The user wants a brand-new Document Model.
+     */
     record NewModel(
         @NonNull String modelName,
         @NonNull ProjectItem folder,
         @NonNull List<Locale> locales,
         @NonNull List<String> roles
-    ) implements MoveTarget {}
+    ) implements MoveTarget {
+    }
   }
 
   // -------------------------------------------------------------------------
   // FXML fields
   // -------------------------------------------------------------------------
 
-  @FXML private RadioButton existingModelRadio;
-  @FXML private RadioButton newModelRadio;
-  @FXML private ToggleGroup modeGroup;
+  @FXML
+  private RadioButton existingModelRadio;
+  @FXML
+  private RadioButton newModelRadio;
+  @FXML
+  private ToggleGroup modeGroup;
 
-  @FXML private VBox existingModelSection;
-  @FXML private ComboBox<DocumentModel> existingModelCombo;
+  @FXML
+  private VBox existingModelSection;
+  @FXML
+  private ComboBox<DocumentModel> existingModelCombo;
 
-  @FXML private VBox newModelSection;
-  @FXML private NewDocumentModelPanelController newDocumentModelPanelController;
+  @FXML
+  private VBox newModelSection;
+  @FXML
+  private NewDocumentModelPanelController newDocumentModelPanelController;
 
-  @FXML private Button okButton;
-  @FXML private Button cancelButton;
+  @FXML
+  private Button okButton;
+  @FXML
+  private Button cancelButton;
 
-  @FXML private ErrorContainerController errorContainerController;
+  @FXML
+  private ErrorContainerController errorContainerController;
 
   // -------------------------------------------------------------------------
   // State
@@ -74,7 +92,8 @@ public class MoveGroupDialogController implements DialogController {
 
   private Stage stage;
   private Optional<ButtonType> result = Optional.of(ButtonType.CANCEL);
-  @Nullable private MoveTarget moveTarget;
+  @Nullable
+  private MoveTarget moveTarget;
 
   // -------------------------------------------------------------------------
   // Initialisation
@@ -83,8 +102,15 @@ public class MoveGroupDialogController implements DialogController {
   @FXML
   private void initialize() {
     existingModelCombo.setConverter(new StringConverter<>() {
-      @Override public String toString(DocumentModel dm) { return dm == null ? "" : dm.getId(); }
-      @Override public DocumentModel fromString(String s) { return null; }
+      @Override
+      public String toString(DocumentModel dm) {
+        return dm == null ? "" : dm.getId();
+      }
+
+      @Override
+      public DocumentModel fromString(String s) {
+        return null;
+      }
     });
 
     modeGroup.selectedToggleProperty().addListener((obs, old, val) -> {
@@ -106,8 +132,8 @@ public class MoveGroupDialogController implements DialogController {
   /**
    * Populates the dialog's existing-model combo and seeds the new-model panel for the given source item.
    *
-   * @param projectItem  the source Document Model's project item (used to find sibling models)
-   * @param groupName    the group being moved — used as the default name for a new model
+   * @param projectItem the source Document Model's project item (used to find sibling models)
+   * @param groupName   the group being moved — used as the default name for a new model
    */
   public void init(@NonNull Stage stage, @NonNull ProjectItem projectItem, @NonNull String groupName) {
     this.stage = stage;
@@ -129,7 +155,8 @@ public class MoveGroupDialogController implements DialogController {
     if (useExisting) {
       errorContainerController.hide();
       okButton.setDisable(existingModelCombo.getValue() == null);
-    } else {
+    }
+    else {
       Optional<String> suffixError = newDocumentModelPanelController.getSuffixError();
       suffixError.ifPresentOrElse(
           msg -> errorContainerController.show("ERROR", msg),
@@ -148,7 +175,8 @@ public class MoveGroupDialogController implements DialogController {
       DocumentModel selected = existingModelCombo.getValue();
       if (selected == null) return;
       moveTarget = new MoveTarget.ExistingModel(selected);
-    } else {
+    }
+    else {
       if (!newDocumentModelPanelController.isValid()) return;
       moveTarget = new MoveTarget.NewModel(
           newDocumentModelPanelController.getModelName(),
@@ -196,12 +224,14 @@ public class MoveGroupDialogController implements DialogController {
     FXMLLoader fxmlLoader = new FXMLLoader(
         MoveGroupDialogController.class.getResource("move-group-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
-    Stage stage = WidgetFactory.createDialogStage(
-        "move-group-dialog", fxmlLoader, owner,
-        StudioBundle.get("move_group_dialog.title"));
+    Stage stage = WidgetFactory.createDialogStage("move-group-dialog", fxmlLoader, owner, StudioBundle.get("move_group_dialog.title"));
     MoveGroupDialogController controller = (MoveGroupDialogController) stage.getUserData();
     controller.init(stage, projectItem, groupName);
+
     WidgetFactory.installResizable(stage);
+    stage.setMinWidth(750);
+    stage.setMinHeight(750);
+
     stage.showAndWait();
     return controller.getMoveTarget();
   }

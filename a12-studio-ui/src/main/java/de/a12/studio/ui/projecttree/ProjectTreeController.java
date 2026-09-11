@@ -83,6 +83,18 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   @FXML
   private void onReload() {
+    reloadProject();
+  }
+
+  /**
+   * Reloads the whole project from disk (fresh {@link ProjectItem} tree + revalidation) and
+   * redraws it. Public so other panels that make out-of-band filesystem changes - e.g. {@link
+   * de.a12.studio.ui.versioncontrol.VersioncontrolPanelController} after a revert - can trigger the
+   * same refresh the toolbar's own "Reload" button does, via {@link
+   * de.a12.studio.ui.RootController} wiring a callback the same way {@link
+   * #setCollapseProjectViewCallback} is wired.
+   */
+  public void reloadProject() {
     if (project != null) {
       project.reload();
       load(project);
@@ -357,9 +369,11 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     return null;
   }
 
+  private static final Set<String> INITIALLY_COLLAPSED_NODE_NAMES = Set.of("auth", "data");
+
   private TreeItem<ProjectItemViewModel> toTreeItem(@NonNull ProjectItemViewModel viewModel) {
     TreeItem<ProjectItemViewModel> treeItem = new TreeItem<>(viewModel);
-    treeItem.setExpanded(true);
+    treeItem.setExpanded(!INITIALLY_COLLAPSED_NODE_NAMES.contains(viewModel.getName()));
     for (ProjectItemViewModel child : viewModel.getChildren()) {
       treeItem.getChildren().add(toTreeItem(child));
     }

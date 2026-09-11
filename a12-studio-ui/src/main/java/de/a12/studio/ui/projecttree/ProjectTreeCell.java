@@ -218,7 +218,7 @@ class ProjectTreeCell extends TreeCell<ProjectItemViewModel> {
 
   private static void installModelTypeTooltip(Node modelIcon, ProjectItemViewModel item) {
     String displayName = item.isAdditiveDocumentModel()
-        ? StudioBundle.get("model_type_name.AdM")
+        ? StudioBundle.get("model_type_name.ADM")
         : ModelTypeLabels.getDisplayName(item.getModelType());
     if (!displayName.isEmpty()) {
       Tooltip.install(modelIcon, WidgetFactory.createTooltip(displayName));

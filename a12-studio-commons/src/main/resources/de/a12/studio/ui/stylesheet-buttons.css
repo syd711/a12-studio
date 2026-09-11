@@ -88,8 +88,8 @@
  */
 .menu-bar-button {
     -fx-background-color: -fx-menu-bar-color;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
     -fx-border-width: 0;
     -fx-pref-width: 34px;
     -fx-pref-height: 34px;
@@ -158,8 +158,8 @@
  */
 .update-available-button {
     -fx-background-color: #1B5E20;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
     -fx-border-width: 0;
     -fx-padding: 0 10px;
     -fx-pref-width: -1;
@@ -180,38 +180,6 @@
 
 .update-available-button .toolbar-icon {
     -fx-icon-color: white;
-}
-
-/**
- * Version menu button (right panel) - text variant of .menu-bar-button,
- * sized to fit its version label instead of being icon-only square.
- */
-.version-menu-button {
-    -fx-background-color: -fx-menu-bar-color;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
-    -fx-border-width: 0;
-    -fx-padding: 0 10px;
-    -fx-pref-height: 34px;
-    -fx-min-height: 34px;
-    -fx-cursor: hand;
-    -fx-text-fill: -fx-text-color-inverse;
-}
-
-.version-menu-button:hover {
-    -fx-background-color: derive(-fx-menu-bar-color, 30%);
-}
-
-.version-menu-button .label {
-    -fx-text-fill: -fx-text-color-inverse;
-}
-
-.version-menu-button .arrow {
-    -fx-background-color: -fx-text-color-inverse;
-}
-
-.version-menu-button .toolbar-icon {
-    -fx-icon-color: -fx-text-color-inverse;
 }
 
 /**

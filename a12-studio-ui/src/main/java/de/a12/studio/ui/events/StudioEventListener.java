@@ -31,6 +31,10 @@ public interface StudioEventListener {
 
   }
 
+  default void modelReverted(@NonNull ModelRevertedEvent event) {
+
+  }
+
   default void modelFocusRequested(@NonNull ModelFocusRequestedEvent event) {
 
   }

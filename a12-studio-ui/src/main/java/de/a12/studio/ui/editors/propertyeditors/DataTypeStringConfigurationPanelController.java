@@ -90,7 +90,9 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     WidgetFactory.restrictToNumericInput(maxLengthField);
 
     // Populate combo with preset entries; the editable text field sits on top for free typing.
+    // A leading empty entry lets the user reset a typed/selected pattern back to "no pattern".
     patternComboBox.getItems().setAll(RegexPreset.ALL);
+    patternComboBox.getItems().add(0, "");
 
     // Show "Description  —  pattern" for presets, raw string for anything else (typed text).
     patternComboBox.setButtonCell(new PatternCell());
@@ -191,6 +193,8 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
         setTooltip(null);
       } else if (item instanceof RegexPreset preset) {
         setText(preset.description() + "  \u2014  " + preset.pattern());
+      } else if ("".equals(item)) {
+        setText(StudioBundle.get("none"));
       } else {
         setText(item.toString());
       }

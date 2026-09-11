@@ -17,6 +17,6 @@ public final class ModelTypeLabels {
     if (modelType == null || modelType.getSuffix() == null) {
       return "";
     }
-    return StudioBundle.get("model_type_name." + modelType.getSuffix());
+    return StudioBundle.get("model_type_name." + modelType.getSuffix().toUpperCase());
   }
 }

@@ -138,30 +138,36 @@ public class AdditionalSettingsPanelController extends AbstractPropertyEditor im
   }
 
   public void setControl(@NonNull Control control, @Nullable ElementIndex elementIndex, @Nullable FormModelContent content) {
-    this.control = control;
-    this.content = content;
+    // Wrapped as one atomic model update (not just the individual setFieldValue/setComboBoxItems calls below):
+    // configureInitialValueCombo's setEditable(...) call can itself make JavaFX commit initialValueCombo's
+    // current editor text into its value property, which would otherwise reach bindComboBox's listener
+    // unguarded and cause a spurious save - see AbstractPropertyEditor.updateFromModel.
+    updateFromModel(() -> {
+      this.control = control;
+      this.content = content;
 
-    configureInitialValueCombo(fixedInitialValueChoices(control, elementIndex));
+      configureInitialValueCombo(fixedInitialValueChoices(control, elementIndex));
 
-    FieldConfigEntry entry = entry();
-    setFieldValue(initialValueCombo, entry.getInitialValue() == null ? NO_INITIAL_VALUE : entry.getInitialValue());
-    setFieldValue(expositionCombo, entry.getExposition());
+      FieldConfigEntry entry = entry();
+      setFieldValue(initialValueCombo, entry.getInitialValue() == null ? NO_INITIAL_VALUE : entry.getInitialValue());
+      setFieldValue(expositionCombo, entry.getExposition());
 
-    setFieldValue(messagePositionCombo, control.getMessageExposition());
-    setFieldValue(readonlyCheckBox, Boolean.TRUE.equals(control.getReadonly()));
-    setFieldValue(readonlyPresentationCombo, control.getReadonlyPresentation());
+      setFieldValue(messagePositionCombo, control.getMessageExposition());
+      setFieldValue(readonlyCheckBox, Boolean.TRUE.equals(control.getReadonly()));
+      setFieldValue(readonlyPresentationCombo, control.getReadonlyPresentation());
 
-    String resolvedReadonlyPresentation = content != null && content.getReadonlyPresentation() != null
-        ? content.getReadonlyPresentation() : READONLY_PRESENTATION_DEFAULT;
-    readonlyPresentationHintLabel.setText(StudioBundle.get("additional_settings_readonly_presentation_default_hint",
-        READONLY_PRESENTATION_LABELS.getOrDefault(resolvedReadonlyPresentation, resolvedReadonlyPresentation)));
+      String resolvedReadonlyPresentation = content != null && content.getReadonlyPresentation() != null
+          ? content.getReadonlyPresentation() : READONLY_PRESENTATION_DEFAULT;
+      readonlyPresentationHintLabel.setText(StudioBundle.get("additional_settings_readonly_presentation_default_hint",
+          READONLY_PRESENTATION_LABELS.getOrDefault(resolvedReadonlyPresentation, resolvedReadonlyPresentation)));
 
-    markingOfRequiredFieldsCombo.setConverter(displayConverter(markingOfRequiredFieldsLabels()));
-    List<String> markingOfRequiredFieldsItems = new ArrayList<>();
-    markingOfRequiredFieldsItems.add(null);
-    markingOfRequiredFieldsItems.addAll(MARKING_OF_REQUIRED_FIELDS_BASE_LABELS.keySet());
-    setComboBoxItems(markingOfRequiredFieldsCombo, markingOfRequiredFieldsItems);
-    setFieldValue(markingOfRequiredFieldsCombo, control.getMarkingOfRequiredFields());
+      markingOfRequiredFieldsCombo.setConverter(displayConverter(markingOfRequiredFieldsLabels()));
+      List<String> markingOfRequiredFieldsItems = new ArrayList<>();
+      markingOfRequiredFieldsItems.add(null);
+      markingOfRequiredFieldsItems.addAll(MARKING_OF_REQUIRED_FIELDS_BASE_LABELS.keySet());
+      setComboBoxItems(markingOfRequiredFieldsCombo, markingOfRequiredFieldsItems);
+      setFieldValue(markingOfRequiredFieldsCombo, control.getMarkingOfRequiredFields());
+    });
   }
 
   private Map<String, String> markingOfRequiredFieldsLabels() {

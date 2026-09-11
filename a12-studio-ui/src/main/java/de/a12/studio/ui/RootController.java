@@ -511,6 +511,7 @@ public class RootController implements Initializable, StudioEventListener {
         versioncontrolPanelRoot = loader.load();
         versioncontrolPanelController = loader.getController();
         versioncontrolPanelController.setCollapseProjectViewCallback(this::collapseProjectView);
+        versioncontrolPanelController.setProjectRefreshCallback(projectTreeController::reloadProject);
         // Lazily loaded, so it may have missed the ProjectOpenedEvent for an already-open project.
         versioncontrolPanelController.setProject(project);
       } catch (Exception e) {

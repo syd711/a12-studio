@@ -170,6 +170,52 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
   }
 
+  /**
+   * Refreshes the tab of a reverted item in place, so an editor left open against a file a
+   * version-control revert just changed out from under it shows the reverted content instead of
+   * stale edits. {@code event.getItem()} has already been {@link ProjectItem#reload() reloaded} by
+   * the caller, so rebuilding from it picks up the reverted content.
+   */
+  @Override
+  public void modelReverted(@NonNull ModelRevertedEvent event) {
+    ProjectItem item = event.getItem();
+    for (Tab tab : tabPane.getTabs()) {
+      ProjectItem tabItem = (ProjectItem) tab.getUserData();
+      if (tabItem != null && tabItem.getPath().equals(item.getPath())) {
+        refreshRevertedTab(tab, item);
+        return;
+      }
+    }
+  }
+
+  /**
+   * Rebuilds {@code tab}'s editor content from {@code item}'s freshly reloaded model, same as
+   * {@link #reloadTab}'s rename handling: the old editor is unregistered first via a synthetic
+   * {@link ModelClosedEvent}. Unlike a rename, the path doesn't change, so the tab's title and the
+   * project's opened-files settings are left alone. If the editor can't be rebuilt in place (e.g.
+   * {@link EditorFactory#create} finds nothing to show for the reverted content), the tab is closed
+   * and a fresh one reopened instead of leaving stale content on screen.
+   */
+  private void refreshRevertedTab(@NonNull Tab tab, @NonNull ProjectItem item) {
+    StudioEventManager.getInstance().fireModelClosedEvent(item);
+    tab.setUserData(item);
+
+    Parent content = EditorFactory.create(item);
+    if (content != null) {
+      tab.setContent(content);
+      return;
+    }
+
+    closeTab(tab);
+    if (item.getFile().exists()) {
+      if (project != null) {
+        project.getSettings().getUISettings().addOpenedFile(item.getPath());
+        project.getSettings().getUISettings().save();
+      }
+      open(item);
+    }
+  }
+
   private boolean isSameOrDescendant(@NonNull String path, @NonNull String ancestorPath) {
     return path.equals(ancestorPath) || path.startsWith(ancestorPath + File.separator);
   }
