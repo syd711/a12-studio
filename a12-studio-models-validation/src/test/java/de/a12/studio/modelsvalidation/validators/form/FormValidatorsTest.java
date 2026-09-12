@@ -1,5 +1,6 @@
 package de.a12.studio.modelsvalidation.validators.form;
 
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
@@ -41,6 +42,16 @@ class FormValidatorsTest {
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("document model reference is required"));
+  }
+
+  @Test
+  void documentModelReferenceValidatorAcceptsCombinedDocumentModelReference() {
+    FormModel model = load("FormDocumentModelReferenceValidator_combination_valid");
+    CombinedDocumentModel combinedModel = TestModels.load("/combineddocumentmodel/Ref_Cm.json", CombinedDocumentModel.class);
+    List<ModelValidationError> errors = new FormDocumentModelReferenceValidator().validate(model,
+        TestModels.contextWithOtherModels(model, combinedModel));
+
+    assertEquals(0, errors.size());
   }
 
   @Test

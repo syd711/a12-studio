@@ -1,0 +1,29 @@
+{
+  "header": {
+    "id": "FormDocumentModelReferenceValidator_combination_valid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Ref_Cm",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Ref_Cm"
+      }
+    ]
+  },
+  "content": {
+    "screens": [],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "header": {
+    "id": "Ref_Cm",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "Ref_DM"
+  }
+}

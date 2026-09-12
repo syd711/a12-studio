@@ -27,7 +27,7 @@
 - for rules, initialize the name field based on the field or group 
 
 # Performance:
-- Document Model field/group/rule editor is slow to switch between tree nodes (~200ms+ per selection, measured via the timing logs added to DocumentModelEditorController/DocumentModelFieldEditorController/TypeDefinitionPanelController/DataTypeConfigurationPanelController). Root cause: DocumentModelEditorController.loadEditor() calls `new FXMLLoader(...).load()` fresh on every single tree selection, even when switching between two elements of the same kind (e.g. field -> field), rebuilding the whole nested panel tree (~9 property-editor panels, each running its own initialize()) from scratch every time (~50-100ms of that alone). Fix: cache/reuse the loaded editor Node + ElementEditorController per editorFxml type in DocumentModelEditorController (keyed by FIELD_EDITOR_FXML/GROUP_EDITOR_FXML/etc.), and when the next selected element needs the same editor type, just call setElement(...) again on the cached instance instead of reloading the FXML. Needs care around ElementEditorController's destroy()/setElement() lifecycle (currently: destroy() on the old controller before loading a new one) and around DataTypeConfigurationPanelController's dispatcher-panel design, which deliberately calls setElement() on all 8 of its sub-panels every time (not just the active one) because DocumentModelFieldEditorController.updateErrorMessagesVisibility() reads dataTypeConfigurationController.patternProperty() (which always delegates to the String sub-panel) unconditionally - don't break that invariant while doing the FXML-reuse optimization.
+
 
 # Document Model:
 - check field init for new validation rules

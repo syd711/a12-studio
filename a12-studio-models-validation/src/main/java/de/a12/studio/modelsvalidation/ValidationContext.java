@@ -1,6 +1,7 @@
 package de.a12.studio.modelsvalidation;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
@@ -67,6 +68,18 @@ public final class ValidationContext {
       return null;
     }
     return otherDocumentModels.stream().filter(model -> id.equals(model.getId())).findFirst().orElse(null);
+  }
+
+  /**
+   * True if {@code id} matches another {@link DocumentModel} or {@link CombinedDocumentModel} in the
+   * project - the model types SME's Form Model allows as a data-binding document reference (alongside
+   * Composed and Transformer Document Models, neither implemented as a distinct type in a12-studio yet;
+   * see {@code client/src/modules/formModel/references/documentModelsEnum/index.ts}'s
+   * {@code createDocumentModelsProvider}). {@link #findOtherDocumentModel} alone rejects a
+   * {@link CombinedDocumentModel} reference since that type doesn't extend {@link DocumentModel}.
+   */
+  public boolean hasOtherDocumentOrCombinedModel(String id) {
+    return findOtherDocumentModel(id) != null || findOtherModel(id) instanceof CombinedDocumentModel;
   }
 
   /**

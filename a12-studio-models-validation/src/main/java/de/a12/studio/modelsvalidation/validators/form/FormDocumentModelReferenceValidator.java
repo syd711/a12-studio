@@ -38,7 +38,7 @@ public final class FormDocumentModelReferenceValidator implements ModelValidator
 
     List<ModelValidationError> errors = new ArrayList<>();
     for (ModelReference reference : documentReferences) {
-      if (context.findOtherDocumentModel(reference.getReference()) == null) {
+      if (!context.hasOtherDocumentOrCombinedModel(reference.getReference())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.formDocumentModelReference.invalid", reference.getReference()),
             Severity.ERROR.name()));
