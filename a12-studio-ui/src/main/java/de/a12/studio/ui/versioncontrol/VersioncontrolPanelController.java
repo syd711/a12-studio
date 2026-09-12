@@ -252,10 +252,20 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     }
     else {
       TreeItem<VersioncontrolTreeNode> root = buildTree(changedFiles);
-      expandAll(root);
+      setExpandedRecursive(root, true);
       setTreeRoot(root);
     }
     updateActionButtons();
+  }
+
+  @FXML
+  private void onExpandAll() {
+    setExpandedRecursive(changesTree.getRoot(), true);
+  }
+
+  @FXML
+  private void onCollapseAll() {
+    setExpandedRecursive(changesTree.getRoot(), false);
   }
 
   /**
@@ -300,10 +310,13 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     return root;
   }
 
-  private void expandAll(@NonNull TreeItem<VersioncontrolTreeNode> item) {
-    item.setExpanded(true);
+  private void setExpandedRecursive(TreeItem<VersioncontrolTreeNode> item, boolean expanded) {
+    if (item == null) {
+      return;
+    }
+    item.setExpanded(expanded);
     for (TreeItem<VersioncontrolTreeNode> child : item.getChildren()) {
-      expandAll(child);
+      setExpandedRecursive(child, expanded);
     }
   }
 

@@ -66,8 +66,7 @@ public interface Icons {
   String PNG_MODEL_PRINT = "/de/a12/studio/ui/icons/Model-Print.png";
   String PNG_MODEL_TREE = "/de/a12/studio/ui/icons/Model-Tree.png";
   String PNG_MODEL_STRUCTURALMAPPING = "/de/a12/studio/ui/icons/Structural-Mapping.png";
-  // No dedicated assets exist yet for these model types; reusing the closest existing icons as placeholders.
-  String PNG_MODEL_COMBINATION = "/de/a12/studio/ui/icons/Model-Transformer.png";
+  String PNG_MODEL_COMBINATION = "/de/a12/studio/ui/icons/Model-Combination.png";
   String PNG_MODEL_MAPPING = "/de/a12/studio/ui/icons/Model-Graph-Diagram.png";
   String PNG_MODEL_QUERY = "/de/a12/studio/ui/icons/Model-Document_SCDM.png";
   String PNG_MODEL_SELECTION = "/de/a12/studio/ui/icons/Model-Document_SCDM.png";

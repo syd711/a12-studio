@@ -2,6 +2,7 @@ package de.a12.studio.ui;
 
 import de.a12.studio.ui.components.FileSearchDialogController;
 import de.a12.studio.ui.components.ProgressDialog;
+import de.a12.studio.ui.components.StudioFileChooser;
 import de.a12.studio.ui.components.StudioFolderChooser;
 import de.a12.studio.ui.newproject.NewProjectDialogController;
 import de.a12.studio.ui.previewapp.PreviewAppDeployer;
@@ -42,6 +43,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -81,6 +83,9 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private Button previewAppLogBtn;
+
+  @FXML
+  private Button downloadDataBtn;
 
   @FXML
   private Button searchBtn;
@@ -321,6 +326,24 @@ public class MenuBarController implements Initializable, StudioEventListener {
   }
 
   @FXML
+  private void onDownloadData() {
+    if (project == null) {
+      return;
+    }
+    StudioFileChooser chooser = new StudioFileChooser();
+    chooser.setTitle(StudioBundle.get("download_preview_data"));
+    chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Data Archive (*.tar.gz)", "*.tar.gz"));
+    chooser.setInitialFileName("seed.tar.gz");
+    File targetFile = chooser.showSaveDialog(Studio.stage);
+    if (targetFile == null) {
+      return;
+    }
+    downloadDataBtn.setDisable(true);
+    PreviewAppDeployer.downloadData(project, targetFile,
+        () -> refreshPreviewAppButtonsState(PreviewAppProcess.getInstance().getState()));
+  }
+
+  @FXML
   private void onOpenPreviewAppLog() {
     RootController root = Studio.getRootController();
     if (root.isConsoleDocked()) {
@@ -360,6 +383,8 @@ public class MenuBarController implements Initializable, StudioEventListener {
     stopPreviewAppBtn.setManaged(visible);
     previewAppLogBtn.setVisible(visible);
     previewAppLogBtn.setManaged(visible);
+    downloadDataBtn.setVisible(visible);
+    downloadDataBtn.setManaged(visible);
   }
 
   /** Deploy is only meaningful while the Preview App server is actually reachable locally. */
@@ -372,6 +397,7 @@ public class MenuBarController implements Initializable, StudioEventListener {
     boolean busy = state == PreviewAppProcess.State.STARTING || state == PreviewAppProcess.State.STOPPING;
     launchPreviewAppBtn.setDisable(running || busy);
     stopPreviewAppBtn.setDisable(!running && !busy);
+    downloadDataBtn.setDisable(!running || PreviewAppDeployer.isDownloading());
   }
 
   @Override

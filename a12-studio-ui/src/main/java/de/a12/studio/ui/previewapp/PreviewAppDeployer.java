@@ -62,7 +62,11 @@ import java.util.zip.ZipOutputStream;
  *
  * <p>{@link #deploy} uploads every (non-excluded) model in the project; {@link #deploySingle} instead
  * uploads only one {@link ProjectItem} - used by an editor's own "Deploy" toolbar button, which targets
- * just the model currently open rather than the whole project.
+ * just the model currently open rather than the whole project. {@link #downloadData} goes the other
+ * direction: it authenticates the same way and then downloads the server's current data (documents,
+ * links, attachments) from its {@code internal/seed-data} endpoint - the same endpoint SME's "Replace
+ * Workspace Data" feature uses - saving the raw archive to a file the user picks, for the menu bar's
+ * "Download Data" button.
  */
 @Slf4j
 public class PreviewAppDeployer {
@@ -98,6 +102,29 @@ public class PreviewAppDeployer {
     }
     else {
       Platform.runLater(() -> deploying.set(value));
+    }
+  }
+
+  /**
+   * Whether a data download ({@link #downloadData}) is currently running - drives the "Download Data"
+   * button's disabled state the same way {@link #deploying} drives the "Deploy" buttons'.
+   */
+  private static final SimpleBooleanProperty downloading = new SimpleBooleanProperty(false);
+
+  public static boolean isDownloading() {
+    return downloading.get();
+  }
+
+  public static ReadOnlyBooleanProperty downloadingProperty() {
+    return downloading;
+  }
+
+  private static void setDownloading(boolean value) {
+    if (Platform.isFxApplicationThread()) {
+      downloading.set(value);
+    }
+    else {
+      Platform.runLater(() -> downloading.set(value));
     }
   }
 
@@ -209,6 +236,65 @@ public class PreviewAppDeployer {
         Platform.runLater(onFinished);
       }
     }
+  }
+
+  /**
+   * Downloads the data currently held by the locally running Preview App server (documents, links and
+   * attachments) and writes it as-is to {@code targetFile} - the same {@code internal/seed-data} endpoint
+   * SME's own "Replace Workspace Data" feature reads from, except this just saves the raw gzip'd tar
+   * archive to disk instead of unpacking it back into the project. Runs on a background thread; {@code
+   * onFinished}, if given, runs on the FX thread once the download attempt (success or failure) has
+   * completed.
+   */
+  public static void downloadData(Project project, File targetFile, Runnable onFinished) {
+    if (isDownloading()) {
+      return;
+    }
+    setDownloading(true);
+
+    Thread downloadThread = new Thread(() -> doDownloadData(project, targetFile, onFinished), "Preview App Data Download");
+    downloadThread.setDaemon(true);
+    downloadThread.start();
+  }
+
+  private static void doDownloadData(Project project, File targetFile, Runnable onFinished) {
+    try {
+      PreviewAppSettings previewAppSettings = project.getSettings().getProjectRootSettings().getPreviewApp();
+      String apiBase = previewAppSettings.getUrl();
+      HttpClient httpClient = HttpClient.newBuilder().connectTimeout(REQUEST_TIMEOUT).build();
+
+      String token = login(httpClient, apiBase, previewAppSettings.getUsername(), previewAppSettings.getPassword());
+      byte[] data = downloadSeedData(httpClient, apiBase, token);
+      Files.write(targetFile.toPath(), data);
+
+      log.info("Downloaded Preview App data to \"{}\"", targetFile.getAbsolutePath());
+    }
+    catch (Exception e) {
+      log.error("Failed to download data from the Preview App server: {}", e.getMessage(), e);
+      showAlert(StudioBundle.get("download_data_failed"), e.getMessage());
+    }
+    finally {
+      setDownloading(false);
+      if (onFinished != null) {
+        Platform.runLater(onFinished);
+      }
+    }
+  }
+
+  private static byte[] downloadSeedData(HttpClient httpClient, String apiBase, String token)
+      throws IOException, InterruptedException {
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(apiBase + "/internal/seed-data"))
+        .timeout(REQUEST_TIMEOUT)
+        .header(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN_TYPE + " " + token)
+        .GET()
+        .build();
+
+    HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+    if (response.statusCode() / 100 != 2) {
+      throw new IOException("Downloading data failed with status " + response.statusCode() + ".");
+    }
+    return response.body();
   }
 
   private static void uploadToPreviewApp(Project project, byte[] zip) throws IOException, InterruptedException {
