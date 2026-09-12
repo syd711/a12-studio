@@ -1,6 +1,7 @@
 package de.a12.studio.models.overviewmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +10,9 @@ import lombok.Setter;
  * filterSelector.showSetFiltersOnly}/{@code filterSelector.searchBar}/{@code newFilterConfiguration.invert} in
  * {@code testing/basic/models/Company_OM.json}: {@code {"enabled": true, "value": false}}. {@code enabled} is the
  * "User Access" toggle shown in the Custom Filter Configuration editor, {@code value} is the initial/default
- * value of the setting itself.
+ * value of the setting itself - omitted (not {@code false}/{@code null}) when unset, e.g. {@code
+ * filterSelector.searchBar}/{@code showSetFiltersOnly} in {@code
+ * testing/workspaces/advanced_new/models/10_People/Person_Ov.json}, which only ever set {@code enabled}.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
@@ -17,5 +20,6 @@ import lombok.Setter;
 public class BooleanUserAccessOption {
 
   private Boolean enabled;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean value;
 }

@@ -22,7 +22,7 @@ public class FilterTriggerValue {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Icon icon;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Boolean hideLabel;
+  private Boolean labelHidden;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> label = new ArrayList<>();
 }

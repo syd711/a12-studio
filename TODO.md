@@ -19,7 +19,19 @@
 # Rule Editor
 
 # Testing
-c\workspace\a12-studio\a12-studio-models\src\test\java\de\a12\studio\models\projects\BasicProjectModelsRoundTripTest.java create a copy of this test using the advanced_new workspace and test the roundtrip with that workspace too.
+I've created AdvancedNewProjectModelsRoundTripTest (mirroring the basic one, via a new TestHelper.resolveTestingAdvancedNewDir() helper) and run it.
+Result: 62 of 96 model files fail the round-trip (vs. the basic workspace, which is fully green). This isn't one bug — advanced_new exercises far more model-type features than basic does, and it's surfacing several distinct root causes:
+- Confirmed pre-existing known gap (documented in CLAUDE.md): header.labels missing @JsonInclude(NON_EMPTY) → 28 files get a spurious "labels":[].                                                                                                                                                                                                                                
+- Query Model: content.sort, content.fields, links[].fields, links[].linkDocumentFields appearing as [] when absent in source (same class of bug); content.constraint for has-type constraints dropped entirely.
+- Relationship UI Model / Tree Model: columns[].linkReferences, columns[].icon, columns[].pinDirection, columns[].styles, nodes[].actions[] fields not round-tripping — looks like missing model fields, not just annotation gaps.
+- Overview Model: filter configuration (newFilterConfiguration.filterGroups[].filterItems[].options/description, filterSelector.*) structurally mismatched — this overlaps with the FilterItemOptions/FilterOptionToggle work you have in progress right now (uncommitted), so may already be mid-fix.
+- Form Model: buttonStyling.icon.theme, screenElements[].reference, hideCondition, dependentControls dropped.
+- Selection Model: content.Data/Computation/Validation entirely missing after save — looks like a real content-mapping bug, not cosmetic.
+- Document Model: documentUniquenessCriteria, Computation.errorCodesToSuppress dropped.
+- Combination Model: modelReferences[].modelType becomes null for additive-document refs.
+
+# Selection Model
+check the advanced_new workspace for selection models. these are not implemented yet. Create the editor for it and check it against the SME if all fields are available and if validators are missing. take your time. create a plain and implement it.
 
 
 # Form Models:

@@ -216,10 +216,12 @@ public final class OverviewElementOptions {
 
   /** Filter Item types whose options include a Ranges group, per the platform docs' "Filter Items" (Number's
    * numeric ranges, or the Date/Time family's date/time ranges - fixture-evidenced for {@code number}/{@code
-   * date}/{@code datetime}, the rest inferred from the same doc text). */
+   * date}/{@code dateTime}, the rest inferred from the same doc text). Matches {@link #filterItemFieldType}'s
+   * exact casing ({@code dateTime}/{@code dateRange}/{@code dateFragment}, fixture-confirmed for {@code
+   * dateTime}). */
   public static boolean supportsRanges(String filterItemType) {
     return switch (filterItemType == null ? "" : filterItemType) {
-      case "number", "date", "datetime", "time", "datefragment", "daterange" -> true;
+      case "number", "date", "dateTime", "time", "dateFragment", "dateRange" -> true;
       default -> false;
     };
   }
@@ -228,7 +230,7 @@ public final class OverviewElementOptions {
    * {@code time}, which the platform docs explicitly exclude from Periods ("Filter Items"). */
   public static boolean supportsPeriods(String filterItemType) {
     return switch (filterItemType == null ? "" : filterItemType) {
-      case "date", "datetime", "datefragment", "daterange" -> true;
+      case "date", "dateTime", "dateFragment", "dateRange" -> true;
       default -> false;
     };
   }
@@ -247,12 +249,12 @@ public final class OverviewElementOptions {
   }
 
   /** The Periods row set for {@code filterItemType}, {@code date} defaulted. Fixture-evidenced for {@code date}
-   * ({@code date}/{@code year}/{@code yearMonth}/{@code month}) and {@code datetime} (all six, adding {@code
-   * time}/{@code dateTime}); {@code datefragment}/{@code daterange} reuse {@code date}'s subset by analogy - not
+   * ({@code date}/{@code year}/{@code yearMonth}/{@code month}) and {@code dateTime} (all six, adding {@code
+   * time}/{@code dateTime}); {@code dateFragment}/{@code dateRange} reuse {@code date}'s subset by analogy - not
    * fixture-confirmed, see {@link de.a12.studio.models.overviewmodel.FilterItemOptions}'s class doc. Empty for
    * any type outside {@link #supportsPeriods(String)}. */
   public static List<FilterOptionToggle> defaultPeriods(String filterItemType) {
-    if ("datetime".equals(filterItemType)) {
+    if ("dateTime".equals(filterItemType)) {
       return new ArrayList<>(List.of(
           toggle(PERIOD_DATE, true),
           toggle(PERIOD_TIME, false),
@@ -328,13 +330,16 @@ public final class OverviewElementOptions {
       return "enumeration";
     }
     if (fieldType instanceof DateTimeFieldType) {
-      return "datetime";
+      // Fixture-confirmed casing (testing/workspaces/advanced_new/models/10_People/Person_Ov.json uses
+      // "dateTime", not "datetime") - see supportsRanges/supportsPeriods/defaultPeriods below, which match on
+      // this exact string.
+      return "dateTime";
     }
     if (fieldType instanceof DateRangeFieldType) {
-      return "daterange";
+      return "dateRange";
     }
     if (fieldType instanceof DateFragmentFieldType) {
-      return "datefragment";
+      return "dateFragment";
     }
     if (fieldType instanceof DateFieldType) {
       return "date";

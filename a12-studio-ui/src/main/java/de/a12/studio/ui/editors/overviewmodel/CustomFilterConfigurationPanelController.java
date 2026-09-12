@@ -356,7 +356,7 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
       if (updatingFromModel || model == null) {
         return;
       }
-      ensureTriggerValue().setHideLabel(newValue ? Boolean.TRUE : null);
+      ensureTriggerValue().setLabelHidden(newValue ? Boolean.TRUE : null);
       commitHeaderChange();
     });
 
@@ -369,7 +369,7 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
     filterButtonUserAccessField.setSelected(trigger != null && Boolean.TRUE.equals(trigger.getEnabled()));
 
     FilterTriggerValue triggerValue = trigger != null ? trigger.getValue() : null;
-    hideFilterButtonLabelField.setSelected(triggerValue != null && Boolean.TRUE.equals(triggerValue.getHideLabel()));
+    hideFilterButtonLabelField.setSelected(triggerValue != null && Boolean.TRUE.equals(triggerValue.getLabelHidden()));
 
     // Read via currentTriggerValue() (non-mutating) rather than ensureTriggerValue(): same reasoning as
     // currentHeaderSubtitle() above - opening this panel must not materialize newFilterConfiguration.
