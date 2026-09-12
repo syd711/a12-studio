@@ -25,7 +25,7 @@ class FilterItemSnapshot {
     item.setId(restored.getId());
     item.setType(restored.getType());
     item.setOptions(restored.getOptions());
-    item.setShowInFilterBar(restored.getShowInFilterBar());
+    item.setPreferFilterBar(restored.getPreferFilterBar());
     item.setCollapsed(restored.getCollapsed());
     item.getLabel().clear();
     item.getLabel().addAll(restored.getLabel());

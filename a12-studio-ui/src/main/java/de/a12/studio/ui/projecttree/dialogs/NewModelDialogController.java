@@ -10,6 +10,7 @@ import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.ModelSuffixValidation;
 import de.a12.studio.ui.util.ModelTypeLabels;
+import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
@@ -129,15 +130,18 @@ public class NewModelDialogController implements DialogController {
   }
 
   // Combines the filename/document-model checks the OK button already gated on with the live
-  // "Enforce Model Suffixes" check (see ModelSuffixValidation), surfacing the latter's message in the
-  // dialog's error container per the "validator messages must name the field" convention.
+  // "Enforce Model Suffixes" check (see ModelSuffixValidation) and the model name convention check (see
+  // NameConventionValidation), surfacing whichever message applies in the dialog's error container per
+  // the "validator messages must name the field" convention.
   private void validate() {
     boolean validFilename = FileUtils.isValidWindowsFilename(nameField.getText());
     boolean missingDocumentModel = requiresDocumentModel(typeComboBox.getValue()) && documentModelCombo.getValue() == null;
-    Optional<String> suffixError = targetFolder == null ? Optional.empty()
+    Optional<String> nameConventionError = NameConventionValidation.validate("Model name", nameField.getText());
+    Optional<String> suffixError = nameConventionError.isPresent() || targetFolder == null ? Optional.empty()
         : ModelSuffixValidation.validate(targetFolder, typeComboBox.getValue(), nameField.getText());
-    suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
-    okButton.setDisable(!validFilename || missingDocumentModel || suffixError.isPresent());
+    Optional<String> error = nameConventionError.or(() -> suffixError);
+    error.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    okButton.setDisable(!validFilename || missingDocumentModel || nameConventionError.isPresent() || suffixError.isPresent());
   }
 
   private void onDocumentModelSelected(String documentModelId) {

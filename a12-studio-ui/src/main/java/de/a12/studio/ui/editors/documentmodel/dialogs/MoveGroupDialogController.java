@@ -157,11 +157,13 @@ public class MoveGroupDialogController implements DialogController {
       okButton.setDisable(existingModelCombo.getValue() == null);
     }
     else {
-      Optional<String> suffixError = newDocumentModelPanelController.getSuffixError();
-      suffixError.ifPresentOrElse(
+      Optional<String> nameConventionError = newDocumentModelPanelController.getNameConventionError();
+      Optional<String> suffixError = nameConventionError.isPresent() ? Optional.empty()
+          : newDocumentModelPanelController.getSuffixError();
+      nameConventionError.or(() -> suffixError).ifPresentOrElse(
           msg -> errorContainerController.show("ERROR", msg),
           errorContainerController::hide);
-      okButton.setDisable(!newDocumentModelPanelController.isValid() || suffixError.isPresent());
+      okButton.setDisable(!newDocumentModelPanelController.isValid());
     }
   }
 

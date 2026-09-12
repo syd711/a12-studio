@@ -25,8 +25,8 @@ import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController;
 import de.a12.studio.ui.editors.documentmodel.dialogs.MoveGroupDialogController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
-import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.Command;
@@ -523,7 +523,7 @@ public class DocumentModelActions {
 
   /**
    * Asks for the new element's name, pre-filled with the factory's auto-generated name, looping
-   * until the entered name is a valid whitespace-free filename or the user cancels.
+   * until the entered name satisfies the name convention or the user cancels.
    */
   private String promptElementName(@NonNull String defaultName) {
     String name = defaultName;
@@ -533,10 +533,11 @@ public class DocumentModelActions {
         return null;
       }
       name = name.trim();
-      if (FileUtils.isValidWindowsFilename(name)) {
+      Optional<String> error = NameConventionValidation.validate("Name", name);
+      if (error.isEmpty()) {
         return name;
       }
-      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("please_enter_a_valid_name_without_whitespace"));
+      WidgetFactory.showAlert(Studio.stage, error.get());
     }
   }
 

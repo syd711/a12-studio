@@ -89,11 +89,12 @@ public class ImportFromExcelDialogController implements DialogController {
   }
 
   private void validate() {
-    Optional<String> suffixError = newDocumentModelPanelController.getSuffixError();
-    suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
-    okButton.setDisable(currentExcelFile == null
-        || !newDocumentModelPanelController.isValid()
-        || suffixError.isPresent());
+    Optional<String> nameConventionError = newDocumentModelPanelController.getNameConventionError();
+    Optional<String> suffixError = nameConventionError.isPresent() ? Optional.empty()
+        : newDocumentModelPanelController.getSuffixError();
+    nameConventionError.or(() -> suffixError)
+        .ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    okButton.setDisable(currentExcelFile == null || !newDocumentModelPanelController.isValid());
   }
 
   // -------------------------------------------------------------------------

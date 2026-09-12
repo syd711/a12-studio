@@ -13,7 +13,7 @@ import java.util.List;
  * One entry of a {@link FilterGroup#getFilterItems()}. Covers the properties the platform docs ({@code
  * overview_engine-overviewengine-dev-docs.md} / {@code sme-sme-om-ba-docs.md}, "Filter Items") describe as
  * common to every filter item: a Field Reference ({@link #options}' {@code fieldId}), the derived {@link #type},
- * {@link #showInFilterBar}, {@link #collapsed}, and {@link #label}/{@link #icon}.
+ * {@link #preferFilterBar}, {@link #collapsed}, and {@link #label}/{@link #icon}.
  * <p>
  * The field reference lives under {@link #options} (SME's actual shape: {@code options.fieldId}), not as a
  * sibling {@code fieldRef}/{@code FieldRef} property - that was this class's original (incorrect) guess, which
@@ -34,7 +34,7 @@ public class FilterItem {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private FilterItemOptions options;
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Boolean showInFilterBar;
+  private Boolean preferFilterBar;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean collapsed;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)

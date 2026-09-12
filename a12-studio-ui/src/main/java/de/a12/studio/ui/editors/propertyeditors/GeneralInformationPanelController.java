@@ -1,10 +1,10 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.models.documentmodel.Element;
-import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -15,16 +15,9 @@ import javafx.scene.input.ClipboardContent;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Optional;
 
 public class GeneralInformationPanelController extends AbstractPropertyEditor {
-
-  // Disallows whitespace and characters that are illegal in filenames on Windows/macOS/Linux, since the
-  // element name is used as-is as a filename/path segment elsewhere.
-  private static final Pattern VALID_NAME = Pattern.compile("^[^\\s\\\\/:*?\"<>|]+$");
-
-  // Mirrors SME's field-name validator: letters, digits and underscores only, must not start with a digit.
-  private static final Pattern VALID_FIELD_NAME = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
 
   @FXML
   private TextField nameField;
@@ -44,14 +37,9 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor {
       return;
     }
 
-    if (element instanceof FieldElement) {
-      if (!VALID_FIELD_NAME.matcher(newName).matches()) {
-        WidgetFactory.showAlert(Studio.stage, "Invalid name",
-            "A field name may only contain letters, digits or underscores. Field names must not begin with a digit.");
-        return;
-      }
-    } else if (!VALID_NAME.matcher(newName).matches()) {
-      WidgetFactory.showAlert(Studio.stage, "Invalid name", "The name must be a valid filename and must not contain whitespace.");
+    Optional<String> error = NameConventionValidation.validate("Name", newName);
+    if (error.isPresent()) {
+      WidgetFactory.showAlert(Studio.stage, "Invalid name", error.get());
       return;
     }
 

@@ -3,6 +3,10 @@
 - Add a drag handler for the items in C:\workspace\a12-studio\a12-studio-ui\src\main\resources\de\a12\studio\ui\editors\overviewmodel\dialogs\filter-items-panel.fxml
 - Why are not all rows editable for C:\workspace\a12-studio\a12-studio-ui\src\main\resources\de\a12\studio\ui\editors\overviewmodel\subheader-slot-panel.fxml. For C:\workspace\a12-studio\testing\workspaces\basic\models\Company_OM.json all rows are editable in the SME.
 
+# Overview Model
+- `FilterItemDialogController`'s Filter Item editor (`overview-filter-item-dialog.fxml`) now covers String (matching + viewMode), Enumeration (viewMode), Number (ranges), and Date/DateTime/Time/DateFragment/DateRange (ranges/periods) - all fixture-evidenced (see `FilterItemOptions`'s class doc). Still not modeled, because no fixture anywhere on disk (including the broader `A12 Tools - 2026.06` sample workspaces) has an example and the BA doc only shows screenshots: Boolean/Confirm criteria-based configuration, and Enumeration/Multi-select's Initial Criteria, Pinned Values and join behavior. Implement once a real example JSON is found.
+- DateFragment/DateRange's Periods row set (`OverviewElementOptions.defaultPeriods`) reuses Date's subset ({date, year, yearMonth, month}) by analogy - not fixture-confirmed. Verify against a real example once found and adjust if the actual subset differs.
+
 
 # Git-Support:
 
@@ -14,6 +18,8 @@
 
 # Rule Editor
 
+# Testing
+c\workspace\a12-studio\a12-studio-models\src\test\java\de\a12\studio\models\projects\BasicProjectModelsRoundTripTest.java create a copy of this test using the advanced_new workspace and test the roundtrip with that workspace too.
 
 
 # Form Models:

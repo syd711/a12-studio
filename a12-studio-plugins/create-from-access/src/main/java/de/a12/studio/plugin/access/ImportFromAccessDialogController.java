@@ -103,12 +103,14 @@ public class ImportFromAccessDialogController implements DialogController {
   // OK only enabled when: a file is chosen, a table is selected, a valid name is entered, and (when
   // "Enforce Model Suffixes" is on) the name carries the Document Model suffix.
   private void validate() {
-    Optional<String> suffixError = newDocumentModelPanelController.getSuffixError();
-    suffixError.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    Optional<String> nameConventionError = newDocumentModelPanelController.getNameConventionError();
+    Optional<String> suffixError = nameConventionError.isPresent() ? Optional.empty()
+        : newDocumentModelPanelController.getSuffixError();
+    nameConventionError.or(() -> suffixError)
+        .ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
     okButton.setDisable(currentAccessFile == null
         || tableListView.getSelectionModel().isEmpty()
-        || !newDocumentModelPanelController.isValid()
-        || suffixError.isPresent());
+        || !newDocumentModelPanelController.isValid());
   }
 
   // -------------------------------------------------------------------------

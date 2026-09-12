@@ -9,6 +9,7 @@ import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.util.DocumentModelBuilder;
 import de.a12.studio.ui.util.FileUtils;
 import de.a12.studio.ui.util.ModelSuffixValidation;
+import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -88,6 +89,16 @@ public class NewDocumentModelPanelController {
   }
 
   /**
+   * Returns the name-convention error message if the current name violates the model naming convention
+   * (letters/digits/hyphens/underscores/periods, no "xml" prefix, at most 100 characters), or empty
+   * otherwise. Checked before {@link #getSuffixError()} so the more fundamental violation takes
+   * precedence when both apply.
+   */
+  public Optional<String> getNameConventionError() {
+    return NameConventionValidation.validate("Model name", modelNameField.getText());
+  }
+
+  /**
    * Returns the suffix-violation error message if the current name violates the project's
    * "Enforce Model Suffixes" rule for {@link ModelType#DOCUMENT}, or empty otherwise.
    */
@@ -100,11 +111,12 @@ public class NewDocumentModelPanelController {
 
   /**
    * Whether the panel's required fields are filled with valid values (valid filename, valid location,
-   * no suffix violation).
+   * no name-convention or suffix violation).
    */
   public boolean isValid() {
     return FileUtils.isValidWindowsFilename(modelNameField.getText())
         && locationCombo.getValue() != null
+        && getNameConventionError().isEmpty()
         && getSuffixError().isEmpty();
   }
 

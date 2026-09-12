@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "general": {
-    "relationshipEngineMode": "new",
+    "relationshipEngineMode": "standard",
     "showMetaDataInUIModels": true,
     "locales": [
       {
@@ -11,7 +11,17 @@
         "code": "en"
       }
     ],
-    "exclusions": []
+    "enforceModelSuffixes": false
   },
-  "previewApp": {}
+  "previewApp": {
+    "enabled": true,
+    "browserType": "SYSTEM_DEFAULT",
+    "autoRefreshEnabled": true,
+    "autoRefreshDelayMillis": 500,
+    "url": "http://localhost:8082/api",
+    "username": "admin",
+    "password": "a12"
+  },
+  "settingsName": "settings.json",
+  "settingsType": "PROJECT_ROOT"
 }

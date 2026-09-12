@@ -1,0 +1,547 @@
+{
+  "header": {
+    "id": "Person_Ov",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Person"
+      },
+      {
+        "locale": "de",
+        "text": "Personen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Person_Dc"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "newFilterConfiguration": {
+        "filterSelector": {
+          "viewMode": "docked",
+          "initialVisibility": "show",
+          "searchBar": {
+            "enabled": false
+          },
+          "showSetFiltersOnly": {
+            "enabled": true,
+            "value": false
+          },
+          "trigger": {
+            "enabled": true,
+            "value": {
+              "labelHidden": true,
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Filter"
+                },
+                {
+                  "locale": "de",
+                  "text": "Filter"
+                }
+              ],
+              "icon": {
+                "name": "filter_list",
+                "theme": "filled"
+              }
+            }
+          }
+        },
+        "joinOperator": {
+          "enabled": true,
+          "value": "and"
+        },
+        "invert": {
+          "enabled": true,
+          "value": false
+        },
+        "filterGroups": [
+          {
+            "id": "filter-group-754db",
+            "name": "Name",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Name"
+              },
+              {
+                "locale": "de",
+                "text": "Name"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-37dab",
+                "preferFilterBar": true,
+                "type": "string",
+                "options": {
+                  "fieldId": "field_99c3b",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              },
+              {
+                "id": "filter-item-ee24d",
+                "preferFilterBar": true,
+                "type": "string",
+                "options": {
+                  "fieldId": "field_4ae85",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "viewMode": "list",
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "filter-group-e1315",
+            "name": "Type",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Other Data"
+              },
+              {
+                "locale": "de",
+                "text": "Andere Daten"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-c748e",
+                "preferFilterBar": true,
+                "type": "enumeration",
+                "options": {
+                  "fieldId": "field_285d3",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "viewMode": "compact"
+                }
+              },
+              {
+                "id": "filter-item-636fd",
+                "type": "string",
+                "options": {
+                  "fieldId": "field_9ec18",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "viewMode": "textField",
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": "filter-group-c27cc",
+            "name": "MetaData",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Meta Data",
+                "technical_defaultValue": "Other"
+              },
+              {
+                "locale": "de",
+                "text": "Metadaten",
+                "technical_defaultValue": "Other"
+              }
+            ],
+            "filterItems": [
+              {
+                "id": "filter-item-41f46",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Creator"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Erstellt von"
+                  }
+                ],
+                "type": "string",
+                "options": {
+                  "fieldId": "abc6a6767a60488754aace2accb73824_field_cdaf9",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              },
+              {
+                "id": "filter-item-65b6a",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Created At"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Erstellt am"
+                  }
+                ],
+                "type": "dateTime",
+                "options": {
+                  "fieldId": "abc6a6767a60488754aace2accb73824_field_65672",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "ranges": [
+                    {
+                      "option": "fromTo",
+                      "default": true,
+                      "enabled": true
+                    },
+                    {
+                      "option": "fromOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "toOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "exact",
+                      "enabled": true
+                    }
+                  ],
+                  "periods": [
+                    {
+                      "option": "date",
+                      "default": true,
+                      "enabled": true
+                    },
+                    {
+                      "option": "time",
+                      "enabled": false
+                    },
+                    {
+                      "option": "dateTime",
+                      "enabled": false
+                    },
+                    {
+                      "option": "year",
+                      "enabled": true
+                    },
+                    {
+                      "option": "yearMonth",
+                      "enabled": true
+                    },
+                    {
+                      "option": "month",
+                      "enabled": false
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "filter-item-ce1ab",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Modifier"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Bearbeitet von"
+                  }
+                ],
+                "type": "string",
+                "options": {
+                  "fieldId": "abc6a6767a60488754aace2accb73824_field_1fa32",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "caseSensitive": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "exactMatch": {
+                    "enabled": true,
+                    "value": false
+                  }
+                }
+              },
+              {
+                "id": "filter-item-2973d",
+                "label": [
+                  {
+                    "locale": "en",
+                    "text": "Modified At"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Bearbeitet am"
+                  }
+                ],
+                "type": "dateTime",
+                "options": {
+                  "fieldId": "abc6a6767a60488754aace2accb73824_field_5cd66",
+                  "invert": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "empty": {
+                    "enabled": true,
+                    "value": false
+                  },
+                  "ranges": [
+                    {
+                      "option": "fromTo",
+                      "default": true,
+                      "enabled": true
+                    },
+                    {
+                      "option": "fromOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "toOnly",
+                      "enabled": true
+                    },
+                    {
+                      "option": "exact",
+                      "enabled": true
+                    }
+                  ],
+                  "periods": [
+                    {
+                      "option": "date",
+                      "default": true,
+                      "enabled": true
+                    },
+                    {
+                      "option": "time",
+                      "enabled": false
+                    },
+                    {
+                      "option": "dateTime",
+                      "enabled": false
+                    },
+                    {
+                      "option": "year",
+                      "enabled": true
+                    },
+                    {
+                      "option": "yearMonth",
+                      "enabled": true
+                    },
+                    {
+                      "option": "month",
+                      "enabled": false
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "showRowCount": true,
+      "initialSorting": [
+        {
+          "idref": "column-8adf6"
+        },
+        {
+          "idref": "column-240a4"
+        }
+      ]
+    },
+    "columns": [
+      {
+        "id": "column-cc4c6",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Profile Picture"
+          },
+          {
+            "locale": "de",
+            "text": "Profilbild"
+          }
+        ],
+        "width": 1,
+        "elementRef": "group_bc062",
+        "attachmentDisplayMode": "preview"
+      },
+      {
+        "id": "column-8adf6",
+        "width": 1,
+        "elementRef": "field_99c3b",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-240a4",
+        "width": 1,
+        "elementRef": "field_4ae85",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "event": "delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Warning"
+              },
+              {
+                "locale": "de",
+                "text": "Warnung"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Do you really want to delete this entry?"
+              },
+              {
+                "locale": "de",
+                "text": "Möchten Sie diesen Eintrag wirklich löschen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "button",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Add"
+            },
+            {
+              "locale": "de",
+              "text": "Hinzufügen"
+            }
+          ],
+          "event": "add",
+          "icon": {
+            "name": "add"
+          },
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    }
+  }
+}

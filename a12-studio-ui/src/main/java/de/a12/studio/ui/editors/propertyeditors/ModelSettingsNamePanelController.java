@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.util.NameConventionValidation;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +13,7 @@ import javafx.scene.control.TextField;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -33,19 +35,37 @@ public class ModelSettingsNamePanelController extends AbstractPropertyEditor imp
 
   private A12Model<?> model;
 
+  // Set while setModel() is repopulating nameField from the model, so the listener below doesn't mistake
+  // that programmatic change for a user edit and re-validate/commit it.
+  private boolean updatingFromModel;
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
 
-    bindTextField(nameField, (element, value) -> model.setId(value));
+    nameField.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      model.setId(newValue);
+      Optional<String> error = NameConventionValidation.validate("Model name", newValue);
+      error.ifPresentOrElse(message -> showError("ERROR", message), this::hideError);
+      commitHeaderChange();
+    });
     bindTextArea(descriptionArea, (element, value) -> model.setDescription(value));
   }
 
   public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
-    setFieldValue(nameField, model.getId());
+    updatingFromModel = true;
+    try {
+      nameField.setText(model.getId());
+    } finally {
+      updatingFromModel = false;
+    }
     versionField.setText(model.getModelVersion());
     setFieldValue(descriptionArea, model.getDescription());
+    hideError();
   }
 
   public void focusNameField() {

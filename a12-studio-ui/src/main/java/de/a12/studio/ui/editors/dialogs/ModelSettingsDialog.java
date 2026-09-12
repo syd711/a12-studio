@@ -35,6 +35,7 @@ import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -87,6 +88,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @FXML
   private ErrorContainerController errorContainerController;
+
+  @FXML
+  private Button saveBtn;
 
   @FXML
   private TimezonePanelController timezoneController;
@@ -244,6 +248,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       } else {
         errorContainerController.hide();
       }
+      saveBtn.setDisable(anyError);
     };
 
     panels.forEach(panel -> {

@@ -14,7 +14,7 @@ import de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
-import de.a12.studio.ui.util.FileUtils;
+import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
@@ -245,8 +245,9 @@ public class TypeDefinitionTableController implements Initializable {
     }
 
     name = name.trim();
-    if (!FileUtils.isValidWindowsFilename(name)) {
-      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("invalid_name"), StudioBundle.get("the_name_must_be_a_valid_filename_and_must_not_con"));
+    Optional<String> error = NameConventionValidation.validate("Name", name);
+    if (error.isPresent()) {
+      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("invalid_name"), error.get());
       return;
     }
 

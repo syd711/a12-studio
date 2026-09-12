@@ -5,7 +5,7 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.components.DialogController;
-import de.a12.studio.ui.util.FileUtils;
+import de.a12.studio.ui.util.NameConventionValidation;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -63,7 +63,7 @@ public class IncludeDialogController implements DialogController {
     });
 
     okButton.disableProperty().bind(Bindings.createBooleanBinding(
-        () -> !FileUtils.isValidWindowsFilename(nameField.getText()) || referenceComboBox.getValue() == null,
+        () -> !NameConventionValidation.isValid(nameField.getText()) || referenceComboBox.getValue() == null,
         nameField.textProperty(), referenceComboBox.valueProperty()));
 
     nameField.requestFocus();

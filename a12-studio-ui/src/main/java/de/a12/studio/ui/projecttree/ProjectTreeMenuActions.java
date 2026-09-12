@@ -13,6 +13,7 @@ import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController;
 import de.a12.studio.ui.projecttree.dialogs.NewModelDialogController.NewModelInput;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
+import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.SystemUtil;
@@ -118,9 +119,23 @@ public class ProjectTreeMenuActions {
   void onRenameItem(@NonNull ProjectItem item) {
     String title = StudioBundle.get("rename_title");
     String currentName = item.isFolder() ? item.getName() : item.getDisplayName();
-    String name = WidgetFactory.showInputDialog(getStage(), title, title, null, null, currentName);
-    if (name == null || name.isBlank() || name.equals(currentName)) {
-      return;
+    String name = currentName;
+    while (true) {
+      name = WidgetFactory.showInputDialog(getStage(), title, title, null, null, name);
+      if (name == null || name.isBlank() || name.equals(currentName)) {
+        return;
+      }
+      name = name.trim();
+      // A model file's name becomes its header.id (see ProjectItem#renameTo), so it must satisfy the same
+      // name convention enforced at model-creation time; folders aren't model names and are exempt.
+      if (item.isFolder()) {
+        break;
+      }
+      Optional<String> error = NameConventionValidation.validate("Model name", name);
+      if (error.isEmpty()) {
+        break;
+      }
+      WidgetFactory.showAlert(getStage(), error.get());
     }
 
     String oldId = item.isFolder() ? null : item.getModel() != null ? item.getModel().getId() : null;

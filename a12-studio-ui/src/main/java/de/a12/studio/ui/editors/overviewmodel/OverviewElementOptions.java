@@ -15,12 +15,14 @@ import de.a12.studio.models.documentmodel.NumberFieldType;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.TimeFieldType;
 import de.a12.studio.models.Label;
+import de.a12.studio.models.overviewmodel.FilterOptionToggle;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewElementResolution;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.util.StringConverter;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -188,6 +190,93 @@ public final class OverviewElementOptions {
     return elementIds(index).stream()
         .filter(id -> "enumeration".equals(filterItemFieldType(index, id)))
         .toList();
+  }
+
+  /** {@code viewMode} values for a String Filter Item, both fixture-evidenced ({@code
+   * testing/workspaces/advanced_new/models/10_People/Person_Ov.json}). */
+  public static final String STRING_VIEW_MODE_TEXT_FIELD = "textField";
+  public static final String STRING_VIEW_MODE_LIST = "list";
+
+  /** The only Enumeration {@code viewMode} value with fixture evidence (same {@code Person_Ov.json}) - see
+   * {@link de.a12.studio.models.overviewmodel.FilterItemOptions}'s class doc for why no second value is offered
+   * here. */
+  public static final String ENUMERATION_VIEW_MODE_COMPACT = "compact";
+
+  private static final String RANGE_FROM_TO = "fromTo";
+  private static final String RANGE_FROM_ONLY = "fromOnly";
+  private static final String RANGE_TO_ONLY = "toOnly";
+  private static final String RANGE_EXACT = "exact";
+
+  private static final String PERIOD_DATE = "date";
+  private static final String PERIOD_TIME = "time";
+  private static final String PERIOD_DATE_TIME = "dateTime";
+  private static final String PERIOD_YEAR = "year";
+  private static final String PERIOD_YEAR_MONTH = "yearMonth";
+  private static final String PERIOD_MONTH = "month";
+
+  /** Filter Item types whose options include a Ranges group, per the platform docs' "Filter Items" (Number's
+   * numeric ranges, or the Date/Time family's date/time ranges - fixture-evidenced for {@code number}/{@code
+   * date}/{@code datetime}, the rest inferred from the same doc text). */
+  public static boolean supportsRanges(String filterItemType) {
+    return switch (filterItemType == null ? "" : filterItemType) {
+      case "number", "date", "datetime", "time", "datefragment", "daterange" -> true;
+      default -> false;
+    };
+  }
+
+  /** Filter Item types whose options include a Periods group - every Ranges-supporting date/time type except
+   * {@code time}, which the platform docs explicitly exclude from Periods ("Filter Items"). */
+  public static boolean supportsPeriods(String filterItemType) {
+    return switch (filterItemType == null ? "" : filterItemType) {
+      case "date", "datetime", "datefragment", "daterange" -> true;
+      default -> false;
+    };
+  }
+
+  /** The fixed 4-option Ranges row set ({@code fromTo}/{@code fromOnly}/{@code toOnly}/{@code exact}), all
+   * enabled with {@code fromTo} as the default - fixture-evidenced identically for Number and Date/DateTime
+   * filter items. Used to lazily populate a filter item's {@link
+   * de.a12.studio.models.overviewmodel.FilterItemOptions#getRanges()} the first time its Ranges section is
+   * shown for a {@link #supportsRanges(String)} type. */
+  public static List<FilterOptionToggle> defaultRanges() {
+    return new ArrayList<>(List.of(
+        toggle(RANGE_FROM_TO, true),
+        toggle(RANGE_FROM_ONLY, false),
+        toggle(RANGE_TO_ONLY, false),
+        toggle(RANGE_EXACT, false)));
+  }
+
+  /** The Periods row set for {@code filterItemType}, {@code date} defaulted. Fixture-evidenced for {@code date}
+   * ({@code date}/{@code year}/{@code yearMonth}/{@code month}) and {@code datetime} (all six, adding {@code
+   * time}/{@code dateTime}); {@code datefragment}/{@code daterange} reuse {@code date}'s subset by analogy - not
+   * fixture-confirmed, see {@link de.a12.studio.models.overviewmodel.FilterItemOptions}'s class doc. Empty for
+   * any type outside {@link #supportsPeriods(String)}. */
+  public static List<FilterOptionToggle> defaultPeriods(String filterItemType) {
+    if ("datetime".equals(filterItemType)) {
+      return new ArrayList<>(List.of(
+          toggle(PERIOD_DATE, true),
+          toggle(PERIOD_TIME, false),
+          toggle(PERIOD_DATE_TIME, false),
+          toggle(PERIOD_YEAR, false),
+          toggle(PERIOD_YEAR_MONTH, false),
+          toggle(PERIOD_MONTH, false)));
+    }
+    if (supportsPeriods(filterItemType)) {
+      return new ArrayList<>(List.of(
+          toggle(PERIOD_DATE, true),
+          toggle(PERIOD_YEAR, false),
+          toggle(PERIOD_YEAR_MONTH, false),
+          toggle(PERIOD_MONTH, false)));
+    }
+    return new ArrayList<>();
+  }
+
+  private static FilterOptionToggle toggle(String option, boolean isDefault) {
+    FilterOptionToggle toggle = new FilterOptionToggle();
+    toggle.setOption(option);
+    toggle.setEnabled(true);
+    toggle.setDefaultOption(isDefault ? Boolean.TRUE : null);
+    return toggle;
   }
 
   /** A reference column's element-specific behavior depends on what kind of Document-Model element its
