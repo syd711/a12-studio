@@ -63,7 +63,7 @@
                               <FontIcon iconLiteral="mdi2t-target" iconSize="18" styleClass="toolbar-icon" />
                           </graphic>
                           <tooltip>
-                              <Tooltip text="%select_active_model_project_tree" />
+                              <Tooltip text="%select_active_model_project_tree_tooltip" />
                           </tooltip>
                       </Button>
                       <Region HBox.hgrow="ALWAYS" />

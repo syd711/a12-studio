@@ -45,7 +45,17 @@ public class RelationshipModelEditorController extends AbstractEditorController 
 
   @Override
   public void initialize(URL url, ResourceBundle resources) {
-    relatedEntitiesController.setOnChange(this::syncModelReferences);
+    relatedEntitiesController.setOnChange(this::onEntitiesChanged);
+  }
+
+  /**
+   * Entity edits can change a role's document model (kept in sync via {@link #syncModelReferences}) and/or an
+   * entity's multiplicity, which the Link Document Model panel's many-to-many warning depends on - so it must
+   * be re-checked here too, not just when that panel's own fields change.
+   */
+  private void onEntitiesChanged() {
+    syncModelReferences();
+    linkDocumentModelController.refreshValidation();
   }
 
   @Override

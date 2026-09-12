@@ -88,6 +88,11 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   @FXML
   private void onSelectActiveModel() {
+    selectActiveModel();
+  }
+
+  /** Reveals the active tab's model in the tree, from either the toolbar button or the Alt+1 shortcut. */
+  public void selectActiveModel() {
     ProjectItem item = Studio.getSelectedProjectItem();
     if (item != null) {
       revealItem(item);

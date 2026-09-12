@@ -50,7 +50,7 @@ The Context only needs to be selected if the Additive Document Model is referenc
 
 
 # Relationship Models:
-- The Link Document Model reference and the checkbox "Duplicable" are only active for n:n Relationships. The Relationship Model Editor should show a warning if a 1:n or 1:1 Relationship Model has a Link Document Model or Duplicable set. Check the SME against this. 
+- ~~The Link Document Model reference and the checkbox "Duplicable" are only active for n:n Relationships...~~ Done: `RelationshipLinkDocumentModelValidator` + `LinkDocumentModelPanelController` already implement this, verified against SME's `RelationshipMetaModel.json` rules `warning_linkDocNotAllowed`/`warning_linkDupNotAllowed` (same many-to-many precondition, same warning text). Fixed a related gap where the warning didn't refresh live when an entity's multiplicity was edited via the Related Entities dialog (only `syncModelReferences` was wired to that panel's `onChange`) - now `RelationshipModelEditorController.onEntitiesChanged()` also calls `LinkDocumentModelPanelController.refreshValidation()`.
 - The labels which can be maintained for the Relationship Model are currently not used in the default UI for Relationships. => Hide them in the settings.
 - 
 

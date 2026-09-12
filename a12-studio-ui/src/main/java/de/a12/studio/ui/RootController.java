@@ -454,6 +454,12 @@ public class RootController implements Initializable, StudioEventListener {
     saveSidePanelState();
   }
 
+  /** Reveals the active tab's model in the project tree from keyboard shortcut (Alt+1), showing the project tree panel first. */
+  public void selectActiveModelInProjectTree() {
+    showProjectTree();
+    projectTreeController.selectActiveModel();
+  }
+
   /** Persists which side panel (Project View / Bookmarks / Versioncontrol / none) is currently shown, so it can be restored on next startup. */
   private void saveSidePanelState() {
     String state = projectViewToggle.isSelected() ? "project"

@@ -51,6 +51,7 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut(StudioBundle.get("f3"), StudioBundle.get("show_the_project_tree"), Category.GENERAL),
       new Shortcut(StudioBundle.get("f4"), StudioBundle.get("show_the_bookmarks_view"), Category.GENERAL),
       new Shortcut(StudioBundle.get("f5"), StudioBundle.get("show_the_version_control_view"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("alt_1"), StudioBundle.get("select_active_model_project_tree"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_shift_n"), StudioBundle.get("search_files"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_shift_f"), StudioBundle.get("find_in_files"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_e"), StudioBundle.get("recent_files"), Category.GENERAL),
@@ -119,6 +120,10 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
     }
     else if (ke.getCode() == KeyCode.F5) {
       Studio.getRootController().showVersionControlView();
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.DIGIT1 && ke.isAltDown()) {
+      Studio.getRootController().selectActiveModelInProjectTree();
       ke.consume();
     }
     else if (ke.getCode() == KeyCode.B && ke.isControlDown()) {

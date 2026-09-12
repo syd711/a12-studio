@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * bound to a single {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern
  * used by e.g. {@link RelatedEntitiesPanelController}. Both fields are only meaningful for n:n relationships;
  * {@link RelationshipLinkDocumentModelValidator} warns otherwise, surfaced in this panel's own error container
- * after every change (see {@link #refreshError}), mirroring {@link
+ * after every change (see {@link #refreshValidation}), mirroring {@link
  * RelatedEntitiesPanelController#refreshEntityCountError()}.
  */
 public class LinkDocumentModelPanelController extends AbstractPropertyEditor implements Initializable {
@@ -83,21 +83,24 @@ public class LinkDocumentModelPanelController extends AbstractPropertyEditor imp
     finally {
       updatingFromModel = false;
     }
-    refreshError();
+    refreshValidation();
   }
 
   private void notifyChanged() {
     commitHeaderChange();
-    refreshError();
+    refreshValidation();
   }
 
   /**
    * Not bound to an {@link de.a12.studio.models.documentmodel.Element}, so the base class's element-keyed
    * validation plumbing never runs for this panel; queries {@link RelationshipLinkDocumentModelValidator}'s
    * element id directly instead. Both of that validator's warnings (link document model and duplicates
-   * allowed) can be present at once, so they're joined into a single message.
+   * allowed) can be present at once, so they're joined into a single message. Public and exposed so the owning
+   * editor can re-check after something changed elsewhere too (e.g. an entity's multiplicity was edited in
+   * {@link RelatedEntitiesPanelController}'s entity dialog), mirroring {@link
+   * de.a12.studio.ui.editors.combineddocumentmodel.CombinationStepsPanelController#refreshValidation()}.
    */
-  private void refreshError() {
+  public void refreshValidation() {
     List<ModelValidationError> errors =
         Studio.getValidationService().validateElement(model, RelationshipLinkDocumentModelValidator.ELEMENT_ID);
     if (errors.isEmpty()) {
