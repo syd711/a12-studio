@@ -18,12 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FilterItemOptionsLoadTest {
 
   @Test
-  void roundTripsStringViewModeEnumerationViewModeAndDateTimeRangesAndPeriods() throws Exception {
+  void roundTripsPreferFilterBarStringViewModeEnumerationViewModeAndDateTimeRangesAndPeriods() throws Exception {
     // Person_Ov.json
     ModelRoundTrip.assertRoundTrip(getClass(), "/overviewmodel/PersonWithFilterViewModeAndPeriods_Ov.json", OverviewModel.class);
 
     OverviewModel model = ModelRoundTrip.load(getClass(), "/overviewmodel/PersonWithFilterViewModeAndPeriods_Ov.json", OverviewModel.class);
     List<FilterGroup> groups = model.getContent().getConfiguration().getNewFilterConfiguration().getFilterGroups();
+
+    FilterItem plainStringItem = groups.get(0).getFilterItems().get(0);
+    assertTrue(plainStringItem.getPreferFilterBar());
 
     FilterItem listViewModeStringItem = groups.get(0).getFilterItems().get(1);
     assertEquals("string", listViewModeStringItem.getType());
