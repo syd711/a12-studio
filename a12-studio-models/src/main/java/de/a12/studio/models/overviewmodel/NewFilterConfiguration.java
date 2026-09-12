@@ -29,4 +29,15 @@ public class NewFilterConfiguration {
   private BooleanUserAccessOption invert;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<FilterGroup> filterGroups = new ArrayList<>();
+
+  /**
+   * Whether this holds actual custom-filter data, as opposed to merely existing as an empty shell (e.g. freshly,
+   * lazily materialized by a sibling panel reading a value for display). Since SME has no {@code filterMode}
+   * equivalent for the "Custom Filter" mode - it's represented purely by {@code newFilterConfiguration} being
+   * populated - this is what stands in for "Filter Mode is set" wherever that field is checked (e.g. the overview
+   * model's "Filter Mode is required" validator).
+   */
+  public boolean hasContent() {
+    return filterSelector != null || joinOperator != null || invert != null || !filterGroups.isEmpty();
+  }
 }

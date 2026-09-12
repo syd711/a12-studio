@@ -1,6 +1,8 @@
 package de.a12.studio.modelsvalidation.validators.overview;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.overviewmodel.NewFilterConfiguration;
+import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
@@ -20,13 +22,21 @@ public final class OverviewFilterModeRequiredValidator implements ModelValidator
     if (!(model instanceof OverviewModel overviewModel) || overviewModel.getContent().getConfiguration() == null) {
       return List.of();
     }
-    if (!Boolean.TRUE.equals(overviewModel.getContent().getConfiguration().getEnableFilter())) {
+    OverviewConfiguration configuration = overviewModel.getContent().getConfiguration();
+    if (!Boolean.TRUE.equals(configuration.getEnableFilter())) {
       return List.of();
     }
-    String filterMode = overviewModel.getContent().getConfiguration().getFilterConfiguration() != null
-        ? overviewModel.getContent().getConfiguration().getFilterConfiguration().getFilterMode()
+    String filterMode = configuration.getFilterConfiguration() != null
+        ? configuration.getFilterConfiguration().getFilterMode()
         : null;
     if (filterMode != null && !filterMode.isBlank()) {
+      return List.of();
+    }
+    // SME has no filterMode-equivalent value for the "Custom Filter" mode at all - it's represented purely by
+    // newFilterConfiguration being populated, with no sibling filterConfiguration.filterMode alongside it. So a
+    // model with custom-filter content there has its Filter Mode set, just not through that field.
+    NewFilterConfiguration newFilterConfiguration = configuration.getNewFilterConfiguration();
+    if (newFilterConfiguration != null && newFilterConfiguration.hasContent()) {
       return List.of();
     }
     return List.of(new ModelValidationError(model, ELEMENT_ID,

@@ -240,20 +240,10 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
     return configuration.getFilterConfiguration();
   }
 
-  /**
-   * Whether {@code configuration.newFilterConfiguration} actually holds custom-filter data, as opposed to
-   * merely existing as an empty shell. Checked field by field rather than via {@code equals}/reflection so an
-   * object that's present but genuinely empty (e.g. freshly, lazily materialized by a sibling panel reading a
-   * value for display) doesn't get misread as "this model has a custom filter configured".
-   */
+  /** Whether {@code configuration.newFilterConfiguration} actually holds custom-filter data - see {@link
+   * NewFilterConfiguration#hasContent()}. */
   private static boolean hasCustomFilterContent(OverviewConfiguration configuration) {
     NewFilterConfiguration newFilterConfiguration = configuration != null ? configuration.getNewFilterConfiguration() : null;
-    if (newFilterConfiguration == null) {
-      return false;
-    }
-    return newFilterConfiguration.getFilterSelector() != null
-        || newFilterConfiguration.getJoinOperator() != null
-        || newFilterConfiguration.getInvert() != null
-        || !newFilterConfiguration.getFilterGroups().isEmpty();
+    return newFilterConfiguration != null && newFilterConfiguration.hasContent();
   }
 }

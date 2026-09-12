@@ -1,0 +1,56 @@
+{
+  "header": {
+    "id": "CombinationOverview_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Combination Overview"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "DM",
+        "modelType": "document",
+        "purpose": "document-model-for-overview",
+        "reference": "CombinationBase_CM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 10,
+      "showRowCount": true
+    },
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "columns": [
+      {
+        "id": "column-1",
+        "width": 1.0,
+        "elementRef": "field_base_name",
+        "sortable": false
+      },
+      {
+        "id": "column-2",
+        "width": 1.0,
+        "elementRef": "17935c3abb732de212ef59c69d8fd76f_field_additive_extra",
+        "sortable": false
+      }
+    ]
+  }
+}

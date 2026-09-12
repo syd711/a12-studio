@@ -126,6 +126,17 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void filterModeRequiredValidatorAcceptsCustomFilterWithoutFilterMode() {
+    // SME has no filterMode-equivalent value for the "Custom Filter" mode - a populated newFilterConfiguration
+    // satisfies the requirement on its own, with no sibling filterConfiguration.filterMode needed.
+    OverviewModel model =
+        TestModels.load("/overviewmodel/OverviewFilterModeRequiredValidator_customFilter_valid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewFilterModeRequiredValidator().validate(model, TestModels.context(model));
+
+    assertEquals(0, errors.size());
+  }
+
+  @Test
   void filterCustomFieldsValidatorReportsEmptySelection() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterCustomFieldsValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewFilterCustomFieldsValidator().validate(model, TestModels.context(model));

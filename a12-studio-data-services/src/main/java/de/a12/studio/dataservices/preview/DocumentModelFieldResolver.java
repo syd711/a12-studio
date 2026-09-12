@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Label;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
@@ -41,11 +42,7 @@ public final class DocumentModelFieldResolver {
         .map(ModelReference::getReference)
         .findFirst()
         .orElse(null);
-    if (documentModelId == null) {
-      return null;
-    }
-    ProjectItem documentItem = contextItem.findByModelId(documentModelId);
-    return documentItem != null && documentItem.getModel() instanceof DocumentModel documentModel ? documentModel : null;
+    return CombinedDocumentModelElements.resolveForFieldReferences(contextItem, documentModelId);
   }
 
   /**

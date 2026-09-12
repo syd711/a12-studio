@@ -91,7 +91,7 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
       long panelStart = System.currentTimeMillis();
       propertyEditor.setElement(element);
       propertyEditor.setEditorDisabled(readOnly);
-      log.info("    bound {} in {}ms", propertyEditor.getClass().getSimpleName(), System.currentTimeMillis() - panelStart);
+//      log.info("    bound {} in {}ms", propertyEditor.getClass().getSimpleName(), System.currentTimeMillis() - panelStart);
     });
     updateErrorMessagesVisibility();
   }

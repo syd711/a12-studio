@@ -27,7 +27,9 @@ import org.jspecify.annotations.NonNull;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 @Slf4j
@@ -49,6 +51,13 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   @FXML
   private DocumentModelElementsTreeController elementsTreeController;
+
+  // Loaded editor Nodes/controllers, keyed by editorFxml (FIELD_EDITOR_FXML, GROUP_EDITOR_FXML, ...), reused
+  // across tree selections of the same kind instead of re-loading the FXML (and re-running every embedded
+  // property editor panel's initialize()) on every single click. Populated lazily in loadEditor() and torn
+  // down (via ElementEditorController#destroy) only when this model's tab closes, in modelClosed().
+  private final Map<String, Node> editorNodeCache = new HashMap<>();
+  private final Map<String, ElementEditorController> editorControllerCache = new HashMap<>();
 
   private ElementEditorController currentElementEditorController;
 
@@ -77,13 +86,10 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   private void onElementSelectionChanged(@NonNull List<Element> selectedElements) {
     long startTime = System.currentTimeMillis();
-    if (currentElementEditorController != null) {
-      currentElementEditorController.destroy();
-      currentElementEditorController = null;
-    }
 
     if (selectedElements.size() != 1) {
       editorContainer.setCenter(null);
+      currentElementEditorController = null;
       return;
     }
 
@@ -93,6 +99,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
     // has no backing entry in this model's content to persist an edit against - show nothing instead.
     if (elementsTreeController.isBaseModelNode(selected)) {
       editorContainer.setCenter(null);
+      currentElementEditorController = null;
       return;
     }
     String editorFxml;
@@ -133,23 +140,32 @@ public class DocumentModelEditorController extends AbstractEditorController impl
   }
 
   private Node loadEditor(@NonNull String fxml, @NonNull Element selected) {
-    try {
-      long loadStart = System.currentTimeMillis();
-      FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-      loader.setResources(StudioBundle.getBundle());
-      Node node = loader.load();
-      long loadDuration = System.currentTimeMillis() - loadStart;
-      long bindStart = System.currentTimeMillis();
-      if (loader.getController() instanceof ElementEditorController elementEditorController) {
-        elementEditorController.setElement(selected, elementsTreeController.getAncestors(selected));
-        currentElementEditorController = elementEditorController;
+    Node node = editorNodeCache.get(fxml);
+    ElementEditorController controller = editorControllerCache.get(fxml);
+    if (node == null) {
+      try {
+        long loadStart = System.currentTimeMillis();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+        loader.setResources(StudioBundle.getBundle());
+        node = loader.load();
+        log.info("  loaded '{}' in {}ms", fxml, System.currentTimeMillis() - loadStart);
+        if (loader.getController() instanceof ElementEditorController elementEditorController) {
+          controller = elementEditorController;
+          editorControllerCache.put(fxml, controller);
+        }
+        editorNodeCache.put(fxml, node);
       }
-      log.info("  loaded '{}' (fxml {}ms, bind {}ms)", fxml, loadDuration, System.currentTimeMillis() - bindStart);
-      return node;
+      catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
     }
-    catch (IOException e) {
-      throw new UncheckedIOException(e);
+    if (controller != null) {
+      long bindStart = System.currentTimeMillis();
+      controller.setElement(selected, elementsTreeController.getAncestors(selected));
+      currentElementEditorController = controller;
+      log.info("  bound '{}' in {}ms", fxml, System.currentTimeMillis() - bindStart);
     }
+    return node;
   }
 
   private void applyDividerPosition(BaseTableSettings tableSettings) {
@@ -178,14 +194,17 @@ public class DocumentModelEditorController extends AbstractEditorController impl
 
   /**
    * In addition to unregistering this editor itself (see {@link AbstractEditorController#modelClosed}), tears
-   * down whichever element editor panel is currently displayed in {@code editorContainer}, since it isn't
-   * otherwise reached by {@link #onElementSelectionChanged} once the tab is gone.
+   * down every cached element editor panel (see {@link #editorControllerCache}), not just whichever one is
+   * currently displayed in {@code editorContainer}, since none of them are otherwise reached by {@link
+   * #onElementSelectionChanged} once the tab is gone.
    */
   @Override
   public void modelClosed(@NonNull ModelClosedEvent event) {
     super.modelClosed(event);
-    if (currentElementEditorController != null && event.getItem().equals(projectItem)) {
-      currentElementEditorController.destroy();
+    if (event.getItem().equals(projectItem)) {
+      editorControllerCache.values().forEach(ElementEditorController::destroy);
+      editorControllerCache.clear();
+      editorNodeCache.clear();
       currentElementEditorController = null;
     }
   }

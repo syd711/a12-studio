@@ -304,7 +304,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     DocumentModel documentModel = otherDocumentModels.stream()
         .filter(candidate -> documentModelId != null && documentModelId.equals(candidate.getId()))
         .findFirst()
-        .orElse(null);
+        .orElseGet(() -> ProjectDocumentModels.resolveDocumentModelForFieldReferences(documentModelId));
     documentModelIndex = OverviewElementOptions.indexOf(documentModel, otherDocumentModels);
     OverviewElementOptions.restrictFieldIds(documentModelIndex, queryModelFieldRestriction());
     overviewColumnsController.setDocumentModelIndex(documentModelIndex, documentModelId);

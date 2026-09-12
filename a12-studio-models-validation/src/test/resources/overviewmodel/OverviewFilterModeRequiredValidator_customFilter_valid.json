@@ -1,0 +1,47 @@
+{
+  "header": {
+    "id": "OverviewFilterModeRequiredValidator_customFilter_valid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10,
+      "enableFilter": true,
+      "newFilterConfiguration": {
+        "joinOperator": {
+          "enabled": true,
+          "value": "and"
+        },
+        "filterGroups": [
+          {
+            "id": "filter-group-1",
+            "name": "Group",
+            "filterItems": [
+              {
+                "id": "filter-item-1",
+                "type": "string",
+                "options": {
+                  "fieldId": "field_1"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ]
+  }
+}

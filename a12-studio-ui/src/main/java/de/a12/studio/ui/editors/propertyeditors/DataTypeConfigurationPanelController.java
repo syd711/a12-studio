@@ -237,7 +237,7 @@ confirmLoader.setResources(StudioBundle.getBundle());
     action.run();
     long duration = System.currentTimeMillis() - start;
     if (duration > 0) {
-      log.info("      {} sub-panel setElement in {}ms", label, duration);
+//      log.info("      {} sub-panel setElement in {}ms", label, duration);
     }
   }
 

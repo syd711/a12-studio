@@ -1,0 +1,41 @@
+{
+  "header": {
+    "id": "CombinationBase_CM",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Combination Base Combined"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "combination-base",
+        "reference": "CombinationBase_DM"
+      },
+      {
+        "modelType": "additive-document",
+        "purpose": "combination-addition",
+        "reference": "CombinationAdditive_DM"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "CombinationBase_DM",
+    "CombinationSteps": [
+      {
+        "type": "Addition",
+        "AdditiveModel": {
+          "dmId": "CombinationAdditive_DM"
+        }
+      }
+    ]
+  }
+}

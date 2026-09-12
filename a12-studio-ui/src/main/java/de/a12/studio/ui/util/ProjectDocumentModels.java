@@ -2,6 +2,7 @@ package de.a12.studio.ui.util;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
@@ -78,6 +79,25 @@ public final class ProjectDocumentModels {
     else if (!item.getPath().equals(excludedPath) && item.getModel() != null && item.getModel().getModelType() == modelType) {
       result.add(item.getModel());
     }
+  }
+
+  /**
+   * Resolves {@code modelId} to the {@link DocumentModel} to use for element-reference lookups: the model
+   * itself if {@code modelId} names a plain Document Model, or - if it names a Combination Model instead
+   * (e.g. an Overview Model's {@code document-model-for-overview} reference pointing at a {@code
+   * PersonEmployee_Cm}-shaped combined document, see {@code PersonEmployee_Ov.json}) - a synthetic merge of
+   * that Combination Model's base Document Model and every {@code Addition} step's additive model (see
+   * {@link CombinedDocumentModelElements}). Resolved from the project's canonical root ({@link
+   * Studio#getCurrentProject()}, see {@link #getOtherDocumentModels} for why), not {@code modelId}'s own
+   * parent chain. {@code null} if {@code modelId} is {@code null}, no project is open, {@code modelId}
+   * doesn't resolve to any model in the project, or resolves to something that's neither.
+   */
+  public static DocumentModel resolveDocumentModelForFieldReferences(String modelId) {
+    Project project = Studio.getCurrentProject();
+    if (project == null || modelId == null) {
+      return null;
+    }
+    return CombinedDocumentModelElements.resolveForFieldReferences(project.getRoot(), modelId);
   }
 
   /**

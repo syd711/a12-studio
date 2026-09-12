@@ -1,0 +1,73 @@
+{
+  "header": {
+    "id": "CombinationAdditive_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Combination Additive"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "additive-document",
+        "value": "true"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "CombinationAdditive_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      },
+      "supportedCharacters": []
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_additive_root",
+          "name": "Additive",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_additive_extra",
+                "name": "Extra",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Extra"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "relativeToParent"
+                  },
+                  "global": true
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

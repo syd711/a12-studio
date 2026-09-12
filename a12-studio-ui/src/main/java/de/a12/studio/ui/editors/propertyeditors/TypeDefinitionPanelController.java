@@ -267,9 +267,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   public void setElement(@NonNull Element element) {
     super.setElement(element);
 
-    long labelsStart = System.currentTimeMillis();
     typeDefinitionLabelsById = collectAvailableTypeDefinitionLabels(element.getId());
-    log.info("      collectAvailableTypeDefinitionLabels in {}ms", System.currentTimeMillis() - labelsStart);
     setComboBoxItems(dataTypeCombo, List.copyOf(typeDefinitionLabelsById.keySet()));
 
     List<String> dataTypeItems = new ArrayList<>();
