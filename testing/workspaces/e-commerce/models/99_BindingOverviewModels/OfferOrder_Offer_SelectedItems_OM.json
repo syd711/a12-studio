@@ -1,0 +1,55 @@
+{
+  "header": {
+    "id": "OfferOrder_Offer_SelectedItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "OfferOrder_Offer____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-cac11",
+        "width": 1,
+        "styles": {},
+        "name": "Info",
+        "expression": "kontext(target){kontext(Collection){\n    [Name] \" (\" [TotalPrice] \"€ valid\"\n        case [ValidFrom] != \"\" { \" from \" [ValidFrom] }\n        case [ValidUntil] != \"\" { \" until \" [ValidFrom] }\n        \")\"\n}}"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

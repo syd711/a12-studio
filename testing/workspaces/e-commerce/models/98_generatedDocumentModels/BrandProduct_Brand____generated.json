@@ -1,0 +1,71 @@
+{
+  "header": {
+    "id": "BrandProduct_Brand____generated",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "application",
+        "value": ""
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Brand_DM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "BrandProduct_Brand____generated",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "G2",
+          "name": "target",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "I4",
+                "name": "Brand",
+                "Group": {
+                  "repeatability": 1,
+                  "includeConfig": {
+                    "reference": "Brand_DM"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

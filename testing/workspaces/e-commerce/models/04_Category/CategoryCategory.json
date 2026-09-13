@@ -1,0 +1,91 @@
+{
+  "header": {
+    "id": "CategoryCategory",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Parent",
+        "reference": "Category_DM"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Child",
+        "reference": "Category_DM"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [
+      {
+        "locale": "en"
+      },
+      {
+        "locale": "de"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Parent Category"
+          },
+          {
+            "locale": "de",
+            "text": "Überkategorie"
+          }
+        ],
+        "role": "Parent",
+        "documentModel": "Category_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        }
+      },
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Sub Category"
+          },
+          {
+            "locale": "de",
+            "text": "Unterkategorie"
+          }
+        ],
+        "role": "Child",
+        "documentModel": "Category_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 100
+          }
+        }
+      }
+    ]
+  }
+}

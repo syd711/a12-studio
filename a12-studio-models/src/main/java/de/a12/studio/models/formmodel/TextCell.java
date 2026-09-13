@@ -12,6 +12,8 @@ public class TextCell extends Cell {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String decoration;
   private TextContainer content;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private HideCondition hideCondition;
 
   public TextCell() {
     setType(CellType.TEXT_CELL);

@@ -1,0 +1,73 @@
+{
+  "header": {
+    "id": "CategoryProduct_Product_SelectedItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CategoryProduct_Product____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-320e5",
+        "width": 0.5,
+        "styles": {},
+        "elementRef": "I4_include_common_field_0b973",
+        "sortable": false
+      },
+      {
+        "id": "column-6f15c",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_include_common_field_4217e",
+        "sortable": false
+      },
+      {
+        "id": "column-cc66b",
+        "icon": {
+          "name": "euro",
+          "theme": "rounded"
+        },
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_include_common_field_8cad7",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

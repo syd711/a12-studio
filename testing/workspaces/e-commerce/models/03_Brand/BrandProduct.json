@@ -1,0 +1,91 @@
+{
+  "header": {
+    "id": "BrandProduct",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Brand",
+        "reference": "Brand_DM"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Product",
+        "reference": "Product_DM"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [
+      {
+        "locale": "en"
+      },
+      {
+        "locale": "de"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Brand"
+          },
+          {
+            "locale": "de",
+            "text": "Marke"
+          }
+        ],
+        "role": "Brand",
+        "documentModel": "Brand_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        }
+      },
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Product"
+          },
+          {
+            "locale": "de",
+            "text": "Produkt"
+          }
+        ],
+        "role": "Product",
+        "documentModel": "Product_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 999999
+          }
+        }
+      }
+    ]
+  }
+}

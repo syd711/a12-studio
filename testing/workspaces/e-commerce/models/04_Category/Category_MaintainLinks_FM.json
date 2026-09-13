@@ -1,0 +1,223 @@
+{
+  "header": {
+    "id": "Category_MaintainLinks_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "bindingConfiguration",
+        "value": "[{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CategoryCategory\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CategoryCategory\",\"targetRole\":\"Child\",\"components\":[{\"name\":\"DualPaneSelection\",\"props\":{\"height\":\"500\"},\"models\":[{\"name\":\"CategoryCategory_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"CategoryCategory_Child_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_8e874\"},{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CategoryCategory\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CategoryCategory\",\"targetRole\":\"Parent\",\"components\":[{\"name\":\"DropDownSelection\",\"models\":[{\"name\":\"CategoryCategory_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"CategoryCategory_Parent_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_27c8c\"}]"
+      },
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Category_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Category_DM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CategoryCategory_Child_SelectedItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CategoryCategory_Parent_SelectedItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CategoryCategory_AvailableItems_OM"
+      }
+    ]
+  },
+  "content": {
+    "subtitle": {
+      "type": "Expression",
+      "expressionText": "(en:\"Manage Hierachy Position of **\", de:\"Position von **\")\nkontext(Category){[Name]}\n(en:\"**\", de:\"** in der Hierarchie bearbeiten\")"
+    },
+    "subHeaderBox": {
+      "id": "subHeaderBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_e850d",
+            "name": "Subcategory",
+            "target": "screen_4f60e",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_50b0d",
+            "name": "Parentcategory",
+            "target": "screen_ed760",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_7fb17",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_ca5b9",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "rounded"
+              }
+            },
+            "event": "event_submit",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen_4f60e",
+        "name": "Subcategories",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Sub Categories"
+              },
+              {
+                "locale": "de",
+                "text": "Unterkategorien"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_8e874",
+            "name": "binding-CategoryCategory",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-CategoryCategory"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-CategoryCategory"
+                  }
+                ]
+              }
+            },
+            "height": 500
+          }
+        ]
+      },
+      {
+        "id": "screen_ed760",
+        "name": "ParentCategories",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Parent Category"
+              },
+              {
+                "locale": "de",
+                "text": "Überkategorie"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_27c8c",
+            "name": "binding-CategoryCategory",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-CategoryCategory"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-CategoryCategory"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

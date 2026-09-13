@@ -20,8 +20,8 @@ import java.util.List;
 // width's JsonNode type otherwise gets pushed to the end of the property order by Jackson's default
 // introspection regardless of declaration order, so the order must be pinned explicitly here.
 @JsonPropertyOrder({"id", "label", "width", "fixedWidth", "alignment", "pinDirection", "styles", "icon",
-    "labelHidden", "elementRef", "sortable", "preferredSorting", "attachmentDisplayMode", "multiSelectDisplayMode",
-    "suffix", "suffixRef", "useDynamicSuffix", "summary", "name", "expression"})
+    "labelHidden", "elementRef", "sortable", "linkReferences", "preferredSorting", "attachmentDisplayMode",
+    "multiSelectDisplayMode", "suffix", "suffixRef", "useDynamicSuffix", "summary", "name", "expression"})
 public class Column {
 
   public static final String PIN_DIRECTION_LEFT = "LEFT";
@@ -62,6 +62,8 @@ public class Column {
   private String elementRef;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean sortable;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<ColumnLinkReference> linkReferences = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String preferredSorting;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)

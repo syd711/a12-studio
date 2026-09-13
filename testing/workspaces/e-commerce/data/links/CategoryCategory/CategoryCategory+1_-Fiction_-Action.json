@@ -1,0 +1,9 @@
+ {"relationshipModel" : "CategoryCategory",
+"entities" : [{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Parent",
+"docRef" : "Category_DM/7_Fiction"},
+{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Child",
+"docRef" : "Category_DM/1_Action"}]}

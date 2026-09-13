@@ -1,0 +1,382 @@
+{
+  "header": {
+    "id": "CollectionOffer_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Offers"
+      },
+      {
+        "locale": "de",
+        "text": "Angebote"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "bindingConfiguration",
+        "value": "[{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CollectionProduct\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CollectionProduct\",\"targetRole\":\"Product\",\"components\":[{\"name\":\"DualPaneSelection\",\"candidatePageSize\":6,\"linkPageSize\":7,\"props\":{\"availableItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Products in Store\"},{\"locale\":\"de\",\"text\":\"Verfügbare Produkte\"}]},\"selectedItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Products included in Offer\"},{\"locale\":\"de\",\"text\":\"Produkte im Angebot\"}]},\"height\":\"500\"},\"models\":[{\"name\":\"Product_LinkFields_FM\",\"use\":\"link\"},{\"name\":\"Product_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"CollectionProduct_Product_SelectedItems_DualPane_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_b7406\"},{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CustomerOffer\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CustomerOffer\",\"targetRole\":\"Customer\",\"components\":[{\"name\":\"DualPaneSelection\",\"props\":{\"availableItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Available Customers\"},{\"locale\":\"de\",\"text\":\"Verfügbare Kunden\"}]},\"selectedItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Selected Customers\"},{\"locale\":\"de\",\"text\":\"Ausgewählte Kunden\"}]}},\"models\":[{\"name\":\"CustomerOffer_LinkFields_FM\",\"use\":\"link\"},{\"name\":\"CustomerOrder_Customer_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"CustomerOffer_Customer_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_d96b4\"}]"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "CollectionOffer_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "CollectionOffer_DM"
+      },
+      {
+        "modelType": "form",
+        "purpose": "bindingReference",
+        "reference": "Product_LinkFields_FM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "Product_AvailableItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CollectionProduct_Product_SelectedItems_DualPane_OM"
+      },
+      {
+        "modelType": "form",
+        "purpose": "bindingReference",
+        "reference": "CustomerOffer_LinkFields_FM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CustomerOrder_Customer_AvailableItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CustomerOffer_Customer_SelectedItems_OM"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_d433a",
+            "name": "Offer",
+            "target": "screen_87d57",
+            "validation": "partial",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_bb22f",
+            "name": "Products",
+            "target": "screen_1765a",
+            "validation": "partial",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_493f9",
+            "name": "Customers",
+            "target": "screen_5fac5",
+            "validation": "partial",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_13b9d",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_e4545",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "rounded"
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen_87d57",
+        "name": "Offer",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Offer"
+              },
+              {
+                "locale": "de",
+                "text": "Angebot"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_36f1f",
+            "name": "cgOffer",
+            "layout": {
+              "lg": "6-6"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_fb3e4",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_0ebfd",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_cc6d0"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_849ea",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_a5ccb",
+                    "elementRef": "field_6523b"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_5244c",
+                    "elementRef": "field_1fd6d"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_bcb7e",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_8f011",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_103e3"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "screen_1765a",
+        "name": "Products",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Included Products"
+              },
+              {
+                "locale": "de",
+                "text": "Produkte im Angebot"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_b7406",
+            "name": "binding-CollectionProduct",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-CollectionProduct"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-CollectionProduct"
+                  }
+                ]
+              }
+            },
+            "height": 500
+          },
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_3d084",
+            "name": "cgPrice",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Pricing"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Preisbildung"
+                  }
+                ]
+              }
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_c4412",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_126d9",
+                    "elementRef": "field_bfcd5"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "screen_5fac5",
+        "name": "Customers",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Customers"
+              },
+              {
+                "locale": "de",
+                "text": "Kunden"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_d96b4",
+            "name": "binding-CustomerOffer",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-CustomerOffer"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-CustomerOffer"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "€"
+              },
+              {
+                "locale": "de",
+                "text": "€"
+              }
+            ]
+          },
+          "elementRef": "field_bfcd5"
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

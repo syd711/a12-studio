@@ -1,0 +1,89 @@
+{
+  "header": {
+    "id": "BundleProduct_Product_SelectedItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "BundleProduct_Product____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-59b5d",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Type"
+          },
+          {
+            "locale": "de",
+            "text": "Typ"
+          }
+        ],
+        "width": 0.5,
+        "styles": {},
+        "elementRef": "I4_include_common_field_0b973",
+        "sortable": false
+      },
+      {
+        "id": "column-a9c31",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Count"
+          },
+          {
+            "locale": "de",
+            "text": "Anzahl"
+          }
+        ],
+        "width": 0.5,
+        "styles": {},
+        "elementRef": "I5_field_1c82c",
+        "sortable": false
+      },
+      {
+        "id": "column-6cc69",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_include_common_field_4217e",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

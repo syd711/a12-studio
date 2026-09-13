@@ -1,0 +1,324 @@
+{
+  "header": {
+    "id": "Category_TM",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Categories"
+      },
+      {
+        "locale": "de",
+        "text": "Kategorien"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM1",
+        "reference": "Category_DM"
+      },
+      {
+        "purpose": "relationship-model-for-tree",
+        "modelType": "relationship",
+        "alias": "RM1",
+        "reference": "CategoryCategory"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "dnd": {
+        "onDrag": {
+          "expandHoveredNode": true
+        }
+      },
+      "subtitle": [
+        {
+          "locale": "en",
+          "text": "Manage the Category Structure"
+        },
+        {
+          "locale": "de",
+          "text": "Verwaltung der Kategoriestruktur"
+        }
+      ],
+      "hierarchicalColumnRef": "column-e73f0",
+      "rootRef": "crc-1b35a",
+      "wholeTreeExpansion": true,
+      "expansionStrategy": {
+        "type": "level_by_level",
+        "initialExpansion": {
+          "type": "all_levels"
+        }
+      }
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "expand_all_popup"
+        },
+        {
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "id": "button-8ea11",
+          "label": [
+            {
+              "locale": "en",
+              "text": "New Category"
+            },
+            {
+              "locale": "de",
+              "text": "Neue Kategorie"
+            }
+          ],
+          "type": "button",
+          "event": "event_add_root_node",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "nodes": [
+      {
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Actions",
+              "actions": [
+                {
+                  "type": "insert",
+                  "position": "as_child",
+                  "icon": {
+                    "name": "insert_as_child",
+                    "theme": "custom"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Add new Subcategory"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Neue Unterkategorie anlegen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_add_link",
+                  "icon": {
+                    "name": "link",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Edit Category Links"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kategoriezuordnungen bearbeiten"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Destructive",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_delete_link",
+                  "icon": {
+                    "name": "link_off",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Remove from Parent Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aus der Oberkategorie entfernen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete_forever",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kategorie löschen"
+                    }
+                  ],
+                  "confirmation": {
+                    "title": [
+                      {
+                        "locale": "en",
+                        "text": "Delete Category"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Kategorie löschen"
+                      }
+                    ],
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Are you sure you want to delete this Category?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Sind Sie sicher, dass Sie diese Kategorie entfernen wollen?"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "id": "node-352ce",
+        "actions": [
+          {
+            "primary": false,
+            "destructive": false,
+            "type": "event",
+            "event": "event_expand_sub_tree",
+            "icon": {
+              "name": "unfold_more",
+              "theme": "rounded"
+            },
+            "description": [
+              {
+                "locale": "en",
+                "text": "Expand Category"
+              },
+              {
+                "locale": "de",
+                "text": "Kategorie aufklappen"
+              }
+            ]
+          },
+          {
+            "primary": false,
+            "destructive": false,
+            "type": "event",
+            "event": "event_collapse_sub_tree",
+            "icon": {
+              "name": "unfold_less",
+              "theme": "rounded"
+            },
+            "description": [
+              {
+                "locale": "en",
+                "text": "Collapse Category"
+              },
+              {
+                "locale": "de",
+                "text": "Kategorie zusammenklappen"
+              }
+            ]
+          }
+        ],
+        "documentModelRef": "Category_DM",
+        "columns": [
+          {
+            "columnRef": "column-e73f0",
+            "elementRef": "field_f9c16"
+          },
+          {
+            "columnRef": "column-160e9",
+            "elementRef": "field_4acc7"
+          }
+        ],
+        "childRelationshipConfigurations": [
+          {
+            "id": "crc-1b35a",
+            "relationshipModelRef": "CategoryCategory",
+            "parentRole": "Parent"
+          }
+        ],
+        "icon": {
+          "name": "category",
+          "theme": "rounded"
+        },
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      }
+    ],
+    "columns": [
+      {
+        "width": 3,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-e73f0",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "name": "Name",
+        "pinDirection": "left"
+      },
+      {
+        "width": 1,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-160e9",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Description"
+          },
+          {
+            "locale": "de",
+            "text": "Beschreibung"
+          }
+        ],
+        "name": "Description"
+      }
+    ]
+  }
+}

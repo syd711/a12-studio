@@ -2,6 +2,7 @@ package de.a12.studio.models.overviewmodel;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import de.a12.studio.models.querymodel.operator.Operator;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,7 +39,18 @@ import java.util.List;
 @Setter
 public class FilterItemOptions {
 
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String fieldId;
+
+  // For a FilterItem.TYPE_QUERY item: the structured alternative to FilterItem#getFilterDefinition()'s free
+  // text, and whether the predefined filter is active by default - both fixture-evidenced (recovered from
+  // testing/workspaces/advanced_new/models/10_People/PersonEmployee_Ov.json) despite FilterItem's own javadoc
+  // describing filterDefinition/enabled as living at the item level; they in fact nest under options instead.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Operator operator;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private BooleanUserAccessOption enabled;
+
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private BooleanUserAccessOption invert;
   @JsonInclude(JsonInclude.Include.NON_NULL)

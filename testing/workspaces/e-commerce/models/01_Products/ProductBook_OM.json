@@ -1,0 +1,414 @@
+{
+  "header": {
+    "id": "ProductBook_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Books"
+      },
+      {
+        "locale": "de",
+        "text": "Bücher"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "ProductBook_DM"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-ad642",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Image"
+          },
+          {
+            "locale": "de",
+            "text": "Bild"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "include_common_group_8837c",
+        "sortable": false,
+        "attachmentDisplayMode": "preview"
+      },
+      {
+        "id": "column-61553",
+        "width": 1,
+        "styles": {},
+        "elementRef": "include_common_field_57956",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-92963",
+        "width": 3,
+        "styles": {
+          "content": [
+            "h_semiBoldFontWeight"
+          ]
+        },
+        "elementRef": "field_5e741",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-5ef18",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Author"
+          },
+          {
+            "locale": "de",
+            "text": "Autoren"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "name": "Authors",
+        "expression": "kontext(Product){kontext(BookProperties){kontext(Authors,delimiter=\", \" ){[AuthorName]}}}"
+      },
+      {
+        "id": "column-4e28c",
+        "width": 1,
+        "styles": {},
+        "elementRef": "include_common_field_8cad7",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "suffix": [
+          {
+            "locale": "en",
+            "text": "€"
+          },
+          {
+            "locale": "de",
+            "text": "€"
+          }
+        ]
+      },
+      {
+        "id": "column-011f5",
+        "width": 1,
+        "styles": {},
+        "elementRef": "include_common_field_d9c49",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-47edd",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_40335",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-c7652",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_906a3",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Delete Book"
+              },
+              {
+                "locale": "de",
+                "text": "Buch Löschen"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Are you sure you want to delete this Book?"
+              },
+              {
+                "locale": "de",
+                "text": "Sind Sie sicher, dass Sie dieses Buch löschen wollen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete_forever",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "Delete Book"
+            },
+            {
+              "locale": "de",
+              "text": "Buch Löschen"
+            }
+          ],
+          "event": "delete",
+          "labelHidden": true,
+          "destructive": true,
+          "primary": false
+        }
+      ]
+    },
+    "styles": [
+      "h_semiBoldFontWeight"
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        },
+        {
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "New Book"
+            },
+            {
+              "locale": "de",
+              "text": "Neues Buch"
+            }
+          ],
+          "type": "button",
+          "event": "add",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "custom_list",
+        "fields": [
+          {
+            "fieldId": "field_5e741"
+          },
+          {
+            "fieldId": "field_a4a57"
+          },
+          {
+            "fieldId": "field_4ab43"
+          },
+          {
+            "fieldId": "field_3c3b2"
+          },
+          {
+            "fieldId": "field_3b822"
+          },
+          {
+            "fieldId": "field_e602b"
+          },
+          {
+            "fieldId": "field_906a3"
+          },
+          {
+            "fieldId": "include_common_field_a5318"
+          },
+          {
+            "fieldId": "include_common_field_8cad7"
+          },
+          {
+            "fieldId": "include_common_field_d9c49"
+          },
+          {
+            "fieldId": "include_common_field_4d54b"
+          },
+          {
+            "fieldId": "include_common_field_5bafa"
+          }
+        ],
+        "sectionData": [
+          {
+            "id": "section-59be8",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Book"
+              },
+              {
+                "locale": "de",
+                "text": "Buch"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "field_5e741"
+              },
+              {
+                "fieldId": "field_a4a57"
+              },
+              {
+                "fieldId": "field_4ab43"
+              },
+              {
+                "fieldId": "field_3c3b2"
+              },
+              {
+                "fieldId": "field_3b822"
+              },
+              {
+                "fieldId": "field_e602b"
+              },
+              {
+                "fieldId": "field_906a3"
+              }
+            ]
+          },
+          {
+            "id": "section-4b321",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Common"
+              },
+              {
+                "locale": "de",
+                "text": "Allgemein"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "include_common_field_a5318"
+              },
+              {
+                "fieldId": "include_common_field_8cad7"
+              },
+              {
+                "fieldId": "include_common_field_d9c49"
+              },
+              {
+                "fieldId": "include_common_field_5bafa"
+              },
+              {
+                "fieldId": "include_common_field_4d54b"
+              }
+            ]
+          }
+        ],
+        "enumeratedStringFilter": {
+          "fields": [
+            {
+              "fieldId": "field_3c3b2"
+            },
+            {
+              "fieldId": "field_3b822"
+            }
+          ],
+          "pagingSize": 20
+        }
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "buttons": [
+          {
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Confirm deletion"
+                },
+                {
+                  "locale": "de",
+                  "text": "Löschen bestätigen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Are you sure you want to delete the selected items?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Sollen die ausgewählten Einträge wirklich gelöscht werden?"
+                }
+              ]
+            },
+            "icon": {
+              "name": "delete"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Delete"
+              },
+              {
+                "locale": "de",
+                "text": "Löschen"
+              }
+            ],
+            "event": "delete_selected",
+            "destructive": false,
+            "primary": false
+          }
+        ],
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "pagingSize": 7,
+      "actionColumnWidth": 0.5,
+      "showRowCount": true,
+      "enableColumnsResize": true,
+      "initialSorting": [
+        {
+          "idref": "column-92963"
+        }
+      ],
+      "rowHeight": 110
+    }
+  }
+}

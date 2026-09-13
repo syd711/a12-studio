@@ -1,0 +1,64 @@
+{
+  "header": {
+    "id": "BrandProduct_Brand_AvailableItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Brand_DM"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-9686d",
+        "width": 1,
+        "styles": {},
+        "name": "Name",
+        "expression": "kontext(Brand){\n    [Name] \n    case [OwnBrand] = \"true\" { (en:\" (Own Brand)\",de:\" (Eigenmarke)\")}\n    }"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": false,
+      "pagingSize": 50,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      }
+    }
+  }
+}

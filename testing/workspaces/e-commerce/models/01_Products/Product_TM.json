@@ -1,0 +1,1035 @@
+{
+  "header": {
+    "id": "Product_TM",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Product Catalog"
+      },
+      {
+        "locale": "de",
+        "text": "Produktkatalog"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM1",
+        "reference": "Category_DM"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM2",
+        "reference": "ProductBook_DM"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM3",
+        "reference": "ProductMovie_DM"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM4",
+        "reference": "ProductBundle_DM"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM5",
+        "reference": "ProductFood_DM"
+      },
+      {
+        "purpose": "relationship-model-for-tree",
+        "modelType": "relationship",
+        "alias": "RM1",
+        "reference": "CategoryCategory"
+      },
+      {
+        "purpose": "relationship-model-for-tree",
+        "modelType": "relationship",
+        "alias": "RM2",
+        "reference": "CategoryProduct"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "multiSelection": {
+        "clearConfirmation": {
+          "enabled": true
+        },
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "buttons": [
+          {
+            "icon": {
+              "name": "content_copy",
+              "theme": "outlined"
+            },
+            "id": "button-74736",
+            "description": [
+              {
+                "locale": "en",
+                "text": "Copy Items"
+              },
+              {
+                "locale": "de",
+                "text": "Kopiere Einträge"
+              }
+            ],
+            "event": "event_copy_nodes",
+            "destructive": false,
+            "primary": false
+          },
+          {
+            "icon": {
+              "name": "content_cut",
+              "theme": "rounded"
+            },
+            "id": "button-afd24",
+            "description": [
+              {
+                "locale": "en",
+                "text": "Cut Items"
+              },
+              {
+                "locale": "de",
+                "text": "Einträge ausschneiden"
+              }
+            ],
+            "event": "event_cut_nodes",
+            "destructive": false,
+            "primary": false
+          },
+          {
+            "icon": {
+              "name": "content_paste",
+              "theme": "rounded"
+            },
+            "id": "button-b77f7",
+            "description": [
+              {
+                "locale": "en",
+                "text": "Paste Items"
+              },
+              {
+                "locale": "de",
+                "text": "Einträge einfügen"
+              }
+            ],
+            "event": "event_paste",
+            "destructive": false,
+            "primary": false
+          },
+          {
+            "confirmation": {
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Are you sure you want to delete all selected items?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Sind Sie sicher, dass Sie alle ausgewählten Einträge löschen wollen?"
+                }
+              ]
+            },
+            "icon": {
+              "name": "delete_forever",
+              "theme": "rounded"
+            },
+            "id": "button-54493",
+            "description": [
+              {
+                "locale": "en",
+                "text": "Delete Selected Items"
+              },
+              {
+                "locale": "de",
+                "text": "Ausgewählte Einträge löschen"
+              }
+            ],
+            "event": "event_delete_nodes",
+            "destructive": true,
+            "primary": false
+          }
+        ]
+      },
+      "dnd": {
+        "onDrag": {
+          "expandHoveredNode": true
+        }
+      },
+      "hierarchicalColumnRef": "column-219b9",
+      "rootRef": "crc-f2dbf",
+      "wholeTreeExpansion": true,
+      "actionColumnWidth": 1,
+      "enableColumnsResize": true,
+      "enableVirtualScroll": true,
+      "expansionStrategy": {
+        "type": "tree",
+        "expansionDepths": [
+          {
+            "maxDepth": 5,
+            "relationshipModel": "CategoryCategory"
+          },
+          {
+            "maxDepth": 1,
+            "relationshipModel": "CategoryProduct"
+          }
+        ]
+      },
+      "rowHeight": 49
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "expand_all_popup"
+        },
+        {
+          "type": "multi_selection"
+        }
+      ],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "nodes": [
+      {
+        "id": "node-9dda8",
+        "actions": [
+          {
+            "primary": false,
+            "destructive": false,
+            "type": "event",
+            "event": "event_expand_sub_tree",
+            "icon": {
+              "name": "unfold_more",
+              "theme": "rounded"
+            },
+            "description": [
+              {
+                "locale": "en",
+                "text": "Expand Categorie"
+              },
+              {
+                "locale": "de",
+                "text": "Kategorie aufklappen"
+              }
+            ]
+          },
+          {
+            "primary": false,
+            "destructive": false,
+            "type": "event",
+            "event": "event_collapse_sub_tree",
+            "icon": {
+              "name": "unfold_less",
+              "theme": "rounded"
+            },
+            "description": [
+              {
+                "locale": "en",
+                "text": "Collapse Category"
+              },
+              {
+                "locale": "de",
+                "text": "Kategorie zusammenklappen"
+              }
+            ]
+          }
+        ],
+        "documentModelRef": "Category_DM",
+        "columns": [
+          {
+            "columnRef": "column-219b9",
+            "elementRef": "field_f9c16"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-fd6c2",
+            "elementRef": "group_f6d01"
+          }
+        ],
+        "childRelationshipConfigurations": [
+          {
+            "id": "crc-f2dbf",
+            "relationshipModelRef": "CategoryCategory",
+            "parentRole": "Parent"
+          },
+          {
+            "id": "crc-d6c8e",
+            "relationshipModelRef": "CategoryProduct",
+            "parentRole": "Category"
+          }
+        ],
+        "icon": {
+          "name": "category",
+          "theme": "rounded"
+        },
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Actions",
+              "actions": [
+                {
+                  "type": "insert",
+                  "position": "as_child",
+                  "icon": {
+                    "name": "insert_below",
+                    "theme": "custom"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Add new item"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Neuen Eintrag hinzufügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_link",
+                  "icon": {
+                    "name": "link_off",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Remove from Parent Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aus der übergeordneten Kategorie entfernen"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "CopyPaste",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_paste",
+                  "icon": {
+                    "name": "content_paste",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Paste"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Einfügen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_copy_node",
+                  "icon": {
+                    "name": "content_copy",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Copy Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kopiere Kategorie"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_cut_node",
+                  "icon": {
+                    "name": "content_cut",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Cut Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kategorie ausschneiden"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "ActionDelete",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kategorie löschen"
+                    }
+                  ],
+                  "confirmation": {
+                    "title": [
+                      {
+                        "locale": "en",
+                        "text": "Delete Category"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Kategorie Löschen"
+                      }
+                    ],
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Are you sure you want to delete this Category?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Sind Sie sicher, dass Sie diese Kategorie löschen möchten?"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "styles": [
+          "h_semiBoldFontWeight"
+        ],
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "icon": {
+          "name": "menu_book",
+          "theme": "rounded"
+        },
+        "id": "node-3fc78",
+        "actions": [],
+        "documentModelRef": "ProductBook_DM",
+        "columns": [
+          {
+            "columnRef": "column-219b9",
+            "elementRef": "include_common_field_4217e"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-fd6c2",
+            "elementRef": "include_common_group_8837c"
+          }
+        ],
+        "childRelationshipConfigurations": [],
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Actions",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_delete_link",
+                  "icon": {
+                    "name": "link_off",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Remove from Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aus Kategorie entfernen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete_forever",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete Book"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Buch löschen"
+                    }
+                  ],
+                  "confirmation": {
+                    "title": [
+                      {
+                        "locale": "en",
+                        "text": "Delete Book"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Buch löschen"
+                      }
+                    ],
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Are you sure you want to delete this book?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Sind Sie sicher, dass Sie dieses Buch löschen wollen?"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "CopyPaste",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_copy_node",
+                  "icon": {
+                    "name": "content_copy",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Copy"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kopiere"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_cut_node",
+                  "icon": {
+                    "name": "content_cut",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Cut"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ausschneiden"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "icon": {
+          "name": "movie_filter",
+          "theme": "rounded"
+        },
+        "id": "node-23e2f",
+        "actions": [],
+        "documentModelRef": "ProductMovie_DM",
+        "columns": [
+          {
+            "columnRef": "column-219b9",
+            "elementRef": "include_common_field_4217e"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-fd6c2",
+            "elementRef": "include_common_group_8837c"
+          }
+        ],
+        "childRelationshipConfigurations": [],
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Actions",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_delete_link",
+                  "icon": {
+                    "name": "link_off",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Remove from Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aus Kategorie entfernen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete_forever",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete Movie"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Film löschen"
+                    }
+                  ],
+                  "confirmation": {
+                    "title": [
+                      {
+                        "locale": "en",
+                        "text": "Delete Movie"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Film löschen"
+                      }
+                    ],
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Are you sure you want to delete this movie?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Sind Sie sicher, dass Sie diesen Film löschen wollen?"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "CopyPaste",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_copy_node",
+                  "icon": {
+                    "name": "content_copy",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Copy"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kopieren"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_cut_node",
+                  "icon": {
+                    "name": "content_cut",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Cut"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ausschneiden"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "icon": {
+          "name": "list_alt",
+          "theme": "rounded"
+        },
+        "id": "node-a2a57",
+        "actions": [],
+        "documentModelRef": "ProductBundle_DM",
+        "columns": [
+          {
+            "columnRef": "column-219b9",
+            "elementRef": "include_common_field_4217e"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-fd6c2",
+            "elementRef": "include_common_group_8837c"
+          }
+        ],
+        "childRelationshipConfigurations": [],
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Actions",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_delete_link",
+                  "icon": {
+                    "name": "link_off",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Remove from Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aus Kategorie entfernen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete_forever",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete Book"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Buch löschen"
+                    }
+                  ],
+                  "confirmation": {
+                    "title": [
+                      {
+                        "locale": "en",
+                        "text": "Delete Book"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Buch löschen"
+                      }
+                    ],
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Are you sure you want to delete this book?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Sind Sie sicher, dass Sie dieses Buch löschen wollen?"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "CopyPaste",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_copy_node",
+                  "icon": {
+                    "name": "content_copy",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Copy"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kopiere"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_cut_node",
+                  "icon": {
+                    "name": "content_cut",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Cut"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ausschneiden"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "icon": {
+          "name": "fastfood",
+          "theme": "rounded"
+        },
+        "id": "node-2beb3",
+        "actions": [],
+        "documentModelRef": "ProductFood_DM",
+        "columns": [
+          {
+            "columnRef": "column-219b9",
+            "elementRef": "include_common_field_4217e"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-fd6c2",
+            "elementRef": "include_common_group_8837c"
+          }
+        ],
+        "childRelationshipConfigurations": [],
+        "contextMenu": {
+          "groups": [
+            {
+              "name": "Actions",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_delete_link",
+                  "icon": {
+                    "name": "link_off",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Remove from Category"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aus Kategorie entfernen"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_delete_node",
+                  "icon": {
+                    "name": "delete_forever",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Delete Food Item"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Nahrungsmittel löschen"
+                    }
+                  ],
+                  "confirmation": {
+                    "title": [
+                      {
+                        "locale": "en",
+                        "text": "Delete Food Item"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Nahrungsmittel löschen"
+                      }
+                    ],
+                    "message": [
+                      {
+                        "locale": "en",
+                        "text": "Are you sure you want to delete this Food Item?"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Sind Sie sicher, dass Sie dieses Nahrungsmittel löschen wollen?"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "CopyPaste",
+              "actions": [
+                {
+                  "type": "event",
+                  "event": "event_copy_node",
+                  "icon": {
+                    "name": "content_copy",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Copy"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kopieren"
+                    }
+                  ]
+                },
+                {
+                  "type": "event",
+                  "event": "event_cut_node",
+                  "icon": {
+                    "name": "content_cut",
+                    "theme": "rounded"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Cut"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Ausschneiden"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      }
+    ],
+    "columns": [
+      {
+        "width": 5,
+        "fixedWidth": false,
+        "styles": {
+          "content": []
+        },
+        "id": "column-219b9",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "name": "Name"
+      },
+      {
+        "width": 1,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-fd6c2",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Image"
+          },
+          {
+            "locale": "de",
+            "text": "Bild"
+          }
+        ],
+        "name": "Image"
+      }
+    ],
+    "styles": [
+      "h_semiBoldFontWeight"
+    ]
+  }
+}

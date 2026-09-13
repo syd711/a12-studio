@@ -1,0 +1,1395 @@
+{
+  "header": {
+    "id": "CommonTypes_TDM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "de"
+      },
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "tdonly",
+        "value": "true"
+      },
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "CommonTypes_TDM"
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c",
+        "name": "Price",
+        "fieldType": {
+          "type": "NumberType",
+          "NumberType": {
+            "minFractionalDigits": 2,
+            "maxFractionalDigits": 2,
+            "trait": "amount"
+          }
+        }
+      },
+      {
+        "id": "typedef_f2175b7e-bb14-4c86-9f7c-9619e1723841",
+        "name": "Language",
+        "fieldType": {
+          "type": "EnumerationType",
+          "EnumerationType": {
+            "values": [
+              {
+                "value": "German",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Deutsch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "German"
+                  }
+                ]
+              },
+              {
+                "value": "English",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Englisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "English"
+                  }
+                ]
+              },
+              {
+                "value": "Xhosa",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Xhosa"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Xhosa"
+                  }
+                ]
+              },
+              {
+                "value": "Russian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Russisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Russian"
+                  }
+                ]
+              },
+              {
+                "value": "Romanian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Romänisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Romanian"
+                  }
+                ]
+              },
+              {
+                "value": "NorthAmericanIndian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Sprache der nordamerikanischen Indianer"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "North American Indian"
+                  }
+                ]
+              },
+              {
+                "value": "Spanish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Spanisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Spanish"
+                  }
+                ]
+              },
+              {
+                "value": "Yiddish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Jiddisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Yiddish"
+                  }
+                ]
+              },
+              {
+                "value": "Syriac",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Syrisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Syriac"
+                  }
+                ]
+              },
+              {
+                "value": "AssyrianNeo-Aramaic",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Assyrisch Neo-Aramäisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Assyrian Neo-Aramaic"
+                  }
+                ]
+              },
+              {
+                "value": "Dutch",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Niederländisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Dutch"
+                  }
+                ]
+              },
+              {
+                "value": "Saami",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Saami"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Saami"
+                  }
+                ]
+              },
+              {
+                "value": "Cantonese",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Kantonesisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Cantonese"
+                  }
+                ]
+              },
+              {
+                "value": "Hungarian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Ungarisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Hungarian"
+                  }
+                ]
+              },
+              {
+                "value": "Mandarin",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Mandarin"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Mandarin"
+                  }
+                ]
+              },
+              {
+                "value": "Japanese",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Japanisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Japanese"
+                  }
+                ]
+              },
+              {
+                "value": "Latin",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Latein"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Latin"
+                  }
+                ]
+              },
+              {
+                "value": "French",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Französisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "French"
+                  }
+                ]
+              },
+              {
+                "value": "Polish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Polnisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Polish"
+                  }
+                ]
+              },
+              {
+                "value": "Arabic",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Arabisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Arabic"
+                  }
+                ]
+              },
+              {
+                "value": "Swedish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Schwedisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Swedish"
+                  }
+                ]
+              },
+              {
+                "value": "Chinese",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Chinesisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Chinese"
+                  }
+                ]
+              },
+              {
+                "value": "Armenian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Armenisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Armenian"
+                  }
+                ]
+              },
+              {
+                "value": "Turkish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Türkisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Turkish"
+                  }
+                ]
+              },
+              {
+                "value": "Italian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Italienisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Italian"
+                  }
+                ]
+              },
+              {
+                "value": "Esperanto",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Esperanto"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Esperanto"
+                  }
+                ]
+              },
+              {
+                "value": "Persian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Persisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Persian"
+                  }
+                ]
+              },
+              {
+                "value": "Indonesian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Indonesisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Indonesian"
+                  }
+                ]
+              },
+              {
+                "value": "Albanian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Albanisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Albanian"
+                  }
+                ]
+              },
+              {
+                "value": "Korean",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Kereanisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Korean"
+                  }
+                ]
+              },
+              {
+                "value": "Lingala",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Lingala"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Lingala"
+                  }
+                ]
+              },
+              {
+                "value": "Hindi",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Hindi"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Hindi"
+                  }
+                ]
+              },
+              {
+                "value": "Greek",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Grieschisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Greek"
+                  }
+                ]
+              },
+              {
+                "value": "Pawnee",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Pawnee"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Pawnee"
+                  }
+                ]
+              },
+              {
+                "value": "Danish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Dänisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Danish"
+                  }
+                ]
+              },
+              {
+                "value": "Ukrainian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Urkainisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Ukrainian"
+                  }
+                ]
+              },
+              {
+                "value": "Norwegian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Norwegisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Norwegian"
+                  }
+                ]
+              },
+              {
+                "value": "Vietnamese",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Vietnamesisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Vietnamese"
+                  }
+                ]
+              },
+              {
+                "value": "Serbian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Serbisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Serbian"
+                  }
+                ]
+              },
+              {
+                "value": "Hebrew",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Hebräisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Hebrew"
+                  }
+                ]
+              },
+              {
+                "value": "BritishSign",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Britische Gebärdensprache"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "British Sign"
+                  }
+                ]
+              },
+              {
+                "value": "Aboriginal",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Aborigine Sprache"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Aboriginal"
+                  }
+                ]
+              },
+              {
+                "value": "AustralianSign",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Australische Gebärdensprache"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Australian Sign"
+                  }
+                ]
+              },
+              {
+                "value": "EgyptianAncient",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Alt Ägyptisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Egyptian (Ancient)"
+                  }
+                ]
+              },
+              {
+                "value": "JapaneseSign",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Japanische Gebärdensprache"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Japanese Sign"
+                  }
+                ]
+              },
+              {
+                "value": "Filipino",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Filipino"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Filipino"
+                  }
+                ]
+              },
+              {
+                "value": "AmericanSign",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Amerikanische Gebärdensprache"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "American Sign"
+                  }
+                ]
+              },
+              {
+                "value": "KoreanSign",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Koreanische Gebärdensprache"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Korean Sign"
+                  }
+                ]
+              },
+              {
+                "value": "Thai",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Thai"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Thai"
+                  }
+                ]
+              },
+              {
+                "value": "Urdu",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Urdu"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Urdu"
+                  }
+                ]
+              },
+              {
+                "value": "Kurdish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Kurdisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Kurdish"
+                  }
+                ]
+              },
+              {
+                "value": "Maya",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Maya"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Maya"
+                  }
+                ]
+              },
+              {
+                "value": "Portuguese",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Portugiesisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Portuguese"
+                  }
+                ]
+              },
+              {
+                "value": "Latvian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Lettisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Latvian"
+                  }
+                ]
+              },
+              {
+                "value": "Ancientto1453",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Altertümlich (bis 1453)"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Ancient (to 1453)"
+                  }
+                ]
+              },
+              {
+                "value": "Georgian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Georgisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Georgian"
+                  }
+                ]
+              },
+              {
+                "value": "Bulgarian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Bulgarisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Bulgarian"
+                  }
+                ]
+              },
+              {
+                "value": "Sign",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Gebärdensprache"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Sign"
+                  }
+                ]
+              },
+              {
+                "value": "Shanghainese",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Shanghainesisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Shanghainese"
+                  }
+                ]
+              },
+              {
+                "value": "Pashtu",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Paschtu"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Pashtu"
+                  }
+                ]
+              },
+              {
+                "value": "Czech",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Tschechisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Czech"
+                  }
+                ]
+              },
+              {
+                "value": "Klingon",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Klingon"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Klingon"
+                  }
+                ]
+              },
+              {
+                "value": "Afrikaans",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Afrikaans"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Afrikaans"
+                  }
+                ]
+              },
+              {
+                "value": "Scots",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Schottisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Scots"
+                  }
+                ]
+              },
+              {
+                "value": "IrishGaelic",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Irisch-Gälisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Irish Gaelic"
+                  }
+                ]
+              },
+              {
+                "value": "Romany",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Romani"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Romany"
+                  }
+                ]
+              },
+              {
+                "value": "Nyanja",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Nyanja"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Nyanja"
+                  }
+                ]
+              },
+              {
+                "value": "Zulu",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Zulu"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Zulu"
+                  }
+                ]
+              },
+              {
+                "value": "Sotho",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Sotho"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Sotho"
+                  }
+                ]
+              },
+              {
+                "value": "Tibetan",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Tibetisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Tibetan"
+                  }
+                ]
+              },
+              {
+                "value": "Hawaiian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Hawaii"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Hawaiian"
+                  }
+                ]
+              },
+              {
+                "value": "Bengali",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Bengali"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Bengali"
+                  }
+                ]
+              },
+              {
+                "value": "SwissGerman",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Schweizerdeutsch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Swiss German"
+                  }
+                ]
+              },
+              {
+                "value": "Greenlandic",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Grönländisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Greenlandic"
+                  }
+                ]
+              },
+              {
+                "value": "Dari",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Dari"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Dari"
+                  }
+                ]
+              },
+              {
+                "value": "Quechua",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Quechua"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Quechua"
+                  }
+                ]
+              },
+              {
+                "value": "Tagalog",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Tagalog"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Tagalog"
+                  }
+                ]
+              },
+              {
+                "value": "Slovenian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Slowenisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Slovenian"
+                  }
+                ]
+              },
+              {
+                "value": "Nepali",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Nepalesisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Nepali"
+                  }
+                ]
+              },
+              {
+                "value": "Welsh",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Walisisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Welsh"
+                  }
+                ]
+              },
+              {
+                "value": "Icelandic",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Isländisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Icelandic"
+                  }
+                ]
+              },
+              {
+                "value": "Gaelic",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Gälisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Gaelic"
+                  }
+                ]
+              },
+              {
+                "value": "Hmong",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Hmong"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Hmong"
+                  }
+                ]
+              },
+              {
+                "value": "Mende",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Mende"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Mende"
+                  }
+                ]
+              },
+              {
+                "value": "Sanskrit",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Sanskrit"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Sanskrit"
+                  }
+                ]
+              },
+              {
+                "value": "Navajo",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Navajo"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Navajo"
+                  }
+                ]
+              },
+              {
+                "value": "Somali",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Somalisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Somali"
+                  }
+                ]
+              },
+              {
+                "value": "Lao",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Laotisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Lao"
+                  }
+                ]
+              },
+              {
+                "value": "OldEnglish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Altenglisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Old English"
+                  }
+                ]
+              },
+              {
+                "value": "Tswana",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Tswana"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Tswana"
+                  }
+                ]
+              },
+              {
+                "value": "Estonian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Estnisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Estonian"
+                  }
+                ]
+              },
+              {
+                "value": "CentralKhmer",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Zentral-Khmer"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Central Khmer"
+                  }
+                ]
+              },
+              {
+                "value": "BrazilianSign",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Brasilianisches Zeichen"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Brazilian Sign"
+                  }
+                ]
+              },
+              {
+                "value": "Berberlanguages",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Berbersprachen"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Berber languages"
+                  }
+                ]
+              },
+              {
+                "value": "Burmese",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Birmanisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Burmese"
+                  }
+                ]
+              },
+              {
+                "value": "Slovak",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Slowakisch"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Slovak"
+                  }
+                ]
+              },
+              {
+                "value": "Sindarin",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Sindarin"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Sindarin"
+                  }
+                ]
+              },
+              {
+                "value": "Quenya",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Quenya"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Quenya"
+                  }
+                ]
+              },
+              {
+                "value": "Sicilian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Sicilian"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Sizilianisch"
+                  }
+                ]
+              },
+              {
+                "value": "Tatar",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Tatar"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Tatarisch"
+                  }
+                ]
+              },
+              {
+                "value": "Polynesian",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Polynesian"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Polynesisch"
+                  }
+                ]
+              },
+              {
+                "value": "Finnish",
+                "label": [
+                  {
+                    "locale": "de",
+                    "text": "Finnish"
+                  },
+                  {
+                    "locale": "en",
+                    "text": "Finnisch"
+                  }
+                ]
+              }
+            ],
+            "categories": [],
+            "alphabeticalSorting": true
+          }
+        }
+      }
+    ],
+    "modelRoot": {
+      "rootGroups": []
+    }
+  }
+}

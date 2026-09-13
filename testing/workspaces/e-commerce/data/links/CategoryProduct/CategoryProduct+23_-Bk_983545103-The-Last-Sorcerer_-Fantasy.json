@@ -1,0 +1,9 @@
+ {"relationshipModel" : "CategoryProduct",
+"entities" : [{"roleOrder" : "",
+"modelName" : "ProductBook_DM",
+"role" : "Product",
+"docRef" : "ProductBook_DM/23_Bk_983545103_The-Last-Sorcerer"},
+{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Category",
+"docRef" : "Category_DM/4_Fantasy"}]}

@@ -1,0 +1,180 @@
+{
+  "header": {
+    "id": "Bundle_MaintainProducts_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "bindingConfiguration",
+        "value": "[{\"type\":\"relationship\",\"details\":{\"name\":\"binding-BundleProduct\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"BundleProduct\",\"targetRole\":\"Product\",\"components\":[{\"name\":\"DualPaneSelection\",\"candidatePageSize\":7,\"linkPageSize\":7,\"props\":{\"height\":\"500\"},\"models\":[{\"name\":\"Product_LinkFields_FM\",\"use\":\"link\"},{\"name\":\"Product_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"BundleProduct_Product_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_20b77\"}]"
+      },
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "ProductBundle_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "ProductBundle_DM"
+      },
+      {
+        "modelType": "form",
+        "purpose": "bindingReference",
+        "reference": "Product_LinkFields_FM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "BundleProduct_Product_SelectedItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "Product_AvailableItems_OM"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_1e26c",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_eb5f1",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "rounded"
+              }
+            },
+            "event": "event_submit",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen_67ab3",
+        "name": "Screen 1",
+        "title": {
+          "type": "Expression",
+          "expressionText": "(en:\"Maintain the Products in Bundle \", de:\"Produkte in \")\n kontext(Product){kontext(Common){[Name]}}\n(en:\"\", de:\" verwalten\")"
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_d31ab",
+            "name": "cg",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_d5ba4",
+                "cell": [
+                  {
+                    "type": "TextCell",
+                    "id": "textcell_a6dc6",
+                    "name": "info",
+                    "decoration": "WARNING",
+                    "content": {
+                      "text": [
+                        {
+                          "locale": "en",
+                          "text": "Note, that the Links and Additional Link Fields changed here, are not reflected in the total Bundle price right away, as you are currently outside a CDM context."
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Bitte beachten Sie, dass die Änderungen an den Links und Additional Link Fields sich nicht automatisch auf den Gesamtpreis des Bundles auswirken, da die Bearbeitung außerhalb eines CDM Kontextes stattfindet."
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_20b77",
+            "name": "binding-BundleProduct",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-BundleProduct"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-BundleProduct"
+                  }
+                ]
+              }
+            },
+            "height": 500
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

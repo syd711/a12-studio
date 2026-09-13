@@ -1,0 +1,9 @@
+ {"relationshipModel" : "CategoryCategory",
+"entities" : [{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Parent",
+"docRef" : "Category_DM/3_Biography"},
+{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Child",
+"docRef" : "Category_DM/5_Autobiography"}]}

@@ -1,0 +1,9 @@
+ {"relationshipModel" : "CategoryProduct",
+"entities" : [{"roleOrder" : "",
+"modelName" : "ProductMovie_DM",
+"role" : "Product",
+"docRef" : "ProductMovie_DM/2_Shadow-Protocol_Dummy_14_Shadow-Protocol"},
+{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Category",
+"docRef" : "Category_DM/1_Action"}]}

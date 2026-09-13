@@ -1,0 +1,98 @@
+{
+  "header": {
+    "id": "CollectionProduct",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Product",
+        "reference": "Product_DM"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Collection",
+        "reference": "Collection_DM"
+      },
+      {
+        "purpose": "Link Document model",
+        "modelType": "document",
+        "alias": "Link Model",
+        "reference": "Product_LinkFields_DM"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": true,
+    "labels": [
+      {
+        "locale": "en"
+      },
+      {
+        "locale": "de"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "documentModel": "Product_DM",
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Product"
+          },
+          {
+            "locale": "de",
+            "text": "Produkt"
+          }
+        ],
+        "role": "Product",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 99
+          }
+        }
+      },
+      {
+        "documentModel": "Collection_DM",
+        "ordered": true,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Collection"
+          },
+          {
+            "locale": "de",
+            "text": "Zusammenstellung"
+          }
+        ],
+        "role": "Collection",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 9999
+          }
+        }
+      }
+    ],
+    "linkDocumentModel": "Product_LinkFields_DM"
+  }
+}

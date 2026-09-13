@@ -1,0 +1,64 @@
+{
+  "header": {
+    "id": "CollectionProduct_Product_SelectedItems_DualPane_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CollectionProduct_Product____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-88673",
+        "width": 0.5,
+        "styles": {},
+        "elementRef": "I5_field_1c82c",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-52081",
+        "width": 3,
+        "styles": {},
+        "elementRef": "I4_include_common_field_4217e",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

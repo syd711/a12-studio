@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.formmodel.formtree;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
+import de.a12.studio.models.formmodel.ColumnLayout;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
 import de.a12.studio.models.formmodel.CustomCell;
@@ -26,6 +27,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -120,28 +122,63 @@ public class FormElementViewModel {
    * {@link FieldBasedRepeatOverviewColumn}, which are commonly left unnamed since their real identity is the
    * Document Model element they bind to - the name of that element ({@code elementRef}/{@code groupRef}) resolved
    * against {@link #elementIndex}, falling back to the raw reference if it can't be resolved, else for a
-   * {@link Row} the placeholder {@code "<Row>"}, else the node's own {@code id} as a last resort.
+   * {@link Row} the placeholder {@code "<Row>"}, else the node's own {@code id} as a last resort. For a
+   * {@link MultiColumnSection} with a resolvable {@link ColumnLayout}, the column count is appended, e.g.
+   * {@code "Payment Info (2 columns)"}.
    */
   public String getName() {
     String name = rawName();
+    String baseName;
     if (name != null && !name.isBlank()) {
-      return name;
+      baseName = name;
     }
-    if (node instanceof Control control && control.getElementRef() != null && !control.getElementRef().isBlank()) {
-      return resolveDocumentElementName(control.getElementRef());
+    else if (node instanceof Control control && control.getElementRef() != null && !control.getElementRef().isBlank()) {
+      baseName = resolveDocumentElementName(control.getElementRef());
     }
-    if (node instanceof AbstractRepeat repeat && repeat.getGroupRef() != null && !repeat.getGroupRef().isBlank()) {
-      return resolveDocumentElementName(repeat.getGroupRef());
+    else if (node instanceof AbstractRepeat repeat && repeat.getGroupRef() != null && !repeat.getGroupRef().isBlank()) {
+      baseName = resolveDocumentElementName(repeat.getGroupRef());
     }
-    if (node instanceof FieldBasedRepeatOverviewColumn column
+    else if (node instanceof FieldBasedRepeatOverviewColumn column
         && column.getElementRef() != null && !column.getElementRef().isBlank()) {
-      return resolveDocumentElementName(column.getElementRef());
+      baseName = resolveDocumentElementName(column.getElementRef());
     }
-    if (node instanceof Row) {
-      return "<Row>";
+    else if (node instanceof Row) {
+      baseName = "<Row>";
     }
-    String id = getId();
-    return id != null ? id : "<" + getTypeLabel() + ">";
+    else {
+      String id = getId();
+      baseName = id != null ? id : "<" + getTypeLabel() + ">";
+    }
+    if (node instanceof MultiColumnSection section) {
+      Integer columns = resolveColumnCount(section.getLayout());
+      if (columns != null) {
+        return baseName + " (" + columns + (columns == 1 ? " column)" : " columns)");
+      }
+    }
+    return baseName;
+  }
+
+  /**
+   * The number of columns a {@link ColumnLayout} defines, read from its widest configured breakpoint ({@code lg},
+   * else {@code md}, else {@code sm}) as the count of {@code "-"}-separated width segments (e.g. {@code "3-3-6"}
+   * is 3 columns) - matching how {@link de.a12.studio.ui.editors.formmodel.FlexLayoutPanelController} stores the
+   * raw value. {@code null} if the layout has no configured breakpoint to derive a count from.
+   */
+  private static @Nullable Integer resolveColumnCount(@Nullable ColumnLayout layout) {
+    if (layout == null) {
+      return null;
+    }
+    String value = layout.getLg();
+    if (value == null || value.isBlank()) {
+      value = layout.getMd();
+    }
+    if (value == null || value.isBlank()) {
+      value = layout.getSm();
+    }
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    return (int) Arrays.stream(value.split("-")).filter(segment -> !segment.isBlank()).count();
   }
 
   /**

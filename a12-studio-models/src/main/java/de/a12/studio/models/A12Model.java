@@ -34,14 +34,26 @@ abstract public class A12Model<C> {
   @JsonIgnore
   private List<Locale> locales = new ArrayList<>();
 
+  // Some files omit "locales"/"labels"/"modelReferences" entirely while others write them explicitly as
+  // "[]"; these flags preserve that distinction across a load/save cycle instead of always writing an
+  // explicit array.
+  @JsonIgnore
+  private boolean localesExplicit;
+
   @JsonIgnore
   private List<Label> labels = new ArrayList<>();
+
+  @JsonIgnore
+  private boolean labelsExplicit;
 
   @JsonIgnore
   private List<Annotation> annotations = new ArrayList<>();
 
   @JsonIgnore
   private List<ModelReference> modelReferences = new ArrayList<>();
+
+  @JsonIgnore
+  private boolean modelReferencesExplicit;
 
   @JsonProperty("content")
   private C content;
@@ -55,10 +67,10 @@ abstract public class A12Model<C> {
     header.setModelType(modelType);
     header.setModelVersion(modelVersion);
     header.setDescription(description);
-    header.setLocales(locales);
-    header.setLabels(labels);
+    header.setLocales(localesExplicit || !locales.isEmpty() ? locales : null);
+    header.setLabels(labelsExplicit || !labels.isEmpty() ? labels : null);
     header.setAnnotations(annotations);
-    header.setModelReferences(modelReferences);
+    header.setModelReferences(modelReferencesExplicit || !modelReferences.isEmpty() ? modelReferences : null);
     return header;
   }
 
@@ -68,10 +80,13 @@ abstract public class A12Model<C> {
     this.modelType = header.getModelType();
     this.modelVersion = header.getModelVersion();
     this.description = header.getDescription();
-    this.locales = header.getLocales();
-    this.labels = header.getLabels();
+    this.localesExplicit = header.getLocales() != null;
+    this.locales = header.getLocales() != null ? header.getLocales() : new ArrayList<>();
+    this.labelsExplicit = header.getLabels() != null;
+    this.labels = header.getLabels() != null ? header.getLabels() : new ArrayList<>();
     this.annotations = header.getAnnotations();
-    this.modelReferences = header.getModelReferences();
+    this.modelReferencesExplicit = header.getModelReferences() != null;
+    this.modelReferences = header.getModelReferences() != null ? header.getModelReferences() : new ArrayList<>();
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -84,9 +99,18 @@ abstract public class A12Model<C> {
     private String modelVersion;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String description;
-    private List<Locale> locales = new ArrayList<>();
-    private List<Label> labels = new ArrayList<>();
+
+    // null (not an initialized empty list) for locales/labels/modelReferences so the outer A12Model can
+    // tell an absent key apart from an explicit "[]" on load, and reproduce the same shape on save.
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Locale> locales;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<Label> labels;
+
     private List<Annotation> annotations = new ArrayList<>();
-    private List<ModelReference> modelReferences = new ArrayList<>();
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<ModelReference> modelReferences;
   }
 }

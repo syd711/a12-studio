@@ -78,7 +78,14 @@ class AdvancedNewProjectModelsRoundTripTest {
         item.save();
         String after = Files.readString(file, StandardCharsets.UTF_8);
         JsonNode afterTree = JsonSettings.objectMapper.readTree(after);
-        assertEquals(beforeTree, afterTree, "Saving a freshly loaded '" + relativeName + "' must not change its content");
+        if (!beforeTree.equals(afterTree)) {
+          // Compare pretty-printed strings (rather than the JsonNodes directly) so a failing
+          // assertion shows a readable, indented diff instead of each side's compact toString().
+          String expectedPretty = JsonSettings.objectMapper.writeValueAsString(beforeTree);
+          String actualPretty = JsonSettings.objectMapper.writeValueAsString(afterTree);
+          assertEquals(expectedPretty, actualPretty,
+              "Saving a freshly loaded '" + relativeName + "' must not change its content");
+        }
       }));
     }
 

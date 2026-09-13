@@ -1,0 +1,55 @@
+{
+  "header": {
+    "id": "CategoryProduct_Category_SelectedItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CategoryProduct_Category____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-b85e2",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_field_f9c16",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

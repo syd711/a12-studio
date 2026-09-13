@@ -1,0 +1,7 @@
+ {"documentModelName" : "Brand_DM",
+"document" : {"Brand" : {"Name" : "Gutenberg's Favorites",
+"Code" : "GUFA",
+"Description" : "Books Gutenberg would have loved to print …",
+"Keywords" : "books",
+"OwnBrand" : true}},
+"locale" : "en"}

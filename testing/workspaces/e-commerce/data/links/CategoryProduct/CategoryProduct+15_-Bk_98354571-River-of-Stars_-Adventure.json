@@ -1,0 +1,9 @@
+ {"relationshipModel" : "CategoryProduct",
+"entities" : [{"roleOrder" : "",
+"modelName" : "ProductBook_DM",
+"role" : "Product",
+"docRef" : "ProductBook_DM/15_Bk_98354571_River-of-Stars"},
+{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Category",
+"docRef" : "Category_DM/2_Adventure"}]}

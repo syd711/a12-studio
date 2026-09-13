@@ -1,0 +1,93 @@
+{
+  "header": {
+    "id": "CustomerOffer_Customer_SelectedItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CustomerOffer_Customer____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-b6637",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_field_7da0e",
+        "sortable": false
+      },
+      {
+        "id": "column-7c947",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_field_666f3",
+        "sortable": false
+      },
+      {
+        "id": "column-e2217",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_field_add42",
+        "sortable": false
+      },
+      {
+        "id": "column-87e5a",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_field_54ef0",
+        "sortable": false
+      },
+      {
+        "id": "column-0ac38",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Notes"
+          },
+          {
+            "locale": "de",
+            "text": "Bemerkungen"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "name": "Notes",
+        "expression": "kontext(relationship){kontext(LinkFields){\n    kontext(Notes, delimiter =\"\n\n\" ){\n\"* \" [Date] \": \" case [Important]=\"true\" {\"**\"} [Note] case [Important]=\"true\" {\"**\"}\n}}}"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

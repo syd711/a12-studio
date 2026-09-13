@@ -1,0 +1,293 @@
+{
+  "header": {
+    "id": "Product_LinkFields_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Product_LinkFields_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Product_LinkFields_DM"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox"
+    },
+    "footerBox": {
+      "id": "footerBox",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_97f05",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_9853b",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "rounded"
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen-70404",
+        "name": "LinkFields",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid-a910f",
+            "name": "Controls",
+            "layout": {
+              "lg": "12"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row-b6d55",
+                "name": "row-b6d55",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-39579",
+                    "elementRef": "field_1c82c"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_554ef",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_bdd6a",
+                    "elementRef": "field_8b02b"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row-a635f",
+                "name": "row-a635f",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control-dcf33",
+                    "elementRef": "field_c9c4f"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "%"
+              },
+              {
+                "locale": "de",
+                "text": "%"
+              }
+            ]
+          },
+          "elementRef": "field_c9c4f"
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {
+      "buttonLabels": {
+        "ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "add"
+            },
+            {
+              "locale": "de",
+              "text": "add"
+            }
+          ]
+        },
+        "COMMIT_ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "add"
+            },
+            {
+              "locale": "de",
+              "text": "add"
+            }
+          ]
+        },
+        "APPLY": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "apply"
+            },
+            {
+              "locale": "de",
+              "text": "apply"
+            }
+          ]
+        },
+        "EDIT": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "edit"
+            },
+            {
+              "locale": "de",
+              "text": "edit"
+            }
+          ]
+        },
+        "REMOVE": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "remove"
+            },
+            {
+              "locale": "de",
+              "text": "remove"
+            }
+          ]
+        },
+        "VIEW": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "view"
+            },
+            {
+              "locale": "de",
+              "text": "view"
+            }
+          ]
+        },
+        "CANCEL": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "cancel"
+            },
+            {
+              "locale": "de",
+              "text": "cancel"
+            }
+          ]
+        },
+        "RETURN": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "return"
+            },
+            {
+              "locale": "de",
+              "text": "return"
+            }
+          ]
+        },
+        "COPY": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "copy"
+            },
+            {
+              "locale": "de",
+              "text": "copy"
+            }
+          ]
+        },
+        "CLOSE": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "close"
+            },
+            {
+              "locale": "de",
+              "text": "close"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

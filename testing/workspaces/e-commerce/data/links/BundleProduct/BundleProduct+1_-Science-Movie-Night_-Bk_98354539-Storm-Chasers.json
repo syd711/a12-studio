@@ -1,0 +1,11 @@
+ {"relationshipModel" : "BundleProduct",
+"entities" : [{"roleOrder" : "",
+"modelName" : "ProductBundle_DM",
+"role" : "Bundle",
+"docRef" : "ProductBundle_DM/1_Science-Movie-Night"},
+{"roleOrder" : "",
+"modelName" : "ProductBook_DM",
+"role" : "Product",
+"docRef" : "ProductBook_DM/7_Bk_98354539_Storm-Chasers"}],
+"linkDocumentModel" : "Product_LinkFields_DM",
+"linkDocumentDocRef" : "Product_LinkFields_DM/BundleProduct_7"}

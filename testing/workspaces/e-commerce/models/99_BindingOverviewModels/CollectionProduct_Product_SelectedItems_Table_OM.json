@@ -1,0 +1,97 @@
+{
+  "header": {
+    "id": "CollectionProduct_Product_SelectedItems_Table_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CollectionProduct_Product____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-d07f7",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_include_common_field_57956",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-a1060",
+        "width": 0.5,
+        "styles": {},
+        "elementRef": "I4_include_common_field_0b973",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-eaee8",
+        "width": 2,
+        "styles": {},
+        "elementRef": "I4_include_common_field_4217e",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-ac97b",
+        "width": 0.3,
+        "styles": {},
+        "elementRef": "I5_field_1c82c",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-1ea44",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Discount"
+          },
+          {
+            "locale": "de",
+            "text": "Rabatt"
+          }
+        ],
+        "width": 0.5,
+        "styles": {},
+        "name": "Discount",
+        "expression": "kontext(relationship){kontext(LinkFields){case [IndividualDiscount] != \"\" { [IndividualDiscount] \" %\"}}}"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

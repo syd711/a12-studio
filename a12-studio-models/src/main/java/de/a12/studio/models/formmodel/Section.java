@@ -15,6 +15,7 @@ public class Section extends ScreenElement {
   private Boolean collapsible;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean initiallyCollapsed;
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<ScreenElement> screenElements = new ArrayList<>();
 
   public Section() {

@@ -52,4 +52,15 @@ public class FieldConfigEntry {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Annotation> annotations = new ArrayList<>();
   private String elementRef;
+  // Attachment-field display configuration, e.g. the icon shown before a file is uploaded.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private AttachmentConfig attachmentConfig;
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  @Getter
+  @Setter
+  public static class AttachmentConfig {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String placeholderIcon;
+  }
 }

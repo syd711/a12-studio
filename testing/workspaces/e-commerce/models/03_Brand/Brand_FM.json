@@ -1,0 +1,247 @@
+{
+  "header": {
+    "id": "Brand_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Brand"
+      },
+      {
+        "locale": "de",
+        "text": "Marke"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Brand_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Brand_DM"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_d7aba",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_f58c6",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "rounded"
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen_f7389",
+        "name": "Brand",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Brand"
+              },
+              {
+                "locale": "de",
+                "text": "Marke"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "MultiColumnSection",
+            "id": "multicolumnsection_b0035",
+            "name": "ImageAndGeneral",
+            "layout": {
+              "lg": "6-6"
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_46afa",
+                "name": "cgImage",
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_05d12",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_d1d44",
+                        "elementRef": "group_c6001"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_984a5",
+                "name": "cgGeneral",
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_fdba4",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_e4af1",
+                        "elementRef": "field_81d22"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_a493d",
+                        "elementRef": "field_161ef"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row_9cc89",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_fa1ad",
+                        "elementRef": "field_72fb2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_e5d1a",
+            "name": "cgDetails",
+            "layout": {
+              "lg": "6-6"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_fb046",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_b7787",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_25a62"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_db2e5",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_ef93c",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_c6399"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_bc7b4",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_6ef3b",
+                    "elementRef": "field_65d9c"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "initiallyFocusedElementId": "control_e4af1"
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

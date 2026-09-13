@@ -18,4 +18,6 @@ public class DocumentModelContent {
   private ModelRoot modelRoot;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<TypeDefinition> typeDefinitions = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<ContentUniquenessCriterion> documentUniquenessCriteria = new ArrayList<>();
 }

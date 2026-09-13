@@ -1,0 +1,104 @@
+{
+  "header": {
+    "id": "CustomerOffer_Offer_SelectedItems_TableList_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CustomerOffer_Offer____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-de3f2",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_field_cc6d0",
+        "sortable": false
+      },
+      {
+        "id": "column-f7f85",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_field_bfcd5",
+        "sortable": false
+      },
+      {
+        "id": "column-bce1d",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_field_add42",
+        "sortable": false
+      },
+      {
+        "id": "column-2b5f1",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_field_54ef0",
+        "sortable": false,
+        "suffix": [
+          {
+            "locale": "en",
+            "text": "%"
+          },
+          {
+            "locale": "de",
+            "text": "%"
+          }
+        ]
+      },
+      {
+        "id": "column-4b9b8",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Cover Letter"
+          },
+          {
+            "locale": "de",
+            "text": "Anschreiben"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_group_01080",
+        "sortable": false,
+        "attachmentDisplayMode": "preview"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "header": {
+    "id": "OfferOrder",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Offer",
+        "reference": "CollectionOffer_DM"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Order",
+        "reference": "CollectionOrder_DM"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [
+      {
+        "locale": "en"
+      },
+      {
+        "locale": "de"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Offer"
+          },
+          {
+            "locale": "de",
+            "text": "Angebot"
+          }
+        ],
+        "role": "Offer",
+        "documentModel": "CollectionOffer_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        }
+      },
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Orders"
+          },
+          {
+            "locale": "de",
+            "text": "Bestellungen"
+          }
+        ],
+        "role": "Order",
+        "documentModel": "CollectionOrder_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 999
+          }
+        }
+      }
+    ]
+  }
+}

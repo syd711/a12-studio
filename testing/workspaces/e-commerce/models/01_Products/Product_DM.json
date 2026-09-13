@@ -1,0 +1,80 @@
+{
+  "header": {
+    "id": "Product_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "abstract",
+        "value": "true"
+      },
+      {
+        "name": "subTypes",
+        "value": "ProductSingle_DM,ProductBundle_DM"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "typeDefinitions",
+        "reference": "CommonTypes_TDM"
+      },
+      {
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Product_Common_DM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Product_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_99a3a",
+          "name": "Product",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_common",
+                "name": "Common",
+                "Group": {
+                  "repeatability": 1,
+                  "includeConfig": {
+                    "reference": "Product_Common_DM"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

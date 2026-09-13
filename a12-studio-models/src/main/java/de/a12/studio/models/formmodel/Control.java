@@ -1,5 +1,6 @@
 package de.a12.studio.models.formmodel;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
@@ -56,8 +57,29 @@ public class Control extends Cell {
   private HideCondition hideCondition;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<de.a12.studio.models.Annotation> annotations = new ArrayList<>();
+  // The inverse of HideCondition/DependentConfig: other screen elements (by id) that should re-evaluate
+  // their own visibility/dependent state when this Control's value changes to masterValue. No editor UI
+  // yet - mapped purely for lossless round-tripping.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private DependentControls dependentControls;
 
   public Control() {
     setType(CellType.CONTROL);
+  }
+
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  @Getter
+  @Setter
+  public static class DependentControls {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<Entry> screenElement = new ArrayList<>();
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    @Setter
+    public static class Entry {
+      private String idref;
+      private String masterValue;
+    }
   }
 }

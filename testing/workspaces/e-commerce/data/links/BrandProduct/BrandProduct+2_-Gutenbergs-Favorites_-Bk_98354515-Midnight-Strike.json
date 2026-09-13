@@ -1,0 +1,9 @@
+ {"relationshipModel" : "BrandProduct",
+"entities" : [{"roleOrder" : "",
+"modelName" : "Brand_DM",
+"role" : "Brand",
+"docRef" : "Brand_DM/1_Gutenbergs-Favorites"},
+{"roleOrder" : "",
+"modelName" : "ProductBook_DM",
+"role" : "Product",
+"docRef" : "ProductBook_DM/2_Bk_98354515_Midnight-Strike"}]}

@@ -3,8 +3,10 @@ package de.a12.studio.models.querymodel;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.a12.studio.models.querymodel.operator.Operator;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,10 +32,18 @@ public class QueryLink {
   private String relationshipModel;
   private String targetRole;
 
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  // Some files omit "fields"/"linkDocumentFields" entirely while others write them explicitly as "[]";
+  // the *Explicit flags preserve that distinction across a load/save cycle (see the getXForJson/
+  // setXForJson bridge methods below), the same trick as QueryModelContent#getFieldsForJson().
+  @JsonIgnore
   private List<String> linkDocumentFields = new ArrayList<>();
+  @JsonIgnore
+  private boolean linkDocumentFieldsExplicit;
 
+  @JsonIgnore
   private List<String> fields = new ArrayList<>();
+  @JsonIgnore
+  private boolean fieldsExplicit;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer maxDepth;
@@ -43,4 +53,28 @@ public class QueryLink {
 
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<QueryLink> links = new ArrayList<>();
+
+  @JsonProperty("linkDocumentFields")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private List<String> getLinkDocumentFieldsForJson() {
+    return linkDocumentFieldsExplicit || !linkDocumentFields.isEmpty() ? linkDocumentFields : null;
+  }
+
+  @JsonProperty("linkDocumentFields")
+  private void setLinkDocumentFieldsForJson(List<String> value) {
+    this.linkDocumentFieldsExplicit = value != null;
+    this.linkDocumentFields = value != null ? value : new ArrayList<>();
+  }
+
+  @JsonProperty("fields")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private List<String> getFieldsForJson() {
+    return fieldsExplicit || !fields.isEmpty() ? fields : null;
+  }
+
+  @JsonProperty("fields")
+  private void setFieldsForJson(List<String> value) {
+    this.fieldsExplicit = value != null;
+    this.fields = value != null ? value : new ArrayList<>();
+  }
 }

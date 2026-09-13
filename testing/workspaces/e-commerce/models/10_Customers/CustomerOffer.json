@@ -1,0 +1,98 @@
+{
+  "header": {
+    "id": "CustomerOffer",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Customer",
+        "reference": "Customer_DM"
+      },
+      {
+        "purpose": "Document model",
+        "modelType": "document",
+        "alias": "Offer",
+        "reference": "CollectionOffer_DM"
+      },
+      {
+        "purpose": "Link Document model",
+        "modelType": "document",
+        "alias": "Link Model",
+        "reference": "CustomerOffer_LinkFields_DM"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": true,
+    "labels": [
+      {
+        "locale": "en"
+      },
+      {
+        "locale": "de"
+      }
+    ],
+    "entityCharacteristics": [
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Customers"
+          },
+          {
+            "locale": "de",
+            "text": "Kunden"
+          }
+        ],
+        "role": "Customer",
+        "documentModel": "Customer_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 99
+          }
+        }
+      },
+      {
+        "ordered": false,
+        "labels": [
+          {
+            "locale": "en",
+            "text": "Offer"
+          },
+          {
+            "locale": "de",
+            "text": "Angebot"
+          }
+        ],
+        "role": "Offer",
+        "documentModel": "CollectionOffer_DM",
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 9999
+          }
+        }
+      }
+    ],
+    "linkDocumentModel": "CustomerOffer_LinkFields_DM"
+  }
+}

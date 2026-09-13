@@ -1,0 +1,213 @@
+{
+  "header": {
+    "id": "CollectionOrder_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Orders"
+      },
+      {
+        "locale": "de",
+        "text": "Bestellungen"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CollectionOrder_DM"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-e3d83",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_00d4a",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-dc4e5",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_ffafe",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-1225d",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_19dc3",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-27b5e",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_bfcd5",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "suffix": [
+          {
+            "locale": "en",
+            "text": "€"
+          },
+          {
+            "locale": "de",
+            "text": "€"
+          }
+        ]
+      },
+      {
+        "id": "column-d4464",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_a8cc8",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-471ad",
+        "label": [
+          {
+            "locale": "en",
+            "text": "From Offer"
+          },
+          {
+            "locale": "de",
+            "text": "Aus Angebot"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_616a0",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "icon": {
+            "name": "delete_forever",
+            "theme": "rounded"
+          },
+          "event": "delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Delete Order"
+              },
+              {
+                "locale": "de",
+                "text": "Bestellung Löschen"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Are you sure you want to delete this Order?"
+              },
+              {
+                "locale": "de",
+                "text": "Sind Sie sicher, dass Sie diese Bestellung löschen wollen?"
+              }
+            ]
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "Delete Order"
+            },
+            {
+              "locale": "de",
+              "text": "Bestellung Löschen"
+            }
+          ],
+          "labelHidden": true,
+          "destructive": true,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "New Order"
+            },
+            {
+              "locale": "de",
+              "text": "Neue Bestellung"
+            }
+          ],
+          "type": "button",
+          "event": "add",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 10,
+      "showRowCount": true,
+      "initialSorting": [
+        {
+          "idref": "column-1225d"
+        },
+        {
+          "idref": "column-dc4e5"
+        }
+      ],
+      "enableColumnsResize": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      }
+    }
+  }
+}

@@ -1,0 +1,2142 @@
+{
+  "header": {
+    "id": "WelcomePage_CM",
+    "modelType": "content",
+    "modelVersion": "0.8.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Content"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "configuration": {
+      "namespaceVersions": {
+        "com.mgmtp.a12.contentengine": "0.9.0"
+      }
+    },
+    "root": {
+      "id": "7083ee19",
+      "type": "Box",
+      "namespace": "com.mgmtp.a12.contentengine",
+      "props": {
+        "style": {
+          "display": "flex",
+          "width": "1000px",
+          "height": "fit-content",
+          "flexDirection": "column",
+          "padding": "8px",
+          "margin": "0px",
+          "gap": "8px",
+          "backgroundRepeat": "no-repeat"
+        }
+      },
+      "children": [
+        {
+          "id": "812e46f9",
+          "type": "Box",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "props": {
+            "style": {
+              "display": "flex",
+              "width": "100%",
+              "height": "fit-content",
+              "flexDirection": "column",
+              "padding": "8px",
+              "margin": "0px",
+              "gap": "8px",
+              "backgroundRepeat": "no-repeat"
+            }
+          },
+          "children": [
+            {
+              "id": "1c69ab9c",
+              "type": "Grid",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "props": {
+                "noGutter": true
+              },
+              "children": [
+                {
+                  "id": "627a5cdf",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          7,
+                          3
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "e025f13c",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    },
+                    {
+                      "id": "23111743",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {
+                        "style": {
+                          "padding": "0px 0px 0px 0px"
+                        }
+                      },
+                      "children": [
+                        {
+                          "id": "a3ce9cc2",
+                          "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%",
+                              "padding": "20px 0px 0px 0px"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                        "text": "A12 Preview App",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">A12 Preview App</span></p>"
+                          }
+                        },
+                        {
+                          "id": "6cc109d8",
+                          "type": "Heading",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 24px;font-weight: 900;",
+                                        "text": "eCommerce Workspace",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "heading",
+                                    "version": 1,
+                                    "tag": "h1"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<h1 class=\"editor-heading-h1\" dir=\"ltr\"><span style=\"font-size: 24px; font-weight: 900; white-space: pre-wrap;\">eCommerce Workspace</span></h1>"
+                          }
+                        },
+                        {
+                          "id": "28fa2bd0",
+                          "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 18px;font-weight: 600;",
+                                        "text": "This is an example workspace",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 0,
+                                    "textStyle": "font-size: 18px;font-weight: 600;"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 18px; font-weight: 600; white-space: pre-wrap;\">This is an example workspace</span></p>"
+                          }
+                        },
+                        {
+                          "id": "5eb2de35",
+                          "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%",
+                              "padding": "20px 0px 10px 0px"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 14px;",
+                                        "text": "The eCommerce Workspace serves as a showcase for advanced A12 modeling features. Modelers can explore examples of many of the features of A12 in this workspace:",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "justify",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 0,
+                                    "textStyle": "font-size: 14px;"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: justify;\"><span style=\"font-size: 14px; white-space: pre-wrap;\">The eCommerce Workspace serves as a showcase for advanced A12 modeling features. Modelers can explore examples of many of the features of A12 in this workspace:</span></p>"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "3e0892a6",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                },
+                {
+                  "id": "7c22fcdc",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "75fe1ccb",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": []
+                    },
+                    {
+                      "id": "d3a6dbdf",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "36a4d658",
+                          "type": "UnorderedList",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%",
+                              "borderStyle": "none",
+                              "borderColor": "#333333",
+                              "borderWidth": "1px",
+                              "padding": "0px 0px 0px 15px",
+                              "margin": "0px"
+                            }
+                          },
+                          "children": [
+                            {
+                              "id": "52be2f4a",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "e7117941",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "Paragraph",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Validation rules",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": ""
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "The ERP ID field is an example of the required field feature. It is also possible to make a field required based on the value of another field – for example, Ingredients must be filled if the food product has the Allergens field filled.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": ""
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Validation tests on repeats are also displayed in this workspace. Testing that the values in a repeat are unique can be seen when adding attributes for a product, all attribute names must be unique. Specifying that at least one value has been added to a repeat is another example of validation in a repeat – At least one author must be added for each book.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": ""
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Validation rules</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">The ERP ID field is an example of the required field feature. It is also possible to make a field required based on the value of another field – for example, Ingredients must be filled if the food product has the Allergens field filled.</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Validation tests on repeats are also displayed in this workspace. Testing that the values in a repeat are unique can be seen when adding attributes for a product, all attribute names must be unique. Specifying that at least one value has been added to a repeat is another example of validation in a repeat – At least one author must be added for each book.</span></p>"
+                                  },
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "id": "9e462b15",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "74051d58",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;font-weight: 400;color: inherit;background-color: transparent;",
+                                                "text": "Computation",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": ""
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                                "text": "An example of a string concatenation can be seen with the VariantFullERP_ID. This is a computed field. It is made up of the product ERP ID concatenated to a 3 digit Variant ERP Suffix.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                                "text": "The `Current Price with Discount` is calculated from the `Current Price` and `Current Discount`. Both are determined from the respective lists on the Pricing Screen of each Product. ",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                                "text": "The Number of Variants field in the product overview is calculated by counting the number of entries in the variants repeat for the product.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">Computation</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">An example of a string concatenation can be seen with the VariantFullERP_ID. This is a computed field. It is made up of the product ERP ID concatenated to a 3 digit Variant ERP Suffix.</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">The `Current Price with Discount` is calculated from the `Current Price` and `Current Discount`. Both are determined from the respective lists on the Pricing Screen of each Product. </span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">The Number of Variants field in the product overview is calculated by counting the number of entries in the variants repeat for the product.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "91cee8f7",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "dd8f3071",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Expressions",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "The assigned attributes that are displayed in the variant repeat on the variant tab of the product page is generated using an expression. The expression concatenates all values in the attributes repeat into one string so that all assigned attributes as one value for a variant are displayed. Basic formatting can be added to the result of the expression like line breaks between values that are concatenated to make the result better readable. An Example of a product with variants can be seen in the ‘pears’ product.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Expressions</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">The assigned attributes that are displayed in the variant repeat on the variant tab of the product page is generated using an expression. The expression concatenates all values in the attributes repeat into one string so that all assigned attributes as one value for a variant are displayed. Basic formatting can be added to the result of the expression like line breaks between values that are concatenated to make the result better readable. An Example of a product with variants can be seen in the ‘pears’ product.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "cfd1960d",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "1b818f86",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Dependent fields",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Some of the fields for the Nutrition Facts are editable or read-only based on the Use Values Of Chemical Analysis boolean. The ‘nutrition fields’ are dependent on the value of the checkbox.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Dependent fields</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Some of the fields for the Nutrition Facts are editable or read-only based on the Use Values Of Chemical Analysis boolean. The ‘nutrition fields’ are dependent on the value of the checkbox.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "aceeba3e",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "1e9dfe60",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Ratio of width of master/details screens",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Shown in the product module is the ‘BundlesFlow’ or ‘MoviesFlow’ for example where the ratio of the width is set to 4:8 (Overview : Form), so that there is more space for the product details. This is set in the app model.The brand module has no setting for the width in the app model so the default ratio is used.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Ratio of width of master/details screens</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Shown in the product module is the ‘BundlesFlow’ or ‘MoviesFlow’ for example where the ratio of the width is set to 4:8 (Overview : Form), so that there is more space for the product details. This is set in the app model.The brand module has no setting for the width in the app model so the default ratio is used.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "959f0d4d",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "40d65a59",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Errors and warnings",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Validation can result in either warnings or errors. The Validate button will trigger all the errors and warnings.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Errors and warnings</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Validation can result in either warnings or errors. The Validate button will trigger all the errors and warnings.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "299204ae",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "18106ad",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Tab navigation",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "The product model contains multiple screens and navigation buttons in the model sub header. These navigations buttons are shown as tabs in the application, which allow the user of the application to navigate between screens.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Tab navigation</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">The product model contains multiple screens and navigation buttons in the model sub header. These navigations buttons are shown as tabs in the application, which allow the user of the application to navigate between screens.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "4f58d2e5",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "ba88a6a9",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Pinned columns in the overview",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "In the product food overview the first column is pinned.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Pinned columns in the overview</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">In the product food overview the first column is pinned.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "98205f1b",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "e4564cd2",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Searching and filtering",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Full text search and powerful filtering is standard with the overview.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Searching and filtering</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Full text search and powerful filtering is standard with the overview.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "4926e2c4",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "12f0a7c8",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Different types of relationships",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Brand-Product relationship is an example of a 1-n relationship.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Collection-Product relationship is an example of an n-n relationship.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Different types of relationships</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Brand-Product relationship is an example of a 1-n relationship.</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Collection-Product relationship is an example of an n-n relationship.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "90f87740",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "31bb14f",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Different relationship bindings",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Dropdown – used to select a brand on the product page.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Dualpane – used to select a product on the bundle page.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Table list – used to display orders on the orders tab of the product page.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Different relationship bindings</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Dropdown – used to select a brand on the product page.</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Dualpane – used to select a product on the bundle page.</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Table list – used to display orders on the orders tab of the product page.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "e76b49f9",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "b712392c",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Placeholder",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "An example of a placeholder is visible on the ‘Customer’ details page, in the ‘Customer Number’ field.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Placeholder</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">An example of a placeholder is visible on the ‘Customer’ details page, in the ‘Customer Number’ field.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "9e9bdbb9",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "f3330491",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Heterogeneity",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "Heterogeneity can be seen in the Product Catalog, where the products are displayed in a heterogeneous tree.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Heterogeneity</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">Heterogeneity can be seen in the Product Catalog, where the products are displayed in a heterogeneous tree.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "8555e20b",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "66770409",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Modeling a Tree",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": "font-size: 16px;"
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "An example of a tree is given in the Product Catalogue module. This tree displays heterogeneous data.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Modeling a Tree</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">An example of a tree is given in the Product Catalogue module. This tree displays heterogeneous data.</span></p>"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "bca3f39f",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 5px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "91a82310",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 8,
+                                                "mode": "normal",
+                                                "style": "font-size: 16px;",
+                                                "text": "Role Based Access Control",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 8,
+                                            "textStyle": ""
+                                          },
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;",
+                                                "text": "This workspace uses Role Based Access Control (RBAC). Users, Roles and Access Rights are defined inside the \"auth\" folder. These Access Rights ultimately determine which operations the User can do.",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textFormat": 0,
+                                            "textStyle": "font-size: 14px;"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><u><span class=\"editor-text-underline\" style=\"font-size: 16px; white-space: pre-wrap;\">Role Based Access Control</span></u></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; white-space: pre-wrap;\">This workspace uses Role Based Access Control (RBAC). Users, Roles and Access Rights are defined inside the \"auth\" folder. These Access Rights ultimately determine which operations the User can do.</span></p>"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "46dbad9f",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "ae8218c9",
+              "type": "Grid",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "props": {
+                "noGutter": true,
+                "style": {
+                  "margin": "auto",
+                  "padding": "10px 0px 0px 0px"
+                }
+              },
+              "children": [
+                {
+                  "id": "d0483473",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    },
+                    "style": {
+                      "padding": "0px 0px 10px 0px"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "c805db6e",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    },
+                    {
+                      "id": "d229c395",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "b8563345",
+                          "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "props": {
+                            "style": {
+                              "width": "100%",
+                              "padding": "0px"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "font-size: 14px;font-weight: 500;color: inherit;background-color: transparent;",
+                                        "text": "The following Users and Roles are available in all workspaces that are created with the Preview App Control:",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 0,
+                                    "textStyle": "font-size: 14px;font-weight: 500;color: inherit;background-color: transparent;"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 500; color: inherit; background-color: transparent; white-space: pre-wrap;\">The following Users and Roles are available in all workspaces that are created with the Preview App Control:</span></p>"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "8774b5da",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                },
+                {
+                  "id": "79a7d28d",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    },
+                    "style": {
+                      "padding": "0px 0px 10px 0px"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "51f11f8",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    },
+                    {
+                      "id": "3f62d488",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "4a2f72e1",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "Table",
+                          "props": {
+                            "columns": [
+                              {
+                                "id": "9ccc6e4",
+                                "pinning": "left",
+                                "label": "User",
+                                "width": 1.5
+                              },
+                              {
+                                "id": "bcdfe948",
+                                "width": 1
+                              },
+                              {
+                                "id": "9d22b050",
+                                "width": 2
+                              }
+                            ],
+                            "enableColumnsResizing": false,
+                            "style": {
+                              "width": "100%",
+                              "padding": "0px"
+                            }
+                          },
+                          "children": [
+                            {
+                              "id": "cd28d6bc",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableHead",
+                              "props": {},
+                              "children": [
+                                {
+                                  "id": "63809b0b",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableHeadRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "6df81987",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableHeadCell",
+                                      "props": {
+                                        "content": "User"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "5f90c8a4",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableHeadCell",
+                                      "props": {
+                                        "content": "Role"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "5cdc5edd",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableHeadCell",
+                                      "props": {
+                                        "content": "Is authorized to..."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "id": "187db436",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableBody",
+                              "props": {},
+                              "children": [
+                                {
+                                  "id": "1394d284",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "c7401c1c",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "enduser"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "c5aea823",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "tester"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "e76045cb",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "access the end user application modules to create, edit and delete Documents."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "e6b12589",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "8a330918",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "reader"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "49bdf44a",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "reviewer"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "49dd4715",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "access the end user application modules to read existing Documents."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "c4fd7189",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "ac680843",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "ba"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "3ea09cac",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "modeler"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "811d8628",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "create, edit and deploy models from SME to the Preview App and test them end-to-end."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "91b9e25c",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyRow",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "c934afb3",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "admin"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "5f0bf60f",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "systemAdmin"
+                                      },
+                                      "children": []
+                                    },
+                                    {
+                                      "id": "351c9546",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "TableBodyCell",
+                                      "props": {
+                                        "content": "access the end user application modules to create, edit and delete Documents as well as create, edit and deploy models from SME to the Preview App Server. In addition, the administrator can perform workflow actions."
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "id": "de184768",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableFoot",
+                              "props": {},
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "4b111f40",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                },
+                {
+                  "id": "f313734",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          10,
+                          1
+                        ]
+                      }
+                    },
+                    "style": {
+                      "padding": "10px 0px 10px 0px"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "5e316834",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    },
+                    {
+                      "id": "9cf78b2",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "c03c6730",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "MessageBox",
+                          "props": {
+                            "label": "There is a special Access Right \"MODEL_MANAGE\", that allows a Role to add, change or read models even if the Role is not listed in the model. \nThis Access Right is assigned to the Roles \"modeler\" and \"systemAdmin\". Hence, these Roles (and the Users \"ba\" and \"admin\") can work with the models although they are not  listed in the model files.",
+                            "focusOnMessage": false,
+                            "variant": "info",
+                            "style": {
+                              "padding": "0px 0px 0px 0px",
+                              "margin": "0px 0px 0px 0px"
+                            }
+                          },
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "5d4b3129",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                },
+                {
+                  "id": "8b64822c",
+                  "type": "GridRow",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "props": {
+                    "layoutConfig": {
+                      "layout": {
+                        "lg": [
+                          2,
+                          9,
+                          1
+                        ],
+                        "md": [
+                          1,
+                          6,
+                          5
+                        ]
+                      }
+                    },
+                    "style": {
+                      "padding": "20px 0px 0px 0px"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "9ce55496",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": []
+                    },
+                    {
+                      "id": "2cadb676",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "e0ed18a1",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "Paragraph",
+                          "props": {
+                            "style": {
+                              "width": "100%"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 2,
+                                        "mode": "normal",
+                                        "style": "font-size: 12px;",
+                                        "text": "The Welcome Page is currently only provided in English.",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 2,
+                                    "textStyle": "font-size: 12px;"
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><i><em class=\"editor-text-italic\" style=\"font-size: 12px; white-space: pre-wrap;\">The Welcome Page is currently only provided in English.</em></i></p>"
+                          },
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "6a82914e",
+                      "type": "GridColumn",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "props": {}
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,352 @@
+{
+  "header": {
+    "id": "Brand_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Brand_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_b17da",
+          "name": "Brand",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_81d22",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_161ef",
+                "name": "Code",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Code"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Code"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_25a62",
+                "name": "Description",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Description"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Beschreibung"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_c6399",
+                "name": "Keywords",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Keywords"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Schlagworte"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_72fb2",
+                "name": "OwnBrand",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Own Brand?"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Eigenmarke?"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_c6001",
+                "name": "Image",
+                "Group": {
+                  "repeatability": 1,
+                  "usageType": "attachment",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_1171b",
+                      "name": "original_filename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_ce606",
+                      "name": "internal_filename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_3b54e",
+                      "name": "content",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true,
+                            "noValueValidation": true
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_3cc16",
+                      "name": "attachment_id",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_2ea28",
+                      "name": "size",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_1fa9d",
+                      "name": "mime_type",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_159d7",
+                      "name": "category",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_28151",
+                      "name": "description",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_37aa2",
+                      "name": "AttachmentInternalFilenameRequired",
+                      "Rule": {
+                        "errorEntityRelPath": "../internal_filename",
+                        "errorCode": "Error rule_37aa2",
+                        "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_febe3",
+                      "name": "AttachmentMimeTypeRequired",
+                      "Rule": {
+                        "errorEntityRelPath": "../mime_type",
+                        "errorCode": "Error rule_febe3",
+                        "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_35feb",
+                      "name": "AttachmentIdOrContentFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../content",
+                        "errorCode": "Error rule_35feb",
+                        "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_8995d",
+                      "name": "SizeOfContentFilled",
+                      "Rule": {
+                        "errorEntityRelPath": "../content",
+                        "errorCode": "Error rule_8995d",
+                        "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Internal Error: If the content is filled, the size must be also filled."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Internal Error: If the content is filled, the size must be also filled."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_65d9c",
+                "name": "CMS_ShowBrandImageOnProductPages",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Show Brand Image on Product Pages?"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Zeige Markenbild auf Produktseite?"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

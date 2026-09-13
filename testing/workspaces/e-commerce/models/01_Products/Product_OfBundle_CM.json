@@ -1,0 +1,1545 @@
+{
+  "header": {
+    "id": "Product_OfBundle_CM",
+    "modelType": "content",
+    "modelVersion": "0.8.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-content-model",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Product_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "namespaceVersions": {
+        "com.mgmtp.a12.contentengine": "0.9.0"
+      }
+    },
+    "root": {
+      "id": "Box-root-node",
+      "namespace": "com.mgmtp.a12.contentengine",
+      "type": "Box",
+      "props": {
+        "style": {
+          "display": "flex",
+          "width": "100%",
+          "height": "fit-content",
+          "flexDirection": "column",
+          "padding": "10px",
+          "margin": "0px",
+          "gap": "0px",
+          "backgroundRepeat": "no-repeat"
+        }
+      },
+      "children": [
+        {
+          "id": "Heading-aa8e2972",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "type": "Heading",
+          "props": {
+            "tree": {
+              "root": {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "detail": 0,
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "text": "Product of Bundle",
+                        "type": "text",
+                        "version": 1
+                      }
+                    ],
+                    "direction": "ltr",
+                    "format": "",
+                    "indent": 0,
+                    "type": "heading",
+                    "version": 1,
+                    "tag": "h1"
+                  }
+                ],
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "type": "root",
+                "version": 1,
+                "textStyle": "font-weight: 700;"
+              }
+            },
+            "html": "<h1 class=\"editor-heading-h1\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Product of Bundle</span></h1>"
+          },
+          "children": []
+        },
+        {
+          "id": "Box-ad7d7935",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "type": "Box",
+          "props": {
+            "style": {
+              "display": "flex",
+              "width": "100%",
+              "height": "fit-content",
+              "flexDirection": "row",
+              "padding": "0px",
+              "margin": "0px",
+              "gap": "20px",
+              "backgroundRepeat": "no-repeat"
+            }
+          },
+          "children": [
+            {
+              "id": "Box-798193e9",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "type": "Box",
+              "props": {
+                "style": {
+                  "display": "flex",
+                  "width": "200px",
+                  "height": "fit-content",
+                  "flexDirection": "column",
+                  "padding": "0px",
+                  "margin": "0px",
+                  "gap": "0px",
+                  "backgroundRepeat": "no-repeat"
+                }
+              },
+              "children": [
+                {
+                  "id": "Image-ff9ebaa6",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "Image",
+                  "props": {
+                    "style": {
+                      "margin": "0",
+                      "height": "auto",
+                      "width": "auto",
+                      "boxShadow": "0px 0px 0px 0px rgb(0, 0, 0, 1)"
+                    },
+                    "src": {
+                      "static": "",
+                      "dynamic": "include_common_group_8837c"
+                    },
+                    "alt": ""
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "id": "Box-dc4811e5",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "type": "Box",
+              "props": {
+                "style": {
+                  "display": "flex",
+                  "width": "100%",
+                  "height": "fit-content",
+                  "flexDirection": "column",
+                  "padding": "0px",
+                  "margin": "0px",
+                  "gap": "0px",
+                  "backgroundRepeat": "no-repeat"
+                }
+              },
+              "children": [
+                {
+                  "id": "Heading-adaec0f1",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "Heading",
+                  "props": {
+                    "tree": {
+                      "root": {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "detail": 0,
+                                "format": 0,
+                                "mode": "normal",
+                                "style": "",
+                                "text": "",
+                                "type": "ce-field-reference",
+                                "version": 1,
+                                "fieldId": "include_common_field_0b973",
+                                "fieldPath": "/Product/Common/Type",
+                                "displayOption": "value-only"
+                              },
+                              {
+                                "detail": 0,
+                                "format": 0,
+                                "mode": "normal",
+                                "style": "",
+                                "text": " ",
+                                "type": "text",
+                                "version": 1
+                              },
+                              {
+                                "detail": 0,
+                                "format": 1,
+                                "mode": "normal",
+                                "style": "font-weight: 700;",
+                                "text": "",
+                                "type": "ce-field-reference",
+                                "version": 1,
+                                "fieldId": "include_common_field_4217e",
+                                "fieldPath": "/Product/Common/Name"
+                              }
+                            ],
+                            "direction": "ltr",
+                            "format": "",
+                            "indent": 0,
+                            "type": "heading",
+                            "version": 1,
+                            "tag": "h1"
+                          }
+                        ],
+                        "direction": "ltr",
+                        "format": "",
+                        "indent": 0,
+                        "type": "root",
+                        "version": 1,
+                        "textStyle": "font-weight: 700;"
+                      }
+                    },
+                    "html": "<h1 class=\"editor-heading-h1\" dir=\"ltr\"><span data-ce-field-ref-id=\"include_common_field_0b973\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Type\" data-ce-field-ref-display-option=\"value-only\" style=\"white-space: pre-wrap;\">[/Product/Common/Type]</span><span style=\"white-space: pre-wrap;\"> </span><b><strong class=\"editor-text-bold ce-lexical-element\" data-ce-field-ref-id=\"include_common_field_4217e\" contenteditable=\"false\" data-ce-field-ref-path=\"/Product/Common/Name\" style=\"font-weight: 700; white-space: pre-wrap;\">[/Product/Common/Name]</strong></b></h1>"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "Paragraph-625c7c55",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "Paragraph",
+                  "props": {
+                    "style": {
+                      "width": "100%"
+                    },
+                    "tree": {
+                      "root": {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "detail": 0,
+                                "format": 0,
+                                "mode": "normal",
+                                "style": "",
+                                "text": "",
+                                "type": "ce-field-reference",
+                                "version": 1,
+                                "fieldId": "include_common_field_a5318",
+                                "fieldPath": "/Product/Common/General/Description"
+                              }
+                            ],
+                            "direction": "ltr",
+                            "format": "",
+                            "indent": 0,
+                            "type": "paragraph",
+                            "version": 1,
+                            "textFormat": 0
+                          }
+                        ],
+                        "direction": "ltr",
+                        "format": "",
+                        "indent": 0,
+                        "type": "root",
+                        "version": 1
+                      }
+                    },
+                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span data-ce-field-ref-id=\"include_common_field_a5318\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/General/Description\" style=\"white-space: pre-wrap;\">[/Product/Common/General/Description]</span></p>"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "Paragraph-ee983b6d",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "Paragraph",
+                  "props": {
+                    "style": {
+                      "width": "100%"
+                    },
+                    "tree": {
+                      "root": {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "detail": 0,
+                                "format": 0,
+                                "mode": "normal",
+                                "style": "",
+                                "text": "It is currently sold for ",
+                                "type": "text",
+                                "version": 1
+                              },
+                              {
+                                "detail": 0,
+                                "format": 0,
+                                "mode": "normal",
+                                "style": "",
+                                "text": "",
+                                "type": "ce-field-reference",
+                                "version": 1,
+                                "fieldId": "include_common_field_d7783",
+                                "fieldPath": "/Product/Common/CurrentPrice"
+                              },
+                              {
+                                "detail": 0,
+                                "format": 0,
+                                "mode": "normal",
+                                "style": "",
+                                "text": " €.",
+                                "type": "text",
+                                "version": 1
+                              }
+                            ],
+                            "direction": "ltr",
+                            "format": "",
+                            "indent": 0,
+                            "type": "paragraph",
+                            "version": 1,
+                            "textFormat": 0,
+                            "textStyle": ""
+                          }
+                        ],
+                        "direction": "ltr",
+                        "format": "",
+                        "indent": 0,
+                        "type": "root",
+                        "version": 1
+                      }
+                    },
+                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">It is currently sold for </span><span data-ce-field-ref-id=\"include_common_field_d7783\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/CurrentPrice\" style=\"white-space: pre-wrap;\">[/Product/Common/CurrentPrice]</span><span style=\"white-space: pre-wrap;\"> €.</span></p>"
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Conditional-4a7eaeea",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "type": "Conditional",
+          "props": {
+            "conditions": [
+              {
+                "operator": "not_equal",
+                "fieldId": "include_common_field_12ee1"
+              }
+            ]
+          },
+          "children": [
+            {
+              "id": "Heading-f4fea58f",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "type": "Heading",
+              "props": {
+                "tree": {
+                  "root": {
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "detail": 0,
+                            "format": 0,
+                            "mode": "normal",
+                            "style": "",
+                            "text": "Available Variants",
+                            "type": "text",
+                            "version": 1
+                          }
+                        ],
+                        "direction": "ltr",
+                        "format": "",
+                        "indent": 0,
+                        "type": "heading",
+                        "version": 1,
+                        "tag": "h2"
+                      }
+                    ],
+                    "direction": "ltr",
+                    "format": "",
+                    "indent": 0,
+                    "type": "root",
+                    "version": 1
+                  }
+                },
+                "html": "<h2 class=\"editor-heading-h2\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Available Variants</span></h2>"
+              },
+              "children": []
+            },
+            {
+              "id": "Box-71ba275d",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "type": "Box",
+              "props": {
+                "style": {
+                  "display": "flex",
+                  "width": "100%",
+                  "height": "fit-content",
+                  "flexDirection": "row",
+                  "padding": "16px",
+                  "margin": "0px",
+                  "gap": "16px",
+                  "backgroundRepeat": "no-repeat"
+                }
+              },
+              "children": [
+                {
+                  "id": "Group-8ddbca87",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "Group",
+                  "props": {
+                    "groupId": "include_common_group_082cd"
+                  },
+                  "children": [
+                    {
+                      "id": "Box-fa54e364",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "type": "Box",
+                      "props": {
+                        "style": {
+                          "display": "flex",
+                          "width": "300px",
+                          "height": "100%",
+                          "flexDirection": "column",
+                          "padding": "30px",
+                          "margin": "0px",
+                          "gap": "0px",
+                          "backgroundRepeat": "no-repeat",
+                          "boxShadow": "1px 1px 15px 0px rgb(107, 107, 134)"
+                        }
+                      },
+                      "children": [
+                        {
+                          "id": "Paragraph-d17f50f4",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "Paragraph",
+                          "props": {
+                            "style": {
+                              "width": "100%"
+                            },
+                            "tree": {
+                              "root": {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 1,
+                                        "mode": "normal",
+                                        "style": "font-weight: 700;",
+                                        "text": "",
+                                        "type": "ce-field-reference",
+                                        "version": 1,
+                                        "fieldId": "include_common_field_df210",
+                                        "fieldPath": "/Product/Common/Variants/VariantName"
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 1,
+                                    "textStyle": "font-weight: 700;"
+                                  },
+                                  {
+                                    "children": [
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "",
+                                        "text": "With Price: ",
+                                        "type": "text",
+                                        "version": 1
+                                      },
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "",
+                                        "text": "",
+                                        "type": "ce-field-reference",
+                                        "version": 1,
+                                        "fieldId": "include_common_field_126a7",
+                                        "fieldPath": "/Product/Common/Variants/VariantLatestPriceWithDiscount"
+                                      },
+                                      {
+                                        "detail": 0,
+                                        "format": 0,
+                                        "mode": "normal",
+                                        "style": "",
+                                        "text": " €",
+                                        "type": "text",
+                                        "version": 1
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "paragraph",
+                                    "version": 1,
+                                    "textFormat": 0,
+                                    "textStyle": ""
+                                  }
+                                ],
+                                "direction": "ltr",
+                                "format": "",
+                                "indent": 0,
+                                "type": "root",
+                                "version": 1,
+                                "textFormat": 1,
+                                "textStyle": "font-weight: 700;"
+                              }
+                            },
+                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold ce-lexical-element\" data-ce-field-ref-id=\"include_common_field_df210\" contenteditable=\"false\" data-ce-field-ref-path=\"/Product/Common/Variants/VariantName\" style=\"font-weight: 700; white-space: pre-wrap;\">[/Product/Common/Variants/VariantName]</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">With Price: </span><span data-ce-field-ref-id=\"include_common_field_126a7\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Variants/VariantLatestPriceWithDiscount\" style=\"white-space: pre-wrap;\">[/Product/Common/Variants/VariantLatestPriceWithDiscount]</span><span style=\"white-space: pre-wrap;\"> €</span></p>"
+                          },
+                          "children": []
+                        },
+                        {
+                          "id": "Conditional-2837d0c3",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "Conditional",
+                          "props": {
+                            "conditions": [
+                              {
+                                "operator": "not_equal",
+                                "fieldId": "include_common_field_6fde0"
+                              }
+                            ]
+                          },
+                          "children": [
+                            {
+                              "id": "Paragraph-f24ae948",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "Paragraph",
+                              "props": {
+                                "style": {
+                                  "width": "100%"
+                                },
+                                "tree": {
+                                  "root": {
+                                    "children": [
+                                      {
+                                        "children": [
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "text": "There is a differing delivery time: ",
+                                            "type": "text",
+                                            "version": 1
+                                          },
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": "",
+                                            "type": "ce-field-reference",
+                                            "version": 1,
+                                            "fieldId": "include_common_field_6fde0",
+                                            "fieldPath": "/Product/Common/Variants/VariantDifferentDeliveryTime"
+                                          },
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "text": " (Main Product: ",
+                                            "type": "text",
+                                            "version": 1
+                                          },
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": "",
+                                            "type": "ce-field-reference",
+                                            "version": 1,
+                                            "fieldId": "include_common_field_bf587",
+                                            "fieldPath": "/Product/Common/General/DeliveryTime"
+                                          },
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": ")",
+                                            "type": "text",
+                                            "version": 1
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "paragraph",
+                                        "version": 1,
+                                        "textFormat": 0
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "root",
+                                    "version": 1
+                                  }
+                                },
+                                "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">There is a differing delivery time: </span><span data-ce-field-ref-id=\"include_common_field_6fde0\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Variants/VariantDifferentDeliveryTime\" style=\"white-space: pre-wrap;\">[/Product/Common/Variants/VariantDifferentDeliveryTime]</span><span style=\"white-space: pre-wrap;\"> (Main Product: </span><span data-ce-field-ref-id=\"include_common_field_bf587\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/General/DeliveryTime\" style=\"white-space: pre-wrap;\">[/Product/Common/General/DeliveryTime]</span><span style=\"white-space: pre-wrap;\">)</span></p>"
+                              },
+                              "children": []
+                            }
+                          ]
+                        },
+                        {
+                          "id": "UnorderedList-7e1f739a",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "UnorderedList",
+                          "props": {
+                            "style": {
+                              "width": "100%"
+                            }
+                          },
+                          "children": [
+                            {
+                              "id": "Group-56fe394a",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "Group",
+                              "props": {
+                                "groupId": "include_common_group_8767d"
+                              },
+                              "children": [
+                                {
+                                  "id": "ListItem-4f6321ea",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "ListItem",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "Paragraph-e22c27a5",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "Paragraph",
+                                      "props": {
+                                        "style": {
+                                          "width": "100%"
+                                        },
+                                        "tree": {
+                                          "root": {
+                                            "children": [
+                                              {
+                                                "children": [
+                                                  {
+                                                    "detail": 0,
+                                                    "format": 0,
+                                                    "mode": "normal",
+                                                    "style": "",
+                                                    "text": "",
+                                                    "type": "ce-field-reference",
+                                                    "version": 1,
+                                                    "fieldId": "include_common_field_5bafa",
+                                                    "fieldPath": "/Product/Common/Variants/Attributes/AttributeName"
+                                                  },
+                                                  {
+                                                    "detail": 0,
+                                                    "format": 0,
+                                                    "mode": "normal",
+                                                    "style": "",
+                                                    "text": " : ",
+                                                    "type": "text",
+                                                    "version": 1
+                                                  },
+                                                  {
+                                                    "detail": 0,
+                                                    "format": 0,
+                                                    "mode": "normal",
+                                                    "style": "",
+                                                    "text": "",
+                                                    "type": "ce-field-reference",
+                                                    "version": 1,
+                                                    "fieldId": "include_common_field_4d54b",
+                                                    "fieldPath": "/Product/Common/Variants/Attributes/AttributeValue"
+                                                  }
+                                                ],
+                                                "direction": "ltr",
+                                                "format": "",
+                                                "indent": 0,
+                                                "type": "paragraph",
+                                                "version": 1,
+                                                "textFormat": 0
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "root",
+                                            "version": 1
+                                          }
+                                        },
+                                        "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span data-ce-field-ref-id=\"include_common_field_5bafa\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Variants/Attributes/AttributeName\" style=\"white-space: pre-wrap;\">[/Product/Common/Variants/Attributes/AttributeName]</span><span style=\"white-space: pre-wrap;\"> : </span><span data-ce-field-ref-id=\"include_common_field_4d54b\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Variants/Attributes/AttributeValue\" style=\"white-space: pre-wrap;\">[/Product/Common/Variants/Attributes/AttributeValue]</span></p>"
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "Heading-530721e3",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "type": "Heading",
+          "props": {
+            "tree": {
+              "root": {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "detail": 0,
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "text": "Pricing History",
+                        "type": "text",
+                        "version": 1
+                      }
+                    ],
+                    "direction": "ltr",
+                    "format": "",
+                    "indent": 0,
+                    "type": "heading",
+                    "version": 1,
+                    "tag": "h2"
+                  }
+                ],
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "type": "root",
+                "version": 1
+              }
+            },
+            "html": "<h2 class=\"editor-heading-h2\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Pricing History</span></h2>"
+          },
+          "children": []
+        },
+        {
+          "id": "Box-4964a160",
+          "namespace": "com.mgmtp.a12.contentengine",
+          "type": "Box",
+          "props": {
+            "style": {
+              "display": "flex",
+              "width": "100%",
+              "height": "fit-content",
+              "flexDirection": "row",
+              "padding": "16px",
+              "margin": "0px",
+              "gap": "16px",
+              "backgroundRepeat": "no-repeat"
+            }
+          },
+          "children": [
+            {
+              "id": "Box-e67d6190",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "type": "Box",
+              "props": {
+                "style": {
+                  "display": "flex",
+                  "width": "100%",
+                  "height": "fit-content",
+                  "flexDirection": "column",
+                  "padding": "0px",
+                  "margin": "0px",
+                  "gap": "0px",
+                  "backgroundRepeat": "no-repeat"
+                }
+              },
+              "children": [
+                {
+                  "id": "Paragraph-a868f6d5",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "Paragraph",
+                  "props": {
+                    "style": {
+                      "width": "100%"
+                    },
+                    "tree": {
+                      "root": {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "detail": 0,
+                                "format": 1,
+                                "mode": "normal",
+                                "style": "font-weight: 700;",
+                                "text": "Prices",
+                                "type": "text",
+                                "version": 1
+                              }
+                            ],
+                            "direction": "ltr",
+                            "format": "",
+                            "indent": 0,
+                            "type": "paragraph",
+                            "version": 1,
+                            "textFormat": 1,
+                            "textStyle": "font-weight: 700;"
+                          }
+                        ],
+                        "direction": "ltr",
+                        "format": "",
+                        "indent": 0,
+                        "type": "root",
+                        "version": 1,
+                        "textFormat": 1,
+                        "textStyle": "font-weight: 700;"
+                      }
+                    },
+                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"font-weight: 700; white-space: pre-wrap;\">Prices</strong></b></p>"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "Table-22f755ed",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "Table",
+                  "props": {
+                    "columns": [
+                      {
+                        "id": "4e7dadd4",
+                        "pinning": "left"
+                      },
+                      {
+                        "id": "ca02fab7"
+                      },
+                      {
+                        "id": "e267f2cc",
+                        "horizontalAlignment": {
+                          "head": "right"
+                        }
+                      },
+                      {
+                        "id": "95a3f57c"
+                      }
+                    ],
+                    "enableColumnsResizing": true
+                  },
+                  "children": [
+                    {
+                      "id": "TableHead-3a850812",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "type": "TableHead",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "TableHeadRow-451b6d2e",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "TableHeadRow",
+                          "props": {},
+                          "children": [
+                            {
+                              "id": "TableHeadCell-ebeae45f",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableHeadCell",
+                              "props": {
+                                "content": "Start"
+                              },
+                              "children": []
+                            },
+                            {
+                              "id": "TableHeadCell-ba3e8d02",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableHeadCell",
+                              "props": {
+                                "content": "End"
+                              },
+                              "children": []
+                            },
+                            {
+                              "id": "TableHeadCell-b7d7fbcc",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableHeadCell",
+                              "props": {
+                                "content": "Price"
+                              },
+                              "children": []
+                            },
+                            {
+                              "id": "TableHeadCell-a4bb7553",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableHeadCell",
+                              "props": {
+                                "content": "Note"
+                              },
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "TableBody-ba2a136d",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "type": "TableBody",
+                      "props": {},
+                      "children": [
+                        {
+                          "id": "Group-d520f72",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "Group",
+                          "props": {
+                            "groupId": "include_common_group_7b560",
+                            "repeatability": 1
+                          },
+                          "children": [
+                            {
+                              "id": "TableBodyRow-2105b27f",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "TableBodyRow",
+                              "props": {},
+                              "children": [
+                                {
+                                  "id": "TableBodyCell-fff03fae",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyCell",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "Paragraph-c2c0b96c",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "Paragraph",
+                                      "props": {
+                                        "style": {
+                                          "width": "100%"
+                                        },
+                                        "tree": {
+                                          "root": {
+                                            "children": [
+                                              {
+                                                "children": [
+                                                  {
+                                                    "detail": 0,
+                                                    "format": 0,
+                                                    "mode": "normal",
+                                                    "style": "",
+                                                    "text": "",
+                                                    "type": "ce-field-reference",
+                                                    "version": 1,
+                                                    "fieldId": "include_common_field_084d6",
+                                                    "fieldPath": "/Product/Common/Pricing/Start",
+                                                    "displayOption": "value-only",
+                                                    "missingValueText": " "
+                                                  }
+                                                ],
+                                                "direction": "ltr",
+                                                "format": "",
+                                                "indent": 0,
+                                                "type": "paragraph",
+                                                "version": 1,
+                                                "textFormat": 0,
+                                                "textStyle": ""
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "root",
+                                            "version": 1
+                                          }
+                                        },
+                                        "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span data-ce-field-ref-id=\"include_common_field_084d6\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Pricing/Start\" data-ce-field-ref-display-option=\"value-only\" data-ce-field-ref-missing-value-text=\" \" style=\"white-space: pre-wrap;\">[/Product/Common/Pricing/Start]</span></p>"
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "TableBodyCell-116396e2",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyCell",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "Paragraph-68d4a2c4",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "Paragraph",
+                                      "props": {
+                                        "style": {
+                                          "width": "100%"
+                                        },
+                                        "tree": {
+                                          "root": {
+                                            "children": [
+                                              {
+                                                "children": [
+                                                  {
+                                                    "detail": 0,
+                                                    "format": 0,
+                                                    "mode": "normal",
+                                                    "style": "",
+                                                    "text": "",
+                                                    "type": "ce-field-reference",
+                                                    "version": 1,
+                                                    "fieldId": "include_common_field_5cdd2",
+                                                    "fieldPath": "/Product/Common/Pricing/End",
+                                                    "displayOption": "value-only",
+                                                    "missingValueText": " "
+                                                  }
+                                                ],
+                                                "direction": "ltr",
+                                                "format": "",
+                                                "indent": 0,
+                                                "type": "paragraph",
+                                                "version": 1,
+                                                "textFormat": 0,
+                                                "textStyle": ""
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "root",
+                                            "version": 1
+                                          }
+                                        },
+                                        "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span data-ce-field-ref-id=\"include_common_field_5cdd2\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Pricing/End\" data-ce-field-ref-display-option=\"value-only\" data-ce-field-ref-missing-value-text=\" \" style=\"white-space: pre-wrap;\">[/Product/Common/Pricing/End]</span></p>"
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "TableBodyCell-3827fbad",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyCell",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "Box-bb5b8e30",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "Box",
+                                      "props": {
+                                        "style": {
+                                          "display": "flex",
+                                          "width": "100%",
+                                          "height": "fit-content",
+                                          "flexDirection": "row",
+                                          "padding": "0px",
+                                          "margin": "0px",
+                                          "gap": "0px",
+                                          "backgroundRepeat": "no-repeat",
+                                          "justifyContent": "end"
+                                        }
+                                      },
+                                      "children": [
+                                        {
+                                          "id": "Conditional-d9cbeb8b",
+                                          "namespace": "com.mgmtp.a12.contentengine",
+                                          "type": "Conditional",
+                                          "props": {
+                                            "conditions": [
+                                              {
+                                                "operator": "equal",
+                                                "fieldId": "include_common_field_d2f50",
+                                                "value": true
+                                              },
+                                              {
+                                                "operator": "not_equal",
+                                                "fieldId": "include_common_field_2b2d3",
+                                                "value": true
+                                              }
+                                            ]
+                                          },
+                                          "children": [
+                                            {
+                                              "id": "Icon-24d83e8a",
+                                              "namespace": "com.mgmtp.a12.contentengine",
+                                              "type": "Icon",
+                                              "props": {
+                                                "icon": {
+                                                  "theme": "filled",
+                                                  "name": "vertical_align_top"
+                                                },
+                                                "title": "Taking the discounts into account, the highest price was in this pricing period."
+                                              },
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "id": "Conditional-94bfe307",
+                                          "namespace": "com.mgmtp.a12.contentengine",
+                                          "type": "Conditional",
+                                          "props": {
+                                            "conditions": [
+                                              {
+                                                "operator": "equal",
+                                                "fieldId": "include_common_field_2b2d3",
+                                                "value": true
+                                              },
+                                              {
+                                                "operator": "not_equal",
+                                                "fieldId": "include_common_field_d2f50",
+                                                "value": true
+                                              }
+                                            ]
+                                          },
+                                          "children": [
+                                            {
+                                              "id": "Icon-1b8664c0",
+                                              "namespace": "com.mgmtp.a12.contentengine",
+                                              "type": "Icon",
+                                              "props": {
+                                                "icon": {
+                                                  "theme": "filled",
+                                                  "name": "vertical_align_bottom"
+                                                },
+                                                "title": "Taking the discounts into account, the lowest price was in this pricing period."
+                                              },
+                                              "children": []
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "id": "Paragraph-6fddcf63",
+                                          "namespace": "com.mgmtp.a12.contentengine",
+                                          "type": "Paragraph",
+                                          "props": {
+                                            "style": {
+                                              "width": "100%",
+                                              "margin": "0px"
+                                            },
+                                            "tree": {
+                                              "root": {
+                                                "children": [
+                                                  {
+                                                    "children": [
+                                                      {
+                                                        "detail": 0,
+                                                        "format": 0,
+                                                        "mode": "normal",
+                                                        "style": "",
+                                                        "text": "",
+                                                        "type": "ce-field-reference",
+                                                        "version": 1,
+                                                        "fieldId": "include_common_field_f3039",
+                                                        "fieldPath": "/Product/Common/Pricing/Price"
+                                                      },
+                                                      {
+                                                        "detail": 0,
+                                                        "format": 0,
+                                                        "mode": "normal",
+                                                        "style": "",
+                                                        "text": " €",
+                                                        "type": "text",
+                                                        "version": 1
+                                                      }
+                                                    ],
+                                                    "direction": "ltr",
+                                                    "format": "right",
+                                                    "indent": 0,
+                                                    "type": "paragraph",
+                                                    "version": 1,
+                                                    "textFormat": 0,
+                                                    "textStyle": ""
+                                                  }
+                                                ],
+                                                "direction": "ltr",
+                                                "format": "",
+                                                "indent": 0,
+                                                "type": "root",
+                                                "version": 1
+                                              }
+                                            },
+                                            "html": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: right;\"><span data-ce-field-ref-id=\"include_common_field_f3039\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Pricing/Price\" style=\"white-space: pre-wrap;\">[/Product/Common/Pricing/Price]</span><span style=\"white-space: pre-wrap;\"> €</span></p>"
+                                          },
+                                          "children": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": "TableBodyCell-8bc02145",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "TableBodyCell",
+                                  "props": {},
+                                  "children": [
+                                    {
+                                      "id": "Paragraph-5c787031",
+                                      "namespace": "com.mgmtp.a12.contentengine",
+                                      "type": "Paragraph",
+                                      "props": {
+                                        "style": {
+                                          "width": "100%"
+                                        },
+                                        "tree": {
+                                          "root": {
+                                            "children": [
+                                              {
+                                                "children": [
+                                                  {
+                                                    "detail": 0,
+                                                    "format": 0,
+                                                    "mode": "normal",
+                                                    "style": "",
+                                                    "text": "",
+                                                    "type": "ce-field-reference",
+                                                    "version": 1,
+                                                    "fieldId": "include_common_field_1b0c7",
+                                                    "fieldPath": "/Product/Common/Pricing/Note",
+                                                    "missingValueText": " "
+                                                  }
+                                                ],
+                                                "direction": "ltr",
+                                                "format": "",
+                                                "indent": 0,
+                                                "type": "paragraph",
+                                                "version": 1,
+                                                "textFormat": 0
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "root",
+                                            "version": 1
+                                          }
+                                        },
+                                        "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span data-ce-field-ref-id=\"include_common_field_1b0c7\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Pricing/Note\" data-ce-field-ref-missing-value-text=\" \" style=\"white-space: pre-wrap;\">[/Product/Common/Pricing/Note]</span></p>"
+                                      },
+                                      "children": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "id": "TableFoot-6ea9f123",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "type": "TableFoot",
+                      "props": {},
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "Box-6b4b4201",
+              "namespace": "com.mgmtp.a12.contentengine",
+              "type": "Box",
+              "props": {
+                "style": {
+                  "display": "flex",
+                  "width": "100%",
+                  "height": "fit-content",
+                  "flexDirection": "column",
+                  "padding": "0px",
+                  "margin": "0px",
+                  "gap": "0px",
+                  "backgroundRepeat": "no-repeat"
+                }
+              },
+              "children": [
+                {
+                  "id": "Paragraph-c7a40e4e",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "Paragraph",
+                  "props": {
+                    "style": {
+                      "width": "100%"
+                    },
+                    "tree": {
+                      "root": {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "detail": 0,
+                                "format": 1,
+                                "mode": "normal",
+                                "style": "font-weight: 700;",
+                                "text": "Discounts",
+                                "type": "text",
+                                "version": 1
+                              }
+                            ],
+                            "direction": "ltr",
+                            "format": "",
+                            "indent": 0,
+                            "type": "paragraph",
+                            "version": 1,
+                            "textFormat": 1,
+                            "textStyle": "font-weight: 700;"
+                          }
+                        ],
+                        "direction": "ltr",
+                        "format": "",
+                        "indent": 0,
+                        "type": "root",
+                        "version": 1,
+                        "textFormat": 1,
+                        "textStyle": "font-weight: 700;"
+                      }
+                    },
+                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold\" style=\"font-weight: 700; white-space: pre-wrap;\">Discounts</strong></b></p>"
+                  },
+                  "children": []
+                },
+                {
+                  "id": "OrderedList-e5490b6a",
+                  "namespace": "com.mgmtp.a12.contentengine",
+                  "type": "OrderedList",
+                  "props": {
+                    "style": {
+                      "width": "100%"
+                    }
+                  },
+                  "children": [
+                    {
+                      "id": "Group-6f956756",
+                      "namespace": "com.mgmtp.a12.contentengine",
+                      "type": "Group",
+                      "props": {
+                        "groupId": "include_common_group_880de"
+                      },
+                      "children": [
+                        {
+                          "id": "ListItem-7f8273eb",
+                          "namespace": "com.mgmtp.a12.contentengine",
+                          "type": "ListItem",
+                          "props": {
+                            "style": {
+                              "padding": "0px 0px 15px 0px"
+                            }
+                          },
+                          "children": [
+                            {
+                              "id": "Conditional-294df2bc",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "Conditional",
+                              "props": {
+                                "conditions": [
+                                  {
+                                    "operator": "equal",
+                                    "fieldId": "include_common_field_08d45",
+                                    "value": true
+                                  }
+                                ]
+                              },
+                              "children": [
+                                {
+                                  "id": "Icon-2256c8b7",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "type": "Icon",
+                                  "props": {
+                                    "icon": {
+                                      "theme": "rounded",
+                                      "name": "star"
+                                    },
+                                    "title": "Discount marked as highlighted."
+                                  },
+                                  "children": []
+                                }
+                              ]
+                            },
+                            {
+                              "id": "Paragraph-cfe4a3a",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "type": "Paragraph",
+                              "props": {
+                                "style": {
+                                  "width": "100%"
+                                },
+                                "tree": {
+                                  "root": {
+                                    "children": [
+                                      {
+                                        "children": [
+                                          {
+                                            "detail": 0,
+                                            "format": 1,
+                                            "mode": "normal",
+                                            "style": "font-weight: 700;",
+                                            "text": "",
+                                            "type": "ce-field-reference",
+                                            "version": 1,
+                                            "fieldId": "include_common_field_ba1f8",
+                                            "fieldPath": "/Product/Common/Discounts/Discount"
+                                          },
+                                          {
+                                            "detail": 0,
+                                            "format": 1,
+                                            "mode": "normal",
+                                            "style": "font-weight: 700;",
+                                            "text": " %",
+                                            "type": "text",
+                                            "version": 1
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "paragraph",
+                                        "version": 1,
+                                        "textFormat": 1,
+                                        "textStyle": "font-weight: 700;"
+                                      },
+                                      {
+                                        "children": [
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": "Start: ",
+                                            "type": "text",
+                                            "version": 1
+                                          },
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": "",
+                                            "type": "ce-field-reference",
+                                            "version": 1,
+                                            "fieldId": "include_common_field_0b5db",
+                                            "fieldPath": "/Product/Common/Discounts/Start"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "paragraph",
+                                        "version": 1,
+                                        "textFormat": 0,
+                                        "textStyle": ""
+                                      },
+                                      {
+                                        "children": [
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": "End: ",
+                                            "type": "text",
+                                            "version": 1
+                                          },
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": "",
+                                            "type": "ce-field-reference",
+                                            "version": 1,
+                                            "fieldId": "include_common_field_145aa",
+                                            "fieldPath": "/Product/Common/Discounts/End",
+                                            "displayOption": "value-only",
+                                            "missingValueText": "- no end -"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "paragraph",
+                                        "version": 1,
+                                        "textFormat": 0,
+                                        "textStyle": ""
+                                      },
+                                      {
+                                        "children": [
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": "Note: ",
+                                            "type": "text",
+                                            "version": 1
+                                          },
+                                          {
+                                            "detail": 0,
+                                            "format": 0,
+                                            "mode": "normal",
+                                            "style": "",
+                                            "text": "",
+                                            "type": "ce-field-reference",
+                                            "version": 1,
+                                            "fieldId": "include_common_field_4ff46",
+                                            "fieldPath": "/Product/Common/Discounts/Reason"
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "paragraph",
+                                        "version": 1,
+                                        "textFormat": 0,
+                                        "textStyle": ""
+                                      }
+                                    ],
+                                    "direction": "ltr",
+                                    "format": "",
+                                    "indent": 0,
+                                    "type": "root",
+                                    "version": 1,
+                                    "textStyle": "font-weight: 700;"
+                                  }
+                                },
+                                "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><b><strong class=\"editor-text-bold ce-lexical-element\" data-ce-field-ref-id=\"include_common_field_ba1f8\" contenteditable=\"false\" data-ce-field-ref-path=\"/Product/Common/Discounts/Discount\" style=\"font-weight: 700; white-space: pre-wrap;\">[/Product/Common/Discounts/Discount]</strong></b><b><strong class=\"editor-text-bold\" style=\"font-weight: 700; white-space: pre-wrap;\"> %</strong></b></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Start: </span><span data-ce-field-ref-id=\"include_common_field_0b5db\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Discounts/Start\" style=\"white-space: pre-wrap;\">[/Product/Common/Discounts/Start]</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">End: </span><span data-ce-field-ref-id=\"include_common_field_145aa\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Discounts/End\" data-ce-field-ref-display-option=\"value-only\" data-ce-field-ref-missing-value-text=\"- no end -\" style=\"white-space: pre-wrap;\">[/Product/Common/Discounts/End]</span></p><p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"white-space: pre-wrap;\">Note: </span><span data-ce-field-ref-id=\"include_common_field_4ff46\" contenteditable=\"false\" class=\"ce-lexical-element\" data-ce-field-ref-path=\"/Product/Common/Discounts/Reason\" style=\"white-space: pre-wrap;\">[/Product/Common/Discounts/Reason]</span></p>"
+                              },
+                              "children": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

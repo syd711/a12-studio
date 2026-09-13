@@ -1,0 +1,424 @@
+{
+  "header": {
+    "id": "CustomerOffer_LinkFields_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "CustomerOffer_LinkFields_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_44746",
+          "name": "LinkFields",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_add42",
+                "name": "SendOutDate",
+                "Field": {
+                  "fieldType": {
+                    "type": "DateType",
+                    "DateType": {
+                      "format": "yyyy-MM-dd"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Send Out Date"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Datum des Versands"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_ac76a",
+                "name": "Notes",
+                "Group": {
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Notes"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bemerkungen"
+                    }
+                  ],
+                  "repeatability": 100,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_47277",
+                      "name": "Date",
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Date"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Datum"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_4e4f5",
+                      "name": "Note",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Note"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Notize"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_6e095",
+                      "name": "Important",
+                      "Field": {
+                        "fieldType": {
+                          "type": "BooleanType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Important?"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Wichtig?"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_1a8b7",
+                "name": "AdditionalDataAdded",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Was there Additional Data Added?"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Wurde mehr Informationen beigefügt?"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_a8d9f",
+                "name": "AdditionalData",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "group_01080",
+                      "name": "AdditionalCoverLetter",
+                      "Group": {
+                        "repeatability": 1,
+                        "usageType": "attachment",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_a6165",
+                            "name": "original_filename",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_08a6a",
+                            "name": "internal_filename",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_a469a",
+                            "name": "content",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType",
+                                "StringType": {
+                                  "lineBreaksPermitted": true,
+                                  "noValueValidation": true
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_5ebb9",
+                            "name": "attachment_id",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_97805",
+                            "name": "size",
+                            "Field": {
+                              "fieldType": {
+                                "type": "NumberType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_5e28d",
+                            "name": "mime_type",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_316f5",
+                            "name": "category",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_ba804",
+                            "name": "description",
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_3f71b",
+                            "name": "AttachmentInternalFilenameRequired",
+                            "Rule": {
+                              "errorEntityRelPath": "../internal_filename",
+                              "errorCode": "Error rule_3f71b",
+                              "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_279b5",
+                            "name": "AttachmentMimeTypeRequired",
+                            "Rule": {
+                              "errorEntityRelPath": "../mime_type",
+                              "errorCode": "Error rule_279b5",
+                              "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_86ef1",
+                            "name": "AttachmentIdOrContentFilled",
+                            "Rule": {
+                              "errorEntityRelPath": "../content",
+                              "errorCode": "Error rule_86ef1",
+                              "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_a0fb9",
+                            "name": "SizeOfContentFilled",
+                            "Rule": {
+                              "errorEntityRelPath": "../content",
+                              "errorCode": "Error rule_a0fb9",
+                              "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: If the content is filled, the size must be also filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: If the content is filled, the size must be also filled."
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_54ef0",
+                      "name": "AdditionalDiscount",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "minValue": 0,
+                            "maxValue": 99
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Additional Discount"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Zusätzlicher Discount"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_dc677",
+                      "name": "AdditionalPromotext",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Additional Promotext"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Zusätzlicher Promotext"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

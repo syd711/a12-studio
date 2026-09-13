@@ -1,0 +1,87 @@
+{
+  "header": {
+    "id": "BundleProduct_Bundle_SelectedItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "BundleProduct_Bundle____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-cadf7",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_include_common_field_57956",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-fd8f8",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_include_common_field_4217e",
+        "sortable": false
+      },
+      {
+        "id": "column-51c05",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_field_1c82c",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-08400",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_field_c9c4f",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-c0a9c",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_field_8b02b",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

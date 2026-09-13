@@ -25,7 +25,9 @@ public class Button implements OverviewButtonLike {
   private List<Label> label = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> description = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean destructive;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean primary;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean labelHidden;

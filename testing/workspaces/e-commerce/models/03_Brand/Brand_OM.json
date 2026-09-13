@@ -1,0 +1,193 @@
+{
+  "header": {
+    "id": "Brand_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Brands"
+      },
+      {
+        "locale": "de",
+        "text": "Marken"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Brand_DM"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-571d7",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Image"
+          },
+          {
+            "locale": "de",
+            "text": "Bild"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "group_c6001",
+        "sortable": false,
+        "attachmentDisplayMode": "preview"
+      },
+      {
+        "id": "column-77008",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_81d22",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-20cc8",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_161ef",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-c6667",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_72fb2",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-2059b",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_65d9c",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Delete Brand"
+              },
+              {
+                "locale": "de",
+                "text": "Marke löschen"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Are you sure you want to delete this Brand?"
+              },
+              {
+                "locale": "de",
+                "text": "Sind Sie sicher, dass Sie diese Marke löschen wollenß"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete_forever",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "Delete Brand"
+            },
+            {
+              "locale": "de",
+              "text": "Marke löschen"
+            }
+          ],
+          "event": "delete",
+          "labelHidden": true,
+          "destructive": true,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "New Brand"
+            },
+            {
+              "locale": "de",
+              "text": "Neue Marke"
+            }
+          ],
+          "type": "button",
+          "event": "add",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "initialSorting": [
+        {
+          "idref": "column-77008"
+        }
+      ],
+      "actionColumnWidth": 1,
+      "enableColumnsResize": true,
+      "showRowCount": true,
+      "enableInfiniteScroll": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "rowHeight": 49
+    }
+  }
+}

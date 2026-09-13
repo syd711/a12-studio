@@ -1,0 +1,9 @@
+ {"relationshipModel" : "CategoryProduct",
+"entities" : [{"roleOrder" : "",
+"modelName" : "ProductBook_DM",
+"role" : "Product",
+"docRef" : "ProductBook_DM/22_Bk_98354598_Shards-of-the-Moonveil"},
+{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Category",
+"docRef" : "Category_DM/4_Fantasy"}]}

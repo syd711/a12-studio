@@ -1,0 +1,377 @@
+{
+  "header": {
+    "id": "CollectionOrder_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Order"
+      },
+      {
+        "locale": "de",
+        "text": "Bestellung"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "bindingConfiguration",
+        "value": "[{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CustomerOrder\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CustomerOrder\",\"targetRole\":\"Customer\",\"components\":[{\"name\":\"DropDownSelection\",\"candidatePageSize\":10,\"models\":[{\"name\":\"CustomerOrder_Customer_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"CustomerOrder_Customer_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_7ef2b\"},{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CollectionProduct\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CollectionProduct\",\"targetRole\":\"Product\",\"components\":[{\"name\":\"TableList\",\"candidatePageSize\":8,\"linkPageSize\":8,\"props\":{\"editDialogTitle\":{\"label\":[{\"locale\":\"en\",\"text\":\"Add Products to this Order\"},{\"locale\":\"de\",\"text\":\"Produkte zu dieser Bestellung hinzufügen\"}]},\"editDialogCancelButtonLabel\":{\"label\":[{\"locale\":\"en\",\"text\":\"Back\"},{\"locale\":\"de\",\"text\":\"Zurück\"}]},\"editDialogCloseButtonLabel\":{\"label\":[{\"locale\":\"en\",\"text\":\"Save\"},{\"locale\":\"de\",\"text\":\"Speichern\"}]},\"editComponent\":\"1\",\"editDialogWidth\":\"1600\"},\"models\":[{\"name\":\"CollectionProduct_Product_SelectedItems_Table_OM\",\"use\":\"link\"}]},{\"name\":\"DualPaneSelection\",\"id\":\"1\",\"candidatePageSize\":8,\"linkPageSize\":8,\"props\":{\"availableItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Products in Store\"},{\"locale\":\"de\",\"text\":\"Angebotene Produkte\"}]},\"selectedItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Products in Basket\"},{\"locale\":\"de\",\"text\":\"Produkte im Warenkorb\"}]},\"height\":\"500\"},\"models\":[{\"name\":\"Product_LinkFields_FM\",\"use\":\"link\"},{\"name\":\"Product_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"CollectionProduct_Product_SelectedItems_DualPane_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_c6b02\"},{\"type\":\"relationship\",\"details\":{\"name\":\"binding-OfferOrder\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"OfferOrder\",\"targetRole\":\"Offer\",\"components\":[{\"name\":\"DropDownSelection\",\"models\":[{\"name\":\"OfferOrder_Offer_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"OfferOrder_Offer_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_e4763\"}]"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "CollectionOrder_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "CollectionOrder_DM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CustomerOrder_Customer_AvailableItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CustomerOrder_Customer_SelectedItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CollectionProduct_Product_SelectedItems_Table_OM"
+      },
+      {
+        "modelType": "form",
+        "purpose": "bindingReference",
+        "reference": "Product_LinkFields_FM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "Product_AvailableItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CollectionProduct_Product_SelectedItems_DualPane_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "OfferOrder_Offer_AvailableItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "OfferOrder_Offer_SelectedItems_OM"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_13b9d",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_e4545",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "rounded"
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen_d15a4",
+        "name": "Order",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Order"
+              },
+              {
+                "locale": "de",
+                "text": "Bestellung"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_e34f9",
+            "name": "Order",
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_35ca9",
+                "name": "cgOrder",
+                "layout": {
+                  "lg": "4-4-4"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_75517",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_a1ebe",
+                        "elementRef": "field_00d4a"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_0e3fd",
+                        "elementRef": "field_ffafe"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_90d49",
+                        "elementRef": "field_19dc3"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row_ac3d4",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_6449e",
+                        "elementRef": "field_a8cc8"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "CustomScreenElement",
+                "id": "customscreenelement_7ef2b",
+                "name": "binding-CustomerOrder",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "binding-CustomerOrder"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "binding-CustomerOrder"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_2470b",
+            "name": "Products",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Products"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Produkte"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_1a6cb",
+                "name": "cgProducts",
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_e82ec",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_6bc98",
+                        "elementRef": "field_bfcd5"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_19a99",
+                        "elementRef": "field_616a0",
+                        "dependentControls": {
+                          "screenElement": [
+                            {
+                              "idref": "section_756a7",
+                              "masterValue": null
+                            },
+                            {
+                              "idref": "section_381df",
+                              "masterValue": "true"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Section",
+                "id": "section_756a7",
+                "name": "IncludedProducts",
+                "screenElements": [
+                  {
+                    "type": "CustomScreenElement",
+                    "id": "customscreenelement_c6b02",
+                    "name": "binding-CollectionProduct",
+                    "title": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "binding-CollectionProduct"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "binding-CollectionProduct"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "Section",
+                "id": "section_381df",
+                "name": "FromOfferSheet",
+                "screenElements": [
+                  {
+                    "type": "CustomScreenElement",
+                    "id": "customscreenelement_e4763",
+                    "name": "binding-OfferOrder",
+                    "title": {
+                      "type": "Multilingual",
+                      "multilingualText": {
+                        "text": [
+                          {
+                            "locale": "en",
+                            "text": "binding-OfferOrder"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "binding-OfferOrder"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "suffix": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "€"
+              },
+              {
+                "locale": "de",
+                "text": "€"
+              }
+            ]
+          },
+          "elementRef": "field_bfcd5"
+        }
+      ]
+    },
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

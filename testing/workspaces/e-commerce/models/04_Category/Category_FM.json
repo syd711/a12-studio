@@ -1,0 +1,444 @@
+{
+  "header": {
+    "id": "Category_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Category"
+      },
+      {
+        "locale": "de",
+        "text": "Kategorie"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "bindingConfiguration",
+        "value": "[{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CategoryCategory\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CategoryCategory\",\"targetRole\":\"Child\",\"components\":[{\"name\":\"DualPaneSelection\",\"linkPageSize\":15,\"candidatePageSize\":15,\"props\":{\"height\":\"500\",\"availableItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Available Categories\"},{\"locale\":\"de\",\"text\":\"Verfügbare Kategorien\"}]},\"selectedItemsTable\":{\"label\":[{\"locale\":\"en\",\"text\":\"Selected Sub Categories\"},{\"locale\":\"de\",\"text\":\"Gewählte Unterkategorien\"}]}},\"models\":[{\"name\":\"CategoryCategory_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"CategoryCategory_Child_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_89990\"},{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CategoryProduct\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CategoryProduct\",\"targetRole\":\"Product\",\"components\":[{\"name\":\"TableList\",\"linkPageSize\":15,\"models\":[{\"name\":\"CategoryProduct_Product_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_f03f4\"}]"
+      },
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Category_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Category_DM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CategoryCategory_AvailableItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CategoryCategory_Child_SelectedItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CategoryProduct_Product_SelectedItems_OM"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_202fc",
+            "name": "General",
+            "target": "screen-12b07",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_368db",
+            "name": "SubCategories",
+            "target": "screen_af96b",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_a579c",
+            "name": "Products",
+            "target": "screen_b2425",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_a09c4",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_99346",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "rounded"
+              }
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen-12b07",
+        "name": "Category",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Category"
+              },
+              {
+                "locale": "de",
+                "text": "Kategorie"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "MultiColumnSection",
+            "id": "multicolumnsection_25f63",
+            "name": "ImageAndGeneral",
+            "layout": {
+              "lg": "4-8"
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_0f046",
+                "name": "cgImage",
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_6019d",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_af294",
+                        "elementRef": "group_f6d01"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid-87978",
+                "name": "category_Controls",
+                "layout": {
+                  "lg": "12"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row-b5f4f",
+                    "name": "row-b5f4f",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control-79835",
+                        "elementRef": "field_f9c16"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "row_9135a",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_e3943",
+                        "elementRef": "field_4acc7"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "initiallyFocusedElementId": "control-79835"
+      },
+      {
+        "id": "screen_af96b",
+        "name": "Subcategories",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Sub Categories"
+              },
+              {
+                "locale": "de",
+                "text": "Unterkategorien"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_89990",
+            "name": "binding-CategoryCategory",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-CategoryCategory"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-CategoryCategory"
+                  }
+                ]
+              }
+            },
+            "height": 500
+          }
+        ]
+      },
+      {
+        "id": "screen_b2425",
+        "name": "Products",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Products"
+              },
+              {
+                "locale": "de",
+                "text": "Produkte"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_f03f4",
+            "name": "binding-CategoryProduct",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-CategoryProduct"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-CategoryProduct"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {
+      "buttonLabels": {
+        "ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "add"
+            },
+            {
+              "locale": "de",
+              "text": "add"
+            }
+          ]
+        },
+        "COMMIT_ADD": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "add"
+            },
+            {
+              "locale": "de",
+              "text": "add"
+            }
+          ]
+        },
+        "APPLY": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "apply"
+            },
+            {
+              "locale": "de",
+              "text": "apply"
+            }
+          ]
+        },
+        "EDIT": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "edit"
+            },
+            {
+              "locale": "de",
+              "text": "edit"
+            }
+          ]
+        },
+        "REMOVE": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "remove"
+            },
+            {
+              "locale": "de",
+              "text": "remove"
+            }
+          ]
+        },
+        "VIEW": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "view"
+            },
+            {
+              "locale": "de",
+              "text": "view"
+            }
+          ]
+        },
+        "CANCEL": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "cancel"
+            },
+            {
+              "locale": "de",
+              "text": "cancel"
+            }
+          ]
+        },
+        "RETURN": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "return"
+            },
+            {
+              "locale": "de",
+              "text": "return"
+            }
+          ]
+        },
+        "COPY": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "copy"
+            },
+            {
+              "locale": "de",
+              "text": "copy"
+            }
+          ]
+        },
+        "CLOSE": {
+          "text": [
+            {
+              "locale": "en",
+              "text": "close"
+            },
+            {
+              "locale": "de",
+              "text": "close"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

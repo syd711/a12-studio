@@ -1,0 +1,5 @@
+ {"documentModelName" : "Brand_DM",
+"document" : {"Brand" : {"Name" : "Schmökeria",
+"Code" : "SCHM",
+"OwnBrand" : true}},
+"locale" : "en"}

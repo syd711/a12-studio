@@ -1,0 +1,69 @@
+{
+  "header": {
+    "id": "CustomerOffer_Offer_SelectedItems_DualPane_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CustomerOffer_Offer____generated"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-997a2",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_field_cc6d0",
+        "sortable": false
+      },
+      {
+        "id": "column-4d079",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I5_field_add42",
+        "sortable": false
+      },
+      {
+        "id": "column-72cda",
+        "width": 1,
+        "styles": {},
+        "elementRef": "I4_field_bfcd5",
+        "sortable": false
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": false,
+      "showFullTextSearch": false,
+      "pagingSize": 50
+    }
+  }
+}

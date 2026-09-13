@@ -1,5 +1,6 @@
 package de.a12.studio.models.formmodel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.a12.studio.models.Annotation;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.IntNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +35,13 @@ public abstract class RepeatOverviewColumn {
   private String id;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText label;
+  // Normally a plain integer column width, but at least one hand-authored fixture uses a fractional value
+  // (e.g. "0.8"); a JsonNode preserves that original value across a load/save cycle instead of truncating
+  // it through an Integer, the same trick as overviewmodel.Column#width. getWidth()/setWidth(Integer) stay
+  // Integer-based since that's the only shape the column editor UI currently supports.
+  @JsonProperty("width")
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Integer width;
+  private JsonNode widthNode;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean sortable;
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -63,4 +71,14 @@ public abstract class RepeatOverviewColumn {
   private HideCondition hideCondition;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Annotation> annotations = new ArrayList<>();
+
+  @JsonIgnore
+  public Integer getWidth() {
+    return widthNode == null || widthNode.isNull() ? null : (int) widthNode.asDouble();
+  }
+
+  @JsonIgnore
+  public void setWidth(Integer width) {
+    widthNode = width == null ? null : IntNode.valueOf(width);
+  }
 }

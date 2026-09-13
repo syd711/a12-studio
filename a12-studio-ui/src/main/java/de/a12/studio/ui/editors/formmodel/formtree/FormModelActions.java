@@ -24,6 +24,7 @@ import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.formmodel.formtree.commands.ReplaceNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.SetSingleChildCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.SwapCommand;
 import de.a12.studio.ui.util.Icons;
@@ -96,6 +97,19 @@ class FormModelActions {
         addMenu.getItems().add(item);
       }
       contextMenu.getItems().add(addMenu);
+      contextMenu.getItems().add(new SeparatorMenuItem());
+    }
+
+    if (selected.getNode() instanceof AbstractRepeat repeat) {
+      RepeatConverter.RepeatKind currentKind = RepeatConverter.kindOf(repeat);
+      for (RepeatConverter.RepeatKind targetKind : RepeatConverter.RepeatKind.values()) {
+        if (targetKind == currentKind) {
+          continue;
+        }
+        MenuItem item = createMenuItem(StudioBundle.get(convertLabelKey(targetKind)), convertIcon(targetKind));
+        item.setOnAction(event -> convertRepeat(selected, repeat, targetKind));
+        contextMenu.getItems().add(item);
+      }
       contextMenu.getItems().add(new SeparatorMenuItem());
     }
 
@@ -235,6 +249,39 @@ class FormModelActions {
     catch (Exception e) {
       log.warn("Failed to paste form model node: {}", e.getMessage(), e);
     }
+  }
+
+  private static String convertLabelKey(RepeatConverter.@NonNull RepeatKind targetKind) {
+    return switch (targetKind) {
+      case INLINE -> "form_model_tree.convert_to_inline_repeat";
+      case EMBEDDED -> "form_model_tree.convert_to_embedded_repeat";
+      case DETACHED -> "form_model_tree.convert_to_detached_repeat";
+    };
+  }
+
+  private static String convertIcon(RepeatConverter.@NonNull RepeatKind targetKind) {
+    return switch (targetKind) {
+      case INLINE -> Icons.FORM_INLINE_REPEAT;
+      case EMBEDDED -> Icons.FORM_EMBEDDED_REPEAT;
+      case DETACHED -> Icons.FORM_DETACHED_REPEAT;
+    };
+  }
+
+  /**
+   * Converts {@code repeat} to a different {@link AbstractRepeat} subtype in place - swaps it out for the
+   * {@link RepeatConverter#convert} result at the same position in its parent's sibling list (a repeat is
+   * always a real {@link Screen}/{@link Section}/{@link MultiColumnSection} child, never a single-slot child,
+   * so {@link #siblingsOf} is never {@code null} here).
+   */
+  private void convertRepeat(@NonNull FormElementViewModel item, @NonNull AbstractRepeat repeat,
+                              RepeatConverter.@NonNull RepeatKind targetKind) {
+    List<Object> siblings = siblingsOf(item);
+    if (siblings == null) {
+      return;
+    }
+    AbstractRepeat converted = RepeatConverter.convert(repeat, targetKind);
+    commandStack.execute(new ReplaceNodeCommand(siblings, repeat, converted));
+    onModelChanged.accept(converted);
   }
 
   private void confirmAndDelete(@NonNull FormElementViewModel item) {

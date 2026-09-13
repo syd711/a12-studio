@@ -1,0 +1,765 @@
+{
+  "header": {
+    "id": "Customer_FM",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Customer"
+      },
+      {
+        "locale": "de",
+        "text": "Kunde"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "bindingConfiguration",
+        "value": "[{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CustomerOrder\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CustomerOrder\",\"targetRole\":\"Order\",\"components\":[{\"name\":\"TableList\",\"linkPageSize\":10,\"models\":[{\"name\":\"CustomerOrder_Order_SelectedItems_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_ea949\"},{\"type\":\"relationship\",\"details\":{\"name\":\"binding-CustomerOffer\",\"metaInformation\":{\"version\":\"1.0.0\"},\"relationshipName\":\"CustomerOffer\",\"targetRole\":\"Offer\",\"components\":[{\"name\":\"TableList\",\"props\":{\"editComponent\":\"1\"},\"models\":[{\"name\":\"CustomerOffer_Offer_SelectedItems_TableList_OM\",\"use\":\"link\"}]},{\"name\":\"DualPaneSelection\",\"id\":\"1\",\"models\":[{\"name\":\"CustomerOffer_LinkFields_FM\",\"use\":\"link\"},{\"name\":\"CustomerOffer_Offer_AvailableItems_OM\",\"use\":\"candidate\"},{\"name\":\"CustomerOffer_Offer_SelectedItems_DualPane_OM\",\"use\":\"link\"}]}]},\"elementId\":\"customscreenelement_857e4\"}]"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "Customer_DM",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "Customer_DM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CustomerOrder_Order_SelectedItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CustomerOffer_Offer_SelectedItems_TableList_OM"
+      },
+      {
+        "modelType": "form",
+        "purpose": "bindingReference",
+        "reference": "CustomerOffer_LinkFields_FM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CustomerOffer_Offer_AvailableItems_OM"
+      },
+      {
+        "modelType": "overview",
+        "purpose": "bindingReference",
+        "reference": "CustomerOffer_Offer_SelectedItems_DualPane_OM"
+      }
+    ]
+  },
+  "content": {
+    "styles": [
+      {
+        "name": "h_hidden"
+      }
+    ],
+    "subtitle": {
+      "type": "Expression",
+      "expressionText": "kontext(Customer){[NameOutput]}"
+    },
+    "subHeaderBox": {
+      "id": "subHeaderBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_2595c",
+            "name": "Customer",
+            "target": "screen_97731",
+            "validation": "partial",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_a9e01",
+            "name": "Orders",
+            "target": "screen_f256e",
+            "validation": "partial",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_1ed15",
+            "name": "Offers",
+            "target": "screen_de768",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "footerBox": {
+      "id": "footerBox1",
+      "majorButtons": {
+        "button": [
+          {
+            "type": "EVENT",
+            "id": "button_7543f",
+            "name": "Cancel",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Cancel"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Abbrechen"
+                    }
+                  ]
+                }
+              },
+              "destructive": true
+            },
+            "event": "event_cancel",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          },
+          {
+            "type": "EVENT",
+            "id": "button_51c7f",
+            "name": "Submit",
+            "buttonStyling": {
+              "label": {
+                "type": "Multilingual",
+                "multilingualText": {
+                  "text": [
+                    {
+                      "locale": "en",
+                      "text": "Save"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Speichern"
+                    }
+                  ]
+                }
+              },
+              "icon": {
+                "name": "save",
+                "theme": "rounded"
+              },
+              "priority": "PRIMARY"
+            },
+            "event": "event_submit",
+            "validation": "full",
+            "scope": "HIDDEN_IN_READONLY_MODE"
+          }
+        ]
+      }
+    },
+    "screens": [
+      {
+        "id": "screen_97731",
+        "name": "Customer",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Customer"
+              },
+              {
+                "locale": "de",
+                "text": "Kunde"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_1046c",
+            "name": "cgGeneral",
+            "layout": {
+              "lg": "6-6"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_b5bf5",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_3fc02",
+                    "elementRef": "field_d129a",
+                    "labelHiddenButRead": true
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_a8027",
+                    "elementRef": "field_7da0e"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_0141b",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_756e4",
+                    "elementRef": "field_b4c6d"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_3de4b",
+                    "elementRef": "field_dc03f"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_93c28",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_d86cf",
+                    "span": {
+                      "lg": 2
+                    },
+                    "elementRef": "field_a0add"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "EmbeddedRepeat",
+            "id": "embeddedrepeat_7b1ad",
+            "name": "repeat-Addresses",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Addresses"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "Adressen"
+                  }
+                ]
+              }
+            },
+            "repeatOverviewColumn": [
+              {
+                "type": "ExpressionRepeatOverviewColumn",
+                "id": "expressionrepeatoverviewcolumn_a637d",
+                "label": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Type"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Typ"
+                      }
+                    ]
+                  }
+                },
+                "width": 1,
+                "sortable": true,
+                "name": "Type",
+                "expression": "case [IsShippingAddress]=\"true\"{(en:\"shipping address\", de:\"Lieferadresse\")} \"\n\n\" \ncase [IsBillingAddress]=\"true\"{(en:\"billing address\", de:\"Rechnungsadresse\")}"
+              },
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "fieldbasedrepeatoverviewcolumn_dfe68",
+                "width": 1,
+                "sortable": true,
+                "filterable": true,
+                "elementRef": "field_d3199"
+              },
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "fieldbasedrepeatoverviewcolumn_220b6",
+                "width": 1,
+                "sortable": true,
+                "filterable": true,
+                "elementRef": "field_d30fc"
+              },
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "fieldbasedrepeatoverviewcolumn_1c355",
+                "width": 1,
+                "sortable": true,
+                "filterable": true,
+                "elementRef": "field_d2048"
+              },
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "fieldbasedrepeatoverviewcolumn_74b0b",
+                "width": 1,
+                "sortable": true,
+                "filterable": true,
+                "elementRef": "field_8c7a1"
+              }
+            ],
+            "groupRef": "group_831e6",
+            "enableAdd": true,
+            "enableRemove": true,
+            "enableReorder": true,
+            "enableCopy": true,
+            "controlGrid": {
+              "type": "ControlGrid",
+              "id": "controlgrid_65c1d",
+              "name": "cg",
+              "layout": {
+                "lg": "4-4-4"
+              },
+              "row": [
+                {
+                  "type": "Row",
+                  "id": "row_3e583",
+                  "cell": [
+                    {
+                      "type": "Control",
+                      "id": "control_540fe",
+                      "span": {
+                        "lg": 2
+                      },
+                      "elementRef": "field_d3199"
+                    },
+                    {
+                      "type": "Control",
+                      "id": "control_802f4",
+                      "elementRef": "field_d30fc"
+                    }
+                  ]
+                },
+                {
+                  "type": "Row",
+                  "id": "row_52bfa",
+                  "cell": [
+                    {
+                      "type": "Control",
+                      "id": "control_a93c8",
+                      "elementRef": "field_d2048"
+                    },
+                    {
+                      "type": "Control",
+                      "id": "control_43f16",
+                      "span": {
+                        "lg": 2
+                      },
+                      "elementRef": "field_8c7a1"
+                    }
+                  ]
+                },
+                {
+                  "type": "Row",
+                  "id": "row_bf475",
+                  "cell": [
+                    {
+                      "type": "Control",
+                      "id": "control_02d80",
+                      "elementRef": "field_3207b"
+                    },
+                    {
+                      "type": "Control",
+                      "id": "control_b06f6",
+                      "elementRef": "field_2cde9"
+                    }
+                  ]
+                },
+                {
+                  "type": "Row",
+                  "id": "row_bcacc",
+                  "name": "helper",
+                  "style": [
+                    {
+                      "name": "h_hidden"
+                    }
+                  ],
+                  "cell": [
+                    {
+                      "type": "Control",
+                      "id": "control_a0eb1",
+                      "elementRef": "field_a611f"
+                    },
+                    {
+                      "type": "Control",
+                      "id": "control_a243a",
+                      "elementRef": "field_3c2f0"
+                    }
+                  ]
+                }
+              ]
+            },
+            "defaultRowAction": {
+              "event": "edit"
+            }
+          },
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_2a11d",
+            "name": "cgPayment",
+            "layout": {
+              "lg": "6-3-3"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_a93f9",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Method of Payment"
+                      },
+                      {
+                        "locale": "de",
+                        "text": "Zahlungsmethode"
+                      }
+                    ]
+                  }
+                },
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_d302d",
+                    "elementRef": "include_718fa_field_dda25"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_1aac9",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_42d3d",
+                    "span": {
+                      "lg": 3
+                    },
+                    "elementRef": "include_718fa_field_9a37a"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_81098",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_3cf83",
+                    "elementRef": "include_718fa_field_a103b"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_ac8ca",
+                    "elementRef": "include_718fa_field_d5e7f"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_ef7aa",
+                    "elementRef": "include_718fa_field_238df"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_9903d",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_3a983",
+                    "span": {
+                      "lg": 3
+                    },
+                    "elementRef": "include_718fa_field_46539"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_fc1e4",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_ee544",
+                    "span": {
+                      "lg": 3
+                    },
+                    "elementRef": "include_718fa_field_6047c"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_3ef67",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_4784c",
+                    "span": {
+                      "lg": 3
+                    },
+                    "elementRef": "include_718fa_field_4e717"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "initiallyFocusedElementId": "control_3fc02"
+      },
+      {
+        "id": "screen_f256e",
+        "name": "Orders",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Orders"
+              },
+              {
+                "locale": "de",
+                "text": "Bestellungen"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_ea949",
+            "name": "binding-CustomerOrder",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-CustomerOrder"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-CustomerOrder"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "screen_de768",
+        "name": "Offers",
+        "title": {
+          "type": "Multilingual",
+          "multilingualText": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "Offers"
+              },
+              {
+                "locale": "de",
+                "text": "Angebote"
+              }
+            ]
+          }
+        },
+        "screenElements": [
+          {
+            "type": "CustomScreenElement",
+            "id": "customscreenelement_857e4",
+            "name": "binding-CustomerOffer",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "binding-CustomerOffer"
+                  },
+                  {
+                    "locale": "de",
+                    "text": "binding-CustomerOffer"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "initialValue": "Natural",
+          "exposition": "INLINE",
+          "elementRef": "field_d129a"
+        },
+        {
+          "initialValue": "CU02341",
+          "placeholder": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "AA000 - AA000000000"
+              },
+              {
+                "locale": "de",
+                "text": "AA000 - AA000000000"
+              }
+            ]
+          },
+          "elementRef": "field_7da0e"
+        },
+        {
+          "placeholder": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "MM/YYYY"
+              },
+              {
+                "locale": "de",
+                "text": "MM/YYYY"
+              }
+            ]
+          },
+          "elementRef": "include_718fa_field_238df"
+        },
+        {
+          "placeholder": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "0000111122223333"
+              },
+              {
+                "locale": "de",
+                "text": "0000111122223333"
+              }
+            ]
+          },
+          "elementRef": "include_718fa_field_a103b"
+        },
+        {
+          "hint": {
+            "text": [
+              {
+                "locale": "en",
+                "text": "You can find this info on the back of your card."
+              },
+              {
+                "locale": "de",
+                "text": "Diese Information finden Sie auf der Rückseite Ihrer Karte."
+              }
+            ]
+          },
+          "elementRef": "include_718fa_field_d5e7f"
+        }
+      ]
+    },
+    "groupConfiguration": {
+      "group": [
+        {
+          "dependentGroup": {
+            "masterField": "field_d129a",
+            "case": [
+              {
+                "masterValue": null,
+                "notRelevant": true
+              },
+              {
+                "masterValue": "Legal",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "group_85a10"
+        },
+        {
+          "dependentGroup": {
+            "masterField": "field_d129a",
+            "case": [
+              {
+                "masterValue": null,
+                "notRelevant": true
+              },
+              {
+                "masterValue": "Natural",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "group_53de9"
+        },
+        {
+          "dependentGroup": {
+            "masterField": "include_718fa_field_dda25",
+            "case": [
+              {
+                "masterValue": null,
+                "notRelevant": true
+              },
+              {
+                "masterValue": "debit",
+                "notRelevant": true
+              },
+              {
+                "masterValue": "invoice",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "include_718fa_group_ce8ea"
+        },
+        {
+          "dependentGroup": {
+            "masterField": "include_718fa_field_dda25",
+            "case": [
+              {
+                "masterValue": null,
+                "notRelevant": true
+              },
+              {
+                "masterValue": "credit",
+                "notRelevant": true
+              },
+              {
+                "masterValue": "invoice",
+                "notRelevant": true
+              }
+            ]
+          },
+          "groupRef": "include_718fa_group_81dc9"
+        }
+      ]
+    },
+    "defaults": {}
+  }
+}

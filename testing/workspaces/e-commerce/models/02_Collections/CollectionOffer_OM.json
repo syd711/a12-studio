@@ -1,0 +1,173 @@
+{
+  "header": {
+    "id": "CollectionOffer_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Offers"
+      },
+      {
+        "locale": "de",
+        "text": "Angebote"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "CollectionOffer_DM"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-e3d83",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_cc6d0",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-27b5e",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_bfcd5",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "suffix": [
+          {
+            "locale": "en",
+            "text": "€"
+          },
+          {
+            "locale": "de",
+            "text": "€"
+          }
+        ]
+      },
+      {
+        "id": "column-d4464",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_6523b",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "icon": {
+            "name": "delete_forever",
+            "theme": "rounded"
+          },
+          "event": "delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Delete Offer"
+              },
+              {
+                "locale": "de",
+                "text": "Angebot Löschen"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Are you sure you want to delete this Offer?"
+              },
+              {
+                "locale": "de",
+                "text": "Sind Sie sicher, dass Sie dieses Angebot löschen wollen?"
+              }
+            ]
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "Delete Offer"
+            },
+            {
+              "locale": "de",
+              "text": "Angebot Löschen"
+            }
+          ],
+          "labelHidden": true,
+          "destructive": true,
+          "primary": false
+        }
+      ]
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "New Offer"
+            },
+            {
+              "locale": "de",
+              "text": "Neues Angebot"
+            }
+          ],
+          "type": "button",
+          "event": "add",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "showRowCount": true,
+      "enableColumnsResize": true,
+      "actionColumnWidth": 0.5,
+      "enableInfiniteScroll": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      },
+      "rowHeight": 49
+    }
+  }
+}

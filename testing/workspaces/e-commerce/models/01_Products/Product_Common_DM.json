@@ -1,0 +1,3718 @@
+{
+  "header": {
+    "id": "Product_Common_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "typeDefinitions",
+        "reference": "CommonTypes_TDM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Product_Common_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_aef13",
+          "name": "Common",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_4217e",
+                "name": "Name",
+                "annotations": [
+                  {
+                    "name": "enable_approximate_match_search",
+                    "value": "true"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "alphabeticalSorting": true
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_0b973",
+                "name": "Type",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "Book",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Book"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Buch"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "Bundle",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Bundle"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Paket"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "Movie",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Movie"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Film"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "Food",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Food"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Nahrungsmittel"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Type"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Typ"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_1094d",
+                "name": "General",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_57956",
+                      "name": "ERP_ID",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "Please enter an alphanumeric code with 5 to 20 characters."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Bitte geben Sie einen 5 bis 20-stelligen alphanumerischen Code ein."
+                              }
+                            ],
+                            "pattern": "[a-z0-9A-Z_-]{5,20}"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "ERP ID"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "ERP ID"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor",
+                          "errorMessage": [
+                            {
+                              "locale": "en",
+                              "text": "Please give a unique ERP ID for this Product."
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Bitte geben Sie eine eindeutige ERP ID für dieses Produkt an."
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_64375",
+                      "name": "IsProductActive",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "BooleanType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Is Product Active?"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Ist das Produkt Aktiv?"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_a5318",
+                      "name": "Description",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Description"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Beschreibung"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_4dca2",
+                      "name": "MarketingDescription",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Marketing Description"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Marketing Beschreibung"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_7e6fe",
+                      "name": "AdvertisingDate",
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Advertising Date"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Werbestart"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_765f6",
+                      "name": "SupplierDescription",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Supplier Description"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Beschreibung des Lieferants"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_19952",
+                      "name": "DataSource",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Data Source / Copyrights by"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Datenquelle / Rechte von"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_8837c",
+                      "name": "MainImage",
+                      "Group": {
+                        "repeatability": 1,
+                        "usageType": "attachment",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_5e7eb",
+                            "name": "original_filename",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_3714b",
+                            "name": "internal_filename",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_54fe1",
+                            "name": "content",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType",
+                                "StringType": {
+                                  "lineBreaksPermitted": true,
+                                  "noValueValidation": true
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_064d0",
+                            "name": "attachment_id",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_82bcb",
+                            "name": "size",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "NumberType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_c389c",
+                            "name": "mime_type",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_11439",
+                            "name": "category",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_4787e",
+                            "name": "description",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_e7bf0",
+                            "name": "AttachmentInternalFilenameRequired",
+                            "Rule": {
+                              "errorEntityRelPath": "../internal_filename",
+                              "errorCode": "Error rule_e7bf0",
+                              "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_12208",
+                            "name": "AttachmentMimeTypeRequired",
+                            "Rule": {
+                              "errorEntityRelPath": "../mime_type",
+                              "errorCode": "Error rule_12208",
+                              "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_fa647",
+                            "name": "AttachmentIdOrContentFilled",
+                            "Rule": {
+                              "errorEntityRelPath": "../content",
+                              "errorCode": "Error rule_fa647",
+                              "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_d479e",
+                            "name": "SizeOfContentFilled",
+                            "Rule": {
+                              "errorEntityRelPath": "../content",
+                              "errorCode": "Error rule_d479e",
+                              "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: If the content is filled, the size must be also filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: If the content is filled, the size must be also filled."
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_57fbb",
+                      "name": "AdditionalImages",
+                      "Group": {
+                        "repeatability": 10,
+                        "elements": [
+                          {
+                            "type": "Group",
+                            "id": "group_25fdb",
+                            "name": "AdditionalPicture",
+                            "Group": {
+                              "repeatability": 1,
+                              "usageType": "attachment",
+                              "elements": [
+                                {
+                                  "type": "Field",
+                                  "id": "field_46cef",
+                                  "name": "original_filename",
+                                  "annotations": [],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "Field",
+                                  "id": "field_f4078",
+                                  "name": "internal_filename",
+                                  "annotations": [],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "Field",
+                                  "id": "field_4d578",
+                                  "name": "content",
+                                  "annotations": [],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType",
+                                      "StringType": {
+                                        "lineBreaksPermitted": true,
+                                        "noValueValidation": true
+                                      }
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "Field",
+                                  "id": "field_9bb08",
+                                  "name": "attachment_id",
+                                  "annotations": [],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "Field",
+                                  "id": "field_f8583",
+                                  "name": "size",
+                                  "annotations": [],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "NumberType"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "Field",
+                                  "id": "field_15763",
+                                  "name": "mime_type",
+                                  "annotations": [],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "Field",
+                                  "id": "field_f061d",
+                                  "name": "category",
+                                  "annotations": [],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "Field",
+                                  "id": "field_8b1da",
+                                  "name": "description",
+                                  "annotations": [],
+                                  "Field": {
+                                    "fieldType": {
+                                      "type": "StringType"
+                                    }
+                                  }
+                                },
+                                {
+                                  "type": "Rule",
+                                  "id": "rule_14b93",
+                                  "name": "AttachmentInternalFilenameRequired",
+                                  "Rule": {
+                                    "errorEntityRelPath": "../internal_filename",
+                                    "errorCode": "Error rule_14b93",
+                                    "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+                                    "severity": "ERROR",
+                                    "errorMessage": [
+                                      {
+                                        "locale": "en",
+                                        "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                                      },
+                                      {
+                                        "locale": "de",
+                                        "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "type": "Rule",
+                                  "id": "rule_af170",
+                                  "name": "AttachmentMimeTypeRequired",
+                                  "Rule": {
+                                    "errorEntityRelPath": "../mime_type",
+                                    "errorCode": "Error rule_af170",
+                                    "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+                                    "severity": "ERROR",
+                                    "errorMessage": [
+                                      {
+                                        "locale": "en",
+                                        "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                                      },
+                                      {
+                                        "locale": "de",
+                                        "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "type": "Rule",
+                                  "id": "rule_37fff",
+                                  "name": "AttachmentIdOrContentFilled",
+                                  "Rule": {
+                                    "errorEntityRelPath": "../content",
+                                    "errorCode": "Error rule_37fff",
+                                    "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+                                    "severity": "ERROR",
+                                    "errorMessage": [
+                                      {
+                                        "locale": "en",
+                                        "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                                      },
+                                      {
+                                        "locale": "de",
+                                        "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "type": "Rule",
+                                  "id": "rule_12ed8",
+                                  "name": "SizeOfContentFilled",
+                                  "Rule": {
+                                    "errorEntityRelPath": "../content",
+                                    "errorCode": "Error rule_12ed8",
+                                    "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+                                    "severity": "ERROR",
+                                    "errorMessage": [
+                                      {
+                                        "locale": "en",
+                                        "text": "Internal Error: If the content is filled, the size must be also filled."
+                                      },
+                                      {
+                                        "locale": "de",
+                                        "text": "Internal Error: If the content is filled, the size must be also filled."
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_a120c",
+                      "name": "VAT_Class",
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "none",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "none"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "keine"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "reduced",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "reduced"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "reduziert"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "full",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "full"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "normal"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "VAT Class"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Mehrwertsteuerklasse"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_bf587",
+                      "name": "DeliveryTime",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "minValue": 0,
+                            "maxValue": 99
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Delivery Time"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Lieferzeit"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_9f7cd",
+                      "name": "AverageRatingInternal",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "maxFractionalDigits": 2
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Average Rating (Internal)"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Durchschnittliche Bewertung (Intern)"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_d9c49",
+                      "name": "AverageRatingExternal",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "maxFractionalDigits": 2
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Average Rating (External)"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Durchschnittliche Bewertung (Extern)"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_61906",
+                      "name": "Helper_AvailableRatingTypes",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "internal",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "internal"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "internal"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "external",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "external"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "external"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "both",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "both"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "both"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "External Rating Source"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Externe Rating Quelle"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_19984",
+                      "name": "Helper_AvailableRatingTypesComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../Helper_AvailableRatingTypes",
+                        "computationAlternatives": [
+                          {
+                            "operation": "\"external\"",
+                            "precondition": "FieldFilled(AverageRatingExternal) and\r\nFieldNotFilled(AverageRatingInternal)"
+                          },
+                          {
+                            "operation": "\"internal\"",
+                            "precondition": "FieldFilled(AverageRatingInternal) and \r\nFieldNotFilled(AverageRatingExternal)"
+                          },
+                          {
+                            "operation": "\"both\"",
+                            "precondition": "FieldFilled(AverageRatingExternal) and \r\nFieldFilled(AverageRatingInternal)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of Helper_AvailableRatingTypesComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of Helper_AvailableRatingTypesComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_77bbd",
+                      "name": "CMS_ShowBrandOnProductPage",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Show Brand on Product Page"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Zeige Marke auf Produktseite"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_c44bb",
+                      "name": "CMS_ShowProductOnBrandPage",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Show Product on Brand Page"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Zeige Produkt auf der Marken Seite"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_803b8",
+                      "name": "HasMatureContent",
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Does this Product contain mature content?"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Enthält dieses Produkt Inhalte, die nur für Erwachsene bestimmt sind?"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_7b560",
+                "name": "Pricing",
+                "Group": {
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Pricing"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Preisbestimmung"
+                    }
+                  ],
+                  "repeatability": 1000,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_f3039",
+                      "name": "Price",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Price"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Preis"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_084d6",
+                      "name": "Start",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Start"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Start"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_43cf9",
+                      "name": "OnlyOneStartFieldEmpty",
+                      "Rule": {
+                        "errorEntityRelPath": "../Start",
+                        "errorCode": "Error rule_43cf9",
+                        "errorCondition": "FieldFilled(Price) and\r\nFieldNotFilled(Start) and\r\nNumberOfFilledFields(../Pricing*/Start) < NumberOfFilledFields(../Pricing*/Price) -1",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "There may not be more than one date range without a Start Date."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Es darf nicht mehr als einen Zeitraum ohne Startdatum geben."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_161b3",
+                      "name": "StartNotWithinOtherDateRange",
+                      "Rule": {
+                        "errorEntityRelPath": "../Start",
+                        "errorCode": "Error rule_161b3",
+                        "errorCondition": "FieldFilled(Start) and\r\nAtLeastOneFieldFilled(../Pricing*/Price Having\r\n  (\r\n    CurrentRepetition(RuleGroup) != CurrentRepetition($RuleGroup) and \r\n    ( ([Start] <= [$Start] and [$Start] <= [End]) or\r\n        ([Start] <= [$Start] and FieldNotFilled(End)) or\r\n        (FieldNotFilled(Start) and [End]>= [$Start]) or\r\n        (FieldNotFilled(Start) and FieldNotFilled(End))\r\n    )\r\n  )\r\n)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "The start of the date range should not be within another date range."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Der Start darf nicht in einem anderen Zeitraum liegen."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_5cdd2",
+                      "name": "End",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "End"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Ende"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_429a9",
+                      "name": "EndAfterStart",
+                      "Rule": {
+                        "errorEntityRelPath": "../End",
+                        "errorCode": "Error rule_429a9",
+                        "errorCondition": "[End]<=[Start]",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "The $End$ must be after the $Start$."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Das $End$ muss nach dem $Start$ sein."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_e9f82",
+                      "name": "OnlyOneEndFieldEmpty",
+                      "Rule": {
+                        "errorEntityRelPath": "../End",
+                        "errorCode": "Error rule_e9f82",
+                        "errorCondition": "FieldFilled(Price) and\r\nFieldNotFilled(End) and\r\nNumberOfFilledFields(../Pricing*/End) < NumberOfFilledFields(../Pricing*/Price) -1",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "There may not be more than one date range without an End Date."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Es darf nicht mehr als einen Zeitraum ohne Enddatum geben."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_7f2b3",
+                      "name": "EndNotWithinOtherDateRange",
+                      "Rule": {
+                        "errorEntityRelPath": "../End",
+                        "errorCode": "Error rule_7f2b3",
+                        "errorCondition": "FieldFilled(End) and\r\nAtLeastOneFieldFilled(../Pricing*/Price Having\r\n  (\r\n    CurrentRepetition(RuleGroup) != CurrentRepetition($RuleGroup) and \r\n    ( ([Start] <= [$End] and [$End] <= [End]) or\r\n        ([Start] <= [$End] and FieldNotFilled(End)) or\r\n        (FieldNotFilled(Start) and [End]>= [$End]) or\r\n        (FieldNotFilled(Start) and FieldNotFilled(End))\r\n    )\r\n  )\r\n)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "The end of the date range should not be within another date range."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Das Ende darf nicht in einem anderen Zeitraum liegen."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_1b0c7",
+                      "name": "Note",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Note"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Anmerkung"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_d2f50",
+                      "name": "Helper_IsHighestPrice",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Is Highest Price"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Ist höchster Preis"
+                          }
+                        ],
+                        "transient": true
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_86bb6",
+                      "name": "Helper_HighestPriceIncludingDiscounts",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Highest Price Including Discounts"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Höchster Preis mit Discounts"
+                          }
+                        ],
+                        "transient": true
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_2b2d3",
+                      "name": "Helper_IsLowestPrice",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Is Lowest Price?"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Ist niedrigster Preis?"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_d3425",
+                      "name": "Helper_LowestPriceIncludingDiscounts",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Lowest Price Including Discounts"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Niedrigster Preis inclusive Discounts"
+                          }
+                        ],
+                        "transient": true
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_d7783",
+                "name": "CurrentPrice",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "TypeDefType",
+                    "TypeDefType": {
+                      "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Current Price"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aktueller Preis"
+                    }
+                  ],
+                  "transient": true
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_e8aaa",
+                "name": "Helper_CurrentPriceDeterminedBySubTypeCalculation",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Helper_CurrentPriceDeterminedBySubTypeCalculation"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Helper_CurrentPriceDeterminedBySubTypeCalculation"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_5a4aa",
+                "name": "CurrentPriceComp",
+                "Computation": {
+                  "computedFieldRelPath": "../CurrentPrice",
+                  "commonPrecondition": "FieldFilled(General/ERP_ID) And\r\nFieldNotFilled(Helper_CurrentPriceDeterminedBySubTypeCalculation)\r\nAnd (FieldFilled(Helper_RefreshPriceManual) or FieldNotFilled(Helper_RefreshPriceManual) or FieldFilled(Helper_RefreshPriceAuto) or FieldNotFilled(Helper_RefreshPriceAuto))\r\n\r\n;;Helper_CurrentPriceDeterminedBySubTypeCalculation Determines, if there is a special Price Calculation in the SubTypes (eg for Bundles.)\r\n\r\n;;The data ranges are mutually exclusive due to Rule StartNotWithinOtherDateranges. Hence it is not nesseccary to check for overlapping dateranges here. Today will always fall into exactly one date range.",
+                  "computationAlternatives": [
+                    {
+                      "operation": "FirstFilledValue(Pricing*/Price Having (\r\n    FieldFilled(Pricing/Start) and FieldFilled(Pricing/End) and [Pricing/End] >= Today and [Pricing/Start] <= Today))",
+                      "precondition": "AtLeastOneFieldFilled(Pricing*/Price Having (\r\n    FieldFilled(Pricing/Start) and FieldFilled(Pricing/End) and \r\n    [Pricing/End] >= Today and [Pricing/Start] <= Today))"
+                    },
+                    {
+                      "operation": "FirstFilledValue(Pricing*/Price Having (FieldFilled(Pricing/End) and [Pricing/End] >= Today and FieldNotFilled(Pricing/Start)))",
+                      "precondition": "AtLeastOneFieldFilled(Pricing*/Price Having (FieldFilled(Pricing/End) and  [Pricing/End] >= Today and FieldNotFilled(Pricing/Start)))"
+                    },
+                    {
+                      "operation": "FirstFilledValue(Pricing*/Price Having (FieldNotFilled(Pricing/End) and [Pricing/Start] <= Today))",
+                      "precondition": "AtLeastOneFieldFilled(Pricing*/Price Having (FieldNotFilled(Pricing/End) and [Pricing/Start] <= Today))"
+                    },
+                    {
+                      "operation": "FirstFilledValue(Pricing*/Price Having (\r\n    FieldNotFilled(Pricing/Start) and FieldNotFilled(Pricing/End) \r\n    )\r\n)",
+                      "precondition": "AtLeastOneFieldFilled(Pricing*/Price Having (\r\n    FieldNotFilled(Pricing/Start) and FieldNotFilled(Pricing/End) \r\n    )\r\n)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of CurrentPriceComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of CurrentPriceComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_d3cf5",
+                "name": "HasCurrentPrice",
+                "Rule": {
+                  "errorEntityRelPath": "../CurrentPrice",
+                  "errorCode": "Error rule_d3cf5",
+                  "errorCondition": ";; If the product is created, both Latest and Current Price is empty -> Warning\r\n;; If the prices are changed, the Current Price is computed and if it is empty, this will be written to LatestPrice -> Warning\r\n;;Only if the Product is edited and the Prices are untouched, then LatestPrice is filled -> No Warning\r\n\r\nFieldNotFilled(LatestPriceWithDiscount) and\r\nFieldNotFilled(CurrentPrice) and GroupFilled(RuleGroup)",
+                  "severity": "WARNING",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Please ensure that the Product has a Current Price."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bitte stellen Sie sicher, dass das Produkt einen Aktuellen Preis hat."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_6001e",
+                "name": "Helper_RefreshPriceManual",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "BooleanType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Refresh Price?"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Preis aktualisieren?"
+                    }
+                  ],
+                  "transient": true
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_7546a",
+                "name": "Helper_RefreshPriceAuto",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Helper Field that is set to true when a value changes occurs in the form. Otherwise an error occurs for the Current Price Computation."
+                    }
+                  ],
+                  "transient": true
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_8205b",
+                "name": "Helper_ShowHasNoCurrentPriceWarning",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": ""
+                    },
+                    {
+                      "locale": "de",
+                      "text": ""
+                    }
+                  ],
+                  "transient": true
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_0629c",
+                "name": "Helper_ShowHasNoCurrentPriceWarningComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Helper_ShowHasNoCurrentPriceWarning",
+                  "computationAlternatives": [
+                    {
+                      "operation": "True",
+                      "precondition": "AtLeastOneFieldFilled(Pricing*/Price) and FieldNotFilled(CurrentPrice)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of Helper_ShowHasNoCurrentPriceWarningComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of Helper_ShowHasNoCurrentPriceWarningComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_880de",
+                "name": "Discounts",
+                "Group": {
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Discounts"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Rabatte"
+                    }
+                  ],
+                  "repeatability": 100,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_ba1f8",
+                      "name": "Discount",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "minValue": 1,
+                            "maxValue": 99,
+                            "trait": "percent"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Discount"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Rabatt"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_0b5db",
+                      "name": "Start",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Start"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Start"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_42399",
+                      "name": "StartNotWithinOtherDateRange",
+                      "Rule": {
+                        "errorEntityRelPath": "../Start",
+                        "errorCode": "Error rule_42399",
+                        "errorCondition": "FieldFilled(Start) and\r\nAtLeastOneFieldFilled(../Discounts*/Discount Having\r\n  (\r\n    CurrentRepetition(RuleGroup) != CurrentRepetition($RuleGroup) and \r\n    ( ([Start] <= [$Start] and [$Start] <= [End]) or\r\n        ([Start] <= [$Start] and FieldNotFilled(End)) or\r\n        (FieldNotFilled(Start) and [End]>= [$Start])  or\r\n        (FieldNotFilled(Start) and FieldNotFilled(End))\r\n    )\r\n  )\r\n)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "The start of the date range should not be within another date range."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Der Start darf nicht in einem anderen Zeitraum liegen."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_56852",
+                      "name": "OnlyOneStartFieldEmpty",
+                      "Rule": {
+                        "errorEntityRelPath": "../Start",
+                        "errorCode": "Error rule_56852",
+                        "errorCondition": "FieldFilled(Discount) and\r\nFieldNotFilled(Start) and\r\nNumberOfFilledFields(../Discounts*/Start) < NumberOfFilledFields(../Discounts*/Discount) -1",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "There may not be more than one date range without a Start Date."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Es darf nicht mehr als einen Zeitraum ohne Startdatum geben."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_145aa",
+                      "name": "End",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "End"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Ende"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_7b6a2",
+                      "name": "EndAfterStart",
+                      "Rule": {
+                        "errorEntityRelPath": "../End",
+                        "errorCode": "Error rule_7b6a2",
+                        "errorCondition": "[End]<=[Start]",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "The $End$ must be after the $Start$."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Das $End$ muss nach dem $Start$ sein."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_90d66",
+                      "name": "EndNotWithinOtherDateRange",
+                      "Rule": {
+                        "errorEntityRelPath": "../End",
+                        "errorCode": "Error rule_90d66",
+                        "errorCondition": "FieldFilled(End) and\r\nAtLeastOneFieldFilled(../Discounts*/Discount Having\r\n  (\r\n    CurrentRepetition(RuleGroup) != CurrentRepetition($RuleGroup) and \r\n    ( ([Start] <= [$End] and [$End] <= [End]) or\r\n        ([Start] <= [$End] and FieldNotFilled(End)) or\r\n        (FieldNotFilled(Start) and [End]>= [$End]) or\r\n        (FieldNotFilled(Start) and FieldNotFilled(End))\r\n    )\r\n  )\r\n)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "The end of the date range should not be within another date range."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Das Ende darf nicht in einem anderen Zeitraum liegen."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_3d268",
+                      "name": "OnlyOneEndFieldEmpty",
+                      "Rule": {
+                        "errorEntityRelPath": "../End",
+                        "errorCode": "Error rule_3d268",
+                        "errorCondition": "FieldFilled(Discount) and\r\nFieldNotFilled(End) and\r\nNumberOfFilledFields(../Discounts*/End) < NumberOfFilledFields(../Discounts*/Discount) -1",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "There may not be more than one date range without an End Date."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Es darf nicht mehr als einen Zeitraum ohne Enddatum geben."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_4ff46",
+                      "name": "Reason",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Promo text"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Werbetext"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_08d45",
+                      "name": "HighlightDiscount",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Should Discount be highlighted?"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Soll der Rabatt hervorgehoben werden?"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_78d1d",
+                      "name": "Helper_ThereIsAGapBeforeTheStartDate",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "ThereIsAGapBeforeTheStartDate"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "ThereIsAGapBeforeTheStartDate"
+                          }
+                        ],
+                        "transient": true
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_c1372",
+                      "name": "Helper_StartDateDirectlyAfterLastEndDateComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../Helper_ThereIsAGapBeforeTheStartDate",
+                        "computationAlternatives": [
+                          {
+                            "operation": "True",
+                            "precondition": "FieldFilled(Start) and \r\nNoFieldFilled(../Discounts*/End\r\n    Having AddDays(End,1) == [$Start]\r\n)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of Helper_StartDateDirectlyAfterLastEndDateComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of Helper_StartDateDirectlyAfterLastEndDateComp"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_0f293",
+                "name": "CurrentDiscount",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "minValue": 1,
+                      "maxValue": 99,
+                      "trait": "percent"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Current Discount"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aktueller Rabatt"
+                    }
+                  ],
+                  "transient": true
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_32206",
+                "name": "CurrentDiscountComp",
+                "Computation": {
+                  "computedFieldRelPath": "../CurrentDiscount",
+                  "commonPrecondition": "(FieldFilled(Helper_RefreshPriceManual) or FieldNotFilled(Helper_RefreshPriceManual) or FieldFilled(Helper_RefreshPriceAuto) or FieldNotFilled(Helper_RefreshPriceAuto))",
+                  "computationAlternatives": [
+                    {
+                      "operation": "FirstFilledValue(Discounts*/Discount \r\n  Having (FieldNotFilled(Discounts/End) and FieldNotFilled(Discounts/Start)\r\n  )\r\n)",
+                      "precondition": "AtLeastOneFieldFilled(Discounts*/Discount \r\n  Having (FieldNotFilled(Discounts/End) and FieldNotFilled(Discounts/Start)\r\n  )\r\n)"
+                    },
+                    {
+                      "operation": "FirstFilledValue(Discounts*/Discount Having ([Discounts/End] >= Today and [Discounts/Start] <= Today))",
+                      "precondition": "AtLeastOneFieldFilled(Discounts*/Discount Having ([Discounts/End] >= Today and [Discounts/Start] <= Today))"
+                    },
+                    {
+                      "operation": "FirstFilledValue(Discounts*/Discount Having (FieldNotFilled(Discounts/End) and [Discounts/Start] <= Today))",
+                      "precondition": "AtLeastOneFieldFilled(Discounts*/Discount Having (FieldNotFilled(Discounts/End) and [Discounts/Start] <= Today))"
+                    },
+                    {
+                      "operation": "FirstFilledValue(Discounts*/Discount Having ([Discounts/End] >= Today and FieldNotFilled(Discounts/Start)))",
+                      "precondition": "AtLeastOneFieldFilled(Discounts*/Discount Having ([Discounts/End] >= Today and FieldNotFilled(Discounts/Start)))"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of CurrentDiscountComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of CurrentDiscountComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_cfb13",
+                "name": "CurrentPriceWithCurrentDiscount",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "TypeDefType",
+                    "TypeDefType": {
+                      "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Current Price with Discount"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Aktueller Preis mit Rabatt"
+                    }
+                  ],
+                  "transient": true
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_85f17",
+                "name": "CurrentPriceWithCurrentDiscountComp",
+                "Computation": {
+                  "computedFieldRelPath": "../CurrentPriceWithCurrentDiscount",
+                  "computationAlternatives": [
+                    {
+                      "operation": "RoundAccounting([CurrentPrice] * {1-[CurrentDiscount]/100},2)",
+                      "precondition": "FieldFilled(CurrentDiscount) and \r\nFieldFilled(CurrentPrice)"
+                    },
+                    {
+                      "operation": "[CurrentPrice]",
+                      "precondition": "FieldFilled(CurrentPrice) And\r\nFieldNotFilled(CurrentDiscount)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of CurrentPriceWithCurrentDiscountComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of CurrentPriceWithCurrentDiscountComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_8cad7",
+                "name": "LatestPriceWithDiscount",
+                "Field": {
+                  "fieldType": {
+                    "type": "TypeDefType",
+                    "TypeDefType": {
+                      "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Latest Price including Discount"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Neuster Preis inklusive Discount"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_15f37",
+                "name": "LatestPriceWithDiscountComp",
+                "Computation": {
+                  "computedFieldRelPath": "../LatestPriceWithDiscount",
+                  "computationAlternatives": [
+                    {
+                      "operation": "[CurrentPriceWithCurrentDiscount]",
+                      "precondition": "FieldFilled(CurrentPriceWithCurrentDiscount)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of LatestPriceWithDiscountComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of LatestPriceWithDiscountComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_bb2bd",
+                "name": "Helper_HighestPriceIncludingDiscountsComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Pricing/Helper_HighestPriceIncludingDiscounts",
+                  "computationAlternatives": [
+                    {
+                      "operation": "[Pricing/Price]",
+                      "precondition": "NoGroupFilled(Discounts*)\r\nor\r\n\r\n( ;; There is only one discount, but it does not fill the price range or is before or after it\r\n  NumberOfFilledFields(Discounts*/Discount)==1 and\r\n  AtLeastOneFieldFilled(Discounts*/Start,Discounts*/End) and\r\n  (\r\n   ( AtLeastOneFieldFilled(Discounts*/Start) and\r\n     (FirstFilledValue(Discounts*/Start) > [Pricing/Start]\r\n       or FieldNotFilled(Pricing/Start)\r\n       or FirstFilledValue(Discounts*/Start) > [Pricing/End] \r\n      )\r\n    )  \r\n    or\r\n    (AtLeastOneFieldFilled(Discounts*/End)  and\r\n      (FirstFilledValue(Discounts*/End) < [Pricing/End] \r\n        or FieldNotFilled(Pricing/End)\r\n        or FirstFilledValue(Discounts*/End) < [Pricing/Start]   \r\n      )\r\n    ) \r\n  )\r\n)or(\r\n;; There are multiple discounts, but either \r\n;; A: there is a gap day before a discount that starts within the current price\r\n;; OR B: the price is unlimited while the discounts are limited (to either side) \r\n;; OR  C: there is no discount covering either the start or the end of the price range \r\n\r\nNumberOfFilledFields(Discounts*/Discount)>1 and\r\n(  ;; A:\r\n  AtLeastOneFieldFilled(Discounts*/Discount Having\r\n   ([Discounts/Helper_ThereIsAGapBeforeTheStartDate]==True\r\n     and [Discounts/Start] > [$Pricing/Start]\r\n     and [Discounts/Start] <=[$Pricing/End]\r\n  ))\r\n \r\n or   ;; B:\r\n (FieldNotFilled(Pricing/End) and \r\n  NumberOfFilledFields(Discounts*/End) ==NumberOfFilledFields(Discounts*/Discount) )\r\n or\r\n (FieldNotFilled(Pricing/Start) and \r\n  NumberOfFilledFields(Discounts*/Start) ==NumberOfFilledFields(Discounts*/Discount) )\r\n or  ;;  C:\r\n  NumberOfFilledFields(Discounts*/Discount Having\r\n    ( [Discounts/Start] <= [$Pricing/Start] and\r\n      ([Discounts/End] > [$Pricing/Start] \r\n        or FieldNotFilled(Discounts/End))    \r\n    )\r\n  ) == 0\r\n or \r\n  NumberOfFilledFields(Discounts*/Discount Having\r\n   ( [Discounts/End] >= [$Pricing/End] and\r\n      ([Discounts/Start] < [$Pricing/End] \r\n        or FieldNotFilled(Discounts/Start))    \r\n   )\r\n  ) == 0\r\n)\r\n)"
+                    },
+                    {
+                      "operation": "RoundAccounting(\r\n{1- FirstFilledValue(Discounts*/Discount) / 100 \r\n} * [Pricing/Price], 2)",
+                      "precondition": ";; There is only one discount and it overlaps with the price\r\n\r\nNumberOfFilledFields(Discounts*/Discount)==1 And\r\n(\r\n  NoFieldFilled(Discounts*/Start, Discounts*/End)\r\n  or\r\n  (NoFieldFilled(Discounts*/Start) and \r\n    FirstFilledValue(Discounts*/End)  >= [Pricing/End])\r\n  or  \r\n  (NoFieldFilled(Discounts*/End) and \r\n    FirstFilledValue(Discounts*/Start)  <= [Pricing/Start])\r\n   or\r\n   (FirstFilledValue(Discounts*/Start)  <= [Pricing/Start] and\r\n    FirstFilledValue(Discounts*/End)  >= [Pricing/End]) \r\n)"
+                    },
+                    {
+                      "operation": "RoundAccounting(\r\n{1- MinValue(Discounts*/Discount Having\r\n (\r\n   ( [Discounts/Start] >= [$Pricing/Start] and\r\n     [Discounts/Start] <= [$Pricing/End] )\r\n   or \r\n   ( [Discounts/Start] <= [$Pricing/Start] and\r\n      ([Discounts/End] > [$Pricing/Start] \r\n       or FieldNotFilled(Discounts/End))    \r\n    )\r\n   or \r\n    ( [Discounts/End] >= [$Pricing/Start] and\r\n      FieldNotFilled(Discounts/Start)   \r\n    )\r\n  ) \r\n)/ 100 } * [Pricing/Price], 2)",
+                      "precondition": ";; There are multiple discounts, none have a gap within the prices date range and there is atleast one discount that covers the start of the price range and one that covers the end of the date range. -> due to the combination of both, this already means, that there is a continous overlap of discounts. so there might be more than 2 discounts that are directely next to each other and span the price date range.\r\n\r\nNumberOfFilledFields(Discounts*/Discount)>1 and\r\nNoFieldFilled(Discounts*/Discount Having\r\n   ([Discounts/Helper_ThereIsAGapBeforeTheStartDate]==True\r\n     and [Discounts/Start] > [$Pricing/Start]\r\n     and [Discounts/Start] <=[$Pricing/End]\r\n  ))\r\nand\r\n NumberOfFilledFields(Discounts*/Discount Having\r\n  ( [Discounts/Start] <= [$Pricing/Start] and\r\n      ([Discounts/End] > [$Pricing/Start] \r\n        or FieldNotFilled(Discounts/End))    \r\n  )\r\n ) > 0\r\nand \r\n NumberOfFilledFields(Discounts*/Discount Having\r\n  ( [Discounts/End] >= [$Pricing/End] and\r\n      ([Discounts/Start] < [$Pricing/End] \r\n        or FieldNotFilled(Discounts/Start))    \r\n  )\r\n )> 0"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of Helper_HighestPriceIncludingDiscountsComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of Helper_HighestPriceIncludingDiscountsComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_ad51b",
+                "name": "Helper_IsHighestPriceComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Pricing/Helper_IsHighestPrice",
+                  "commonPrecondition": "FieldFilled(Pricing/Helper_HighestPriceIncludingDiscounts)",
+                  "computationAlternatives": [
+                    {
+                      "operation": "True",
+                      "precondition": "MaxValue(Pricing*/Helper_HighestPriceIncludingDiscounts) ==[Pricing/Helper_HighestPriceIncludingDiscounts]"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of Helper_IsHighestPriceComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of Helper_IsHighestPriceComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_b393d",
+                "name": "Helper_LowestPriceIncludingDiscountsComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Pricing/Helper_LowestPriceIncludingDiscounts",
+                  "computationAlternatives": [
+                    {
+                      "operation": "RoundAccounting(\r\n{1- MaxValue(Discounts*/Discount Having\r\n (\r\n  NoFieldFilled($Pricing/End,$Pricing/Start)  \r\n  or ([Discounts/Start] >= [$Pricing/Start] and [Discounts/Start] <= [$Pricing/End])\r\n  or ([Discounts/End] >= [$Pricing/Start] and [Discounts/End] <= [$Pricing/End]) \r\n  or ([Discounts/Start] < [$Pricing/Start] and \r\n        ([Discounts/End] >= [$Pricing/End] or FieldNotFilled(Discounts/End))\r\n     )\r\n  or ([Discounts/End] > [$Pricing/End] and \r\n        ([Discounts/Start] <= [$Pricing/Start] or FieldNotFilled(Discounts/Start))\r\n     )   \r\n )\r\n) / 100 \r\n} * [Pricing/Price], 2)",
+                      "precondition": "AtLeastOneFieldFilled(Discounts*/Discount)"
+                    },
+                    {
+                      "operation": "[Pricing/Price]",
+                      "precondition": "NoFieldFilled(Discounts*/Discount) and FieldFilled(Pricing/Price)\r\n\r\n;; if there are discounts but they do not fall into the price range, the MaxValue function returns 0 -> no need to treat this extra."
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of Helper_LowestPriceIncludingDiscountsComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of Helper_LowestPriceIncludingDiscountsComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_5e80c",
+                "name": "Helper_IsLowestPriceComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Pricing/Helper_IsLowestPrice",
+                  "computationAlternatives": [
+                    {
+                      "operation": "True",
+                      "precondition": "FieldFilled(Pricing/Helper_LowestPriceIncludingDiscounts)\r\nand\r\nMinValue(Pricing*/Helper_LowestPriceIncludingDiscounts) ==[Pricing/Helper_LowestPriceIncludingDiscounts]"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of Helper_IsLowestPriceComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of Helper_IsLowestPriceComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_8ea26",
+                "name": "PricingStatistics",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_39e46",
+                      "name": "HighestPriceIncludingDiscounts",
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Highest Price including Discounts"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Höchster Preis inclusive Discounts"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_e0f67",
+                      "name": "HighestPriceIncludingDiscountsComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../HighestPriceIncludingDiscounts",
+                        "computationAlternatives": [
+                          {
+                            "operation": "MaxValue(../Pricing*/Helper_HighestPriceIncludingDiscounts)",
+                            "precondition": "NumberOfFilledFields(../Pricing*/Start,../Pricing*/End,../Discounts*/Start,../Discounts*/End,../Pricing*/Price,../Discounts*/Discount)>4"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of HighestPriceIncludingDiscountsComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of HighestPriceIncludingDiscountsComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_2cd8e",
+                      "name": "HighestPriceIncludingDiscountsStart",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Start of Latest Occurance"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Start des Letzten Auftretens"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_f1b48",
+                      "name": "HighestPriceIncludingDiscountsStartComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../HighestPriceIncludingDiscountsStart",
+                        "computationAlternatives": [
+                          {
+                            "operation": "FirstFilledValue(../Pricing*/Start Having [HighestPriceIncludingDiscounts] == [../Pricing/Helper_HighestPriceIncludingDiscounts])",
+                            "precondition": "FieldFilled(HighestPriceIncludingDiscounts) and\r\nAtLeastOneFieldFilled(../Pricing*/Start Having [HighestPriceIncludingDiscounts] == [../Pricing/Helper_HighestPriceIncludingDiscounts])"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of HighestPriceIncludingDiscountsStartComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of HighestPriceIncludingDiscountsStartComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_399fd",
+                      "name": "HighestPriceIncludingDiscountsEnd",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "End of Latest Occurance"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Ende des Letzten Auftretens"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_5481a",
+                      "name": "HighestPriceIncludingDiscountsEndComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../HighestPriceIncludingDiscountsEnd",
+                        "computationAlternatives": [
+                          {
+                            "operation": "FirstFilledValue(../Pricing*/End Having [HighestPriceIncludingDiscounts] == [../Pricing/Helper_HighestPriceIncludingDiscounts])",
+                            "precondition": "FieldFilled(HighestPriceIncludingDiscounts) and\r\nAtLeastOneFieldFilled(../Pricing*/End Having [HighestPriceIncludingDiscounts] == [../Pricing/Helper_HighestPriceIncludingDiscounts])"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of HighestPriceIncludingDiscountsEndComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of HighestPriceIncludingDiscountsEndComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_b88eb",
+                      "name": "LowestPriceIncludingDiscounts",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Lowest Price including Discounts"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Niedrigster Preis inklusive Discounts"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_0696f",
+                      "name": "LowestPriceIncludingDiscountsComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../LowestPriceIncludingDiscounts",
+                        "computationAlternatives": [
+                          {
+                            "operation": "MinValue(../Pricing*/Helper_LowestPriceIncludingDiscounts)",
+                            "precondition": "NumberOfFilledFields(../Pricing*/Start,../Pricing*/End,../Discounts*/Start,../Discounts*/End,../Pricing*/Price,../Discounts*/Discount)>4"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of LowestPriceIncludingDiscountsComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of LowestPriceIncludingDiscountsComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_18cf5",
+                      "name": "LowestPriceIncludingDiscountsStart",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Start of Latest Occurance"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Start des Letzten Auftretens"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_26838",
+                      "name": "LowestPriceIncludingDiscountsStartComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../LowestPriceIncludingDiscountsStart",
+                        "computationAlternatives": [
+                          {
+                            "operation": "FirstFilledValue(../Pricing*/Start Having [../Pricing/Helper_IsLowestPrice]==True)",
+                            "precondition": "FieldFilled(LowestPriceIncludingDiscounts)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of LowestPriceIncludingDiscountsStartComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of LowestPriceIncludingDiscountsStartComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_40e30",
+                      "name": "LowestPriceIncludingDiscountsEnd",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "End of Latest Occurance"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Ende des Letzten Auftretens"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_6e209",
+                      "name": "LowestPriceIncludingDiscountsEndComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../LowestPriceIncludingDiscountsEnd",
+                        "computationAlternatives": [
+                          {
+                            "operation": "FirstFilledValue(../Pricing*/End Having [../Pricing/Helper_IsLowestPrice]==True)",
+                            "precondition": "FieldFilled(LowestPriceIncludingDiscounts)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of LowestPriceIncludingDiscountsEndComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of LowestPriceIncludingDiscountsEndComp"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_082cd",
+                "name": "Variants",
+                "Group": {
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Variants"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Varianten"
+                    }
+                  ],
+                  "repeatability": 100,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_d929b",
+                      "name": "VariantERPSuffix",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "The variant ERP suffix can contain only numbers and must be 3 digits long."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Der Varianten ERP Suffix darf nur Zahlen enthalten und muss 3-stellig sein."
+                              }
+                            ],
+                            "minLength": 3,
+                            "maxLength": 3,
+                            "pattern": "[0-9]{3}"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Variant ERP Suffix"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "ERP Suffix der Variante"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_4f3e5",
+                      "name": "VariantFullERP_ID",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Variant Full ERP ID"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Vollständige ERP ID der Variante"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_8b8dd",
+                      "name": "VariantFullERP_IDComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../VariantFullERP_ID",
+                        "computationAlternatives": [
+                          {
+                            "operation": "[../General/ERP_ID] + \"-\"+ [VariantERPSuffix]",
+                            "precondition": "AllFieldsFilled(../General/ERP_ID,VariantERPSuffix)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of VariantFullERP_IDComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of VariantFullERP_IDComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_df210",
+                      "name": "VariantName",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Variant Name"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Name der Variante"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_53f5d",
+                      "name": "VariantNameGenerated",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Generated Variant Name"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Generierter Variantenname"
+                          }
+                        ],
+                        "transient": true
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_56cba",
+                      "name": "VariantNameGeneratedComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../VariantNameGenerated",
+                        "computationAlternatives": [
+                          {
+                            "operation": "[../Name]",
+                            "precondition": "NoGroupFilled(Attributes*) And FieldNotFilled(VariantERPSuffix)"
+                          },
+                          {
+                            "operation": "[../Name] + \" (\" + [VariantERPSuffix] + \")\"",
+                            "precondition": "NoGroupFilled(Attributes*) and FieldFilled(VariantERPSuffix)"
+                          },
+                          {
+                            "operation": "[../Name] + \" (\" \r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==1)   \r\n  + \")\"",
+                            "precondition": "NumberOfFilledGroups(Attributes*)==1"
+                          },
+                          {
+                            "operation": "[../Name] + \" (\" \r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==1)    +\" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==2)  \r\n     \r\n  + \")\"",
+                            "precondition": "NumberOfFilledGroups(Attributes*)==2"
+                          },
+                          {
+                            "operation": "[../Name] + \" (\" \r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==1)    +\" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue  \r\n     Having CurrentRepetition(Attributes)==2)    + \" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==3)     \r\n  + \")\"",
+                            "precondition": "NumberOfFilledGroups(Attributes*)==3"
+                          },
+                          {
+                            "operation": "[../Name] + \" (\" \r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==1)    +\" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue  \r\n     Having CurrentRepetition(Attributes)==2)    + \" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue  \r\n     Having CurrentRepetition(Attributes)==3)    + \" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==4)     \r\n  + \")\"",
+                            "precondition": "NumberOfFilledGroups(Attributes*)==4"
+                          },
+                          {
+                            "operation": "[../Name] + \" (\" \r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==1)    +\" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue  \r\n     Having CurrentRepetition(Attributes)==2)    + \" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue  \r\n     Having CurrentRepetition(Attributes)==3)    + \" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue  \r\n     Having CurrentRepetition(Attributes)==4)    + \" \"\r\n  + FirstFilledValue(Attributes*/AttributeValue \r\n     Having CurrentRepetition(Attributes)==5)     \r\n  + \")\"",
+                            "precondition": "NumberOfFilledGroups(Attributes*)>4"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of VariantNameGeneratedComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of VariantNameGeneratedComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_07b0e",
+                      "name": "VariantNameCustom",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Variant Name"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Name der Variante"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_6788a",
+                      "name": "HasCustomVariantName",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Use a Custom Variant Name?"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Eigenen Variantennamen verwenden?"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_04132",
+                      "name": "VariantNameComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../VariantName",
+                        "computationAlternatives": [
+                          {
+                            "operation": "[VariantNameGenerated]",
+                            "precondition": "FieldNotFilled(HasCustomVariantName)"
+                          },
+                          {
+                            "operation": "[VariantNameCustom]",
+                            "precondition": "FieldFilled(HasCustomVariantName)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of VariantNameComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of VariantNameComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_18260",
+                      "name": "VariantAdditionalMarketingDescription",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "lineBreaksPermitted": true
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Addtitional Marketing Description for this Variant"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Zusätzliche Marketing Beschreibung für diese Variante"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_259c2",
+                      "name": "VariantMainImage",
+                      "Group": {
+                        "repeatability": 1,
+                        "usageType": "attachment",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_ce558",
+                            "name": "original_filename",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_a1bc2",
+                            "name": "internal_filename",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_ba296",
+                            "name": "content",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType",
+                                "StringType": {
+                                  "lineBreaksPermitted": true,
+                                  "noValueValidation": true
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_ecd83",
+                            "name": "attachment_id",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_23b67",
+                            "name": "size",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "NumberType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_6fb5b",
+                            "name": "mime_type",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_afdb2",
+                            "name": "category",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_4670a",
+                            "name": "description",
+                            "annotations": [],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_b3ecf",
+                            "name": "AttachmentInternalFilenameRequired",
+                            "Rule": {
+                              "errorEntityRelPath": "../internal_filename",
+                              "errorCode": "Error rule_b3ecf",
+                              "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(internal_filename)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Field internal_filename of customType attachment is not filled."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_0e553",
+                            "name": "AttachmentMimeTypeRequired",
+                            "Rule": {
+                              "errorEntityRelPath": "../mime_type",
+                              "errorCode": "Error rule_0e553",
+                              "errorCondition": "GroupFilled(RuleGroup) and FieldNotFilled(mime_type)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Field mime_type of customType attachment is not filled."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_cfc18",
+                            "name": "AttachmentIdOrContentFilled",
+                            "Rule": {
+                              "errorEntityRelPath": "../content",
+                              "errorCode": "Error rule_cfc18",
+                              "errorCondition": "GroupFilled(RuleGroup) and NotExactlyOneFieldFilled(attachment_id, content)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: Either attachment_id or content must be filled in a customType attachment, but not both."
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "type": "Rule",
+                            "id": "rule_4fa95",
+                            "name": "SizeOfContentFilled",
+                            "Rule": {
+                              "errorEntityRelPath": "../content",
+                              "errorCode": "Error rule_4fa95",
+                              "errorCondition": "FieldFilled(content) and FieldNotFilled(size)",
+                              "severity": "ERROR",
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "Internal Error: If the content is filled, the size must be also filled."
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Internal Error: If the content is filled, the size must be also filled."
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_54bdc",
+                      "name": "VariantHasDifferentPrice",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "EnumerationType",
+                          "EnumerationType": {
+                            "values": [
+                              {
+                                "value": "no",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "no"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "nein"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "fixed",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Fixed Price"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Fixpreis"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "discount",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Discount"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Rabatt"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "premium",
+                                "label": [
+                                  {
+                                    "locale": "en",
+                                    "text": "Premium"
+                                  },
+                                  {
+                                    "locale": "de",
+                                    "text": "Aufschlag"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Differing Pricing"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Abweichende Preisbildung"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_fc019",
+                      "name": "VariantDifferentPriceFixed",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Differing Fixed Price of the Variant"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Abweichender Fixpreis der Variante"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_29eaf",
+                      "name": "VariantDifferentPriceRelative",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "minValue": 1,
+                            "maxValue": 99,
+                            "trait": "percent"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Percentage of Price Difference"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Prozentualer Preisunterschied"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_24c6d",
+                      "name": "VariantLatestPrice",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Latest Price of Variant"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Neuster Preis der Variante"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_7b88e",
+                      "name": "VariantLatestPriceComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../VariantLatestPrice",
+                        "computationAlternatives": [
+                          {
+                            "operation": "[../CurrentPrice]",
+                            "precondition": "FieldFilled(../CurrentPrice) and\r\n( FieldNotFilled(VariantHasDifferentPrice) or \r\n  [VariantHasDifferentPrice] == \"no\" )"
+                          },
+                          {
+                            "operation": "[VariantDifferentPriceFixed]",
+                            "precondition": "[VariantHasDifferentPrice]==\"fixed\" and\r\nFieldFilled(VariantDifferentPriceFixed)"
+                          },
+                          {
+                            "operation": "RoundAccounting([../CurrentPrice] * \r\n  {1 + [VariantDifferentPriceRelative]/100},2)",
+                            "precondition": "FieldFilled(../CurrentPrice) and\r\n[VariantHasDifferentPrice]==\"premium\" and\r\nFieldFilled(VariantDifferentPriceRelative)"
+                          },
+                          {
+                            "operation": "RoundAccounting([../CurrentPrice] * \r\n  {1 - [VariantDifferentPriceRelative]/100},2)",
+                            "precondition": "FieldFilled(../CurrentPrice) and\r\n[VariantHasDifferentPrice]==\"discount\" and\r\nFieldFilled(VariantDifferentPriceRelative)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of VariantLatestPriceComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of VariantLatestPriceComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_126a7",
+                      "name": "VariantLatestPriceWithDiscount",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "TypeDefType",
+                          "TypeDefType": {
+                            "typeDefinitionId": "typedef_735f62a5-c8e9-4fd5-a286-eac5bf3c4b2c"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Price of Variant with Discount"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Preis der Variante mit Rabatt"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_f9204",
+                      "name": "VariantLatestPriceWithDiscountComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../VariantLatestPriceWithDiscount",
+                        "computationAlternatives": [
+                          {
+                            "operation": "RoundAccounting( [VariantLatestPrice] * \r\n                 {1- [../CurrentDiscount]/100} , 2)",
+                            "precondition": "FieldFilled(VariantLatestPrice) And\r\nFieldFilled(../CurrentDiscount)"
+                          },
+                          {
+                            "operation": "[VariantLatestPrice]",
+                            "precondition": "FieldFilled(VariantLatestPrice) And\r\nFieldNotFilled(../CurrentDiscount)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of VariantLatestPriceWithDiscountComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of VariantLatestPriceWithDiscountComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_6fde0",
+                      "name": "VariantDifferentDeliveryTime",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {
+                            "minValue": 0,
+                            "maxValue": 99
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Differing Delivery Time of Variant"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Abweichende Lieferzeit der Variante"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_8767d",
+                      "name": "Attributes",
+                      "Group": {
+                        "repeatability": 25,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_5bafa",
+                            "name": "AttributeName",
+                            "annotations": [
+                              {
+                                "name": "enable_approximate_match_search",
+                                "value": "true"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Attribute"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Attribut"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_4d54b",
+                            "name": "AttributeValue",
+                            "annotations": [
+                              {
+                                "name": "enable_approximate_match_search",
+                                "value": "true"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Attribute Value"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Attributwert"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          },
+                          {
+                            "type": "Field",
+                            "id": "field_11de6",
+                            "name": "AttributeUsageInfo",
+                            "annotations": [
+                              {
+                                "name": "indexed",
+                                "value": "false"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "NumberType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "This Attribute-Value combination is used in n other Variants"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Diese Attribut-Wert-Kombination wird in n anderen Varianten verwendet"
+                                }
+                              ],
+                              "transient": true
+                            }
+                          },
+                          {
+                            "type": "Computation",
+                            "id": "computation_2e7be",
+                            "name": "AttributeUsageInfoComp",
+                            "Computation": {
+                              "computedFieldRelPath": "../AttributeUsageInfo",
+                              "computationAlternatives": [
+                                {
+                                  "operation": "NumberOfFilledFields(../../Variants*/Attributes*/AttributeName\r\nHaving (\r\n    [AttributeName] ==[$AttributeName] and \r\n    [AttributeValue] ==[$AttributeValue]\r\n    )\r\n)-1",
+                                  "precondition": "AllFieldsFilled(AttributeName,AttributeValue)\r\nand \r\nNumberOfFilledFields(../../Variants*/Attributes*/AttributeName\r\nHaving (\r\n    [AttributeName] ==[$AttributeName] and \r\n    [AttributeValue] ==[$AttributeValue]\r\n    )\r\n)>1   \r\n\r\n;;In order to make the Expression work, 0 must be excluded as result"
+                                }
+                              ],
+                              "errorMessage": [
+                                {
+                                  "locale": "en",
+                                  "text": "error text for computation of AttributeUsageInfoComp"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "error text for computation of AttributeUsageInfoComp"
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_f6886",
+                      "name": "AtLeastOneAttributeGiven",
+                      "Rule": {
+                        "errorEntityRelPath": "../VariantERPSuffix",
+                        "errorCode": "Error rule_f6886",
+                        "errorCondition": "FieldFilled(VariantERPSuffix) And\r\nNoGroupFilled(Attributes*)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Each Variant needs at least one Attribute."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Jede Variante benötigt mindestens ein Attribut."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_691e3",
+                      "name": "AtLeastOneAttributeValueComboUnique",
+                      "Rule": {
+                        "errorEntityRelPath": "../VariantERPSuffix",
+                        "errorCode": "Error rule_691e3",
+                        "errorCondition": "FieldFilled(VariantERPSuffix) And\r\nAtLeastOneGroupFilled(Attributes*) and\r\nNumberOfFilledFields(Attributes*/AttributeName\r\n    Having (FieldNotFilled(Attributes/AttributeUsageInfo)\r\n            or [Attributes/AttributeUsageInfo] ==0\r\n           )\r\n) ==0",
+                        "severity": "INFO",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "All the Attribute Value combinations occur also in different Variants."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Alle Attribut-Werte-Kombinationen treten auch in anderen Varianten auf."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_f9645",
+                      "name": "AttributeNamesAreUnique",
+                      "Rule": {
+                        "errorEntityRelPath": "../Attributes/AttributeName",
+                        "errorCode": "Error rule_f9645",
+                        "errorCondition": "RepetitionNotUnique(Attributes/AttributeName)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "The Attribute Names must be unique."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Die Attributnamen müssen eindeutig sein."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_8dd93",
+                      "name": "VariantIsSelected",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "transient": true
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_f688e",
+                      "name": "VariantCanNotBeSelected",
+                      "annotations": [
+                        {
+                          "name": "indexed",
+                          "value": "false"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "transient": true
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_6ac29",
+                      "name": "VariantCanNotBeSelectedComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../VariantCanNotBeSelected",
+                        "computationAlternatives": [
+                          {
+                            "operation": "True",
+                            "precondition": "AtLeastOneFieldFilled(../Variants*/VariantIsSelected Having CurrentRepetition($RuleGroup) != CurrentRepetition(RuleGroup))"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of VariantCanNotBeSelectedComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of VariantCanNotBeSelectedComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_6edbb",
+                      "name": "OnlyOneVariantSelected",
+                      "Rule": {
+                        "errorEntityRelPath": "../VariantIsSelected",
+                        "errorCode": "Error rule_6edbb",
+                        "errorCondition": "FieldFilled(VariantIsSelected) And FieldFilled(VariantCanNotBeSelected)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Please select only one Variant."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte nur eine Variante auswählen."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_ed499",
+                "name": "WarningIfAttributeNotUsedInAllVariants",
+                "Rule": {
+                  "errorEntityRelPath": "../Variants/Attributes/AttributeName",
+                  "errorCode": "Error rule_ed499",
+                  "errorCondition": "FieldFilled(Variants/Attributes/AttributeName) and \r\n\r\nNumberOfFilledFields(Variants*/Attributes*/AttributeName\r\n Having [$Variants/Attributes/AttributeName] ==\r\n        [Variants/Attributes/AttributeName])\r\n\r\n< NumberOfFilledFields(Variants*/VariantERPSuffix)\r\n\r\n\r\n;; There is another rule that ensures, that the Attribute Names are unique within the Variants. So there are no Variants with the same Attribute Name twice.",
+                  "severity": "WARNING",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "The Attribute $Variants/Attributes/AttributeName.value$ is not used in all Variants."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Das Attribut $Variants/Attributes/AttributeName.value$ ist nicht für alle Varianten gesetzt."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_c9bc2",
+                "name": "VariantERPSuffixMustBeUnique",
+                "Rule": {
+                  "errorEntityRelPath": "../Variants/VariantERPSuffix",
+                  "errorCode": "Error rule_c9bc2",
+                  "errorCondition": "RepetitionNotUnique(Variants/VariantERPSuffix)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "The Variant ERP Suffix must be unique."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Die Varianten ERP Nummer muss eineindeutig sein."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_12ee1",
+                "name": "NumberOfVariants",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Number of Variants"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Anzahl Varianten"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_c3f0a",
+                "name": "NumberOfVariantsComp",
+                "Computation": {
+                  "computedFieldRelPath": "../NumberOfVariants",
+                  "computationAlternatives": [
+                    {
+                      "operation": "NumberOfFilledFields(Variants*/VariantERPSuffix)",
+                      "precondition": "AtLeastOneFieldFilled(Variants*/VariantERPSuffix)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of NumberOfVariantsComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of NumberOfVariantsComp"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

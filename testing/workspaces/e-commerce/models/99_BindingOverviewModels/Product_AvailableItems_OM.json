@@ -1,0 +1,197 @@
+{
+  "header": {
+    "id": "Product_AvailableItems_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Product_DM"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-ba10d",
+        "width": 0.5,
+        "styles": {},
+        "elementRef": "include_common_field_0b973",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-4d4ab",
+        "width": 2,
+        "styles": {},
+        "elementRef": "include_common_field_4217e",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-698ec",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Latest Price"
+          },
+          {
+            "locale": "de",
+            "text": "Neuster Preis"
+          }
+        ],
+        "width": 0.5,
+        "styles": {},
+        "elementRef": "include_common_field_8cad7",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {},
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": false,
+      "pagingSize": 50,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "custom_list",
+        "fields": [
+          {
+            "fieldId": "include_common_field_4217e"
+          },
+          {
+            "fieldId": "include_common_field_0b973"
+          },
+          {
+            "fieldId": "include_common_field_57956"
+          },
+          {
+            "fieldId": "include_common_field_a5318"
+          },
+          {
+            "fieldId": "include_common_field_7e6fe"
+          },
+          {
+            "fieldId": "include_common_field_bf587"
+          },
+          {
+            "fieldId": "include_common_field_d9c49"
+          },
+          {
+            "fieldId": "include_common_field_8cad7"
+          },
+          {
+            "fieldId": "include_common_field_12ee1"
+          },
+          {
+            "fieldId": "include_common_field_df210"
+          },
+          {
+            "fieldId": "include_common_field_4d54b"
+          },
+          {
+            "fieldId": "include_common_field_5bafa"
+          }
+        ],
+        "sectionData": [
+          {
+            "id": "section-ef516",
+            "label": [
+              {
+                "locale": "en",
+                "text": "General"
+              },
+              {
+                "locale": "de",
+                "text": "Allgemein"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "include_common_field_4217e"
+              },
+              {
+                "fieldId": "include_common_field_0b973"
+              },
+              {
+                "fieldId": "include_common_field_57956"
+              },
+              {
+                "fieldId": "include_common_field_a5318"
+              },
+              {
+                "fieldId": "include_common_field_7e6fe"
+              },
+              {
+                "fieldId": "include_common_field_bf587"
+              },
+              {
+                "fieldId": "include_common_field_d9c49"
+              },
+              {
+                "fieldId": "include_common_field_8cad7"
+              }
+            ]
+          },
+          {
+            "id": "section-5457f",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Variants"
+              },
+              {
+                "locale": "de",
+                "text": "Varianten"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "include_common_field_df210"
+              },
+              {
+                "fieldId": "include_common_field_5bafa"
+              },
+              {
+                "fieldId": "include_common_field_4d54b"
+              },
+              {
+                "fieldId": "include_common_field_12ee1"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

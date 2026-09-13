@@ -1,0 +1,9 @@
+ {"relationshipModel" : "CategoryProduct",
+"entities" : [{"roleOrder" : "",
+"modelName" : "ProductBook_DM",
+"role" : "Product",
+"docRef" : "ProductBook_DM/30_Bk_983545128_A-Kitchen-in-Paris"},
+{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Category",
+"docRef" : "Category_DM/6_Memoir"}]}

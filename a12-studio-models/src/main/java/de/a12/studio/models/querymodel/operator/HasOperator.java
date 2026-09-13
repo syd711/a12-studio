@@ -22,6 +22,9 @@ public class HasOperator extends Operator {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Operator linkDocumentConstraint;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer maxDepth;
+
   public HasOperator() {
     setOperator("has");
   }

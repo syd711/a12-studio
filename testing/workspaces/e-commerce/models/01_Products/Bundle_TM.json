@@ -1,0 +1,487 @@
+{
+  "header": {
+    "id": "Bundle_TM",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Product Bundles"
+      },
+      {
+        "locale": "de",
+        "text": "Produktpakete"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "reviewer,tester"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM1",
+        "reference": "ProductBundle_DM"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM2",
+        "reference": "ProductBook_DM"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM3",
+        "reference": "ProductMovie_DM"
+      },
+      {
+        "purpose": "document-model-for-tree",
+        "modelType": "document",
+        "alias": "DM4",
+        "reference": "ProductFood_DM"
+      },
+      {
+        "purpose": "relationship-model-for-tree",
+        "modelType": "relationship",
+        "alias": "RM1",
+        "reference": "BundleProduct"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "dnd": {
+        "onDrag": {
+          "expandHoveredNode": true
+        }
+      },
+      "hierarchicalColumnRef": "column-3e1e8",
+      "rootRef": "crc-8be36",
+      "wholeTreeExpansion": true,
+      "expansionStrategy": {
+        "type": "level_by_level",
+        "initialExpansion": {
+          "type": "level_limit",
+          "level": 1,
+          "affectedNodeRefs": [
+            "node-0eccf"
+          ]
+        },
+        "pageSize": 50
+      }
+    },
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "expand_all_popup"
+        },
+        {
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "id": "button-ce94e",
+          "label": [
+            {
+              "locale": "en",
+              "text": "New Bundle"
+            },
+            {
+              "locale": "de",
+              "text": "Neues Paket"
+            }
+          ],
+          "type": "button",
+          "event": "event_add_root_node",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": []
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "nodes": [
+      {
+        "icon": {
+          "name": "list_alt",
+          "theme": "rounded"
+        },
+        "id": "node-0eccf",
+        "actions": [
+          {
+            "primary": false,
+            "destructive": true,
+            "labelHidden": true,
+            "type": "event",
+            "event": "event_delete_node",
+            "icon": {
+              "name": "delete_forever",
+              "theme": "filled"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Delete Bundle"
+              },
+              {
+                "locale": "de",
+                "text": "Paket Löschen"
+              }
+            ],
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Delete Bundle"
+                },
+                {
+                  "locale": "de",
+                  "text": "Paket Löschen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Do you want to delete this Bundle?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Sind Sie sicher, dass Sie dieses Paket löschen möchten?"
+                }
+              ]
+            }
+          },
+          {
+            "primary": false,
+            "destructive": false,
+            "labelHidden": true,
+            "type": "event",
+            "event": "event_add_link",
+            "icon": {
+              "name": "link",
+              "theme": "filled"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Maintain Assigned Products"
+              },
+              {
+                "locale": "de",
+                "text": "Zugeordnete Produkte verwalten"
+              }
+            ]
+          }
+        ],
+        "documentModelRef": "ProductBundle_DM",
+        "columns": [
+          {
+            "columnRef": "column-3e1e8",
+            "elementRef": "include_common_field_4217e"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-53bfc",
+            "elementRef": "include_common_group_8837c"
+          }
+        ],
+        "childRelationshipConfigurations": [
+          {
+            "id": "crc-8be36",
+            "relationshipModelRef": "BundleProduct",
+            "parentRole": "Bundle",
+            "columns": [
+              {
+                "columnRef": "column-f6c87",
+                "elementRef": "field_1c82c"
+              }
+            ]
+          }
+        ],
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "icon": {
+          "name": "menu_book",
+          "theme": "filled"
+        },
+        "id": "node-48373",
+        "actions": [
+          {
+            "primary": false,
+            "destructive": true,
+            "labelHidden": true,
+            "type": "event",
+            "event": "event_delete_link",
+            "icon": {
+              "name": "link_off",
+              "theme": "rounded"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Remove from Bundle"
+              },
+              {
+                "locale": "de",
+                "text": "Aus Paket entfernen"
+              }
+            ],
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Remove from Bundle"
+                },
+                {
+                  "locale": "de",
+                  "text": "Aus Bundle entfernen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Are you sure you want to remove this Book from the Bundle?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Sind Sie sicher, dass Sie dieses Buch aus dem Paket entfernen wollen?"
+                }
+              ]
+            }
+          }
+        ],
+        "documentModelRef": "ProductBook_DM",
+        "columns": [
+          {
+            "columnRef": "column-3e1e8",
+            "elementRef": "include_common_field_4217e"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-53bfc",
+            "elementRef": "include_common_group_8837c"
+          }
+        ],
+        "childRelationshipConfigurations": [],
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "icon": {
+          "name": "movie_filter",
+          "theme": "filled"
+        },
+        "id": "node-2f5a0",
+        "actions": [
+          {
+            "primary": false,
+            "destructive": true,
+            "labelHidden": true,
+            "type": "event",
+            "event": "event_delete_link",
+            "icon": {
+              "name": "link_off",
+              "theme": "rounded"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Remove from Bundle"
+              },
+              {
+                "locale": "de",
+                "text": "Aus Paket entfernen"
+              }
+            ],
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Remove from Bundle"
+                },
+                {
+                  "locale": "de",
+                  "text": "Aus Bundle entfernen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Are you sure you want to remove this Movie from the Bundle?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Sind Sie sicher, dass Sie diesen Film aus dem Paket entfernen wollen?"
+                }
+              ]
+            }
+          }
+        ],
+        "documentModelRef": "ProductMovie_DM",
+        "columns": [
+          {
+            "columnRef": "column-3e1e8",
+            "elementRef": "include_common_field_4217e"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-53bfc",
+            "elementRef": "include_common_group_8837c"
+          }
+        ],
+        "childRelationshipConfigurations": [],
+        "configuration": {
+          "dnd": true,
+          "inherit": {}
+        }
+      },
+      {
+        "icon": {
+          "name": "fastfood",
+          "theme": "rounded"
+        },
+        "id": "node-74258",
+        "actions": [
+          {
+            "primary": false,
+            "destructive": true,
+            "labelHidden": true,
+            "type": "event",
+            "event": "event_delete_link",
+            "icon": {
+              "name": "link_off",
+              "theme": "rounded"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Remove from Bundle"
+              },
+              {
+                "locale": "de",
+                "text": "Aus Paket entfernen"
+              }
+            ],
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Remove from Bundle"
+                },
+                {
+                  "locale": "de",
+                  "text": "Aus Bundle entfernen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Are you sure you want to remove this Food Item from the Bundle?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Sind Sie sicher, dass Sie dieses Nahrungsmittel aus dem Paket entfernen wollen?"
+                }
+              ]
+            }
+          }
+        ],
+        "documentModelRef": "ProductFood_DM",
+        "columns": [
+          {
+            "columnRef": "column-3e1e8",
+            "elementRef": "include_common_field_4217e"
+          },
+          {
+            "configuration": {
+              "attachmentDisplayMode": "preview"
+            },
+            "columnRef": "column-53bfc",
+            "elementRef": "include_common_group_8837c"
+          }
+        ],
+        "childRelationshipConfigurations": [],
+        "configuration": {
+          "dnd": false,
+          "inherit": {}
+        }
+      }
+    ],
+    "columns": [
+      {
+        "width": 5,
+        "fixedWidth": true,
+        "styles": {},
+        "id": "column-3e1e8",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Name"
+          },
+          {
+            "locale": "de",
+            "text": "Name"
+          }
+        ],
+        "name": "Name",
+        "pinDirection": "left"
+      },
+      {
+        "icon": {
+          "name": "image",
+          "theme": "filled"
+        },
+        "width": 1,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-53bfc",
+        "label": [],
+        "name": "Image"
+      },
+      {
+        "width": 1,
+        "fixedWidth": false,
+        "styles": {},
+        "id": "column-f6c87",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Count"
+          },
+          {
+            "locale": "de",
+            "text": "Anzahl"
+          }
+        ],
+        "name": "Count"
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+ {"relationshipModel" : "BundleProduct",
+"entities" : [{"roleOrder" : "",
+"modelName" : "ProductBundle_DM",
+"role" : "Bundle",
+"docRef" : "ProductBundle_DM/1_Science-Movie-Night"},
+{"roleOrder" : "",
+"modelName" : "ProductMovie_DM",
+"role" : "Product",
+"docRef" : "ProductMovie_DM/5_Arctic-Drift_Dummy_26_Arctic-Drift"}],
+"linkDocumentModel" : "Product_LinkFields_DM",
+"linkDocumentDocRef" : "Product_LinkFields_DM/BundleProduct_9"}

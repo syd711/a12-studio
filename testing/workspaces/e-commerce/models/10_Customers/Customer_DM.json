@@ -1,0 +1,756 @@
+{
+  "header": {
+    "id": "Customer_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "PaymentInfo_DM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Customer_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_4c0c1",
+          "name": "Customer",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_d129a",
+                "name": "Type",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "Natural",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Natural Person"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Natürliche Person"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "Legal",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Legal Entity"
+                            },
+                            {
+                              "locale": "de",
+                              "text": "Juristische Person"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Type of Customer"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Art des Kunden"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_7da0e",
+                "name": "CustomerNumber",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "errorMessage": [
+                        {
+                          "locale": "en",
+                          "text": "Format for Customer Numbers: AA000 - AA000000000"
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Format der Kundennummer: AA000 - AA00000000"
+                        }
+                      ],
+                      "pattern": "[A-Z]{2}[0-9]{3,9}"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Customer Number"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Kundennummer"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_85a10",
+                "name": "NaturalPerson",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_dc03f",
+                      "name": "Lastname",
+                      "annotations": [
+                        {
+                          "name": "ExcelDataUploader_Unique",
+                          "value": "true"
+                        },
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Lastname"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Nachname"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_044c2",
+                      "name": "AtLeastLastNameOfNaturalPersonGiven",
+                      "Rule": {
+                        "errorEntityRelPath": "../Lastname",
+                        "errorCode": "Error rule_044c2",
+                        "errorCondition": "FieldFilled(../Type) and\r\n[../Type] == \"Natural\" and\r\nFieldNotFilled(Lastname)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Please enter at least a Lastname."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte geben Sie mindestens den Nachnamen an."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_b4c6d",
+                      "name": "Firstname",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Firstname"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Vorname"
+                          }
+                        ],
+                        "helperText": [
+                          {
+                            "locale": "en",
+                            "text": "Please include all middle names."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte alle Vornamen angeben."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_53de9",
+                "name": "Company",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_a0add",
+                      "name": "CompanyName",
+                      "annotations": [
+                        {
+                          "name": "ExcelDataUploader_Unique",
+                          "value": "true"
+                        },
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Name of Company"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Name des Geschäfts"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_afc28",
+                      "name": "BusinessNameGivenForLegalEntity",
+                      "Rule": {
+                        "errorEntityRelPath": "../CompanyName",
+                        "errorCode": "Error rule_afc28",
+                        "errorCondition": "FieldFilled(../Type) and\r\n[../Type] == \"Legal\" and\r\nFieldNotFilled(CompanyName)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Please give the Name of the Legal Entity."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte geben Sie den Namen der Juristischen Person an."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_666f3",
+                "name": "NameOutput",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Name"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_873c1",
+                "name": "NameOutputComp",
+                "Computation": {
+                  "computedFieldRelPath": "../NameOutput",
+                  "computationAlternatives": [
+                    {
+                      "operation": "[Company/CompanyName]",
+                      "precondition": "FieldFilled(Type) And [Type]==\"Legal\""
+                    },
+                    {
+                      "operation": "[NaturalPerson/Firstname] + \" \" +[NaturalPerson/Lastname]",
+                      "precondition": "FieldFilled(Type) And [Type]==\"Natural\" and \r\nFieldFilled(NaturalPerson/Firstname) and\r\nFieldFilled(NaturalPerson/Lastname)"
+                    },
+                    {
+                      "operation": "[NaturalPerson/Firstname]",
+                      "precondition": "FieldFilled(Type) And [Type]==\"Natural\" and\r\nFieldFilled(NaturalPerson/Firstname) and\r\nFieldNotFilled(NaturalPerson/Lastname)"
+                    },
+                    {
+                      "operation": "[NaturalPerson/Lastname]",
+                      "precondition": "FieldFilled(Type) And [Type]==\"Natural\" and\r\nFieldNotFilled(NaturalPerson/Firstname) and\r\nFieldFilled(NaturalPerson/Lastname)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of NameOutputComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of NameOutputComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_f7d88",
+                "name": "AllowedToBuyMatureRatedProducts",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Allowed to buy mature rated products?"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Berechtigt Produkte mit Altersfreigabe zu kaufen?"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_718fa",
+                "name": "PaymentInformation",
+                "Group": {
+                  "repeatability": 1,
+                  "includeConfig": {
+                    "reference": "PaymentInfo_DM"
+                  }
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_831e6",
+                "name": "Addresses",
+                "Group": {
+                  "repeatability": 10,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_d3199",
+                      "name": "Street",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Street"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Straße"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_d30fc",
+                      "name": "Nr",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "Please enter number. Address additions a-j are permitted."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Bitte geben eine Hausnummer ein. Adresszusätze a-j sind zulässig."
+                              }
+                            ],
+                            "pattern": "[0-9]+([A-Ja-j]?)"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Number"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Hausnummer"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_d2048",
+                      "name": "PostalCode",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "Pleaser enter a five-digit Postal Code."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Bitte geben Sie eine fünf-stellige Postleitzahl an."
+                              }
+                            ],
+                            "pattern": "[0-9]{5}"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Postal Code"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Postleitzahl"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_8c7a1",
+                      "name": "City",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "City"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Stadt"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_ec53a",
+                      "name": "AddressOutput",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Address"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Adresse"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_94694",
+                      "name": "AddressOutputComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../AddressOutput",
+                        "computationAlternatives": [
+                          {
+                            "operation": "[Street] + \" \" + [Nr] + \", \" + [PostalCode] + \" \" + [City]",
+                            "precondition": "AllFieldsFilled(Street,Nr,PostalCode,City)"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of AddressOutputComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of AddressOutputComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_3207b",
+                      "name": "IsShippingAddress",
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Shipping Address"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Lieferadresse"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_80dcb",
+                      "name": "OnlyOneShippingAddress",
+                      "Rule": {
+                        "errorEntityRelPath": "../IsShippingAddress",
+                        "errorCode": "Error rule_80dcb",
+                        "errorCondition": "FieldFilled(IsShippingAddress) and FieldFilled(CanNotBeShippingAdress)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Please select only one address to be the shipping address."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte nur eine Adresse als Lieferadresse auswählen."
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_2cde9",
+                      "name": "IsBillingAddress",
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Billing Address"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Rechnungsadresse"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_a611f",
+                      "name": "CanNotBeShippingAdress",
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "transient": true
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_c302f",
+                      "name": "CanNotBeShippingAdressComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../CanNotBeShippingAdress",
+                        "computationAlternatives": [
+                          {
+                            "operation": "True",
+                            "precondition": "NumberOfFilledFields(../Addresses*/IsShippingAddress)>1"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of CanNotBeShippingAdressComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of CanNotBeShippingAdressComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_3c2f0",
+                      "name": "CanNotBeBillingAddress",
+                      "Field": {
+                        "fieldType": {
+                          "type": "ConfirmType"
+                        },
+                        "transient": true
+                      }
+                    },
+                    {
+                      "type": "Computation",
+                      "id": "computation_fc183",
+                      "name": "CanNotBeBillingAddressComp",
+                      "Computation": {
+                        "computedFieldRelPath": "../CanNotBeBillingAddress",
+                        "computationAlternatives": [
+                          {
+                            "operation": "True",
+                            "precondition": "NumberOfFilledFields(../Addresses*/IsBillingAddress)>1"
+                          }
+                        ],
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "error text for computation of CanNotBeBillingAddressComp"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "error text for computation of CanNotBeBillingAddressComp"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Rule",
+                      "id": "rule_aa4c0",
+                      "name": "OnlyOneBillingAddress",
+                      "Rule": {
+                        "errorEntityRelPath": "../IsBillingAddress",
+                        "errorCode": "Error rule_aa4c0",
+                        "errorCondition": "FieldFilled(IsBillingAddress) and FieldFilled(CanNotBeBillingAddress)",
+                        "severity": "ERROR",
+                        "errorMessage": [
+                          {
+                            "locale": "en",
+                            "text": "Please select only one address to be the billing address."
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Bitte nur eine Adresse als Rechnungsadresse auswählen."
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_80b14",
+                "name": "AtLeastOneAdressGiven",
+                "Rule": {
+                  "errorEntityRelPath": "../CustomerNumber",
+                  "errorCode": "Error rule_80b14",
+                  "errorCondition": "FieldFilled(CustomerNumber) and\r\n(\r\n    NoFieldFilled(Addresses*/IsBillingAddress)\r\n    or \r\n    NoFieldFilled(Addresses*/IsShippingAddress)\r\n)",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "Please give at least a shipping and a billing address."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Bitte geben Sie mindestens eine Rechnungs- und Lieferadresse an."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

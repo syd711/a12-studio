@@ -1,0 +1,9 @@
+ {"relationshipModel" : "CategoryCategory",
+"entities" : [{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Parent",
+"docRef" : "Category_DM/9_Media"},
+{"roleOrder" : "",
+"modelName" : "Category_DM",
+"role" : "Child",
+"docRef" : "Category_DM/8_Non-Fiction"}]}

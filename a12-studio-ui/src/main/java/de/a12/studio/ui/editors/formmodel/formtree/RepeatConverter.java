@@ -1,33 +1,43 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.a12.studio.models.Annotation;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Cell;
+import de.a12.studio.models.formmodel.ConfirmationText;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
+import de.a12.studio.models.formmodel.DefaultRowAction;
 import de.a12.studio.models.formmodel.DetachedRepeat;
 import de.a12.studio.models.formmodel.EmbeddedRepeat;
 import de.a12.studio.models.formmodel.FieldBasedRepeatOverviewColumn;
+import de.a12.studio.models.formmodel.HideCondition;
 import de.a12.studio.models.formmodel.InlineRepeat;
+import de.a12.studio.models.formmodel.LocalizedText;
 import de.a12.studio.models.formmodel.MultiColumnSection;
 import de.a12.studio.models.formmodel.RepeatOverviewColumn;
 import de.a12.studio.models.formmodel.Row;
+import de.a12.studio.models.formmodel.RowActionGroup;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.ScreenElement;
 import de.a12.studio.models.formmodel.Section;
+import de.a12.studio.models.formmodel.Style;
+import de.a12.studio.models.formmodel.TableStyle;
+import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.models.util.JsonSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Converts a Form Model repeat (Inline, Embedded or Detached) into a different repeat type, mirroring the SME
- * reference's {@code repeatConverter.ts}: every field the two types share (everything on {@link AbstractRepeat},
- * inherited from the common base rather than split per subtype as in SME) carries over unchanged, and the
- * type-specific detail-edit structure is rebuilt for the target type:
+ * reference's {@code repeatConverter.ts}: every field the two types share (everything on {@link AbstractRepeat}
+ * and {@link ScreenElement}, inherited from the common base rather than split per subtype as in SME) carries
+ * over unchanged, and the type-specific detail-edit structure is rebuilt for the target type:
  * <ul>
  *   <li>Embedded -&gt; Detached: the existing Control Grid is moved (same instance/ids) into a new detail Screen.</li>
  *   <li>Detached -&gt; Embedded: a new Control Grid is built from the detail Screen's Cells (one Row per Cell,
@@ -38,10 +48,10 @@ import java.util.List;
  *   <li>Embedded/Detached -&gt; Inline: the Control Grid/detail Screen is simply dropped; the repeat's own
  *       {@code repeatOverviewColumn}s become the (already editable) inline row.</li>
  * </ul>
- * The common-field copy goes through a JSON round trip via the same {@link JsonSettings#objectMapper} used by
- * {@link FormModelActions#cloneNode} rather than manual getter/setter copying, so every nested mutable field
- * (e.g. {@code tableStyle}, {@code label}) is deep-copied - {@link FormModelActions}'s undo command puts the
- * original {@code source} node back on Undo, which must come back untouched.
+ * The common-field copy deep-clones every nested mutable field (e.g. {@code tableStyle}, {@code label}) via a
+ * JSON round trip through the same {@link JsonSettings#objectMapper} used by {@link FormModelActions#cloneNode}
+ * rather than aliasing the source's objects - {@link FormModelActions}'s undo command puts the original
+ * {@code source} node back on Undo, which must come back untouched.
  * <p>
  * Not replicated here (no equivalent infrastructure exists in a12-studio yet): SME additionally forces
  * attachment-backed field columns to read-only/"TEXT" presentation when converting into Inline/Embedded (and
@@ -53,21 +63,9 @@ final class RepeatConverter {
   private RepeatConverter() {
   }
 
-  /** The repeat types a repeat may be converted to/from - one {@link FormModelNodeTypes} descriptor per type. */
+  /** The repeat types a repeat may be converted to/from. */
   enum RepeatKind {
-    INLINE("InlineRepeat", "inlinerepeat", InlineRepeat.class),
-    EMBEDDED("EmbeddedRepeat", "embeddedrepeat", EmbeddedRepeat.class),
-    DETACHED("DetachedRepeat", "detachedrepeat", DetachedRepeat.class);
-
-    final String typeName;
-    final String idPrefix;
-    final Class<? extends AbstractRepeat> resultClass;
-
-    RepeatKind(String typeName, String idPrefix, Class<? extends AbstractRepeat> resultClass) {
-      this.typeName = typeName;
-      this.idPrefix = idPrefix;
-      this.resultClass = resultClass;
-    }
+    INLINE, EMBEDDED, DETACHED
   }
 
   static @Nullable RepeatKind kindOf(@NonNull AbstractRepeat repeat) {
@@ -82,26 +80,90 @@ final class RepeatConverter {
    * mutated - the caller swaps it out for the returned node (see {@code FormModelActions#convertRepeat}).
    */
   static AbstractRepeat convert(@NonNull AbstractRepeat source, @NonNull RepeatKind targetKind) {
-    try {
-      ObjectNode node = (ObjectNode) JsonSettings.objectMapper.valueToTree(source);
-      node.remove("controlGrid");
-      node.remove("detailScreen");
-      node.remove("multiFileUploadOptions");
-      node.put("type", targetKind.typeName);
-      node.put("id", FormModelElementFactory.generateId(targetKind.idPrefix));
+    AbstractRepeat target = switch (targetKind) {
+      case INLINE -> FormModelElementFactory.newInlineRepeat();
+      case EMBEDDED -> FormModelElementFactory.newEmbeddedRepeat();
+      case DETACHED -> FormModelElementFactory.newDetachedRepeat();
+    };
+    copyCommonFields(source, target);
+    if (target instanceof EmbeddedRepeat embedded && embedded.getTableStyle() != null) {
+      // Embedded repeats don't scroll a fixed-height table the way Inline/Detached ones can.
+      embedded.getTableStyle().setTableHeight(null);
+    }
+    applyStructuralConversion(source, target);
+    return target;
+  }
 
-      AbstractRepeat target = JsonSettings.objectMapper.treeToValue(node, targetKind.resultClass);
-      if (target instanceof EmbeddedRepeat embedded && embedded.getTableStyle() != null) {
-        // Embedded repeats don't scroll a fixed-height table the way Inline/Detached ones can.
-        embedded.getTableStyle().setTableHeight(null);
-      }
-      applyStructuralConversion(source, target);
-      return target;
+  private static void copyCommonFields(@NonNull AbstractRepeat source, @NonNull AbstractRepeat target) {
+    // ScreenElement fields (id and type stay as freshly generated by the factory).
+    target.setName(source.getName());
+    target.setTitle(deepClone(source.getTitle(), LocalizedText.class));
+    target.setStyle(deepCloneList(source.getStyle(), Style.class));
+    target.setAnnotations(deepCloneList(source.getAnnotations(), Annotation.class));
+    target.setHideCondition(deepClone(source.getHideCondition(), HideCondition.class));
+    target.setIncludeId(source.getIncludeId());
+    target.setFormModelRef(source.getFormModelRef());
+    target.setHostDocumentModelPath(source.getHostDocumentModelPath());
+
+    // AbstractRepeat fields.
+    target.setReadonly(source.getReadonly());
+    target.setRepeatOverviewColumn(deepCloneList(source.getRepeatOverviewColumn(), RepeatOverviewColumn.class));
+    target.setGroupRef(source.getGroupRef());
+    target.setEnableAdd(source.getEnableAdd());
+    target.setEnableRemove(source.getEnableRemove());
+    target.setEnableReorder(source.getEnableReorder());
+    target.setEnableCopy(source.getEnableCopy());
+    target.setEnableColumnsResize(source.getEnableColumnsResize());
+    target.setInfiniteScrolling(source.getInfiniteScrolling());
+    target.setReadonlyPresentation(source.getReadonlyPresentation());
+    target.setTableStyle(deepClone(source.getTableStyle(), TableStyle.class));
+    target.setDefaultRowAction(deepClone(source.getDefaultRowAction(), DefaultRowAction.class));
+    target.setRowActionGroup(deepClone(source.getRowActionGroup(), RowActionGroup.class));
+    target.setFilterExpression(source.getFilterExpression());
+    target.setInitialSorting(source.getInitialSorting());
+    target.setTitleHidden(source.getTitleHidden());
+    target.setConfirmationTexts(deepCloneConfirmationTexts(source.getConfirmationTexts()));
+    target.setLabel(deepClone(source.getLabel(), LocalizedText.class));
+    target.setHint(deepClone(source.getHint(), TextContainer.class));
+    target.setPlaceholder(deepClone(source.getPlaceholder(), TextContainer.class));
+    target.setDefaultHorizontalAlignment(source.getDefaultHorizontalAlignment());
+    target.setHeaderStyle(deepCloneList(source.getHeaderStyle(), Style.class));
+  }
+
+  private static <T> @Nullable T deepClone(@Nullable T value, @NonNull Class<T> type) {
+    if (value == null) {
+      return null;
+    }
+    try {
+      String json = JsonSettings.objectMapper.writeValueAsString(value);
+      return JsonSettings.objectMapper.readValue(json, type);
     }
     catch (Exception e) {
-      log.warn("Failed to convert {} to {}: {}", source.getClass().getSimpleName(), targetKind, e.getMessage(), e);
-      throw new IllegalStateException("Failed to convert repeat to " + targetKind, e);
+      log.warn("Failed to deep-clone a {} while converting a repeat: {}", type.getSimpleName(), e.getMessage(), e);
+      return null;
     }
+  }
+
+  private static <T> List<T> deepCloneList(@NonNull List<T> values, @NonNull Class<T> type) {
+    List<T> result = new ArrayList<>();
+    for (T value : values) {
+      T clone = deepClone(value, type);
+      if (clone != null) {
+        result.add(clone);
+      }
+    }
+    return result;
+  }
+
+  private static Map<String, ConfirmationText> deepCloneConfirmationTexts(@NonNull Map<String, ConfirmationText> source) {
+    Map<String, ConfirmationText> result = new LinkedHashMap<>();
+    for (Map.Entry<String, ConfirmationText> entry : source.entrySet()) {
+      ConfirmationText clone = deepClone(entry.getValue(), ConfirmationText.class);
+      if (clone != null) {
+        result.put(entry.getKey(), clone);
+      }
+    }
+    return result;
   }
 
   private static void applyStructuralConversion(@NonNull AbstractRepeat source, @NonNull AbstractRepeat target) {

@@ -1,0 +1,209 @@
+{
+  "header": {
+    "id": "Customer_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Customers"
+      },
+      {
+        "locale": "de",
+        "text": "Kunden"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "Customer_DM"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-bc273",
+        "width": 1,
+        "styles": {},
+        "elementRef": "field_d129a",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-6099c",
+        "width": 2,
+        "styles": {
+          "content": [
+            "h_semiBoldFontWeight"
+          ]
+        },
+        "elementRef": "field_666f3",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-7ebfa",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Shipping Address Postal Code"
+          },
+          {
+            "locale": "de",
+            "text": "Lieferadresse Postleitzahl"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "name": "ShippingAddress",
+        "expression": "kontext(Customer){kontext(Addresses){\n    case [IsShippingAddress]=\"true\" {[PostalCode]}\n}}"
+      },
+      {
+        "id": "column-7e9d3",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Billing Address"
+          },
+          {
+            "locale": "de",
+            "text": "Rechnungsadresse"
+          }
+        ],
+        "width": 3,
+        "styles": {},
+        "name": "BillingAddress",
+        "expression": "kontext(Customer){kontext(Addresses){\n    case [IsBillingAddress]=\"true\" {[AddressOutput]}\n}}"
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Delete Customer"
+              },
+              {
+                "locale": "de",
+                "text": "Kunde löschen"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Are you sure you want to delete this customer?"
+              },
+              {
+                "locale": "de",
+                "text": "Sind Sie sicher, dass Sie diesen Kunden löschen wollen?"
+              }
+            ]
+          },
+          "icon": {
+            "name": "delete_forever",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "Delete Customer"
+            },
+            {
+              "locale": "de",
+              "text": "Kunde löschen"
+            }
+          ],
+          "event": "delete",
+          "labelHidden": true,
+          "destructive": true,
+          "primary": false
+        }
+      ]
+    },
+    "styles": [
+      "h_semiBoldFontWeight"
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "New Customer"
+            },
+            {
+              "locale": "de",
+              "text": "Neuer Kunde"
+            }
+          ],
+          "type": "button",
+          "event": "add",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "showFullTextSearch": true,
+      "pagingSize": 50,
+      "initialSorting": [
+        {
+          "idref": "column-6099c"
+        }
+      ],
+      "subtitle": [
+        {
+          "locale": "en",
+          "text": "All registered Customers"
+        },
+        {
+          "locale": "de",
+          "text": "Alle registrierten Kunden"
+        }
+      ],
+      "showRowCount": true,
+      "enableColumnsResize": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all_columns"
+      }
+    }
+  }
+}

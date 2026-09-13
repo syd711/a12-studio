@@ -1,0 +1,380 @@
+{
+  "header": {
+    "id": "ProductSingle_OM",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Products"
+      },
+      {
+        "locale": "de",
+        "text": "Produkte"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "DM",
+        "reference": "ProductSingle_DM"
+      }
+    ]
+  },
+  "content": {
+    "columns": [
+      {
+        "id": "column-cf5d8",
+        "label": [
+          {
+            "locale": "en",
+            "text": "Image"
+          },
+          {
+            "locale": "de",
+            "text": "Bild"
+          }
+        ],
+        "width": 1,
+        "styles": {},
+        "elementRef": "include_common_group_8837c",
+        "sortable": false,
+        "attachmentDisplayMode": "preview"
+      },
+      {
+        "id": "column-30b6a",
+        "width": 0.7,
+        "styles": {
+          "content": []
+        },
+        "elementRef": "include_common_field_0b973",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-31953",
+        "width": 5,
+        "styles": {
+          "content": [
+            "h_semiBoldFontWeight"
+          ]
+        },
+        "elementRef": "include_common_field_4217e",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-2d8dc",
+        "width": 1,
+        "styles": {},
+        "elementRef": "include_common_field_8cad7",
+        "sortable": true,
+        "preferredSorting": "ASC",
+        "suffix": [
+          {
+            "locale": "en",
+            "text": "€"
+          },
+          {
+            "locale": "de",
+            "text": "€"
+          }
+        ]
+      },
+      {
+        "id": "column-ee76a",
+        "width": 1,
+        "styles": {},
+        "elementRef": "include_common_field_12ee1",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      },
+      {
+        "id": "column-08135",
+        "width": 1,
+        "styles": {},
+        "elementRef": "include_common_field_57956",
+        "sortable": true,
+        "preferredSorting": "ASC"
+      }
+    ],
+    "rowActionGroup": {
+      "actions": [
+        {
+          "icon": {
+            "name": "delete_forever",
+            "theme": "rounded"
+          },
+          "event": "delete",
+          "confirmation": {
+            "title": [
+              {
+                "locale": "en",
+                "text": "Delete Product"
+              },
+              {
+                "locale": "de",
+                "text": "Produkt löschen"
+              }
+            ],
+            "message": [
+              {
+                "locale": "en",
+                "text": "Are you sure you want to delete this product?"
+              },
+              {
+                "locale": "de",
+                "text": "Sind Sie sicher, dass Sie diese Produkt löschen wollen?"
+              }
+            ]
+          },
+          "destructive": true,
+          "primary": false
+        }
+      ]
+    },
+    "styles": [
+      "h_semiBoldFontWeight"
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "multi_selection"
+        },
+        {
+          "icon": {
+            "name": "add",
+            "theme": "rounded"
+          },
+          "label": [
+            {
+              "locale": "en",
+              "text": "New Product"
+            },
+            {
+              "locale": "de",
+              "text": "Neues Produkt"
+            }
+          ],
+          "type": "button",
+          "event": "add",
+          "destructive": false,
+          "primary": false
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "search"
+        },
+        {
+          "type": "filter"
+        }
+      ]
+    },
+    "footerBox": {
+      "leftSlot": [],
+      "rightSlot": []
+    },
+    "configuration": {
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "custom_list",
+        "fields": [
+          {
+            "fieldId": "include_common_field_4217e"
+          },
+          {
+            "fieldId": "include_common_field_0b973"
+          },
+          {
+            "fieldId": "include_common_field_57956"
+          },
+          {
+            "fieldId": "include_common_field_a5318"
+          },
+          {
+            "fieldId": "include_common_field_7e6fe"
+          },
+          {
+            "fieldId": "include_common_field_bf587"
+          },
+          {
+            "fieldId": "include_common_field_d9c49"
+          },
+          {
+            "fieldId": "include_common_field_8cad7"
+          },
+          {
+            "fieldId": "include_common_field_12ee1"
+          },
+          {
+            "fieldId": "include_common_field_df210"
+          },
+          {
+            "fieldId": "include_common_field_4d54b"
+          },
+          {
+            "fieldId": "include_common_field_5bafa"
+          }
+        ],
+        "sectionData": [
+          {
+            "id": "section-ef516",
+            "label": [
+              {
+                "locale": "en",
+                "text": "General"
+              },
+              {
+                "locale": "de",
+                "text": "Allgemein"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "include_common_field_4217e"
+              },
+              {
+                "fieldId": "include_common_field_0b973"
+              },
+              {
+                "fieldId": "include_common_field_57956"
+              },
+              {
+                "fieldId": "include_common_field_a5318"
+              },
+              {
+                "fieldId": "include_common_field_7e6fe"
+              },
+              {
+                "fieldId": "include_common_field_bf587"
+              },
+              {
+                "fieldId": "include_common_field_d9c49"
+              },
+              {
+                "fieldId": "include_common_field_8cad7"
+              }
+            ]
+          },
+          {
+            "id": "section-5457f",
+            "label": [
+              {
+                "locale": "en",
+                "text": "Variants"
+              },
+              {
+                "locale": "de",
+                "text": "Varianten"
+              }
+            ],
+            "fields": [
+              {
+                "fieldId": "include_common_field_df210"
+              },
+              {
+                "fieldId": "include_common_field_5bafa"
+              },
+              {
+                "fieldId": "include_common_field_4d54b"
+              },
+              {
+                "fieldId": "include_common_field_12ee1"
+              }
+            ]
+          }
+        ],
+        "enumeratedStringFilter": {
+          "fields": [
+            {
+              "fieldId": "include_common_field_5bafa"
+            },
+            {
+              "fieldId": "include_common_field_4d54b"
+            }
+          ],
+          "pagingSize": 10
+        }
+      },
+      "multiSelection": {
+        "collapseOption": "collapsible_collapsed",
+        "counterOption": "simple",
+        "selectionArea": "checkbox_and_row",
+        "buttons": [
+          {
+            "confirmation": {
+              "title": [
+                {
+                  "locale": "en",
+                  "text": "Confirm deletion"
+                },
+                {
+                  "locale": "de",
+                  "text": "Löschen bestätigen"
+                }
+              ],
+              "message": [
+                {
+                  "locale": "en",
+                  "text": "Are you sure you want to delete the selected items?"
+                },
+                {
+                  "locale": "de",
+                  "text": "Sollen die ausgewählten Einträge wirklich gelöscht werden?"
+                }
+              ]
+            },
+            "icon": {
+              "name": "delete"
+            },
+            "label": [
+              {
+                "locale": "en",
+                "text": "Delete"
+              },
+              {
+                "locale": "de",
+                "text": "Löschen"
+              }
+            ],
+            "event": "delete_selected",
+            "destructive": false,
+            "primary": false
+          }
+        ],
+        "clearConfirmation": {
+          "enabled": true
+        }
+      },
+      "showFullTextSearch": true,
+      "showRowCount": true,
+      "initialSorting": [
+        {
+          "idref": "column-31953"
+        }
+      ],
+      "enableColumnsResize": true,
+      "actionColumnWidth": 0.4,
+      "enableInfiniteScroll": true,
+      "rowHeight": 49
+    }
+  }
+}

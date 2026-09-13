@@ -1,0 +1,137 @@
+{
+  "header": {
+    "id": "Product_LinkFields_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Product_LinkFields_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_ba4bb",
+          "name": "LinkFields",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_1c82c",
+                "name": "Count",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "zeroNotAllowed": true,
+                      "minValue": 1
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Count"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Anzahl"
+                    }
+                  ],
+                  "requirednessConfig": {
+                    "mode": "absoluteOrRelativeToNextRepAncestor"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_c9c4f",
+                "name": "IndividualDiscount",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "minValue": 0,
+                      "maxValue": 99,
+                      "trait": "percent"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Individual Discount"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Individueller Discount"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_8b02b",
+                "name": "SelectedVariantERPSuffix",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType",
+                    "StringType": {
+                      "errorMessage": [
+                        {
+                          "locale": "en",
+                          "text": "The variant ERP suffix can contain only numbers and must be 3 digits long."
+                        },
+                        {
+                          "locale": "de",
+                          "text": "Der Varianten ERP Suffix darf nur Zahlen enthalten und muss 3-stellig sein."
+                        }
+                      ],
+                      "minLength": 3,
+                      "maxLength": 3,
+                      "pattern": "[0-9]{3}"
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "ERP-Suffix of the selected Variant"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "ERP Suffix der gewählten Variante"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,607 @@
+{
+  "header": {
+    "id": "ProductMovie_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "Movie"
+      },
+      {
+        "locale": "de",
+        "text": "Film"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "superTypes",
+        "value": "ProductSingle_DM"
+      },
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "Product_Common_DM"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "ProductMovie_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_80b19",
+          "name": "Product",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "include_common",
+                "name": "Common",
+                "Group": {
+                  "repeatability": 1,
+                  "includeConfig": {
+                    "reference": "Product_Common_DM"
+                  }
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_379b7",
+                "name": "MovieProperties",
+                "Group": {
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Movie"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Film"
+                    }
+                  ],
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_9698f",
+                      "name": "IMDb_ID",
+                      "annotations": [
+                        {
+                          "name": "ExcelDataUploader_Unique",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "IMDb ID"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "IMDb ID"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_90d48",
+                      "name": "Title",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Title"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Titel"
+                          }
+                        ],
+                        "requirednessConfig": {
+                          "mode": "absoluteOrRelativeToNextRepAncestor"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_1c9c2",
+                      "name": "ReleaseYear",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType",
+                          "StringType": {
+                            "errorMessage": [
+                              {
+                                "locale": "en",
+                                "text": "Please enter a year of the 20th or 21st century."
+                              },
+                              {
+                                "locale": "de",
+                                "text": "Bitte ein Jahr des 20. oder 21. Jahrhunderts eingeben."
+                              }
+                            ],
+                            "minLength": 4,
+                            "maxLength": 4,
+                            "pattern": "(19|20)[0-9]{2}"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Release Year"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Veröffentlichungsjahr"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_8de42",
+                      "name": "PublishedDate",
+                      "Field": {
+                        "fieldType": {
+                          "type": "DateType",
+                          "DateType": {
+                            "format": "yyyy-MM-dd"
+                          }
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Published Date"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Veröffentlichungstag"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_c24e6",
+                      "name": "PG_Rating",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Motion Picture Association film rating"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "US-Amerikanische Altersfreigabe"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_82302",
+                      "name": "Runtime",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Runtime"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Laufzeit"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_75e75",
+                      "name": "Genres",
+                      "Group": {
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Genres"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Genres"
+                          }
+                        ],
+                        "repeatability": 10,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_93c17",
+                            "name": "Genre",
+                            "annotations": [
+                              {
+                                "name": "enable_approximate_match_search",
+                                "value": "true"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Genre"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Genre"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_23cb1",
+                      "name": "Director",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Director"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Regisseur"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_e7b9d",
+                      "name": "Writers",
+                      "Group": {
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Writers"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Autoren"
+                          }
+                        ],
+                        "repeatability": 10,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_b19d4",
+                            "name": "Writer",
+                            "annotations": [
+                              {
+                                "name": "enable_approximate_match_search",
+                                "value": "true"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Writer"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Autor"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_a2fba",
+                      "name": "Actors",
+                      "Group": {
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Actors"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Schauspieler"
+                          }
+                        ],
+                        "repeatability": 50,
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_9c9db",
+                            "name": "Actor",
+                            "annotations": [
+                              {
+                                "name": "enable_approximate_match_search",
+                                "value": "true"
+                              }
+                            ],
+                            "Field": {
+                              "fieldType": {
+                                "type": "StringType"
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Actor"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Schauspielerin"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_baa06",
+                      "name": "Country",
+                      "annotations": [
+                        {
+                          "name": "enable_approximate_match_search",
+                          "value": "true"
+                        }
+                      ],
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Country"
+                          },
+                          {
+                            "locale": "de",
+                            "text": "Land"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_12a31",
+                      "name": "Languages",
+                      "Group": {
+                        "repeatability": 999999,
+                        "usageType": "multi-select",
+                        "elements": [
+                          {
+                            "type": "Field",
+                            "id": "field_c0fcc",
+                            "name": "value",
+                            "Field": {
+                              "fieldType": {
+                                "type": "TypeDefType",
+                                "TypeDefType": {
+                                  "typeDefinitionId": "typedef_f2175b7e-bb14-4c86-9f7c-9619e1723841"
+                                }
+                              },
+                              "label": [
+                                {
+                                  "locale": "en",
+                                  "text": "Languages"
+                                },
+                                {
+                                  "locale": "de",
+                                  "text": "Sprachen"
+                                }
+                              ],
+                              "requirednessConfig": {
+                                "mode": "absoluteOrRelativeToNextRepAncestor"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_4fdfd",
+                "name": "TypeComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Common/Type",
+                  "computationAlternatives": [
+                    {
+                      "operation": "\"Movie\""
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of TypeComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of TypeComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_dccf4",
+                "name": "NameComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Common/Name",
+                  "computationAlternatives": [
+                    {
+                      "operation": "[MovieProperties/Title]"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of NameComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of NameComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_53759",
+                "name": "Helper_RefreshPriceAutoComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Common/Helper_RefreshPriceAuto",
+                  "computationAlternatives": [
+                    {
+                      "operation": "True",
+                      "precondition": "GroupFilled(Common/General) or\r\nGroupFilled(MovieProperties)"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of Helper_RefreshPriceAutoComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of Helper_RefreshPriceAutoComp"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Rule",
+                "id": "rule_a3432",
+                "name": "ValidMovie_ERPID",
+                "Rule": {
+                  "errorEntityRelPath": "../Common/General/ERP_ID",
+                  "errorCode": "Error rule_a3432",
+                  "errorCondition": "RangeAsString(Common/General/ERP_ID,1,3)!=\"M23\"",
+                  "severity": "ERROR",
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "The ERP ID of Movies must start with M23."
+                    },
+                    {
+                      "locale": "de",
+                      "text": "Die ERP IDs von Filmen muss mit M23 beginnen."
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Computation",
+                "id": "computation_79fcb",
+                "name": "HasMatureContentComp",
+                "Computation": {
+                  "computedFieldRelPath": "../Common/General/HasMatureContent",
+                  "computationAlternatives": [
+                    {
+                      "operation": "True",
+                      "precondition": "FieldFilled(MovieProperties/PG_Rating) and\r\nFieldValueIncludedInValueList(MovieProperties/PG_Rating, \"NC-17\",\"R\", \"M\", \"M/PG\",\"TV-MA\")"
+                    }
+                  ],
+                  "errorMessage": [
+                    {
+                      "locale": "en",
+                      "text": "error text for computation of HasMatureContentComp"
+                    },
+                    {
+                      "locale": "de",
+                      "text": "error text for computation of HasMatureContentComp"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

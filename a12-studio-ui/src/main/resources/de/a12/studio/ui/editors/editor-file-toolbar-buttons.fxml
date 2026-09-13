@@ -11,7 +11,7 @@
 <VBox fx:id="root" spacing="6.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.EditorFileToolbarButtonsController">
     <Button mnemonicParsing="false" onAction="#onFileEdit" styleClass="action-button">
         <graphic>
-            <FontIcon iconLiteral="mdi2f-file-edit-outline" iconSize="18" />
+            <FontIcon iconLiteral="mdi2f-file-document-edit" iconSize="18" />
         </graphic>
         <tooltip>
             <Tooltip text="%edit_file" />
@@ -19,7 +19,7 @@
     </Button>
     <Button mnemonicParsing="false" onAction="#onFileOpen" styleClass="action-button">
         <graphic>
-            <FontIcon iconLiteral="mdi2f-folder-open-outline" iconSize="18" />
+            <FontIcon iconLiteral="mdi2f-folder-open" iconSize="18" />
         </graphic>
         <tooltip>
             <Tooltip text="%open_model_folder" />

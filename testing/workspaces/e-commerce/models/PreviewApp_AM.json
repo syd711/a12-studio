@@ -1,0 +1,1527 @@
+{
+  "header": {
+    "id": "PreviewApp_AM",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [
+      {
+        "locale": "en",
+        "text": "eCommerce"
+      },
+      {
+        "locale": "de",
+        "text": "eCommerce"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "systemAdmin,modeler,tester,reviewer"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "region": {
+      "name": "APP",
+      "layout": {
+        "name": "ApplicationFrame"
+      },
+      "subRegions": [
+        {
+          "layout": {
+            "name": "MasterDetail"
+          },
+          "name": "CONTENT"
+        },
+        {
+          "layout": {
+            "name": "Null"
+          },
+          "name": "SIDEBAR"
+        },
+        {
+          "layout": {
+            "name": "Stack"
+          },
+          "name": "MODAL"
+        }
+      ]
+    },
+    "defaultRegion": [
+      "CONTENT"
+    ],
+    "modules": [
+      {
+        "name": "WelcomeModule",
+        "menu": {
+          "name": "WelcomeModule",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Welcome"
+            },
+            {
+              "locale": "de",
+              "text": "Willkommen"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "name": "WelcomePage",
+              "menuEntry": "WelcomeModule"
+            },
+            "withoutData": true
+          }
+        },
+        "flows": [
+          {
+            "name": "WelcomeModuleFlow",
+            "scenes": [
+              {
+                "name": "Show_WelcomePage_CM",
+                "matchConditions": [
+                  {
+                    "key": "name",
+                    "mustEqual": "WelcomePage"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "WelcomeModule"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "ContentEngine",
+                      "models": [
+                        {
+                          "modelType": "content",
+                          "name": "WelcomePage_CM"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Products",
+        "menu": {
+          "name": "Products",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Products"
+            },
+            {
+              "locale": "de",
+              "text": "Produkte"
+            }
+          ],
+          "children": [
+            {
+              "name": "ProductCatalog",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Product Catalog"
+                },
+                {
+                  "locale": "de",
+                  "text": "Produktkatalog"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "Category_DM",
+                  "menuEntry": "ProductCatalog"
+                }
+              }
+            },
+            {
+              "name": "Bundles",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Bundles"
+                },
+                {
+                  "locale": "de",
+                  "text": "Pakete"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "ProductBundle_DM",
+                  "menuEntry": "Bundles"
+                }
+              }
+            },
+            {
+              "name": "AllProducts",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "All Products"
+                },
+                {
+                  "locale": "de",
+                  "text": "Alle Produkte"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "ProductSingle_DM",
+                  "menuEntry": "AllProducts"
+                }
+              }
+            },
+            {
+              "name": "Books",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Books"
+                },
+                {
+                  "locale": "de",
+                  "text": "Bücher"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "ProductBook_DM",
+                  "menuEntry": "Books"
+                }
+              }
+            },
+            {
+              "name": "Movies",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Movies"
+                },
+                {
+                  "locale": "de",
+                  "text": "Filme"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "ProductMovie_DM",
+                  "menuEntry": "Movies"
+                }
+              }
+            },
+            {
+              "name": "Food",
+              "label": [
+                {
+                  "locale": "en",
+                  "text": "Food"
+                },
+                {
+                  "locale": "de",
+                  "text": "Nahrungsmittel"
+                }
+              ],
+              "initialActivity": {
+                "descriptor": {
+                  "model": "ProductFood_DM",
+                  "menuEntry": "Food"
+                }
+              }
+            }
+          ]
+        },
+        "flows": [
+          {
+            "name": "ProductCatalogFlow",
+            "scenes": [
+              {
+                "name": "Show_Product_TM_for_Category_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Category_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "ProductCatalog"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "tree",
+                          "name": "Product_TM"
+                        }
+                      ],
+                      "name": "TreeEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "name": "FormEngine",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Category_FM"
+                        }
+                      ],
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                },
+                "name": "Show_Category_FM_for_Category_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Category_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "ProductCatalog"
+                  }
+                ]
+              },
+              {
+                "name": "Show_Product_Forms",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "ProductCatalog"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "ProductBook_FM",
+                          "documentModel": "ProductBook_DM"
+                        },
+                        {
+                          "modelType": "form",
+                          "name": "ProductBundle_FM",
+                          "documentModel": "ProductBundle_DM"
+                        },
+                        {
+                          "modelType": "form",
+                          "name": "ProductFood_FM",
+                          "documentModel": "ProductFood_DM"
+                        },
+                        {
+                          "modelType": "form",
+                          "name": "ProductMovie_FM",
+                          "documentModel": "ProductMovie_DM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                },
+                "description": ""
+              }
+            ]
+          },
+          {
+            "name": "BundlesFlow",
+            "scenes": [
+              {
+                "name": "Show_Bundle_TM_for_ProductBundle_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductBundle_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Bundles"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "tree",
+                          "name": "Bundle_TM"
+                        }
+                      ],
+                      "name": "TreeEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Bundle_MaintainProducts_FM_for_ProductBundle_DM_ToEditLinks",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductBundle_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "engine",
+                    "mustEqual": "relationship"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Bundles"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Bundle_MaintainProducts_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      },
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Product_LinkFields_FM_for_Product_LinkFields_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Product_LinkFields_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Bundles"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Product_LinkFields_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      },
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_ProductBundle_FM_for_ProductBundle_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductBundle_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Bundles"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "ProductBundle_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Product_OfBundle_CM",
+                "matchConditions": [
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Bundles"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "content",
+                          "name": "Product_OfBundle_CM"
+                        }
+                      ],
+                      "name": "ContentEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "AllProductsFlow",
+            "scenes": [
+              {
+                "name": "Show_ProductSingle_OM_for_ProductSingle_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductSingle_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "AllProducts"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "ProductSingle_OM"
+                        }
+                      ],
+                      "name": "OverviewEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_ProductFood_FM_for_ProductFood_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductFood_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "AllProducts"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "ProductFood_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_ProductBook_FM_for_ProductBook_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductBook_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "AllProducts"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "ProductBook_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_ProductMovie_FM_for_ProductMovie_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductMovie_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "AllProducts"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "ProductMovie_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "BooksFlow",
+            "scenes": [
+              {
+                "name": "Show_ProductBook_OM_for_ProductBook_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductBook_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Books"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "ProductBook_OM"
+                        }
+                      ],
+                      "name": "OverviewEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_ProductBook_FM_for_ProductBook_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductBook_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Books"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "ProductBook_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "MoviesFlow",
+            "scenes": [
+              {
+                "name": "Show_ProductMovie_OM_for_ProductMovie_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductMovie_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Movies"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "ProductMovie_OM"
+                        }
+                      ],
+                      "name": "OverviewEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_ProductMovie_FM_for_ProductMovie_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductMovie_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Movies"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "ProductMovie_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "FoodFlow",
+            "scenes": [
+              {
+                "name": "Show_ProductFood_OM_for_ProductFood_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductFood_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Food"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "ProductFood_OM"
+                        }
+                      ],
+                      "name": "OverviewEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_ProductFood_FM_for_ProductFood_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "ProductFood_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Food"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "ProductFood_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 8
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Categories",
+        "menu": {
+          "name": "Categories",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Categories"
+            },
+            {
+              "locale": "de",
+              "text": "Kategorien"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "model": "Category_DM",
+              "menuEntry": "Categories"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "CategoriesFlow",
+            "scenes": [
+              {
+                "name": "Show_Category_TM_for_Category_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Category_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Categories"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "tree",
+                          "name": "Category_TM"
+                        }
+                      ],
+                      "name": "TreeEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Category_MaintainLinks_FM_for_Category_DM_ToEditLinks",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Category_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "engine",
+                    "mustEqual": "relationship"
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Categories"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Category_MaintainLinks_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      },
+                      "region": [
+                        "MODAL"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Category_FM_for_Category_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Category_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Categories"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Category_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Brands",
+        "menu": {
+          "name": "Brands",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Brands"
+            },
+            {
+              "locale": "de",
+              "text": "Marken"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "model": "Brand_DM",
+              "menuEntry": "Brands"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "BrandsFlow",
+            "scenes": [
+              {
+                "name": "Show_Brand_OM_for_Brand_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Brand_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Brands"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Brand_OM"
+                        }
+                      ],
+                      "name": "OverviewEngine"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Brand_FM_for_Brand_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Brand_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Brands"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Brand_FM"
+                        }
+                      ],
+                      "name": "FormEngine"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Customer",
+        "menu": {
+          "name": "Customer",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Customers"
+            },
+            {
+              "locale": "de",
+              "text": "Kunde"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "model": "Customer_DM",
+              "menuEntry": "Customer"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "CustomerFlow",
+            "scenes": [
+              {
+                "name": "Show_Customer_OM_for_Customer_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Customer_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Customer"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "Customer_OM"
+                        }
+                      ],
+                      "name": "OverviewEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_Customer_FM_for_Customer_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "Customer_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Customer"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "Customer_FM"
+                        }
+                      ],
+                      "name": "FormEngine",
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 7
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Orders",
+        "menu": {
+          "name": "Orders",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Orders"
+            },
+            {
+              "locale": "de",
+              "text": "Bestellungen"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "model": "CollectionOrder_DM",
+              "menuEntry": "Orders"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "OrdersFlow",
+            "scenes": [
+              {
+                "name": "Show_CollectionOrder_OM_for_CollectionOrder_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "CollectionOrder_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Orders"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "CollectionOrder_OM"
+                        }
+                      ],
+                      "name": "OverviewEngine"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_CollectionOrder_FM_for_CollectionOrder_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "CollectionOrder_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Orders"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "CollectionOrder_FM"
+                        }
+                      ],
+                      "name": "FormEngine"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Offers",
+        "menu": {
+          "name": "Offers",
+          "label": [
+            {
+              "locale": "en",
+              "text": "Offers"
+            },
+            {
+              "locale": "de",
+              "text": "Angebote"
+            }
+          ],
+          "initialActivity": {
+            "descriptor": {
+              "model": "CollectionOffer_DM",
+              "menuEntry": "Offers"
+            }
+          }
+        },
+        "flows": [
+          {
+            "name": "OffersFlow",
+            "scenes": [
+              {
+                "name": "Show_CollectionOffer_OM_for_CollectionOffer_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "CollectionOffer_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": false
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Offers"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "layout": {
+                        "name": "MasterDetail"
+                      },
+                      "type": "REGION_CLEAR"
+                    },
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "overview",
+                          "name": "CollectionOffer_OM"
+                        }
+                      ],
+                      "name": "OverviewEngine"
+                    }
+                  ]
+                }
+              },
+              {
+                "name": "Show_CollectionOffer_FM_for_CollectionOffer_DM",
+                "matchConditions": [
+                  {
+                    "key": "model",
+                    "mustEqual": "CollectionOffer_DM"
+                  },
+                  {
+                    "key": "instance",
+                    "isSet": true
+                  },
+                  {
+                    "key": "menuEntry",
+                    "mustEqual": "Offers"
+                  }
+                ],
+                "sceneChange": {
+                  "onEnter": [
+                    {
+                      "type": "VIEW_ADD",
+                      "models": [
+                        {
+                          "modelType": "form",
+                          "name": "CollectionOffer_FM"
+                        }
+                      ],
+                      "name": "FormEngine"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "initialActivity": {
+      "descriptor": {
+        "name": "WelcomePage",
+        "menuEntry": "WelcomeModule"
+      },
+      "withoutData": true
+    }
+  }
+}

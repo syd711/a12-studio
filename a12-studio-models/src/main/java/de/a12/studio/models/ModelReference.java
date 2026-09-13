@@ -1,6 +1,8 @@
 package de.a12.studio.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,8 +41,29 @@ public class ModelReference {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String alias;
-  private ModelType modelType;
+
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String purpose;
+
+  // ModelType.fromValue() returns null (by design, see its javadoc) for a real a12 platform type
+  // a12-studio has no editor for yet (e.g. "additive-document", "composed-document"). unresolvedModelType
+  // keeps the original JSON string in that case so saving a reference to such a type doesn't corrupt it
+  // into a null modelType - see getModelTypeForJson/setModelTypeForJson below.
+  @JsonIgnore
+  private ModelType modelType;
+  @JsonIgnore
+  private String unresolvedModelType;
+
   private String reference;
+
+  @JsonProperty("modelType")
+  private String getModelTypeForJson() {
+    return modelType != null ? modelType.getValue() : unresolvedModelType;
+  }
+
+  @JsonProperty("modelType")
+  private void setModelTypeForJson(String value) {
+    this.modelType = ModelType.fromValue(value);
+    this.unresolvedModelType = modelType == null ? value : null;
+  }
 }
