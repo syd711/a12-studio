@@ -16,7 +16,12 @@ public class UISettings extends JsonSettings {
   /** Cap for {@link #recentFiles}; see {@link #addRecentFile(String)}. */
   public static final int MAX_RECENT_FILES = 20;
 
-  private double dividerPosition = 0.3;
+  /** Main SplitPane divider position (0-1) for each side panel, saved separately so switching between them doesn't clobber a sibling's saved width. */
+  private double projectViewDividerPosition = 0.3;
+
+  private double bookmarksDividerPosition = 0.3;
+
+  private double versioncontrolDividerPosition = 0.3;
 
   private List<String> openedFiles = new ArrayList<>();
 
@@ -35,12 +40,28 @@ public class UISettings extends JsonSettings {
     return SettingsType.UI;
   }
 
-  public double getDividerPosition() {
-    return dividerPosition;
+  public double getProjectViewDividerPosition() {
+    return projectViewDividerPosition;
   }
 
-  public void setDividerPosition(double dividerPosition) {
-    this.dividerPosition = dividerPosition;
+  public void setProjectViewDividerPosition(double projectViewDividerPosition) {
+    this.projectViewDividerPosition = projectViewDividerPosition;
+  }
+
+  public double getBookmarksDividerPosition() {
+    return bookmarksDividerPosition;
+  }
+
+  public void setBookmarksDividerPosition(double bookmarksDividerPosition) {
+    this.bookmarksDividerPosition = bookmarksDividerPosition;
+  }
+
+  public double getVersioncontrolDividerPosition() {
+    return versioncontrolDividerPosition;
+  }
+
+  public void setVersioncontrolDividerPosition(double versioncontrolDividerPosition) {
+    this.versioncontrolDividerPosition = versioncontrolDividerPosition;
   }
 
   public List<String> getOpenedFiles() {

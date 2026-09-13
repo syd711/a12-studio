@@ -13,6 +13,10 @@ public class TestHelper {
     return resolveTestingWorkspaceDir("advanced_new");
   }
 
+  public static Path resolveTestingCommerceDir() {
+    return resolveTestingWorkspaceDir("e-commerce");
+  }
+
   private static Path resolveTestingWorkspaceDir(String workspaceName) {
     for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
       Path candidate = dir.resolve("testing").resolve("workspaces").resolve(workspaceName);

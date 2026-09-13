@@ -43,12 +43,10 @@
       {
         "relationshipModel": "PersonCompany",
         "targetRole": "Company",
-        "sortBy": {
-          "field": "/Company/CompanyDetails/CompanyLogo/original_filename",
-          "direction": "ASC",
-          "nullHandling": "NULLS_FIRST",
-          "ignoreCase": false
-        }
+        "field": "/Company/CompanyDetails/CompanyLogo/original_filename",
+        "direction": "ASC",
+        "nullHandling": "NULLS_FIRST",
+        "ignoreCase": false
       }
     ]
   }

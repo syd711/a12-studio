@@ -22,6 +22,9 @@ public class DocumentModelComputationRuleEditorController implements ElementEdit
   private TargetFieldPanelController computedFieldController;
 
   @FXML
+  private ComputationOptionsPanelController computationOptionsController;
+
+  @FXML
   private ComputationAlternativesPanelController computationAlternativesController;
 
   @FXML
@@ -45,8 +48,9 @@ public class DocumentModelComputationRuleEditorController implements ElementEdit
     descriptionInternalController.configureInternal();
     descriptionExternalController.configureExternal();
 
-    propertyEditors = List.of(generalInformationController, computedFieldController, computationAlternativesController,
-        errorMessageController, descriptionInternalController, descriptionExternalController, annotationsController);
+    propertyEditors = List.of(generalInformationController, computedFieldController, computationOptionsController,
+        computationAlternativesController, errorMessageController, descriptionInternalController,
+        descriptionExternalController, annotationsController);
   }
 
   @Override

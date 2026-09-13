@@ -6,7 +6,6 @@ import de.a12.studio.models.formmodel.ButtonStyling;
 import de.a12.studio.models.formmodel.ButtonType;
 import de.a12.studio.models.formmodel.EventButton;
 import de.a12.studio.models.formmodel.LocalizedText;
-import de.a12.studio.models.formmodel.MultilingualText;
 import de.a12.studio.models.formmodel.NavigationButton;
 import de.a12.studio.models.formmodel.Style;
 import de.a12.studio.models.formmodel.TextContainer;
@@ -200,27 +199,16 @@ public class FormButtonDialogController implements DialogController {
 
   private List<Label> currentDescriptionTexts() {
     ButtonStyling styling = getButtonStyling();
-    LocalizedText description = styling != null ? styling.getDescription() : null;
-    if (description instanceof MultilingualText multilingualText && multilingualText.getMultilingualText() != null) {
-      return multilingualText.getMultilingualText().getText();
-    }
-    return List.of();
+    TextContainer description = styling != null ? styling.getDescription() : null;
+    return description != null ? description.getText() : List.of();
   }
 
   private List<Label> writeDescriptionTexts() {
     ButtonStyling styling = button.getOrCreateButtonStyling();
-    MultilingualText multilingualText;
-    if (styling.getDescription() instanceof MultilingualText existing) {
-      multilingualText = existing;
+    if (styling.getDescription() == null) {
+      styling.setDescription(new TextContainer());
     }
-    else {
-      multilingualText = new MultilingualText();
-      styling.setDescription(multilingualText);
-    }
-    if (multilingualText.getMultilingualText() == null) {
-      multilingualText.setMultilingualText(new TextContainer());
-    }
-    return multilingualText.getMultilingualText().getText();
+    return styling.getDescription().getText();
   }
 
   private List<Style> currentStyles() {

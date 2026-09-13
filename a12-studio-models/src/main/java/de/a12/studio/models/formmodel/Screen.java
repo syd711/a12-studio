@@ -26,4 +26,8 @@ public class Screen {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Annotation> annotations = new ArrayList<>();
   private List<ScreenElement> screenElements = new ArrayList<>();
+  // Id of the Control that should receive keyboard focus when this screen is shown. No editor UI yet -
+  // mapped purely for lossless round-tripping.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String initiallyFocusedElementId;
 }

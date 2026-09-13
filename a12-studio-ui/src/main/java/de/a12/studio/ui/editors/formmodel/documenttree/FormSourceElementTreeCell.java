@@ -5,6 +5,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.layout.HBox;
 
@@ -27,6 +28,10 @@ class FormSourceElementTreeCell extends TreeCell<ElementViewModel> {
 
     Node icon = WidgetFactory.createIcon(item.getIcon());
     icon.getStyleClass().add("tree-icon");
+    String type = item.getType();
+    if (type != null) {
+      Tooltip.install(icon, WidgetFactory.createTooltip(type));
+    }
     Label nameLabel = new Label(item.getName());
     nameLabel.getStyleClass().add("tree-cell-name-label");
     HBox graphic = new HBox(4, icon, nameLabel);

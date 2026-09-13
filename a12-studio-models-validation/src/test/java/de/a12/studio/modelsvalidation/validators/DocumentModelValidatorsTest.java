@@ -1,6 +1,8 @@
 package de.a12.studio.modelsvalidation.validators;
 
 import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.documentmodel.ComputationConfig;
+import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelContent;
 import de.a12.studio.models.documentmodel.FieldConfig;
@@ -139,6 +141,74 @@ class DocumentModelValidatorsTest {
 
     assertTrue(errors.stream().anyMatch(error -> "field_product_type".equals(error.elementId())),
         "A TypeDefType field whose type definition can't be resolved anywhere must still be reported");
+  }
+
+  /**
+   * Regression test: a Computation's {@code computedFieldRelPath} reaching into a field that lives in an
+   * Included model (not this model's own local elements) must resolve through {@link
+   * ElementIndex#resolveRelativePath}, not get wrongly flagged "Missing Computed Field" just because the
+   * Include group has no local {@code elements} of its own.
+   */
+  @Test
+  void missingReferenceValidatorAcceptsAComputedFieldReachedThroughAnInclude() {
+    FieldElement includedField = new FieldElement();
+    includedField.setId("field_name");
+    includedField.setName("Name");
+    FieldConfig includedFieldConfig = new FieldConfig();
+    includedFieldConfig.setFieldType(new StringFieldType());
+    includedField.setField(includedFieldConfig);
+
+    GroupElement ownerRoot = new GroupElement();
+    ownerRoot.setId("owner_root");
+    ownerRoot.setName("Common");
+    GroupConfig ownerRootConfig = new GroupConfig();
+    ownerRootConfig.setElements(new ArrayList<>(List.of(includedField)));
+    ownerRoot.setGroup(ownerRootConfig);
+
+    DocumentModel owner = new DocumentModel();
+    owner.setId("Owner_DM");
+    DocumentModelContent ownerContent = new DocumentModelContent();
+    ModelRoot ownerModelRoot = new ModelRoot();
+    ownerModelRoot.setRootGroups(List.of(ownerRoot));
+    ownerContent.setModelRoot(ownerModelRoot);
+    owner.setContent(ownerContent);
+
+    GroupElement includeGroup = new GroupElement();
+    includeGroup.setId("include_common");
+    includeGroup.setName("Common");
+    GroupConfig includeConfig = new GroupConfig();
+    IncludeConfig includeReference = new IncludeConfig();
+    includeReference.setReference("Owner_DM");
+    includeConfig.setIncludeConfig(includeReference);
+    includeGroup.setGroup(includeConfig);
+
+    ComputationElement computation = new ComputationElement();
+    computation.setId("computation_name");
+    computation.setName("NameComp");
+    ComputationConfig computationConfig = new ComputationConfig();
+    computationConfig.setComputedFieldRelPath("../Common/Name");
+    computation.setComputation(computationConfig);
+
+    GroupElement productRoot = new GroupElement();
+    productRoot.setId("product_root");
+    productRoot.setName("Product");
+    GroupConfig productConfig = new GroupConfig();
+    productConfig.setElements(new ArrayList<>(List.of(includeGroup, computation)));
+    productRoot.setGroup(productConfig);
+
+    DocumentModel company = new DocumentModel();
+    company.setId("Company_DM");
+    DocumentModelContent companyContent = new DocumentModelContent();
+    ModelRoot companyModelRoot = new ModelRoot();
+    companyModelRoot.setRootGroups(List.of(productRoot));
+    companyContent.setModelRoot(companyModelRoot);
+    company.setContent(companyContent);
+
+    List<ModelValidationError> errors = new MissingReferenceValidator()
+        .validate(company, TestModels.contextWithDocumentModels(company, owner));
+
+    assertTrue(errors.stream().noneMatch(error -> "computation_name".equals(error.elementId())),
+        "A Computation whose computedFieldRelPath reaches a field inherited via Include must not be reported as missing");
   }
 
   /**

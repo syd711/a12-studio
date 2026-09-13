@@ -1,5 +1,6 @@
 package de.a12.studio.ui.bookmarks;
 
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.ui.events.BookmarksChangedEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
@@ -20,8 +21,10 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
@@ -41,9 +44,15 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
 
   private Consumer<Bookmark> onOpenBookmark;
   private Runnable collapseProjectViewCallback;
+  private @Nullable Project project;
 
   public void setOnOpenBookmark(Consumer<Bookmark> handler) {
     this.onOpenBookmark = handler;
+  }
+
+  public void setProject(@Nullable Project project) {
+    this.project = project;
+    refresh();
   }
 
   public void setCollapseProjectViewCallback(Runnable callback) {
@@ -85,8 +94,20 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
   }
 
   public void refresh() {
-    List<Bookmark> bookmarks = BookmarkService.getInstance().getBookmarks();
+    if (project == null) {
+      bookmarkList.getItems().clear();
+      return;
+    }
+    String rootPath = project.getFolder().getAbsolutePath();
+    List<Bookmark> bookmarks = BookmarkService.getInstance().getBookmarks().stream()
+        .filter(b -> belongsToProject(b, rootPath))
+        .toList();
     bookmarkList.getItems().setAll(bookmarks);
+  }
+
+  private static boolean belongsToProject(Bookmark bookmark, String rootPath) {
+    String path = bookmark.getPath();
+    return path != null && (path.equals(rootPath) || path.startsWith(rootPath + File.separator));
   }
 
   @FXML

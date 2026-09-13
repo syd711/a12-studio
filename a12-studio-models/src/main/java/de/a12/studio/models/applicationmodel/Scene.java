@@ -14,7 +14,9 @@ import java.util.List;
 public class Scene {
 
   private String name;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  // NON_NULL (not NON_EMPTY): at least one fixture writes an explicit "" that must round-trip as-is,
+  // distinct from the key being absent entirely.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String description;
   // The name of the scene that must have been shown directly before this one; acts as an additional match condition.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)

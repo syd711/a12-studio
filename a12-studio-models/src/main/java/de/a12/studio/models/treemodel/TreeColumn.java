@@ -23,7 +23,6 @@ public class TreeColumn {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Map<String, Object> styles;
   private String id;
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> label = new ArrayList<>();
   private String name;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)

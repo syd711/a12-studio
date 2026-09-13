@@ -277,11 +277,39 @@ public class ElementIndex {
     }
     List<GroupElement> rootGroups = model.getContent().getModelRoot().getRootGroups();
     Element current = rootGroups == null ? null : findByName(rootGroups, names.get(0));
-    for (int i = 1; current != null && i < names.size(); i++) {
-      if (!(current instanceof GroupElement group) || group.getGroup() == null || group.getGroup().getElements() == null) {
+    return descendByName(current, names, 1, new HashSet<>(List.of(model.getId())));
+  }
+
+  /**
+   * Walks {@code names[i..]} down from {@code current}, mirroring the kernel's flattened Include tree: when a
+   * step lands on a Group whose elements aren't stored locally but referenced through an {@link
+   * de.a12.studio.models.documentmodel.GroupConfig#getIncludeConfig()} (see {@link #resolve} for the id-based
+   * equivalent), the next name segment is looked up among the *included* model's own root-group elements
+   * instead - the include group's name already stands in for the included model's own root group, matching how
+   * SME requires those two names to match.
+   */
+  private Optional<Element> descendByName(Element current, List<String> names, int i, Set<String> visitedModelIds) {
+    while (current != null && i < names.size()) {
+      if (!(current instanceof GroupElement group) || group.getGroup() == null) {
         return Optional.empty();
       }
-      current = findByName(group.getGroup().getElements(), names.get(i));
+      if (group.getGroup().getIncludeConfig() != null) {
+        DocumentModel included = resolveIncludedModel(group.getGroup().getIncludeConfig().getReference());
+        if (included == null || included.getContent() == null || included.getContent().getModelRoot() == null
+            || !visitedModelIds.add(included.getId())) {
+          return Optional.empty();
+        }
+        List<GroupElement> includedRootGroups = included.getContent().getModelRoot().getRootGroups();
+        current = includedRootGroups == null ? null : findByName(includedRootGroups.stream()
+            .filter(rootGroup -> rootGroup.getGroup() != null && rootGroup.getGroup().getElements() != null)
+            .flatMap(rootGroup -> rootGroup.getGroup().getElements().stream())
+            .toList(), names.get(i));
+      } else if (group.getGroup().getElements() != null) {
+        current = findByName(group.getGroup().getElements(), names.get(i));
+      } else {
+        return Optional.empty();
+      }
+      i++;
     }
     return Optional.ofNullable(current);
   }

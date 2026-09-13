@@ -4,6 +4,7 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.plugin.manager.IFileDropHandler;
 import de.a12.studio.plugin.manager.PluginManager;
+import de.a12.studio.models.projects.settings.UISettings;
 import de.a12.studio.models.projects.settings.VersionControlSettings;
 import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
@@ -126,12 +127,10 @@ public class RootController implements Initializable, StudioEventListener {
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
 
-    mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
-      if (project != null) {
-        project.getSettings().getUISettings().setDividerPosition(newValue.doubleValue());
-        project.getSettings().getUISettings().save();
-      }
-    });
+    // The FXML preloads the project tree into mainSplitPane's items (matching projectViewToggle's
+    // selected="true" default), so its divider already exists synchronously here. If a different
+    // side panel is restored below, showSidePanel() swaps it in later and attaches its own listener.
+    attachSidePanelDividerListener();
 
     projectTreeController.setCollapseProjectViewCallback(this::collapseProjectView);
 
@@ -474,11 +473,67 @@ public class RootController implements Initializable, StudioEventListener {
       // Remove any currently shown side panel first
       removeSidePanel();
       mainSplitPane.getItems().add(0, panel);
-      double pos = project != null
-          ? project.getSettings().getUISettings().getDividerPosition()
-          : 0.3;
+      double pos = getDividerPositionFor(panel);
       Platform.runLater(() -> mainSplitPane.setDividerPositions(pos));
+      // A new Divider model is only created by the skin on the next layout pass after the items
+      // change (see attachSidePanelDividerListener()), so re-attach on every transition into view
+      // rather than relying on a listener added once at startup - it would go stale as soon as the
+      // panel is hidden and shown again.
+      attachSidePanelDividerListener();
     }
+  }
+
+  /**
+   * Returns the saved divider position (0-1) for the given side panel (Project View / Bookmarks /
+   * Versioncontrol), falling back to the FXML default of 0.3 when no project is open yet.
+   */
+  private double getDividerPositionFor(Parent panel) {
+    if (project == null) {
+      return 0.3;
+    }
+    UISettings uiSettings = project.getSettings().getUISettings();
+    if (panel == projectTree) {
+      return uiSettings.getProjectViewDividerPosition();
+    }
+    if (panel == bookmarksPanelRoot) {
+      return uiSettings.getBookmarksDividerPosition();
+    }
+    if (panel == versioncontrolPanelRoot) {
+      return uiSettings.getVersioncontrolDividerPosition();
+    }
+    return 0.3;
+  }
+
+  /**
+   * Persists the current divider position under whichever side panel is currently selected. The
+   * listener that calls this is re-attached on every transition into view (see
+   * {@link #attachSidePanelDividerListener()}), so it always corresponds to the panel actually
+   * showing rather than a stale one captured at attach time.
+   */
+  private void saveActiveSidePanelDividerPosition(double position) {
+    if (project == null) {
+      return;
+    }
+    UISettings uiSettings = project.getSettings().getUISettings();
+    if (projectViewToggle.isSelected()) {
+      uiSettings.setProjectViewDividerPosition(position);
+    } else if (bookmarksToggle.isSelected()) {
+      uiSettings.setBookmarksDividerPosition(position);
+    } else if (versioncontrolToggle.isSelected()) {
+      uiSettings.setVersioncontrolDividerPosition(position);
+    } else {
+      return;
+    }
+    uiSettings.save();
+  }
+
+  private void attachSidePanelDividerListener() {
+    Platform.runLater(() -> {
+      if (!mainSplitPane.getDividers().isEmpty()) {
+        mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) ->
+            saveActiveSidePanelDividerPosition(newValue.doubleValue()));
+      }
+    });
   }
 
   private void removeSidePanel() {
@@ -509,6 +564,7 @@ public class RootController implements Initializable, StudioEventListener {
         bookmarksPanelController = loader.getController();
         bookmarksPanelController.setOnOpenBookmark(this::openBookmark);
         bookmarksPanelController.setCollapseProjectViewCallback(this::collapseProjectView);
+        bookmarksPanelController.setProject(project);
       } catch (Exception e) {
         log.error("Failed to load bookmarks panel", e);
       }
@@ -562,17 +618,30 @@ public class RootController implements Initializable, StudioEventListener {
     this.mainSplitPane.setManaged(true);
     this.project = event.getProject();
     consolePanelController.setProject(project);
+    if (bookmarksPanelController != null) {
+      bookmarksPanelController.setProject(project);
+    }
     updateVersioncontrolToggleAvailability();
     // Ensure the active side panel is shown
+    Parent activeSidePanel = null;
     if (projectViewToggle.isSelected()) {
-      showSidePanel(projectTree);
+      activeSidePanel = projectTree;
+      showSidePanel(activeSidePanel);
     } else if (bookmarksToggle.isSelected()) {
-      showSidePanel(getBookmarksPanelRoot());
+      activeSidePanel = getBookmarksPanelRoot();
+      showSidePanel(activeSidePanel);
     } else if (versioncontrolToggle.isSelected()) {
-      showSidePanel(getVersioncontrolPanelRoot());
+      activeSidePanel = getVersioncontrolPanelRoot();
+      showSidePanel(activeSidePanel);
     }
-    double dividerPosition = project.getSettings().getUISettings().getDividerPosition();
-    Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
+    // showSidePanel() above only restores the divider position when it actually has to add the
+    // panel to mainSplitPane's items; on the very first project open, projectTree is already
+    // present from the FXML (see scene-root.fxml's default items), so that branch is skipped and
+    // the saved position needs to be applied here instead.
+    if (activeSidePanel != null) {
+      double dividerPosition = getDividerPositionFor(activeSidePanel);
+      Platform.runLater(() -> mainSplitPane.setDividerPositions(dividerPosition));
+    }
   }
 
   @Override
@@ -583,6 +652,9 @@ public class RootController implements Initializable, StudioEventListener {
     this.mainSplitPane.setManaged(false);
     this.project = null;
     consolePanelController.setProject(null);
+    if (bookmarksPanelController != null) {
+      bookmarksPanelController.setProject(null);
+    }
     versioncontrolToggle.setVisible(false);
     versioncontrolToggle.setManaged(false);
   }

@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Copies the real {@code testing/workspaces/commerce} sample project into a temp directory
+ * Copies the real {@code testing/workspaces/e-commerce} sample project into a temp directory
  * and round-trips every model file found in it (load, then save), verifying each one comes back
  * semantically identical: the same JSON content, regardless of object property order (array
  * order is still compared, since element order is meaningful in these models - e.g. scenes,
@@ -34,7 +34,7 @@ class CommerceProjectModelsRoundTripTest {
 
   @TestFactory
   Stream<DynamicTest> saveAfterLoadLeavesEveryModelFileUnchanged(@TempDir Path tempDir) throws IOException {
-    Path source = TestHelper.resolveTestingAdvancedNewDir();
+    Path source = TestHelper.resolveTestingCommerceDir();
     Path projectDir = tempDir.resolve("commerce");
     copyDirectory(source, projectDir);
 

@@ -38,6 +38,9 @@ public class Control extends Cell {
   // e.g. how a readonly Control renders. Unset falls back to that model setting.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String readonlyPresentation;
+  // Per-Control override of the model-wide FieldConfigEntry.exposition default, e.g. "COMPACT".
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String exposition;
   // Per-Control override of the model-wide FormModelContent.markingOfRequiredFields default
   // ("NONE"/"REQUIRED"/"ALWAYS"), i.e. whether this Control's label shows a required-field asterisk.
   // Unset falls back to that model setting.

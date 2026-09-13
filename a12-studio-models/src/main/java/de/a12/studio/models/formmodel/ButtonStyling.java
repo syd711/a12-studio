@@ -15,8 +15,10 @@ public class ButtonStyling {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText label;
+  // Unlike label, description is a plain TextContainer ({"text": [...]}), not a polymorphic LocalizedText -
+  // fixture-evidenced (testing/workspaces/e-commerce/models/01_Products/Product_FM.json).
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private LocalizedText description;
+  private TextContainer description;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Icon icon;
   // "PRIMARY" or "SECONDARY".

@@ -20,6 +20,9 @@
             <!-- Computed Field (target field) -->
             <fx:include fx:id="computedField" source="target-field-panel.fxml"/>
 
+            <!-- Allow Differing Decimal Places / Common Precondition -->
+            <fx:include fx:id="computationOptions" source="computation-options-panel.fxml"/>
+
             <!-- Computation Alternatives -->
             <fx:include fx:id="computationAlternatives" source="computation-alternatives-panel.fxml"/>
 

@@ -25,6 +25,9 @@ public abstract class AbstractRepeat extends ScreenElement {
   private Boolean enableAdd;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean enableRemove;
+  // Number of rows fetched/rendered per page. No editor UI yet - mapped purely for lossless round-tripping.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer pageSize;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean enableReorder;
   @JsonInclude(JsonInclude.Include.NON_NULL)
