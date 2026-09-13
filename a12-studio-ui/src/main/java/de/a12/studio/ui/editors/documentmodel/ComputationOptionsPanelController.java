@@ -4,10 +4,10 @@ import de.a12.studio.models.documentmodel.ComputationConfig;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextArea;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -20,7 +20,9 @@ import java.util.ResourceBundle;
  * Decimal Places" maps to the presence of the kernel error code {@value #DIFFERING_DECIMAL_PLACES_ERROR_CODE}
  * in {@link ComputationConfig#getErrorCodesToSuppress()}; "Common Precondition" is a plain UI toggle for
  * whether {@link ComputationConfig#getCommonPrecondition()} is set at all - checking it creates an (initially
- * empty) common precondition and reveals the text area to edit it, unchecking it clears the field again.
+ * empty) common precondition and reveals a nested {@link
+ * de.a12.studio.ui.editors.propertyeditors.RichtextEditorController} to edit it, unchecking it clears the
+ * field again.
  */
 public class ComputationOptionsPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -33,11 +35,13 @@ public class ComputationOptionsPanelController extends AbstractPropertyEditor im
   private CheckBox commonPreconditionCheckBox;
 
   @FXML
-  private TextArea commonPreconditionTextArea;
+  private RichtextEditorController commonPreconditionController;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
+
+    commonPreconditionController.configureCustom("commonPrecondition", "");
 
     bindCheckBox(allowDifferingDecimalPlacesCheckBox, (element, value) -> {
       List<String> errorCodesToSuppress = getComputation(element).getErrorCodesToSuppress();
@@ -53,8 +57,6 @@ public class ComputationOptionsPanelController extends AbstractPropertyEditor im
     bindCheckBox(commonPreconditionCheckBox, (element, value) ->
         getComputation(element).setCommonPrecondition(value ? "" : null));
     commonPreconditionCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> updateCommonPreconditionVisibility());
-
-    bindTextArea(commonPreconditionTextArea, (element, value) -> getComputation(element).setCommonPrecondition(value));
   }
 
   @Override
@@ -64,14 +66,18 @@ public class ComputationOptionsPanelController extends AbstractPropertyEditor im
     ComputationConfig computation = getComputation(element);
     setFieldValue(allowDifferingDecimalPlacesCheckBox, computation.getErrorCodesToSuppress().contains(DIFFERING_DECIMAL_PLACES_ERROR_CODE));
     setFieldValue(commonPreconditionCheckBox, computation.getCommonPrecondition() != null);
-    setFieldValue(commonPreconditionTextArea, computation.getCommonPrecondition());
+    commonPreconditionController.setCustom(computation::getCommonPrecondition, computation::setCommonPrecondition);
     updateCommonPreconditionVisibility();
   }
 
   private void updateCommonPreconditionVisibility() {
-    boolean visible = commonPreconditionCheckBox.isSelected();
-    commonPreconditionTextArea.setVisible(visible);
-    commonPreconditionTextArea.setManaged(visible);
+    commonPreconditionController.setVisible(commonPreconditionCheckBox.isSelected());
+  }
+
+  @Override
+  public void destroy() {
+    super.destroy();
+    commonPreconditionController.destroy();
   }
 
   private static ComputationConfig getComputation(Element element) {

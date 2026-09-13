@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
@@ -13,7 +12,7 @@
     <children>
       <CheckBox fx:id="allowDifferingDecimalPlacesCheckBox" text="%allow_differing_decimal_places" />
       <CheckBox fx:id="commonPreconditionCheckBox" text="%common_precondition" />
-      <TextArea fx:id="commonPreconditionTextArea" prefRowCount="4" visible="false" managed="false" wrapText="true" />
+      <fx:include fx:id="commonPrecondition" source="../propertyeditors/richtext-editor.fxml" />
     </children>
   </VBox>
  </center>
