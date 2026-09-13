@@ -95,7 +95,7 @@ class AdvancedNewProjectModelsRoundTripTest {
       String value = root.path("header").path("modelType").asString(null);
       return value != null && !value.isBlank() ? value : null;
     }
-    catch (IOException e) {
+    catch (Exception e) {
       return null;
     }
   }

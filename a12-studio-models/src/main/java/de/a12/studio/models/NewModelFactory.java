@@ -40,6 +40,8 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModelContent;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModelContent;
+import de.a12.studio.models.selectionmodel.SelectionCategory;
+import de.a12.studio.models.selectionmodel.SelectionDefault;
 import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.selectionmodel.SelectionModelContent;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
@@ -450,13 +452,24 @@ public class NewModelFactory {
     return model;
   }
 
-  // Deliberately as empty as SelectionModelContent itself - there is no Selection Model editor yet (see
-  // ModelType#SELECTION), so a newly created one has nothing to populate beyond its header.
+  // Every section defaults to "Selected" with no path specifications yet, matching SME's own
+  // handleLoadNew (selectionFrameDataProvider.ts): a brand new Selection Model selects everything in the
+  // (as yet unknown) reference Document Model until the user starts carving out exceptions.
   private static SelectionModel buildSelectionModel(List<Locale> locales) {
     SelectionModel model = new SelectionModel();
-    model.setContent(new SelectionModelContent());
+    SelectionModelContent content = new SelectionModelContent();
+    content.setData(newSelectionCategory());
+    content.setComputation(newSelectionCategory());
+    content.setValidation(newSelectionCategory());
+    model.setContent(content);
     model.setLocales(locales);
     return model;
+  }
+
+  private static SelectionCategory newSelectionCategory() {
+    SelectionCategory category = new SelectionCategory();
+    category.setDefaultValue(SelectionDefault.SELECTED);
+    return category;
   }
 
   private static String shortId() {

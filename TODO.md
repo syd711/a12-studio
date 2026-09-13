@@ -1,6 +1,4 @@
 # Commons
-- Field and model name validation: The name of the Combined Document Model. It needs to fulfill certain conventions: Only letters, digits, hyphens, underscores and periods are allowed. Furthermore, the name of the model must not start with "xml" and must be at most 100 characters long.
-- Add a drag handler for the items in C:\workspace\a12-studio\a12-studio-ui\src\main\resources\de\a12\studio\ui\editors\overviewmodel\dialogs\filter-items-panel.fxml
 - Why are not all rows editable for C:\workspace\a12-studio\a12-studio-ui\src\main\resources\de\a12\studio\ui\editors\overviewmodel\subheader-slot-panel.fxml. For C:\workspace\a12-studio\testing\workspaces\basic\models\Company_OM.json all rows are editable in the SME.
 
 # Overview Model
@@ -31,7 +29,7 @@ Result: 62 of 96 model files fail the round-trip (vs. the basic workspace, which
 - Combination Model: modelReferences[].modelType becomes null for additive-document refs.
 
 # Selection Model
-check the advanced_new workspace for selection models. these are not implemented yet. Create the editor for it and check it against the SME if all fields are available and if validators are missing. take your time. create a plain and implement it.
+
 
 
 # Form Models:

@@ -15,11 +15,13 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.input.DataFormat;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +38,9 @@ import java.util.UUID;
  * {@link FilterGroupDialogController}'s deferred save mode), so there's nothing to commit per-change here.
  */
 public class FilterItemsPanelController {
+
+  // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into getFilterItems().
+  private static final DataFormat FILTER_ITEM_INDEX = new DataFormat("application/x-a12-overview-filter-item-index");
 
   @FXML
   private HBox filterItemColumnHeaders;
@@ -93,6 +98,18 @@ public class FilterItemsPanelController {
   }
 
   private HBox createRow(FilterItem item, int index, int rowCount) {
+    FontIcon dragHandle = RowFactory.createDragHandle();
+
+    Label typeLabel = new Label(item.getType() != null ? item.getType() : "");
+    typeLabel.setId("filterItemType-" + index);
+    typeLabel.setPrefWidth(100.0);
+    typeLabel.setCursor(Cursor.HAND);
+    typeLabel.setOnMouseClicked(event -> {
+      if (event.getClickCount() == 1) {
+        openEditDialog(item);
+      }
+    });
+
     Label summaryLabel = new Label(summary(item));
     summaryLabel.setId("filterItemSummary-" + index);
     summaryLabel.setMaxWidth(Double.MAX_VALUE);
@@ -106,10 +123,17 @@ public class FilterItemsPanelController {
 
     HBox actionsBox = createActionsBox(item, index, rowCount);
 
-    HBox row = new HBox(10.0, summaryLabel, actionsBox);
+    HBox row = new HBox(10.0, dragHandle, typeLabel, summaryLabel, actionsBox);
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
+    RowFactory.setupRowDragAndDrop(row, dragHandle, FILTER_ITEM_INDEX, index, this::moveFilterItem);
     return row;
+  }
+
+  private void moveFilterItem(int fromIndex, int insertBeforeIndex) {
+    if (RowFactory.reorder(group.getFilterItems(), fromIndex, insertBeforeIndex)) {
+      rebuildRows();
+    }
   }
 
   private String summary(FilterItem item) {
@@ -123,6 +147,9 @@ public class FilterItemsPanelController {
     }
     if (item.getOptions() != null && item.getOptions().getFieldId() != null) {
       return OverviewElementOptions.displayPath(documentModelIndex, item.getOptions().getFieldId());
+    }
+    if (item.getFilterDefinition() != null) {
+      return item.getFilterDefinition();
     }
     return "";
   }

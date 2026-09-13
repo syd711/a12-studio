@@ -260,7 +260,76 @@ A Combination Step's Selection Model reference (`SelectionModel.smId`) needed a 
 a12-studio had no `ModelType.SELECTION` at all. Added a minimal stub (`ModelType.SELECTION`, an empty
 `SelectionModel`/`SelectionModelContent`, `model-versions.json` entry with `enabled: false`) — same shape as the
 existing `PrintModel` precedent (loadable/referenceable project-wide, but opens "not supported yet" until a real
-editor exists, still priority #6 below).
+editor exists. **Superseded 2026-09-13** — see the dedicated "Selection Model" section below, `enabled` is now
+`true`).
+
+---
+
+## Selection Model
+
+*Built 2026-09-13, superseding the stub described just above.*
+
+SME's own Selection Model shape turned out to be much flatter than the stub-era placeholder assumed: `content`
+has exactly three identically-shaped sections — `Data`, `Computation`, `Validation` (field order confirmed
+against every real fixture, both in this repo and in SME's own test/example fixtures) — each a `SelectionContent`
+(`Default: "Selected" | "Unselected"`, optional `Selected`/`Unselected` arrays of `{path}`). Ported to
+`a12-studio-models/.../selectionmodel/`: `SelectionModelContent` (Data/Computation/Validation), `SelectionCategory`
+(`defaultValue`/`selected`/`unselected`), `SelectionDefault` (enum), `PathSpecification` (`path`).
+`selected`/`unselected` are `@JsonInclude(NON_NULL)` over a nullable (not pre-initialized) `List`, not `NON_EMPTY`
+over an eagerly-initialized one — the same absent-vs-explicit-empty fidelity fix this doc's "Known Issues" section
+already describes for `A12Model.Header.labels`/`overviewmodel.Column.width`, needed here because real fixtures use
+both shapes for the same field (e.g. `PersonSkills_NumberConversion_Se.json`'s `Data.Selected: []` vs. its
+`Computation`/`Validation`, which omit `Selected`/`Unselected` entirely).
+
+**No persisted reference Document Model, confirmed by design, not by omission.** Every real `"modelType":
+"selection"` fixture found (in this repo and in SME's own repo, including SME's `client/src/modules/selectionModel`
+source) has an empty `header.modelReferences` — SME's own standalone Selection Model editor
+(`selectionFrameDataProvider.ts`) receives its reference Document Model transiently at open/create time
+(`InitialSelectionData.referenceModel`, supplied by whatever the Selection Model was opened from - typically a
+Combination Model's base model) and never writes it back to the file; `SelectionModelEntry.isAddable` is even
+`false` in SME, meaning a Selection Model can't be created standalone at all, only in that referencing context.
+a12-studio's editor therefore has no live Document Model tree/checkbox view (SME's "Selected Elements" tab) - there
+is nothing durable in the file to resolve one against, and building a transient "pick a DM just for this editing
+session" flow was judged out of scope for a first editor. `Selected`/`Unselected` path specifications are instead
+edited as plain, pattern-validated text — the same tier of fidelity `overviewmodel.Column.expression`/
+`QueryModelContent.filterDefinition` already get via `RichtextEditorController`, just with plain `TextField` rows
+here since paths are single-line.
+
+**Editor** (`a12-studio-ui/.../editors/selectionmodel/`): `SelectionModelEditorController`, a single-tab
+settings+content layout (no tree) following `CombinedDocumentModelEditorController`'s precedent, embedding three
+instances of one shared `SelectionCategoryPanelController`/`selection-category-panel.fxml` (Default combo +
+Selected/Unselected repeatable path lists, dynamic-row pattern per `AnnotationsPanelController`) — reused
+runtime-retitled per section rather than three near-duplicate FXML/controller pairs, the same trick
+`DataTypeDateConfigurationPanelController` uses for Date/DateTime/Time. Not bound to a single `Element` (no element
+graph exists), so every field is wired with a plain listener + a local `updatingFromModel` guard and saved via
+`commitHeaderChange()`, per `LayoutPanelController`'s documented reasoning — the inherited `bindTextField`/
+`bindComboBox` helpers always end up calling the *element-bound* `commitChange()`, which unconditionally hides a
+header-style panel's own error container on every debounced commit (there is no bound `Element` to validate), which
+would otherwise clobber the validation message this panel deliberately shows.
+
+**Validators** (`a12-studio-models-validation/.../validators/selection/`, wired into a new
+`SelectionModelValidationService`) port all 7 structural rules from the kernel's `MM_SelectionModel_2` domain model
+(cross-checked against SME's own `DomainSelectionSpecification.json`, which encodes the identical rule set) —
+applied uniformly across Data/Computation/Validation via a small `SelectionCategories` helper so each validator is
+written once, not three times: `DEFAULT_MISSING`, `ONLY_WILDCARD`/`INVALID_PATTERN` (a single path-specification
+grammar regex, ported verbatim), `SELECTED_DUPLICATE`/`UNSELECTED_DUPLICATE`, `SELECTED_IN_UNSELECTED`, and
+`DEFAULT_SELECTED_BUT_NO_UNSELECTED`/`DEFAULT_UNSELECTED_BUT_NO_SELECTED`. **Not ported**: the header-level
+`HEADER_ID_STARTS_WITH_XML` and `mustNotHaveARolesAnnotation` rules from the kernel's Selection-Model-specific
+header meta-model (`DomainSelectionSettings.json`) — the former has no equivalent anywhere else in a12-studio today
+(every other model type's header could use it too; adding it only for Selection Model would be inconsistent scope
+creep) and the latter is already soft-mitigated by `AnnotationsPanelController` hiding any header annotation named
+`"roles"` from view for every model type. Selection Model's join/consistency check against a live Document Model
+(SME's `SelectionModelController`, see the Backend/kernel capability map below) remains unimplemented, same as
+every other kernel-join capability in this repo.
+
+**Known round-trip gap, not introduced by this work**: enabling `ModelType.SELECTION` (`model-versions.json`) makes
+`AdvancedNewProjectModelsRoundTripTest` exercise `PersonSkills_NumberConversion_Se.json` for the first time: its
+`content` (Data/Computation/Validation) round-trips byte-for-byte, but its header does not, because `A12Model.Header`
+unconditionally re-serializes `locales`/`labels`/`modelReferences` as `[]` when empty rather than leaving them absent
+(this fixture's header has none of the three keys at all). This is the exact same class of issue as the "Still-open,
+same-shaped gap" already logged in this doc's "Known Issues" section for `labels` — pre-existing, shared by every
+model type's header, and out of scope for a Selection-Model-specific change. Not a regression: this model type's
+round trip simply wasn't exercised at all before `enabled` flipped to `true`.
 
 ---
 
@@ -773,7 +842,7 @@ document, serialize back to JSON (occasionally YAML) on save.
 | 3 | **combinationModel** | **Structural editor + validators built 2026-09-08** (see dedicated section above) — fields and the 7 structural `Rule`s are ported; DM-expansion/SMT validation and loop detection are not, since no kernel expansion service exists in this repo despite the "combination model" kernel lib being present. |
 | 4 | **additiveDocumentModel** | Kernel lib present (`kernel-md-join`) but no dedicated data model/editor yet. Hard dependency of both mappingModel and combinationModel — needed before those are fully usable. Overlay editing mode: elements are included/overwritten/purely-additive relative to a base DM. |
 | 5 | **relationshipModel** | No current scaffolding, but foundational — link, masterDetailModel, treeModel, modelGraphDiagram, and formModel's `Binding`/`BindingRepeat` all reference it. |
-| 6 | **selectionModel** | Needed by combinationModel; reusable filter/subset spec over DM data. A minimal stub (`ModelType.SELECTION`, empty `SelectionModel`/`SelectionModelContent`, `enabled: false`) was added 2026-09-08 so Combination Steps could reference Selection Models by id — no editor yet, same "referenceable but opens 'not supported yet'" state as `printModel`. |
+| 6 | **selectionModel** | **Structural editor + validators built 2026-09-13** (see dedicated section above) — `enabled: true`. Fields (Data/Computation/Validation, each Default+Selected+Unselected) and all 7 structural rules are ported; the live Document Model tree SME's standalone editor has is not, since SME never persists a reference DM in the file to build one against. |
 | 7 | **printModel** | Kernel libs present (`print-engine-api/runtime`); `PrintService`/`DocumentModelResolver`/`PrintParameters` scaffolding exists. Most editor-complex of the print family — relies on an external print-engine component library for the layout canvas. Backend renders PDF only (PDFBox or legacy engine), no HTML path. |
 | 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. `print-typesetting` lib already present; no dedicated model/service for either exists yet. |
 | 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model (don't confuse with Document Model itself). |
@@ -802,7 +871,7 @@ document, serialize back to JSON (occasionally YAML) on save.
 - **printTypesettingModel** — typography/typesetting rules referenced by print models; no cross-model references.
 - **queryModel** — reusable structured query (filter/sort/selection tree) over a DM; experimental. See dedicated "Query Model" section above.
 - **relationshipModel** — associations/candidate constraints, ordered links between DM entities — backbone for link/masterDetailModel/treeModel/formModel bindings.
-- **selectionModel** — reusable selection/filter spec over DM data; experimental.
+- **selectionModel** — reusable selection/filter spec over DM data; experimental. See dedicated "Selection Model" section above.
 - **settingsModule** — single workspace-level `settings.yaml` (deployment exclusions, global project settings) — the one clear YAML (not JSON) file type besides umModule.
 - **structuralMappingModel** — see priority table.
 - **transformerModel** — computes/derives a DM from another DM plus transformation rules; stores only the rules on disk and reconstructs the result at load time; experimental.

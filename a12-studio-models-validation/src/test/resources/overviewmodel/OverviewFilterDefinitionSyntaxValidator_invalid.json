@@ -1,0 +1,48 @@
+{
+  "header": {
+    "id": "OverviewFilterDefinitionSyntaxValidator_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Ref_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10,
+      "enableFilter": true,
+      "newFilterConfiguration": {
+        "filterGroups": [
+          {
+            "id": "filter-group-1",
+            "filterItems": [
+              {
+                "id": "filter-item-1",
+                "type": "query",
+                "filterDefinition": "[/Root/Name] ==="
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ]
+  }
+}

@@ -2,12 +2,14 @@ package de.a12.studio.modelsvalidation.validators.overview;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Label;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidationMessages;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -26,11 +28,20 @@ public final class OverviewColumnHeaderLabelOrIconValidator implements ModelVali
     if (!(model instanceof OverviewModel overviewModel)) {
       return List.of();
     }
+    DocumentModel documentModel = OverviewElementResolution.referencedDocumentModel(overviewModel, context);
+    if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
+      return List.of();
+    }
+
+    ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
     List<ModelValidationError> errors = new ArrayList<>();
     for (Column column : overviewModel.getContent().getColumns()) {
-      if (isMissingLabelOrIcon(column)) {
+      // A dangling elementRef is already flagged separately (as an ERROR) by
+      // OverviewFieldReferenceValidator - only report this accessibility warning once the field is known to
+      // actually exist, identified by its resolved display path rather than its raw internal id.
+      if (isMissingLabelOrIcon(column) && index.isResolvable(column.getElementRef())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing", column.getElementRef()),
+            ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing", index.resolveDisplayPath(column.getElementRef())),
             Severity.WARNING.name()));
       }
     }

@@ -16,6 +16,7 @@ import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnHeaderLa
 import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnsNotEmptyValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewDocumentModelRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterDefinitionSyntaxValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterCustomFieldsValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterGroupsValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeIndexedAnnotationValidator;
@@ -52,6 +53,7 @@ public final class OverviewModelValidationService {
       new OverviewFilterModeIndexedAnnotationValidator(),
       new OverviewFilterSectionsValidator(),
       new OverviewFilterGroupsValidator(),
+      new OverviewFilterDefinitionSyntaxValidator(),
       new OverviewMultiSelectionElementValidator(),
       new OverviewSearchElementValidator(),
       new OverviewPagingSizeValidator(),

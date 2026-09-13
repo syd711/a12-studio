@@ -106,6 +106,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       private final HBox graphic = new HBox(4, checkBox, nameLabel);
 
       {
+        nameLabel.getStyleClass().add("tree-cell-name-label");
         checkBox.setFocusTraversable(false);
         graphic.setAlignment(Pos.CENTER_LEFT);
         checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> {

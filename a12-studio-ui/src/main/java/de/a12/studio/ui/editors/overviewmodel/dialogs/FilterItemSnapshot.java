@@ -30,5 +30,9 @@ class FilterItemSnapshot {
     item.getLabel().clear();
     item.getLabel().addAll(restored.getLabel());
     item.setIcon(restored.getIcon());
+    item.setFilterDefinition(restored.getFilterDefinition());
+    item.getDescription().clear();
+    item.getDescription().addAll(restored.getDescription());
+    item.setEnabled(restored.getEnabled());
   }
 }

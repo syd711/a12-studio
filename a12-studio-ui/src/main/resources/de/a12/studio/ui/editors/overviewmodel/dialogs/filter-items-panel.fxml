@@ -17,6 +17,8 @@
             <children>
                <HBox fx:id="filterItemColumnHeaders" spacing="10.0">
                   <children>
+                     <Label styleClass="field-label" text="" prefWidth="18.0" />
+                     <Label styleClass="field-label" text="%type" prefWidth="100.0" />
                      <Label styleClass="field-label" text="%filter_items" HBox.hgrow="ALWAYS" />
                   </children>
                </HBox>

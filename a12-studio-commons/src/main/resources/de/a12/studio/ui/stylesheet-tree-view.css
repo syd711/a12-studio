@@ -351,6 +351,39 @@
 }
 
 /*
+ * ID-scoped overrides for the Versioncontrol panel's changes TreeView (fx:id="changesTree"),
+ * mirroring #projectTree above - an id selector always outranks Modena's built-in class/pseudo-class
+ * selectors, so this is used as a guaranteed override for row selection background/text regardless
+ * of focus state. Uses the same softer, muted blue as #projectTree since this tree shows the same
+ * kind of content (files/folders).
+ */
+#changesTree .tree-cell:filled:selected,
+#changesTree .tree-cell:filled:selected:focused,
+#changesTree .tree-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+#changesTree .tree-cell:filled:selected .tree-icon,
+#changesTree .tree-cell:filled:selected:focused .tree-icon,
+#changesTree .tree-cell:filled:selected:hover .tree-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}
+
+/*
+ * The changed-file name is rendered via a Label set as the cell's graphic (see
+ * VersioncontrolPanelController), not as the cell's own text, so -fx-text-fill on the .tree-cell
+ * rule above never reaches it - same situation as #projectTree's/#elementsTreeTable's/#flowsTree's
+ * .tree-cell-name-label overrides above.
+ */
+#changesTree .tree-cell:filled:selected .tree-cell-name-label,
+#changesTree .tree-cell:filled:selected:focused .tree-cell-name-label,
+#changesTree .tree-cell:filled:selected:hover .tree-cell-name-label {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+/*
  * ID-scoped overrides for the annotation data set editor's TreeView (fx:id="annotationTree"),
  * mirroring #projectTree above - an id selector always outranks Modena's built-in class/pseudo-class
  * selectors, so this is used as a guaranteed override for row selection background/text regardless

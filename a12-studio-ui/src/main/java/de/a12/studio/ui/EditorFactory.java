@@ -14,6 +14,7 @@ import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
+import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
@@ -31,6 +32,7 @@ import de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController;
 import de.a12.studio.ui.editors.querymodel.QueryModelEditorController;
 import de.a12.studio.ui.editors.relationshipmodel.RelationshipModelEditorController;
 import de.a12.studio.ui.editors.relationshipuimodel.RelationshipUiModelEditorController;
+import de.a12.studio.ui.editors.selectionmodel.SelectionModelEditorController;
 import de.a12.studio.ui.editors.structuralmappingmodel.StructuralMappingModelEditorController;
 import de.a12.studio.ui.editors.treemodel.TreeModelEditorController;
 import de.a12.studio.ui.editors.typedefinitionmodel.TypeDefintionModelEditorController;
@@ -156,6 +158,13 @@ public class EditorFactory {
         loader.setResources(StudioBundle.getBundle());
         content = loader.load();
         StructuralMappingModelEditorController controller = loader.getController();
+        controller.load(item);
+      }
+      else if (item.getModel() instanceof SelectionModel) {
+        FXMLLoader loader = new FXMLLoader(SelectionModelEditorController.class.getResource("selection-model-editor.fxml"));
+        loader.setResources(StudioBundle.getBundle());
+        content = loader.load();
+        SelectionModelEditorController controller = loader.getController();
         controller.load(item);
       }
       else if (item.getAuthDocument() instanceof RolesDocument) {

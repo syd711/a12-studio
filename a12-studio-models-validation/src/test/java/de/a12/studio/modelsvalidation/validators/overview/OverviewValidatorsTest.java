@@ -90,10 +90,24 @@ class OverviewValidatorsTest {
   @Test
   void columnHeaderLabelOrIconValidatorReportsEmptyHeader() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewColumnHeaderLabelOrIconValidator_invalid.json", OverviewModel.class);
-    List<ModelValidationError> errors = new OverviewColumnHeaderLabelOrIconValidator().validate(model, TestModels.context(model));
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewColumnHeaderLabelOrIconValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("no icon and no visible label"));
+    assertTrue(errors.get(0).message().contains("Name"));
+  }
+
+  @Test
+  void columnHeaderLabelOrIconValidatorSkipsWithoutReferencedDocumentModel() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewColumnHeaderLabelOrIconValidator_invalid.json", OverviewModel.class);
+    // Without the referenced Document Model in context, the column's elementRef can't be resolved - since a
+    // genuinely dangling reference is already reported separately (as an ERROR) by
+    // OverviewFieldReferenceValidator, this validator must not also fire.
+    List<ModelValidationError> errors = new OverviewColumnHeaderLabelOrIconValidator().validate(model, TestModels.context(model));
+
+    assertEquals(0, errors.size());
   }
 
   @Test
@@ -165,6 +179,24 @@ class OverviewValidatorsTest {
 
     // Missing group id, a filter item with no field reference, plus a field reference annotated indexed=false.
     assertEquals(3, errors.size());
+  }
+
+  @Test
+  void filterGroupsValidatorReportsMissingFilterDefinitionOnQueryItem() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterGroupsValidator_query_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewFilterGroupsValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("must define a filter definition"));
+  }
+
+  @Test
+  void filterDefinitionSyntaxValidatorReportsInvalidQueryItemSyntax() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterDefinitionSyntaxValidator_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewFilterDefinitionSyntaxValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("Invalid filter expression"));
   }
 
   @Test

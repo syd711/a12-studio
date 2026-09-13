@@ -15,6 +15,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
+import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.modelsvalidation.services.ApplicationModelValidationService;
 import de.a12.studio.modelsvalidation.services.CombinationModelValidationService;
@@ -27,6 +28,7 @@ import de.a12.studio.modelsvalidation.services.PrintModelValidationService;
 import de.a12.studio.modelsvalidation.services.QueryModelValidationService;
 import de.a12.studio.modelsvalidation.services.RelationshipModelValidationService;
 import de.a12.studio.modelsvalidation.services.RelationshipUiModelValidationService;
+import de.a12.studio.modelsvalidation.services.SelectionModelValidationService;
 import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
@@ -56,6 +58,7 @@ public class ValidationService {
   private final MasterDetailModelValidationService masterDetailModelValidationService = new MasterDetailModelValidationService();
   private final QueryModelValidationService queryModelValidationService = new QueryModelValidationService();
   private final CombinationModelValidationService combinationModelValidationService = new CombinationModelValidationService();
+  private final SelectionModelValidationService selectionModelValidationService = new SelectionModelValidationService();
 
   public ValidationService(Project project) {
     this.project = project;
@@ -104,6 +107,7 @@ public class ValidationService {
       case MasterDetailModel masterDetailModel -> masterDetailModelValidationService.validate(masterDetailModel, context);
       case QueryModel queryModel -> queryModelValidationService.validate(queryModel, context);
       case CombinedDocumentModel combinedDocumentModel -> combinationModelValidationService.validate(combinedDocumentModel, context);
+      case SelectionModel selectionModel -> selectionModelValidationService.validate(selectionModel, context);
       default -> List.of();
     };
   }
@@ -123,6 +127,7 @@ public class ValidationService {
       case MASTERDETAIL -> masterDetailModelValidationService.addValidator(validator);
       case QUERY -> queryModelValidationService.addValidator(validator);
       case COMBINATION -> combinationModelValidationService.addValidator(validator);
+      case SELECTION -> selectionModelValidationService.addValidator(validator);
     }
   }
 
@@ -141,6 +146,7 @@ public class ValidationService {
       case MASTERDETAIL -> masterDetailModelValidationService.removeValidator(validator);
       case QUERY -> queryModelValidationService.removeValidator(validator);
       case COMBINATION -> combinationModelValidationService.removeValidator(validator);
+      case SELECTION -> selectionModelValidationService.removeValidator(validator);
     }
   }
 

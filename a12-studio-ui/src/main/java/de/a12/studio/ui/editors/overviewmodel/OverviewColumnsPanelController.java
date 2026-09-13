@@ -267,7 +267,8 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
     else if (OverviewColumnOptions.isMissingLabelOrIcon(column)) {
       label.getStyleClass().add("validation-error");
       label.setTooltip(WidgetFactory.createTooltip(
-          ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing", column.getElementRef())));
+          ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing",
+              OverviewElementOptions.displayPath(documentModelIndex, column.getElementRef()))));
     }
     else {
       label.setTooltip(WidgetFactory.createTooltip(summary));

@@ -36,6 +36,9 @@ import java.util.Optional;
  */
 public class NewDocumentModelPanelController {
 
+  private static final String MODEL_SUFFIX = "_DM";
+  private static final String DEFAULT_MODEL_NAME = "NewModel" + MODEL_SUFFIX;
+
   @FXML
   private TextField modelNameField;
 
@@ -66,15 +69,15 @@ public class NewDocumentModelPanelController {
    *
    * @param targetFolder the project folder the new model will be created in
    * @param defaultName  optional pre-filled name (e.g. derived from the group being moved), or {@code null}
+   *                     to fall back to {@value #DEFAULT_MODEL_NAME}
    */
   public void init(@NonNull ProjectItem targetFolder, @Nullable String defaultName) {
     this.targetFolder = targetFolder;
     ProjectModelFolders.configureLocationCombo(locationCombo, targetFolder);
     localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
     rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
-    if (defaultName != null && !defaultName.isBlank()) {
-      modelNameField.setText(defaultName);
-    }
+    modelNameField.setText(defaultName != null && !defaultName.isBlank() ? defaultName : DEFAULT_MODEL_NAME);
+    requestNameFocus();
   }
 
   /** Sets the callback that is invoked whenever any field in this panel changes. */
@@ -137,9 +140,16 @@ public class NewDocumentModelPanelController {
     return rolesController.getRoles();
   }
 
-  /** Requests focus on the name field for convenient keyboard entry. */
+  /**
+   * Requests focus on the name field and selects everything up to (but not including) a trailing
+   * {@code _DM} suffix, if present, so the user can type over the meaningful part of the suggested
+   * name while keeping the model suffix convention intact.
+   */
   public void requestNameFocus() {
     modelNameField.requestFocus();
+    String text = modelNameField.getText();
+    int selectionEnd = text.endsWith(MODEL_SUFFIX) ? text.length() - MODEL_SUFFIX.length() : text.length();
+    modelNameField.selectRange(0, selectionEnd);
   }
 
   /**

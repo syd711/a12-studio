@@ -4,12 +4,15 @@ import de.a12.studio.models.overviewmodel.BooleanUserAccessOption;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterItemOptions;
 import de.a12.studio.models.overviewmodel.FilterOptionToggle;
+import de.a12.studio.models.querymodel.ql.QueryLanguageEmitter;
+import de.a12.studio.models.querymodel.ql.QueryLanguageException;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -20,6 +23,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -36,13 +40,17 @@ import java.util.function.Function;
  * {@link FilterItem} is mutated live and the outer {@link FilterGroupDialogController}'s own OK does the actual
  * save, in one go, once the whole group is confirmed.
  * <p>
- * Only Field Reference-based items are supported - see {@link FilterItem}'s class doc for which field-type-
- * specific {@link FilterItemOptions} are modeled and which (Boolean/Confirm criteria, Enumeration/Multi-select
- * Initial Criteria/Pinned Values, and Filter-Definition-based/query items) aren't - see {@code TODO.md}'s
- * Overview Model section.
+ * Besides Field Reference-based items, this also supports Filter-Definition-based (query) items - see {@link
+ * FilterItem}'s class doc. See {@code TODO.md}'s Overview Model section for which field-type-specific {@link
+ * FilterItemOptions} (Boolean/Confirm criteria, Enumeration/Multi-select Initial Criteria/Pinned Values) still
+ * aren't modeled.
  */
 public class FilterItemDialogController implements DialogController {
 
+  private static final QueryLanguageEmitter EMITTER = new QueryLanguageEmitter();
+
+  @FXML
+  private HBox fieldReferenceSection;
   @FXML
   private ComboBox<String> fieldRefField;
   @FXML
@@ -52,9 +60,21 @@ public class FilterItemDialogController implements DialogController {
   @FXML
   private CheckBox collapsedField;
   @FXML
+  private CheckBox useFilterDefinitionField;
+  @FXML
   private LocalizedTextPanelController labelController;
   @FXML
   private IconPanelController iconController;
+  @FXML
+  private LocalizedTextPanelController filterDefinitionDescriptionController;
+  @FXML
+  private VBox filterDefinitionOptionsBox;
+  @FXML
+  private CheckBox filterDefinitionEnabledField;
+  @FXML
+  private CheckBox filterDefinitionEnabledUserAccessField;
+  @FXML
+  private RichtextEditorController filterDefinitionController;
   @FXML
   private VBox matchingOptionsBox;
   @FXML
@@ -116,9 +136,15 @@ public class FilterItemDialogController implements DialogController {
     labelController.configureCustom("label", StudioBundle.get("label"));
     labelController.setSaveMode(saveMode);
     iconController.setSaveMode(saveMode);
+    filterDefinitionDescriptionController.configureCustom("description", StudioBundle.get("description"));
+    filterDefinitionDescriptionController.setSaveMode(saveMode);
+    filterDefinitionController.configureCustom("filterDefinition", StudioBundle.get("filter_definition"));
+    filterDefinitionController.setSaveMode(saveMode);
+    filterDefinitionController.setValidator(FilterItemDialogController::validateFilterDefinition);
+    filterDefinitionController.errorProperty().addListener((observable, oldValue, newValue) -> validate());
 
     fieldRefField.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
+      if (updatingFromModel || useFilterDefinitionField.isSelected()) {
         return;
       }
       setFieldId(newValue);
@@ -134,6 +160,24 @@ public class FilterItemDialogController implements DialogController {
     collapsedField.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
         item.setCollapsed(newValue ? Boolean.TRUE : null);
+      }
+    });
+    useFilterDefinitionField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        item.setType(newValue ? FilterItem.TYPE_QUERY : OverviewElementOptions.filterItemFieldType(documentModelIndex, fieldRefField.getValue()));
+      }
+      updateFilterDefinitionVisibility();
+      updateTypeField();
+      validate();
+    });
+    filterDefinitionEnabledField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureEnabled().setValue(newValue);
+      }
+    });
+    filterDefinitionEnabledUserAccessField.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        ensureEnabled().setEnabled(newValue);
       }
     });
 
@@ -212,6 +256,11 @@ public class FilterItemDialogController implements DialogController {
       fieldRefField.setValue(item.getOptions() != null ? item.getOptions().getFieldId() : null);
       preferFilterBarField.setSelected(Boolean.TRUE.equals(item.getPreferFilterBar()));
       collapsedField.setSelected(Boolean.TRUE.equals(item.getCollapsed()));
+      useFilterDefinitionField.setSelected(FilterItem.TYPE_QUERY.equals(item.getType()));
+
+      BooleanUserAccessOption enabled = item.getEnabled();
+      filterDefinitionEnabledField.setSelected(enabled != null && Boolean.TRUE.equals(enabled.getValue()));
+      filterDefinitionEnabledUserAccessField.setSelected(enabled != null && Boolean.TRUE.equals(enabled.getEnabled()));
 
       BooleanUserAccessOption invert = currentInvert();
       invertField.setSelected(invert != null && Boolean.TRUE.equals(invert.getValue()));
@@ -233,10 +282,13 @@ public class FilterItemDialogController implements DialogController {
     finally {
       updatingFromModel = false;
     }
+    updateFilterDefinitionVisibility();
     updateTypeField();
 
     labelController.setCustom(item::getLabel);
     iconController.setCustom(item::getIcon, item::setIcon);
+    filterDefinitionDescriptionController.setCustom(item::getDescription);
+    filterDefinitionController.setCustom(item::getFilterDefinition, item::setFilterDefinition);
 
     validate();
   }
@@ -246,6 +298,8 @@ public class FilterItemDialogController implements DialogController {
   void destroy() {
     labelController.destroy();
     iconController.destroy();
+    filterDefinitionDescriptionController.destroy();
+    filterDefinitionController.destroy();
   }
 
   @Override
@@ -264,14 +318,28 @@ public class FilterItemDialogController implements DialogController {
     return result.isPresent() && result.get() == ButtonType.OK;
   }
 
+  /** Shows the Field Reference-only sections (Filter Definition-based items have neither a field-derived type
+   * nor any of the field-type-specific option groups below) and hides the Filter Definition-only sections, or
+   * vice versa, depending on {@link #useFilterDefinitionField}. */
+  private void updateFilterDefinitionVisibility() {
+    boolean filterDefinitionBased = useFilterDefinitionField.isSelected();
+    fieldReferenceSection.setVisible(!filterDefinitionBased);
+    fieldReferenceSection.setManaged(!filterDefinitionBased);
+    filterDefinitionDescriptionController.setVisible(filterDefinitionBased);
+    filterDefinitionOptionsBox.setVisible(filterDefinitionBased);
+    filterDefinitionOptionsBox.setManaged(filterDefinitionBased);
+    filterDefinitionController.setVisible(filterDefinitionBased);
+  }
+
   private void updateTypeField() {
     String type = item.getType();
     typeField.setText(type != null ? type : "");
 
-    boolean isStringField = "string".equals(type);
-    boolean isEnumerationField = "enumeration".equals(type);
-    boolean showRanges = OverviewElementOptions.supportsRanges(type);
-    boolean showPeriods = OverviewElementOptions.supportsPeriods(type);
+    boolean filterDefinitionBased = useFilterDefinitionField.isSelected();
+    boolean isStringField = !filterDefinitionBased && "string".equals(type);
+    boolean isEnumerationField = !filterDefinitionBased && "enumeration".equals(type);
+    boolean showRanges = !filterDefinitionBased && OverviewElementOptions.supportsRanges(type);
+    boolean showPeriods = !filterDefinitionBased && OverviewElementOptions.supportsPeriods(type);
 
     matchingOptionsBox.setVisible(isStringField);
     matchingOptionsBox.setManaged(isStringField);
@@ -283,8 +351,8 @@ public class FilterItemDialogController implements DialogController {
     periodsBox.setManaged(showPeriods);
 
     boolean hasTypeSpecificOptions = isStringField || isEnumerationField || showRanges || showPeriods;
-    noTypeSpecificOptionsLabel.setVisible(!hasTypeSpecificOptions);
-    noTypeSpecificOptionsLabel.setManaged(!hasTypeSpecificOptions);
+    noTypeSpecificOptionsLabel.setVisible(!filterDefinitionBased && !hasTypeSpecificOptions);
+    noTypeSpecificOptionsLabel.setManaged(!filterDefinitionBased && !hasTypeSpecificOptions);
 
     if (showRanges) {
       rebuildToggleGrid(rangesGrid, ensureRanges(), FilterItemDialogController::rangeOptionLabelKey);
@@ -401,7 +469,27 @@ public class FilterItemDialogController implements DialogController {
   }
 
   private void validate() {
-    okButton.setDisable(fieldRefField.getValue() == null);
+    boolean valid = useFilterDefinitionField.isSelected()
+        ? !filterDefinitionController.errorProperty().get()
+        : fieldRefField.getValue() != null;
+    okButton.setDisable(!valid);
+  }
+
+  private static String validateFilterDefinition(String text) {
+    try {
+      EMITTER.emit(text);
+      return null;
+    }
+    catch (QueryLanguageException e) {
+      return "Invalid filter expression: " + e.getMessage();
+    }
+  }
+
+  private BooleanUserAccessOption ensureEnabled() {
+    if (item.getEnabled() == null) {
+      item.setEnabled(new BooleanUserAccessOption());
+    }
+    return item.getEnabled();
   }
 
   private void setFieldId(String fieldId) {
