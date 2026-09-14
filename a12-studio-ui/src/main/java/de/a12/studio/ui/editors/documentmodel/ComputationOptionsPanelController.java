@@ -10,6 +10,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.PlainPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleLanguageConstructs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
@@ -77,6 +78,7 @@ public class ComputationOptionsPanelController extends AbstractPropertyEditor im
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel) {
       commonPreconditionController.setSuggestionProvider(new PlainPathSuggestionProvider(new ElementIndex(documentModel), element));
+      commonPreconditionController.setHighlightedFunctionNames(RuleLanguageConstructs.NAMES);
     }
   }
 

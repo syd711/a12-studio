@@ -4,6 +4,7 @@
 .expression-code-area {
     -fx-font-family: "Consolas", "Monospaced";
     -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
     -fx-background-color: -fx-input-bg;
     -fx-border-color: -fx-border-input;
     -fx-border-width: 1px;
@@ -25,4 +26,38 @@
 
 .expression-code-area .selection {
     -fx-fill: -fx-selection-bg;
+}
+
+/*
+ * RichTextFX's StyleClassedTextArea only ever gives a range's Text node the style classes handed to it via
+ * StyleSpans (see RichtextEditorController#computeHighlighting) - plain javafx.scene.text.Text has no
+ * built-in "text" style class of its own, so these must NOT be written as ".text.string"/".text.keyword"
+ * (that compound selector can never match, since a highlighted range's Text node only ever carries
+ * "string"/"keyword" alone) the way richtext.css previously got this wrong.
+ */
+.expression-code-area .string {
+    -fx-fill: #2a7d2a;
+}
+
+.expression-code-area .keyword {
+    -fx-fill: -fx-accent-color;
+    -fx-font-weight: bold;
+}
+
+.completion-list {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Consolas", "Monospaced";
+    -fx-background-color: -fx-input-bg;
+    -fx-border-color: -fx-border-input;
+    -fx-border-width: 1px;
+}
+
+.completion-list .list-cell:filled:selected,
+.completion-list .list-cell:filled:hover {
+    -fx-background-color: -fx-selection-bg;
+}
+
+.completion-label {
+    -fx-text-fill: -fx-text-color;
 }

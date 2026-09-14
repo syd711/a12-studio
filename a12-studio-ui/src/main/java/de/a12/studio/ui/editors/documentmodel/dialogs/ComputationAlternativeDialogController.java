@@ -10,6 +10,7 @@ import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.PlainPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleLanguageConstructs;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -71,6 +72,8 @@ public class ComputationAlternativeDialogController implements DialogController 
       PlainPathSuggestionProvider suggestionProvider = new PlainPathSuggestionProvider(new ElementIndex(documentModel), computation);
       preconditionController.setSuggestionProvider(suggestionProvider);
       operationController.setSuggestionProvider(suggestionProvider);
+      preconditionController.setHighlightedFunctionNames(RuleLanguageConstructs.NAMES);
+      operationController.setHighlightedFunctionNames(RuleLanguageConstructs.NAMES);
     }
   }
 

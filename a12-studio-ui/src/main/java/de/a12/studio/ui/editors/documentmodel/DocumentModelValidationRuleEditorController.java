@@ -12,6 +12,7 @@ import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelControlle
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.PlainPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleLanguageConstructs;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -71,6 +72,7 @@ public class DocumentModelValidationRuleEditorController implements ElementEdito
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel) {
       errorConditionController.setSuggestionProvider(new PlainPathSuggestionProvider(new ElementIndex(documentModel), element));
+      errorConditionController.setHighlightedFunctionNames(RuleLanguageConstructs.NAMES);
     }
 
     boolean readOnly = isWithinAttachment(ancestors) || isWithinInclude(ancestors);

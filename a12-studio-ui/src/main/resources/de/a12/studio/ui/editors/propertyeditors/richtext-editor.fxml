@@ -16,6 +16,5 @@
     </BorderPane>
    <stylesheets>
       <URL value="@../../stylesheet.css" />
-      <URL value="@../../richtext.css" />
    </stylesheets>
 </TitledPane>

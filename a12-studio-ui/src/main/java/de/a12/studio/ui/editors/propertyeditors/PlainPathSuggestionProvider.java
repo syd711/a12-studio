@@ -5,16 +5,20 @@ import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.FieldPathSuggestions;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Suggests relative field paths (kernel {@code ElementPathUtils} convention, e.g. {@code "../fieldName"}) for
- * a bare identifier/path the user is typing - the Rule/Computation condition language's field-reference syntax
- * (no brackets, no grammar available - see {@code FieldPathSuggestions}). Triggers as soon as the caret is
- * preceded by at least one path character; the whole run is replaced on commit.
+ * Suggests relative field paths (kernel {@code ElementPathUtils} convention, e.g. {@code "../fieldName"}), plus
+ * the kernel's built-in {@link RuleLanguageConstructs} function names (e.g. {@code GroupFilled}, {@code
+ * RangeAsString}), for a bare identifier/path the user is typing - the Rule/Computation condition language's
+ * field-reference and function-call syntax (no brackets, no grammar available - see {@code
+ * FieldPathSuggestions}). Triggers as soon as the caret is preceded by at least one path character; the whole
+ * run is replaced on commit.
  */
 public class PlainPathSuggestionProvider implements SuggestionProvider {
 
@@ -39,10 +43,12 @@ public class PlainPathSuggestionProvider implements SuggestionProvider {
       return Optional.empty();
     }
     String prefix = matcher.group();
-    List<Suggestion> suggestions = FieldPathSuggestions.relativePaths(index, referencingElement).stream()
+    List<Suggestion> suggestions = new ArrayList<>(RuleLanguageConstructs.suggestions(prefix));
+    FieldPathSuggestions.relativePaths(index, referencingElement).stream()
         .filter(entry -> entry.path().toLowerCase().contains(prefix.toLowerCase()))
         .map(entry -> new Suggestion(entry.path(), entry.path(), entry.documentation()))
-        .toList();
+        .forEach(suggestions::add);
+    suggestions.sort(Comparator.comparing(Suggestion::label, String.CASE_INSENSITIVE_ORDER));
     if (suggestions.isEmpty()) {
       return Optional.empty();
     }
