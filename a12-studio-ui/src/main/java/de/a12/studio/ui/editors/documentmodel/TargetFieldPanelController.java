@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel;
 
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -10,6 +11,7 @@ import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -97,13 +99,22 @@ public class TargetFieldPanelController extends AbstractPropertyEditor implement
     items.add("");
 
     if (projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel) {
-      currentIndex = new ElementIndex(documentModel);
+      currentIndex = new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem),
+          ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.COMBINATION));
       for (Element candidate : currentIndex.allElements()) {
         if (candidate instanceof FieldElement) {
           String path = currentIndex.getPath(candidate);
           fieldsByDisplayPath.put(path, candidate);
           items.add(path);
         }
+      }
+      // Fields the base Document Model of an Additive Document Model provides, that this model's own file
+      // doesn't redefine - empty unless documentModel is additive with a resolvable base model, see
+      // ElementIndex's 3-arg constructor.
+      for (FieldElement candidate : currentIndex.additiveFieldElements()) {
+        String path = currentIndex.getPath(candidate);
+        fieldsByDisplayPath.put(path, candidate);
+        items.add(path);
       }
     } else {
       currentIndex = null;

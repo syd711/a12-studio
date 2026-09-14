@@ -76,6 +76,10 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
 
     if (index >= openedFiles.size()) {
+      // Selected once, here, rather than as each matching tab is opened below: open() always selects
+      // the tab it just added, so selecting mid-loop would just get clobbered by every subsequent
+      // tab's open() call, leaving the last-opened tab selected instead of the previously-active one.
+      selectRestoredTab(selectedFile);
       restoringSelection = false;
       StudioEventManager.getInstance().fireTabsRestoredEvent(project);
       return;
@@ -92,9 +96,6 @@ public class TabPaneController implements Initializable, StudioEventListener {
       ProjectItem item = file.exists() ? project.getRoot().findByPath(path) : null;
       if (item != null && item.isModelSupported()) {
         open(item);
-        if (path.equals(selectedFile)) {
-          tabPane.getSelectionModel().select(tabPane.getTabs().get(tabPane.getTabs().size() - 1));
-        }
       }
     }
     catch (Exception e) {
@@ -102,6 +103,19 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
 
     Platform.runLater(() -> restoreNextTab(project, openedFiles, index + 1, selectedFile));
+  }
+
+  private void selectRestoredTab(String selectedFile) {
+    if (selectedFile == null) {
+      return;
+    }
+    for (Tab tab : tabPane.getTabs()) {
+      ProjectItem item = (ProjectItem) tab.getUserData();
+      if (item != null && item.getPath().equals(selectedFile)) {
+        tabPane.getSelectionModel().select(tab);
+        return;
+      }
+    }
   }
 
   @Override

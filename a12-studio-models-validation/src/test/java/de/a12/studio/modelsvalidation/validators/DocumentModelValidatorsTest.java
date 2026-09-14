@@ -1,6 +1,12 @@
 package de.a12.studio.modelsvalidation.validators;
 
 import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
+import de.a12.studio.models.combineddocumentmodel.CombinationStep;
+import de.a12.studio.models.combineddocumentmodel.CombinationStepType;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelContent;
+import de.a12.studio.models.combineddocumentmodel.DocumentModelIdRef;
 import de.a12.studio.models.documentmodel.ComputationConfig;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -209,6 +215,79 @@ class DocumentModelValidatorsTest {
 
     assertTrue(errors.stream().noneMatch(error -> "computation_name".equals(error.elementId())),
         "A Computation whose computedFieldRelPath reaches a field inherited via Include must not be reported as missing");
+  }
+
+  /**
+   * Regression test: a Computation on an {@link AdditiveDocumentModel} whose {@code computedFieldRelPath}
+   * reaches a field the base Document Model provides (found via {@link
+   * de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModelResolver}'s reverse lookup through a
+   * Combination Model's Addition step, mirroring {@code PersonEmployee_Ad.json}'s real-world "../Type"
+   * pointing at {@code Person_Dc.json}'s own {@code /Person/Type} field) must not be wrongly flagged
+   * "Missing Computed Field" just because that field isn't in the Additive Document Model's own file.
+   */
+  @Test
+  void missingReferenceValidatorAcceptsAComputedFieldReachedThroughAnAdditiveBaseModel() {
+    FieldElement baseType = new FieldElement();
+    baseType.setId("field_type");
+    baseType.setName("Type");
+    FieldConfig baseTypeConfig = new FieldConfig();
+    baseTypeConfig.setFieldType(new StringFieldType());
+    baseType.setField(baseTypeConfig);
+
+    GroupElement basePersonRoot = new GroupElement();
+    basePersonRoot.setId("base_person_root");
+    basePersonRoot.setName("Person");
+    GroupConfig basePersonRootConfig = new GroupConfig();
+    basePersonRootConfig.setElements(new ArrayList<>(List.of(baseType)));
+    basePersonRoot.setGroup(basePersonRootConfig);
+
+    DocumentModel baseModel = new DocumentModel();
+    baseModel.setId("Person_Dc");
+    DocumentModelContent baseContent = new DocumentModelContent();
+    ModelRoot baseModelRoot = new ModelRoot();
+    baseModelRoot.setRootGroups(List.of(basePersonRoot));
+    baseContent.setModelRoot(baseModelRoot);
+    baseModel.setContent(baseContent);
+
+    ComputationElement computation = new ComputationElement();
+    computation.setId("computation_type");
+    computation.setName("TypeComp");
+    ComputationConfig computationConfig = new ComputationConfig();
+    computationConfig.setComputedFieldRelPath("../Type");
+    computation.setComputation(computationConfig);
+
+    GroupElement additivePersonRoot = new GroupElement();
+    additivePersonRoot.setId("additive_person_root");
+    additivePersonRoot.setName("Person");
+    GroupConfig additivePersonRootConfig = new GroupConfig();
+    additivePersonRootConfig.setElements(new ArrayList<>(List.of(computation)));
+    additivePersonRoot.setGroup(additivePersonRootConfig);
+
+    AdditiveDocumentModel additiveModel = new AdditiveDocumentModel();
+    additiveModel.setId("PersonEmployee_Ad");
+    DocumentModelContent additiveContent = new DocumentModelContent();
+    ModelRoot additiveModelRoot = new ModelRoot();
+    additiveModelRoot.setRootGroups(List.of(additivePersonRoot));
+    additiveContent.setModelRoot(additiveModelRoot);
+    additiveModel.setContent(additiveContent);
+
+    DocumentModelIdRef additiveStepRef = new DocumentModelIdRef();
+    additiveStepRef.setDmId("PersonEmployee_Ad");
+    CombinationStep additionStep = new CombinationStep();
+    additionStep.setType(CombinationStepType.ADDITION);
+    additionStep.setAdditiveModel(additiveStepRef);
+    CombinedDocumentModelContent combinationContent = new CombinedDocumentModelContent();
+    combinationContent.setBaseModelId("Person_Dc");
+    combinationContent.getCombinationSteps().add(additionStep);
+    CombinedDocumentModel combinationModel = new CombinedDocumentModel();
+    combinationModel.setId("PersonEmployee_Cm");
+    combinationModel.setContent(combinationContent);
+
+    List<ModelValidationError> errors = new MissingReferenceValidator()
+        .validate(additiveModel, TestModels.contextWithOtherModels(additiveModel, baseModel, combinationModel));
+
+    assertTrue(errors.stream().noneMatch(error -> "computation_type".equals(error.elementId())),
+        "A Computation whose computedFieldRelPath reaches a field provided by the additive base model must not be reported as missing");
   }
 
   /**

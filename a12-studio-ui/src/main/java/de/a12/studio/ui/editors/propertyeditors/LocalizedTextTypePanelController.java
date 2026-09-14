@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -26,7 +27,7 @@ import java.util.function.Supplier;
 /**
  * Edits a single {@link LocalizedText} value that is either per-locale text ({@link MultilingualText}, the
  * default) or an {@link ExpressionText}, switched via a Type combo box: {@link #textController} edits the
- * per-locale case, {@link #expressionController} the expression case, and only the one matching the current
+ * per-locale case, {@link #expressionArea} the expression case, and only the one matching the current
  * type is shown at a time. Not bound to a single {@link de.a12.studio.models.documentmodel.Element} - the
  * value is read/written via a caller-supplied {@code Supplier}/{@code Consumer} pair (see {@link #setCustom}),
  * e.g. {@link de.a12.studio.models.formmodel.ButtonStyling#getLabel()}/{@code setLabel} (a button's label, via
@@ -45,7 +46,7 @@ public class LocalizedTextTypePanelController extends AbstractPropertyEditor imp
   private LocalizedTextPanelController textController;
 
   @FXML
-  private RichtextEditorController expressionController;
+  private TextArea expressionArea;
 
   private Supplier<LocalizedText> reader;
 
@@ -77,32 +78,31 @@ public class LocalizedTextTypePanelController extends AbstractPropertyEditor imp
         applyType(newValue);
       }
     });
+
+    bindTextArea(expressionArea, (el, value) -> writeExpression(value));
   }
 
   /**
    * Overrides this panel's title and expanded-state settings key, and clears the nested {@link
-   * #textController}/{@link #expressionController}'s own titles (this panel's own title already names the
-   * field) - mirrors {@link LocalizedTextPanelController#configureCustom}.
+   * #textController}'s own title (this panel's own title already names the field) - mirrors {@link
+   * LocalizedTextPanelController#configureCustom}.
    */
   public void configureCustom(@NonNull String fieldKey, @NonNull String title) {
     setTitle(title);
     setSettingsKeySuffix("." + fieldKey);
     textController.configureCustom(fieldKey, "");
-    expressionController.configureCustom(fieldKey, "");
   }
 
   @Override
   public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
     super.setSaveMode(saveMode);
     textController.setSaveMode(saveMode);
-    expressionController.setSaveMode(saveMode);
   }
 
   @Override
   public void destroy() {
     super.destroy();
     textController.destroy();
-    expressionController.destroy();
   }
 
   public void setVisible(boolean visible) {
@@ -110,18 +110,14 @@ public class LocalizedTextTypePanelController extends AbstractPropertyEditor imp
   }
 
   /**
-   * Enables field/group-name autocomplete in the Expression case (see {@link RichtextEditorController#
-   * setSuggestionProvider}), scoped to {@code documentModel}'s field tree - e.g. {@link
+   * No-op: the Expression case is a plain {@link TextArea} with no field/group-name autocomplete, unlike
+   * {@link RichtextEditorController}. Kept (rather than removed) so the many callers that resolve a
+   * {@code documentModel} field index and pass it here unconditionally (e.g. {@link
    * de.a12.studio.ui.editors.formmodel.FormModelEditorController#resolveDataBindingDocumentModel}'s result at
-   * this panel's call site. This panel has no {@link de.a12.studio.models.documentmodel.Element} of its own
-   * (see {@link #setCustom}), so unlike a document-model-bound panel, every caller must supply this
-   * explicitly; {@code null} (no Document Model resolved, or the caller not yet updated) leaves the Expression
-   * field's completion disabled.
+   * this panel's call sites) don't need special-casing.
    */
   public void setFieldSuggestionSource(@Nullable ElementIndex documentModelIndex) {
-    if (documentModelIndex != null) {
-      expressionController.setSuggestionProvider(new ExpressionScopeSuggestionProvider(documentModelIndex));
-    }
+    // Intentionally empty - see javadoc.
   }
 
   /**
@@ -145,7 +141,8 @@ public class LocalizedTextTypePanelController extends AbstractPropertyEditor imp
       updatingFromModel = false;
     }
     textController.setCustom(this::currentTexts, this::writeTexts);
-    expressionController.setCustom(this::currentExpression, this::writeExpression);
+    String currentExpression = currentExpression();
+    setFieldValue(expressionArea, currentExpression != null ? currentExpression : "");
     updateVisibility(expression);
   }
 
@@ -164,7 +161,8 @@ public class LocalizedTextTypePanelController extends AbstractPropertyEditor imp
 
   private void updateVisibility(boolean expression) {
     textController.setVisible(!expression);
-    expressionController.setVisible(expression);
+    expressionArea.setVisible(expression);
+    expressionArea.setManaged(expression);
   }
 
   private List<Label> currentTexts() {

@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
@@ -16,7 +17,7 @@
                     <Label styleClass="field-label" text="%type" />
                     <ComboBox fx:id="typeCombo" maxWidth="Infinity" />
                     <fx:include fx:id="text" source="localized-text-panel.fxml" styleClass="titled-pane-sub-child" />
-                    <fx:include fx:id="expression" source="richtext-editor.fxml" styleClass="titled-pane-sub-child" />
+                    <TextArea fx:id="expressionArea" prefRowCount="3" wrapText="true" />
                 </children>
             </VBox>
         </center>

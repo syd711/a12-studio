@@ -25,5 +25,10 @@ dependencies {
 }
 
 generateGrammarSource {
-    arguments += ['-visitor', '-package', 'de.a12.studio.models.querymodel.ql']
+    // No blanket "-package" here: it would force every grammar under src/main/antlr onto the same package
+    // regardless of directory, which broke once a second grammar (RuleLang.g4) was added in its own package
+    // directory. Without it, the antlr plugin infers each grammar's package from its own location under
+    // src/main/antlr (matching the Java convention QL.g4/RuleLang.g4's directories already follow), and
+    // "-visitor" alone still applies to all of them.
+    arguments += ['-visitor']
 }

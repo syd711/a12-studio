@@ -1,5 +1,8 @@
 package de.a12.studio.modelsvalidation.validators;
 
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModelResolver;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -17,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,13 +37,24 @@ public class ElementIndex {
   private final Map<Element, GroupElement> parentOf = new HashMap<>();
   private final List<Element> all = new ArrayList<>();
 
+  // Elements that don't belong to this model's own file at all, but are reachable through it because it's
+  // an AdditiveDocumentModel and this element lives in the base Document Model it adds onto, at a position
+  // this model itself doesn't (re)define locally - see mergeAdditiveElements(). Kept out of byId/parentOf/all
+  // deliberately: those back allElements()/parentOf(), which every structural check (duplicate names, enum
+  // counts, type definitions, ...) iterates, and a base model's own fields must not be validated a second
+  // time as if they were this model's. Only path resolution (resolveRelativePath, via resolveByNamePath) and
+  // getPath() (via parentOfAny) look here - covering the two real use cases: a Computation/Rule's relative
+  // path legitimately pointing at an inherited field, and the target-field picker offering such fields too.
+  private final Map<Element, GroupElement> additiveParentOf = new HashMap<>();
+  private final List<FieldElement> additiveFieldElements = new ArrayList<>();
+
   // Lazily computed on first effectiveFieldType() lookup that needs it, then reused: TransitiveTypeDefinitions
   // walks the whole Include/Import graph, and effectiveFieldType is called once per TypeDefType field, so this
   // avoids re-walking it from scratch for every such field in the same model.
   private List<TransitiveTypeDefinitions.Entry> transitiveTypeDefinitions;
 
   public ElementIndex(DocumentModel model) {
-    this(model, List.of());
+    this(model, List.of(), List.of());
   }
 
   /**
@@ -50,6 +65,20 @@ public class ElementIndex {
    *                     that (e.g. a check that never touches {@code TypeDefType} fields).
    */
   public ElementIndex(DocumentModel model, List<DocumentModel> otherModels) {
+    this(model, otherModels, List.of());
+  }
+
+  /**
+   * @param otherModelsOfAnyType every other model in the project, of any type - needed, only when {@code
+   *                     model} is an {@link AdditiveDocumentModel}, to resolve the base Document Model it
+   *                     adds onto (via {@link AdditiveDocumentModelResolver}, which looks for a Combination
+   *                     Model among these) so {@link #resolveRelativePath} and the target-field picker (see
+   *                     {@link #additiveFieldElements()}) can reach fields that model provides but {@code
+   *                     model}'s own file doesn't redefine. Pass {@code List.of()} if the caller doesn't need
+   *                     that (e.g. {@code model} is never an Additive Document Model in practice, or the
+   *                     check never touches relative paths).
+   */
+  public ElementIndex(DocumentModel model, List<DocumentModel> otherModels, List<A12Model<?>> otherModelsOfAnyType) {
     this.model = model;
     this.otherModels = otherModels;
     List<GroupElement> rootGroups = model.getContent().getModelRoot().getRootGroups();
@@ -57,6 +86,10 @@ public class ElementIndex {
       for (GroupElement rootGroup : rootGroups) {
         index(rootGroup, null);
       }
+    }
+    if (model instanceof AdditiveDocumentModel additiveModel) {
+      AdditiveDocumentModelResolver.findBaseModel(additiveModel, otherModelsOfAnyType, otherModels)
+          .ifPresent(baseModel -> mergeAdditiveBaseModel(rootGroups, baseModel));
     }
   }
 
@@ -71,6 +104,84 @@ public class ElementIndex {
         index(child, group);
       }
     }
+  }
+
+  /**
+   * For each of {@code localRootGroups} that shares its name with one of {@code baseModel}'s own root
+   * groups (the ordinary case: an Additive Document Model's root group mirrors the base model's), merges
+   * that base root group's own descendants in - see {@link #mergeAdditiveElements}.
+   */
+  private void mergeAdditiveBaseModel(List<GroupElement> localRootGroups, DocumentModel baseModel) {
+    if (localRootGroups == null || baseModel.getContent() == null || baseModel.getContent().getModelRoot() == null) {
+      return;
+    }
+    List<GroupElement> baseRootGroups = baseModel.getContent().getModelRoot().getRootGroups();
+    if (baseRootGroups == null) {
+      return;
+    }
+    for (GroupElement localRoot : localRootGroups) {
+      baseRootGroups.stream()
+          .filter(baseRoot -> Objects.equals(baseRoot.getName(), localRoot.getName()))
+          .findFirst()
+          .ifPresent(baseRoot -> mergeAdditiveElements(localRoot, baseRoot));
+    }
+  }
+
+  /**
+   * Recursively makes {@code baseGroup}'s own children reachable as if they were also children of {@code
+   * localGroup} (see the {@link #additiveParentOf}/{@link #additiveFieldElements} field docs for why they're
+   * indexed separately from this model's real elements). A child whose name is already used by a real local
+   * child shadows the base one - matching the a12 kernel's Addition-step override semantics - but if both
+   * are groups, their own children are still merged, so a field the base model nests two levels deep under a
+   * group this Additive Document Model also happens to redefine (by name) is still found.
+   */
+  private void mergeAdditiveElements(GroupElement localGroup, GroupElement baseGroup) {
+    if (baseGroup.getGroup() == null || baseGroup.getGroup().getElements() == null) {
+      return;
+    }
+    List<Element> localElements = localGroup.getGroup() == null ? null : localGroup.getGroup().getElements();
+    Set<String> localNames = new HashSet<>();
+    if (localElements != null) {
+      for (Element localElement : localElements) {
+        localNames.add(localElement.getName());
+      }
+    }
+    for (Element baseChild : baseGroup.getGroup().getElements()) {
+      if (!localNames.contains(baseChild.getName())) {
+        indexAdditive(baseChild, localGroup);
+        continue;
+      }
+      if (baseChild instanceof GroupElement baseChildGroup && localElements != null) {
+        localElements.stream()
+            .filter(GroupElement.class::isInstance).map(GroupElement.class::cast)
+            .filter(localChildGroup -> Objects.equals(localChildGroup.getName(), baseChildGroup.getName()))
+            .findFirst()
+            .ifPresent(localChildGroup -> mergeAdditiveElements(localChildGroup, baseChildGroup));
+      }
+    }
+  }
+
+  private void indexAdditive(Element element, GroupElement parent) {
+    additiveParentOf.put(element, parent);
+    if (element instanceof FieldElement field) {
+      additiveFieldElements.add(field);
+    }
+    if (element instanceof GroupElement group && group.getGroup() != null && group.getGroup().getElements() != null) {
+      for (Element child : group.getGroup().getElements()) {
+        indexAdditive(child, group);
+      }
+    }
+  }
+
+  /**
+   * Every {@link FieldElement} reachable only through {@link #mergeAdditiveElements} - i.e. fields the base
+   * Document Model of an Additive Document Model provides at a position this model's own file doesn't
+   * redefine. Empty unless this index's model is an {@link AdditiveDocumentModel} with a resolvable base
+   * model (see the 3-arg constructor). Used by the target-field picker to offer these alongside this
+   * model's own fields from {@link #allElements()}.
+   */
+  public List<FieldElement> additiveFieldElements() {
+    return additiveFieldElements;
   }
 
   /** Every element in the model, in document order. */
@@ -101,9 +212,15 @@ public class ElementIndex {
     Element current = element;
     while (current != null) {
       names.addFirst(current.getName());
-      current = parentOf.get(current);
+      current = parentOfAny(current);
     }
     return new ArrayList<>(names);
+  }
+
+  /** {@link #parentOf} for this model's own elements, falling back to {@link #additiveParentOf} for one
+   * reached only through {@link #mergeAdditiveElements} - see that field's doc. */
+  private GroupElement parentOfAny(Element element) {
+    return parentOf.containsKey(element) ? parentOf.get(element) : additiveParentOf.get(element);
   }
 
   /**
@@ -307,7 +424,15 @@ public class ElementIndex {
     }
     List<GroupElement> rootGroups = model.getContent().getModelRoot().getRootGroups();
     Element current = rootGroups == null ? null : findByName(rootGroups, names.get(0));
-    return descendByName(current, names, 1, new HashSet<>(List.of(model.getId())));
+    Optional<Element> local = descendByName(current, names, 1, new HashSet<>(List.of(model.getId())));
+    if (local.isPresent() || additiveFieldElements.isEmpty()) {
+      return local;
+    }
+    // Not found among this model's own elements - see if it's one reached only through the base model an
+    // Additive Document Model adds onto (mergeAdditiveElements()); getPath() works for those too, via
+    // parentOfAny(), so a plain path match is enough without a parallel name-walk.
+    String targetPath = "/" + String.join("/", names);
+    return additiveFieldElements.stream().filter(field -> getPath(field).equals(targetPath)).findFirst().map(Element.class::cast);
   }
 
   /**

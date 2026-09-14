@@ -84,14 +84,16 @@ public final class ValidationContext {
 
   /**
    * The {@link ElementIndex} for the model being validated, built once (with {@link #otherDocumentModels()}
-   * for transitive Include/Import resolution) and cached here so every validator in this call shares it
-   * instead of each re-walking the same element tree from scratch. Null when the model being validated isn't
-   * a {@link DocumentModel} (e.g. this context was built for a Form/Overview/Print model that needs an
-   * index over a *different*, referenced document model — those still build their own {@link ElementIndex}).
+   * for transitive Include/Import resolution, and {@link #otherModels()} to resolve an Additive Document
+   * Model's base model, see {@link ElementIndex}'s 3-arg constructor) and cached here so every validator in
+   * this call shares it instead of each re-walking the same element tree from scratch. Null when the model
+   * being validated isn't a {@link DocumentModel} (e.g. this context was built for a Form/Overview/Print
+   * model that needs an index over a *different*, referenced document model — those still build their own
+   * {@link ElementIndex}).
    */
   public ElementIndex elementIndex() {
     if (elementIndex == null && model instanceof DocumentModel documentModel) {
-      elementIndex = new ElementIndex(documentModel, otherDocumentModels);
+      elementIndex = new ElementIndex(documentModel, otherDocumentModels, otherModels);
     }
     return elementIndex;
   }

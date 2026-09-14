@@ -1,5 +1,12 @@
 grammar QL;
 
+// Explicit package (rather than build.gradle's generateGrammarSource task): the antlr Gradle plugin does not
+// infer a package from a grammar file's own directory, so with more than one grammar under src/main/antlr
+// (see RuleLang.g4) each one needs to say where it belongs.
+@header {
+package de.a12.studio.models.querymodel.ql;
+}
+
 program
 	: expression EOF
 	;
