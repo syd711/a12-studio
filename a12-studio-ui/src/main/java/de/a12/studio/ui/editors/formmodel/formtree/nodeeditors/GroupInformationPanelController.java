@@ -5,10 +5,12 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.formmodel.AbstractRepeat;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TitledPane;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -34,6 +36,9 @@ import java.util.List;
 public class GroupInformationPanelController {
 
   @FXML
+  private TitledPane root;
+
+  @FXML
   private Label groupIdLabel;
 
   @FXML
@@ -47,6 +52,7 @@ public class GroupInformationPanelController {
 
   @FXML
   private void initialize() {
+    AbstractPropertyEditor.persistExpandedState(root, getClass());
     internalDescriptionController.configureCustom("internalDescription",
         StudioBundle.get("internal_field_description"));
     internalDescriptionController.setCollapsed();

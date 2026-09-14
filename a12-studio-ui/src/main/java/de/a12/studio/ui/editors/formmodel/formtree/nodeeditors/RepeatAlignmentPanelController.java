@@ -3,10 +3,12 @@ package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TitledPane;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -23,6 +25,8 @@ public class RepeatAlignmentPanelController implements Initializable {
   private static final List<String> ALIGNMENT_VALUES = List.of("left", "center", "right");
 
   @FXML
+  private TitledPane root;
+  @FXML
   private ComboBox<String> horizontalAlignmentCombo;
 
   private AbstractRepeat repeat;
@@ -30,6 +34,8 @@ public class RepeatAlignmentPanelController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    AbstractPropertyEditor.persistExpandedState(root, getClass());
+
     horizontalAlignmentCombo.getItems().setAll(ALIGNMENT_VALUES);
     horizontalAlignmentCombo.valueProperty().addListener((obs, old, val) -> {
       if (updatingFromModel || repeat == null) return;

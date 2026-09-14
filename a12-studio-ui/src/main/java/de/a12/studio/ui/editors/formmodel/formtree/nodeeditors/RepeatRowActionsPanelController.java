@@ -5,6 +5,7 @@ import de.a12.studio.models.formmodel.RowAction;
 import de.a12.studio.models.formmodel.RowActionGroup;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -14,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import org.jspecify.annotations.NonNull;
@@ -39,6 +41,8 @@ public class RepeatRowActionsPanelController implements Initializable {
       List.of("ALWAYS", "DISABLED_IN_EDIT_MODE", "DISABLED_IN_READONLY_MODE", "HIDDEN_IN_EDIT_MODE", "HIDDEN_IN_READONLY_MODE");
 
   @FXML
+  private TitledPane root;
+  @FXML
   private TableView<RowAction> actionsTable;
   @FXML
   private TableColumn<RowAction, String> eventColumn;
@@ -53,6 +57,8 @@ public class RepeatRowActionsPanelController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    AbstractPropertyEditor.persistExpandedState(root, getClass());
+
     actionsTable.setEditable(true);
     actionsTable.setItems(FXCollections.observableArrayList());
 

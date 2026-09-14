@@ -53,6 +53,7 @@
                                 <fx:include fx:id="externalEnumeration" source="formtree/nodeeditors/external-enumeration-panel.fxml" />
                                 <fx:include fx:id="dependentEnumeration" source="formtree/nodeeditors/dependent-enumeration-panel.fxml" />
                                 <fx:include fx:id="dependentField" source="formtree/nodeeditors/dependent-field-panel.fxml" />
+                                <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
                             </children>
                             <padding>
                                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

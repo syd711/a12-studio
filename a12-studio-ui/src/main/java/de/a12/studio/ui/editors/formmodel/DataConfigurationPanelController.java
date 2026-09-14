@@ -19,6 +19,7 @@ import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentFieldPan
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentGroupPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.ExternalEnumerationPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.HideConditionPanelController.MasterFieldScope;
+import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.StudioBundle;
@@ -98,6 +99,8 @@ public class DataConfigurationPanelController implements Initializable {
   private DependentFieldPanelController dependentFieldController;
   @FXML
   private DependentGroupPanelController dependentGroupController;
+  @FXML
+  private AnnotationsPanelController annotationsController;
   @FXML
   private TextField numberOfInitialRowsField;
 
@@ -318,6 +321,7 @@ public class DataConfigurationPanelController implements Initializable {
       externalEnumerationController.setEntry(entry);
       dependentEnumerationController.setEntry(entry, elementIndex, MasterFieldScope.root());
       dependentFieldController.setEntry(entry, elementIndex);
+      annotationsController.setCustom(entry::getAnnotations);
     }
     else if (isGroup) {
       GroupConfigEntry entry = (GroupConfigEntry) row.entry();

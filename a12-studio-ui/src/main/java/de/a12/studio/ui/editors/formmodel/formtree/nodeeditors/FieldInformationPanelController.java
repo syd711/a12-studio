@@ -6,6 +6,7 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextReadonlyPanelController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
@@ -38,6 +39,9 @@ import java.util.Optional;
 public class FieldInformationPanelController {
 
   @FXML
+  private TitledPane root;
+
+  @FXML
   private Label fieldIdLabel;
 
   @FXML
@@ -51,6 +55,7 @@ public class FieldInformationPanelController {
 
   @FXML
   private void initialize() {
+    AbstractPropertyEditor.persistExpandedState(root, getClass());
     internalDescriptionController.configureCustom("internalDescription", StudioBundle.get("internal_field_description"));
   }
 

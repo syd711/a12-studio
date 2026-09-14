@@ -1,8 +1,10 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
 import de.a12.studio.models.formmodel.AbstractRepeat;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import javafx.fxml.FXML;
+import javafx.scene.control.TitledPane;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -14,7 +16,14 @@ import org.jspecify.annotations.NonNull;
 public class RepeatHeaderStylesPanelController {
 
   @FXML
+  private TitledPane root;
+  @FXML
   private StylesPanelController headerStylesListController;
+
+  @FXML
+  private void initialize() {
+    AbstractPropertyEditor.persistExpandedState(root, getClass());
+  }
 
   public void setRepeat(@NonNull AbstractRepeat repeat) {
     headerStylesListController.setCustom(repeat::getHeaderStyle, repeat::getHeaderStyle);

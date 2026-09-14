@@ -9,6 +9,7 @@ import de.a12.studio.models.formmodel.FieldConfigEntry;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.HideConditionPanelController.MasterFieldScope;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -22,6 +23,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import org.jspecify.annotations.NonNull;
@@ -42,6 +44,8 @@ public class DependentFieldPanelController implements Initializable {
 
   private static final String NO_VALUE_DISPLAY = "(no value)";
 
+  @FXML
+  private TitledPane root;
   @FXML
   private ComboBox<String> masterFieldCombo;
   @FXML
@@ -66,6 +70,8 @@ public class DependentFieldPanelController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    AbstractPropertyEditor.persistExpandedState(root, getClass());
+
     casesTable.setEditable(true);
     casesTable.setItems(FXCollections.observableArrayList());
 

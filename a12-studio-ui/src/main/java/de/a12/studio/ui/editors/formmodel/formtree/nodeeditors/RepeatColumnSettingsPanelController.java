@@ -4,11 +4,13 @@ import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.TableStyle;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TitledPane;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -24,6 +26,8 @@ public class RepeatColumnSettingsPanelController implements Initializable {
   private static final int DEFAULT = 0;
   private static final int MAX = 9999;
 
+  @FXML
+  private TitledPane root;
   @FXML
   private Spinner<Integer> rowHeightSpinner;
 
@@ -41,6 +45,8 @@ public class RepeatColumnSettingsPanelController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    AbstractPropertyEditor.persistExpandedState(root, getClass());
+
     rowHeightSpinner.setValueFactory(
         new SpinnerValueFactory.IntegerSpinnerValueFactory(DEFAULT, MAX, DEFAULT));
     rowHeightSpinner.setEditable(true);

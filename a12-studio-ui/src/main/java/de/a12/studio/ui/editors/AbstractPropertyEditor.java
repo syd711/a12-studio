@@ -148,17 +148,10 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     StudioEventManager.getInstance().addListener(this);
-    Platform.runLater(() -> {
-      String settingsKey = getExpandedSettingsKey();
-      if (settingsKey != null) {
-        boolean animated = root.isAnimated();
-        root.setAnimated(false);
-        root.setExpanded(LocalUISettings.getBoolean(settingsKey, true));
-        root.setAnimated(animated);
-        root.expandedProperty().addListener((observable, oldValue, newValue) ->
-            LocalUISettings.saveProperty(settingsKey, String.valueOf(newValue)));
-      }
-    });
+    String settingsKey = getExpandedSettingsKey();
+    if (settingsKey != null) {
+      bindExpandedState(root, settingsKey);
+    }
     showValidationError(null);
     errorContainerController.errorProperty().addListener((observable, oldValue, newValue) -> {
       log.info("[TabErrorBadge] {} error-container errorProperty changed to {}", getClass().getSimpleName(), newValue);
@@ -536,6 +529,37 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   }
 
   private String getExpandedSettingsKey() {
+    return expandedSettingsKey(getClass(), settingsKeySuffix);
+  }
+
+  /**
+   * Persists {@code pane}'s expanded/collapsed state under a settings key namespaced by the current model type
+   * and {@code controllerClass}, defaulting to expanded when nothing was saved yet. This is what every {@link
+   * AbstractPropertyEditor} subclass gets for free via {@link #initialize}; exposed statically so form-tree
+   * node editors that intentionally don't extend {@link AbstractPropertyEditor} (see e.g. {@code
+   * HideConditionPanelController}'s class-level javadoc for why) can still opt their own {@code root}
+   * {@link TitledPane} into the same persisted/expand-by-default behavior by calling this from their own
+   * {@code initialize()}.
+   */
+  public static void persistExpandedState(@NonNull TitledPane pane, @NonNull Class<?> controllerClass) {
+    String settingsKey = expandedSettingsKey(controllerClass, "");
+    if (settingsKey != null) {
+      bindExpandedState(pane, settingsKey);
+    }
+  }
+
+  private static void bindExpandedState(@NonNull TitledPane pane, @NonNull String settingsKey) {
+    Platform.runLater(() -> {
+      boolean animated = pane.isAnimated();
+      pane.setAnimated(false);
+      pane.setExpanded(LocalUISettings.getBoolean(settingsKey, true));
+      pane.setAnimated(animated);
+      pane.expandedProperty().addListener((observable, oldValue, newValue) ->
+          LocalUISettings.saveProperty(settingsKey, String.valueOf(newValue)));
+    });
+  }
+
+  private static String expandedSettingsKey(@NonNull Class<?> controllerClass, @NonNull String settingsKeySuffix) {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem == null || projectItem.getModel() == null) {
       return null;
@@ -546,7 +570,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
       return null;
     }
 
-    return modelType.getValue() + "." + getClass().getSimpleName() + settingsKeySuffix + ".expanded";
+    return modelType.getValue() + "." + controllerClass.getSimpleName() + settingsKeySuffix + ".expanded";
   }
 
   protected ModelConfig getModelConfig(A12Model<?> model) {
