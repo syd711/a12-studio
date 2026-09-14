@@ -185,7 +185,7 @@ public class NewModelFactory {
       case TREE -> buildTreeModel(locales);
       case COMBINATION -> buildCombinationModel(locales);
       case MAPPING -> buildMappingModel(locales);
-      case QUERY -> buildQueryModel(locales);
+      case QUERY -> buildQueryModel(documentModelId, locales);
       case STRUCTURALMAPPING -> buildStructuralMappingModel(locales);
       case SELECTION -> buildSelectionModel(locales);
     };
@@ -438,9 +438,21 @@ public class NewModelFactory {
     return model;
   }
 
-  private static QueryModel buildQueryModel(List<Locale> locales) {
+  // Target document model is mandatory (see QueryTargetDocumentModelRequiredValidator), so the New Model
+  // dialog collects it up front; mirrors QuerySettingsPanelController#handleTargetModelSelectionChanged,
+  // which performs the same targetDocumentModel/projectionName/header-reference sync when changed later.
+  private static QueryModel buildQueryModel(String documentModelId, List<Locale> locales) {
     QueryModel model = new QueryModel();
-    model.setContent(new QueryModelContent());
+    QueryModelContent content = new QueryModelContent();
+    if (documentModelId != null && !documentModelId.isBlank()) {
+      content.setTargetDocumentModel(documentModelId);
+      content.setProjectionName("document");
+      ModelReference reference = new ModelReference();
+      reference.setModelType(ModelType.DOCUMENT);
+      reference.setReference(documentModelId);
+      model.getModelReferences().add(reference);
+    }
+    model.setContent(content);
     model.setLocales(locales);
     return model;
   }

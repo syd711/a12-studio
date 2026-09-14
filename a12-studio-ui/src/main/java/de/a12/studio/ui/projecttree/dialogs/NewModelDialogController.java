@@ -127,7 +127,7 @@ public class NewModelDialogController implements DialogController {
   }
 
   private static boolean requiresDocumentModel(ModelType modelType) {
-    return modelType == ModelType.FORM || modelType == ModelType.OVERVIEW;
+    return modelType == ModelType.FORM || modelType == ModelType.OVERVIEW || modelType == ModelType.QUERY;
   }
 
   private void updateDocumentModelVisibility(ModelType modelType) {
