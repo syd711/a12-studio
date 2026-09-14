@@ -127,17 +127,12 @@ public final class TabErrorBadge {
       Object existing = tab.getProperties().get(BADGE_STYLE_CLASS);
       if (existing instanceof Circle badge) {
         badge.setVisible(false);
-        log.info("[TabErrorBadge]     badge hidden for tab '{}'", tabLabel(tab));
       }
       return;
     }
     Circle badge = ensureBadge(tab);
     badge.setVisible(true);
     badge.pseudoClassStateChanged(WARNING_PSEUDO_CLASS, "WARNING".equals(severity));
-    log.info("[TabErrorBadge]     badge shown for tab '{}' severity={}, badge.parent={}, badge.scene={}, badge.layoutBounds={}",
-        tabLabel(tab), severity,
-        badge.getParent() != null ? badge.getParent().getClass().getSimpleName() : "null",
-        badge.getScene() != null ? "attached" : "null", badge.getLayoutBounds());
   }
 
   private static Circle ensureBadge(@NonNull Tab tab) {
@@ -147,8 +142,6 @@ public final class TabErrorBadge {
     }
 
     String originalText = tab.getText();
-    log.info("[TabErrorBadge]     creating badge graphic for tab '{}' (had graphic={})", originalText, tab.getGraphic() != null);
-
     Circle badge = new Circle(4);
     badge.getStyleClass().add(BADGE_STYLE_CLASS);
     badge.setMouseTransparent(true);

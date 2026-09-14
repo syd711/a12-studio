@@ -34,30 +34,39 @@
     "modelReferences": [
       {
         "alias": "Person_DM",
-        "modelType": "document",
         "purpose": "data binding",
-        "reference": "Person_DM"
+        "reference": "Person_DM",
+        "modelType": "document"
       },
       {
         "alias": "PersonCompany_Company_AvailableItems_OM",
-        "modelType": "overview",
         "purpose": "bindingReference",
-        "reference": "PersonCompany_Company_AvailableItems_OM"
+        "reference": "PersonCompany_Company_AvailableItems_OM",
+        "modelType": "overview"
       },
       {
         "alias": "PersonCompany_Company_SelectedItems_OM",
-        "modelType": "overview",
         "purpose": "bindingReference",
-        "reference": "PersonCompany_Company_SelectedItems_OM"
+        "reference": "PersonCompany_Company_SelectedItems_OM",
+        "modelType": "overview"
       }
     ]
   },
   "content": {
     "subHeaderBox": {
-      "id": "subHeaderBox1"
+      "id": "subHeaderBox1",
+      "minorButtons": {
+        "button": []
+      },
+      "majorButtons": {
+        "button": []
+      }
     },
     "footerBox": {
       "id": "footerBox1",
+      "minorButtons": {
+        "button": []
+      },
       "majorButtons": {
         "button": [
           {
@@ -294,7 +303,6 @@
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-997b0",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
@@ -306,34 +314,35 @@
                       "head": "middle",
                       "body": "middle"
                     },
-                    "elementRef": "F12"
+                    "elementRef": "F12",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-a695d",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "F13"
+                    "elementRef": "F13",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-84c4a",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "F14"
+                    "elementRef": "F14",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-c2200",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "F15"
+                    "elementRef": "F15",
+                    "width": 1
                   }
                 ],
                 "groupRef": "G10",
@@ -418,7 +427,6 @@
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-bb467",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
@@ -430,12 +438,12 @@
                       "head": "middle",
                       "body": "middle"
                     },
-                    "elementRef": "F17"
+                    "elementRef": "F17",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-1f124",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
@@ -447,7 +455,8 @@
                       "head": "middle",
                       "body": "middle"
                     },
-                    "elementRef": "F18"
+                    "elementRef": "F18",
+                    "width": 1
                   }
                 ],
                 "groupRef": "G16",
@@ -486,7 +495,6 @@
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-8aa90",
-                    "width": 1,
                     "sortable": true,
                     "filterable": true,
                     "preferredSorting": "ASC",
@@ -498,12 +506,12 @@
                       "head": "middle",
                       "body": "middle"
                     },
-                    "elementRef": "F20"
+                    "elementRef": "F20",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-c6f56",
-                    "width": 1,
                     "sortable": false,
                     "filterable": true,
                     "preferredSorting": "ASC",
@@ -515,12 +523,12 @@
                       "head": "middle",
                       "body": "middle"
                     },
-                    "elementRef": "F21"
+                    "elementRef": "F21",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-8c5af",
-                    "width": 1,
                     "sortable": false,
                     "filterable": true,
                     "preferredSorting": "ASC",
@@ -532,12 +540,12 @@
                       "head": "middle",
                       "body": "middle"
                     },
-                    "elementRef": "F22"
+                    "elementRef": "F22",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-afc95",
-                    "width": 1,
                     "sortable": true,
                     "filterable": true,
                     "preferredSorting": "ASC",
@@ -545,7 +553,8 @@
                       "absolute": false,
                       "preselectionYear": 0
                     },
-                    "elementRef": "field_30c98"
+                    "elementRef": "field_30c98",
+                    "width": 1
                   }
                 ],
                 "groupRef": "G19",
@@ -658,38 +667,38 @@
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-8fb36",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "field_bd968"
+                    "elementRef": "field_bd968",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-db8f8",
-                    "width": 1,
                     "sortable": false,
                     "filterable": true,
                     "preferredSorting": "ASC",
-                    "elementRef": "field_8f469"
+                    "elementRef": "field_8f469",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-c409a",
-                    "width": 1,
                     "sortable": true,
                     "filterable": true,
                     "preferredSorting": "ASC",
-                    "elementRef": "field_83f64"
+                    "elementRef": "field_83f64",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-b2111",
-                    "width": 1,
                     "sortable": true,
                     "filterable": true,
                     "preferredSorting": "ASC",
-                    "elementRef": "field_a5823"
+                    "elementRef": "field_a5823",
+                    "width": 1
                   }
                 ],
                 "groupRef": "group_51be2",
@@ -816,6 +825,9 @@
           "initialValue": "MOBILE",
           "exposition": "COMPACT",
           "elementRef": "F18"
+        },
+        {
+          "elementRef": "field_30c98"
         }
       ]
     },

@@ -52,9 +52,13 @@ import java.util.function.Consumer;
  * Builds the Form Model tree's context menu and carries out its actions: Add (per {@link
  * FormModelNodeTypes#allowedChildTypes}), Delete, Duplicate, Cut/Copy/Paste, Move Up/Down - every mutation
  * going through the shared {@link CommandStack} passed in at construction, so it's undoable via the toolbar's
- * Undo/Redo buttons. Also exposes the underlying list-mutation building blocks ({@link #siblingsOf}, {@link
- * #createAttachCommand}, {@link #createDetachCommand}) to {@link FormModelTreeController} so drag-and-drop
- * builds the exact same kind of commands instead of duplicating the parent-type dispatch.
+ * Undo/Redo buttons. The same actions ({@link #cut}/{@link #copy}/{@link #paste}/{@link #duplicate}/{@link
+ * #move}/{@link #confirmAndDelete}, plus {@link #createAddMenuItems}/{@link #createConvertMenuItems} for the
+ * "Add"/"Convert" menus) are package-visible so {@link FormModelTreeController} can wire the equivalent toolbar
+ * buttons to the exact same code path instead of duplicating it. Also exposes the underlying list-mutation
+ * building blocks ({@link #siblingsOf}, {@link #createAttachCommand}, {@link #createDetachCommand}) to {@link
+ * FormModelTreeController} so drag-and-drop builds the exact same kind of commands instead of duplicating the
+ * parent-type dispatch.
  * <p>
  * Node duplication/paste clones via a JSON round-trip through the app's shared {@link JsonSettings#objectMapper}
  * (the same mapper used to load/save model files), then {@link #regenerateIds} walks the clone so it never
@@ -82,34 +86,21 @@ class FormModelActions {
   ContextMenu createContextMenu(@Nullable FormElementViewModel selected) {
     ContextMenu contextMenu = new ContextMenu();
     if (selected == null) {
-      MenuItem addScreenItem = createMenuItem("_Add Screen", Icons.FORM_SCREEN);
-      addScreenItem.setOnAction(event -> addRootScreen());
-      contextMenu.getItems().add(addScreenItem);
+      contextMenu.getItems().addAll(createAddMenuItems(null));
       return contextMenu;
     }
 
-    List<FormModelNodeTypes.ChildTypeDescriptor> addTypes = FormModelNodeTypes.allowedChildTypes(selected.getNode());
-    if (!addTypes.isEmpty()) {
+    List<MenuItem> addItems = createAddMenuItems(selected);
+    if (!addItems.isEmpty()) {
       Menu addMenu = new Menu("_Add");
-      for (FormModelNodeTypes.ChildTypeDescriptor descriptor : addTypes) {
-        MenuItem item = createMenuItem(descriptor.label(), descriptor.icon());
-        item.setOnAction(event -> addChild(selected, descriptor));
-        addMenu.getItems().add(item);
-      }
+      addMenu.getItems().addAll(addItems);
       contextMenu.getItems().add(addMenu);
       contextMenu.getItems().add(new SeparatorMenuItem());
     }
 
-    if (selected.getNode() instanceof AbstractRepeat repeat) {
-      RepeatConverter.RepeatKind currentKind = RepeatConverter.kindOf(repeat);
-      for (RepeatConverter.RepeatKind targetKind : RepeatConverter.RepeatKind.values()) {
-        if (targetKind == currentKind) {
-          continue;
-        }
-        MenuItem item = createMenuItem(StudioBundle.get(convertLabelKey(targetKind)), convertIcon(targetKind));
-        item.setOnAction(event -> convertRepeat(selected, repeat, targetKind));
-        contextMenu.getItems().add(item);
-      }
+    List<MenuItem> convertItems = createConvertMenuItems(selected);
+    if (!convertItems.isEmpty()) {
+      contextMenu.getItems().addAll(convertItems);
       contextMenu.getItems().add(new SeparatorMenuItem());
     }
 
@@ -155,6 +146,51 @@ class FormModelActions {
     return contextMenu;
   }
 
+  /**
+   * The "Add" items valid for {@code selected} (per {@link FormModelNodeTypes#allowedChildTypes}) - shared by
+   * {@link #createContextMenu}'s "Add" submenu and {@link FormModelTreeController}'s toolbar "Add" {@link
+   * javafx.scene.control.MenuButton}, which is repopulated from this on every selection change since (unlike
+   * {@code DocumentModelActions#createAddMenuItems}) the available types genuinely differ per selected node type.
+   */
+  List<MenuItem> createAddMenuItems(@Nullable FormElementViewModel selected) {
+    List<MenuItem> items = new ArrayList<>();
+    if (selected == null) {
+      MenuItem addScreenItem = createMenuItem("_Add Screen", Icons.FORM_SCREEN);
+      addScreenItem.setOnAction(event -> addRootScreen());
+      items.add(addScreenItem);
+      return items;
+    }
+    for (FormModelNodeTypes.ChildTypeDescriptor descriptor : FormModelNodeTypes.allowedChildTypes(selected.getNode())) {
+      MenuItem item = createMenuItem(descriptor.label(), descriptor.icon());
+      item.setOnAction(event -> addChild(selected, descriptor));
+      items.add(item);
+    }
+    return items;
+  }
+
+  /**
+   * The repeat-conversion items valid for {@code selected} (every {@link RepeatConverter.RepeatKind} other than
+   * its current one), or empty if {@code selected} isn't an {@link AbstractRepeat} - shared by {@link
+   * #createContextMenu} and {@link FormModelTreeController}'s toolbar "Convert" {@link
+   * javafx.scene.control.MenuButton}, same reasoning as {@link #createAddMenuItems}.
+   */
+  List<MenuItem> createConvertMenuItems(@Nullable FormElementViewModel selected) {
+    if (!(selected != null && selected.getNode() instanceof AbstractRepeat repeat)) {
+      return List.of();
+    }
+    List<MenuItem> items = new ArrayList<>();
+    RepeatConverter.RepeatKind currentKind = RepeatConverter.kindOf(repeat);
+    for (RepeatConverter.RepeatKind targetKind : RepeatConverter.RepeatKind.values()) {
+      if (targetKind == currentKind) {
+        continue;
+      }
+      MenuItem item = createMenuItem(StudioBundle.get(convertLabelKey(targetKind)), convertIcon(targetKind));
+      item.setOnAction(event -> convertRepeat(selected, repeat, targetKind));
+      items.add(item);
+    }
+    return items;
+  }
+
   private void addRootScreen() {
     Screen screen = FormModelElementFactory.newScreen();
     List<Object> screens = topLevelSiblings();
@@ -172,7 +208,7 @@ class FormModelActions {
     onModelChanged.accept(newChild);
   }
 
-  private void move(@NonNull FormElementViewModel item, int delta) {
+  void move(@NonNull FormElementViewModel item, int delta) {
     List<Object> siblings = siblingsOf(item);
     if (siblings == null) {
       return;
@@ -186,7 +222,7 @@ class FormModelActions {
     onModelChanged.accept(item.getNode());
   }
 
-  private void duplicate(@NonNull FormElementViewModel item) {
+  void duplicate(@NonNull FormElementViewModel item) {
     List<Object> siblings = siblingsOf(item);
     if (siblings == null) {
       return;
@@ -201,7 +237,7 @@ class FormModelActions {
     onModelChanged.accept(clone);
   }
 
-  private void cut(@NonNull FormElementViewModel item) {
+  void cut(@NonNull FormElementViewModel item) {
     if (!copyToClipboard(item.getNode())) {
       return;
     }
@@ -212,7 +248,7 @@ class FormModelActions {
     onModelChanged.accept(null);
   }
 
-  private void copy(@NonNull FormElementViewModel item) {
+  void copy(@NonNull FormElementViewModel item) {
     copyToClipboard(item.getNode());
   }
 
@@ -228,11 +264,11 @@ class FormModelActions {
     }
   }
 
-  private boolean canPasteInto(@NonNull Object target) {
+  boolean canPasteInto(@NonNull Object target) {
     return clipboardType != null && FormModelNodeTypes.canContain(target, clipboardType);
   }
 
-  private void paste(@NonNull FormElementViewModel target) {
+  void paste(@NonNull FormElementViewModel target) {
     if (!canPasteInto(target.getNode())) {
       return;
     }
@@ -284,7 +320,7 @@ class FormModelActions {
     onModelChanged.accept(converted);
   }
 
-  private void confirmAndDelete(@NonNull FormElementViewModel item) {
+  void confirmAndDelete(@NonNull FormElementViewModel item) {
     boolean hasChildren = !item.getChildren().isEmpty();
     String help = hasChildren ? "Child elements will be deleted as well." : null;
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,

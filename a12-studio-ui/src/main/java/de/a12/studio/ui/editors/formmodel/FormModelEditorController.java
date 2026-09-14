@@ -12,6 +12,10 @@ import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.form.FormConfigEntryCleanup;
+import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormGroupReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormUnusedConfigEntryValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
@@ -20,9 +24,12 @@ import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController;
 import de.a12.studio.ui.events.ModelSaveEvent;
+import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.events.TabSelectionChangedEvent;
 import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -118,8 +125,6 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private FormModelTreeController formModelTreeController;
   @FXML
   private DataConfigurationPanelController dataConfigurationController;
-  @FXML
-  private CleanupPanelController cleanupController;
 
   @FXML
   private SplitPane overviewSplitPane;
@@ -182,7 +187,34 @@ public class FormModelEditorController extends AbstractEditorController implemen
     ElementIndex elementIndex = resolveElementIndex(documentModel);
     dataBindingElementIndex = elementIndex;
     dataConfigurationController.setModel(formModel.getContent(), elementIndex);
-    cleanupController.setModel(formModel, elementIndex == null ? List.of() : List.of(elementIndex));
+    cleanupDanglingAndUnusedConfigEntries(formModel, elementIndex);
+  }
+
+  /**
+   * Auto-removes any dangling ({@link FormFieldReferenceValidator}/{@link FormGroupReferenceValidator}) or
+   * unused ({@link FormUnusedConfigEntryValidator}) field/group configuration entries - replacing the old
+   * manual "Cleanup" tab: those two validators keep flagging the problem on the project tree node the moment it
+   * appears (e.g. right after a Document Model field is deleted elsewhere), but by the time this editor is
+   * opened or its tab is reselected (see {@link #tabSelectionChanged}) there's nothing left for the user to fix
+   * by hand - this just does it and tells them via a one-time notification.
+   */
+  private void cleanupDanglingAndUnusedConfigEntries(@NonNull FormModel formModel, @Nullable ElementIndex elementIndex) {
+    List<ElementIndex> indexes = elementIndex == null ? List.of() : List.of(elementIndex);
+    int removed = FormConfigEntryCleanup.removeDanglingAndUnusedEntries(formModel, indexes);
+    if (removed == 0) {
+      return;
+    }
+    projectItem.save();
+    StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
+    WidgetFactory.showAlert(Studio.stage, StudioBundle.get("form_model_cleanup_notification"));
+  }
+
+  /** Re-runs the cleanup above whenever this editor's tab is (re)selected, not just when it's first opened. */
+  @Override
+  public void tabSelectionChanged(@NonNull TabSelectionChangedEvent event) {
+    if (projectItem != null && projectItem.equals(event.getItem()) && projectItem.getModel() instanceof FormModel formModel) {
+      cleanupDanglingAndUnusedConfigEntries(formModel, dataBindingElementIndex);
+    }
   }
 
   /** Mirrors {@link FormModelTreeController}'s own element index construction. */

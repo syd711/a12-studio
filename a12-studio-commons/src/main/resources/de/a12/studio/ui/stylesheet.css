@@ -107,6 +107,11 @@
     -fx-background-color: #fbfcfd;
 }
 
+.field-editor-scroll,
+.field-editor-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
 .properties-panel-toolbar {
     -fx-background-color: transparent;
     -fx-border-color: transparent;

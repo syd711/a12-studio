@@ -63,6 +63,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -110,6 +111,30 @@ public class FormModelTreeController implements Initializable {
 
   @FXML
   private Button redoButton;
+
+  @FXML
+  private MenuButton addButton;
+
+  @FXML
+  private Button cutButton;
+
+  @FXML
+  private Button copyButton;
+
+  @FXML
+  private Button pasteButton;
+
+  @FXML
+  private Button duplicateButton;
+
+  @FXML
+  private Button moveUpButton;
+
+  @FXML
+  private Button moveDownButton;
+
+  @FXML
+  private Button deleteButton;
 
   @FXML
   private SearchFieldController searchController;
@@ -220,12 +245,14 @@ public class FormModelTreeController implements Initializable {
     });
     tree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
       updateEditorPane(newValue);
+      updateToolbarActionsState();
       if (newValue != null && onNodeSelected != null) {
         onNodeSelected.run();
       }
     });
     updateEditorPane(null);
     updateUndoRedoState();
+    updateToolbarActionsState();
 
     BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
     applyDividerPosition(tableSettings);
@@ -276,6 +303,99 @@ public class FormModelTreeController implements Initializable {
   private void updateUndoRedoState() {
     undoButton.setDisable(!commandStack.canUndo());
     redoButton.setDisable(!commandStack.canRedo());
+  }
+
+  @FXML
+  private void onCut() {
+    FormElementViewModel selected = selectedViewModel();
+    if (selected != null) {
+      actions.cut(selected);
+    }
+  }
+
+  @FXML
+  private void onCopy() {
+    FormElementViewModel selected = selectedViewModel();
+    if (selected != null) {
+      actions.copy(selected);
+      updateToolbarActionsState();
+    }
+  }
+
+  @FXML
+  private void onPaste() {
+    FormElementViewModel selected = selectedViewModel();
+    if (selected != null) {
+      actions.paste(selected);
+    }
+  }
+
+  @FXML
+  private void onDuplicate() {
+    FormElementViewModel selected = selectedViewModel();
+    if (selected != null) {
+      actions.duplicate(selected);
+    }
+  }
+
+  @FXML
+  private void onMoveUp() {
+    FormElementViewModel selected = selectedViewModel();
+    if (selected != null) {
+      actions.move(selected, -1);
+    }
+  }
+
+  @FXML
+  private void onMoveDown() {
+    FormElementViewModel selected = selectedViewModel();
+    if (selected != null) {
+      actions.move(selected, 1);
+    }
+  }
+
+  @FXML
+  private void onDeleteButton() {
+    FormElementViewModel selected = selectedViewModel();
+    if (selected != null) {
+      actions.confirmAndDelete(selected);
+    }
+  }
+
+  private @Nullable FormElementViewModel selectedViewModel() {
+    TreeItem<FormElementViewModel> selected = tree.getSelectionModel().getSelectedItem();
+    return selected == null ? null : selected.getValue();
+  }
+
+  /**
+   * Refreshes the toolbar's Add/Cut/Copy/Paste/Duplicate/Move Up/Move Down/Delete buttons from the
+   * current tree selection - the toolbar equivalent of {@link #createContextMenu}, rebuilt from the same
+   * {@link FormModelActions#createAddMenuItems} and enabled
+   * per the same {@link FormModelActions#siblingsOf}/{@link FormModelActions#canPasteInto} checks the context
+   * menu uses, so both stay in lockstep with what's actually possible on the current selection. Called on every
+   * selection change and after every model mutation (see {@link #onModelChanged}), and once from {@link
+   * #initialize}/{@link #setModel} to seed the initial (no-selection) state.
+   */
+  private void updateToolbarActionsState() {
+    if (actions == null) {
+      return;
+    }
+    FormElementViewModel selected = selectedViewModel();
+
+    addButton.getItems().setAll(actions.createAddMenuItems(selected));
+    addButton.setDisable(addButton.getItems().isEmpty());
+
+    boolean hasSelection = selected != null;
+    boolean reorderable = hasSelection && actions.siblingsOf(selected) != null;
+    boolean canPaste = hasSelection && actions.canPasteInto(selected.getNode());
+
+    cutButton.setDisable(!hasSelection);
+    copyButton.setDisable(!hasSelection);
+    pasteButton.setDisable(!canPaste);
+    duplicateButton.setDisable(!reorderable);
+    moveUpButton.setDisable(!reorderable);
+    moveDownButton.setDisable(!reorderable);
+    deleteButton.setDisable(!hasSelection);
   }
 
   /**
@@ -427,6 +547,7 @@ public class FormModelTreeController implements Initializable {
     this.actions = new FormModelActions(content, commandStack, this::onModelChanged);
     tree.setContextMenu(createContextMenu(null));
     applyFilter(searchController.getText());
+    updateToolbarActionsState();
   }
 
   private static boolean hasModelRoot(@Nullable DocumentModel documentModel) {
@@ -500,6 +621,7 @@ public class FormModelTreeController implements Initializable {
     if (nodeToSelect != null) {
       selectNode(nodeToSelect);
     }
+    updateToolbarActionsState();
     projectItem.save();
     StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
   }

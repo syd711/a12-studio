@@ -1,8 +1,11 @@
 package de.a12.studio.ui.editors.formmodel;
 
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.EnumerationFieldType;
 import de.a12.studio.models.documentmodel.FieldElement;
+import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.formmodel.FieldConfigEntry;
 import de.a12.studio.models.formmodel.FieldConfiguration;
 import de.a12.studio.models.formmodel.FormModelContent;
@@ -10,6 +13,7 @@ import de.a12.studio.models.formmodel.GroupConfigEntry;
 import de.a12.studio.models.formmodel.GroupConfiguration;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentEnumerationPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentFieldPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentGroupPanelController;
@@ -28,12 +32,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -61,6 +68,8 @@ public class DataConfigurationPanelController implements Initializable {
   @FXML
   private TableColumn<Row, String> typeColumn;
   @FXML
+  private TableColumn<Row, String> dataTypeColumn;
+  @FXML
   private ComboBox<String> addFieldCombo;
   @FXML
   private Button addFieldButton;
@@ -75,6 +84,11 @@ public class DataConfigurationPanelController implements Initializable {
   private Node fieldDetailPane;
   @FXML
   private Node groupDetailPane;
+
+  @FXML
+  private Node externalEnumeration;
+  @FXML
+  private Node dependentEnumeration;
 
   @FXML
   private ExternalEnumerationPanelController externalEnumerationController;
@@ -95,6 +109,8 @@ public class DataConfigurationPanelController implements Initializable {
     elementColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().reference()));
     typeColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(
         data.getValue().isField() ? StudioBundle.get("data_configuration_field_type") : StudioBundle.get("data_configuration_group_type")));
+    dataTypeColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(
+        Objects.requireNonNullElse(typeLabel(rawReference(data.getValue())), "")));
 
     table.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> showDetail(newVal));
 
@@ -112,6 +128,12 @@ public class DataConfigurationPanelController implements Initializable {
         // Leave the stored value unchanged until the user types a valid integer.
       }
     });
+
+    addFieldCombo.setConverter(elementRefConverter());
+    addGroupCombo.setConverter(elementRefConverter());
+
+    addFieldButton.disableProperty().bind(addFieldCombo.valueProperty().isNull());
+    addGroupButton.disableProperty().bind(addGroupCombo.valueProperty().isNull());
 
     addFieldButton.setOnAction(e -> onAddField());
     addGroupButton.setOnAction(e -> onAddGroup());
@@ -179,10 +201,48 @@ public class DataConfigurationPanelController implements Initializable {
         }
       }
     }
+    fieldIds.sort(Comparator.comparing(this::displayName));
+    groupIds.sort(Comparator.comparing(this::displayName));
     addFieldCombo.getItems().setAll(fieldIds);
     addFieldCombo.setValue(null);
     addGroupCombo.getItems().setAll(groupIds);
     addGroupCombo.setValue(null);
+  }
+
+  /** Renders a combo box's underlying element id (e.g. {@link #addFieldCombo}/{@link #addGroupCombo}'s items)
+   * as its resolved display path, matching how existing entries are shown in {@link #table} via {@link
+   * #displayName}, plus the element's type in brackets (e.g. "String", "Enumeration", "Group"). */
+  private StringConverter<String> elementRefConverter() {
+    return new StringConverter<>() {
+      @Override
+      public String toString(String elementRef) {
+        if (elementRef == null) {
+          return "";
+        }
+        String name = displayName(elementRef);
+        String type = typeLabel(elementRef);
+        return type == null || type.isBlank() ? name : name + " [" + type + "]";
+      }
+
+      @Override
+      public String fromString(String string) {
+        return string;
+      }
+    };
+  }
+
+  /** The element's type, formatted the same way as {@code DocumentModelElementsTreeController}'s Type column
+   * (e.g. {@code StringType} -> {@code String}). */
+  private @Nullable String typeLabel(@Nullable String elementRef) {
+    if (elementIndex == null) {
+      return null;
+    }
+    String type = elementIndex.resolveElement(elementRef).map(el -> new ElementViewModel(el).getType()).orElse(null);
+    return type == null ? null : type.replaceAll("Type", "");
+  }
+
+  private String rawReference(Row row) {
+    return row.isField() ? ((FieldConfigEntry) row.entry()).getElementRef() : ((GroupConfigEntry) row.entry()).getGroupRef();
   }
 
   private void refreshTable() {
@@ -203,6 +263,20 @@ public class DataConfigurationPanelController implements Initializable {
       rows.stream().filter(r -> r.entry() == previouslySelected.entry()).findFirst()
           .ifPresent(r -> table.getSelectionModel().select(r));
     }
+  }
+
+  /** Resolves the effective (type-definition-aware) {@link FieldType} of a field element reference, or
+   * {@code null} if it doesn't resolve to a {@link FieldElement}. */
+  private @Nullable FieldType resolveFieldType(@Nullable String elementRef) {
+    if (elementIndex == null) {
+      return null;
+    }
+    return elementIndex.resolveElement(elementRef)
+        .filter(FieldElement.class::isInstance)
+        .map(el -> ((FieldElement) el).getField())
+        .filter(Objects::nonNull)
+        .map(field -> elementIndex.effectiveFieldType(field.getFieldType()))
+        .orElse(null);
   }
 
   private String displayName(@Nullable String reference) {
@@ -229,6 +303,18 @@ public class DataConfigurationPanelController implements Initializable {
 
     if (isField) {
       FieldConfigEntry entry = (FieldConfigEntry) row.entry();
+      FieldType fieldType = resolveFieldType(entry.getElementRef());
+      boolean isStringField = fieldType instanceof StringFieldType;
+      boolean isEnumerationField = fieldType instanceof EnumerationFieldType;
+
+      // externalEnumeration only applies to string-typed fields (its values replace what would otherwise be
+      // free text), dependentEnumeration only to enumeration-like fields (it filters that field's own enum
+      // values) - see SME's "External Enumeration"/"Dependent Enumeration" docs.
+      externalEnumeration.setVisible(isStringField);
+      externalEnumeration.setManaged(isStringField);
+      dependentEnumeration.setVisible(isEnumerationField);
+      dependentEnumeration.setManaged(isEnumerationField);
+
       externalEnumerationController.setEntry(entry);
       dependentEnumerationController.setEntry(entry, elementIndex, MasterFieldScope.root());
       dependentFieldController.setEntry(entry, elementIndex);

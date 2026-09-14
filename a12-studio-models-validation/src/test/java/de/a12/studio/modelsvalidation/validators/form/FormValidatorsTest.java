@@ -74,6 +74,27 @@ class FormValidatorsTest {
   }
 
   @Test
+  void groupReferenceValidatorReportsUnknownGroup() {
+    FormModel model = load("FormGroupReferenceValidator_invalid");
+    List<ModelValidationError> errors = new FormGroupReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm()));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("group_missing"));
+  }
+
+  @Test
+  void unusedConfigEntryValidatorReportsResolvableButUnreferencedFieldAndGroup() {
+    FormModel model = load("FormUnusedConfigEntryValidator_invalid");
+    List<ModelValidationError> errors = new FormUnusedConfigEntryValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm()));
+
+    assertEquals(2, errors.size());
+    assertTrue(errors.stream().anyMatch(e -> e.message().contains("field_1")));
+    assertTrue(errors.stream().anyMatch(e -> e.message().contains("group_root")));
+  }
+
+  @Test
   void layoutColumnSumValidatorReportsSumAbove12AndColumnCountMismatch() {
     FormModel model = load("FormLayoutColumnSumValidator_invalid");
     List<ModelValidationError> errors = new FormLayoutColumnSumValidator().validate(model, TestModels.context(model));

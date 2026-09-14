@@ -19,8 +19,10 @@ import de.a12.studio.modelsvalidation.validators.form.ExternalEnumerationSourceR
 import de.a12.studio.modelsvalidation.validators.form.FormButtonScreenReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormGroupReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormSiblingNameUniquenessValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormUnusedConfigEntryValidator;
 import de.a12.studio.modelsvalidation.validators.form.HideConditionAtLeastOneCaseValidator;
 import de.a12.studio.modelsvalidation.validators.form.HideConditionSupportedValuesValidator;
 
@@ -39,6 +41,8 @@ public final class FormModelValidationService {
       new NameConventionValidator(),
       new FormDocumentModelReferenceValidator(),
       new FormFieldReferenceValidator(),
+      new FormGroupReferenceValidator(),
+      new FormUnusedConfigEntryValidator(),
       new FormButtonScreenReferenceValidator(),
       new FormLayoutColumnSumValidator(),
       new FormSiblingNameUniquenessValidator(),
