@@ -10,7 +10,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.BracketedPathSuggestionProvider;
-import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -22,10 +22,10 @@ import java.util.Optional;
 
 /**
  * Single-field dialog editing a {@link QueryModelContent#getFilterDefinition()} via the shared {@link
- * RichtextEditorController} expression editor, mirroring {@code OverviewColumnDialogController}'s use of the
+ * RuleEditorController} expression editor, mirroring {@code OverviewColumnDialogController}'s use of the
  * same panel: a {@link PropertyEditorSaveMode.Deferred} save mode defers persisting to OK, and {@link
  * #originalValue} restores the in-memory value on Cancel (the panel's writer still mutates {@code content}
- * live as the user types, deferred save mode only skips the file write - see {@link RichtextEditorController
+ * live as the user types, deferred save mode only skips the file write - see {@link RuleEditorController
  * #setCustom}). The text is validated against {@link QueryLanguageEmitter} (see
  * docs/sme-reference-comparison.md "Query Model" section) so a typo shows a real parse error instead of being
  * silently accepted as opaque free text.
@@ -35,7 +35,7 @@ public class QueryFilterDefinitionDialogController implements DialogController {
   private static final QueryLanguageEmitter EMITTER = new QueryLanguageEmitter();
 
   @FXML
-  private RichtextEditorController expressionPanelController;
+  private RuleEditorController expressionPanelController;
 
   @FXML
   private Button okButton;

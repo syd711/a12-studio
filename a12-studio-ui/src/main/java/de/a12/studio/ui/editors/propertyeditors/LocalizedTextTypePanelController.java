@@ -111,7 +111,7 @@ public class LocalizedTextTypePanelController extends AbstractPropertyEditor imp
 
   /**
    * No-op: the Expression case is a plain {@link TextArea} with no field/group-name autocomplete, unlike
-   * {@link RichtextEditorController}. Kept (rather than removed) so the many callers that resolve a
+   * {@link RuleEditorController}. Kept (rather than removed) so the many callers that resolve a
    * {@code documentModel} field index and pass it here unconditionally (e.g. {@link
    * de.a12.studio.ui.editors.formmodel.FormModelEditorController#resolveDataBindingDocumentModel}'s result at
    * this panel's call sites) don't need special-casing.

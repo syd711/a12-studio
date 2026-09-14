@@ -16,7 +16,7 @@ import de.a12.studio.ui.editors.overviewmodel.StylesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.ExpressionScopeSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
-import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -100,7 +100,7 @@ public class OverviewColumnDialogController implements DialogController {
   @FXML
   private TextField nameField;
   @FXML
-  private RichtextEditorController expressionPanelController;
+  private RuleEditorController expressionPanelController;
 
   @FXML
   private TextField idField;

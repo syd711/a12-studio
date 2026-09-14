@@ -13,7 +13,7 @@ import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
 import de.a12.studio.ui.editors.propertyeditors.BracketedPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
-import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -75,7 +75,7 @@ public class FilterItemDialogController implements DialogController {
   @FXML
   private CheckBox filterDefinitionEnabledUserAccessField;
   @FXML
-  private RichtextEditorController filterDefinitionController;
+  private RuleEditorController filterDefinitionController;
   @FXML
   private VBox matchingOptionsBox;
   @FXML

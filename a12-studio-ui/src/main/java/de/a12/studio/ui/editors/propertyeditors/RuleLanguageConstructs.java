@@ -118,7 +118,7 @@ public final class RuleLanguageConstructs {
       new LanguageConstruct("YearFromDate", "YearFromDate(X)", "Returns the year of X (a Date or DateTime) as a number.")
   );
 
-  /** Bare names only, for {@link RichtextEditorController#setHighlightedFunctionNames}. */
+  /** Bare names only, for {@link RuleEditorController#setHighlightedFunctionNames}. */
   public static final Set<String> NAMES = ALL.stream()
       .map(LanguageConstruct::name)
       .collect(Collectors.toUnmodifiableSet());

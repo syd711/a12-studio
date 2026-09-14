@@ -6,6 +6,7 @@ import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
@@ -22,7 +23,7 @@ import java.util.ResourceBundle;
  * RuleConfig#getSeverity()}. The rest of {@link RuleConfig} ({@code errorEntityRelPath}, {@code errorCondition},
  * {@code errorMessage}) is edited by sibling panels included alongside this one (see
  * {@code document-model-validation-rule-editor.fxml}): {@link TargetFieldPanelController#configureRuleErrorEntity()},
- * a plain {@link de.a12.studio.ui.editors.propertyeditors.RichtextEditorController}, and {@link
+ * a plain {@link RuleEditorController}, and {@link
  * de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController#configureRuleErrorMessage()}.
  */
 public class RulePropertiesPanelController extends AbstractPropertyEditor implements Initializable {

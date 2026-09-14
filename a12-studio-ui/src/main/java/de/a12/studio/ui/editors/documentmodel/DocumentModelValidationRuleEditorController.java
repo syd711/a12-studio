@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.documentmodel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.RuleElement;
+import de.a12.studio.models.documentmodel.rulelang.RuleLanguageSyntaxChecker;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
@@ -11,7 +12,7 @@ import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.GeneralInformationPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.PlainPathSuggestionProvider;
-import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.editors.propertyeditors.RuleLanguageConstructs;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
@@ -34,7 +35,7 @@ public class DocumentModelValidationRuleEditorController implements ElementEdito
   private TargetFieldPanelController errorEntityController;
 
   @FXML
-  private RichtextEditorController errorConditionController;
+  private RuleEditorController errorConditionController;
 
   @FXML
   private LocalizedTextPanelController errorMessageController;
@@ -54,6 +55,7 @@ public class DocumentModelValidationRuleEditorController implements ElementEdito
   public void initialize(URL location, ResourceBundle resources) {
     errorEntityController.configureRuleErrorEntity();
     errorConditionController.configureCustom("errorCondition", StudioBundle.get("error_condition"));
+    errorConditionController.setValidator(RuleLanguageSyntaxChecker::validate);
     errorMessageController.configureRuleErrorMessage();
     descriptionInternalController.configureInternal();
     descriptionExternalController.configureExternal();

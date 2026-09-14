@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * de.a12.studio.models.formmodel.ExpressionText#getExpressionText()} (used by {@link
  * de.a12.studio.ui.editors.formmodel.dialogs.FormButtonDialogController} for a button's expression-typed label).
  */
-public class RichtextEditorController extends AbstractPropertyEditor implements Initializable {
+public class RuleEditorController extends AbstractPropertyEditor implements Initializable {
 
   // Quoted string literals in the a12 expression language, e.g. "* * *" in Invoice_OM.json's ExpressionColumn.
   private static final Pattern STRING_PATTERN = Pattern.compile("\"([^\"\\\\]|\\\\.)*\"");

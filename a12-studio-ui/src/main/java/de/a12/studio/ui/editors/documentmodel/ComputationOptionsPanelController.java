@@ -4,12 +4,13 @@ import de.a12.studio.models.documentmodel.ComputationConfig;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.rulelang.RuleLanguageSyntaxChecker;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.PlainPathSuggestionProvider;
-import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.editors.propertyeditors.RuleLanguageConstructs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -27,7 +28,7 @@ import java.util.ResourceBundle;
  * in {@link ComputationConfig#getErrorCodesToSuppress()}; "Common Precondition" is a plain UI toggle for
  * whether {@link ComputationConfig#getCommonPrecondition()} is set at all - checking it creates an (initially
  * empty) common precondition and reveals a nested {@link
- * de.a12.studio.ui.editors.propertyeditors.RichtextEditorController} to edit it, unchecking it clears the
+ * RuleEditorController} to edit it, unchecking it clears the
  * field again.
  */
 public class ComputationOptionsPanelController extends AbstractPropertyEditor implements Initializable {
@@ -41,13 +42,14 @@ public class ComputationOptionsPanelController extends AbstractPropertyEditor im
   private CheckBox commonPreconditionCheckBox;
 
   @FXML
-  private RichtextEditorController commonPreconditionController;
+  private RuleEditorController commonPreconditionController;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
 
     commonPreconditionController.configureCustom("commonPrecondition", "");
+    commonPreconditionController.setValidator(RuleLanguageSyntaxChecker::validate);
 
     bindCheckBox(allowDifferingDecimalPlacesCheckBox, (element, value) -> {
       List<String> errorCodesToSuppress = getComputation(element).getErrorCodesToSuppress();

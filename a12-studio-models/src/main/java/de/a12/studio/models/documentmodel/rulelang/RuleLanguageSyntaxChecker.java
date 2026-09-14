@@ -64,7 +64,7 @@ public final class RuleLanguageSyntaxChecker {
     });
 
     // Throws (via the listeners above, on the first problem found) rather than collecting every error like
-    // QueryLanguageEmitter does - this check only ever needs to show one message at a time (RichtextEditorController's
+    // QueryLanguageEmitter does - this check only ever needs to show one message at a time (RuleEditorController's
     // error container), and stopping at the first error also avoids cascading nonsense from ANTLR's own
     // error-recovery continuing to parse after a syntax error.
     parser.program();

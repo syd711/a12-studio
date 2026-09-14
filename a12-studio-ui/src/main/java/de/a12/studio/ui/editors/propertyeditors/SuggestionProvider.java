@@ -3,7 +3,7 @@ package de.a12.studio.ui.editors.propertyeditors;
 import java.util.Optional;
 
 /**
- * Supplies {@link RichtextEditorController}'s completion popup with proposals for the current editor state.
+ * Supplies {@link RuleEditorController}'s completion popup with proposals for the current editor state.
  * Implementations own both halves of "when to trigger" (RichTextFX itself has no completion API - see {@code
  * RICHTEXT.md} §3 - so each expression language decides its own trigger character/prefix) and "what a commit
  * replaces": a plain condition/computation field triggers on a trailing identifier and replaces just that

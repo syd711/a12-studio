@@ -3,16 +3,18 @@ package de.a12.studio.ui.editors.documentmodel.dialogs;
 import de.a12.studio.models.documentmodel.ComputationAlternative;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.rulelang.RuleLanguageSyntaxChecker;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.PlainPathSuggestionProvider;
-import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.editors.propertyeditors.RuleLanguageConstructs;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
@@ -23,7 +25,7 @@ import java.util.Optional;
  * Modal Add/Edit dialog for a single {@link ComputationAlternative} (precondition/operation pair), opened from
  * {@link de.a12.studio.ui.editors.documentmodel.ComputationAlternativesPanelController} (via {@link Dialogs}) by
  * clicking a row or its Edit/Add button. Edits the real {@link ComputationAlternative} live via the embedded
- * {@link RichtextEditorController}s, so - unlike the class's previous "mutate only in onDialogSubmit" shape - a
+ * {@link RuleEditorController}s, so - unlike the class's previous "mutate only in onDialogSubmit" shape - a
  * snapshot of both fields is taken up front and restored on Cancel, mirroring {@link
  * de.a12.studio.ui.editors.overviewmodel.dialogs.OverviewColumnDialogController}. Both panels share a {@link
  * PropertyEditorSaveMode.Deferred} so their edits aren't persisted to disk until this dialog's own commit
@@ -33,10 +35,13 @@ import java.util.Optional;
 public class ComputationAlternativeDialogController implements DialogController {
 
   @FXML
-  private RichtextEditorController preconditionController;
+  private RuleEditorController preconditionController;
 
   @FXML
-  private RichtextEditorController operationController;
+  private RuleEditorController operationController;
+
+  @FXML
+  private Button okButton;
 
   private final PropertyEditorSaveMode.Deferred saveMode = new PropertyEditorSaveMode.Deferred();
 
@@ -54,8 +59,12 @@ public class ComputationAlternativeDialogController implements DialogController 
   private void initialize() {
     preconditionController.configureCustom("precondition", StudioBundle.get("precondition"));
     preconditionController.setSaveMode(saveMode);
+    preconditionController.setValidator(RuleLanguageSyntaxChecker::validate);
+    preconditionController.errorProperty().addListener((observable, oldValue, newValue) -> updateOkButton());
     operationController.configureCustom("operation", StudioBundle.get("operation"));
     operationController.setSaveMode(saveMode);
+    operationController.setValidator(RuleLanguageSyntaxChecker::validate);
+    operationController.errorProperty().addListener((observable, oldValue, newValue) -> updateOkButton());
   }
 
   void init(@NonNull Stage stage, @NonNull ComputationElement computation, @NonNull ComputationAlternative alternative) {
@@ -75,6 +84,11 @@ public class ComputationAlternativeDialogController implements DialogController 
       preconditionController.setHighlightedFunctionNames(RuleLanguageConstructs.NAMES);
       operationController.setHighlightedFunctionNames(RuleLanguageConstructs.NAMES);
     }
+    updateOkButton();
+  }
+
+  private void updateOkButton() {
+    okButton.setDisable(preconditionController.errorProperty().get() || operationController.errorProperty().get());
   }
 
   /** Unregisters the embedded panels once this dialog is closed - see {@link Dialogs}. */

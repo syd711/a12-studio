@@ -7,6 +7,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -30,11 +31,10 @@ import java.util.Optional;
 /**
  * Edits a {@link ComputationElement}'s {@code Computation.computationAlternatives} - each row a {@link
  * ComputationAlternative} (precondition/operation pair), evaluated in order. {@code precondition}/{@code
- * operation} are plain multi-line text (no semantic condition-language validation - see the "Backend / kernel
- * capability map" correction in {@code docs/sme-reference-comparison.md}: a12-studio has no kernel dependency to
- * validate this expression text against), matching how {@link
- * de.a12.studio.ui.editors.propertyeditors.RichtextEditorController}-based expression fields elsewhere in this
- * codebase (e.g. {@code overviewmodel.Column.expression}) are edited today. Each row is a read-only,
+ * operation} are Rule/Computation condition language text, syntax-checked (not resolved against a real
+ * Document Model) by {@link de.a12.studio.models.documentmodel.rulelang.RuleLanguageSyntaxChecker} - see {@link
+ * de.a12.studio.ui.editors.documentmodel.dialogs.ComputationAlternativeDialogController} where the actual {@link
+ * RuleEditorController}s live. Each row is a read-only,
  * draggable/reorderable summary (matching {@link
  * de.a12.studio.ui.editors.combineddocumentmodel.CombinationStepsPanelController}'s module-row pattern); the
  * actual fields are edited in {@link Dialogs#showComputationAlternativeForAdd}/{@link
