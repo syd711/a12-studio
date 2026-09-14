@@ -22,6 +22,7 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -88,6 +89,18 @@ public class HideConditionPanelController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     valueList.setCellFactory(CheckBoxListCell.forListView(this::checkedPropertyFor));
+
+    fieldCombo.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(String elementId) {
+        return elementId == null ? "" : (elementIndex != null ? elementIndex.resolveDisplayPath(elementId) : elementId);
+      }
+
+      @Override
+      public String fromString(String string) {
+        return string;
+      }
+    });
 
     fieldCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
       if (updatingFromModel || setter == null) {

@@ -20,7 +20,7 @@
                 <children>
                     <VBox>
                         <children>
-                            <Label styleClass="field-label" text="%dependent_enumeration_master_field" />
+                            <Label styleClass="field-label" text="%dependent_enumeration_trigger_element" />
                             <ComboBox fx:id="masterFieldCombo" maxWidth="Infinity" />
                         </children>
                     </VBox>

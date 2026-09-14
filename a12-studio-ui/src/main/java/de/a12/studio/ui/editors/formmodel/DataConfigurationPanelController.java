@@ -319,7 +319,8 @@ public class DataConfigurationPanelController implements Initializable {
       dependentEnumeration.setManaged(isEnumerationField);
 
       externalEnumerationController.setEntry(entry);
-      dependentEnumerationController.setEntry(entry, elementIndex, MasterFieldScope.root());
+      dependentEnumerationController.setEntry(entry, elementIndex,
+          MasterFieldScope.anchoredOrUnbound(entry.getElementRef(), elementIndex));
       dependentFieldController.setEntry(entry, elementIndex);
       annotationsController.setCustom(entry::getAnnotations);
     }

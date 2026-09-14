@@ -26,10 +26,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -67,10 +69,23 @@ public class DependentFieldPanelController implements Initializable {
 
   private boolean updatingFromModel;
   private FieldConfigEntry entry;
+  private @Nullable ElementIndex elementIndex;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     AbstractPropertyEditor.persistExpandedState(root, getClass());
+
+    masterFieldCombo.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(String elementId) {
+        return elementId == null ? "" : (elementIndex != null ? elementIndex.resolveDisplayPath(elementId) : elementId);
+      }
+
+      @Override
+      public String fromString(String string) {
+        return string;
+      }
+    });
 
     casesTable.setEditable(true);
     casesTable.setItems(FXCollections.observableArrayList());
@@ -151,16 +166,24 @@ public class DependentFieldPanelController implements Initializable {
     });
   }
 
-  /** Master field candidates are collected with root scope: a field config entry isn't anchored to one tree position. */
+  /** Master field candidates are anchored to this entry's own field, mirroring SME's {@code getMasterField}
+   * (called with the field configuration entry's {@code elementRef}) - so sibling fields reachable through the
+   * same repeat context as the field being configured (e.g. another field in the same repeatable group) are
+   * offered, not just fields reachable from the document model root. */
   public void setEntry(@NonNull FieldConfigEntry entry, @Nullable ElementIndex elementIndex) {
     this.entry = entry;
+    this.elementIndex = elementIndex;
 
-    List<String> masterFieldIds = HideConditionPanelController.collectMasterFieldIds(elementIndex, MasterFieldScope.root(),
+    MasterFieldScope scope = MasterFieldScope.anchoredOrUnbound(entry.getElementRef(), elementIndex);
+    List<String> masterFieldIds = HideConditionPanelController.collectMasterFieldIds(elementIndex, scope,
         (index, field) -> field.getField() != null && isCompatibleMasterType(index.effectiveFieldType(field.getField().getFieldType())));
 
     updatingFromModel = true;
     try {
-      masterFieldCombo.getItems().setAll(masterFieldIds);
+      List<String> comboItems = new ArrayList<>();
+      comboItems.add(null);
+      comboItems.addAll(masterFieldIds);
+      masterFieldCombo.getItems().setAll(comboItems);
       DependentConfig config = entry.getDependentField();
       masterFieldCombo.setValue(config == null ? null : config.getMasterField());
       ObservableList<DependentCase> items = FXCollections.observableArrayList();

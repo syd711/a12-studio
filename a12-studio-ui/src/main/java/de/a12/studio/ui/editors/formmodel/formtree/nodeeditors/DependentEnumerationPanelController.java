@@ -21,6 +21,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -66,10 +67,23 @@ public class DependentEnumerationPanelController implements Initializable {
   private boolean updatingFromModel;
 
   private FieldConfigEntry entry;
+  private @Nullable ElementIndex elementIndex;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     AbstractPropertyEditor.persistExpandedState(root, getClass());
+
+    masterFieldCombo.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(String elementId) {
+        return elementId == null ? "" : (elementIndex != null ? elementIndex.resolveDisplayPath(elementId) : elementId);
+      }
+
+      @Override
+      public String fromString(String string) {
+        return string;
+      }
+    });
 
     constraintsTable.setEditable(true);
     constraintsTable.setItems(FXCollections.observableArrayList());
@@ -140,13 +154,17 @@ public class DependentEnumerationPanelController implements Initializable {
 
   public void setEntry(@NonNull FieldConfigEntry entry, @Nullable ElementIndex elementIndex, @NonNull MasterFieldScope scope) {
     this.entry = entry;
+    this.elementIndex = elementIndex;
 
     List<String> masterFieldIds = HideConditionPanelController.collectMasterFieldIds(elementIndex, scope,
         (index, field) -> field.getField() != null && index.effectiveFieldType(field.getField().getFieldType()) instanceof EnumerationFieldType);
 
     updatingFromModel = true;
     try {
-      masterFieldCombo.getItems().setAll(masterFieldIds);
+      List<String> comboItems = new ArrayList<>();
+      comboItems.add(null);
+      comboItems.addAll(masterFieldIds);
+      masterFieldCombo.getItems().setAll(comboItems);
       DependentEnumeration dependentEnumeration = entry.getDependentEnumeration();
       masterFieldCombo.setValue(dependentEnumeration == null ? null : dependentEnumeration.getMasterField());
       ObservableList<DependentEnumerationConstraint> items = FXCollections.observableArrayList();

@@ -131,11 +131,14 @@ public class DependentGroupPanelController implements Initializable {
     });
   }
 
-  /** Master field candidates are collected with root scope: a group config entry isn't anchored to one tree position. */
+  /** Master field candidates are anchored to this entry's own group, mirroring SME's {@code getMasterField}
+   * (called with the group configuration entry's {@code groupRef}) - so fields reachable through the same repeat
+   * context as the group being configured are offered, not just fields reachable from the document model root. */
   public void setEntry(@NonNull GroupConfigEntry entry, @Nullable ElementIndex elementIndex) {
     this.entry = entry;
 
-    List<String> masterFieldIds = HideConditionPanelController.collectMasterFieldIds(elementIndex, MasterFieldScope.root(),
+    MasterFieldScope scope = MasterFieldScope.anchoredOrUnbound(entry.getGroupRef(), elementIndex);
+    List<String> masterFieldIds = HideConditionPanelController.collectMasterFieldIds(elementIndex, scope,
         (index, field) -> field.getField() != null && isCompatibleMasterType(index.effectiveFieldType(field.getField().getFieldType())));
 
     updatingFromModel = true;

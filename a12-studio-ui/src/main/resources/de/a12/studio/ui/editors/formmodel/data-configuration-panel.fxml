@@ -51,8 +51,8 @@
                         <VBox spacing="12.0" styleClass="field-editor">
                             <children>
                                 <fx:include fx:id="externalEnumeration" source="formtree/nodeeditors/external-enumeration-panel.fxml" />
-                                <fx:include fx:id="dependentEnumeration" source="formtree/nodeeditors/dependent-enumeration-panel.fxml" />
                                 <fx:include fx:id="dependentField" source="formtree/nodeeditors/dependent-field-panel.fxml" />
+                                <fx:include fx:id="dependentEnumeration" source="formtree/nodeeditors/dependent-enumeration-panel.fxml" />
                                 <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
                             </children>
                             <padding>
