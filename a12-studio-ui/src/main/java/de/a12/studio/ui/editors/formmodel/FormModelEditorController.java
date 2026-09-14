@@ -515,16 +515,18 @@ public class FormModelEditorController extends AbstractEditorController implemen
   }
 
   /**
-   * Refreshes the Form Model tree's cell labels whenever anything belonging to this model is saved, so a
-   * Name/Label edit made in the tree's own right-hand editor pane ({@link FormModelTreeController}) - which
-   * commits directly rather than going through {@code formtree.FormModelActions}' tree-rebuilding {@code
-   * onModelChanged} - is still reflected in the tree immediately. Delegates every other save (in particular
-   * a Document Model save elsewhere - see {@link #onDocumentModelChangedElsewhere}) to the base class.
+   * Refreshes the Form Model tree's cell labels, and the Data Configuration tab's tree's bold-when-configured
+   * cell styling, whenever anything belonging to this model is saved - both editors commit directly from their
+   * own sub-panels rather than through a shared tree-rebuilding path, so neither would otherwise reflect the
+   * other's (or their own right-hand editor pane's) edits immediately. Delegates every other save (in
+   * particular a Document Model save elsewhere - see {@link #onDocumentModelChangedElsewhere}) to the base
+   * class.
    */
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
     if (event.getItem().equals(projectItem)) {
       formModelTreeController.refreshTreeLabels();
+      dataConfigurationController.refreshTreeAppearance();
       return;
     }
     super.modelSaved(event);

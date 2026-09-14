@@ -7,9 +7,11 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css"
             text="%dependent_enumeration" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -21,23 +23,26 @@
                     <VBox>
                         <children>
                             <Label styleClass="field-label" text="%dependent_enumeration_trigger_element" />
-                            <ComboBox fx:id="masterFieldCombo" maxWidth="Infinity" />
+                            <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                <children>
+                                    <ComboBox fx:id="masterFieldCombo" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="copyMasterFieldButton" mnemonicParsing="false" styleClass="default-button">
+                                        <graphic>
+                                            <FontIcon iconLiteral="mdi2c-content-copy" iconSize="16" />
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="%copy_master_field_value" />
+                                        </tooltip>
+                                    </Button>
+                                </children>
+                            </HBox>
                         </children>
                     </VBox>
-                    <Label styleClass="field-label" text="%dependent_enumeration_constraints" />
-                    <TableView fx:id="constraintsTable" prefHeight="150.0">
+                    <TableView fx:id="constraintsTable" prefHeight="420.0">
                         <columns>
-                            <TableColumn fx:id="masterValueColumn" text="%dependent_enumeration_master_value_column" prefWidth="100.0" />
-                            <TableColumn fx:id="constraintValuesColumn" text="%dependent_enumeration_constraint_values_column" prefWidth="220.0" />
-                            <TableColumn fx:id="valueForMasterChangeColumn" text="%dependent_enumeration_value_for_master_change_column" prefWidth="140.0" />
+                            <TableColumn fx:id="masterValueColumn" text="%dependent_enumeration_master_value_column" prefWidth="140.0" sortable="false" />
                         </columns>
                     </TableView>
-                    <HBox spacing="8.0">
-                        <children>
-                            <Button fx:id="addButton" text="%dependent_enumeration_add" />
-                            <Button fx:id="removeButton" text="%dependent_enumeration_remove" />
-                        </children>
-                    </HBox>
                 </children>
                 <padding>
                     <Insets top="4.0" />

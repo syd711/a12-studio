@@ -2,46 +2,58 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <SplitPane dividerPositions="0.4" stylesheets="@/de/a12/studio/ui/stylesheet.css" styleClass="properties-panel"
            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="de.a12.studio.ui.editors.formmodel.DataConfigurationPanelController">
     <items>
-        <VBox spacing="8.0">
+        <VBox>
             <children>
-                <HBox alignment="CENTER_LEFT" spacing="6.0">
-                    <children>
-                        <ComboBox fx:id="addFieldCombo" promptText="%data_configuration_add_field_prompt" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-                        <Button fx:id="addFieldButton" text="%dependent_enumeration_add" styleClass="primary-button" minWidth="-Infinity" />
-                    </children>
-                </HBox>
-                <HBox alignment="CENTER_LEFT" spacing="6.0">
-                    <children>
-                        <ComboBox fx:id="addGroupCombo" promptText="%data_configuration_add_group_prompt" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
-                        <Button fx:id="addGroupButton" text="%dependent_enumeration_add" styleClass="primary-button" minWidth="-Infinity" />
-                    </children>
-                </HBox>
-                <TableView fx:id="table" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="elementColumn" text="%data_configuration_elements_column" prefWidth="330.0" />
-                        <TableColumn fx:id="typeColumn" text="%data_configuration_type_column" prefWidth="60.0" />
-                        <TableColumn fx:id="dataTypeColumn" text="%data_configuration_data_type_column" prefWidth="90.0" />
-                    </columns>
-                </TableView>
+                <ToolBar styleClass="panel-toolbar">
+                    <items>
+                        <Button fx:id="expandAllButton" accessibleText="%expand_all" mnemonicParsing="false" onAction="#onExpandAll" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2a-arrow-expand-vertical" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%expand_all" />
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="collapseAllButton" accessibleText="%collapse_all" mnemonicParsing="false" onAction="#onCollapseAll" styleClass="default-button">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2a-arrow-collapse-vertical" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%collapse_all" />
+                            </tooltip>
+                        </Button>
+                        <Separator orientation="VERTICAL" />
+                        <fx:include fx:id="search" source="/de/a12/studio/ui/components/search-field.fxml" />
+                    </items>
+                </ToolBar>
+                <ToolBar styleClass="panel-toolbar">
+                    <items>
+                        <CheckBox fx:id="hideUnusedFieldsCheckBox" mnemonicParsing="false" onAction="#onHideUnusedFieldsToggled" text="%data_configuration_hide_unused_fields" />
+                    </items>
+                </ToolBar>
+                <TreeView fx:id="tree" VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="6.0" top="10.0" />
+                    </VBox.margin>
+                </TreeView>
             </children>
-            <padding>
-                <Insets bottom="10.0" left="10.0" right="6.0" top="10.0" />
-            </padding>
         </VBox>
         <StackPane styleClass="field-editor">
             <children>

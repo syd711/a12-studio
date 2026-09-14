@@ -1,0 +1,47 @@
+{
+  "header": {
+    "id": "RelationshipRootGroupCountValidator_twoRootGroups",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "RelationshipRootGroupCountValidator_twoRootGroups",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_root_1",
+          "name": "RootOne",
+          "Group": {
+            "repeatability": 1,
+            "elements": []
+          }
+        },
+        {
+          "type": "Group",
+          "id": "group_root_2",
+          "name": "RootTwo",
+          "Group": {
+            "repeatability": 1,
+            "elements": []
+          }
+        }
+      ]
+    }
+  }
+}

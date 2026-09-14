@@ -16,6 +16,7 @@ import de.a12.studio.modelsvalidation.validators.relationship.RelationshipDocume
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipEntityCountValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipGeneratedDmNameLengthValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipLinkDocumentModelValidator;
+import de.a12.studio.modelsvalidation.validators.relationship.RelationshipRootGroupCountValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipUniqueRolesValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipUpperLimitValidator;
 
@@ -37,6 +38,7 @@ public final class RelationshipModelValidationService {
       new RelationshipUniqueRolesValidator(),
       new RelationshipUpperLimitValidator(),
       new RelationshipDocumentModelReferenceValidator(),
+      new RelationshipRootGroupCountValidator(),
       new RelationshipLinkDocumentModelValidator(),
       new RelationshipGeneratedDmNameLengthValidator()));
 

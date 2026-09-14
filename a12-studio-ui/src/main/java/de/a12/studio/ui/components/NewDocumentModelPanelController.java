@@ -21,10 +21,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Reusable panel for entering the name and location of a new Document Model, together with
- * its locales and roles. Intended to be embedded via {@code fx:include} in dialogs that need
- * to create a new Document Model as part of their flow (e.g. the Move Group dialog, the Access
- * import dialog, the Excel import dialog).
+ * Reusable panel for entering the name and location of a new model, together with its locales and
+ * roles. Intended to be embedded via {@code fx:include} in dialogs that need to create a new model
+ * as part of their flow (e.g. the generic "New Model" dialog, the Move Group dialog, the Access
+ * import dialog, the Excel import dialog). Three of those four flows only ever create a Document
+ * Model, so {@link #init(ProjectItem, String)} defaults to {@link ModelType#DOCUMENT}; the "New
+ * Model" dialog passes the user's selected {@link ModelType} explicitly (see {@link #init(ProjectItem,
+ * String, ModelType)} and {@link #setModelType(ModelType)}) so the filename-suffix convention and
+ * default suggested name track whichever type is currently selected.
  *
  * <p>Call {@link #init(ProjectItem, String)} once the owning dialog's {@code targetFolder} is
  * known, then read {@link #getModelName()}, {@link #getFolder()}, {@link #getLocales()} and
@@ -36,8 +40,7 @@ import java.util.Optional;
  */
 public class NewDocumentModelPanelController {
 
-  private static final String MODEL_SUFFIX = "_DM";
-  private static final String DEFAULT_MODEL_NAME = "NewModel" + MODEL_SUFFIX;
+  private static final String DEFAULT_MODEL_BASE_NAME = "NewModel";
 
   @FXML
   private TextField modelNameField;
@@ -52,6 +55,9 @@ public class NewDocumentModelPanelController {
   private RolesEditorPanelController rolesController;
 
   private ProjectItem targetFolder;
+
+  /** Used for the filename-suffix convention and the default suggested name; see the class doc. */
+  private ModelType modelType = ModelType.DOCUMENT;
 
   /** Callback invoked on every keystroke / selection change so the owning dialog can re-validate. */
   private Runnable onChanged;
@@ -69,20 +75,47 @@ public class NewDocumentModelPanelController {
    *
    * @param targetFolder the project folder the new model will be created in
    * @param defaultName  optional pre-filled name (e.g. derived from the group being moved), or {@code null}
-   *                     to fall back to {@value #DEFAULT_MODEL_NAME}
+   *                     to fall back to the default suggested name for {@link ModelType#DOCUMENT}
    */
   public void init(@NonNull ProjectItem targetFolder, @Nullable String defaultName) {
+    init(targetFolder, defaultName, ModelType.DOCUMENT);
+  }
+
+  /**
+   * Same as {@link #init(ProjectItem, String)}, but for a dialog that can create model types other
+   * than Document Model (e.g. the generic "New Model" dialog) -- {@code modelType} drives the
+   * filename-suffix convention and the default suggested name (see {@link #getSuffixError()}).
+   */
+  public void init(@NonNull ProjectItem targetFolder, @Nullable String defaultName, @NonNull ModelType modelType) {
     this.targetFolder = targetFolder;
+    this.modelType = modelType;
     ProjectModelFolders.configureLocationCombo(locationCombo, targetFolder);
     localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
     rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
-    modelNameField.setText(defaultName != null && !defaultName.isBlank() ? defaultName : DEFAULT_MODEL_NAME);
+    modelNameField.setText(defaultName != null && !defaultName.isBlank() ? defaultName : defaultModelName());
     requestNameFocus();
+  }
+
+  /**
+   * Updates the {@link ModelType} used for suffix validation and the default suggested name, without
+   * touching any other field -- for a dialog whose type selection can change after {@link #init}
+   * (e.g. the "New Model" dialog's type combo box).
+   */
+  public void setModelType(@NonNull ModelType modelType) {
+    this.modelType = modelType;
   }
 
   /** Sets the callback that is invoked whenever any field in this panel changes. */
   public void setOnChanged(@NonNull Runnable onChanged) {
     this.onChanged = onChanged;
+  }
+
+  /**
+   * Overwrites the roles panel's current selection, e.g. reseeded by the owning dialog from a
+   * selected Document Model's own roles rather than the application model's.
+   */
+  public void setRoles(@NonNull List<String> roles) {
+    rolesController.initializeRoles(roles);
   }
 
   private void notifyChanged() {
@@ -103,13 +136,14 @@ public class NewDocumentModelPanelController {
 
   /**
    * Returns the suffix-violation error message if the current name violates the project's
-   * "Enforce Model Suffixes" rule for {@link ModelType#DOCUMENT}, or empty otherwise.
+   * "Enforce Model Suffixes" rule for this panel's current {@link ModelType} (see {@link #init(ProjectItem,
+   * String, ModelType)} / {@link #setModelType(ModelType)}), or empty otherwise.
    */
   public Optional<String> getSuffixError() {
     if (targetFolder == null) {
       return Optional.empty();
     }
-    return ModelSuffixValidation.validate(targetFolder, ModelType.DOCUMENT, modelNameField.getText());
+    return ModelSuffixValidation.validate(targetFolder, modelType, modelNameField.getText());
   }
 
   /**
@@ -142,13 +176,14 @@ public class NewDocumentModelPanelController {
 
   /**
    * Requests focus on the name field and selects everything up to (but not including) a trailing
-   * {@code _DM} suffix, if present, so the user can type over the meaningful part of the suggested
-   * name while keeping the model suffix convention intact.
+   * model-suffix (e.g. {@code _DM}), if present, so the user can type over the meaningful part of
+   * the suggested name while keeping the model suffix convention intact.
    */
   public void requestNameFocus() {
     modelNameField.requestFocus();
     String text = modelNameField.getText();
-    int selectionEnd = text.endsWith(MODEL_SUFFIX) ? text.length() - MODEL_SUFFIX.length() : text.length();
+    String suffix = modelSuffixWithUnderscore();
+    int selectionEnd = suffix != null && text.endsWith(suffix) ? text.length() - suffix.length() : text.length();
     modelNameField.selectRange(0, selectionEnd);
   }
 
@@ -167,5 +202,18 @@ public class NewDocumentModelPanelController {
    */
   public boolean isModelNameAutoFilled(String autoFilledValue) {
     return autoFilledValue != null && autoFilledValue.equals(modelNameField.getText());
+  }
+
+  /** E.g. {@code "NewModel_DM"} for {@link ModelType#DOCUMENT}, or just {@code "NewModel"} if the current
+   *  {@link #modelType} has no configured suffix. */
+  private String defaultModelName() {
+    String suffix = modelSuffixWithUnderscore();
+    return suffix != null ? DEFAULT_MODEL_BASE_NAME + suffix : DEFAULT_MODEL_BASE_NAME;
+  }
+
+  @Nullable
+  private String modelSuffixWithUnderscore() {
+    String suffix = modelType.getSuffix();
+    return suffix != null ? "_" + suffix : null;
   }
 }

@@ -1,24 +1,16 @@
 package de.a12.studio.ui.projecttree.dialogs;
 
-import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.components.ErrorContainerController;
-import de.a12.studio.ui.editors.PropertyEditorSaveMode;
-import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
+import de.a12.studio.ui.components.NewDocumentModelPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
-import de.a12.studio.ui.util.DocumentModelBuilder;
-import de.a12.studio.ui.util.FileUtils;
-import de.a12.studio.ui.util.ModelSuffixValidation;
 import de.a12.studio.ui.util.ModelTypeLabels;
-import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.ProjectDocumentModels;
-import de.a12.studio.ui.util.ProjectModelFolders;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.Locale;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,7 +19,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
@@ -46,12 +37,6 @@ public class NewModelDialogController implements DialogController {
   private ComboBox<ModelType> typeComboBox;
 
   @FXML
-  private TextField nameField;
-
-  @FXML
-  private ComboBox<ProjectItem> locationCombo;
-
-  @FXML
   private Label documentModelLabel;
 
   @FXML
@@ -67,10 +52,7 @@ public class NewModelDialogController implements DialogController {
   private Button cancelButton;
 
   @FXML
-  private LocalesPanelController localesController;
-
-  @FXML
-  private RolesEditorPanelController rolesController;
+  private NewDocumentModelPanelController commonFieldsController;
 
   @FXML
   private ErrorContainerController errorContainerController;
@@ -83,10 +65,6 @@ public class NewModelDialogController implements DialogController {
 
   @FXML
   private void initialize() {
-    // Signals RolesEditorPanelController that it's embedded in a dialog, so it hides its "Edit Roles"
-    // button (this dialog builds the model on submit, outside the panel's own save flow, so
-    // Deferred#flush() is never called -- only isEmbeddedInDialog()'s side effect is needed here).
-    rolesController.setSaveMode(new PropertyEditorSaveMode.Deferred());
     buildScreensFromFieldsCheckBox.setDisable(true);
     typeComboBox.getItems().setAll(ModelType.values());
     typeComboBox.setConverter(new StringConverter<>() {
@@ -101,12 +79,13 @@ public class NewModelDialogController implements DialogController {
       }
     });
     typeComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+      commonFieldsController.setModelType(newValue);
       updateDocumentModelVisibility(newValue);
       updateBuildScreensFromFieldsVisibility(newValue);
       if (!requiresDocumentModel(newValue)) {
         // Switching away from a document-model type: seed roles from the application model instead
         if (targetFolder != null) {
-          rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
+          commonFieldsController.setRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
         }
       } else {
         // Switching to a document-model type: seed roles from currently selected document model (if any)
@@ -114,7 +93,7 @@ public class NewModelDialogController implements DialogController {
         if (selectedDocModel != null && !selectedDocModel.isBlank()) {
           onDocumentModelSelected(selectedDocModel);
         } else {
-          rolesController.initializeRoles(List.of());
+          commonFieldsController.setRoles(List.of());
         }
       }
       validate();
@@ -124,30 +103,26 @@ public class NewModelDialogController implements DialogController {
       buildScreensFromFieldsCheckBox.setDisable(newValue == null || newValue.isBlank());
       validate();
     });
-    nameField.textProperty().addListener((observable, oldValue, newValue) -> validate());
+    commonFieldsController.setOnChanged(this::validate);
     typeComboBox.getSelectionModel().selectFirst();
-    nameField.requestFocus();
   }
 
-  // Combines the filename/document-model checks the OK button already gated on with the live
-  // "Enforce Model Suffixes" check (see ModelSuffixValidation) and the model name convention check (see
-  // NameConventionValidation), surfacing whichever message applies in the dialog's error container per
-  // the "validator messages must name the field" convention.
+  // Combines the filename/document-model check the OK button already gated on with the panel's own
+  // live "Enforce Model Suffixes" / model name convention checks, surfacing whichever message applies
+  // in the dialog's error container per the "validator messages must name the field" convention.
   private void validate() {
-    boolean validFilename = FileUtils.isValidWindowsFilename(nameField.getText());
     boolean missingDocumentModel = requiresDocumentModel(typeComboBox.getValue()) && documentModelCombo.getValue() == null;
-    Optional<String> nameConventionError = NameConventionValidation.validate("Model name", nameField.getText());
-    Optional<String> suffixError = nameConventionError.isPresent() || targetFolder == null ? Optional.empty()
-        : ModelSuffixValidation.validate(targetFolder, typeComboBox.getValue(), nameField.getText());
-    Optional<String> error = nameConventionError.or(() -> suffixError);
-    error.ifPresentOrElse(message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
-    okButton.setDisable(!validFilename || missingDocumentModel || nameConventionError.isPresent() || suffixError.isPresent());
+    Optional<String> nameConventionError = commonFieldsController.getNameConventionError();
+    Optional<String> suffixError = nameConventionError.isPresent() ? Optional.empty() : commonFieldsController.getSuffixError();
+    nameConventionError.or(() -> suffixError).ifPresentOrElse(
+        message -> errorContainerController.show("ERROR", message), errorContainerController::hide);
+    okButton.setDisable(!commonFieldsController.isValid() || missingDocumentModel);
   }
 
   private void onDocumentModelSelected(String documentModelId) {
     if (documentModelId != null && !documentModelId.isBlank() && targetFolder != null) {
       List<String> roles = RolesEditorPanelController.findDocumentModelRoles(targetFolder, documentModelId);
-      rolesController.initializeRoles(roles);
+      commonFieldsController.setRoles(roles);
     }
   }
 
@@ -196,18 +171,16 @@ public class NewModelDialogController implements DialogController {
     NewModelDialogController controller = (NewModelDialogController) stage.getUserData();
     controller.stage = stage;
     controller.targetFolder = targetFolder;
-    ProjectModelFolders.configureLocationCombo(controller.locationCombo, targetFolder);
-    controller.localesController.initializeLocales(findProjectLocales());
+    ModelType initialType = preselectedType != null ? preselectedType : controller.typeComboBox.getValue();
+    controller.commonFieldsController.init(targetFolder, null, initialType);
     controller.documentModelCombo.getItems().setAll(ProjectDocumentModels.getOtherDocumentModels(targetFolder).stream()
         .map(DocumentModel::getId)
         .sorted(Comparator.naturalOrder())
         .toList());
-    // For model types that require a document model (e.g. FORM), roles are seeded from the selected
-    // document model via onDocumentModelSelected; skip the application model lookup for those types.
-    if (preselectedType == null || !requiresDocumentModel(preselectedType)) {
-      controller.rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
-    }
     if (preselectedType != null) {
+      // Fires the type listener (see #initialize), which re-seeds roles from the selected document
+      // model instead when preselectedType requires one (e.g. FORM), overriding the application-model
+      // roles #init just seeded.
       controller.typeComboBox.getSelectionModel().select(preselectedType);
     }
     controller.validate();
@@ -216,28 +189,14 @@ public class NewModelDialogController implements DialogController {
 
     if (controller.result.isPresent() && controller.result.get() == ButtonType.OK) {
       ModelType modelType = controller.typeComboBox.getValue();
-      String name = controller.nameField.getText();
-      if (modelType != null && name != null && !name.isBlank()) {
+      String name = controller.commonFieldsController.getModelName();
+      if (modelType != null && !name.isBlank()) {
         String documentModelId = requiresDocumentModel(modelType) ? controller.documentModelCombo.getValue() : null;
-        ProjectItem folder = controller.locationCombo.getValue();
         boolean buildScreensFromFields = modelType == ModelType.FORM && controller.buildScreensFromFieldsCheckBox.isSelected();
-        return Optional.of(new NewModelInput(modelType, name.trim(), documentModelId, controller.localesController.getLocales(),
-            controller.rolesController.getRoles(), folder != null ? folder : targetFolder, buildScreensFromFields));
+        return Optional.of(new NewModelInput(modelType, name, documentModelId, controller.commonFieldsController.getLocales(),
+            controller.commonFieldsController.getRoles(), controller.commonFieldsController.getFolder(), buildScreensFromFields));
       }
     }
     return Optional.empty();
-  }
-
-  // Seeds the locales panel from the project's own settings.json (general.locales), mirroring
-  // NewModelFactory#resolveDefaultLocales -- so what the dialog shows already matches what the model would
-  // get if the user left the panel untouched. Falls back to the JVM's system locale (see
-  // DocumentModelBuilder#systemLocaleFallback) when the project has none configured yet.
-  private static List<Locale> findProjectLocales() {
-    Project project = Studio.getCurrentProject();
-    if (project == null) {
-      return DocumentModelBuilder.systemLocaleFallback();
-    }
-    List<Locale> locales = project.getSettings().getProjectRootSettings().getGeneral().getLocales();
-    return locales.isEmpty() ? DocumentModelBuilder.systemLocaleFallback() : locales;
   }
 }

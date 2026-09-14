@@ -1,5 +1,6 @@
 package de.a12.studio.modelsvalidation.validators.relationship;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
@@ -54,6 +55,21 @@ class RelationshipValidatorsTest {
     // First entity references a document model that doesn't exist; the second has none selected.
     assertEquals(2, errors.size());
     assertNotNull(errors.get(0).elementId());
+  }
+
+  @Test
+  void rootGroupCountValidatorReportsDocumentModelWithMultipleRootGroups() {
+    RelationshipModel model = load("RelationshipRootGroupCountValidator_invalid");
+    DocumentModel twoRootGroupsDm = TestModels.load(
+        "/documentmodel/RelationshipRootGroupCountValidator_twoRootGroups.json", DocumentModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new RelationshipRootGroupCountValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, twoRootGroupsDm, refDm));
+
+    // Only the "First" entity's document model has more than one root group; "Second" (Ref_DM) is fine.
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("First"));
+    assertEquals(Severity.ERROR.name(), errors.get(0).severity());
   }
 
   @Test

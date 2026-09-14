@@ -4,17 +4,23 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.auth.AuthFileType;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.projecttree.ProjectItemViewModel;
+import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -23,10 +29,12 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -154,6 +162,60 @@ public class DeploymentExclusionsDialogController implements DialogController {
         }
       }
       return new javafx.beans.property.ReadOnlyStringWrapper(name);
+    });
+
+    nameColumn.setCellFactory(col -> new TreeTableCell<ProjectItem, String>() {
+      private final FontIcon folderIcon = new FontIcon();
+      private TreeItem<ProjectItem> boundTreeItem;
+
+      private final ChangeListener<Boolean> expandedListener = (obs, wasExpanded, expanded) ->
+          folderIcon.setIconLiteral(expanded ? Icons.FOLDER_OPEN_OUTLINE : Icons.FOLDER_OUTLINE);
+
+      {
+        folderIcon.getStyleClass().add("tree-icon");
+        folderIcon.setIconSize(18);
+      }
+
+      @Override
+      protected void updateItem(String value, boolean empty) {
+        super.updateItem(value, empty);
+
+        if (boundTreeItem != null) {
+          boundTreeItem.expandedProperty().removeListener(expandedListener);
+          boundTreeItem = null;
+        }
+
+        if (empty || value == null) {
+          setText(null);
+          setGraphic(null);
+          return;
+        }
+
+        ProjectItem item = getTreeTableRow() == null ? null : getTreeTableRow().getItem();
+        if (item == null) {
+          setText(value);
+          setGraphic(null);
+          return;
+        }
+
+        Node icon;
+        if (item.isFolder()) {
+          boundTreeItem = getTreeTableRow().getTreeItem();
+          folderIcon.setIconLiteral(boundTreeItem.isExpanded() ? Icons.FOLDER_OPEN_OUTLINE : Icons.FOLDER_OUTLINE);
+          boundTreeItem.expandedProperty().addListener(expandedListener);
+          icon = folderIcon;
+        }
+        else {
+          icon = createModelTypeIcon(item);
+        }
+
+        Label label = new Label(value);
+        label.getStyleClass().add("tree-cell-name-label");
+        HBox graphic = new HBox(4, icon, label);
+        graphic.setAlignment(Pos.CENTER_LEFT);
+        setText(null);
+        setGraphic(graphic);
+      }
     });
 
     modelTree.setShowRoot(true);
@@ -350,6 +412,24 @@ public class DeploymentExclusionsDialogController implements DialogController {
     String search = searchField.getText();
     return search == null || search.isBlank()
         || item.getDisplayName().toLowerCase().contains(search.trim().toLowerCase());
+  }
+
+  /**
+   * Returns the model-type icon for {@code item} (or a generic file icon if it has no model),
+   * following the same {@link ProjectItemViewModel#getIconPath()} lookup used by the project tree.
+   */
+  @NonNull
+  private Node createModelTypeIcon(@NonNull ProjectItem item) {
+    if (item.getModel() != null) {
+      String iconPath = new ProjectItemViewModel(item, Map.of()).getIconPath();
+      if (iconPath != null) {
+        return WidgetFactory.createModelIcon(iconPath);
+      }
+    }
+    FontIcon icon = new FontIcon();
+    icon.setIconSize(18);
+    icon.setIconLiteral(Icons.FILE_OUTLINE);
+    return icon;
   }
 
   private void expandAll(@NonNull TreeItem<ProjectItem> item) {

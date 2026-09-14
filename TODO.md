@@ -51,7 +51,6 @@ Result: 62 of 96 model files fail the round-trip (vs. the basic workspace, which
 - check references in error messages using the $$ notation
 - Check the tree update after moving groups or creating validation rules
 - Check validation rules for repeatable groups and field not filled. kcp3
-- Validate: Document Models that should be connected via a Relationship must possess only one root group each. 
 
 # Application Model
 
@@ -66,7 +65,7 @@ The Context only needs to be selected if the Additive Document Model is referenc
 
 
 # Relationship Models:
-- ~~The Link Document Model reference and the checkbox "Duplicable" are only active for n:n Relationships...~~ Done: `RelationshipLinkDocumentModelValidator` + `LinkDocumentModelPanelController` already implement this, verified against SME's `RelationshipMetaModel.json` rules `warning_linkDocNotAllowed`/`warning_linkDupNotAllowed` (same many-to-many precondition, same warning text). Fixed a related gap where the warning didn't refresh live when an entity's multiplicity was edited via the Related Entities dialog (only `syncModelReferences` was wired to that panel's `onChange`) - now `RelationshipModelEditorController.onEntitiesChanged()` also calls `LinkDocumentModelPanelController.refreshValidation()`.
+
 - The labels which can be maintained for the Relationship Model are currently not used in the default UI for Relationships. => Hide them in the settings.
 - 
 

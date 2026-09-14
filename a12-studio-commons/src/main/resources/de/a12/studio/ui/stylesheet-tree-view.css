@@ -112,6 +112,15 @@
 }
 
 /*
+ * Form Model editor's Data Configuration tab (DataConfigurationPanelController): marks a field/group node
+ * whose FieldConfigEntry/GroupConfigEntry actually holds a configured value, as opposed to one that only
+ * exists because it was selected (see that class's ElementRowTreeCell/hasConfiguredValues).
+ */
+.tree-cell-name-label.data-configuration-configured-label {
+    -fx-font-weight: bold;
+}
+
+/*
  * ID-scoped overrides for the document model elements TreeTableView
  * (fx:id="elementsTreeTable"). An id selector always outranks Modena's
  * built-in class/pseudo-class selectors, so this is used as a guaranteed

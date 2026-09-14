@@ -535,6 +535,28 @@ covered by round-trip tests.**
   by the tree) entries with "Clean All", backed by a new `FormReferences` utility.
   `ExternalEnumerationPanelController`/`DependentEnumerationPanelController` were refactored to take a
   `FieldConfigEntry` directly (not a `Control`) so the same panels serve both the per-node editor and this tab.
+  **Dependent Field**/**Dependent Group** were initially a raw, free-editing table over whatever `case` entries
+  already existed in the file (no way to pick a trigger value from the master field's own declared values) - a
+  materially weaker editor than SME's grid (`DependentFieldGroupTable` in `dependencyTable.tsx`), which
+  auto-populates one row per value the master field can actually take. Rebuilt to match: both panels now derive
+  their rows from the master field's own type (`DependentCaseSupport.masterValueOptions`, mirroring SME's
+  `createCaseMap`) - one checkbox row per enum value / true-false / true, plus a synthetic "-No Selection-" row -
+  with a Display picker (Default/Not Relevant/Read Only, Read Only hidden for a field the DM already computes)
+  and, for Dependent Field only, a Value-Type picker (Unchanged/Value/Field Value) whose Value column becomes a
+  picker of the dependent field's own enum/boolean/confirm values, free text, or a dropdown of type-compatible
+  sibling fields, depending on the choice. Unchecked rows are simply not written; the whole `case` list is
+  rebuilt from checked rows on every edit, matching SME's `mergeCaseMap`.
+  **Dependent Enumeration** got the same treatment, mirroring SME's `DependentEnumerationTable`: the panel was a
+  plain three-column free-text table (`masterValue`, comma-separated `constraintValues`, and a `valueForMasterChange`
+  text box), not a grid backed by either field's own declared values. Rebuilt into a 2-D grid - one row per literal
+  value the master field's own Enumeration declares (via `DependentCaseSupport.enumerationLiterals`; unlike Dependent
+  Field/Group there's no synthetic "no selection" row, matching SME's `getValuesFromEnumerationLike`), one column per
+  literal value the *dependent* field (the entry's own `elementRef`) declares, each cell a Hidden/Visible/Default
+  3-state picker. "Default" (at most one per row, enforced by clearing any other Default in the same row on
+  selection) is what becomes `valueForMasterChange`; every row always yields a constraint entry (there's no per-row
+  checkbox - unlike Dependent Field/Group, SME's own model has no way to "disable" a single master-value row) unless
+  the whole grid is neutral (every cell Visible), in which case `constraint` is cleared entirely, matching the
+  reference's "useless to have the dependent enum" check in `mergeConstraintsMap`.
 - **Step 4**: `filterExpression`, `initialSorting`, `titleHidden` added to `AbstractRepeat` with UI. Real
   `RowAction`/`RowActionGroup` added (rich, multi-action); the old single-slot type was renamed
   `DefaultRowAction` to stop colliding with it and now correctly matches SME's `DefaultRowAction` shape
