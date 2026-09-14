@@ -300,7 +300,7 @@ public class QueryModelTreeController implements Initializable {
   }
 
   private void onEditFilterDefinition() {
-    if (Dialogs.showFilterDefinition(Studio.stage, content())) {
+    if (Dialogs.showFilterDefinition(Studio.stage, targetDocumentModel, content())) {
       elementsTreeTable.refresh();
     }
   }

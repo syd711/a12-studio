@@ -1,12 +1,15 @@
 package de.a12.studio.ui.editors.querymodel.dialogs;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.querymodel.QueryModelContent;
 import de.a12.studio.models.querymodel.ql.QueryLanguageEmitter;
 import de.a12.studio.models.querymodel.ql.QueryLanguageException;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
+import de.a12.studio.ui.editors.propertyeditors.BracketedPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.fxml.FXML;
@@ -54,11 +57,14 @@ public class QueryFilterDefinitionDialogController implements DialogController {
     okButton.disableProperty().bind(expressionPanelController.errorProperty());
   }
 
-  void init(@NonNull Stage stage, @NonNull QueryModelContent content) {
+  void init(@NonNull Stage stage, DocumentModel targetDocumentModel, @NonNull QueryModelContent content) {
     this.stage = stage;
     this.content = content;
     this.originalValue = content.getFilterDefinition();
     expressionPanelController.setCustom(content::getFilterDefinition, content::setFilterDefinition);
+    if (targetDocumentModel != null) {
+      expressionPanelController.setSuggestionProvider(new BracketedPathSuggestionProvider(new ElementIndex(targetDocumentModel)));
+    }
   }
 
   private static String validate(String text) {

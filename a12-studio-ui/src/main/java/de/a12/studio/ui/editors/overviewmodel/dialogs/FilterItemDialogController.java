@@ -10,6 +10,7 @@ import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
+import de.a12.studio.ui.editors.propertyeditors.BracketedPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
@@ -250,6 +251,9 @@ public class FilterItemDialogController implements DialogController {
 
     fieldRefField.getItems().setAll(OverviewElementOptions.elementIds(documentModelIndex));
     OverviewElementOptions.applyElementRefConverter(fieldRefField, documentModelIndex);
+    if (documentModelIndex != null) {
+      filterDefinitionController.setSuggestionProvider(new BracketedPathSuggestionProvider(documentModelIndex));
+    }
 
     updatingFromModel = true;
     try {

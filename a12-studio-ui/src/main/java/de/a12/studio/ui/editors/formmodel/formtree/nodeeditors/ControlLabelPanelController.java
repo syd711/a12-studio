@@ -10,6 +10,7 @@ import de.a12.studio.models.formmodel.FieldConfigEntry;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.LocalizedText;
 import de.a12.studio.models.formmodel.MultilingualText;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextReadonlyPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
@@ -61,6 +62,11 @@ public class ControlLabelPanelController extends AbstractPropertyEditor implemen
     documentModelLabelController.setCustom(() -> findFieldLabel(control.getElementRef(), documentModel));
     fieldConfigLabelController.setCustom(entry::getLabel, entry::setLabel);
     controlLabelController.setCustom(control::getLabel, control::setLabel);
+
+    ElementIndex elementIndex = documentModel != null && documentModel.getContent() != null
+        && documentModel.getContent().getModelRoot() != null ? new ElementIndex(documentModel) : null;
+    fieldConfigLabelController.setFieldSuggestionSource(elementIndex);
+    controlLabelController.setFieldSuggestionSource(elementIndex);
   }
 
   private static List<Label> textsOf(LocalizedText value) {

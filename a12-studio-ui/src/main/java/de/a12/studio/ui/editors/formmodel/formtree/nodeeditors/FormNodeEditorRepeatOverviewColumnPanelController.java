@@ -85,6 +85,7 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
   public void setColumn(@NonNull RepeatOverviewColumn column, @Nullable ElementIndex elementIndex) {
     this.column = column;
     labelController.setCustom(column::getLabel, column::setLabel);
+    labelController.setFieldSuggestionSource(elementIndex);
     setFieldValue(widthField, column.getWidth() == null ? "" : column.getWidth().toString());
     setFieldValue(sortableCheckBox, Boolean.TRUE.equals(column.getSortable()));
     setFieldValue(filterableCheckBox, Boolean.TRUE.equals(column.getFilterable()));

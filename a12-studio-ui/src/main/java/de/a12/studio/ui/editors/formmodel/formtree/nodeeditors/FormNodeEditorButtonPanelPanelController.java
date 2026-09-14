@@ -50,8 +50,9 @@ public class FormNodeEditorButtonPanelPanelController {
       @NonNull List<String> screenIds, HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     nameController.setCustom(buttonPanel::getName, buttonPanel::setName);
     labelController.setCustom(buttonPanel::getTitle, buttonPanel::setTitle);
+    labelController.setFieldSuggestionSource(elementIndex);
     buttonsController.configure(StudioBundle.get("buttons"), ".buttonPanel-" + buttonPanel.getId(), buttonPanel.getButton(),
-        () -> Dialogs.showButtonForAdd(Studio.stage, screenIds), button -> editButtonViaDialog(screenIds, button),
+        () -> Dialogs.showButtonForAdd(Studio.stage, elementIndex, screenIds), button -> editButtonViaDialog(elementIndex, screenIds, button),
         Dialogs::generateButtonId);
     hideConditionController.configure(
         buttonPanel::getHideCondition, buttonPanel::setHideCondition,
@@ -60,7 +61,7 @@ public class FormNodeEditorButtonPanelPanelController {
     annotationsController.setCustom(buttonPanel::getAnnotations);
   }
 
-  private Optional<Button> editButtonViaDialog(@NonNull List<String> screenIds, @NonNull Button button) {
-    return Dialogs.showButtonForEdit(Studio.stage, screenIds, button);
+  private Optional<Button> editButtonViaDialog(@Nullable ElementIndex elementIndex, @NonNull List<String> screenIds, @NonNull Button button) {
+    return Dialogs.showButtonForEdit(Studio.stage, elementIndex, screenIds, button);
   }
 }

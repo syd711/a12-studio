@@ -68,7 +68,7 @@ public class ComputationAlternativesPanelController extends AbstractPropertyEdit
   @FXML
   private void onAdd() {
     ComputationAlternative alternative = new ComputationAlternative();
-    if (Dialogs.showComputationAlternativeForAdd(Studio.stage, alternative)) {
+    if (Dialogs.showComputationAlternativeForAdd(Studio.stage, (ComputationElement) element, alternative)) {
       getAlternatives().add(alternative);
       rebuildRows();
       commitChange();
@@ -132,7 +132,7 @@ public class ComputationAlternativesPanelController extends AbstractPropertyEdit
   }
 
   private void openEditDialog(ComputationAlternative alternative) {
-    if (Dialogs.showComputationAlternativeForEdit(Studio.stage, alternative)) {
+    if (Dialogs.showComputationAlternativeForEdit(Studio.stage, (ComputationElement) element, alternative)) {
       rebuildRows();
       commitChange();
     }

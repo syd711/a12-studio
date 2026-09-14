@@ -39,6 +39,7 @@ public class FormNodeEditorRowPanelController {
       HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     nameController.setCustom(row::getName, row::setName);
     labelController.setCustom(row::getTitle, row::setTitle);
+    labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(
         row::getHideCondition, row::setHideCondition,
         elementIndex, hideConditionScope);

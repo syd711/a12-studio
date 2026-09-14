@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.querymodel.dialogs;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.querymodel.QueryModelContent;
 import de.a12.studio.models.querymodel.QuerySort;
@@ -21,14 +22,18 @@ public class Dialogs {
   /**
    * Opens the Filter Definition editor for {@code content}, editing {@link
    * QueryModelContent#getFilterDefinition()} live so a Cancel can undo the change (see {@link
-   * QueryFilterDefinitionDialogController}). Returns whether the dialog was confirmed.
+   * QueryFilterDefinitionDialogController}). {@code targetDocumentModel} (the query's own root, resolved the
+   * same way {@code QueryModelTreeController} resolves its tree root - may be {@code null} if it doesn't
+   * resolve) drives field-path autocomplete inside the filter definition's {@code [...]} references;
+   * relationship-traversal targets aren't offered yet, only fields directly on the target model. Returns
+   * whether the dialog was confirmed.
    */
-  public static boolean showFilterDefinition(Stage owner, @NonNull QueryModelContent content) {
+  public static boolean showFilterDefinition(Stage owner, DocumentModel targetDocumentModel, @NonNull QueryModelContent content) {
     FXMLLoader fxmlLoader = new FXMLLoader(QueryFilterDefinitionDialogController.class.getResource("query-filter-definition-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("query-filter-definition-dialog", fxmlLoader, owner, StudioBundle.get("edit_filter_definition"));
     QueryFilterDefinitionDialogController controller = (QueryFilterDefinitionDialogController) stage.getUserData();
-    controller.init(stage, content);
+    controller.init(stage, targetDocumentModel, content);
     stage.setOnHidden(event -> controller.destroy());
     WidgetFactory.installResizable(stage);
 

@@ -72,3 +72,8 @@ The Context only needs to be selected if the Additive Document Model is referenc
 
 # Composed Document Models
 - Add separate property editor for cdm.queryRoot property
+
+
+# Richtext:
+@..\..\mnt\c\workspace\a12-studio\a12-studio-ui\src\main\java\de\a12\studio\ui\editors\propertyeditors\RichtextEditorController.java you know how to customize the richtext for syntax highlighting and autocompletition. I want the same autocomplete for this editor the SME is using. take your time create a plan.                                                            
+

@@ -4,6 +4,7 @@ import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.ButtonGroup;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.models.formmodel.Screen;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
 import de.a12.studio.ui.editors.formmodel.NamePanelController;
@@ -15,6 +16,7 @@ import de.a12.studio.ui.editors.propertyeditors.ToolbarButtonsPanelController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,15 +49,19 @@ public class FormNodeEditorScreenPanelController {
 
   private Screen screen;
 
+  private @Nullable ElementIndex elementIndex;
+
   @FXML
   private void initialize() {
     labelController.configureCustom("label", StudioBundle.get("label"));
   }
 
-  public void setScreen(@NonNull Screen screen, @NonNull List<String> screenIds) {
+  public void setScreen(@NonNull Screen screen, @Nullable ElementIndex elementIndex, @NonNull List<String> screenIds) {
     this.screen = screen;
+    this.elementIndex = elementIndex;
     nameController.setCustom(screen::getName, screen::setName);
     labelController.setCustom(screen::getTitle, screen::setTitle);
+    labelController.setFieldSuggestionSource(elementIndex);
     annotationsController.setCustom(screen::getAnnotations);
 
     HeaderFooterBox subHeaderBox = ensureBox(screen.getSubHeaderBox(), screen.getId() + "-subHeaderBox", screen::setSubHeaderBox);
@@ -100,10 +106,10 @@ public class FormNodeEditorScreenPanelController {
   }
 
   private Optional<Button> newButtonViaDialog(List<String> screenIds) {
-    return Dialogs.showButtonForAdd(Studio.stage, screenIds);
+    return Dialogs.showButtonForAdd(Studio.stage, elementIndex, screenIds);
   }
 
   private Optional<Button> editButtonViaDialog(List<String> screenIds, Button button) {
-    return Dialogs.showButtonForEdit(Studio.stage, screenIds, button);
+    return Dialogs.showButtonForEdit(Studio.stage, elementIndex, screenIds, button);
   }
 }

@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.GroupConfigEntry;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
 import de.a12.studio.ui.util.StudioBundle;
@@ -35,9 +36,11 @@ public class RepeatLabelPanelController extends AbstractPropertyEditor implement
     repeatLabelController.configureCustom("repeatLabel", StudioBundle.get("repeat"));
   }
 
-  public void setRepeat(@NonNull AbstractRepeat repeat, @Nullable FormModelContent content) {
+  public void setRepeat(@NonNull AbstractRepeat repeat, @Nullable FormModelContent content, @Nullable ElementIndex elementIndex) {
     GroupConfigEntry entry = GroupConfigEntryHelper.findOrCreate(repeat, content);
     groupConfigLabelController.setCustom(entry::getLabel, entry::setLabel);
+    groupConfigLabelController.setFieldSuggestionSource(elementIndex);
     repeatLabelController.setCustom(repeat::getLabel, repeat::setLabel);
+    repeatLabelController.setFieldSuggestionSource(elementIndex);
   }
 }

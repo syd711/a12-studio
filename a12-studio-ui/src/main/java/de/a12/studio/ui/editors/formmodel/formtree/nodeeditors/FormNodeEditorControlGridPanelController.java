@@ -51,6 +51,7 @@ public class FormNodeEditorControlGridPanelController {
         value -> getOrCreateLayout(grid).setLg(value));
     responsiveLayoutController.setControlGrid(grid);
     labelController.setCustom(grid::getTitle, grid::setTitle);
+    labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(
         grid::getHideCondition, grid::setHideCondition,
         elementIndex, hideConditionScope);

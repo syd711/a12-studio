@@ -185,6 +185,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         ruleConfirmationSettingsController.setModel(formModel);
         ruleConfirmationSettingsController.setVisible(true);
         subtitleController.setModel(formModel);
+        subtitleController.setFieldSuggestionSource(generalSettingsController.getFieldIndex());
         subtitleController.setVisible(true);
       } else {
         generalSettingsController.setVisible(false);

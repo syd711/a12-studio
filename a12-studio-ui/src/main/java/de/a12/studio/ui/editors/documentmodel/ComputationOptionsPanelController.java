@@ -2,8 +2,13 @@ package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.models.documentmodel.ComputationConfig;
 import de.a12.studio.models.documentmodel.ComputationElement;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.PlainPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -68,6 +73,11 @@ public class ComputationOptionsPanelController extends AbstractPropertyEditor im
     setFieldValue(commonPreconditionCheckBox, computation.getCommonPrecondition() != null);
     commonPreconditionController.setCustom(computation::getCommonPrecondition, computation::setCommonPrecondition);
     updateCommonPreconditionVisibility();
+
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel) {
+      commonPreconditionController.setSuggestionProvider(new PlainPathSuggestionProvider(new ElementIndex(documentModel), element));
+    }
   }
 
   private void updateCommonPreconditionVisibility() {

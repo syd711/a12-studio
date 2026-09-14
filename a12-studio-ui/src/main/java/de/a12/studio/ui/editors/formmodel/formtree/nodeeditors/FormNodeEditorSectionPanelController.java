@@ -39,6 +39,7 @@ public class FormNodeEditorSectionPanelController {
       HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     nameController.setSection(section);
     labelController.setCustom(section::getTitle, section::setTitle);
+    labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(
         section::getHideCondition, section::setHideCondition,
         elementIndex, hideConditionScope);

@@ -40,6 +40,7 @@ public class FormNodeEditorCustomScreenElementPanelController {
       HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     nameController.setCustom(element::getName, element::setName);
     labelController.setCustom(element::getTitle, element::setTitle);
+    labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(
         element::getHideCondition, element::setHideCondition,
         elementIndex, hideConditionScope);

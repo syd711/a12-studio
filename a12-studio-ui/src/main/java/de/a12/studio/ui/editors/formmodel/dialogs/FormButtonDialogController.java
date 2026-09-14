@@ -10,6 +10,7 @@ import de.a12.studio.models.formmodel.NavigationButton;
 import de.a12.studio.models.formmodel.Style;
 import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
@@ -25,6 +26,7 @@ import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -80,6 +82,8 @@ public class FormButtonDialogController implements DialogController {
 
   private List<String> screenIds = List.of();
 
+  private ElementIndex elementIndex;
+
   private Optional<javafx.scene.control.ButtonType> result = Optional.of(javafx.scene.control.ButtonType.CANCEL);
 
   @FXML
@@ -101,8 +105,9 @@ public class FormButtonDialogController implements DialogController {
     generalController.nameProperty().addListener((observable, oldValue, newValue) -> validate());
   }
 
-  void init(@NonNull Stage stage, @NonNull List<String> screenIds, @NonNull Button button) {
+  void init(@NonNull Stage stage, @Nullable ElementIndex elementIndex, @NonNull List<String> screenIds, @NonNull Button button) {
     this.stage = stage;
+    this.elementIndex = elementIndex;
     this.screenIds = screenIds;
     this.button = button;
 
@@ -170,6 +175,7 @@ public class FormButtonDialogController implements DialogController {
     visualController.setButton(button);
 
     labelController.setCustom(this::currentLabel, this::writeLabel);
+    labelController.setFieldSuggestionSource(elementIndex);
 
     descriptionController.setCustom(this::currentDescriptionTexts, this::writeDescriptionTexts);
 

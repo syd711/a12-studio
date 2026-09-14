@@ -17,6 +17,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.util.Comparator;
@@ -139,6 +140,12 @@ public class GeneralSettingsPanelController extends AbstractPropertyEditor imple
   /** Hides this panel entirely for model types other than {@link FormModel}. */
   public void setVisible(boolean visible) {
     setEditorVisible(visible);
+  }
+
+  /** The data-binding Document Model's field tree, rebuilt on every {@link #setModel}/document-model-combo
+   * change - reused by {@code ModelSettingsDialog} to enable field-name autocomplete in the Subtitle field. */
+  public @Nullable ElementIndex getFieldIndex() {
+    return fieldIndex;
   }
 
   public void setModel(@NonNull FormModel model, @NonNull List<DocumentModel> documentModels) {

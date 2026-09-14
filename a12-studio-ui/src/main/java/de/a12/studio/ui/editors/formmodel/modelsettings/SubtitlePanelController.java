@@ -2,12 +2,14 @@ package de.a12.studio.ui.editors.formmodel.modelsettings;
 
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -40,6 +42,12 @@ public class SubtitlePanelController extends AbstractPropertyEditor implements I
   /** Hides this panel entirely for model types other than {@link FormModel}. */
   public void setVisible(boolean visible) {
     setEditorVisible(visible);
+  }
+
+  /** Enables field-name autocomplete in the Expression case - see {@code ModelSettingsDialog}, whose {@link
+   * GeneralSettingsPanelController#getFieldIndex()} already resolves the form's data-binding Document Model. */
+  public void setFieldSuggestionSource(@Nullable ElementIndex elementIndex) {
+    subtitleTextController.setFieldSuggestionSource(elementIndex);
   }
 
   public void setModel(@NonNull FormModel model) {

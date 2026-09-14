@@ -145,6 +145,10 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private boolean documentRelationshipModelCollapsed = false;
   private @Nullable Timeline documentRelationshipModelToggleTimeline;
 
+  // Resolved once in loadOverview() (the data-binding Document Model's field tree), reused by the subheader/
+  // footer button dialogs' label field for field-name autocomplete - see newButtonViaDialog/editButtonViaDialog.
+  private @Nullable ElementIndex dataBindingElementIndex;
+
   public void loadModel(@NonNull A12Model<?> model) {
     load((FormModel) model);
     updateSettingsErrorBadge();
@@ -176,6 +180,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
     formModelTreeController.setModel(formModel, documentModel, projectItem);
     formModelTreeController.setOnNodeSelected(this::onFormModelTreeNodeSelected);
     ElementIndex elementIndex = resolveElementIndex(documentModel);
+    dataBindingElementIndex = elementIndex;
     dataConfigurationController.setModel(formModel.getContent(), elementIndex);
     cleanupController.setModel(formModel, elementIndex == null ? List.of() : List.of(elementIndex));
   }
@@ -320,11 +325,11 @@ public class FormModelEditorController extends AbstractEditorController implemen
   }
 
   private Optional<Button> newButtonViaDialog(List<String> screenIds) {
-    return Dialogs.showButtonForAdd(Studio.stage, screenIds);
+    return Dialogs.showButtonForAdd(Studio.stage, dataBindingElementIndex, screenIds);
   }
 
   private Optional<Button> editButtonViaDialog(List<String> screenIds, Button button) {
-    return Dialogs.showButtonForEdit(Studio.stage, screenIds, button);
+    return Dialogs.showButtonForEdit(Studio.stage, dataBindingElementIndex, screenIds, button);
   }
 
   /**

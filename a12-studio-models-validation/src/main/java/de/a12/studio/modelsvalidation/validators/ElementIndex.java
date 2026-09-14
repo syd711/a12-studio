@@ -271,6 +271,36 @@ public class ElementIndex {
     return result.toString();
   }
 
+  /**
+   * The direct children of the group reached by descending {@code scopeNames} from the model root - e.g. the
+   * enclosing {@code kontext(...)} chain at some point in an Overview/Form "Expression" (see {@code
+   * docs/2606-06-doc/expression-expression-docs.md}'s grammar) - or, when {@code scopeNames} is empty, the
+   * combined direct children of every root group (normally just one). A {@code kontext(...)} block only
+   * exposes its own named group's direct children as bare {@code [FieldName]}/{@code kontext(childName)}
+   * targets, not the whole model, mirroring the language's scoping rules. Empty if {@code scopeNames} doesn't
+   * resolve to an actual group.
+   */
+  public List<Element> directChildren(List<String> scopeNames) {
+    if (scopeNames.isEmpty()) {
+      List<GroupElement> rootGroups = model.getContent().getModelRoot().getRootGroups();
+      if (rootGroups == null) {
+        return List.of();
+      }
+      List<Element> children = new ArrayList<>();
+      for (GroupElement root : rootGroups) {
+        if (root.getGroup() != null && root.getGroup().getElements() != null) {
+          children.addAll(root.getGroup().getElements());
+        }
+      }
+      return children;
+    }
+    return resolveByNamePath(scopeNames)
+        .filter(GroupElement.class::isInstance)
+        .map(GroupElement.class::cast)
+        .map(group -> group.getGroup() != null && group.getGroup().getElements() != null ? group.getGroup().getElements() : List.<Element>of())
+        .orElse(List.of());
+  }
+
   private Optional<Element> resolveByNamePath(List<String> names) {
     if (names.isEmpty()) {
       return Optional.empty();

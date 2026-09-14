@@ -6,6 +6,7 @@ import de.a12.studio.models.formmodel.LocalizedText;
 import de.a12.studio.models.formmodel.LocalizedTextType;
 import de.a12.studio.models.formmodel.MultilingualText;
 import de.a12.studio.models.formmodel.TextContainer;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import javafx.collections.FXCollections;
@@ -14,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.util.List;
@@ -105,6 +107,21 @@ public class LocalizedTextTypePanelController extends AbstractPropertyEditor imp
 
   public void setVisible(boolean visible) {
     setEditorVisible(visible);
+  }
+
+  /**
+   * Enables field/group-name autocomplete in the Expression case (see {@link RichtextEditorController#
+   * setSuggestionProvider}), scoped to {@code documentModel}'s field tree - e.g. {@link
+   * de.a12.studio.ui.editors.formmodel.FormModelEditorController#resolveDataBindingDocumentModel}'s result at
+   * this panel's call site. This panel has no {@link de.a12.studio.models.documentmodel.Element} of its own
+   * (see {@link #setCustom}), so unlike a document-model-bound panel, every caller must supply this
+   * explicitly; {@code null} (no Document Model resolved, or the caller not yet updated) leaves the Expression
+   * field's completion disabled.
+   */
+  public void setFieldSuggestionSource(@Nullable ElementIndex documentModelIndex) {
+    if (documentModelIndex != null) {
+      expressionController.setSuggestionProvider(new ExpressionScopeSuggestionProvider(documentModelIndex));
+    }
   }
 
   /**

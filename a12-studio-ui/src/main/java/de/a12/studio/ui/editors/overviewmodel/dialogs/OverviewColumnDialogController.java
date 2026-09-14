@@ -13,6 +13,7 @@ import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions.ElementKind;
 import de.a12.studio.ui.editors.overviewmodel.StylesPanelController;
+import de.a12.studio.ui.editors.propertyeditors.ExpressionScopeSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.RichtextEditorController;
@@ -329,6 +330,9 @@ public class OverviewColumnDialogController implements DialogController {
     OverviewElementOptions.applyElementRefConverter(elementRefCombo, documentModelIndex);
     suffixRefCombo.getItems().setAll(OverviewElementOptions.enumerationElementIds(documentModelIndex));
     OverviewElementOptions.applyElementRefConverter(suffixRefCombo, documentModelIndex);
+    if (documentModelIndex != null) {
+      expressionPanelController.setSuggestionProvider(new ExpressionScopeSuggestionProvider(documentModelIndex));
+    }
 
     updatingFromModel = true;
     try {

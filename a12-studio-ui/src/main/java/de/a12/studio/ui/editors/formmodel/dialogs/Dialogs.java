@@ -3,10 +3,12 @@ package de.a12.studio.ui.editors.formmodel.dialogs;
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.EventButton;
 import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+import org.jspecify.annotations.Nullable;
 
 import java.security.SecureRandom;
 import java.util.List;
@@ -30,11 +32,11 @@ public class Dialogs {
    * adds the returned button to its owning list once present - it's never attached to the model tree by this
    * method itself.
    */
-  public static Optional<Button> showButtonForAdd(Stage owner, List<String> screenIds) {
+  public static Optional<Button> showButtonForAdd(Stage owner, @Nullable ElementIndex elementIndex, List<String> screenIds) {
     EventButton button = new EventButton();
     button.setId(generateButtonId());
     button.setScope(DEFAULT_SCOPE);
-    return showButton(owner, StudioBundle.get("add_button_title"), screenIds, button);
+    return showButton(owner, StudioBundle.get("add_button_title"), elementIndex, screenIds, button);
   }
 
   /**
@@ -44,16 +46,16 @@ public class Dialogs {
    * different {@link Button} subtype mid-edit, which a field-level restore can't undo. The caller only replaces
    * the original row with the returned button once present.
    */
-  public static Optional<Button> showButtonForEdit(Stage owner, List<String> screenIds, Button button) {
-    return showButton(owner, StudioBundle.get("edit_button_title"), screenIds, cloneButton(button));
+  public static Optional<Button> showButtonForEdit(Stage owner, @Nullable ElementIndex elementIndex, List<String> screenIds, Button button) {
+    return showButton(owner, StudioBundle.get("edit_button_title"), elementIndex, screenIds, cloneButton(button));
   }
 
-  private static Optional<Button> showButton(Stage owner, String title, List<String> screenIds, Button button) {
+  private static Optional<Button> showButton(Stage owner, String title, @Nullable ElementIndex elementIndex, List<String> screenIds, Button button) {
     FXMLLoader fxmlLoader = new FXMLLoader(FormButtonDialogController.class.getResource("form-button-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("button-dialog", fxmlLoader, owner, title);
     FormButtonDialogController controller = (FormButtonDialogController) stage.getUserData();
-    controller.init(stage, screenIds, button);
+    controller.init(stage, elementIndex, screenIds, button);
     stage.setOnHidden(event -> controller.destroy());
     WidgetFactory.installResizable(stage);
 

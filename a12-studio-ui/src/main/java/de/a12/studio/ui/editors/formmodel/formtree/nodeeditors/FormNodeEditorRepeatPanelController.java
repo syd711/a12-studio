@@ -61,7 +61,7 @@ public class FormNodeEditorRepeatPanelController {
       @Nullable ElementIndex elementIndex,
       HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     fieldInformationController.setRepeat(repeat, documentModel);
-    labelController.setRepeat(repeat, content);
+    labelController.setRepeat(repeat, content, elementIndex);
     hintController.setRepeat(repeat, content);
     placeholderController.setRepeat(repeat, content);
     columnSettingsController.setRepeat(repeat);
