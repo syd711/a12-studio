@@ -3,9 +3,12 @@ package de.a12.studio.ui.editors.querymodel;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import org.jspecify.annotations.NonNull;
@@ -102,5 +105,27 @@ public record QueryTraversalOption(String relationshipModel, String targetRole) 
           .orElse(null);
     }
     return null;
+  }
+
+  /** Every field path reachable in {@code documentModel} - the values a {@link
+   * de.a12.studio.models.querymodel.QuerySortBy#getField()} can reference, mirroring {@link
+   * QueryTreeRow#collectDescendantFieldPaths}'s use for the Model Tree's own field paths. Empty if {@code
+   * documentModel} is null or has no model root yet. */
+  public static List<String> availableFieldPaths(@Nullable DocumentModel documentModel) {
+    if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
+      return List.of();
+    }
+    List<GroupElement> rootGroups = documentModel.getContent().getModelRoot().getRootGroups();
+    if (rootGroups == null) {
+      return List.of();
+    }
+    ElementIndex elementIndex = new ElementIndex(documentModel);
+    List<String> paths = new ArrayList<>();
+    for (GroupElement group : rootGroups) {
+      ElementViewModel elementViewModel = new ElementViewModel(group);
+      paths.addAll(QueryTreeRow.collectDescendantFieldPaths(elementViewModel, ev -> elementIndex.getPath(ev.getElement())));
+    }
+    paths.sort(String.CASE_INSENSITIVE_ORDER);
+    return paths;
   }
 }

@@ -6,7 +6,6 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -36,7 +35,7 @@
                <VBox spacing="2.0">
                   <children>
                      <Label styleClass="field-label" text="%field" />
-                     <TextField fx:id="fieldField" />
+                     <ComboBox fx:id="fieldCombo" editable="true" maxWidth="Infinity" />
                   </children>
                </VBox>
 

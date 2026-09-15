@@ -17,26 +17,27 @@ public class Dialogs {
   private Dialogs() {
   }
 
-  public static Optional<QuerySort> showSortForAdd(Stage owner, ProjectItem projectItem) {
+  public static Optional<QuerySort> showSortForAdd(Stage owner, ProjectItem projectItem, String targetDocumentModelId) {
     QuerySort sort = new QuerySort();
     sort.getSortBy().setDirection(QuerySortBy.DIRECTION_ASC);
-    return showSort(owner, StudioBundle.get("add_sort_title"), projectItem, sort) ? Optional.of(sort) : Optional.empty();
+    return showSort(owner, StudioBundle.get("add_sort_title"), projectItem, targetDocumentModelId, sort) ? Optional.of(sort) : Optional.empty();
   }
 
-  public static boolean showSortForEdit(Stage owner, ProjectItem projectItem, QuerySort sort) {
-    return showSort(owner, StudioBundle.get("edit_sort_title"), projectItem, sort);
+  public static boolean showSortForEdit(Stage owner, ProjectItem projectItem, String targetDocumentModelId, QuerySort sort) {
+    return showSort(owner, StudioBundle.get("edit_sort_title"), projectItem, targetDocumentModelId, sort);
   }
 
   /**
    * Opens the sort entry editor for {@code sort}, editing it live so a Cancel can undo the changes (see {@link
-   * QuerySortDialogController}).
+   * QuerySortDialogController}). {@code targetDocumentModelId} is the query's own target Document Model - the
+   * field combo's source when the sort has no relationship traversal.
    */
-  private static boolean showSort(Stage owner, String title, ProjectItem projectItem, @NonNull QuerySort sort) {
+  private static boolean showSort(Stage owner, String title, ProjectItem projectItem, String targetDocumentModelId, @NonNull QuerySort sort) {
     FXMLLoader fxmlLoader = new FXMLLoader(QuerySortDialogController.class.getResource("query-sort-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("query-sort-dialog", fxmlLoader, owner, title);
     QuerySortDialogController controller = (QuerySortDialogController) stage.getUserData();
-    controller.init(stage, projectItem, sort);
+    controller.init(stage, projectItem, targetDocumentModelId, sort);
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();

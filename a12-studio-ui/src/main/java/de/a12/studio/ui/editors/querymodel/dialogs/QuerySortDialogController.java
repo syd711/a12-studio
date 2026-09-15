@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.querymodel.dialogs;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.querymodel.QuerySort;
 import de.a12.studio.models.querymodel.QuerySortBy;
@@ -7,6 +8,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.querymodel.QueryTraversalOption;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -14,10 +16,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,7 @@ public class QuerySortDialogController implements DialogController {
   @FXML
   private ComboBox<QueryTraversalOption> traversalCombo;
   @FXML
-  private TextField fieldField;
+  private ComboBox<String> fieldCombo;
   @FXML
   private ComboBox<String> directionCombo;
   @FXML
@@ -50,6 +52,8 @@ public class QuerySortDialogController implements DialogController {
   private Button cancelButton;
 
   private Stage stage;
+  private ProjectItem projectItem;
+  private String targetDocumentModelId;
   private QuerySort sort;
   private QuerySortSnapshot snapshot;
 
@@ -84,15 +88,17 @@ public class QuerySortDialogController implements DialogController {
 
     traversalCombo.setConverter(traversalConverter());
     traversalCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+      QueryTraversalOption selected = newValue != null ? newValue : QueryTraversalOption.NONE;
+      refreshFieldOptions(selected);
       if (updatingFromModel) {
         return;
       }
-      QueryTraversalOption selected = newValue != null ? newValue : QueryTraversalOption.NONE;
       sort.setRelationshipModel(selected.relationshipModel());
       sort.setTargetRole(selected.targetRole());
     });
 
-    fieldField.textProperty().addListener((observable, oldValue, newValue) -> {
+    fieldCombo.setEditable(true);
+    fieldCombo.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
         sort.getSortBy().setField(blankToNull(newValue));
       }
@@ -105,8 +111,10 @@ public class QuerySortDialogController implements DialogController {
     });
   }
 
-  void init(@NonNull Stage stage, @NonNull ProjectItem projectItem, @NonNull QuerySort sort) {
+  void init(@NonNull Stage stage, @NonNull ProjectItem projectItem, String targetDocumentModelId, @NonNull QuerySort sort) {
     this.stage = stage;
+    this.projectItem = projectItem;
+    this.targetDocumentModelId = targetDocumentModelId;
     this.sort = sort;
     this.snapshot = new QuerySortSnapshot(sort);
 
@@ -121,7 +129,7 @@ public class QuerySortDialogController implements DialogController {
     updatingFromModel = true;
     try {
       traversalCombo.setValue(current);
-      fieldField.setText(sort.getSortBy().getField());
+      fieldCombo.setValue(sort.getSortBy().getField());
       directionCombo.setValue(sort.getSortBy().getDirection() != null ? sort.getSortBy().getDirection() : QuerySortBy.DIRECTION_ASC);
       nullHandlingCombo.setValue(sort.getSortBy().getNullHandling());
       ignoreCaseField.setSelected(Boolean.TRUE.equals(sort.getSortBy().getIgnoreCase()));
@@ -131,6 +139,28 @@ public class QuerySortDialogController implements DialogController {
     }
 
     validate();
+  }
+
+  /** Repopulates {@link #fieldCombo}'s items with every field path reachable from {@code traversal}'s target
+   * (the query's own target Document Model for {@link QueryTraversalOption#NONE}, or the relationship's
+   * resolved target otherwise) - the combo stays editable so an already-set field that doesn't resolve (e.g.
+   * a stale traversal) is still shown rather than silently cleared. */
+  private void refreshFieldOptions(@NonNull QueryTraversalOption traversal) {
+    DocumentModel documentModel = resolveDocumentModel(traversal);
+    String currentText = fieldCombo.getEditor().getText();
+    fieldCombo.setItems(FXCollections.observableArrayList(QueryTraversalOption.availableFieldPaths(documentModel)));
+    fieldCombo.getEditor().setText(currentText);
+  }
+
+  @Nullable
+  private DocumentModel resolveDocumentModel(@NonNull QueryTraversalOption traversal) {
+    if (QueryTraversalOption.NONE.equals(traversal)) {
+      return ProjectDocumentModels.getOtherDocumentModels(projectItem).stream()
+          .filter(dm -> dm.getId().equals(targetDocumentModelId))
+          .findFirst()
+          .orElse(null);
+    }
+    return QueryTraversalOption.resolveTargetDocumentModel(projectItem, traversal.relationshipModel(), traversal.targetRole());
   }
 
   @Override
@@ -155,7 +185,8 @@ public class QuerySortDialogController implements DialogController {
   }
 
   private void validate() {
-    okButton.setDisable(fieldField.getText() == null || fieldField.getText().isBlank());
+    String field = fieldCombo.getEditor().getText();
+    okButton.setDisable(field == null || field.isBlank());
   }
 
   private static StringConverter<QueryTraversalOption> traversalConverter() {

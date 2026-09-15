@@ -70,7 +70,7 @@ public class QuerySortingPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAddSort() {
-    Dialogs.showSortForAdd(Studio.stage, projectItem).ifPresent(sort -> {
+    Dialogs.showSortForAdd(Studio.stage, projectItem, content().getTargetDocumentModel()).ifPresent(sort -> {
       getSort().add(sort);
       rebuildSortingRows();
       commitHeaderChange();
@@ -138,7 +138,7 @@ public class QuerySortingPanelController extends AbstractPropertyEditor {
   }
 
   private void openEditDialog(QuerySort sort) {
-    Dialogs.showSortForEdit(Studio.stage, projectItem, sort);
+    Dialogs.showSortForEdit(Studio.stage, projectItem, content().getTargetDocumentModel(), sort);
     rebuildSortingRows();
   }
 
