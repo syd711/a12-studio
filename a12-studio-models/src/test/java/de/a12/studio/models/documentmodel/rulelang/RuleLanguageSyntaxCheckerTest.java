@@ -58,10 +58,10 @@ class RuleLanguageSyntaxCheckerTest {
       "10",
       "[Price] * [Quantity]",
       "[Field1] DiffersWithToleranceRange10 [Field2]",
-      "StringField PatternMatched \"^[A-Z]+$\"",
+      "[StringField] PatternMatched \"^[A-Z]+$\"",
       "@SuppressWarning(MVK_INVALID_COMPARE_DEC_PLACES)\n[Product] == [Factor1] * [Factor2]",
       "3 ^ 2 + 1 * 2",
-      "a ^ { 2 + 1 } * 2".replace("a", "3"),
+      "3 ^ { 2 + 1 } * 2",
   })
   void acceptsKnownValidConstructs(String expression) {
     assertNull(RuleLanguageSyntaxChecker.validate(expression), () -> "expected no syntax error for: " + expression);
@@ -135,13 +135,21 @@ class RuleLanguageSyntaxCheckerTest {
   private static final Set<String> CONDITION_FIELD_NAMES =
       Set.of("errorCondition", "precondition", "operation", "commonPrecondition");
 
+  /** {@code overviewmodel.SummaryConfig.operation} (e.g. {@code "sum"}) reuses the same field name as {@code
+   * ComputationAlternative.operation} but holds a fixed aggregation keyword, not a RuleLang expression - this
+   * generic path-based scan can't tell the two "operation" fields apart any other way, so it excludes the
+   * shape by path instead. */
+  private static final java.util.regex.Pattern OVERVIEW_SUMMARY_OPERATION =
+      java.util.regex.Pattern.compile(".*\\.summary\\[\\d+]\\.operation$");
+
   private static List<FoundExpression> collectConditionFields(JsonNode node, String path) {
     List<FoundExpression> found = new ArrayList<>();
     if (node.isObject()) {
       node.properties().forEach(entry -> {
         String childPath = path.isEmpty() ? entry.getKey() : path + "." + entry.getKey();
         JsonNode value = entry.getValue();
-        if (CONDITION_FIELD_NAMES.contains(entry.getKey()) && value.isString() && !value.asString().isBlank()) {
+        if (CONDITION_FIELD_NAMES.contains(entry.getKey()) && value.isString() && !value.asString().isBlank()
+            && !OVERVIEW_SUMMARY_OPERATION.matcher(childPath).matches()) {
           found.add(new FoundExpression(childPath, value.asString()));
         }
         else {

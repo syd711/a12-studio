@@ -19,10 +19,12 @@ import lombok.Setter;
  * QueryElementRelationship} - see docs/sme-reference-comparison.md "Query Model" section.
  *
  * <p>{@code constraint} and {@code linkDocumentFields} are mapped here purely so an existing file with either
- * set round-trips losslessly; neither has editor UI yet (per-node filtering is a separate, not-yet-built piece -
- * see the "Query Model" doc section's Phase 3 - and {@code linkDocumentFields} would need resolving the
+ * set round-trips losslessly; neither has editor UI yet ({@code linkDocumentFields} would need resolving the
  * relationship's own link-document schema, {@link de.a12.studio.models.relationshipmodel.RelationshipModelContent
- * #getLinkDocumentModel()}, which nothing in this editor does yet either).
+ * #getLinkDocumentModel()}, which nothing in this editor does yet). {@code filterDefinition}/{@code useAllFields}
+ * mirror the same-named fields on {@link QueryModelContent} - a relationship hop's resolved target Document
+ * Model is just as filterable/projectable a node as the query's own root, see
+ * {@code QueryDocumentNodePanelController}.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
@@ -50,6 +52,12 @@ public class QueryLink {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Operator constraint;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String filterDefinition;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean useAllFields;
 
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<QueryLink> links = new ArrayList<>();

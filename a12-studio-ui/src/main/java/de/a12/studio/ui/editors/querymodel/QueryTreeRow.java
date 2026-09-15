@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.querymodel;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.querymodel.QueryLink;
@@ -40,6 +41,12 @@ class QueryTreeRow {
   private final String path;
   private List<String> descendantFieldPaths = List.of();
   private List<String> fieldsScope = List.of();
+
+  // The Document Model this row's own "document node" (target-DM or relationship-link) resolves to - null for
+  // ROOT_LABEL/ELEMENT rows and for an unresolved relationship link. Drives QueryModelTreeController's
+  // selection-driven right-hand panel (QueryDocumentNodePanelController): which fields are pickable, and what
+  // autocomplete/validation context the embedded Filter Definition editor uses.
+  private DocumentModel resolvedTargetDocumentModel;
 
   private QueryTreeRow(Kind kind, ElementViewModel elementViewModel, QueryLink link, String name, String path) {
     this.kind = kind;
@@ -116,11 +123,20 @@ class QueryTreeRow {
     return kind != Kind.ROOT_LABEL && !isUnresolvedRelationshipLink();
   }
 
-  /** Whether this row shows the "Filter Definition" cell: only the target Document Model's own row (see class
-   * doc on {@link QueryModelTreeController} for why it's collapsed to one filter per query rather than one per
-   * node, unlike SME). */
-  boolean hasFilterDefinition() {
-    return kind == Kind.TARGET_DOCUMENT_MODEL;
+  /** Whether this row is a "document node" - the target Document Model itself, or a relationship link that
+   * resolved to one - and so gets the right-hand Filter Definition / Fields-in-Result-Set panel
+   * ({@code QueryDocumentNodePanelController}) when selected. */
+  boolean isDocumentNode() {
+    return resolvedTargetDocumentModel != null && (kind == Kind.TARGET_DOCUMENT_MODEL || kind == Kind.RELATIONSHIP_LINK);
+  }
+
+  void setResolvedTargetDocumentModel(DocumentModel resolvedTargetDocumentModel) {
+    this.resolvedTargetDocumentModel = resolvedTargetDocumentModel;
+  }
+
+  @Nullable
+  DocumentModel getResolvedTargetDocumentModel() {
+    return resolvedTargetDocumentModel;
   }
 
   String getIcon() {

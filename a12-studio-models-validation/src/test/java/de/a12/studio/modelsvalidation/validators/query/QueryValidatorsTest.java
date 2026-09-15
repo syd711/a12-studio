@@ -72,12 +72,15 @@ class QueryValidatorsTest {
   }
 
   @Test
-  void filterDefinitionSyntaxValidatorReportsInvalidExpression() {
+  void filterDefinitionSyntaxValidatorReportsInvalidExpressionOnRootAndNestedLinks() {
     QueryModel model = TestModels.load("/querymodel/QueryFilterDefinitionSyntaxValidator_invalid.json", QueryModel.class);
     List<ModelValidationError> errors = new QueryFilterDefinitionSyntaxValidator().validate(model, TestModels.context(model));
 
-    assertEquals(1, errors.size());
+    // The root's own filterDefinition, plus a nested link's own filterDefinition two levels deep - the
+    // link between them has none set, proving recursion doesn't stop at the first unset hop.
+    assertEquals(2, errors.size());
     assertTrue(errors.get(0).message().contains("Invalid filter expression"));
+    assertTrue(errors.get(1).message().contains("Invalid filter expression"));
   }
 
   @Test

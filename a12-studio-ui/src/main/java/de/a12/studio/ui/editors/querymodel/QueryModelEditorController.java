@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.events.ModelClosedEvent;
 import javafx.fxml.FXML;
 import org.jspecify.annotations.NonNull;
 
@@ -40,6 +41,16 @@ public class QueryModelEditorController extends AbstractEditorController {
   @Override
   protected void onDocumentModelChangedElsewhere() {
     loadModel(projectItem.getModel());
+  }
+
+  /** Tears down {@link QueryModelTreeController}'s cached node-editor panel (flushing any still-debounced
+   * Filter Definition edit) alongside this editor's own teardown - see {@link QueryModelTreeController#destroy()}. */
+  @Override
+  public void modelClosed(@NonNull ModelClosedEvent event) {
+    super.modelClosed(event);
+    if (event.getItem().equals(projectItem)) {
+      queryModelTreeController.destroy();
+    }
   }
 
   @Override

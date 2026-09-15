@@ -31,7 +31,6 @@ public class Row {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private HideCondition hideCondition;
 
-  // Every fixture writes "cell" even when empty (unlike most other list fields here), so it's not
-  // NON_EMPTY like the others.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Cell> cell = new ArrayList<>();
 }

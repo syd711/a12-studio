@@ -12,6 +12,21 @@
   "content": {
     "projectionName": "document",
     "targetDocumentModel": "Ref_DM",
-    "filterDefinition": "[/Root/Name] ==="
+    "filterDefinition": "[/Root/Name] ===",
+    "links": [
+      {
+        "relationshipModel": "PersonRef",
+        "targetRole": "RefSide",
+        "fields": [],
+        "links": [
+          {
+            "relationshipModel": "PersonRef",
+            "targetRole": "RefSide",
+            "fields": [],
+            "filterDefinition": "[/Root/Name] ==="
+          }
+        ]
+      }
+    ]
   }
 }

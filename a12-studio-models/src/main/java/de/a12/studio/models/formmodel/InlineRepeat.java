@@ -10,6 +10,8 @@ import lombok.Setter;
 public class InlineRepeat extends AbstractRepeat {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean multiFileUpload;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private MultiFileUploadOptions multiFileUploadOptions;
 
   public InlineRepeat() {

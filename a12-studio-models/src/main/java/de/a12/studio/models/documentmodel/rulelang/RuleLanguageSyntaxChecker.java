@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
@@ -59,7 +60,7 @@ public final class RuleLanguageSyntaxChecker {
       @Override
       public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
           int charPositionInLine, String msg, RecognitionException e) {
-        throw new RuleLanguageException(parserErrorMessage(offendingSymbol, msg));
+        throw new RuleLanguageException(parserErrorMessage(recognizer, offendingSymbol, msg));
       }
     });
 
@@ -75,8 +76,14 @@ public final class RuleLanguageSyntaxChecker {
     return "Character '" + character + "' at position " + (charPositionInLine + 1) + " is incorrect. [MVK_LEXER_STANDARD_ERROR]";
   }
 
-  private static String parserErrorMessage(Object offendingSymbol, String antlrMessage) {
+  private static String parserErrorMessage(Recognizer<?, ?> recognizer, Object offendingSymbol, String antlrMessage) {
     if (offendingSymbol instanceof Token token && token.getType() == Token.EOF) {
+      if (isSoleLeadingIdentifier(recognizer, token)) {
+        // The kernel doc's own MVK_EXPECTED_TOKEN_NOT_FOUND example ("NumberOfFilledFields", nothing else) -
+        // a bare call name with no "(" at all is a more specific diagnosis than "incomplete", since an IDENT can
+        // only ever start a callExpression, which always requires "(" next.
+        return "Corrupt input or condition not complete (yet): Expected '('. [MVK_EXPECTED_TOKEN_NOT_FOUND]";
+      }
       return "The condition is not complete (yet). [MVK_INCOMPLETE_INPUT]";
     }
     if (antlrMessage.startsWith("missing ")) {
@@ -85,6 +92,17 @@ public final class RuleLanguageSyntaxChecker {
     }
     String found = offendingSymbol instanceof Token token ? token.getText() : extractQuoted(antlrMessage).orElse("?");
     return "Corrupt input or condition not complete (yet): Unexpected found '" + found + "'. [MVK_UNEXPECTED_TOKEN]";
+  }
+
+  /** True if the only non-EOF token in the whole input is a single IDENT (i.e. the source is nothing but a bare
+   * call name, e.g. {@code "NumberOfFilledFields"}) - deliberately narrow so it doesn't misfire on an IDENT that
+   * trails a longer, genuinely-incomplete input (e.g. {@code "GroupFilled(RuleGroup"}). */
+  private static boolean isSoleLeadingIdentifier(Recognizer<?, ?> recognizer, Token eofToken) {
+    if (!(recognizer instanceof Parser parser) || !(parser.getInputStream() instanceof CommonTokenStream stream)) {
+      return false;
+    }
+    int eofIndex = eofToken.getTokenIndex();
+    return eofIndex == 1 && stream.get(0).getType() == RuleLangLexer.IDENT;
   }
 
   /** The first single-quoted substring in an ANTLR error message, e.g. {@code "'('"} out of {@code "missing

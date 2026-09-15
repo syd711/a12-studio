@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeTableColumn?>
@@ -60,23 +61,27 @@
         </VBox>
     </top>
     <center>
-        <TreeTableView fx:id="elementsTreeTable" BorderPane.alignment="CENTER">
-            <columns>
-                <TreeTableColumn fx:id="nameColumn" prefWidth="350.0" text="%name" />
-                <TreeTableColumn fx:id="inResultColumn" prefWidth="90.0" text="%in_result">
-                    <graphic>
-                        <Label prefHeight="9.0" prefWidth="7.0">
-                            <tooltip>
-                                <Tooltip prefWidth="300.0" text="%it_can_be_selected_whether_the_data_for_the_respective_field" wrapText="true" />
-                            </tooltip>
+        <SplitPane dividerPositions="0.55" BorderPane.alignment="CENTER">
+            <items>
+                <TreeTableView fx:id="elementsTreeTable">
+                    <columns>
+                        <TreeTableColumn fx:id="nameColumn" prefWidth="350.0" text="%name" />
+                        <TreeTableColumn fx:id="inResultColumn" prefWidth="90.0" text="%in_result">
                             <graphic>
-                                <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                                <Label prefHeight="9.0" prefWidth="7.0">
+                                    <tooltip>
+                                        <Tooltip prefWidth="300.0" text="%it_can_be_selected_whether_the_data_for_the_respective_field" wrapText="true" />
+                                    </tooltip>
+                                    <graphic>
+                                        <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" />
+                                    </graphic>
+                                </Label>
                             </graphic>
-                        </Label>
-                    </graphic>
-                </TreeTableColumn>
-                <TreeTableColumn fx:id="filterDefinitionColumn" prefWidth="400.0" text="%filter_definition" />
-            </columns>
-        </TreeTableView>
+                        </TreeTableColumn>
+                    </columns>
+                </TreeTableView>
+                <BorderPane fx:id="nodeEditorContainer" />
+            </items>
+        </SplitPane>
     </center>
 </BorderPane>

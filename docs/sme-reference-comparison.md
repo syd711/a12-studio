@@ -590,11 +590,12 @@ covered by round-trip tests.**
 *Analyzed 2026-09-05 (rest of this doc last analyzed 2026-07-17 — don't assume the same currency).*
 
 a12-studio's Query Model editor (`a12-studio-ui/.../editors/querymodel/`, data model in
-`a12-studio-models/.../querymodel/`) exists but is a thin shell: the tree is read-only, filtering is a single
-free-text expression for the whole query rather than per-node, there is no UI to set the target Document Model
-after creation, and there are **zero validators**. SME's `queryModel` (`client/src/modules/queryModel/`) is a real
-structured-query editor built on a manipulable document-graph tree with per-node constraint authoring, aggregation,
-and full reference/rename tracking — see comparison below.
+`a12-studio-models/.../querymodel/`) has an editable, split-view tree (`QueryModelTreeController`: the graph on
+the left, a per-selected-"document node" property panel — `QueryDocumentNodePanelController` — on the right,
+mirroring `document-model-editor.fxml`'s own tree+editorContainer split) with per-node filter/field-projection
+authoring, validators, and a target-DM Settings tab. Aggregation config and reference/rename tracking are still
+gaps — see comparison below. SME's `queryModel` (`client/src/modules/queryModel/`) remains the fuller reference
+for those two.
 
 ### Data model
 
@@ -602,13 +603,13 @@ and full reference/rename tracking — see comparison below.
 |---|---|---|
 | Target | `targetDocumentModel` (String, DM id only) | `targetDocumentModel` — can also be a Combined Document Model or Transformer Model output |
 | Projection | `projectionName` | `projectionName` |
-| Field selection | `fields[]` (in-result paths) | `fields[]`, plus a `useAllFields` mode |
-| Filter | `filterDefinition` — **one free-text string for the entire query** | `constraint` — recursive `Operator` AST (`and`/`or`/`not`/`exact_match`/`double_range`/`date_range`/`undefined_match`/`simple_search`/`has`), attachable **per graph node** |
-| Traversal | none — tree is a fixed mirror of the target DM | `links[]` — nested relationship traversals (`relationshipModel`, `targetRole`, optional `constraint`, optional `maxDepth` for self-reference recursion), plus `has(...)` as a filter-only traversal |
+| Field selection | `fields[]` (in-result paths), plus a `useAllFields` (Boolean) mode — same on `QueryLink` for a relationship-hop's own target | `fields[]`, plus a `useAllFields` mode |
+| Filter | `filterDefinition` (free-text Query Language, `QueryLanguageEmitter`/`Formatter`) — **per graph node**: `QueryModelContent.filterDefinition` for the root, `QueryLink.filterDefinition` for a relationship hop's own target | `constraint` — recursive `Operator` AST (`and`/`or`/`not`/`exact_match`/`double_range`/`date_range`/`undefined_match`/`simple_search`/`has`), attachable **per graph node** |
+| Traversal | `links[]` — nested relationship traversals (`relationshipModel`, `targetRole`, optional `maxDepth` for self-reference recursion); `constraint` (structured `Operator`)/`linkDocumentFields` map for lossless round-tripping only, no editor UI | `links[]` — nested relationship traversals (`relationshipModel`, `targetRole`, optional `constraint`, optional `maxDepth` for self-reference recursion), plus `has(...)` as a filter-only traversal |
 | Sort | `sort[]` (`QuerySort`: optional relationship+role hop, then `QuerySortBy` — field/direction/nullHandling/ignoreCase) | `sort` — same shape (field/direction/nullHandling/ignoreCase) |
 | Paging | `paging` (pageNumber, pageSize) | `paging` — same shape |
 | Aggregation | `aggregateResults` (Boolean) — **dangling flag, no config behind it** | `aggregation` — `group: {field}[]` + `aggregations: {function: count\|sum\|max\|min\|avg, field}[]`, a distinct result-shape mode |
-| Root exclusion | not present | `exclude` — omit the root document itself, return only linked docs |
+| Root exclusion | `exclude` (Boolean, root only) — "Only Links" checkbox (`QueryOnlyLinksPanelController`) | `exclude` — omit the root document itself, return only linked docs |
 
 SME's in-editor representation additionally splits into three independently-validated sub-documents (`settings`
 header form, `documentGraph` tree, `postProcessing` sort/paging/aggregation) that get merged back into the flat
@@ -620,15 +621,15 @@ needs to copy architecturally.
 | Feature | SME reference | a12-studio status |
 |---|---|---|
 | Editable tree / document graph | Add a root DM via an ER-diagram picker (reuses the Model Graph Diagram component); add relationship-traversal nodes (only relationships actually connected to the selected node are offered) | **Missing** — tree is a fixed, read-only mirror of one target DM's fields/groups; no traversal nodes, no add/remove |
-| Per-node filter/constraint | Query-language grammar editor (ANTLR-backed, field/relationship autocomplete against the model graph), compiles to the `Operator` AST; semantically validated (field exists, type-correct operator, valid relationship+role) | One whole-query free-text `filterDefinition` via `RichtextEditorController` — confirmed to be a plain `CodeArea` with cosmetic string-literal highlighting only, **no grammar parsing, no autocomplete, no semantic validation** |
-| Target Document Model selection | Settings tab, editable at any time | **No UI at all** — `targetDocumentModel`/`projectionName` can only be set by hand-editing the JSON; `ModelSettingsDialog` explicitly hides model-references/supported-characters for QueryModel |
-| In-result field toggles | Inline tree checkboxes, tri-state on groups, disabled+forced for non-indexed fields | Present (`QueryModelTreeController`'s In-Result column), roughly at parity |
+| Per-node filter/constraint | Query-language grammar editor (ANTLR-backed, field/relationship autocomplete against the model graph), compiles to the `Operator` AST; semantically validated (field exists, type-correct operator, valid relationship+role) | Present, per graph node (`QueryDocumentNodePanelController`'s embedded `RuleEditorController`, `QueryLanguageEmitter`-validated, bracketed-path autocomplete via `BracketedPathSuggestionProvider`) — free-text QL grammar rather than SME's structured-AST editor, and only syntax is checked (field existence inside the expression isn't) |
+| Target Document Model selection | Settings tab, editable at any time | Present (Settings tab, `QuerySettingsPanelController`), roughly at parity |
+| In-result field toggles | Inline tree checkboxes, tri-state on groups, disabled+forced for non-indexed fields | Present (`QueryModelTreeController`'s In-Result column, tri-state on groups) **and** the right panel's "Fields included in Result Set" list (add/remove + "All Fields of the Document Model") — a12-studio has no `indexed`-annotation concept at all, so non-indexed fields aren't specially disabled |
 | Sort | Multi-field, relationship-hop, direction, null-handling, ignore-case | Present (`QuerySort`/`QuerySortBy`/sorting panel), roughly at parity — `QueryTraversalOption.options()` scopes to *every* relationship in the project rather than only ones connected to the target DM |
 | Paging | pageNumber/pageSize | Present, roughly at parity |
 | Aggregation/grouping | Full group-by + count/sum/max/min/avg mode | **Missing** — `aggregateResults` boolean has no config surface behind it |
 | Multi-target-type queries (CDM, Transformer Model as target) | Supported | Not supported — DM only |
 | Reference/rename tracking | Target-DM, relationship, sort/aggregation field-path references are all first-class in SME's refactoring graph; renaming a DM/field auto-updates or flags the query (`qmModule.ts` `refactorDocument()`) | **Missing** — `resolveTargetDocumentModel()` silently produces an empty tree if the stored id no longer resolves, no error surfaced |
-| Validation | Root-required, per-node schema validation, constraint semantic validity, target-role validity, field-projection sanity, tab-level validation counts | **None** — no `QueryModelValidationService`, nothing wired to `ModelType.QUERY` at all; even the sorting panel's "relationship could not be resolved" indicator is a UI style hint, not a real validation error |
+| Validation | Root-required, per-node schema validation, constraint semantic validity, target-role validity, field-projection sanity, tab-level validation counts | Present (`QueryModelValidationService`, `a12-studio-models-validation/.../validators/query/`): target-DM required, `fields[]`/sort field-path resolution (root and per-link, recursive), relationship+role resolution (sort traversal and graph links, recursive), paging bounds, and `filterDefinition` QL syntax (root and per-link, recursive) — field-projection sanity is reachability-only (the "Add" combo only offers real field paths, so an invalid path isn't reachable through the UI at all); no field-existence check on refs *inside* a filter expression's own text |
 
 ### Feasibility spike: the query-grammar dependency (2026-09-05) — **feasible, not kernel-gated**
 
@@ -827,20 +828,60 @@ source in this session - flagged the same way the `date_range` `value`/`reverse`
   needs manual verification, e.g. against `testing/workspaces/basic` with a Relationship Model connected to a
   Query Model's target Document Model.
 
-**Still remaining**: no per-node constraint slot yet (`filterDefinition` is still one whole-query expression on
-the root only, not attachable to a relationship-link node) - that's Phase 3, now unblocked by this tree work.
-Real semantic validation of the *filter expression's own* field references (does `[/Foo/Bar]` inside a
-`filterDefinition` string actually exist) also isn't checked - only its syntax is. Aggregation and reference/
-rename tracking are unchanged from the plan below.
+**Status (2026-09-14): Phase 3 (per-node filtering) UI done — closes the gap flagged above.** Every "document
+node" in the graph (the target Document Model row, and any relationship-link row that resolved to one) now gets
+its own Filter Definition and Fields-in-Result-Set editor, not just the root:
+
+- **Split-view tree**: `query-model-tree.fxml`'s `<center>` is now a `SplitPane` (tree left, a `BorderPane
+  fx:id="nodeEditorContainer"` right — mirrors `document-model-editor.fxml`'s tree+editorContainer split
+  exactly), driven by a new `elementsTreeTable` selection listener in `QueryModelTreeController`. The old
+  "Filter Definition" tree column and its click-to-open-a-dialog cell (`FilterDefinitionCell`,
+  `QueryFilterDefinitionDialogController`, `query-filter-definition-dialog.fxml`) are removed — editing moved
+  entirely into the always-visible panel, so there is no longer a second, redundant editing surface for the
+  same field. The "In Result" checkbox column is unchanged (still useful as a quick per-field toggle while
+  browsing) and stays in sync both ways with the new panel's field list, since both read/write the exact same
+  `fields` `List` instance (`QueryTreeRow#getFieldsScope()`) — a plain `elementsTreeTable.refresh()`/panel
+  `refresh()` call after either side's edit is enough, no tree rebuild needed.
+- **Data model**: `QueryLink` gained `filterDefinition` (String) and `useAllFields` (Boolean), mirroring the
+  same-named fields already on `QueryModelContent` — a relationship hop's resolved target Document Model is
+  exactly as filterable/projectable a node as the query's own root. `QueryModelContent` gained `useAllFields`
+  too; `exclude` already existed (round-trip-only) and now has UI.
+- **`QueryDocumentNodePanelController`** (`query-document-node-panel.fxml`) is the panel shown in
+  `nodeEditorContainer`: a read-only "Target/Linked Document Model: `<id>`" label, the embedded `RuleEditorController`
+  (Filter Definition, same `QueryLanguageEmitter` syntax validation and `BracketedPathSuggestionProvider`
+  autocomplete the old dialog used), `QueryFieldsProjectionPanelController` ("Fields included in Result Set" -
+  the "All Fields of the Document Model" checkbox, and, when off, an add/remove-able list of field paths sourced
+  from `ElementIndex(targetDocumentModel).allElements()` filtered to `FieldElement`), and - root only -
+  `QueryOnlyLinksPanelController` ("Only Links", `content.exclude`). `QueryFilterableNode` is a small adapter
+  interface (`QueryFilterableNode.of(QueryModelContent)` / `.of(QueryLink)`) so the panels work against one
+  shape regardless of which backing type is bound - the two don't share a common supertype.
+- **Event-firing subtlety**: `RuleEditorController`'s own inherited `commitChange()` only fires
+  `StudioEventManager.fireModelSavedEvent` when bound to a real `Element` (`this.element != null`) - true for
+  every *other* embedded use of it in this codebase (each one also calls `setElement(...)` purely for this
+  side effect, e.g. `DocumentModelValidationRuleEditorController`), but there is no `Element` backing a
+  `QueryFilterableNode`. `QueryDocumentNodePanelController`'s `setCustom` writer does the full commit itself
+  (save + fire event + notify `QueryModelTreeController` to refresh) instead, accepting one harmless redundant
+  `ProjectItem#save()` from the inherited call that runs afterward - flagged here in case a future "model-header
+  + embedded RuleEditorController" case wants a cleaner shared solution (e.g. a small `RuleEditorController`
+  subclass overriding `commitChange()` to call `commitHeaderChange()`) instead of repeating this workaround.
+- **Validators**: `QueryFilterDefinitionSyntaxValidator` now also recursively checks every `QueryLink.filterDefinition`
+  (not just `content.filterDefinition`), the same recursion shape `QueryLinkValidator` already uses for
+  `fields`/target-role.
+- **Not ported**: SME's field-projection custom condition (`QmInvalidFieldProjection`) also rejects a field with
+  an `indexed = false` annotation - a12-studio's `DocumentModel` has no `indexed`-annotation concept at all, so
+  there is nothing to port that check against; not a gap this pass could close.
+
+**Still remaining**: real semantic validation of the *filter expression's own* field references (does
+`[/Foo/Bar]` inside a `filterDefinition` string actually exist) still isn't checked - only its syntax is.
+Aggregation and reference/rename tracking are unchanged from the plan below.
 
 ### Proposed build order
 
 1. ~~**Settings + validators**~~ — done, see Status above (2026-09-05).
 2. ~~**Editable graph tree**~~ — done, see Status above (2026-09-06).
-3. **Per-node filtering**: give each graph node (not just the whole query) its own constraint, authored/validated
-   via the already-built `QueryLanguageEmitter`/`Formatter` and stored in `QueryLink.constraint` (already mapped
-   in the data model, just not editable yet). Autocomplete remains a separate follow-up once a semantic
-   (field-existence-aware) layer exists.
+3. ~~**Per-node filtering**~~ — UI done, see Status above (2026-09-14). Autocomplete already existed (reused
+   from the old whole-query dialog); a semantic (field-existence-aware) layer for the filter expression's own
+   references remains a separate follow-up.
 4. **Aggregation** — only once it's confirmed the kernel path a12-studio would use actually supports an
    aggregation-mode query result; otherwise a documented non-goal.
 5. **Reference/rename tracking** — hook into whatever a12-studio's existing rename/move refactoring mechanism is

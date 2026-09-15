@@ -21,14 +21,12 @@ program: suppressWarningHint* expression EOF;
 
 suppressWarningHint: AT_SUPPRESS_WARNING B_OPEN_PAREN IDENT B_CLOSE_PAREN;
 
-expression
-    : andExpression
-    | orExpression
-    | atom
-    ;
-
-andExpression: atom (K_AND atom)+;
-orExpression: atom (K_OR atom)+;
+// Left-factored so the parser can commit to a single atom via plain LL(1) lookahead instead of needing full
+// context-sensitive prediction to choose between three alternatives that all start with the same atom - that
+// ambiguity previously made a bare, unparenthesized call name at EOF (e.g. "NumberOfFilledFields") come back as
+// a generic "no viable alternative" (reported as MVK_INCOMPLETE_INPUT) instead of a specific missing-'(' error
+// (MVK_EXPECTED_TOKEN_NOT_FOUND, per the kernel doc's own canonical example for that exact input).
+expression: atom ((K_AND atom)+ | (K_OR atom)+)?;
 
 atom
     : comparison
@@ -70,7 +68,7 @@ fieldValue: B_OPEN_SQUARE path B_CLOSE_SQUARE;
 // (e.g. "GroupFilled(RuleGroup)") - already covered by pathArgument below, no separate token needed for those.
 bareConstant: K_TODAY | K_NOW;
 
-callExpression: IDENT B_OPEN_PAREN arguments? B_CLOSE_PAREN;
+callExpression: IDENT B_OPEN_PAREN arguments B_CLOSE_PAREN;
 
 arguments: argument (S_COMMA argument)*;
 
@@ -98,7 +96,13 @@ pathAccessor
     | K_FOR (STRING_LITERAL | path)
     ;
 
-segment: (IDENT | S_DOTDOT | QUOTED_SEGMENT) S_STAR?;
+// The kernel doc's own "turning Group" convention (e.g. "../../..Account/O/Hotel/Amount") attaches the last
+// ".." directly to the following segment name with no "/" between them, unlike every other segment transition -
+// so a lone ".." optionally absorbs a following IDENT/QUOTED_SEGMENT directly, instead of requiring S_SLASH.
+segment
+    : S_DOTDOT (IDENT | QUOTED_SEGMENT)? S_STAR?
+    | (IDENT | QUOTED_SEGMENT) S_STAR?
+    ;
 
 pathSegmentName: IDENT | QUOTED_SEGMENT;
 

@@ -54,9 +54,15 @@ public class QueryModelContent {
   private Boolean aggregateResults;
 
   // Inverts "constraint"/"links" into an exclusion filter (used by e.g. an "AvailableItems" query that
-  // projects everything NOT already linked). No editor UI yet - preserved purely for lossless round-tripping.
+  // projects everything NOT already linked).
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean exclude;
+
+  // Whether the whole target Document Model is retrieved (true) rather than just the paths listed in
+  // "fields" (absent/false) - mirrors SME's QueryElementDocument.DocumentModel.useAllFields. Less performant
+  // (retrieves from the database instead of the index) but simpler; edited via QueryFieldsProjectionPanelController.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean useAllFields;
 
   @JsonProperty("fields")
   @JsonInclude(JsonInclude.Include.NON_NULL)

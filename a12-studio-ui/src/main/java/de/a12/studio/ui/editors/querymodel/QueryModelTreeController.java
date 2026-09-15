@@ -18,8 +18,9 @@ import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -30,8 +31,11 @@ import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.layout.BorderPane;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,13 +51,16 @@ import java.util.ResourceBundle;
  * column reading/writing its own {@code fields} list ({@link QueryModelContent#getFields()} for the root,
  * {@link QueryLink#getFields()} for a hop - see {@link QueryTreeRow#getFieldsScope()}).
  *
- * <p>Unlike SME's Query Model, "Filter Definition" is still collapsed to a single expression on the whole query
- * ({@link QueryModelContent#getFilterDefinition()}) rather than one per graph node - per-node filtering (backed
- * by {@link de.a12.studio.models.querymodel.ql.QueryLanguageEmitter}/{@code Formatter}, already built) is a
- * separate, not-yet-done piece; see {@link QueryTreeRow#hasFilterDefinition()} and
- * docs/sme-reference-comparison.md "Query Model" section.
+ * <p>Selecting a "document node" row ({@link QueryTreeRow#isDocumentNode()} - the target Document Model itself,
+ * or a relationship link that resolved to one) shows {@link QueryDocumentNodePanelController} in {@link
+ * #nodeEditorContainer}, mirroring {@code DocumentModelEditorController}'s tree+editorContainer split: its own
+ * "Filter Definition" (per-node, unlike the single query-level expression this used to be limited to) and
+ * "Fields included in Result Set" (including "All Fields of the Document Model") editors. Any other selection
+ * (the root label, a Field/Group element, or an unresolved relationship link) clears the panel.
  */
 public class QueryModelTreeController implements Initializable {
+
+  private static final String NODE_EDITOR_FXML = "query-document-node-panel.fxml";
 
   @FXML
   private SearchFieldController searchController;
@@ -74,11 +81,16 @@ public class QueryModelTreeController implements Initializable {
   private TreeTableColumn<QueryTreeRow, QueryTreeRow> inResultColumn;
 
   @FXML
-  private TreeTableColumn<QueryTreeRow, QueryTreeRow> filterDefinitionColumn;
+  private BorderPane nodeEditorContainer;
 
   private ProjectItem projectItem;
   private QueryModel model;
   private DocumentModel targetDocumentModel;
+
+  // Loaded once and reused across selections (see DocumentModelEditorController's identically-shaped cache) so
+  // the panel's embedded RuleEditorController isn't re-initialized (and its CodeArea rebuilt) on every click.
+  private Node nodeEditorNode;
+  private QueryDocumentNodePanelController nodeEditorController;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -89,11 +101,11 @@ public class QueryModelTreeController implements Initializable {
     inResultColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue()));
     inResultColumn.setCellFactory(column -> new InResultCell());
 
-    filterDefinitionColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue()));
-    filterDefinitionColumn.setCellFactory(column -> new FilterDefinitionCell());
-
     elementsTreeTable.setRowFactory(table -> createTreeTableRow());
-    elementsTreeTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> updateActionButtonsState());
+    elementsTreeTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+      updateActionButtonsState();
+      updateNodeEditor(newValue);
+    });
 
     searchController.setOnSearch(term -> rebuildTree());
   }
@@ -103,6 +115,14 @@ public class QueryModelTreeController implements Initializable {
     this.model = model;
     resolveTargetDocumentModel();
     rebuildTree();
+  }
+
+  /** Flushes/releases {@link #nodeEditorController} (if it was ever loaded) - called when this model's tab
+   * closes, mirroring {@code DocumentModelEditorController#modelClosed}'s identically-shaped cache teardown. */
+  public void destroy() {
+    if (nodeEditorController != null) {
+      nodeEditorController.destroy();
+    }
   }
 
   private QueryModelContent content() {
@@ -139,6 +159,7 @@ public class QueryModelTreeController implements Initializable {
     ElementIndex elementIndex = new ElementIndex(targetDocumentModel);
     QueryTreeRow row = QueryTreeRow.targetDocumentModel(targetDocumentModel.getId());
     row.setFieldsScope(content().getFields());
+    row.setResolvedTargetDocumentModel(targetDocumentModel);
 
     List<String> allFieldPaths = new ArrayList<>();
     List<TreeItem<QueryTreeRow>> children = new ArrayList<>();
@@ -178,6 +199,7 @@ public class QueryModelTreeController implements Initializable {
   private TreeItem<QueryTreeRow> buildRelationshipLinkItem(@NonNull QueryLink link, @NonNull String term) {
     DocumentModel linkedDocumentModel = QueryTraversalOption.resolveTargetDocumentModel(projectItem, link.getRelationshipModel(), link.getTargetRole());
     QueryTreeRow row = QueryTreeRow.relationshipLink(link, linkedDocumentModel != null ? linkedDocumentModel.getId() : null);
+    row.setResolvedTargetDocumentModel(linkedDocumentModel);
 
     List<TreeItem<QueryTreeRow>> children = new ArrayList<>();
     List<String> allFieldPaths = new ArrayList<>();
@@ -277,6 +299,11 @@ public class QueryModelTreeController implements Initializable {
     }
     commitChange();
     elementsTreeTable.refresh();
+    // The currently-shown node panel (if any) may be listing the very fields list this checkbox just changed
+    // (see updateNodeEditor's onChange wiring for the reverse direction) - refresh it too.
+    if (nodeEditorController != null) {
+      nodeEditorController.refresh();
+    }
   }
 
   @FXML
@@ -299,10 +326,39 @@ public class QueryModelTreeController implements Initializable {
     }
   }
 
-  private void onEditFilterDefinition() {
-    if (Dialogs.showFilterDefinition(Studio.stage, targetDocumentModel, content())) {
-      elementsTreeTable.refresh();
+  /** Shows/hides/rebinds {@link #nodeEditorContainer}'s {@link QueryDocumentNodePanelController} for the newly
+   * selected row - see the class doc for which rows qualify. */
+  private void updateNodeEditor(TreeItem<QueryTreeRow> selectedItem) {
+    QueryTreeRow row = selectedItem != null ? selectedItem.getValue() : null;
+    if (row == null || !row.isDocumentNode()) {
+      nodeEditorContainer.setCenter(null);
+      return;
     }
+    QueryFilterableNode node = row.getKind() == QueryTreeRow.Kind.RELATIONSHIP_LINK
+        ? QueryFilterableNode.of(row.getLink())
+        : QueryFilterableNode.of(content());
+    nodeEditorContainer.setCenter(loadNodeEditor());
+    // The panel mutates the very same List instance row.getFieldsScope() reads (content.fields / link.fields),
+    // so a plain refresh (no rebuildTree()) is enough to reflect an Add/Remove-field or All-Fields toggle back
+    // onto this tree's own "In Result" checkboxes - and vice versa, a checkbox toggle here should update
+    // whichever field list is currently showing in the panel.
+    nodeEditorController.setOnChange(elementsTreeTable::refresh);
+    nodeEditorController.load(projectItem, node, row.getResolvedTargetDocumentModel(), row.getResolvedTargetDocumentModel().getId(),
+        row.getKind() == QueryTreeRow.Kind.TARGET_DOCUMENT_MODEL);
+  }
+
+  private Node loadNodeEditor() {
+    if (nodeEditorNode == null) {
+      FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(NODE_EDITOR_FXML));
+      fxmlLoader.setResources(StudioBundle.getBundle());
+      try {
+        nodeEditorNode = fxmlLoader.load();
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+      nodeEditorController = fxmlLoader.getController();
+    }
+    return nodeEditorNode;
   }
 
   private TreeTableRow<QueryTreeRow> createTreeTableRow() {
@@ -451,31 +507,6 @@ public class QueryModelTreeController implements Initializable {
       checkBox.setIndeterminate(state == QueryTreeRow.InResultState.MIXED);
       checkBox.setSelected(state == QueryTreeRow.InResultState.ALL);
       setGraphic(checkBox);
-    }
-  }
-
-  private class FilterDefinitionCell extends TreeTableCell<QueryTreeRow, QueryTreeRow> {
-
-    @Override
-    protected void updateItem(QueryTreeRow row, boolean empty) {
-      super.updateItem(row, empty);
-      if (empty || row == null || !row.hasFilterDefinition()) {
-        setText(null);
-        setGraphic(null);
-        setOnMouseClicked(null);
-        return;
-      }
-      String filterDefinition = content().getFilterDefinition();
-      setText(filterDefinition == null || filterDefinition.isBlank()
-          ? StudioBundle.get("edit_filter_definition") : summarize(filterDefinition));
-      setGraphic(null);
-      setCursor(Cursor.HAND);
-      setOnMouseClicked(event -> onEditFilterDefinition());
-    }
-
-    private String summarize(@NonNull String filterDefinition) {
-      String singleLine = filterDefinition.strip().replaceAll("\\s+", " ");
-      return singleLine.length() > 80 ? singleLine.substring(0, 80) + "…" : singleLine;
     }
   }
 }
