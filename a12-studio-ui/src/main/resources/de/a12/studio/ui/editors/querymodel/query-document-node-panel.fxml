@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" styleClass="properties-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.querymodel.QueryDocumentNodePanelController">
+  <content>
+    <VBox spacing="12.0" styleClass="field-editor">
+      <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+      </padding>
+
+      <Label fx:id="targetDocumentModelLabel" styleClass="field-label" />
+
+      <fx:include fx:id="filterDefinitionPanel" source="../propertyeditors/richtext-editor.fxml" />
+
+      <fx:include fx:id="fieldsProjectionPanel" source="query-fields-projection-panel.fxml" />
+
+      <fx:include fx:id="onlyLinksPanel" source="query-only-links-panel.fxml" />
+    </VBox>
+  </content>
+</ScrollPane>

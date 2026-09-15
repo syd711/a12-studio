@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%query_fields_projection.title" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.querymodel.QueryFieldsProjectionPanelController">
+  <BorderPane>
+    <top>
+      <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+    </top>
+    <center>
+      <VBox spacing="10.0" BorderPane.alignment="CENTER">
+        <padding>
+          <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+        </padding>
+        <CheckBox fx:id="useAllFieldsCheckBox" mnemonicParsing="false" text="%query_fields_projection.use_all_fields">
+          <tooltip>
+            <Tooltip prefWidth="320.0" text="%query_fields_projection.use_all_fields_hint" wrapText="true" />
+          </tooltip>
+        </CheckBox>
+        <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+        <VBox fx:id="fieldsBox" spacing="6.0" />
+        <HBox spacing="8.0">
+          <ComboBox fx:id="addFieldCombo" editable="true" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+          <Button fx:id="addButton" mnemonicParsing="false" styleClass="primary-button" text="%query_fields_projection.add_field">
+            <graphic>
+              <FontIcon iconLiteral="mdi2p-plus" iconSize="16" styleClass="button-icon" />
+            </graphic>
+          </Button>
+        </HBox>
+      </VBox>
+    </center>
+  </BorderPane>
+</TitledPane>
