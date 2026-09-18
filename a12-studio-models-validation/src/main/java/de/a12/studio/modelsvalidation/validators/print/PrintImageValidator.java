@@ -12,6 +12,7 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Image elements need an alternative text (accessibility requirement of the print engine, mandatory
@@ -32,7 +33,8 @@ public final class PrintImageValidator implements ModelValidator {
       if (!(definition instanceof GenericPrintElement generic) || !"Image".equalsIgnoreCase(generic.getType())) {
         continue;
       }
-      Object alternativeText = generic.getExtras().get("alternativeText");
+      Object image = generic.getExtras().get("image");
+      Object alternativeText = image instanceof Map<?, ?> imageMap ? imageMap.get("alternativeText") : null;
       if (alternativeText == null || String.valueOf(alternativeText).isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.printImage.missingAlternativeText", definition.getId()),

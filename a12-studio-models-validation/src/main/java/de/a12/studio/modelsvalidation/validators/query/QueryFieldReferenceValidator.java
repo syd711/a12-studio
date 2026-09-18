@@ -35,7 +35,7 @@ public final class QueryFieldReferenceValidator implements ModelValidator {
     ElementIndex index = new ElementIndex(targetDocumentModel, context.otherDocumentModels());
     List<ModelValidationError> errors = new ArrayList<>();
     for (String path : queryModel.getContent().getFields()) {
-      if (QueryElementResolution.resolveByPath(index, path) == null) {
+      if (!QueryElementResolution.isMetaPath(path) && QueryElementResolution.resolveByPath(index, path) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.common.fieldReferenceMissing", path), Severity.ERROR.name()));
       }

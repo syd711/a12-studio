@@ -50,8 +50,8 @@ public final class OverviewColumnOptions {
    * problem flagged by {@link OverviewColumnHeaderLabelOrIconValidator} (WARNING), surfaced here the same way
    * as {@link #isUnresolvedElementRef} since that validator's shared {@code ELEMENT_ID} can't identify which
    * column it's about. */
-  public static boolean isMissingLabelOrIcon(Column column) {
-    return OverviewColumnHeaderLabelOrIconValidator.isMissingLabelOrIcon(column);
+  public static boolean isMissingLabelOrIcon(Column column, ElementIndex documentModelIndex) {
+    return OverviewColumnHeaderLabelOrIconValidator.isMissingLabelOrIcon(column, documentModelIndex);
   }
 
   /** A column with no field reference is an expression column, shown as "Expression Column" wherever it's

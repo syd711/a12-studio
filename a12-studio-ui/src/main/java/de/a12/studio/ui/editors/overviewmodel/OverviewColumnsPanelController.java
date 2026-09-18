@@ -264,7 +264,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
       label.getStyleClass().add("validation-error");
       label.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("path_could_not_be_resolved", summary)));
     }
-    else if (OverviewColumnOptions.isMissingLabelOrIcon(column)) {
+    else if (OverviewColumnOptions.isMissingLabelOrIcon(column, documentModelIndex)) {
       label.getStyleClass().add("validation-error");
       label.setTooltip(WidgetFactory.createTooltip(
           ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing",

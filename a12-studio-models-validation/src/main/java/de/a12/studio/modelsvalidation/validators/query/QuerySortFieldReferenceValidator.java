@@ -45,7 +45,7 @@ public final class QuerySortFieldReferenceValidator implements ModelValidator {
         continue;
       }
       String field = sort.getSortBy().getField();
-      if (field != null && QueryElementResolution.resolveByPath(index, field) == null) {
+      if (field != null && !QueryElementResolution.isMetaPath(field) && QueryElementResolution.resolveByPath(index, field) == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.common.fieldReferenceMissing", field), Severity.ERROR.name()));
       }

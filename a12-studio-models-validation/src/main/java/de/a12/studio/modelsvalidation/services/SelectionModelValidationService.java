@@ -6,7 +6,6 @@ import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
-import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
 import de.a12.studio.modelsvalidation.validators.ModelSuffixValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
@@ -25,7 +24,6 @@ import java.util.List;
 public final class SelectionModelValidationService {
 
   private final List<ModelValidator> validators = new ArrayList<>(List.of(
-      new MissingLocaleValidator(),
       new LocaleCodeValidator(),
       new ModelIdFilenameValidator(),
       new ModelSuffixValidator(),

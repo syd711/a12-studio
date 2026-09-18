@@ -40,4 +40,11 @@ public final class QueryElementResolution {
     }
     return null;
   }
+
+  /** Whether {@code path} is a framework-injected per-document metadata reference (e.g. {@code /__meta/docRef})
+   * rather than a Document Model element - these never appear in the target model's element tree by design (see
+   * a12 query docs), so callers must skip element resolution for them instead of treating a miss as an error. */
+  public static boolean isMetaPath(String path) {
+    return path != null && path.startsWith("/__meta/");
+  }
 }

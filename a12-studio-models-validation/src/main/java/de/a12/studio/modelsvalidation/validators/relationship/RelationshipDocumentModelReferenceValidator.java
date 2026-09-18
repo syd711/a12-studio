@@ -37,7 +37,7 @@ public final class RelationshipDocumentModelReferenceValidator implements ModelV
 
     String linkDocumentModel = relationshipModel.getContent().getLinkDocumentModelValue();
     if (linkDocumentModel != null && !linkDocumentModel.isBlank()
-        && context.findOtherDocumentModel(linkDocumentModel) == null) {
+        && !context.hasOtherDocumentOrCombinedModel(linkDocumentModel)) {
       errors.add(new ModelValidationError(model, ELEMENT_ID,
           ValidationMessages.get("validation.relationshipDocumentModelReference.linkNotFound", linkDocumentModel), Severity.ERROR.name()));
     }

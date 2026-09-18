@@ -67,6 +67,16 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "Field",
+                "id": "field_3",
+                "name": "NoLabel",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  }
+                }
               }
             ]
           }

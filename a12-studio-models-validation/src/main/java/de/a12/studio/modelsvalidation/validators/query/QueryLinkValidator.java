@@ -68,7 +68,7 @@ public final class QueryLinkValidator implements ModelValidator {
         && linkedDocumentModel.getContent().getModelRoot() != null) {
       ElementIndex index = new ElementIndex(linkedDocumentModel, context.otherDocumentModels());
       for (String path : link.getFields()) {
-        if (QueryElementResolution.resolveByPath(index, path) == null) {
+        if (!QueryElementResolution.isMetaPath(path) && QueryElementResolution.resolveByPath(index, path) == null) {
           errors.add(new ModelValidationError(model, ELEMENT_ID,
               ValidationMessages.get("validation.common.fieldReferenceMissing", path), Severity.ERROR.name()));
         }

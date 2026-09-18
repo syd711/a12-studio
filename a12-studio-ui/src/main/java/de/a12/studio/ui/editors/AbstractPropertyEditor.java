@@ -154,11 +154,9 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
     }
     showValidationError(null);
     errorContainerController.errorProperty().addListener((observable, oldValue, newValue) -> {
-      log.info("[TabErrorBadge] {} error-container errorProperty changed to {}", getClass().getSimpleName(), newValue);
       TabErrorBadge.refresh(root);
     });
     errorContainerController.severityProperty().addListener((observable, oldValue, newValue) -> {
-      log.info("[TabErrorBadge] {} error-container severityProperty changed to {}", getClass().getSimpleName(), newValue);
       TabErrorBadge.refresh(root);
     });
   }

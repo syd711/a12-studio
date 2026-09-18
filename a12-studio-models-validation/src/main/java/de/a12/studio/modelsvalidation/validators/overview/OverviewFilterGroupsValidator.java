@@ -81,7 +81,7 @@ public final class OverviewFilterGroupsValidator implements ModelValidator {
           continue;
         }
 
-        if (index == null) {
+        if (index == null || OverviewElementResolution.isMetaFieldId(fieldId)) {
           continue;
         }
         Element element = OverviewElementResolution.resolve(index, fieldId);

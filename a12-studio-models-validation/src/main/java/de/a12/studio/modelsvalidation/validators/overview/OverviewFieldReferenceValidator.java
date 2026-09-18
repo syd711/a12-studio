@@ -38,7 +38,7 @@ public final class OverviewFieldReferenceValidator implements ModelValidator {
     List<ModelValidationError> errors = new ArrayList<>();
     for (Column column : overviewModel.getContent().getColumns()) {
       String elementRef = column.getElementRef();
-      if (elementRef == null || elementRef.isBlank()) {
+      if (elementRef == null || elementRef.isBlank() || OverviewElementResolution.isMetaFieldId(elementRef)) {
         continue;
       }
       Element element = OverviewElementResolution.resolve(index, elementRef);

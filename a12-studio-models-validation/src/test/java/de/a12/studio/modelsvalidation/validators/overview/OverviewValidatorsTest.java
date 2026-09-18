@@ -96,7 +96,20 @@ class OverviewValidatorsTest {
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("no icon and no visible label"));
-    assertTrue(errors.get(0).message().contains("Name"));
+    assertTrue(errors.get(0).message().contains("NoLabel"));
+  }
+
+  @Test
+  void columnHeaderLabelOrIconValidatorAcceptsColumnInheritingFieldLabel() {
+    // field_1 ("Name") has its own label in Ref_DM - even though the column itself sets no label, SME
+    // auto-fills the column header from the referenced field's label, so this must not warn.
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewColumnHeaderLabelOrIconValidator_invalid.json", OverviewModel.class);
+    model.getContent().getColumns().get(0).setElementRef("field_1");
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewColumnHeaderLabelOrIconValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    assertEquals(0, errors.size());
   }
 
   @Test

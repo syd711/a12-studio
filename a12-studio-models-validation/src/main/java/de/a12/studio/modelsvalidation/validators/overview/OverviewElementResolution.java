@@ -51,6 +51,26 @@ public final class OverviewElementResolution {
     return index.resolveElement(elementRef).orElse(null);
   }
 
+  /**
+   * The kernel injects the same fixed {@code __meta} group (id {@value #META_GROUP_ID_PREFIX}{@code 8f4b1})
+   * into every Document Model at load time - {@code docRef}, {@code modelReference}, {@code modelVersion},
+   * {@code creator}, {@code createdAt}, {@code modifier}, {@code modifiedAt} (plus a nested {@code
+   * extensions} group) - with the exact same element ids in every model (confirmed identical across multiple
+   * unrelated SME fixtures, e.g. {@code Person_DM.json}, {@code PersonWithTeamsAndContracts_COM.json}), so
+   * these are legitimately referenceable fields even though a12-studio's own Document Model files never
+   * author them explicitly and {@link ElementIndex} has no record of them. Recognized by id prefix rather
+   * than a fixed id set so any of the group's known fields (present or future) resolve.
+   */
+  private static final String META_GROUP_ID_PREFIX = "abc6a6767a60488754aace2accb73824_";
+
+  /** True when {@code elementRef} (an {@code elementId}/{@code fieldId}) refers to the kernel-injected {@code
+   * __meta} group or one of its fields - see {@link #META_GROUP_ID_PREFIX}. Callers should skip existence/
+   * indexed/repeatable checks for these instead of resolving them against {@link ElementIndex}, which never
+   * contains them. */
+  public static boolean isMetaFieldId(String elementRef) {
+    return elementRef != null && elementRef.startsWith(META_GROUP_ID_PREFIX);
+  }
+
   public static boolean isIndexedFalse(Element element) {
     if (element.getAnnotations() == null) {
       return false;
