@@ -6,11 +6,15 @@ import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.StudioEventManager;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,6 +83,31 @@ public final class ProjectDocumentModels {
     else if (!item.getPath().equals(excludedPath) && item.getModel() != null && item.getModel().getModelType() == modelType) {
       result.add(item.getModel());
     }
+  }
+
+  /**
+   * Every {@link RelationshipModel} in {@code projectItem}'s project, sorted by id. Unfiltered when {@code
+   * documentModelId} is {@code null}; otherwise limited to relationships with an {@link EntityCharacteristic}
+   * whose {@code documentModel} equals it - the Form Model "Relationships" panel's candidate list ({@link
+   * de.a12.studio.ui.editors.formmodel.RelationshipModelPanelController}). Mirrors the same relationship
+   * lookup {@code de.a12.studio.ui.editors.querymodel.QueryTraversalOption} already does per-role; this
+   * variant dedups to one row per relationship model instead of one per role.
+   */
+  public static List<RelationshipModel> getRelationshipModelsConnectedTo(@NonNull ProjectItem projectItem, @Nullable String documentModelId) {
+    List<A12Model<?>> models = getOtherModelsOfType(projectItem, ModelType.RELATIONSHIP);
+    List<RelationshipModel> result = new ArrayList<>();
+    for (A12Model<?> model : models) {
+      if (!(model instanceof RelationshipModel relationshipModel) || relationshipModel.getContent() == null) {
+        continue;
+      }
+      if (documentModelId == null || relationshipModel.getContent().getEntityCharacteristics().stream()
+          .map(EntityCharacteristic::getDocumentModel)
+          .anyMatch(documentModelId::equals)) {
+        result.add(relationshipModel);
+      }
+    }
+    result.sort(Comparator.comparing(A12Model::getId));
+    return result;
   }
 
   /**

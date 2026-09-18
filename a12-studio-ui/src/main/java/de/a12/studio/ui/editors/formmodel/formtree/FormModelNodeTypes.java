@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.formmodel.Binding;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
@@ -109,12 +110,24 @@ final class FormModelNodeTypes {
     return List.of();
   }
 
-  /** Whether an object of {@code childClass} may be added as a child of {@code node}. */
+  /**
+   * Whether an object of {@code childClass} may be added as a child of {@code node}. {@link Binding} is
+   * deliberately left out of {@link #allowedChildTypes}'s {@code SCREEN_ELEMENT_CHILD_TYPES} - as in the SME
+   * reference, it can't be created via the generic "Add" menu, only by dragging a row from the Form Model
+   * editor's Relationships panel (see {@code RelationshipModelPanelController}/{@code
+   * FormModelTreeController#dropRelationshipModel}) - but a {@link Screen}/{@link Section}/{@link
+   * MultiColumnSection} must still recognize it as a valid child here so an already-created Binding can be
+   * cut/copied/pasted or reparented via drag-and-drop like any other {@code ScreenElement}.
+   */
   static boolean canContain(@NonNull Object node, @NonNull Class<?> childClass) {
     for (ChildTypeDescriptor descriptor : allowedChildTypes(node)) {
       if (descriptor.resultClass().isAssignableFrom(childClass)) {
         return true;
       }
+    }
+    if ((node instanceof Screen || node instanceof Section || node instanceof MultiColumnSection)
+        && Binding.class.isAssignableFrom(childClass)) {
+      return true;
     }
     return false;
   }

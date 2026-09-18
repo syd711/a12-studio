@@ -122,6 +122,8 @@ public class FormModelEditorController extends AbstractEditorController implemen
   @FXML
   private DocumentSourceTreeController documentSourceTreeController;
   @FXML
+  private RelationshipModelPanelController relationshipModelPanelController;
+  @FXML
   private FormModelTreeController formModelTreeController;
   @FXML
   private DataConfigurationPanelController dataConfigurationController;
@@ -182,6 +184,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private void loadOverview(@NonNull FormModel formModel) {
     DocumentModel documentModel = resolveDataBindingDocumentModel(formModel);
     documentSourceTreeController.load(documentModel, projectItem);
+    relationshipModelPanelController.load(documentModel, projectItem);
     formModelTreeController.setModel(formModel, documentModel, projectItem);
     formModelTreeController.setOnNodeSelected(this::onFormModelTreeNodeSelected);
     ElementIndex elementIndex = resolveElementIndex(documentModel);

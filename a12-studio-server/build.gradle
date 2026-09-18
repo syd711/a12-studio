@@ -29,6 +29,11 @@ launch4j {
     headerType = 'console'
     copyConfigurable = files()
     libraryDir = ''
+    // Relative to A12-Studio-Server.exe's own directory at runtime. Lands next to A12-Studio.exe
+    // in Output/A12-Studio (see a12-studio-ui's stageWindowsJre task), so both exes share the
+    // same bundled java-runtime folder.
+    bundledJrePath = 'java-runtime'
+    jreMinVersion = '21'
 }
 createExe.dependsOn bootJar
 

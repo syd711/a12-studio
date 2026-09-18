@@ -1,3 +1,5 @@
+import org.gradle.api.file.RelativePath
+
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
@@ -106,6 +108,49 @@ shadowJar {
     mergeServiceFiles()
 }
 
+// Same Zulu build used by the macOS/Linux jobs in .github/workflows/workflow.yml, so all three
+// platforms ship the identical JRE+JavaFX version - keep these in sync if that version changes.
+def windowsJreBundle = 'zulu21.42.19-ca-fx-jre21.0.7-win_x64.zip'
+def windowsJreCacheDir = file("${rootDir}/.jre-cache")
+def windowsJreZip = file("${windowsJreCacheDir}/${windowsJreBundle}")
+// "java-runtime" is also the value passed to launch4j's bundledJrePath below - launch4j resolves
+// that path relative to A12-Studio.exe's own directory at runtime, so the extracted/staged
+// directory name must match.
+def windowsJreExtractDir = file("${windowsJreCacheDir}/java-runtime")
+
+tasks.register('downloadWindowsJre') {
+    group = 'distribution'
+    description = 'Downloads the Windows Zulu JRE+JavaFX bundle used to self-contain the Windows installer (cached under .jre-cache/, skipped if already present).'
+    outputs.file(windowsJreZip)
+    onlyIf { !windowsJreZip.exists() }
+    doLast {
+        windowsJreCacheDir.mkdirs()
+        logger.lifecycle("Downloading ${windowsJreBundle} ...")
+        ant.get(src: "https://cdn.azul.com/zulu/bin/${windowsJreBundle}", dest: windowsJreZip, skipexisting: true)
+    }
+}
+
+tasks.register('extractWindowsJre', Sync) {
+    group = 'distribution'
+    description = "Extracts the bundled Windows JRE, stripping the archive's single top-level folder so java-runtime/bin/java.exe exists directly (mirrors vpin-studio's cutdirsmapper unzip)."
+    dependsOn 'downloadWindowsJre'
+    from(zipTree(windowsJreZip)) {
+        eachFile { details ->
+            details.relativePath = new RelativePath(true, details.relativePath.segments.drop(1) as String[])
+        }
+        includeEmptyDirs = false
+    }
+    into windowsJreExtractDir
+}
+
+tasks.register('stageWindowsJre', Sync) {
+    group = 'distribution'
+    description = 'Stages the bundled Windows JRE next to A12-Studio.exe so the exe wrapper (via bundledJrePath) and the Inno Setup installer can find it without a system Java install.'
+    dependsOn 'extractWindowsJre'
+    from windowsJreExtractDir
+    into "${rootDir}/Output/A12-Studio/java-runtime"
+}
+
 launch4j {
     outfile = 'A12-Studio.exe'
     mainClassName = 'de.a12.studio.ui.Launcher'
@@ -113,6 +158,10 @@ launch4j {
     headerType = 'gui'
     copyConfigurable = files()
     libraryDir = ''
+    // Relative to A12-Studio.exe's own directory at runtime; checked before falling back to any
+    // system-installed/registry JRE. Kept in sync with windowsJreExtractDir/stageWindowsJre above.
+    bundledJrePath = 'java-runtime'
+    jreMinVersion = '21'
     // Reduce Sophos Intercept X "Lockdown" false positives:
     // - Disable core dump generation (writing large crash files resembles ransomware behaviour)
     // - Disallow self-attach via the Attach API (prevents Sophos from classifying the JVM as injecting into itself)
@@ -148,7 +197,7 @@ tasks.register('prepareInstallerScript', Copy) {
 }
 
 tasks.register('buildInstaller', Exec) {
-    dependsOn prepareInstallerScript, copyToOutput, stageWcfCli, ':a12-studio-server:copyToOutput', ':generateLicenses'
+    dependsOn prepareInstallerScript, copyToOutput, stageWcfCli, stageWindowsJre, ':a12-studio-server:copyToOutput', ':generateLicenses'
     onlyIf { org.gradle.internal.os.OperatingSystem.current().isWindows() }
     commandLine 'ISCC.exe', layout.buildDirectory.file('installer/inno-installer-a12-studio-full.iss').get().asFile
 }

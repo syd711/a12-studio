@@ -7,7 +7,7 @@
 
 
 # Git-Support:
-
+Hide the version control view and button when no .git folder is found above the project folder.
 
 # Relationship-UI:
 

@@ -20,6 +20,7 @@ import java.util.List;
     @JsonSubTypes.Type(value = ControlGrid.class, name = "ControlGrid"),
     @JsonSubTypes.Type(value = CustomScreenElement.class, name = "CustomScreenElement"),
     @JsonSubTypes.Type(value = ButtonPanel.class, name = "ButtonPanel"),
+    @JsonSubTypes.Type(value = Binding.class, name = "Binding"),
     @JsonSubTypes.Type(value = InlineRepeat.class, name = "InlineRepeat"),
     @JsonSubTypes.Type(value = EmbeddedRepeat.class, name = "EmbeddedRepeat"),
     @JsonSubTypes.Type(value = DetachedRepeat.class, name = "DetachedRepeat")

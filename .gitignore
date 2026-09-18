@@ -29,3 +29,4 @@ config/*.properties
 /testing/workspaces/basic-tutorial/logs/previewapp-server.log
 /.studio/
 *.jar.pending-delete
+/.jre-cache/

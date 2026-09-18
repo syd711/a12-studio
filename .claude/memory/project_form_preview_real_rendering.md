@@ -1,0 +1,28 @@
+---
+name: project-form-preview-real-rendering
+description: "Investigation into replicating SME's real (styled, actually-rendered) Form Model preview in a12-studio, vs. the current custom wireframe preview"
+metadata:
+  node_type: memory
+  type: project
+  originSessionId: 4aa3b702-3f0d-4e9d-af62-09768e4fa5b4
+  modified: 2026-08-30T16:34:32.408Z
+---
+
+a12-studio's current Form Model / Application Model "eye icon" preview (`a12-studio-ui/.../preview/PreviewServer.java`, `PreviewLauncher.java`, `preview.html`; DTOs/services in `a12-studio-data-services/.../dataservices/preview/` — `ApplicationModelPreviewService`, `FormModelPreviewService`, shared `DocumentModelFieldResolver`) is a custom-built, from-scratch wireframe: an embedded local HTTP server serves one shared static HTML/JS shell that polls a JSON data endpoint and draws labeled boxes for regions/views/screens/fields with real resolved Document-Model field labels/types, but no real widgets, no styling beyond inline CSS, and no interactivity. It has no direct equivalent in SME's source — it was built as a lightweight approximation, not a port of anything.
+
+**SME actually has two unrelated "preview" concepts** (confirmed by reading SME source + `C:\workspace\a12\2606-06-doc\overall-preview_app.md` — this doc lives outside the a12-studio repo, see `CLAUDE.md`), and only one of them is comparable to a12-studio's existing `PreviewAppProcess`:
+
+1. **"Deploy → Preview App"** (the platform's official full-stack test environment, documented in `overall-preview_app.md`): a real A12 server + client + embedded Postgres DB, with real auth/roles. The `ba`/`modeler` role "create[s], edit[s] and deploy[s] models from SME to the Preview App and test[s] them end-to-end" — deploy-triggered, not live-on-keystroke; only role/user changes are documented as requiring a full restart. **a12-studio's `PreviewAppProcess`** (`a12-studio-ui/.../previewapp/PreviewAppProcess.java`, launched from the main toolbar) already replicates this faithfully — it runs the real `preview-app-server` + real client static assets (`PreviewAppInstallation.getClientStaticDir()`) against the actual project workspace. This is real fidelity already; the only gap is it's whole-workspace-scoped with no deep-link to a specific model/screen.
+
+2. **`fmm-support`'s in-editor `createFormEnginePreview()`** (this is what the user wants to pursue, explicitly preferring it over #1 — asked 2026-08-30 to remember this direction while they check on embedded-API/licensing/sources themselves): a separate, much lighter mechanism baked into SME's own frontend bundle (reference repo at `C:\workspace\sme`, outside a12-studio) for instant feedback *before* deploying anything. Mechanism, confirmed from SME source:
+   - `client/src/app/index.tsx`: the SME SPA is reloaded in a **new window** (`window.open(location.href, PREVIEW_CONTEXT)` in `modules/preview/handleOpenOrFocusPreviewSaga.ts`), and on boot checks `if (window.name === PREVIEW_CONTEXT) { createFormEnginePreview(); }` instead of booting the normal editor UI. So the preview window has every stylesheet/font/the whole `@com.mgmtp.a12.widgets` component library "for free" — it's literally the same bundle, not a bespoke page.
+   - Editor and preview window communicate over `postMessage` (`modules/formModel/preview/previewCommunicationSagas.ts`, `modules/preview/sendMessageToPreview.ts`/`handleMessageFromPreview.ts`): on open, editor sends `set-initial-data` with `{formModel, documentModel, documentNames, themeNames, validationCode, titles}` (all JSON-serialized); on every edit, `update-formModel`.
+   - Theming: `modules/preview/themes.ts` reads the workspace's actual `.theme` JSON file, parses it into a real `DefaultThemeType` (from `@com.mgmtp.a12.widgets/widgets-core/lib/theme`), and pushes it via a `send-theme` message — so the preview renders with the project's actual theme, not a default.
+   - `createFormEnginePreview` and `PREVIEW_CONTEXT` come from the private npm package `@com.mgmtp.a12.sme/fmm-support` — no local source available in the `sme` repo (not vendored, no node_modules installed) to inspect further.
+
+**What replicating #2 in a12-studio would require** (none of this is started/decided yet):
+1. A standalone, embeddable copy of the actual client-side form-rendering engine `fmm-support` wraps, capable of rendering purely from `{formModel, documentModel, validationCode, theme}` JSON with no backend. **This is the load-bearing open question** — `fmm-support` is private/SME-internal; not documented anywhere as a redistributable artifact, so licensing/availability is unconfirmed.
+2. A way to produce compiled `validationCode` (the browser-runnable compiled form of the Document Model's validation rules) — a12-studio already depends on the real `com.mgmtp.a12.kernel:*` JVM libraries in-process (see `CLAUDE.md`'s "port strategy" note), so this is plausible but unverified which kernel API emits that representation.
+3. Serving mechanism: swap the current hand-rolled wireframe renderer in `PreviewServer`/`preview.html` for the real engine's JS/CSS bundle, feeding it the live in-memory model — either via the existing HTTP polling endpoint, or (if embedding via a JavaFX webview instead of an external browser tab) a real `postMessage` channel matching SME's push-on-edit behavior.
+
+**How to apply:** Before any implementation, the licensing/availability of `fmm-support` (or an equivalent embeddable a12 client-side rendering engine) needs to be resolved. Do not start building a "real engine" integration until that's confirmed. The user is currently investigating this themselves ("I'll check on the embedded API and licensing and sources") — check with them for the outcome before proposing next steps.

@@ -387,6 +387,24 @@ jobs:
           Remove-Item $pfxPath -Force
           Write-Host "EXE signing complete."
 
+      - name: Download and stage Windows JRE with JavaFX
+        # Bundles a self-contained JRE next to A12-Studio.exe (via the .iss's java-runtime Files
+        # entry and launch4j's bundledJrePath baked into the exe), so installs don't need a
+        # system-installed Java. Same Zulu build as the macOS/Linux jobs above - keep in sync.
+        shell: pwsh
+        run: |
+          $jreBundle = "zulu21.42.19-ca-fx-jre21.0.7-win_x64.zip"
+          Invoke-WebRequest -Uri "https://cdn.azul.com/zulu/bin/$jreBundle" -OutFile $jreBundle
+          Expand-Archive -Path $jreBundle -DestinationPath jre-extract -Force
+          $jreRoot = Get-ChildItem -Path jre-extract -Directory | Select-Object -First 1
+          New-Item -ItemType Directory -Force -Path ".\Output\A12-Studio\java-runtime" | Out-Null
+          Copy-Item -Path "$($jreRoot.FullName)\*" -Destination ".\Output\A12-Studio\java-runtime" -Recurse -Force
+          if (-not (Test-Path ".\Output\A12-Studio\java-runtime\bin\java.exe")) {
+            Write-Error "Bundled JRE missing bin\java.exe after extraction"
+            exit 1
+          }
+          Write-Host "Windows JRE staged at Output\A12-Studio\java-runtime"
+
       - name: Prepare installer script
         shell: pwsh
         run: |

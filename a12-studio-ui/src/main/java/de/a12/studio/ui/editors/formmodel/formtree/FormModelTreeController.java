@@ -6,6 +6,7 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.formmodel.AbstractRepeat;
+import de.a12.studio.models.formmodel.Binding;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
@@ -25,15 +26,18 @@ import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.formmodel.TextCell;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.formmodel.MultiColumnSectionEditorPanelController;
+import de.a12.studio.ui.editors.formmodel.RelationshipModelPanelController;
 import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeController;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.MoveNodeCommand;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorBindingPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorButtonPanelPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorConfirmControlPanelController;
@@ -206,6 +210,10 @@ public class FormModelTreeController implements Initializable {
   private Node customCellEditor;
   @FXML
   private FormNodeEditorCustomCellPanelController customCellEditorController;
+  @FXML
+  private Node bindingEditor;
+  @FXML
+  private FormNodeEditorBindingPanelController bindingEditorController;
 
   private ProjectItem projectItem;
   private FormModelContent content;
@@ -424,6 +432,7 @@ public class FormModelTreeController implements Initializable {
     boolean isCustomScreenElement = node instanceof CustomScreenElement;
     boolean isButtonPanel = node instanceof ButtonPanel;
     boolean isCustomCell = node instanceof CustomCell;
+    boolean isBinding = node instanceof Binding;
 
     setVisible(rowEditor, isRow);
     setVisible(multiColumnSectionEditor, isMultiColumnSection);
@@ -439,9 +448,10 @@ public class FormModelTreeController implements Initializable {
     setVisible(customScreenElementEditor, isCustomScreenElement);
     setVisible(buttonPanelEditor, isButtonPanel);
     setVisible(customCellEditor, isCustomCell);
+    setVisible(bindingEditor, isBinding);
     setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection
         || isControlGrid || isControl || isConfirmControl || isRepeat || isTextCell || isExpressionCell
-        || isRepeatOverviewColumn || isCustomScreenElement || isButtonPanel || isCustomCell));
+        || isRepeatOverviewColumn || isCustomScreenElement || isButtonPanel || isCustomCell || isBinding));
 
     if (isRow) {
       rowEditorController.setRow((Row) node, elementIndex, containerHideConditionScope(selectedItem));
@@ -487,6 +497,9 @@ public class FormModelTreeController implements Initializable {
     }
     else if (isCustomCell) {
       customCellEditorController.setCustomCell((CustomCell) node);
+    }
+    else if (isBinding) {
+      bindingEditorController.setBinding((Binding) node, documentModel, projectItem);
     }
   }
 
@@ -775,6 +788,10 @@ public class FormModelTreeController implements Initializable {
         position = resolveExternalDropPosition(dragboard, cell.getTreeItem(), event.getY(), cell.getHeight());
         transferMode = TransferMode.COPY;
       }
+      else if (dragboard.hasContent(RelationshipModelPanelController.RELATIONSHIP_DRAG_FORMAT)) {
+        position = resolveRelationshipDropPosition(cell.getTreeItem(), event.getY(), cell.getHeight());
+        transferMode = TransferMode.COPY;
+      }
       if (position != null) {
         event.acceptTransferModes(transferMode);
         showDropIndicator(cell, position.location());
@@ -802,6 +819,13 @@ public class FormModelTreeController implements Initializable {
           DropTarget position = resolveExternalDropPosition(dragboard, cell.getTreeItem(), event.getY(), cell.getHeight());
           if (position != null) {
             dropDocumentElement(dragboard, position);
+            success = true;
+          }
+        }
+        else if (dragboard.hasContent(RelationshipModelPanelController.RELATIONSHIP_DRAG_FORMAT)) {
+          DropTarget position = resolveRelationshipDropPosition(cell.getTreeItem(), event.getY(), cell.getHeight());
+          if (position != null) {
+            dropRelationshipModel(dragboard, position);
             success = true;
           }
         }
@@ -1029,5 +1053,50 @@ public class FormModelTreeController implements Initializable {
       commandStack.execute(command);
       actions.notifyChanged(repeat);
     }
+  }
+
+  /**
+   * Where a {@link RelationshipModel} row dragged from {@link RelationshipModelPanelController} would land:
+   * only a {@link Screen}/{@link Section}/{@link MultiColumnSection}'s middle band ("into" its own {@code
+   * screenElements} list, same band as a repeatable Group dropped from the Document Model tree above) - a
+   * {@link Binding} is otherwise created exactly like any other top-level screen element, never reparented
+   * into a Row/Cell/Control Grid.
+   */
+  private DropTarget resolveRelationshipDropPosition(@NonNull TreeItem<FormElementViewModel> target, double relativeY, double rowHeight) {
+    Object targetNode = target.getValue().getNode();
+    double fraction = rowHeight <= 0 ? 0.5 : relativeY / rowHeight;
+    if ((targetNode instanceof Screen || targetNode instanceof Section || targetNode instanceof MultiColumnSection)
+        && fraction > 0.25 && fraction < 0.75) {
+      return new DropTarget(target, DropLocation.INTO);
+    }
+    return null;
+  }
+
+  /**
+   * Creates a {@link Binding} pre-wired to the dropped {@link RelationshipModel} (see {@link
+   * FormModelElementFactory#newBinding}) and attaches it as a child of {@code position}'s target - the Form
+   * Model analogue of the SME reference's relationship-model-list drop handling.
+   */
+  private void dropRelationshipModel(@NonNull Dragboard dragboard, @NonNull DropTarget position) {
+    Object relationshipId = dragboard.getContent(RelationshipModelPanelController.RELATIONSHIP_DRAG_FORMAT);
+    if (!(relationshipId instanceof String id)) {
+      return;
+    }
+    RelationshipModel relationshipModel = ProjectDocumentModels
+        .getRelationshipModelsConnectedTo(projectItem, documentModel != null ? documentModel.getId() : null).stream()
+        .filter(candidate -> id.equals(candidate.getId()))
+        .findFirst()
+        .orElse(null);
+    if (relationshipModel == null) {
+      return;
+    }
+    Object targetNode = position.targetItem().getValue().getNode();
+    Binding binding = FormModelElementFactory.newBinding(relationshipModel, documentModel != null ? documentModel.getId() : null);
+    Command command = actions.createAttachCommand(targetNode, binding);
+    if (command == null) {
+      return;
+    }
+    commandStack.execute(command);
+    actions.notifyChanged(binding);
   }
 }

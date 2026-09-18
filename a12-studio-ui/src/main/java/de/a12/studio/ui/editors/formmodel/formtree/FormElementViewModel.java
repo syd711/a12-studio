@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
 import de.a12.studio.models.formmodel.AbstractRepeat;
+import de.a12.studio.models.formmodel.Binding;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.ColumnLayout;
@@ -101,6 +102,12 @@ public class FormElementViewModel {
   private String rawName() {
     if (node instanceof Screen screen) {
       return screen.getName();
+    }
+    // Binding's display name lives under binding.details.name (mirroring the SME reference's own getName()
+    // override for its Binding element type), not the generic ScreenElement "name" field every other subtype
+    // uses - so this must be checked before the generic ScreenElement fallback below.
+    if (node instanceof Binding binding) {
+      return binding.getBinding().getDetails().getName();
     }
     if (node instanceof ScreenElement screenElement) {
       return screenElement.getName();
@@ -228,6 +235,9 @@ public class FormElementViewModel {
     if (node instanceof ButtonPanel) {
       return "Button Panel";
     }
+    if (node instanceof Binding) {
+      return "Binding";
+    }
     if (node instanceof Row) {
       return "Row";
     }
@@ -276,6 +286,9 @@ public class FormElementViewModel {
     }
     if (node instanceof ButtonPanel) {
       return Icons.FORM_BUTTON_PANEL;
+    }
+    if (node instanceof Binding) {
+      return Icons.FORM_BINDING;
     }
     if (node instanceof Row) {
       return Icons.FORM_ROW;
@@ -327,8 +340,9 @@ public class FormElementViewModel {
         childNodes.add(detachedRepeat.getDetailScreen());
       }
     }
-    // CustomScreenElement, ButtonPanel, Control, TextCell, ExpressionCell, CustomCell, RepeatOverviewColumn:
-    // no children shown in this tree (ButtonPanel's own buttons are edited via a panel, not tree nodes).
+    // CustomScreenElement, ButtonPanel, Binding, Control, TextCell, ExpressionCell, CustomCell,
+    // RepeatOverviewColumn: no children shown in this tree (ButtonPanel's own buttons are edited via a panel,
+    // not tree nodes).
 
     List<FormElementViewModel> children = new ArrayList<>();
     for (Object child : childNodes) {

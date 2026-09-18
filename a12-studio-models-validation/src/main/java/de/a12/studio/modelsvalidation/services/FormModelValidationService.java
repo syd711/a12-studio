@@ -16,6 +16,8 @@ import de.a12.studio.modelsvalidation.validators.form.DependentEnumerationMaster
 import de.a12.studio.modelsvalidation.validators.form.DependentFieldMasterRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.DependentGroupMasterRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.ExternalEnumerationSourceRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormBindingRelationshipReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormBindingTargetRoleValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormButtonScreenReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
@@ -52,7 +54,9 @@ public final class FormModelValidationService {
       new DependentFieldMasterRequiredValidator(),
       new DependentGroupMasterRequiredValidator(),
       new DependentEnumerationMasterRequiredValidator(),
-      new ExternalEnumerationSourceRequiredValidator()));
+      new ExternalEnumerationSourceRequiredValidator(),
+      new FormBindingRelationshipReferenceValidator(),
+      new FormBindingTargetRoleValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

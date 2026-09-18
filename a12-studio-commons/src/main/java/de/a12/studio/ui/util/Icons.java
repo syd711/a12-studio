@@ -100,6 +100,7 @@ public interface Icons {
   String FORM_CUSTOM_SCREEN_ELEMENT = "mdi2p-puzzle-outline";
   String FORM_BUTTON_PANEL = "mdi2g-gesture-tap-button";
   String FORM_CUSTOM_CELL = "mdi2p-puzzle-outline";
+  String FORM_BINDING = "mdi2l-link-variant";
 
   static String forModelType(ModelType modelType) {
     if (modelType == null) {

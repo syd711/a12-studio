@@ -10,6 +10,7 @@ public enum ScreenElementType {
   CONTROL_GRID("ControlGrid"),
   CUSTOM_SCREEN_ELEMENT("CustomScreenElement"),
   BUTTON_PANEL("ButtonPanel"),
+  BINDING("Binding"),
   INLINE_REPEAT("InlineRepeat"),
   EMBEDDED_REPEAT("EmbeddedRepeat"),
   DETACHED_REPEAT("DetachedRepeat"),

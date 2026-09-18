@@ -1,5 +1,8 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.formmodel.Binding;
+import de.a12.studio.models.formmodel.BindingDetails;
+import de.a12.studio.models.formmodel.BindingMetaInformation;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
@@ -16,8 +19,13 @@ import de.a12.studio.models.formmodel.Row;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.formmodel.TextCell;
+import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -162,5 +170,54 @@ final class FormModelElementFactory {
     ExpressionRepeatOverviewColumn column = new ExpressionRepeatOverviewColumn();
     column.setId(generateId("expressionrepeatoverviewcolumn"));
     return column;
+  }
+
+  // Matches the SME reference's Binding_SUFFIX ("_Binding") and its I_Binding mixin's fixed metaInformation
+  // version, both applied whenever a Binding is created by dropping a relationship onto the tree (see
+  // createBindingFromDroppedRelationshipModel in the SME client sources).
+  private static final String BINDING_NAME_SUFFIX = "_Binding";
+  private static final String BINDING_META_INFORMATION_VERSION = "1.0.0";
+
+  /**
+   * A new {@link Binding} pre-wired to {@code relationshipModel}, created by dropping a row from the Form Model
+   * editor's Relationships panel onto the tree ({@code RelationshipModelPanelController}/{@code
+   * FormModelTreeController#dropRelationshipModel}). Mirrors the SME reference's {@code
+   * createBindingFromDroppedRelationshipModel}: the display name defaults to {@code <relationshipId>_Binding},
+   * and {@code targetRole} is pre-selected to whichever of the relationship's two entity roles does *not*
+   * belong to {@code boundDocumentModelId} - i.e. the side the binding will show/edit, since the other side is
+   * already this Form Model's own bound Document Model - left unset (for the user to choose) whenever that
+   * can't be determined unambiguously (a self-relationship where both sides are the bound Document Model, or
+   * neither side is).
+   */
+  static Binding newBinding(@NonNull RelationshipModel relationshipModel, @Nullable String boundDocumentModelId) {
+    Binding binding = new Binding();
+    binding.setId(generateId("binding"));
+    binding.getBinding().setType("relationship");
+    BindingDetails details = binding.getBinding().getDetails();
+    details.setName(relationshipModel.getId() + BINDING_NAME_SUFFIX);
+    details.setRelationshipName(relationshipModel.getId());
+    details.setTargetRole(calculateTargetRole(relationshipModel, boundDocumentModelId));
+    BindingMetaInformation metaInformation = new BindingMetaInformation();
+    metaInformation.setVersion(BINDING_META_INFORMATION_VERSION);
+    details.setMetaInformation(metaInformation);
+    return binding;
+  }
+
+  private static @Nullable String calculateTargetRole(@NonNull RelationshipModel relationshipModel, @Nullable String boundDocumentModelId) {
+    List<EntityCharacteristic> characteristics = relationshipModel.getContent() == null
+        ? List.of()
+        : relationshipModel.getContent().getEntityCharacteristics();
+    if (boundDocumentModelId == null || characteristics.size() != 2) {
+      return null;
+    }
+    EntityCharacteristic left = characteristics.get(0);
+    EntityCharacteristic right = characteristics.get(1);
+    boolean leftMatches = boundDocumentModelId.equals(left.getDocumentModel());
+    boolean rightMatches = boundDocumentModelId.equals(right.getDocumentModel());
+    if (leftMatches == rightMatches) {
+      // Both sides are the bound Document Model (a self-relationship) or neither is - ambiguous either way.
+      return null;
+    }
+    return leftMatches ? right.getRole() : left.getRole();
   }
 }
