@@ -44,6 +44,15 @@
     -fx-border-width: 0;
 }
 
+/* Default ListView skin paints an extra focus-ring background layer with negative insets when focused
+   (see modena.css .list-view:focused), which bleeds outside the list's own bounds and paints over the
+   dialog's 1px .root border on the left/right edges, making it look like the border disappeared. Pin the
+   focused background to the same single flat layer as the unfocused state to stop that bleed. */
+.search-dialog-results:focused {
+    -fx-background-color: -fx-content-bg;
+    -fx-background-insets: 0;
+}
+
 .search-dialog-results .list-cell {
     -fx-padding: 6px 14px;
     -fx-background-color: -fx-content-bg;

@@ -46,13 +46,13 @@ public class RelationshipModelPanelController implements Initializable {
   private StackPane listContainer;
 
   @FXML
-  private ListView<RelationshipModel> list;
+  private ListView<RelationshipModel> relationshipList;
 
   private Label placeholderLabel;
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    list.setCellFactory(view -> {
+    relationshipList.setCellFactory(view -> {
       RelationshipModelListCell cell = new RelationshipModelListCell();
       setupDragSource(cell);
       return cell;
@@ -63,10 +63,10 @@ public class RelationshipModelPanelController implements Initializable {
     List<RelationshipModel> relationshipModels = documentModel == null
         ? List.of()
         : ProjectDocumentModels.getRelationshipModelsConnectedTo(projectItem, documentModel.getId());
-    list.getItems().setAll(relationshipModels);
+    relationshipList.getItems().setAll(relationshipModels);
     boolean hasAny = !relationshipModels.isEmpty();
-    list.setVisible(hasAny);
-    list.setManaged(hasAny);
+    relationshipList.setVisible(hasAny);
+    relationshipList.setManaged(hasAny);
     if (hasAny) {
       hidePlaceholder();
     }

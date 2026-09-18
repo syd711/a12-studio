@@ -598,3 +598,12 @@
 #bookmarkList .list-cell:filled:selected .bookmark-cell-path {
     -fx-fill: -fx-text-color-inverse;
 }
+
+/* -----------------------------------------------------------------------
+ * Relationship model list cells (Form Model editor's Relationships panel)
+ * --------------------------------------------------------------------- */
+#relationshipList .list-cell:filled:selected .tree-icon,
+#relationshipList .list-cell:filled:selected:focused .tree-icon,
+#relationshipList .list-cell:filled:selected:hover .tree-icon {
+    -fx-icon-color: -fx-text-color-inverse;
+}
