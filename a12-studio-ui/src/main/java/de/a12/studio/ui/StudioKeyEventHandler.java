@@ -60,8 +60,6 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut(StudioBundle.get("ctrl_alt_u"), StudioBundle.get("show_update_info"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_alt_h"), StudioBundle.get("resize_window_to_1920x1080"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_alt_w"), StudioBundle.get("resize_window_to_2560x1440"), Category.GENERAL),
-      new Shortcut(StudioBundle.get("win_left"), StudioBundle.get("snap_window_to_the_left_half_of_the_screen"), Category.GENERAL),
-      new Shortcut(StudioBundle.get("win_right"), StudioBundle.get("snap_window_to_the_right_half_of_the_screen"), Category.GENERAL),
       new Shortcut(StudioBundle.get("win_up"), StudioBundle.get("maximize_the_window"), Category.GENERAL),
       new Shortcut(StudioBundle.get("win_down"), StudioBundle.get("restore_then_minimize_the_window"), Category.GENERAL),
 
@@ -214,8 +212,12 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
   }
 
   /**
-   * Handles Win+Left/Right/Up/Down the same way a regular (decorated) Windows app would via
-   * Aero Snap. Returns true if the key was handled and consumed.
+   * Handles Win+Up/Down the same way a regular (decorated) Windows app would via Aero Snap.
+   * Win+Left/Right are reserved by the Windows shell's own Snap Assist ahead of normal window
+   * messages, so a plain JavaFX key listener never sees them - there is no non-hook way to
+   * intercept them, so that pair of shortcuts was dropped rather than reintroducing the global
+   * low-level keyboard hook this used to rely on. Returns true if the key was handled and
+   * consumed.
    */
   private boolean handleWindowsArrowShortcut(KeyEvent ke) {
     if (!(stage.getUserData() instanceof FXResizeHelper helper)) {
@@ -225,8 +227,6 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
     // Windows sometimes drops the extended-key flag on Win+Arrow combos, which makes the OS
     // report the dedicated arrow keys as their numpad (KP_*) equivalents instead - handle both.
     switch (ke.getCode()) {
-      case LEFT, KP_LEFT -> helper.snapLeft();
-      case RIGHT, KP_RIGHT -> helper.snapRight();
       case UP, KP_UP -> helper.maximize();
       case DOWN, KP_DOWN -> helper.restoreOrMinimize();
       default -> {
