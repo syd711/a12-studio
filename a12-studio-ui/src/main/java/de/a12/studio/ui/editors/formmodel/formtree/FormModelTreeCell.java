@@ -33,7 +33,9 @@ class FormModelTreeCell extends TreeCell<FormElementViewModel> {
       return;
     }
 
-    Node icon = WidgetFactory.createIcon(item.getIcon());
+    Node icon = item.isModelReferenceIcon()
+        ? WidgetFactory.createModelIcon(item.getIcon())
+        : WidgetFactory.createIcon(item.getIcon());
     icon.getStyleClass().add("tree-icon");
     Tooltip.install(icon, WidgetFactory.createTooltip(item.getTypeLabel()));
     Label nameLabel = new Label(item.getName());

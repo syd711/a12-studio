@@ -489,7 +489,7 @@ public class FormModelTreeController implements Initializable {
     }
     else if (isCustomScreenElement) {
       customScreenElementEditorController.setCustomScreenElement((CustomScreenElement) node, elementIndex,
-          containerHideConditionScope(selectedItem));
+          containerHideConditionScope(selectedItem), projectItem);
     }
     else if (isButtonPanel) {
       buttonPanelEditorController.setButtonPanel((ButtonPanel) node, elementIndex, screenIds(),

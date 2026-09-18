@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Binding;
 import de.a12.studio.models.formmodel.ButtonPanel;
@@ -24,12 +26,14 @@ import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.formmodel.TextCell;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Wraps one node of the Form Model structural tree (a {@link Screen}, {@link ScreenElement}, {@link Row} or
@@ -128,8 +132,10 @@ public class FormElementViewModel {
    * The tree label: the node's own {@code name} if set, else - for a {@link Control}, {@link AbstractRepeat} or
    * {@link FieldBasedRepeatOverviewColumn}, which are commonly left unnamed since their real identity is the
    * Document Model element they bind to - the name of that element ({@code elementRef}/{@code groupRef}) resolved
-   * against {@link #elementIndex}, falling back to the raw reference if it can't be resolved, else for a
-   * {@link Row} the placeholder {@code "<Row>"}, else the node's own {@code id} as a last resort. For a
+   * against {@link #elementIndex}, falling back to the raw reference if it can't be resolved - else for a
+   * {@link CustomScreenElement} its own {@code reference} (the embedded Relationship UI Model's id, or a
+   * custom component's name) - else for a {@link Row} the placeholder {@code "<Row>"}, else the node's own
+   * {@code id} as a last resort. For a
    * {@link MultiColumnSection} with a resolvable {@link ColumnLayout}, the column count is appended, e.g.
    * {@code "Payment Info (2 columns)"}.
    */
@@ -148,6 +154,12 @@ public class FormElementViewModel {
     else if (node instanceof FieldBasedRepeatOverviewColumn column
         && column.getElementRef() != null && !column.getElementRef().isBlank()) {
       baseName = resolveDocumentElementName(column.getElementRef());
+    }
+    else if (node instanceof CustomScreenElement customScreenElement
+        && customScreenElement.getReference() != null && !customScreenElement.getReference().isBlank()) {
+      // Unlike Control/AbstractRepeat above, no elementIndex resolution needed here - the reference already
+      // names the thing to show (the embedded Relationship UI Model's own id, or a custom component's name).
+      baseName = customScreenElement.getReference();
     }
     else if (node instanceof Row) {
       baseName = "<Row>";
@@ -230,7 +242,8 @@ public class FormElementViewModel {
       return "Detached Repeat";
     }
     if (node instanceof CustomScreenElement) {
-      return "Custom Screen Element";
+      return resolvedReferenceModelType().filter(type -> type == ModelType.RELATIONSHIPUI).isPresent()
+          ? "Relationship UI Model" : "Custom Screen Element";
     }
     if (node instanceof ButtonPanel) {
       return "Button Panel";
@@ -282,7 +295,7 @@ public class FormElementViewModel {
       return Icons.FORM_DETACHED_REPEAT;
     }
     if (node instanceof CustomScreenElement) {
-      return Icons.FORM_CUSTOM_SCREEN_ELEMENT;
+      return resolvedReferenceModelType().map(Icons::forModelType).orElse(Icons.FORM_CUSTOM_SCREEN_ELEMENT);
     }
     if (node instanceof ButtonPanel) {
       return Icons.FORM_BUTTON_PANEL;
@@ -309,6 +322,35 @@ public class FormElementViewModel {
       return Icons.FORM_CONTROL;
     }
     return Icons.ELEMENT_GENERIC;
+  }
+
+  /**
+   * Whether {@link #getIcon()}'s value is a model-type PNG resource (rendered via {@code
+   * WidgetFactory.createModelIcon}) rather than an mdi glyph literal (rendered via {@code
+   * WidgetFactory.createIcon}) - true only for a {@link CustomScreenElement} whose {@code reference} resolves
+   * to another model in the project, mirroring {@code QueryTreeNameCell}'s same distinction for its
+   * Target-Document-Model/relationship-link rows.
+   */
+  public boolean isModelReferenceIcon() {
+    return node instanceof CustomScreenElement && resolvedReferenceModelType().isPresent();
+  }
+
+  /**
+   * The {@link ModelType} of the project model a {@link CustomScreenElement}'s {@code reference} names, if
+   * any - e.g. the embedded Relationship UI Model in {@code Team_Relationships_Fm.json}. Empty for a blank
+   * reference, a dangling one, or any other node type.
+   */
+  private Optional<ModelType> resolvedReferenceModelType() {
+    if (!(node instanceof CustomScreenElement customScreenElement)) {
+      return Optional.empty();
+    }
+    String reference = customScreenElement.getReference();
+    if (reference == null || reference.isBlank()) {
+      return Optional.empty();
+    }
+    return ProjectDocumentModels.findProjectItemByModelId(reference)
+        .map(item -> item.getModel())
+        .map(A12Model::getModelType);
   }
 
   public List<FormElementViewModel> getChildren() {
