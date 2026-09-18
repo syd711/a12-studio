@@ -10,6 +10,7 @@ import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.HideCondition;
 import de.a12.studio.models.formmodel.HideConditionCase;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -58,7 +59,7 @@ public final class HideConditionSupportedValuesValidator implements ModelValidat
           .filter(value -> !supported.contains(value))
           .toList();
       if (!unsupported.isEmpty()) {
-        errors.add(new ModelValidationError(model, entry.nodeId(),
+        errors.add(new ModelValidationError(model, entry.nodeId(), ElementProperty.HIDE_CONDITION,
             ValidationMessages.get("validation.hideCondition.unsupportedValues", describe(unsupported)),
             Severity.ERROR.name()));
       }

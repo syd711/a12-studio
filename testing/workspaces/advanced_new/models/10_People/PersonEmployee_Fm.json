@@ -30,24 +30,24 @@
     "modelReferences": [
       {
         "alias": "PersonEmployee_Cm",
-        "modelType": "document",
         "purpose": "data binding",
-        "reference": "PersonEmployee_Cm"
+        "reference": "PersonEmployee_Cm",
+        "modelType": "document"
       },
       {
         "purpose": "relationship-ui",
-        "modelType": "relationship-ui",
-        "reference": "PersonSkills_Skills_Ru"
+        "reference": "PersonSkills_Skills_Ru",
+        "modelType": "relationship-ui"
       },
       {
         "purpose": "relationship-ui",
-        "modelType": "relationship-ui",
-        "reference": "PersonTeamAssignment_TableWithEditModal_Ru"
+        "reference": "PersonTeamAssignment_TableWithEditModal_Ru",
+        "modelType": "relationship-ui"
       },
       {
         "purpose": "relationship-ui",
-        "modelType": "relationship-ui",
-        "reference": "PersonCity_City"
+        "reference": "PersonCity_City",
+        "modelType": "relationship-ui"
       }
     ]
   },
@@ -302,38 +302,38 @@
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-997b0",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F12"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F12",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-a695d",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F13"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F13",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-c2200",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F15"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F15",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-84c4a",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F14"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F14",
+                    "width": 1
                   }
                 ],
                 "groupRef": "3ebb47b738ad9c6e3c36113ff04df00d_G10",
@@ -420,20 +420,20 @@
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-bb467",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F17"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F17",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-1f124",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F18"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F18",
+                    "width": 1
                   }
                 ],
                 "groupRef": "3ebb47b738ad9c6e3c36113ff04df00d_G16",
@@ -470,34 +470,33 @@
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-8aa90",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F20"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F20",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-c6f56",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F21"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F21",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-8c5af",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F22"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F22",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-5a1c5",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
@@ -507,12 +506,12 @@
                       "absolute": false,
                       "preselectionYear": -10
                     },
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F23"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F23",
+                    "width": 1
                   },
                   {
                     "type": "FieldBasedRepeatOverviewColumn",
                     "id": "fieldbasedrepeatoverviewcolumn-d5032",
-                    "width": 1,
                     "sortable": false,
                     "filterable": false,
                     "preferredSorting": "ASC",
@@ -522,7 +521,8 @@
                       "absolute": false,
                       "preselectionYear": -5
                     },
-                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F24"
+                    "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F24",
+                    "width": 1
                   }
                 ],
                 "groupRef": "3ebb47b738ad9c6e3c36113ff04df00d_G19",
@@ -650,39 +650,7 @@
         ]
       }
     ],
-    "fieldConfiguration": {
-      "field": [
-        {
-          "label": {
-            "type": "Multilingual",
-            "multilingualText": {
-              "text": [
-                {
-                  "locale": "en",
-                  "text": "Profile Picture"
-                },
-                {
-                  "locale": "de",
-                  "text": "Profilbild"
-                }
-              ]
-            }
-          },
-          "elementRef": "group_bc062",
-          "attachmentConfig": {
-            "placeholderIcon": "image"
-          }
-        },
-        {
-          "exposition": "COMPACT",
-          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_F6"
-        },
-        {
-          "exposition": "AUTOCOMPLETE",
-          "elementRef": "3ebb47b738ad9c6e3c36113ff04df00d_field_86a6c"
-        }
-      ]
-    },
+    "fieldConfiguration": {},
     "groupConfiguration": {},
     "defaults": {
       "buttonLabels": {

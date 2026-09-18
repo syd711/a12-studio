@@ -75,7 +75,7 @@ public class FormNodeEditorCustomScreenElementPanelController {
     labelController.setCustom(element::getTitle, element::setTitle);
     labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(
-        element::getHideCondition, element::setHideCondition,
+        element.getId(), element::getHideCondition, element::setHideCondition,
         elementIndex, hideConditionScope);
     stylesController.setCustom(element::getStyle, element::getStyle);
     annotationsController.setCustom(element::getAnnotations);

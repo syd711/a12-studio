@@ -41,7 +41,7 @@ public class FormNodeEditorRowPanelController {
     labelController.setCustom(row::getTitle, row::setTitle);
     labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(
-        row::getHideCondition, row::setHideCondition,
+        row.getId(), row::getHideCondition, row::setHideCondition,
         elementIndex, hideConditionScope);
     stylesController.setCustom(row::getStyle, row::getStyle);
     annotationsController.setCustom(row::getAnnotations);

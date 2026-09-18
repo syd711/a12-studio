@@ -41,7 +41,7 @@ public class FormNodeEditorSectionPanelController {
     labelController.setCustom(section::getTitle, section::setTitle);
     labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(
-        section::getHideCondition, section::setHideCondition,
+        section.getId(), section::getHideCondition, section::setHideCondition,
         elementIndex, hideConditionScope);
     stylesController.setCustom(section::getStyle, section::getStyle);
     annotationsController.setCustom(section::getAnnotations);

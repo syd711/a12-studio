@@ -89,7 +89,7 @@ public class FormNodeEditorControlPanelController {
     dependentEnumerationController.setEntry(fieldConfigEntry, elementIndex,
         HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(control.getElementRef(), elementIndex));
     hideConditionController.configure(
-        control::getHideCondition, control::setHideCondition,
+        control.getId(), control::getHideCondition, control::setHideCondition,
         elementIndex, HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(control.getElementRef(), elementIndex));
     accessibilityController.setControl(control);
     stylesController.setCustom(control::getStyle, control::getStyle);

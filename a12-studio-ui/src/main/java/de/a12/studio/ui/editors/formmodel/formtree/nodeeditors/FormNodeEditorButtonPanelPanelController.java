@@ -55,7 +55,7 @@ public class FormNodeEditorButtonPanelPanelController {
         () -> Dialogs.showButtonForAdd(Studio.stage, elementIndex, screenIds), button -> editButtonViaDialog(elementIndex, screenIds, button),
         Dialogs::generateButtonId);
     hideConditionController.configure(
-        buttonPanel::getHideCondition, buttonPanel::setHideCondition,
+        buttonPanel.getId(), buttonPanel::getHideCondition, buttonPanel::setHideCondition,
         elementIndex, hideConditionScope);
     stylesController.setCustom(buttonPanel::getStyle, buttonPanel::getStyle);
     annotationsController.setCustom(buttonPanel::getAnnotations);

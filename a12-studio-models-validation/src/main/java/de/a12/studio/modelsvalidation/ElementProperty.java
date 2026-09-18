@@ -32,6 +32,9 @@ public final class ElementProperty {
   /** A Computation's computed field and alternatives (precondition/operation). */
   public static final String COMPUTATION_PROPERTIES = "computationProperties";
 
+  /** A Form Model node's Hide Condition (master field + trigger values). */
+  public static final String HIDE_CONDITION = "hideCondition";
+
   private ElementProperty() {
   }
 }

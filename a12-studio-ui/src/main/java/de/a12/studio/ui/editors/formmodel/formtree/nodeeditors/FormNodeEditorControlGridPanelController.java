@@ -53,7 +53,7 @@ public class FormNodeEditorControlGridPanelController {
     labelController.setCustom(grid::getTitle, grid::setTitle);
     labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(
-        grid::getHideCondition, grid::setHideCondition,
+        grid.getId(), grid::getHideCondition, grid::setHideCondition,
         elementIndex, hideConditionScope);
     stylesController.setCustom(grid::getStyle, grid::getStyle);
     annotationsController.setCustom(grid::getAnnotations);

@@ -8,16 +8,22 @@ import de.a12.studio.models.documentmodel.EnumerationValue;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.HideCondition;
 import de.a12.studio.models.formmodel.HideConditionCase;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ElementProperty;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.TabErrorBadge;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -38,6 +44,7 @@ import java.util.ResourceBundle;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Edits the "Hide Condition" property of a form node (Section, Row, ControlGrid, Repeat, Control):
@@ -58,7 +65,12 @@ import java.util.function.Supplier;
  * form-tree node (Section / Row / ControlGrid / Repeat / Control) rather than a document-model {@link Element}.
  * Saves are performed directly via {@link Studio#getSelectedProjectItem()} and
  * {@link StudioEventManager#fireModelSavedEvent}, matching the pattern used by
- * non-element panels such as {@link de.a12.studio.ui.editors.formmodel.StylesPanelController}.
+ * non-element panels such as {@link de.a12.studio.ui.editors.formmodel.StylesPanelController}. For the same
+ * reason, {@code HideConditionAtLeastOneCaseValidator}/{@code HideConditionSupportedValuesValidator} errors
+ * (tagged {@link ElementProperty#HIDE_CONDITION}) aren't surfaced via the base class's element-keyed
+ * validation plumbing either; {@link #refreshValidation} queries {@link Studio#getValidationService()}
+ * directly by node id, mirroring {@link
+ * de.a12.studio.ui.editors.relationshipmodel.LinkDocumentModelPanelController#refreshValidation()}.
  * <p>
  * Call {@link #configure} once per node selection to bind this panel to the node's hide-condition
  * getter/setter and repopulate the field combo for the given {@link MasterFieldScope}.
@@ -70,14 +82,21 @@ public class HideConditionPanelController implements Initializable {
   public static final String DISPLAY_TRUE = "true";
 
   @FXML
+  private TitledPane root;
+
+  @FXML
   private ComboBox<String> fieldCombo;
 
   @FXML
   private ListView<String> valueList;
 
+  @FXML
+  private ErrorContainerController errorContainerController;
+
   // Guards programmatic repopulation in configure()/rebuildValueList() from being treated as user edits.
   private boolean updatingFromModel;
 
+  private @Nullable String nodeId;
   private Supplier<HideCondition> getter;
   private Consumer<HideCondition> setter;
   private @Nullable ElementIndex elementIndex;
@@ -88,6 +107,9 @@ public class HideConditionPanelController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    errorContainerController.errorProperty().addListener((obs, oldVal, newVal) -> TabErrorBadge.refresh(root));
+    errorContainerController.severityProperty().addListener((obs, oldVal, newVal) -> TabErrorBadge.refresh(root));
+
     valueList.setCellFactory(CheckBoxListCell.forListView(this::checkedPropertyFor));
 
     fieldCombo.setConverter(new StringConverter<>() {
@@ -123,17 +145,21 @@ public class HideConditionPanelController implements Initializable {
    * Binds this panel to the hide-condition property of a form node and repopulates the field combo from
    * {@code scope}. Must be called every time a new node is selected in the form tree.
    *
+   * @param nodeId       the node's own id (e.g. {@code control.getId()}), used to look up this node's own
+   *                     Hide Condition validation errors for {@link #refreshValidation}
    * @param getter       reads the node's {@link HideCondition} (may be {@code null})
    * @param setter       writes the node's {@link HideCondition} (may be called with {@code null})
    * @param elementIndex index over the Document Model linked to the form, or {@code null} if none is linked
    * @param scope        where in the Document Model to look for candidate master fields, see {@link MasterFieldScope}
    */
   public void configure(
+      @NonNull String nodeId,
       @NonNull Supplier<HideCondition> getter,
       @NonNull Consumer<HideCondition> setter,
       @Nullable ElementIndex elementIndex,
       @NonNull MasterFieldScope scope) {
 
+    this.nodeId = nodeId;
     this.getter = getter;
     this.setter = setter;
     this.elementIndex = elementIndex;
@@ -149,6 +175,7 @@ public class HideConditionPanelController implements Initializable {
       updatingFromModel = false;
     }
     rebuildValueList();
+    refreshValidation();
   }
 
   private BooleanProperty checkedPropertyFor(String display) {
@@ -254,6 +281,33 @@ public class HideConditionPanelController implements Initializable {
     }
     projectItem.save();
     StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
+    refreshValidation();
+  }
+
+  /**
+   * Re-validates this panel's node against the model's current state and reflects the result in this panel's
+   * own error container. Called after every commit and whenever a new node is bound via {@link #configure},
+   * so an error already present when the node is (re)selected - not just one caused by an edit in this panel -
+   * shows up here too.
+   */
+  private void refreshValidation() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (nodeId == null || projectItem == null || !(projectItem.getModel() instanceof FormModel formModel)) {
+      errorContainerController.hide();
+      return;
+    }
+    List<ModelValidationError> errors = Studio.getValidationService().validateElement(formModel, nodeId).stream()
+        .filter(error -> ElementProperty.HIDE_CONDITION.equals(error.property()))
+        .toList();
+    if (errors.isEmpty()) {
+      errorContainerController.hide();
+    } else {
+      String message = errors.stream().map(ModelValidationError::message).collect(Collectors.joining("\n"));
+      // Matches AbstractPropertyEditor#showError: a collapsed panel must still surface that it now holds an
+      // error, e.g. when the erroneous node is first selected and this panel starts out collapsed.
+      root.setExpanded(true);
+      errorContainerController.show(errors.get(0).severity(), message);
+    }
   }
 
   /**

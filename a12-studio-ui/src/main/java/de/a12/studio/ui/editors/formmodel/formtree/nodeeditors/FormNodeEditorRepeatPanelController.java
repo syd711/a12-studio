@@ -69,7 +69,7 @@ public class FormNodeEditorRepeatPanelController {
     additionalSettingsController.setRepeat(repeat);
     rowActionsController.setRepeat(repeat);
     hideConditionController.configure(
-        repeat::getHideCondition, repeat::setHideCondition,
+        repeat.getId(), repeat::getHideCondition, repeat::setHideCondition,
         elementIndex, hideConditionScope);
     stylesController.setCustom(repeat::getStyle, repeat::getStyle);
     headerStylesController.setRepeat(repeat);

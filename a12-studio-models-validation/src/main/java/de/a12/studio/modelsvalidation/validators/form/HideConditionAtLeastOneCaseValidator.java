@@ -2,6 +2,7 @@ package de.a12.studio.modelsvalidation.validators.form;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
@@ -26,7 +27,7 @@ public final class HideConditionAtLeastOneCaseValidator implements ModelValidato
     for (HideConditionElements.Entry entry : HideConditionElements.collect(formModel.getContent())) {
       String masterField = entry.hideCondition().getMasterField();
       if (masterField != null && !masterField.isBlank() && entry.hideCondition().getCases().isEmpty()) {
-        errors.add(new ModelValidationError(model, entry.nodeId(),
+        errors.add(new ModelValidationError(model, entry.nodeId(), ElementProperty.HIDE_CONDITION,
             ValidationMessages.get("validation.hideCondition.atLeastOneCase"), Severity.ERROR.name()));
       }
     }
