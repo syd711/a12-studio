@@ -21,6 +21,8 @@ import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preview.PreviewServer;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
+import de.a12.studio.ui.updater.UpdateApplier;
+import de.a12.studio.ui.updater.Updater;
 import de.a12.studio.ui.versioncontrol.GitService;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -57,11 +59,12 @@ public class Studio extends Application implements StudioEventListener {
   private static Project currentProject;
   private static ValidationService validationService;
   private static GitService gitService;
-  private static WindowsSnapHook windowsSnapHook;
 
   @Override
   public void start(Stage stage) throws IOException {
     Studio.stage = stage;
+
+    UpdateApplier.cleanupBackupFiles(Updater.getWriteableBaseFolder());
 
     // Apply stored language preference before any FXML is loaded.
     String storedLang = LocalUISettings.getString(LocalUISettings.LANGUAGE);
@@ -129,12 +132,6 @@ public class Studio extends Application implements StudioEventListener {
     stage.requestFocus();
     stage.setAlwaysOnTop(false);
 
-    // Win+Left/Right are reserved by the Windows shell's own Snap Assist ahead of normal window
-    // messages, so a plain JavaFX key listener never sees them (unlike Win+Up/Down, which
-    // StudioKeyEventHandler already handles as a fallback). This hook intercepts them earlier.
-    windowsSnapHook = new WindowsSnapHook(key -> Platform.runLater(() -> handleWindowsSnapKey(key)));
-    windowsSnapHook.install();
-
     Platform.runLater(Studio::checkA12InstallationFolder);
   }
 
@@ -152,23 +149,8 @@ public class Studio extends Application implements StudioEventListener {
     }
   }
 
-  private static void handleWindowsSnapKey(WindowsSnapHook.SnapKey key) {
-    if (!(stage.getUserData() instanceof FXResizeHelper helper)) {
-      return;
-    }
-    switch (key) {
-      case LEFT -> helper.snapLeft();
-      case RIGHT -> helper.snapRight();
-      case UP -> helper.maximize();
-      case DOWN -> helper.restoreOrMinimize();
-    }
-  }
-
   @Override
   public void stop() {
-    if (windowsSnapHook != null) {
-      windowsSnapHook.uninstall();
-    }
     PreviewServer.stopIfRunning();
     PreviewAppProcess.getInstance().stop();
   }

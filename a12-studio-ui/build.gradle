@@ -70,9 +70,6 @@ dependencies {
     implementation 'org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r'
     // Renders the downloaded RELEASE_NOTES.md as HTML for display in the update-info dialog's WebView.
     implementation 'org.commonmark:commonmark:0.24.0'
-    // Windows-only: low-level keyboard hook so Win+Left/Right window snapping can be
-    // intercepted before the shell's own reserved Snap Assist handling consumes it.
-    implementation 'net.java.dev.jna:jna-platform:5.15.0'
     // Pure-Java Microsoft Access reader; no ODBC or native drivers needed.
 
     // WCF -> RMC model conversion tool (injects the `__meta` metadata group every document model

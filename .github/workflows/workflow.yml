@@ -295,7 +295,7 @@ jobs:
       - name: Create client update ZIP
         # Consumed by Updater.downloadUpdate() for in-app self-updates on ALL platforms - the download
         # URL/filename (Updater.UI_ZIP) has no per-OS variant, so one archive must serve all three:
-        # update-client-windows.bat unpacks both files in place, while update-client-macos.sh/
+        # UpdateApplier (Windows) unpacks both files in place, while update-client-macos.sh/
         # update-client-linux.sh each cherry-pick only a12-studio-ui.jar and ignore the Windows exe.
         run: |
           mkdir -p update-zip

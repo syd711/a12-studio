@@ -128,11 +128,19 @@ public class Updater {
 
   public static boolean installClientUpdate(@Nullable String oldVersion, @Nullable String newVersion) throws IOException {
     if (OSUtil.isWindows()) {
-      String cmds = loadTemplate("update-client-windows.bat");
-      FileUtils.writeBatch("update-client.bat", cmds);
-      log.info("Written temporary batch: {}", cmds);
-      List<String> commands = Arrays.asList("cmd", "/c", "start", "update-client.bat");
-      SystemCommandExecutor executor = new SystemCommandExecutor(commands);
+      // Relaunches the already-signed A12-Studio.exe itself in "apply update" mode (see
+      // UpdateApplier) instead of dropping a .bat script to disk and running it via `cmd /c
+      // start`. Endpoint security tools (e.g. Sophos Intercept X "Lockdown") treat "process
+      // writes a script, then cmd.exe executes it and overwrites the app's own installed
+      // binaries" as dropper-like behaviour and block it - having the signed exe perform its own
+      // update avoids that shape entirely.
+      File exe = new File(getWriteableBaseFolder(), "A12-Studio.exe");
+      List<String> commands = List.of(
+          exe.getAbsolutePath(),
+          UpdateApplier.APPLY_UPDATE_FLAG,
+          STUDIO_ZIP,
+          String.valueOf(ProcessHandle.current().pid()));
+      SystemCommandExecutor executor = new SystemCommandExecutor(commands, false);
       executor.setDir(getWriteableBaseFolder());
       executor.executeCommandAsync();
       new Thread(() -> {
