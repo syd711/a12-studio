@@ -22,10 +22,12 @@ import java.util.List;
  * filter item must reference a field ({@code options.fieldId}), and that field must resolve against the
  * referenced Document Model like a column's element reference. A Filter-Definition-based item ({@link
  * FilterItem#getType()} == {@value FilterItem#TYPE_QUERY}) has no field reference to check instead - see {@link
- * FilterItem}'s class doc - so it's required to have a non-blank {@link FilterItem#getFilterDefinition()}
- * instead (its actual query syntax is checked separately, mirroring {@code QueryFilterDefinitionSyntaxValidator}).
- * Mirrors {@link OverviewFilterSectionsValidator}'s rules for the older {@code filterConfiguration.sectionData}
- * structure.
+ * FilterItem}'s class doc - so it's required to have either a non-blank {@link FilterItem#getFilterDefinition()}
+ * (free-text query) or a non-null {@link de.a12.studio.models.overviewmodel.FilterItemOptions#getOperator()}
+ * (structured alternative, e.g. a relationship-based operator - see {@link FilterItemOptions}'s class doc) instead
+ * (the free-text form's actual query syntax is checked separately, mirroring {@code
+ * QueryFilterDefinitionSyntaxValidator}). Mirrors {@link OverviewFilterSectionsValidator}'s rules for the older
+ * {@code filterConfiguration.sectionData} structure.
  * <p>
  * Without this validator a filter item can be saved with no field reference at all - see {@link FilterItem}'s
  * class doc: {@code testing/workspaces/basic/models/Company_OM.json} shipped in exactly that state because
@@ -61,7 +63,8 @@ public final class OverviewFilterGroupsValidator implements ModelValidator {
       for (FilterItem item : group.getFilterItems()) {
         if (FilterItem.TYPE_QUERY.equals(item.getType())) {
           String filterDefinition = item.getFilterDefinition();
-          if (filterDefinition == null || filterDefinition.isBlank()) {
+          boolean hasStructuredOperator = item.getOptions() != null && item.getOptions().getOperator() != null;
+          if ((filterDefinition == null || filterDefinition.isBlank()) && !hasStructuredOperator) {
             errors.add(new ModelValidationError(model, ELEMENT_ID,
                 "Filter item \"" + describeItem(item) + "\" in filter group \"" + describeGroup(group)
                     + "\" must define a filter definition.", Severity.ERROR.name()));

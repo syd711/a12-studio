@@ -191,6 +191,14 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void filterGroupsValidatorAcceptsStructuredOperatorOnQueryItem() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterGroupsValidator_query_operator_valid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewFilterGroupsValidator().validate(model, TestModels.context(model));
+
+    assertEquals(0, errors.size());
+  }
+
+  @Test
   void filterDefinitionSyntaxValidatorReportsInvalidQueryItemSyntax() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterDefinitionSyntaxValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewFilterDefinitionSyntaxValidator().validate(model, TestModels.context(model));
