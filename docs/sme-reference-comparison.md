@@ -30,7 +30,10 @@ that was never actually true (no such `build.gradle` entries exist in git histor
 same as this repo's own `LICENSE` — so an in-process kernel dependency is a legally and technically viable path, not
 a blocked one. But taking it is a real architectural decision (large transitive dependency footprint; turns
 a12-studio from an independent reimplementation into a kernel wrapper for whatever slice uses it), so it hasn't been
-taken. The strategy actually in use is a **clean-room, data-driven port**: read the same JSON rule definitions the
+taken. **Spike 2026-09-19** (see "Kernel dependency spike" in the Backend / kernel capability map below) confirmed the
+path is technically viable for kernel **31.1.1** — not SME's pinned 30.7.0, which is unpublished and whose 30.8.x
+successors cannot even read a12-studio's Document Model version 29.4.0 — for everything except TDG, which is
+enterprise-only. The strategy actually in use is a **clean-room, data-driven port**: read the same JSON rule definitions the
 kernel/SME ship (e.g. `client/resources/models/documentModel/Domain*.json`) and evaluate them with a
 purpose-built interpreter in `a12-studio-data-services`, rather than either reimplementing SME's REST endpoints or
 depending on the real kernel jars. See the `SchemaVersionValidator`, `DuplicateIdValidator`,
@@ -362,8 +365,8 @@ repeats (Inline/Embedded/Detached), buttons, and a lightweight live preview. The
 | `ButtonPanel` (a button bar addable as its own node *inside* the screen tree) | — | **Absent** — a12-studio only supports buttons in the model-level/per-screen header+footer boxes (`HeaderFooterBox`), never as an inline, addable screen-tree node |
 | `DetachedRepeat` / `EmbeddedRepeat` / `InlineRepeat` | same | Has it structurally; see "Repeats" below for field-level gaps |
 | `Binding` / `BindingRepeat` (CDM relationship-driven selector/repeat) | — | **Completely absent** — no class, no UI, no validator. Confirmed by grep: zero matches for "Binding" anywhere in `a12-studio-models/.../formmodel/` |
-| `FieldBasedRepeatOverviewColumn` | `FieldBasedRepeatOverviewColumn` | Data model present but **no "Add Column" UI and no editor panel at all** — existing columns render read-only in the tree; also missing `filterExposition`, `pinDirection`, `icon`, `labelHidden`, `headerStyle`, `fixedWidth`, and hide-condition support (SME's `RepeatOverviewColumnBase` includes `ConditionallyHidden`) |
-| `ExpressionRepeatOverviewColumn` (compute a column via expression instead of a field) | — | **Absent** — only field-based and generic-fallback column types exist |
+| `FieldBasedRepeatOverviewColumn` | `FieldBasedRepeatOverviewColumn` | Present, with "Add Column" and an editor panel (label/width/sortable/filterable/preferred sorting, readonly, message position) plus — since 2026-09-19 — panels for **pin direction**, **icon** and the per-column **hide condition** (`ConditionallyHidden`; master fields scoped to the column's own field, like a Control). Still no UI for `filterExposition`, `labelHidden`, `headerStyle`, `fixedWidth`, `specificHorizontal/VerticalAlignment` and annotations (all modeled, round-trip verified) |
+| `ExpressionRepeatOverviewColumn` (compute a column via expression instead of a field) | `ExpressionRepeatOverviewColumn` | Present (step 2 below); its expression is edited with the rule editor (`RuleEditorController`), and it shares the pin direction / icon / hide-condition panels above (hide-condition master fields scoped to the enclosing repeat's group, as in SME's `resolveDmElementForFmElement`) |
 
 ### Field/group configuration & the dependency system
 
@@ -410,14 +413,19 @@ SME's shared `RepeatBase` (`fmElements/types/detachedRepeat.ts`) has several fie
   validator, "a repeat's `initialSorting` column must itself be sortable", has no a12-studio equivalent since neither
   side exists).
 - **`rowActionGroup`** — a list of custom row actions, each with its own `buttonStyling`, `event`, `confirmation`/
-  `confirmationDialogTitle`, and `scope`. a12-studio's `AbstractRepeat.defaultRowAction` is a single `RowAction{event}`
-  field with **no editor panel referencing it anywhere** — confirmed dead/unwired in the current UI. This is a real
-  feature gap, not just a naming difference.
+  `confirmationDialogTitle`, and `scope`. **Closed** (step 4 below, completed 2026-09-19): the "Row Actions" table edits
+  event/scope inline and an Edit dialog (`RowActionDialogController`, mirroring SME's `I_SectionRowAction-form.json`
+  and the Button dialog) edits everything else — functions, confirmation title/message, visual settings, label,
+  description, styles, annotations. Not ported: SME's `updateRowAction`/`syncDefaultRowActionReducer` behaviour that
+  clears `defaultRowAction` when its row action gains a confirmation (a12-studio has no UI for `defaultRowAction`).
 - **`titleHidden`** — missing.
 - **`confirmationTexts`** per-repeat override — a12-studio only has a model-level default (`Defaults.confirmationTexts`),
   no per-repeat override.
 - **`MultiFileUploadOptions`** (attachment-repeat config: download toggle, upload description/button/helper text) —
-  entirely missing; relates to the `attachmentConfig` gap above.
+  **Closed** (2026-09-19): `RepeatMultiFileUploadPanelController` on Inline/Embedded repeats (hidden for Detached). As
+  the SME docs require, enabling picks the repeated group's single non-repeatable attachment group automatically
+  (`MultiFileUploadSupport`) and is refused with an error naming the group if there is none/several. Still open, from
+  the `attachmentConfig` gap above: `accept`, `placeholderIcon`, `defaultAction`.
 - **`TableStyle`**: SME's has `cardHeight`/`actionColumnWidth` in addition to `tableHeight`/`rowHeight`, which are all
   a12-studio's `TableStyle` has.
 - **No repeat-type conversion** (Detached⇄Embedded⇄Inline⇄Binding) exists in the UI — converting requires
@@ -445,9 +453,11 @@ a missing panel, the data model itself can't represent an include on any node.
 - **No structural consistency check** between the form model and its (possibly since-changed) document model. SME's
   is a categorized `Problem[]` (INFO/WARNING/ERROR) background check — a12-studio doesn't need the server-side
   architecture, but has no equivalent drift-detection pass of any kind today.
-- **No style-preset UI.** `FormModelContent.styles` (a model-level named style-class list) exists in the data model
-  but has no panel anywhere — grepped `getStyles()/setStyles(` in the UI module, only `overviewmodel`'s (unrelated)
-  controller uses those method names.
+- **Style presets.** `FormModelContent.styles` (a model-level named style-class list) now has a panel in the Model
+  Settings dialog (2026-09-19; the shared `StylesPanelController`, restored on Cancel via `ModelSnapshot`). **Not**
+  ported: SME uses this list as the candidate source of the per-element `style`/`headerStyle` reference pickers and
+  prunes a deleted preset from every element (`handleDeletedStyleMiddleware`); a12-studio's per-element style editors
+  are still free text, so a preset is a plain list for now.
 - **Live preview is architecturally different, not just less complete.** a12-studio's `PreviewServer` renders an
   explicitly-labeled "lightweight v1 wireframe" from the live in-memory model in an external browser tab. SME's
   preview drives the actual Form Engine runtime via postMessage sync. This is a reasonable simplification given
@@ -524,7 +534,7 @@ covered by round-trip tests.**
   the tree's generic add/attach/detach/reorder commands (which needed two latent-bug fixes: they previously assumed
   only `ControlGrid`/`Screen` could ever occupy a Repeat's single child slot). New column editor panel covers
   label/width/sortable/filterable/preferred-sorting + type-specific fields; icon/pin-direction/per-column hide
-  condition still deferred (modeled, no UI yet).
+  condition were deferred here and added 2026-09-19 (see the column table rows above).
 - **Step 3**: new **Data Configuration tab** — a flat table of every field/group config entry with reusable detail
   editors (External Enumeration, Dependent Enumeration, and two new panels, **Dependent Field** and **Dependent
   Group**, closing a gap bigger than originally scoped: `dependentField`/`dependentGroup` had **zero** editor UI
@@ -559,10 +569,11 @@ covered by round-trip tests.**
 - **Step 4**: `filterExpression`, `initialSorting`, `titleHidden` added to `AbstractRepeat` with UI. Real
   `RowAction`/`RowActionGroup` added (rich, multi-action); the old single-slot type was renamed
   `DefaultRowAction` to stop colliding with it and now correctly matches SME's `DefaultRowAction` shape
-  (`event`/`custom`/`hideButton`) instead of the richer one. New "Row Actions" table editor (event + scope; full
-  per-action `buttonStyling`/confirmation editing deferred). Per-repeat `confirmationTexts` override and
-  `TableStyle.cardHeight`/`actionColumnWidth` added, both with UI. `MultiFileUploadOptions` added to
-  `InlineRepeat`/`EmbeddedRepeat` only (matching SME's actual restriction) — modeled, no UI yet.
+  (`event`/`custom`/`hideButton`) instead of the richer one. New "Row Actions" table editor (event + scope; the full
+  per-action `buttonStyling`/confirmation editing was deferred here and added 2026-09-19 as the Edit dialog).
+  Per-repeat `confirmationTexts` override and `TableStyle.cardHeight`/`actionColumnWidth` added, both with UI.
+  `MultiFileUploadOptions` added to `InlineRepeat`/`EmbeddedRepeat` only (matching SME's actual restriction) — UI
+  added 2026-09-19.
 - **Step 5** (originally planned last, done ahead of step 6 once its actual shape was found): **not** attempted as
   a live resolve-and-expand feature — a real fixture (`client/resources/input/models/fmm/workspace/HostModel.json`)
   showed SME expands an include at *author* time (copies the referenced subtree into this model's own `screens`
@@ -950,17 +961,17 @@ on its own:
 
 | Capability | SME backend | a12-studio equivalent |
 |---|---|---|
-| Rule contradiction / consistency (constraint solver) | `RuleContradictionCheckService` → `com.mgmtp.a12.tdg.lib.TestDataGenerator.checkModel(...)` | **Missing** — no `tdg` dependency |
-| Document model structural/consistency validation | `DMValidationService` (kernel `getElementProblems` + custom checks) | Partially present (`ValidationRuleService`, `ComputationRuleService` call the same kernel APIs) |
-| Condition/expression language validation & formatting | `ValidationRuleService`, `ComputationRuleService` (Kotlin) | **Missing** (corrected 2026-09-05 — previously claimed present; no such Java services exist, no kernel dependency in this repo). `RuleConfig.errorCondition`/`ComputationAlternative.precondition`/`operation` are edited as plain text with no semantic validation — see the Document Model "Editor features" correction above |
+| Rule contradiction / consistency (constraint solver) | `RuleContradictionCheckService` → `com.mgmtp.a12.tdg.lib.TestDataGenerator.checkModel(...)` | **Missing, and blocked** (spike 2026-09-19): `com.mgmtp.a12.tdg:tdg-lib` is not in any community Maven repo (404) and the enterprise repos answer 401, so it cannot be pulled anonymously. Needs mgm credentials/commercial licence, or a clean-room solver |
+| Document model structural/consistency validation | `DMValidationService` (kernel `getElementProblems` + custom checks) | Hand-ported clean-room validators only (`BasicConsistencyValidator` etc.) — corrected 2026-09-19: the `ValidationRuleService`/`ComputationRuleService` previously listed here never existed in this repo. **Feasible on kernel 31.1.1 through the public API**: `IDocumentModelService.checkConsistency` flags corrupted conditions, unexpanded includes and invalid entity paths (message only, no line/column) |
+| Condition/expression language validation & formatting | `ValidationRuleService`, `ComputationRuleService` (Kotlin) | **Missing** (corrected 2026-09-05 — previously claimed present; no such Java services exist, no kernel dependency in this repo). `RuleConfig.errorCondition`/`ComputationAlternative.precondition`/`operation` are edited as plain text with no semantic validation — see the Document Model "Editor features" correction above. **Spike 2026-09-19: works in-process on kernel 31.1.1** (`DocumentModelService.hasValidConditionText` / `isValidComputation` / `formatComputationOperation`, all `a12internal`), with line/column positions; needs the model expanded first |
 | Print rendering (PDF) | `PrintService` — PDFBox or legacy engine via `a12.print.engine.runtime` | Scaffolding present (`PrintService.java`, `DocumentModelResolver.java`, print-engine deps) but editor missing |
-| Document model expansion (includes/imports) | `ExpansionService` | Not yet confirmed — check `documentmodel/features` |
+| Document model expansion (includes/imports) | `ExpansionService` | **Missing** (confirmed 2026-09-19: no include/import expansion anywhere in this repo). **Feasible on kernel 31.1.1** (`DocumentModelExpandService.expand`, `internal`): `Invoice_DM` 6 → 135 elements in 23 ms |
 | Combination Model expansion | `CombinationModelExpansionService` | **Missing** (corrected 2026-09-08 — previously claimed present; no such service, or `services/combinationmodel/` directory, exists in this repo). The Combined Document Model editor built 2026-09-08 only validates the structural rules from `DomainCombination.json` (missing/not-allowed/duplicate references per step); DM expansion, rule-contradiction/SMT solving, loop detection and the "Validate model up to this step" action all still depend on this |
-| Additive Model join | `AdditiveModelController` (`kernel-md-join`) | Dependency present, service scaffolding not yet confirmed |
+| Additive Model join | `AdditiveModelController` (`kernel-md-join`) | **Missing** — corrected 2026-09-19: no kernel dependency is present (this row previously said it was). **Feasible on kernel 31.1.1**: `kernel-md-join` no longer exists there, the join moved into `kernel-md-facade` (`DocumentModelJoiningService.join`, `internal`); `Person_Dc` + `PersonEmployee_Ad` joined to 42 elements |
 | Selection Model join/validate | `SelectionModelController` | Not yet present |
 | Structural Mapping Model consistency | `StructuralMappingModelService` (`SmmService`) | Present — `services/structuralmappingmodel/` |
 | Mapping Model consistency/generation | `SMEMappingModelService` | Present — `services/mappingmodel/` |
-| Test data generation | `TestDataService` (same TDG lib, generative mode) | Missing (needs `tdg` dep) |
+| Test data generation | `TestDataService` (same TDG lib, generative mode) | Missing, and blocked on the same TDG availability problem as rule contradiction |
 | Formula/computation execution over content documents | `DocumentValidationService` (`docRtService.compute(...)`) | Not yet confirmed |
 | XSD → Document Model transformation | `TransformerService` | Not present |
 | Move/rename refactoring (rewrite condition text) | `MoveRefactoringService` | Present in-process (clean-room `DocumentModelRefactoring` + `ProjectReferenceRefactoring`, no kernel call), within the model and across the project's Print/Query/Mapping/Structural Mapping/Selection models and including Document Models; remaining gaps listed in the Document Model gap list above |
@@ -969,6 +980,122 @@ on its own:
 `a12-studio-server` currently contains only `A12StudioServer.java`, `A12StudioServerTest.java`, and
 `SystemResource.java` — it is not yet where kernel calls happen; that logic currently lives in
 `a12-studio-data-services`.
+
+### Kernel dependency spike (2026-09-19) — decision: **hybrid, kernel pinned to 31.1.1**
+
+Time-boxed spike, no production code. A scratch Gradle project (outside the repo) resolved the kernel against the
+same repository a12-studio already configures in `settings.gradle`
+(`https://artifacts.geta12.com/artifactory/a12-community-maven/`, no credentials) and ran the four capabilities
+in-process against the JSON fixtures under `testing/workspaces/{basic,advanced_new,e-commerce}` (53 Document
+Models with a `modelRoot`). Everything below was observed, not inferred from documentation, unless marked otherwise.
+
+**Which kernel version.** SME pins kernel `30.7.0`; that version is not published. Published: `30.8.1/5/6`,
+`31.1.0/1/3`. The version has to match the Document Model version of the files, and a12-studio's files are
+DM `29.4.0`, which is the kernel **31.1.x** generation (kernel changelog A12K-4102/3995: `includeConfig`,
+`documentUniquenessCriteria`):
+
+| Kernel | Reads a12-studio's DM 29.4.0 fixtures? |
+|---|---|
+| 30.8.6 | 52 of 53. `Person_Dc` fails hard on `documentUniquenessCriteria`. **Worse:** the serializer only knows the old `modelAlias`, so `includeConfig` is silently dropped and expanding `Invoice_DM` does nothing (resolver never called, 0 problems, 6 elements before and after). A silent no-op, not an error |
+| 31.1.1 | 53 of 53 |
+
+`31.1.3` is unusable today: `kernel-md-facade:31.1.3` requires `kernel-internal-*:31.1.3`, which are only published
+up to `31.1.1`. Pin `31.1.1` and re-check when `31.1.3`'s internals appear. In 31.x the modules were reshuffled:
+`kernel-md-model` and `kernel-md-join` no longer exist past 30.8.6 (the model classes are in
+`kernel-internal-md-model`, the join is inside `kernel-md-facade`), and `kernel-md-facade` alone pulls in the rest.
+
+**Footprint and conflicts (kernel 31.1.1, `kernel-md-facade` + `-documentmodel` + `-serializer`).** 72 jars,
+20.5 MB: 56 `com.mgmtp.a12.kernel` artifacts (including the `mm*` model-typing/validator ones), 2 `com.mgmtp.a12.base`, and
+four third-party artifacts new to the studio: Groovy 3.0.25, commons-cli, commons-text, jakarta.validation-api. The studio's `a12-studio-ui` runtime
+classpath has 50 artifacts, 11 of which overlap; none needs a code change, all resolve upward:
+
+| Artifact | Studio | Kernel | Resolves to |
+|---|---|---|---|
+| `tools.jackson.core:jackson-databind`/`-core` | 3.1.4 | 3.2.1 | 3.2.1 |
+| `jackson-annotations` | 2.21 | 2.22 | 2.22 |
+| `commons-lang3` | 3.16.0 | 3.20.0 | 3.20.0 |
+| `commons-collections4` | 4.4 | 4.5.0 | 4.5.0 |
+| `commons-io`, `slf4j-api` | 2.22.0 / 2.0.18 | 2.21.0 / 2.0.17 | studio's (higher) |
+| `antlr4-runtime`, `antlr-runtime`, `ST4` | 4.13.2 / 3.5.3 / 4.3.4 | identical | unchanged |
+
+Kernel 31.x uses **Jackson 3** (`tools.jackson`), the same generation as the studio, so there is no second Jackson
+on the classpath (kernel 30.8.x used Jackson 2 / `com.fasterxml`). The one real bump, Jackson 3.1.4 → 3.2.1, was
+tested by forcing it through a Gradle init script: `:a12-studio-models:test` 821 tests, 0 failures, 6 skipped. The
+studio has no `module-info.java`, so there are no JPMS split-package problems. **Not verified:** a full
+`a12-studio-ui` build/run or `shadowJar` with the kernel on the classpath (check `mergeServiceFiles()` and
+JavaFX co-existence when this is first integrated), and installer size impact. Avoid `kernel-rewrite`: it pulls
+OpenRewrite → Groovy 4 (`org.apache.groovy`) and clashes with the kernel's Groovy 3 on the same Gradle capability.
+
+**Licence.** `base-model-consistency` publishes a `-license.txt`; `kernel-md-facade` and `kernel-internal-md-model` 31.1.1
+ship `META-INF/LICENSE`, `NOTICE`, `THIRD_PARTY_NOTICES`, and the facade sources carry
+`SPDX-License-Identifier: EUPL-1.2 OR LicenseRef-commercial` (read from `DocumentModelExpandService.java`; I did not
+open every artifact). That is the same dual licence
+as this repo's `LICENSE` (EUPL-1.2), so linking is compatible if the EUPL option is chosen, and the notices must be
+shipped. Metadata is thin: the kernel POMs I checked have no `<licenses>` block and the `kernel-md-facade` CycloneDX SBOM declares a licence for only
+3 of 58 `com.mgmtp` components, which will show up as "undeclared" in `generateLicenses` output. **TDG is different:**
+no `com.mgmtp.a12.tdg` group exists in `a12-community-maven`, `a12-2026-06-community-maven` or
+`a12-2025-06-community-maven` (404), and `a12-enterprise-maven` / `a12-enterprise-plus-maven` return 401. TDG is a
+licensed product; use needs mgm credentials (`a12-license@mgm-tp.com`).
+
+**Capabilities, in-process on kernel 31.1.1 against a12-studio JSON:**
+
+| # | Capability | Result |
+|---|---|---|
+| a | Validate a rule `errorCondition` / computation `operation` | **Works.** Company_DM 4 rules OK, Person_Dc 4 rules + 1 computation OK, Country_Dc 4 + 1 OK, Invoice_DM (expanded) 30 rules + 21 computations OK, 0 false positives. A deliberately corrupted condition gives `L1:4-12 ... Unexpected found 'nonsense'. [MVK_UNEXPECTED_TOKEN]`, so line/column positions are available. The kernel **refuses** to build its validation service for a model with unexpanded includes (`Unexpanded include at '/Invoice/Addresses'`), so the pipeline is expand, then validate. First service creation 35 ms cold, 110 ms for the 135-element Invoice_DM |
+| b | Expand a Document Model's includes | **Works.** `Invoice_DM` 6 → 135 elements, 23 ms, 0 notifications; the resolver is fed by `UnexpandedModelResolverImpl(Function<String, Reader>)`, i.e. from in-memory or on-disk JSON without a directory layout |
+| c | TDG `checkModel` rule contradiction | **Not testable.** Library not obtainable (see Licence) |
+| d | Additive join | **Works mechanically.** `Person_Dc` (21 elements) + `PersonEmployee_Ad` (23) → 42 elements, 2 expected warnings (`roles` and `additive-document` annotations are not joined). Not diffed against SME's output, so semantic parity is unchecked |
+
+**API stability, the main risk.** Everything used above except `checkConsistency` sits in an `internal` or `a12internal`
+package (`DocumentModelService`, `DocumentModelSerializer`, `DocumentModelExpandService`,
+`DocumentModelJoiningService`, `IMVK_Service`). The kernel's own policy (`kernel-kernel-documentation-dev.md`,
+"Architecture") says changes there "are documented neither in the changelog nor in the migration instructions" and can
+land in minor and patch releases; other A12 components are informed in advance, an outside consumer is not. SME is such a
+component. The evidence that this bites: between SME's kernel 30.x code and 31.1.1 the expansion moved from
+`DocumentModelService.expand(dm, resolver, reporter)` to `DocumentModelExpandService.expand(dm, ExpandingDmResolver, consumer)`,
+the join changed from `join(ref, adm, locale, ..., AdditionOrigins)` to `join(ref, List<JoiningItem>, locale, JoiningProblemReporter)`
+with `JoiningType.ADDITIVE_MODEL`, `getMvkServiceForModel(dm, String)` lost its second argument, and Jackson went 2 → 3.
+SME's Kotlin helpers therefore cannot be ported line by line. The **public** API (`DocumentModelServiceFactory`) is
+small: `IDocumentModelSerializer` (de)serialize, `IDocumentModelService` (`getPath`, `checkConsistency`,
+`generateValidationCode`, `getAllAnnotatedElements`) and `IDocumentModelMigrator` (forward and backward migration).
+`checkConsistency` alone already reports corrupted conditions, unexpanded includes and invalid entity paths, but with
+messages only.
+
+**Recommendation: hybrid per capability.**
+
+- **Adopt the kernel, pinned to exactly `31.1.1`,** for whole-model consistency (public API), per-rule and computation
+  validation and formatting, DM expansion, additive join and model migration.
+- **Confine it to one new Gradle module** exposing a12-studio-typed interfaces (no kernel types leaking out), so the `internal`
+  surface, the Jackson/commons bumps and any future kernel upgrade touch one place. Guard it with contract tests over
+  the existing `testing/workspaces` fixtures (the same ones the round-trip tests use), so a kernel bump that changes
+  behaviour fails a test instead of shipping silently.
+- **Stay clean-room** for everything already built (move/rename refactoring, the hand-ported structural validators) and
+  for anything TDG-dependent until mgm access is sorted out. Rule contradiction and test-data generation are blocked,
+  not merely unbuilt.
+- **Before committing:** ask mgm (`a12-license@mgm-tp.com`) whether depending on `a12internal`/`internal` classes from
+  a non-A12 component is acceptable and whether they will announce changes; that is a business decision and it decides
+  how much of the `internal` surface is safe to rely on.
+
+**What it would unlock, ranked by value per effort:**
+
+1. **Semantic validation and formatting of rule/computation conditions**, with positions. Plugs into
+   `RichtextEditorController.setValidator(...)`, which already exists and currently has nothing semantic to call.
+2. **DM expansion.** Prerequisite for the kernel to validate any model with includes at all, for the Combined Document
+   Model's "validate model up to this step", for Form Model includes, and for any view of the effective element tree.
+3. **Additive join.** Unblocks the Additive Document Model editor and is a hard dependency of the Mapping and
+   Combination models (see "Other model types").
+4. **Kernel consistency check** as the authoritative layer next to the hand-ported validators (check for duplicate
+   messages before switching any of them off).
+5. **Model migration** through `IDocumentModelMigrator`, the only piece here that is public API.
+6. *Blocked:* rule contradiction, test-data generation (TDG).
+
+**Reproducing.** Repository above; coordinates `com.mgmtp.a12.kernel:kernel-md-facade:31.1.1`,
+`kernel-md-documentmodel:31.1.1`, `kernel-md-serializer:31.1.1`; entry points
+`DocumentModelSerializer().deserialize(Reader)`, `new DocumentModelService().getMvkServiceForModel(dm)`,
+`hasValidConditionText(mvk, rule, reporter)`, `isValidComputation(path, dm, reporter)`,
+`DocumentModelExpandService.expand(dm, ExpandingDmResolver.of(new UnexpandedModelResolverImpl(id -> reader), locale, sink), sink)`,
+`DocumentModelJoiningService.join(ref, List.of(new DocumentModelJoiningItem(adm, JoiningType.ADDITIVE_MODEL)), locale, new JoiningProblemReporter(reporter))`.
+The scratch project is not in the repo; it was ~200 lines of Java over the calls above.
 
 ---
 

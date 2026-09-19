@@ -1,0 +1,45 @@
+{
+  "header": {
+    "id": "HideConditionColumnValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "InlineRepeat",
+            "id": "inlinerepeat1",
+            "name": "Items",
+            "groupRef": "group_items",
+            "repeatOverviewColumn": [
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "column_visible",
+                "elementRef": "field_name"
+              },
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "column_hidden",
+                "elementRef": "field_price",
+                "hideCondition": {
+                  "masterField": "field_bool",
+                  "cases": []
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

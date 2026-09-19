@@ -485,7 +485,8 @@ public class FormModelTreeController implements Initializable {
       expressionCellEditorController.setExpressionCell((ExpressionCell) node);
     }
     else if (isRepeatOverviewColumn) {
-      repeatOverviewColumnEditorController.setColumn((RepeatOverviewColumn) node, elementIndex);
+      repeatOverviewColumnEditorController.setColumn((RepeatOverviewColumn) node, elementIndex,
+          columnHideConditionScope((RepeatOverviewColumn) node, selectedItem));
     }
     else if (isCustomScreenElement) {
       customScreenElementEditorController.setCustomScreenElement((CustomScreenElement) node, elementIndex,
@@ -515,6 +516,19 @@ public class FormModelTreeController implements Initializable {
     return ancestorRepeat == null
         ? HideConditionPanelController.MasterFieldScope.root()
         : HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(ancestorRepeat.getGroupRef(), elementIndex);
+  }
+
+  /**
+   * Where a Repeat overview column looks for hide-condition master fields, mirroring SME's {@code
+   * resolveDmElementForFmElement}: a field-based column is anchored at its own field (like a Control), an
+   * expression column at the closest enclosing Repeat's group (or the root), like the other container nodes.
+   */
+  private HideConditionPanelController.@NonNull MasterFieldScope columnHideConditionScope(
+      @NonNull RepeatOverviewColumn column, @Nullable TreeItem<FormElementViewModel> selectedItem) {
+    if (column instanceof FieldBasedRepeatOverviewColumn fieldColumn) {
+      return HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(fieldColumn.getElementRef(), elementIndex);
+    }
+    return containerHideConditionScope(selectedItem);
   }
 
   // Walks strictly upward from the selected tree item (never including it) to find the nearest enclosing Repeat.

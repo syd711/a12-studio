@@ -9,6 +9,7 @@ import de.a12.studio.models.formmodel.EmbeddedRepeat;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.HideCondition;
 import de.a12.studio.models.formmodel.MultiColumnSection;
+import de.a12.studio.models.formmodel.RepeatOverviewColumn;
 import de.a12.studio.models.formmodel.Row;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.ScreenElement;
@@ -17,7 +18,10 @@ import de.a12.studio.models.formmodel.Section;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Shared traversal collecting every node in a Form Model's screen tree that carries a {@link HideCondition}. */
+/**
+ * Shared traversal collecting every node in a Form Model's screen tree that carries a {@link HideCondition} -
+ * including the overview columns of a Repeat, which are tree nodes with an id of their own.
+ */
 final class HideConditionElements {
 
   private HideConditionElements() {}
@@ -42,6 +46,13 @@ final class HideConditionElements {
     for (ScreenElement element : elements) {
       if (element.getHideCondition() != null) {
         entries.add(new Entry(element.getId(), element.getHideCondition()));
+      }
+      if (element instanceof AbstractRepeat repeat) {
+        for (RepeatOverviewColumn column : repeat.getRepeatOverviewColumn()) {
+          if (column.getHideCondition() != null) {
+            entries.add(new Entry(column.getId(), column.getHideCondition()));
+          }
+        }
       }
       if (element instanceof Section section) {
         visit(section.getScreenElements(), entries);

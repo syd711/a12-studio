@@ -6,6 +6,7 @@ import de.a12.studio.models.formmodel.RepeatOverviewColumn;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
+import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,7 +14,6 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -29,12 +29,13 @@ import java.util.ResourceBundle;
  * <p>
  * Covers the fields shared by both column types (label, width, sortable, filterable, preferred sorting, and
  * - the field-based variant only - the read-only bound element, readonly and message position) plus the
- * expression variant's own expression text. Deliberately does not expose
- * {@code filterExposition}/{@code pinDirection}/{@code icon}/{@code labelHidden}/{@code headerStyle}/
- * {@code fixedWidth}/{@code specificHorizontalAlignment}/{@code specificVerticalAlignment}/{@code
- * datePickerConfig}/{@code annotations} or a hide condition - a deliberate scope simplification for the
- * first pass at making these columns editable at all; the underlying data model already has all of these
- * fields, so a future pass can add panels for them without another data-model change.
+ * expression variant's own expression text, and embeds one panel each for the pin direction ({@link
+ * RepeatColumnPinDirectionPanelController}), the header icon ({@link RepeatColumnIconPanelController}) and the
+ * per-column hide condition ({@link HideConditionPanelController}). Deliberately does not (yet) expose
+ * {@code filterExposition}/{@code labelHidden}/{@code headerStyle}/{@code fixedWidth}/{@code
+ * specificHorizontalAlignment}/{@code specificVerticalAlignment}/{@code datePickerConfig}/{@code annotations};
+ * the underlying data model already has all of these fields, so a future pass can add panels for them
+ * without another data-model change.
  */
 public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -61,7 +62,13 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
   @FXML
   private TextField expressionNameField;
   @FXML
-  private TextArea expressionArea;
+  private RuleEditorController expressionController;
+  @FXML
+  private RepeatColumnPinDirectionPanelController pinDirectionController;
+  @FXML
+  private RepeatColumnIconPanelController iconController;
+  @FXML
+  private HideConditionPanelController hideConditionController;
 
   private RepeatOverviewColumn column;
 
@@ -79,11 +86,21 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
     bindCheckBox(readonlyCheckBox, (el, value) -> asFieldBased().setReadonly(value ? Boolean.TRUE : null));
     bindComboBox(messageExpositionCombo, (el, value) -> asFieldBased().setMessageExposition(value));
     bindTextField(expressionNameField, (el, value) -> asExpressionBased().setName(value));
-    bindTextArea(expressionArea, (el, value) -> asExpressionBased().setExpression(value));
+    expressionController.configureCustom("repeatColumnExpression", StudioBundle.get("expression_cell_expression"));
   }
 
-  public void setColumn(@NonNull RepeatOverviewColumn column, @Nullable ElementIndex elementIndex) {
+  /**
+   * @param hideConditionScope where the per-column hide condition looks for master fields - the column's own
+   *                           field for a field-based column, the closest enclosing repeat's group (or the root)
+   *                           for an expression column, mirroring SME's {@code resolveDmElementForFmElement}
+   */
+  public void setColumn(@NonNull RepeatOverviewColumn column, @Nullable ElementIndex elementIndex,
+      HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     this.column = column;
+    pinDirectionController.setColumn(column);
+    iconController.setColumn(column);
+    hideConditionController.configure(column.getId(), column::getHideCondition, column::setHideCondition,
+        elementIndex, hideConditionScope);
     labelController.setCustom(column::getLabel, column::setLabel);
     labelController.setFieldSuggestionSource(elementIndex);
     setFieldValue(widthField, column.getWidth() == null ? "" : column.getWidth().toString());
@@ -106,7 +123,7 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
     else {
       ExpressionRepeatOverviewColumn expressionColumn = (ExpressionRepeatOverviewColumn) column;
       setFieldValue(expressionNameField, expressionColumn.getName());
-      setFieldValue(expressionArea, expressionColumn.getExpression());
+      expressionController.setCustom(expressionColumn::getExpression, expressionColumn::setExpression);
     }
   }
 

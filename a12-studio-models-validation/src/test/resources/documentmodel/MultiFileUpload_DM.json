@@ -1,0 +1,164 @@
+{
+  "header": {
+    "id": "MultiFileUpload_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "MultiFileUpload_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_root",
+          "name": "Root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Group",
+                "id": "group_single",
+                "name": "SingleAttachment",
+                "Group": {
+                  "repeatability": 10,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "group_single_attachment",
+                      "name": "attachments",
+                      "Group": {
+                        "repeatability": 1,
+                        "usageType": "attachment"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_none",
+                "name": "NoAttachment",
+                "Group": {
+                  "repeatability": 10,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_title",
+                      "name": "Title",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_two",
+                "name": "TwoAttachments",
+                "Group": {
+                  "repeatability": 10,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "group_two_first",
+                      "name": "first",
+                      "Group": {
+                        "repeatability": 1,
+                        "usageType": "attachment"
+                      }
+                    },
+                    {
+                      "type": "Group",
+                      "id": "group_two_wrapper",
+                      "name": "wrapper",
+                      "Group": {
+                        "repeatability": 1,
+                        "elements": [
+                          {
+                            "type": "Group",
+                            "id": "group_two_second",
+                            "name": "second",
+                            "Group": {
+                              "repeatability": 1,
+                              "usageType": "attachment"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_nested",
+                "name": "NestedRepeatable",
+                "Group": {
+                  "repeatability": 10,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "group_nested_inner",
+                      "name": "inner",
+                      "Group": {
+                        "repeatability": 5,
+                        "elements": [
+                          {
+                            "type": "Group",
+                            "id": "group_nested_attachment",
+                            "name": "attachments",
+                            "Group": {
+                              "repeatability": 1,
+                              "usageType": "attachment"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_repeatable_attachment",
+                "name": "RepeatableAttachment",
+                "Group": {
+                  "repeatability": 10,
+                  "elements": [
+                    {
+                      "type": "Group",
+                      "id": "group_repeatable_attachment_child",
+                      "name": "attachments",
+                      "Group": {
+                        "repeatability": 3,
+                        "usageType": "attachment"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.formmodel.dialogs;
 
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.EventButton;
+import de.a12.studio.models.formmodel.RowAction;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.StudioBundle;
@@ -63,6 +64,30 @@ public class Dialogs {
     // Reads back controller.getButton() rather than the local `button` above, since onTypeChanged may have
     // replaced it with a different Button subtype instance since init() was called.
     return controller.isConfirmed() ? Optional.of(controller.getButton()) : Optional.empty();
+  }
+
+  /**
+   * Opens the Edit Row Action dialog for a working copy of {@code rowAction}, so a Cancel leaves the real,
+   * attached action untouched (same reasoning as {@link #showButtonForEdit}). The caller only replaces the
+   * original in its {@code rowActionGroup} with the returned action once present.
+   */
+  public static Optional<RowAction> showRowActionForEdit(Stage owner, @Nullable ElementIndex elementIndex, RowAction rowAction) {
+    RowAction working = cloneRowAction(rowAction);
+    FXMLLoader fxmlLoader = new FXMLLoader(RowActionDialogController.class.getResource("row-action-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("row-action-dialog", fxmlLoader, owner, StudioBundle.get("edit_row_action_title"));
+    RowActionDialogController controller = (RowActionDialogController) stage.getUserData();
+    controller.init(stage, elementIndex, working);
+    stage.setOnHidden(event -> controller.destroy());
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.isConfirmed() ? Optional.of(controller.getRowAction()) : Optional.empty();
+  }
+
+  private static RowAction cloneRowAction(RowAction rowAction) {
+    String json = JsonSettings.objectMapper.writeValueAsString(rowAction);
+    return JsonSettings.objectMapper.readValue(json, RowAction.class);
   }
 
   private static Button cloneButton(Button button) {

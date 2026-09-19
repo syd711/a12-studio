@@ -4,8 +4,10 @@ import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.RowAction;
 import de.a12.studio.models.formmodel.RowActionGroup;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
 import de.a12.studio.ui.events.StudioEventManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -18,7 +20,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseButton;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.util.List;
@@ -30,10 +34,11 @@ import java.util.ResourceBundle;
  * the built-in row-click behavior). Previously {@code rowActionGroup} had no editor at all - the data model
  * didn't even have it (only the single-action {@code defaultRowAction}, itself unwired in the UI).
  * <p>
- * Covers {@code event} and {@code scope} only - {@code buttonStyling} (label/icon/priority/destructive),
- * {@code confirmation}/{@code confirmationDialogTitle}, {@code style} and {@code annotations} are modeled
- * but not yet editable here, a deliberate scope simplification (matches the same pattern used for
- * {@code DependentEnumerationPanelController}'s plain-text columns).
+ * {@code event} and {@code scope} can be edited inline in the table; everything else a row action carries -
+ * {@code buttonStyling} (label/description/icon/priority/destructive/hide-label/styles), {@code confirmation}/
+ * {@code confirmationDialogTitle} and {@code annotations} - is edited through the Edit dialog ({@link
+ * de.a12.studio.ui.editors.formmodel.dialogs.RowActionDialogController}), opened via the Edit button or by
+ * double-clicking a row.
  */
 public class RepeatRowActionsPanelController implements Initializable {
 
@@ -52,8 +57,11 @@ public class RepeatRowActionsPanelController implements Initializable {
   private Button addButton;
   @FXML
   private Button removeButton;
+  @FXML
+  private Button editButton;
 
   private AbstractRepeat repeat;
+  private @Nullable ElementIndex elementIndex;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -85,6 +93,18 @@ public class RepeatRowActionsPanelController implements Initializable {
       commitChange();
     });
 
+    editButton.disableProperty().bind(actionsTable.getSelectionModel().selectedItemProperty().isNull());
+    editButton.setOnAction(e -> editSelected());
+    actionsTable.setRowFactory(table -> {
+      javafx.scene.control.TableRow<RowAction> row = new javafx.scene.control.TableRow<>();
+      row.setOnMouseClicked(event -> {
+        if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && !row.isEmpty()) {
+          editSelected();
+        }
+      });
+      return row;
+    });
+
     removeButton.setOnAction(e -> {
       RowAction selected = actionsTable.getSelectionModel().getSelectedItem();
       if (selected == null) {
@@ -98,13 +118,32 @@ public class RepeatRowActionsPanelController implements Initializable {
     });
   }
 
-  public void setRepeat(@NonNull AbstractRepeat repeat) {
+  public void setRepeat(@NonNull AbstractRepeat repeat, @Nullable ElementIndex elementIndex) {
+    this.elementIndex = elementIndex;
     this.repeat = repeat;
     ObservableList<RowAction> items = FXCollections.observableArrayList();
     if (repeat.getRowActionGroup() != null) {
       items.addAll(repeat.getRowActionGroup().getAction());
     }
     actionsTable.setItems(items);
+  }
+
+  private void editSelected() {
+    RowAction selected = actionsTable.getSelectionModel().getSelectedItem();
+    if (selected == null || repeat.getRowActionGroup() == null) {
+      return;
+    }
+    List<RowAction> actions = repeat.getRowActionGroup().getAction();
+    int index = actions.indexOf(selected);
+    if (index < 0) {
+      return;
+    }
+    Dialogs.showRowActionForEdit(Studio.stage, elementIndex, selected).ifPresent(edited -> {
+      actions.set(index, edited);
+      actionsTable.getItems().set(index, edited);
+      actionsTable.getSelectionModel().select(index);
+      commitChange();
+    });
   }
 
   private RowActionGroup getOrCreate() {

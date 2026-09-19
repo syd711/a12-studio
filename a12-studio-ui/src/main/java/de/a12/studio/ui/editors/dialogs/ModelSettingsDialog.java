@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
@@ -18,6 +19,7 @@ import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralDetachedRepeatSet
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralInlineRepeatSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.RuleConfirmationSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.SubtitlePanelController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DocumentUniquenessCriteriaPanelController;
@@ -61,6 +63,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @FXML
   private SubtitlePanelController subtitleController;
+
+  @FXML
+  private StylesPanelController modelStylesController;
 
   @FXML
   private SupportedCharactersPanelController supportedCharactersController;
@@ -122,6 +127,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     labelsController.configureModelLabels();
     subtitlesController.configureCustom("subtitle", StudioBundle.get("subtitles"));
     annotationsController.hideAnnotationDatasetsButton();
+    modelStylesController.configureModelStyles();
 
     modelSettingsNameController.setSaveMode(saveMode);
     generalSettingsController.setSaveMode(saveMode);
@@ -129,6 +135,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     generalInlineRepeatSettingsController.setSaveMode(saveMode);
     ruleConfirmationSettingsController.setSaveMode(saveMode);
     subtitleController.setSaveMode(saveMode);
+    modelStylesController.setSaveMode(saveMode);
     supportedCharactersController.setSaveMode(saveMode);
     localesController.setSaveMode(saveMode);
     labelsController.setSaveMode(saveMode);
@@ -187,12 +194,15 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         subtitleController.setModel(formModel);
         subtitleController.setFieldSuggestionSource(generalSettingsController.getFieldIndex());
         subtitleController.setVisible(true);
+        modelStylesController.setCustom(() -> ensureContent(formModel).getStyles(), () -> ensureContent(formModel).getStyles());
+        modelStylesController.setVisible(true);
       } else {
         generalSettingsController.setVisible(false);
         generalDetachedRepeatSettingsController.setVisible(false);
         generalInlineRepeatSettingsController.setVisible(false);
         ruleConfirmationSettingsController.setVisible(false);
         subtitleController.setVisible(false);
+        modelStylesController.setVisible(false);
       }
       supportedCharactersController.setVisible(
           !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel)
@@ -202,6 +212,13 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     }
 
     bindErrorContainer();
+  }
+
+  private FormModelContent ensureContent(FormModel formModel) {
+    if (formModel.getContent() == null) {
+      formModel.setContent(new FormModelContent());
+    }
+    return formModel.getContent();
   }
 
   private OverviewConfiguration ensureConfiguration(OverviewModel overviewModel) {
@@ -225,6 +242,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         generalInlineRepeatSettingsController,
         ruleConfirmationSettingsController,
         subtitleController,
+        modelStylesController,
         supportedCharactersController,
         localesController,
         labelsController,
@@ -288,5 +306,6 @@ public class ModelSettingsDialog implements Initializable, DialogController {
    */
   public void destroy() {
     labelsController.destroy();
+    modelStylesController.destroy();
   }
 }

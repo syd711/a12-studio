@@ -7,6 +7,8 @@ import de.a12.studio.models.Locale;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelContent;
 import de.a12.studio.models.documentmodel.DocumentUniquenessCriterion;
+import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.formmodel.Style;
 import de.a12.studio.models.documentmodel.ModelConfig;
 import org.jspecify.annotations.NonNull;
 
@@ -22,6 +24,9 @@ import java.util.List;
  * which this dialog never edits and which other, non-modal parts of the UI may already hold live {@code
  * Element} references into - replacing it wholesale (e.g. via a JSON round-trip of the whole model) would
  * silently detach those references.
+ * <p>
+ * Also covers a {@link FormModel}'s model-level {@code content.styles} list, the one Form Model setting that
+ * is edited through {@link ModelSettingsDialog}'s deferred property editors and can be restored this cheaply.
  */
 class ModelSnapshot {
 
@@ -35,6 +40,7 @@ class ModelSnapshot {
   private final String timeZone;
   private final List<String> supportedCharacters;
   private final List<DocumentUniquenessCriterion> uniquenessCriteria = new ArrayList<>();
+  private final List<Style> formStyles = new ArrayList<>();
 
   ModelSnapshot(@NonNull A12Model<?> model) {
     this.model = model;
@@ -52,6 +58,9 @@ class ModelSnapshot {
         : null;
     if (modelConfig != null) {
       copyUniquenessCriteria(modelConfig.getUniquenessCriteria(), uniquenessCriteria);
+    }
+    if (model instanceof FormModel formModel && formModel.getContent() != null) {
+      copyStyles(formModel.getContent().getStyles(), formStyles);
     }
   }
 
@@ -72,6 +81,9 @@ class ModelSnapshot {
       modelConfig.setTimeZone(timeZone);
       replaceContents(modelConfig.getSupportedCharacters(), supportedCharacters);
       replaceContents(modelConfig.getUniquenessCriteria(), uniquenessCriteria);
+    }
+    if (model instanceof FormModel formModel && formModel.getContent() != null) {
+      replaceContents(formModel.getContent().getStyles(), formStyles);
     }
   }
 
@@ -97,6 +109,14 @@ class ModelSnapshot {
       Annotation copy = new Annotation();
       copy.setName(annotation.getName());
       copy.setValue(annotation.getValue());
+      target.add(copy);
+    }
+  }
+
+  private static void copyStyles(List<Style> source, List<Style> target) {
+    for (Style style : source) {
+      Style copy = new Style();
+      copy.setName(style.getName());
       target.add(copy);
     }
   }

@@ -43,6 +43,9 @@
                           <!-- Form Model only: Subtitle -->
                           <fx:include fx:id="subtitle" source="../formmodel/modelsettings/subtitle-panel.fxml" />
 
+                          <!-- Form Model only: Styles -->
+                          <fx:include fx:id="modelStyles" source="../formmodel/styles-panel.fxml" />
+
                           <!-- Supported Characters -->
                           <fx:include fx:id="supportedCharacters" source="../propertyeditors/supported-characters-panel.fxml" />
 

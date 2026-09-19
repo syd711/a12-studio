@@ -74,7 +74,7 @@ public abstract class Button implements EventButtonLike {
   @Override
   @JsonIgnore
   public String getIconName() {
-    return buttonStyling != null && buttonStyling.getIcon() != null ? buttonStyling.getIcon().getName() : null;
+    return buttonStyling != null ? buttonStyling.getIconName() : null;
   }
 
   @Override
@@ -82,17 +82,11 @@ public abstract class Button implements EventButtonLike {
   public void setIconName(String name) {
     if (name == null || name.isEmpty()) {
       if (buttonStyling != null) {
-        buttonStyling.setIcon(null);
+        buttonStyling.setIconName(null);
       }
       return;
     }
-    ButtonStyling styling = getOrCreateButtonStyling();
-    Icon icon = styling.getIcon();
-    if (icon == null) {
-      icon = new Icon();
-      styling.setIcon(icon);
-    }
-    icon.setName(name);
+    getOrCreateButtonStyling().setIconName(name);
   }
 
   @JsonIgnore

@@ -30,6 +30,8 @@ import org.jspecify.annotations.Nullable;
  *   <li><b>Row Actions</b> ({@link RepeatRowActionsPanelController}) — custom row action buttons
  *       ({@link AbstractRepeat#getRowActionGroup()}), distinct from the single built-in
  *       {@link AbstractRepeat#getDefaultRowAction()}.</li>
+ *   <li><b>Multi File Upload</b> ({@link RepeatMultiFileUploadPanelController}) — Inline/Embedded Repeats
+ *       only: the {@code multiFileUpload} switch and its {@link de.a12.studio.models.formmodel.MultiFileUploadOptions}.</li>
  *   <li><b>Hide Condition</b> ({@link HideConditionPanelController}) — inherited from
  *       {@link de.a12.studio.models.formmodel.ScreenElement}.</li>
  *   <li><b>Styles</b> ({@link StylesPanelController}) — body CSS style classes from
@@ -50,6 +52,7 @@ public class FormNodeEditorRepeatPanelController {
   @FXML private RepeatAlignmentPanelController alignmentController;
   @FXML private RepeatAdditionalSettingsPanelController additionalSettingsController;
   @FXML private RepeatRowActionsPanelController rowActionsController;
+  @FXML private RepeatMultiFileUploadPanelController multiFileUploadController;
   @FXML private HideConditionPanelController hideConditionController;
   @FXML private StylesPanelController stylesController;
   @FXML private RepeatHeaderStylesPanelController headerStylesController;
@@ -67,7 +70,8 @@ public class FormNodeEditorRepeatPanelController {
     columnSettingsController.setRepeat(repeat);
     alignmentController.setRepeat(repeat);
     additionalSettingsController.setRepeat(repeat);
-    rowActionsController.setRepeat(repeat);
+    rowActionsController.setRepeat(repeat, elementIndex);
+    multiFileUploadController.setRepeat(repeat, elementIndex);
     hideConditionController.configure(
         repeat.getId(), repeat::getHideCondition, repeat::setHideCondition,
         elementIndex, hideConditionScope);

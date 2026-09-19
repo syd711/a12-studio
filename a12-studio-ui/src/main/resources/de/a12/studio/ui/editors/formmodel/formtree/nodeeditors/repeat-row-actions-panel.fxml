@@ -25,6 +25,7 @@
                     <HBox spacing="8.0">
                         <children>
                             <Button fx:id="addButton" text="%dependent_enumeration_add" />
+                            <Button fx:id="editButton" text="%repeat_row_action_edit" />
                             <Button fx:id="removeButton" text="%dependent_enumeration_remove" />
                         </children>
                     </HBox>

@@ -1,5 +1,6 @@
 package de.a12.studio.models.formmodel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
@@ -31,4 +32,28 @@ public class ButtonStyling {
   // SME's "stylable_mixin" (see Control#getStyle()) - a plain "style" field on the wire, not nested.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Style> style = new ArrayList<>();
+
+  @JsonIgnore
+  public String getIconName() {
+    return icon != null ? icon.getName() : null;
+  }
+
+  @JsonIgnore
+  public void setIconName(String name) {
+    if (name == null || name.isEmpty()) {
+      icon = null;
+      return;
+    }
+    if (icon == null) {
+      icon = new Icon();
+    }
+    icon.setName(name);
+  }
+
+  /** Whether none of the styling fields is set, i.e. this object would serialize as an empty {@code {}}. */
+  @JsonIgnore
+  public boolean isBlank() {
+    return label == null && description == null && icon == null && (priority == null || priority.isEmpty())
+        && destructive == null && labelHidden == null && style.isEmpty();
+  }
 }

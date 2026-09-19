@@ -158,6 +158,15 @@ class FormValidatorsTest {
   }
 
   @Test
+  void hideConditionAtLeastOneCaseValidatorCoversRepeatOverviewColumns() {
+    FormModel model = load("HideConditionColumnValidator_invalid");
+    List<ModelValidationError> errors = new HideConditionAtLeastOneCaseValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("column_hidden", errors.get(0).elementId());
+  }
+
+  @Test
   void hideConditionSupportedValuesValidatorReportsUnsupportedValues() {
     FormModel model = load("HideConditionSupportedValuesValidator_invalid");
     List<ModelValidationError> errors = new HideConditionSupportedValuesValidator().validate(model,

@@ -12,6 +12,9 @@ import lombok.Setter;
 @Setter
 public class MultiFileUploadOptions {
 
+  // Id of the attachment group the uploaded files are written into; the editor sets it, see
+  // MultiFileUploadSupport in the validation module.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String elementRef;
   // Only hides/shows a download button in the row actions - not a general enablement flag.
   @JsonInclude(JsonInclude.Include.NON_NULL)

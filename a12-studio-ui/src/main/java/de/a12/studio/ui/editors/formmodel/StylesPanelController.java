@@ -37,6 +37,9 @@ import java.util.function.Supplier;
  * de.a12.studio.models.formmodel.Button}'s {@code buttonStyling.style}. Distinct from {@link
  * de.a12.studio.ui.editors.overviewmodel.StylesPanelController}, which edits a plain {@code List<String>}
  * instead (Overview Model's model-level style class list has no per-entry object).
+ * <p>
+ * Also serves the Form Model's own model-level style list ({@code FormModelContent.styles}, see {@link
+ * #configureModelStyles()}), shown in the Model Settings dialog.
  */
 public class StylesPanelController extends AbstractPropertyEditor {
 
@@ -53,6 +56,21 @@ public class StylesPanelController extends AbstractPropertyEditor {
   private Supplier<List<Style>> reader;
 
   private Supplier<List<Style>> writer;
+
+  /**
+   * Retitles this panel for the Form Model's model-level style list ({@code FormModelContent.styles}) - SME's
+   * "styles" section of {@code FormModelFrame-form.json} - and gives it its own persisted expanded state,
+   * separate from the per-node instances. Call once after loading from FXML, before {@link #setCustom}.
+   */
+  public void configureModelStyles() {
+    setTitle(StudioBundle.get("model_styles"));
+    setSettingsKeySuffix(".model");
+  }
+
+  /** Shows or hides the whole panel, e.g. for the Model Settings dialog's non-Form model types. */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
 
   public void setCustom(@NonNull Supplier<List<Style>> reader, @NonNull Supplier<List<Style>> writer) {
     this.reader = reader;
