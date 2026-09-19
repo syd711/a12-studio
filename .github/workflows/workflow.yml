@@ -368,20 +368,29 @@ jobs:
             ".\Output\A12-Studio\A12-Studio-Server.exe"
           )
           foreach ($target in $targets) {
-            if (Test-Path $target) {
-              Write-Host "Signing: $target"
-              & $signtool sign `
-                /fd SHA256 `
-                /f $pfxPath `
-                /p $env:CODESIGN_PFX_PASSWORD `
-                /d "A12-Studio" `
-                /du "https://github.com/syd711/a12-studio" `
-                /t "http://timestamp.digicert.com" `
-                $target
-              if ($LASTEXITCODE -ne 0) { Write-Error "signtool failed for $target"; exit 1 }
-            } else {
-              Write-Warning "Not found, skipping: $target"
+            if (-not (Test-Path $target)) {
+              Write-Error "Sign target not found: $target"
+              exit 1
             }
+            Write-Host "Signing: $target"
+            & $signtool sign `
+              /fd SHA256 `
+              /f $pfxPath `
+              /p $env:CODESIGN_PFX_PASSWORD `
+              /d "A12-Studio" `
+              /du "https://github.com/syd711/a12-studio" `
+              /t "http://timestamp.digicert.com" `
+              $target
+            if ($LASTEXITCODE -ne 0) { Write-Error "signtool failed for $target"; exit 1 }
+
+            # signtool exiting 0 doesn't guarantee a signature was actually embedded - verify
+            # explicitly so a broken/no-op signing pass can't silently ship an unsigned binary.
+            $sig = Get-AuthenticodeSignature $target
+            if ($sig.Status -eq 'NotSigned') {
+              Write-Error "No Authenticode signature present on $target after signing"
+              exit 1
+            }
+            Write-Host "Verified signature present on $target (Status: $($sig.Status))"
           }
           # Clean up cert
           Remove-Item $pfxPath -Force
@@ -459,6 +468,13 @@ jobs:
             /t "http://timestamp.digicert.com" `
             $installer.FullName
           if ($LASTEXITCODE -ne 0) { Write-Error "signtool failed for installer"; exit 1 }
+
+          $sig = Get-AuthenticodeSignature $installer.FullName
+          if ($sig.Status -eq 'NotSigned') {
+            Write-Error "No Authenticode signature present on $($installer.FullName) after signing"
+            exit 1
+          }
+          Write-Host "Verified signature present on $($installer.FullName) (Status: $($sig.Status))"
 
           Remove-Item $pfxPath -Force
           Write-Host "Installer signing complete."
