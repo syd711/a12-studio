@@ -10,6 +10,7 @@ import de.a12.studio.models.Annotation;
 import lombok.Getter;
 import lombok.Setter;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.DoubleNode;
 import tools.jackson.databind.node.IntNode;
 
 import java.util.ArrayList;
@@ -35,10 +36,11 @@ public abstract class RepeatOverviewColumn {
   private String id;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText label;
-  // Normally a plain integer column width, but at least one hand-authored fixture uses a fractional value
-  // (e.g. "0.8"); a JsonNode preserves that original value across a load/save cycle instead of truncating
-  // it through an Integer, the same trick as overviewmodel.Column#width. getWidth()/setWidth(Integer) stay
-  // Integer-based since that's the only shape the column editor UI currently supports.
+  // A column width is a number with at most one decimal place and a minimum of 0.3 (SME's NumberType
+  // constraints; 1.0 is roughly 150px). Fixtures mix plain integers ("1") and fractions ("0.8"), so a JsonNode
+  // preserves the original token across a load/save cycle, the same trick as overviewmodel.Column#width.
+  // getWidth()/setWidth(Double) are the convenience accessors; an integral value is written back as an
+  // integer, like the fixtures do.
   @JsonProperty("width")
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private JsonNode widthNode;
@@ -73,12 +75,20 @@ public abstract class RepeatOverviewColumn {
   private List<Annotation> annotations = new ArrayList<>();
 
   @JsonIgnore
-  public Integer getWidth() {
-    return widthNode == null || widthNode.isNull() ? null : (int) widthNode.asDouble();
+  public Double getWidth() {
+    return widthNode == null || widthNode.isNull() ? null : widthNode.asDouble();
   }
 
   @JsonIgnore
-  public void setWidth(Integer width) {
-    widthNode = width == null ? null : IntNode.valueOf(width);
+  public void setWidth(Double width) {
+    if (width == null) {
+      widthNode = null;
+    }
+    else if (width == Math.rint(width) && Math.abs(width) < Integer.MAX_VALUE) {
+      widthNode = IntNode.valueOf((int) Math.rint(width));
+    }
+    else {
+      widthNode = DoubleNode.valueOf(width);
+    }
   }
 }

@@ -13,11 +13,15 @@ import java.util.List;
 @Setter
 @JsonPropertyOrder({"type", "id", "name", "offset", "span", "style", "readonly", "readonlyPresentation",
     "messageExposition", "markingOfRequiredFields", "label", "hint", "placeholder", "accessibility",
-    "datePickerConfig", "elementRef", "tooltipsOnTop", "labelHiddenButRead", "annotations"})
+    "datePickerConfig", "elementRef", "index", "tooltipsOnTop", "labelHiddenButRead", "annotations"})
 public class Control extends Cell {
 
   // Reference to the underlying Document Model field (or group, for attachments) this Control edits.
   private String elementRef;
+  // Which repetition of a repeatable group to show when this Control sits outside that group's repeat (SME's
+  // "Control Index"). Only meaningful for such a Control, see ElementIndex#granularity.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private ControlIndex index;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText label;
   @JsonInclude(JsonInclude.Include.NON_NULL)

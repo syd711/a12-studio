@@ -4,6 +4,8 @@ import de.a12.studio.models.formmodel.ExpressionRepeatOverviewColumn;
 import de.a12.studio.models.formmodel.FieldBasedRepeatOverviewColumn;
 import de.a12.studio.models.formmodel.RepeatOverviewColumn;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.form.DatePickerSupport;
+import de.a12.studio.modelsvalidation.validators.form.FormColumnWidthValidator;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
@@ -19,6 +21,7 @@ import javafx.scene.control.TextField;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -35,8 +38,11 @@ import java.util.ResourceBundle;
  * RepeatColumnPinDirectionPanelController}), the header icon ({@link RepeatColumnIconPanelController}), the
  * header/content alignment overrides ({@link RepeatColumnAlignmentPanelController}), the per-column hide
  * condition ({@link HideConditionPanelController}), the header styles ({@link
- * RepeatColumnHeaderStylesPanelController}) and the annotations. Only {@code datePickerConfig} of a field-based
- * column still has no UI.
+ * RepeatColumnHeaderStylesPanelController}), the annotations and - for a field-based column bound to a date
+ * field - the date picker's year range ({@link DatePickerConfigPanelController}).
+ * <p>
+ * The width is a number of at least {@value FormColumnWidthValidator#MIN_WIDTH} with one decimal place at most
+ * (1.0 is about 150px); anything else is reported in the panel's error container and not written.
  */
 public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -67,6 +73,8 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
   @FXML
   private RepeatColumnDisplayPanelController displayController;
   @FXML
+  private DatePickerConfigPanelController datePickerController;
+  @FXML
   private RepeatColumnPinDirectionPanelController pinDirectionController;
   @FXML
   private RepeatColumnAlignmentPanelController alignmentController;
@@ -88,7 +96,7 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
     preferredSortingCombo.getItems().setAll(null, "ASC", "DESC");
     messageExpositionCombo.getItems().setAll(null, "TOOLTIP");
 
-    bindTextField(widthField, (el, value) -> column.setWidth(parseIntOrNull(value)));
+    bindTextField(widthField, (el, value) -> editWidth(value));
     bindCheckBox(sortableCheckBox, (el, value) -> column.setSortable(value ? Boolean.TRUE : null));
     bindCheckBox(filterableCheckBox, (el, value) -> {
       column.setFilterable(value ? Boolean.TRUE : null);
@@ -119,7 +127,8 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
         elementIndex, hideConditionScope);
     labelController.setCustom(column::getLabel, column::setLabel);
     labelController.setFieldSuggestionSource(elementIndex);
-    setFieldValue(widthField, column.getWidth() == null ? "" : column.getWidth().toString());
+    hideError();
+    setFieldValue(widthField, formatWidth(column.getWidth()));
     setFieldValue(sortableCheckBox, Boolean.TRUE.equals(column.getSortable()));
     setFieldValue(filterableCheckBox, Boolean.TRUE.equals(column.getFilterable()));
     setFieldValue(preferredSortingCombo, column.getPreferredSorting());
@@ -129,6 +138,14 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
     fieldBasedSection.setManaged(fieldBased);
     expressionSection.setVisible(!fieldBased);
     expressionSection.setManaged(!fieldBased);
+
+    boolean datePicker = fieldBased
+        && DatePickerSupport.isSupportedElement(elementIndex, ((FieldBasedRepeatOverviewColumn) column).getElementRef());
+    datePickerController.setVisible(datePicker);
+    if (datePicker) {
+      FieldBasedRepeatOverviewColumn dateColumn = (FieldBasedRepeatOverviewColumn) column;
+      datePickerController.setConfig(dateColumn::getDatePickerConfig, dateColumn::setDatePickerConfig);
+    }
 
     if (fieldBased) {
       FieldBasedRepeatOverviewColumn fieldColumn = (FieldBasedRepeatOverviewColumn) column;
@@ -151,16 +168,32 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
     return (ExpressionRepeatOverviewColumn) column;
   }
 
-  private static Integer parseIntOrNull(String value) {
-    if (value == null || value.isBlank()) {
-      return null;
+  /** Writes the typed width; a blank clears it (the default is 1.0), an invalid one is reported and not written. */
+  private void editWidth(String text) {
+    String trimmed = text == null ? "" : text.strip().replace(',', '.');
+    if (trimmed.isEmpty()) {
+      column.setWidth(null);
+      hideError();
+      return;
     }
+    Double width = null;
     try {
-      return Integer.parseInt(value.strip());
+      width = Double.valueOf(trimmed);
     }
     catch (NumberFormatException e) {
-      return null;
+      // reported below
     }
+    if (width == null || !FormColumnWidthValidator.isValid(width)) {
+      showError("ERROR", StudioBundle.get("repeat_column_width_invalid", FormColumnWidthValidator.MIN_WIDTH));
+      return;
+    }
+    column.setWidth(width);
+    hideError();
+  }
+
+  // 1 and 0.8, not 1.0 and 0.8000000000000000444: the shortest exact form of the stored number.
+  private static String formatWidth(Double width) {
+    return width == null ? "" : BigDecimal.valueOf(width).stripTrailingZeros().toPlainString();
   }
 
   private static String displayName(String elementRef, ElementIndex elementIndex) {

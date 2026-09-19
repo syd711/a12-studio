@@ -8,6 +8,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.FieldType;
+import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.models.documentmodel.TypeDefFieldType;
@@ -277,11 +278,26 @@ public class ElementIndex {
     return resolve(elementId, new HashSet<>(List.of(model.getId()))).map(Resolution::repeatableAncestor).orElse(false);
   }
 
+  /**
+   * SME's "granularity" of {@code elementId}: the paths of the repeatable groups on the way from the model root to
+   * the element (the element itself included when it is a repeatable group), outermost first. Attachment and
+   * multi-select groups do not count - they are repeatable only technically. Nested Includes are followed like
+   * in {@link #isInRepeatableGroup}, an Include group counting as the repeatable group it is. Empty when
+   * {@code elementId} is not repeated at all <em>or</em> does not resolve; use {@link #resolveElement} to tell
+   * the two apart.
+   */
+  public List<String> granularity(String elementId) {
+    if (elementId == null) {
+      return List.of();
+    }
+    return resolve(elementId, new HashSet<>(List.of(model.getId()))).map(Resolution::granularity).orElse(List.of());
+  }
+
   private Optional<Resolution> resolve(String elementId, Set<String> visitedModelIds) {
     Optional<Element> direct = findById(elementId);
     if (direct.isPresent()) {
       Element element = direct.get();
-      return Optional.of(new Resolution(element, getPath(element), hasRepeatableAncestor(element)));
+      return Optional.of(new Resolution(element, getPath(element), hasRepeatableAncestor(element), granularityOf(element)));
     }
     for (Element element : all) {
       if (!(element instanceof GroupElement group) || group.getGroup() == null
@@ -306,8 +322,12 @@ public class ElementIndex {
         // otherwise duplicate that segment. Strip it so only the elements *below* the included root are
         // appended.
         String innerPathBelowIncludedRoot = inner.get().path().replaceFirst("^/[^/]*", "");
+        List<String> granularity = new ArrayList<>(granularityOf(group));
+        for (String innerGranularityPath : inner.get().granularity()) {
+          granularity.add(getPath(group) + innerGranularityPath.replaceFirst("^/[^/]*", ""));
+        }
         return Optional.of(new Resolution(inner.get().element(), getPath(group) + innerPathBelowIncludedRoot,
-            inner.get().repeatableAncestor() || repeatableThroughInclude));
+            inner.get().repeatableAncestor() || repeatableThroughInclude, granularity));
       }
     }
     return Optional.empty();
@@ -330,7 +350,23 @@ public class ElementIndex {
     return false;
   }
 
-  private record Resolution(Element element, String path, boolean repeatableAncestor) {}
+  private record Resolution(Element element, String path, boolean repeatableAncestor, List<String> granularity) {}
+
+  /** Paths of the groups counting towards {@code element}'s granularity, see {@link #granularity}. */
+  private List<String> granularityOf(Element element) {
+    Deque<String> paths = new ArrayDeque<>();
+    Element current = element;
+    // The model's own root group is never a repetition, whatever its repeatability says.
+    while (current != null && parentOfAny(current) != null) {
+      if (current instanceof GroupElement group && isRepeatable(group) && group.getGroup() != null
+          && !group.getGroup().isAttachment()
+          && !GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(group.getGroup().getUsageType())) {
+        paths.addFirst(getPath(current));
+      }
+      current = parentOfAny(current);
+    }
+    return new ArrayList<>(paths);
+  }
 
   private DocumentModel resolveIncludedModel(String reference) {
     if (reference == null) {

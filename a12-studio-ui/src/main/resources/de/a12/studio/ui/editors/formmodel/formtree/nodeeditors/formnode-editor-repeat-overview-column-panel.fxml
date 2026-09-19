@@ -79,6 +79,7 @@
             </BorderPane>
         </TitledPane>
         <fx:include fx:id="display" source="repeat-column-display-panel.fxml" />
+        <fx:include fx:id="datePicker" source="date-picker-config-panel.fxml" />
         <fx:include fx:id="pinDirection" source="repeat-column-pin-direction-panel.fxml" />
         <fx:include fx:id="icon" source="repeat-column-icon-panel.fxml" />
         <fx:include fx:id="alignment" source="repeat-column-alignment-panel.fxml" />

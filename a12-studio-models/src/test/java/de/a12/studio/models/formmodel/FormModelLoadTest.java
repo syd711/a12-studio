@@ -231,7 +231,7 @@ class FormModelLoadTest {
         (ExpressionRepeatOverviewColumn) repeat.getRepeatOverviewColumn().get(0);
     assertEquals("expression1", expressionColumn.getName());
     assertEquals("\"Hallo\"", expressionColumn.getExpression());
-    assertEquals(1, expressionColumn.getWidth());
+    assertEquals(1.0, expressionColumn.getWidth());
     assertEquals("ASC", expressionColumn.getPreferredSorting());
     MultilingualText label = assertInstanceOf(MultilingualText.class, expressionColumn.getLabel());
     assertEquals("Expression", label.getMultilingualText().getText().get(0).getText());
@@ -239,7 +239,7 @@ class FormModelLoadTest {
     FieldBasedRepeatOverviewColumn fieldColumn =
         (FieldBasedRepeatOverviewColumn) repeat.getRepeatOverviewColumn().get(1);
     assertEquals("field_455f3", fieldColumn.getElementRef());
-    assertEquals(1, fieldColumn.getWidth());
+    assertEquals(1.0, fieldColumn.getWidth());
 
     String reserialized = MAPPER.writeValueAsString(model);
     FormModel reloaded = MAPPER.readValue(reserialized, FormModel.class);

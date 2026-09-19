@@ -4,6 +4,8 @@ import de.a12.studio.models.util.JsonSettings;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -141,6 +143,62 @@ class FormModelEditableFieldsRoundTripTest {
     assertEquals("center", json.get("body").asString());
   }
 
+  // Third batch: the date picker range (wire shape from PersonEmployee_AddNew_Fm.json, including its explicit
+  // "absolute": false) and column widths, which mix integer and fractional tokens across fixtures.
+  private static final String THIRD_JSON = """
+      {
+        "header": {"id": "Editable3_FM", "modelType": "form", "modelVersion": "39.0.0"},
+        "content": {
+          "defaults": {}, "fieldConfiguration": {}, "groupConfiguration": {},
+          "screens": [{
+            "id": "screen1", "name": "Screen1",
+            "screenElements": [{
+              "type": "InlineRepeat", "id": "repeat1", "name": "Items", "groupRef": "group_items",
+              "repeatOverviewColumn": [
+                {"type": "FieldBasedRepeatOverviewColumn", "id": "column1", "elementRef": "field_a", "width": 1,
+                 "datePickerConfig": {"minYear": -70, "maxYear": -18, "absolute": false, "preselectionYear": -34}},
+                {"type": "FieldBasedRepeatOverviewColumn", "id": "column2", "elementRef": "field_b", "width": 0.8},
+                {"type": "ExpressionRepeatOverviewColumn", "id": "column3", "name": "sum", "expression": "1", "width": 2.5}
+              ]
+            }]
+          }]
+        }
+      }
+      """;
+
+  @Test
+  void datePickerRangeAndColumnWidthsKeepTheirOriginalShape() throws Exception {
+    FormModel model = load(THIRD_JSON);
+    InlineRepeat repeat = assertInstanceOf(InlineRepeat.class, model.getContent().getScreens().get(0).getScreenElements().get(0));
+    FieldBasedRepeatOverviewColumn dated = assertInstanceOf(FieldBasedRepeatOverviewColumn.class, repeat.getRepeatOverviewColumn().get(0));
+    assertEquals(-70, dated.getDatePickerConfig().getMinYear());
+    assertEquals(Boolean.FALSE, dated.getDatePickerConfig().getAbsolute(), "an explicit false must survive");
+    assertEquals(1.0, dated.getWidth());
+    assertEquals(0.8, repeat.getRepeatOverviewColumn().get(1).getWidth());
+    assertEquals(2.5, repeat.getRepeatOverviewColumn().get(2).getWidth());
+
+    JsonNode expected = JsonSettings.objectMapper.readTree(THIRD_JSON);
+    JsonNode actual = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(model));
+    assertEquals(expected.get("content"), actual.get("content"));
+  }
+
+  @Test
+  void aWidthIsWrittenAsAnIntegerWhenItIsOne() throws Exception {
+    FieldBasedRepeatOverviewColumn column = new FieldBasedRepeatOverviewColumn();
+
+    column.setWidth(2.0);
+    assertTrue(JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(column)).get("width").isIntegralNumber(),
+        "2.0 is written as 2, like the fixtures");
+
+    column.setWidth(0.3);
+    assertEquals(0.3, JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(column)).get("width").asDouble());
+    assertEquals(0.3, column.getWidth());
+
+    column.setWidth(null);
+    assertFalse(JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(column)).has("width"));
+    assertNull(column.getWidth());
+  }
+
   @Test
   void loadsAllFields() throws Exception {
     FormModel model = load(JSON);
@@ -226,6 +284,79 @@ class FormModelEditableFieldsRoundTripTest {
     JsonNode json = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(options));
     assertFalse(json.has("elementRef"));
     assertTrue(json.get("enableDownload").asBoolean());
+  }
+
+  // Fourth batch: the small element gaps. Wire shapes follow real fixtures - Screen.initiallyFocusedElementId as in
+  // e-commerce/Product_FM.json, a Multi-Column Section's lg/md layout as in Company_FM.json (sm uses the same
+  // "layout" mixin as the Control Grid), CustomScreenElement.height as in e-commerce/Category_FM.json. No fixture
+  // sets Control.index: its shape is SME's mapping rule (jsonName "index", children type/value of the editor's
+  // "Index" group) and the {SEMANTIC|NUMERIC} enumeration of Control.json.
+  private static final String FOURTH_JSON = """
+      {
+        "header": {"id": "Editable4_FM", "modelType": "form", "modelVersion": "39.0.0"},
+        "content": {
+          "defaults": {}, "fieldConfiguration": {}, "groupConfiguration": {},
+          "screens": [{
+            "id": "screen1", "name": "Screen1", "initiallyFocusedElementId": "control1",
+            "screenElements": [
+              {"type": "MultiColumnSection", "id": "mcs1", "name": "Columns",
+               "layout": {"lg": "2-10", "md": "3-9", "sm": "12-12"},
+               "screenElements": [{
+                 "type": "ControlGrid", "id": "grid1",
+                 "row": [{"type": "Row", "id": "row1", "cell": [
+                   {"type": "Control", "id": "control1", "elementRef": "field_a"},
+                   {"type": "Control", "id": "control2", "elementRef": "field_b",
+                    "index": {"type": "SEMANTIC", "value": "primary"}},
+                   {"type": "Control", "id": "control3", "elementRef": "field_c",
+                    "index": {"type": "NUMERIC", "value": "1"}}
+                 ]}]
+               }]},
+              {"type": "CustomScreenElement", "id": "custom1", "name": "Relationships", "reference": "Rel_Ru", "height": 500}
+            ]
+          }]
+        }
+      }
+      """;
+
+  @Test
+  void initialFocusControlIndexCustomElementHeightAndFlexLayoutSurviveLoadThenSave() throws Exception {
+    FormModel model = load(FOURTH_JSON);
+    Screen screen = model.getContent().getScreens().get(0);
+    assertEquals("control1", screen.getInitiallyFocusedElementId());
+
+    MultiColumnSection section = assertInstanceOf(MultiColumnSection.class, screen.getScreenElements().get(0));
+    assertEquals("2-10", section.getLayout().getLg());
+    assertEquals("3-9", section.getLayout().getMd());
+    assertEquals("12-12", section.getLayout().getSm());
+
+    ControlGrid grid = assertInstanceOf(ControlGrid.class, section.getScreenElements().get(0));
+    List<Cell> cells = grid.getRow().get(0).getCell();
+    assertNull(assertInstanceOf(Control.class, cells.get(0)).getIndex(), "a Control without index stays without");
+    ControlIndex semantic = assertInstanceOf(Control.class, cells.get(1)).getIndex();
+    assertEquals(ControlIndex.TYPE_SEMANTIC, semantic.getType());
+    assertEquals("primary", semantic.getValue());
+    assertEquals(ControlIndex.TYPE_NUMERIC, assertInstanceOf(Control.class, cells.get(2)).getIndex().getType());
+
+    CustomScreenElement custom = assertInstanceOf(CustomScreenElement.class, screen.getScreenElements().get(1));
+    assertEquals(500, custom.getHeight());
+
+    JsonNode expected = JsonSettings.objectMapper.readTree(FOURTH_JSON);
+    JsonNode actual = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(model));
+    assertEquals(expected.get("content"), actual.get("content"));
+  }
+
+  @Test
+  void aControlWithoutIndexAndAnIndexWithOnlyATypeWriteNoNulls() throws Exception {
+    Control control = new Control();
+    control.setElementRef("field_a");
+    assertFalse(JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(control)).has("index"));
+
+    ControlIndex index = new ControlIndex();
+    index.setType(ControlIndex.TYPE_NUMERIC);
+    control.setIndex(index);
+    JsonNode written = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(control)).get("index");
+    assertEquals("NUMERIC", written.get("type").asString());
+    assertFalse(written.has("value"), "an absent value stays absent instead of becoming null");
   }
 
   private static FormModel load(String json) throws Exception {

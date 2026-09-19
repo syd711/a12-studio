@@ -18,16 +18,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The style-preset and default-row-action validators are strict reference checks; the real form models of the
+ * The style-preset, default-row-action, date-picker-range, column-width, initial-focus and custom-element-height
+ * validators are strict checks; the real form models of the
  * sample workspaces (authored in SME, so valid by construction) must not trip them. Guards against the rules
  * being stricter than SME's.
  */
 class FixtureWorkspacesFormValidatorsTest {
 
   @Test
-  void realFormModelsHaveNoStyleOrDefaultRowActionErrors() throws IOException {
+  void realFormModelsHaveNoErrorsFromTheStrictReferenceAndRangeValidators() throws IOException {
     Path workspaces = locateWorkspaces();
-    List<ModelValidator> validators = List.of(new FormStyleReferenceValidator(), new FormDefaultRowActionValidator());
+    List<ModelValidator> validators = List.of(new FormStyleReferenceValidator(), new FormDefaultRowActionValidator(),
+        new FormDatePickerConfigValidator(), new FormColumnWidthValidator(),
+        new FormInitiallyFocusedElementValidator(), new FormCustomScreenElementHeightValidator());
     List<String> problems = new ArrayList<>();
     int formModels = 0;
     try (Stream<Path> walk = Files.walk(workspaces)) {

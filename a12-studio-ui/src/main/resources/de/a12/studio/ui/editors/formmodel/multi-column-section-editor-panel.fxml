@@ -14,6 +14,7 @@
                 <fx:include fx:id="styles" source="styles-panel.fxml" />
                 <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
                 <fx:include fx:id="flexLayout" source="flex-layout-panel.fxml" />
+                <fx:include fx:id="responsiveLayout" source="responsive-layout-panel.fxml" />
             </children>
             <padding>
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

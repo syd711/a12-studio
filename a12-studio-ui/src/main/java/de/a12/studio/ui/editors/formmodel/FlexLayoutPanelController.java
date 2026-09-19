@@ -15,9 +15,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Edits a {@link MultiColumnSection}'s {@code layout.lg} (SME's per-breakpoint {@link ColumnLayout} - only the
- * "lg" breakpoint is exposed here, matching the Multi-Column Section editor's scope for now). Not tied to a
- * single {@code Element}, so it follows the model-header pattern.
+ * Edits a {@link MultiColumnSection}'s {@code layout.lg} (SME's per-breakpoint {@link ColumnLayout} - the base
+ * breakpoint, which is required; the {@code md}/{@code sm} overrides are edited by the sibling {@link
+ * ResponsiveLayoutPanelController}). Not tied to a single {@code Element}, so it follows the model-header
+ * pattern.
  */
 public class FlexLayoutPanelController extends AbstractPropertyEditor implements Initializable {
 

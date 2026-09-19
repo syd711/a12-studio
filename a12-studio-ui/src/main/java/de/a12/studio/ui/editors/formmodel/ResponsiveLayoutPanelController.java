@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.formmodel;
 
 import de.a12.studio.models.formmodel.ColumnLayout;
 import de.a12.studio.models.formmodel.ControlGrid;
+import de.a12.studio.models.formmodel.MultiColumnSection;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -13,12 +14,16 @@ import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
- * Edits a {@link ControlGrid}'s {@code layout.md}/{@code layout.lg} responsive breakpoint overrides (the {@code
- * lg} breakpoint itself is edited separately, by the shared {@link
- * de.a12.studio.ui.editors.propertyeditors.ColumnLayoutPanelController}). Not tied to a single {@code Element},
- * so it follows the model-header pattern, mirroring {@link FlexLayoutPanelController}.
+ * Edits the {@code layout.md}/{@code layout.sm} responsive breakpoint overrides of a {@link ControlGrid} or a
+ * {@link MultiColumnSection} (SME's shared "layout" mixin; the {@code lg} breakpoint itself is edited separately,
+ * by the shared {@link de.a12.studio.ui.editors.propertyeditors.ColumnLayoutPanelController} for a grid and by
+ * {@link FlexLayoutPanelController} for a section). Not tied to a single {@code Element}, so it follows the
+ * model-header pattern, mirroring {@link FlexLayoutPanelController}; the owner's {@link ColumnLayout} is reached
+ * through a getter/setter pair because it is created on the first edit.
  */
 public class ResponsiveLayoutPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -31,7 +36,8 @@ public class ResponsiveLayoutPanelController extends AbstractPropertyEditor impl
   @FXML
   private TextField layoutSmField;
 
-  private ControlGrid grid;
+  private Supplier<ColumnLayout> layoutGetter;
+  private Consumer<ColumnLayout> layoutSetter;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -43,17 +49,26 @@ public class ResponsiveLayoutPanelController extends AbstractPropertyEditor impl
   }
 
   public void setControlGrid(@NonNull ControlGrid grid) {
-    this.grid = grid;
-    ColumnLayout layout = grid.getLayout();
+    setLayoutOwner(grid::getLayout, grid::setLayout);
+  }
+
+  public void setSection(@NonNull MultiColumnSection section) {
+    setLayoutOwner(section::getLayout, section::setLayout);
+  }
+
+  private void setLayoutOwner(@NonNull Supplier<ColumnLayout> getter, @NonNull Consumer<ColumnLayout> setter) {
+    this.layoutGetter = getter;
+    this.layoutSetter = setter;
+    ColumnLayout layout = getter.get();
     setFieldValue(layoutMdField, layout != null ? layout.getMd() : null);
     setFieldValue(layoutSmField, layout != null ? layout.getSm() : null);
   }
 
   private ColumnLayout getOrCreateLayout() {
-    ColumnLayout layout = grid.getLayout();
+    ColumnLayout layout = layoutGetter.get();
     if (layout == null) {
       layout = new ColumnLayout();
-      grid.setLayout(layout);
+      layoutSetter.accept(layout);
     }
     return layout;
   }

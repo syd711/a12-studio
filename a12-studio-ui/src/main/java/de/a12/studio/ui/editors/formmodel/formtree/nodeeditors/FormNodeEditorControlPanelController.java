@@ -6,6 +6,7 @@ import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.FieldConfigEntry;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.form.DatePickerSupport;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
@@ -31,6 +32,8 @@ import org.jspecify.annotations.Nullable;
  *   <li><b>Additional Settings</b> ({@link AdditionalSettingsPanelController}) — initial value/exposition
  *       (model-wide {@code FieldConfigEntry}), message position, readonly, readonly presentation and
  *       required-field asterisk marking.</li>
+ *   <li><b>Date Picker</b> ({@link DatePickerConfigPanelController}) — only for a date, date-time or
+ *       {@code YYYY-MM-DD} date-range field: the year range of the picker ({@link Control#getDatePickerConfig()}).</li>
  *   <li><b>Attachment Settings</b> ({@link AttachmentSettingsPanelController}) — only for a Control bound to an
  *       attachment group: placeholder icon, default action and accepted MIME types (model-wide
  *       {@code FieldConfigEntry.attachmentConfig}).</li>
@@ -66,6 +69,8 @@ public class FormNodeEditorControlPanelController {
   @FXML
   private AdditionalSettingsPanelController additionalSettingsController;
   @FXML
+  private DatePickerConfigPanelController datePickerController;
+  @FXML
   private AttachmentSettingsPanelController attachmentSettingsController;
   @FXML
   private ExternalEnumerationPanelController externalEnumerationController;
@@ -91,6 +96,11 @@ public class FormNodeEditorControlPanelController {
     layoutController.setControl(control);
     additionalSettingsController.setControl(control, elementIndex, content);
     FieldConfigEntry fieldConfigEntry = FieldConfigEntryHelper.findOrCreate(control, content);
+    boolean datePicker = DatePickerSupport.isSupportedElement(elementIndex, control.getElementRef());
+    datePickerController.setVisible(datePicker);
+    if (datePicker) {
+      datePickerController.setConfig(control::getDatePickerConfig, control::setDatePickerConfig);
+    }
     boolean attachmentGroup = elementIndex != null && elementIndex.resolveElement(control.getElementRef())
         .filter(element -> element instanceof GroupElement group && group.getGroup() != null && group.getGroup().isAttachment())
         .isPresent();

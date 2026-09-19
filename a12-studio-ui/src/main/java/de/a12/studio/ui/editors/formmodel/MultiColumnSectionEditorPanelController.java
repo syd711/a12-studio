@@ -18,7 +18,8 @@ import java.util.List;
 /**
  * The Form Model tree's right-hand editor pane for a selected {@link MultiColumnSection} ("Multi-Column
  * Section") node ({@link FormModelTreeController}): the same Name/Label/Styles/Annotations fields as {@link
- * FormNodeEditorRowPanelController}, plus a Flex Layout panel for {@link MultiColumnSection#getLayout()}.
+ * FormNodeEditorRowPanelController}, plus a Flex Layout panel ({@code lg}) and a Responsive Layout panel ({@code md}/{@code sm}) for {@link
+ * MultiColumnSection#getLayout()}.
  */
 public class MultiColumnSectionEditorPanelController {
 
@@ -32,6 +33,8 @@ public class MultiColumnSectionEditorPanelController {
   private AnnotationsPanelController annotationsController;
   @FXML
   private FlexLayoutPanelController flexLayoutController;
+  @FXML
+  private ResponsiveLayoutPanelController responsiveLayoutController;
 
   private MultiColumnSection section;
 
@@ -47,6 +50,7 @@ public class MultiColumnSectionEditorPanelController {
     stylesController.setCustom(section::getStyle, section::getStyle);
     annotationsController.setCustom(section::getAnnotations);
     flexLayoutController.setSection(section);
+    responsiveLayoutController.setSection(section);
   }
 
   private List<Label> currentLabelTexts() {

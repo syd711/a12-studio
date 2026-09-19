@@ -14,7 +14,7 @@ public class CustomScreenElement extends ScreenElement {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String reference;
   // Fixed pixel height for the embedded custom component (e.g. a Relationship UI Model's own scrollable
-  // area). No editor UI yet - mapped purely for lossless round-tripping.
+  // area). Zero is not allowed (SME: NumberType zeroNotAllowed), see FormCustomScreenElementHeightValidator.
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer height;
 
