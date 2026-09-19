@@ -18,6 +18,7 @@ Hide the version control view and button when no .git folder is found above the 
 
 # Testing
 I've created AdvancedNewProjectModelsRoundTripTest (mirroring the basic one, via a new TestHelper.resolveTestingAdvancedNewDir() helper) and run it.
+**[Stale as of 2026-09-19: the Advanced-new round-trip is now fully green — 96 tests, 0 failures, 3 skipped for disabled model types. Findings below are historical.]**
 Result: 62 of 96 model files fail the round-trip (vs. the basic workspace, which is fully green). This isn't one bug — advanced_new exercises far more model-type features than basic does, and it's surfacing several distinct root causes:
 - Confirmed pre-existing known gap (documented in CLAUDE.md): header.labels missing @JsonInclude(NON_EMPTY) → 28 files get a spurious "labels":[].                                                                                                                                                                                                                                
 - Query Model: content.sort, content.fields, links[].fields, links[].linkDocumentFields appearing as [] when absent in source (same class of bug); content.constraint for has-type constraints dropped entirely.
@@ -76,3 +77,84 @@ The Context only needs to be selected if the Additive Document Model is referenc
 # Richtext:
 @..\..\mnt\c\workspace\a12-studio\a12-studio-ui\src\main\java\de\a12\studio\ui\editors\propertyeditors\RichtextEditorController.java you know how to customize the richtext for syntax highlighting and autocompletition. I want the same autocomplete for this editor the SME is using. take your time create a plan.                                                            
 
+
+# SME Gap Backlog
+Source: `docs/sme-reference-comparison.md` (analysis of 2026-09-19). Each `##` entry below is a self-contained prompt: copy the paragraph(s) under it as-is. Entries are in recommended order; "Depends on" notes say what has to land first. Every prompt assumes the conventions in `CLAUDE.md` and that `docs/sme-reference-comparison.md` gets updated when a gap is closed.
+
+## 1. Header round-trip fidelity (labels / locales / modelReferences) — DONE (verified 2026-09-19)
+Already fixed by commit 332d4654 (2026-09-13): `A12Model` keeps absent-vs-explicit-`[]` via a null-backed `Header` DTO + `*Explicit` flags. Verified 2026-09-19: `AdvancedNewProjectModelsRoundTripTest` 96 tests / 0 failures / 3 skipped (was 62 failing), Basic 21/0, Commerce 92/0/3 skipped; added `A12ModelHeaderRoundTripTest`; CLAUDE.md and the comparison doc updated. Original prompt kept below for reference.
+
+`A12Model.Header` re-serializes `labels`, `locales` and `modelReferences` as `[]` when the source file omits the key, so every save churns files of any model type whose header lacks them (e.g. `PersonSkills_NumberConversion_Se.json`). A plain `@JsonInclude(NON_EMPTY)` is not an option: other fixtures (`RelationshipModel.json`, `TreeModel.json`, `TypeDefinition.json`) rely on an explicit `[]` round-tripping. Fix it with the same absent-vs-explicit-empty-aware `JsonNode`-backed approach already used for `overviewmodel.Column.width` and `RelationshipModelContent.linkDocumentModel` (see the "Known issues" section in CLAUDE.md), keeping the existing `getLabels()`/`setLabels()` style accessors working for calling UI code. Then run `AdvancedNewProjectModelsRoundTripTest` and `BasicProjectModelsRoundTripTest`: report how many of the 28 spurious-`labels` failures (see "Testing" above) are gone and whether any new ones appeared. Update CLAUDE.md's "Still-open, same-shaped gap" paragraph and the "Known round-trip gap" note in the Selection Model section of the comparison doc.
+
+## 2. Document Model: move/rename refactoring
+Depends on: nothing (do #1 first only if you want a clean round-trip baseline).
+
+The Document Model editor only has `DeleteNodeCommand`; renaming or moving a field/group silently breaks rules (`errorEntityRelPath`, `errorCondition`), computations (`computedFieldRelPath`, `precondition`, `operation`), and references from Form/Overview/Query/other models, and the validators then only flag the damage. Read SME's reference first: `C:\workspace\sme\client\src\modules\documentModel` `moveElementApi.ts` and the backend `MoveRefactoringService` (endpoint `/move-element-with-refactoring`), and the kernel condition-language path syntax in `C:\workspace\a12\2606-06-doc`. Then design and implement a refactoring command on the existing `CommandStack` that, on move/rename of an element, rewrites relative-path references in rule/computation condition text within the same Document Model (use `ElementIndex.relativePathTo` for path computation), and updates cross-model references (Form `FieldConfigEntry.elementRef`/`FormReferences`, Overview columns, Query paths, Mapping etc. - inventory which model types hold path/id references to DM elements first and list them before coding). Make it undoable as one step. Start with a plan and a list of which reference kinds you will and won't cover in the first pass; add tests for path rewriting (including relative paths across repeatable groups and `$$` references in error messages).
+
+## 3. Spike: kernel dependency vs. clean-room (decision, not implementation)
+Depends on: nothing. Produces a decision that gates rule contradiction, condition validation, DM expansion, additive join and test-data generation.
+
+The comparison doc says a12-studio has no `com.mgmtp.a12.kernel:*` / `tdg` dependency and that Community artifacts (`kernel-md-facade`, `kernel-md-model`) are anonymously downloadable from `artifacts.geta12.com` under EUPL-1.2/commercial. Do a time-boxed spike, no production code: in a scratch Gradle module, try resolving `kernel-md-facade` (and whatever provides condition parsing/validation, `kernel-md-join`, and `tdg`), report transitive dependency size/conflicts with the current JavaFX/Jackson stack, license terms per artifact, and whether each of these works in-process against a12-studio's JSON models: (a) validating a rule `errorCondition`/computation `operation` string, (b) expanding a Document Model's includes, (c) TDG `checkModel` rule-contradiction, (d) additive join. Compare against SME's backend (`C:\workspace\sme\backend`: `ValidationRuleService`, `ComputationRuleService`, `ExpansionService`, `RuleContradictionCheckService`, `AdditiveModelController`). End with a recommendation (adopt kernel / stay clean-room / hybrid per capability) and a ranked list of what it would unlock. Write findings into the "Backend / kernel capability map" section of `docs/sme-reference-comparison.md`.
+
+## 4. Form Model: finish "modeled but no UI" fields
+Depends on: nothing.
+
+These are already in the data model (round-trip verified) but have no editor UI, so users can't configure them: (a) `MultiFileUploadOptions` on `InlineRepeat`/`EmbeddedRepeat` (download toggle, upload description/button/helper text), (b) `RepeatOverviewColumn` icon, pin direction and per-column hide condition, (c) per-action `buttonStyling` / `confirmation` / `confirmationDialogTitle` on `RowActionGroup` rows (the Row Actions table currently only edits event+scope), (d) `FormModelContent.styles` (model-level named style-class list) has no panel at all. Reference SME under `C:\workspace\sme\client\src\modules\formModel` and the "Form Model" section of `docs/sme-reference-comparison.md`. Follow the "Extract property editors" convention in CLAUDE.md (one `<name>-panel.fxml` + `<Name>PanelController` each, with `error-container.fxml`), reuse existing panels where shapes match (e.g. `ToolbarButtonsPanelController` for button styling), and use `RichtextEditorController` for any expression field. Verify wire shapes against real SME fixtures before adding fields; add round-trip tests.
+
+## 5. Form Model: missing fields and small element gaps
+Depends on: nothing.
+
+Add what SME has and a12-studio's data model lacks, each verified against a real SME fixture and round-trip tested: `Screen.initiallyFocusedElementId` (SME validates it's only settable on the first screen - add that validator too), `Control.index` (SEMANTIC/NUMERIC search-indexing config) and `nameForTree`, `CustomScreenElement.height`, and `md`/`sm` flex layout in `FlexLayoutPanelController` (currently only `lg`). Also check `FieldConfigEntry`/`attachmentConfig` (`placeholderIcon`, `accept` MIME filter, `defaultAction` replace/download) - the comparison doc lists it as absent and never marks it done; confirm its current state in code first, then implement with a panel if still missing. Reference: `C:\workspace\sme\client\src\modules\formModel` (`fmElements/types/*`).
+
+## 6. Form Model: remaining validators
+Depends on: nothing.
+
+Port the SME custom conditions still marked "Gap" in the Form Model validator table of `docs/sme-reference-comparison.md`, in `a12-studio-models-validation/.../validators/form/` and registered in `FormModelValidationService`: `DependentControlOptionsMustExistInFormModel` (a Confirm control's `notRelevantNodes` pointing at a deleted node), `DependentControlsAtLeastOneOptionMustBeSelected`, and `DependentFieldAtLeastOneActionPerCaseMustBeSelected` / `CaseValueIsUndefined`. Also add the missing test for `FormButtonScreenReferenceValidator` (no case exists in `FormValidatorsTest`). Read SME's `validation/customConditions/index.ts` for exact conditions and messages; per CLAUDE.md, validator messages must name the field/what is missing (no generic "field is required"). Add fixtures/tests for each. Before starting, check which of the listed validators already exist - the doc may be stale.
+
+## 7. Form Model: dependent controls beyond Confirm, and form-vs-DM drift check
+Depends on: #6 (validators) is helpful but not required.
+
+(a) `DependentCase.notRelevantNodes` (dependent controls) is only implemented for Confirm-type Controls via `ConfirmDependenciesPanelController`, but SME's `isPossibleDependentControlMaster` also allows Boolean and Enumeration masters. Decide whether the limitation is deliberate (check git history/CLAUDE.md/memory) and, if not, generalize the Dependencies tab to Boolean/Enumeration masters. (b) Add a structural consistency check between a Form Model and its (possibly since-changed) Document Model - SME produces a categorized `Problem[]` (INFO/WARNING/ERROR) - e.g. field type changed so a configured `dependentEnumeration`/hide-condition case value no longer exists, `elementRef` now points at a different element type. Surface it via the existing validation service, not a new architecture. Start with a plan listing which drift cases you'll detect.
+
+## 8. Form Model: Includes copy-and-rewrite action
+Depends on: nothing, but needs a design pass first.
+
+Only the provenance fields (`includeId`/`formModelRef`/`hostDocumentModelPath`) exist on `ScreenElement` for round-trip fidelity. SME expands an include at author time: it copies the referenced Form Model's subtree into the host model's own `screens` with rewritten ids, keeping the three fields as provenance. Study the real fixture `C:\workspace\sme\client\resources\input\models\fmm\workspace\HostModel.json` and SME's include-insertion code, then write a short design (which node types can be included, id-rewrite rules, how `hostDocumentModelPath` is derived, how field/group config entries from the source are merged, conflict handling, how it's exposed in the tree context menu with localized `StudioBundle` labels) and get my sign-off before implementing.
+
+## 9. Query Model: semantic filter validation
+Depends on: nothing.
+
+`filterDefinition` (root and per `QueryLink`) is checked for syntax only via `QueryLanguageEmitter`; field references inside the expression (`[/Path/To/Field]`) and relationship/role references are not resolved. Add a semantic check that resolves every bracketed path against the target (or link-target) Document Model and reports unknown fields with the field name in the message. Reuse `QueryElementResolution` (linear-scan "/"-path lookup) and `BracketedPathSuggestionProvider`'s path knowledge; add a new validator next to `QueryFilterDefinitionSyntaxValidator` and wire it into the `RichtextEditorController` per-keystroke validator hook used by `QueryDocumentNodePanelController`. Reference: SME `moduleSupport/qmm` `binder.ts`/`checker.ts`. Note: the emitter deliberately does no type checking; keep this to existence checks unless type checking is cheap. Add tests.
+
+## 10. Query Model: reference/rename tracking
+Depends on: #2 (Document Model move/rename refactoring) - reuse its mechanism rather than inventing a second one.
+
+`QueryModelTreeController.resolveTargetDocumentModel()` silently yields an empty tree when the stored DM id no longer resolves, and renaming a DM/field never updates or flags queries. Hook Query Model references (target DM, relationship/role in links and sort, `fields[]`, sort field paths) into the refactoring mechanism from #2, and make an unresolvable target an explicit validation error surfaced in the UI rather than an empty tree. Reference: SME `qmModule.ts` `refactorDocument()`.
+
+## 11. Query Model: aggregation (gated)
+Depends on: #3 (kernel spike) - confirm the target runtime supports an aggregation-mode result first; otherwise record it as a documented non-goal in the comparison doc and stop.
+
+`QueryModelContent.aggregateResults` is a dangling boolean with no config. SME's `aggregation` is `group: {field}[]` plus `aggregations: {function: count|sum|max|min|avg, field}[]`. If confirmed worthwhile: model it in `QueryModelContent`, add a panel (follow the Sort panel pattern), a validator (fields resolve, function/type compatibility), and round-trip fixtures from SME's `client/resources/input/models` examples.
+
+## 12. Combined Document Model: loop detection
+Depends on: nothing for the reference-graph part; full expansion depends on #3.
+
+The doc says base/step loop detection (SME's `CombModelReferenceHelper`) isn't ported. First check whether loop detection needs DM expansion or only the reference graph (base model + step model references, following Additive/Selection/Decoration models' own references). If it works on references alone, implement it as a validator in `de.a12.studio.modelsvalidation.validators.combination` with tests including a self-reference and a two-model cycle. If it truly needs expansion, say so and stop.
+
+## 13. Document Model: smaller SME features (verify first)
+Depends on: nothing.
+
+Several are marked "Not confirmed present" in the comparison doc, so first verify each in the code and report what actually exists, then propose which to build: tree filtering (by type, category, annotated-only - SME `dmEditorView` filters), multi-select bulk actions (bulk delete/cut/copy), "Insert from another Document Model" (SME resolves includes and copies/imports type defs), and ad hoc testing (SME generates a reduced test Document+Validation model for selected elements; needs #3 to be meaningful). Reference `C:\workspace\sme\client\src\modules\commonDocumentModel\api\editor\*` and `documentModel`. Don't start implementing before I pick from your list.
+
+## 14. Refresh the comparison doc
+Depends on: nothing; best done after a few of the above land.
+
+`docs/sme-reference-comparison.md` was last fully analyzed 2026-07-17; the priority table and "Other model types" survey still list model types (structuralMapping, mapping, combination, additive, relationship, print family, etc.) whose editors may since have been built, and the Backend/kernel capability map has several "Not yet confirmed" rows. Re-verify against the code in `a12-studio-ui/.../editors`, `a12-studio-models`, `a12-studio-data-services` and against `C:\workspace\sme`, and update the stale sections, marking every changed statement with the date. Don't touch sections already dated after 2026-09-05 unless something contradicts the code.
+
+## Parked (do not start unless I ask)
+- AI-assisted Document Model generation (SME `documentModel/ai/*`) - needs a conscious scope decision.
+- Model diff/compare editor.
+- Markdown report per element (`createMarkdownReport`).
+- Form Model `Binding`/`BindingRepeat` - blocked on Relationship Model + Composed Document Model support.
+- Query Model multi-target types (CDM/Transformer as target) and SME's structured-AST filter editor.
+- Real Form Engine preview (current preview is a wireframe; see the project memory on real Form Model rendering).

@@ -322,14 +322,13 @@ creep) and the latter is already soft-mitigated by `AnnotationsPanelController` 
 (SME's `SelectionModelController`, see the Backend/kernel capability map below) remains unimplemented, same as
 every other kernel-join capability in this repo.
 
-**Known round-trip gap, not introduced by this work**: enabling `ModelType.SELECTION` (`model-versions.json`) makes
-`AdvancedNewProjectModelsRoundTripTest` exercise `PersonSkills_NumberConversion_Se.json` for the first time: its
-`content` (Data/Computation/Validation) round-trips byte-for-byte, but its header does not, because `A12Model.Header`
-unconditionally re-serializes `locales`/`labels`/`modelReferences` as `[]` when empty rather than leaving them absent
-(this fixture's header has none of the three keys at all). This is the exact same class of issue as the "Still-open,
-same-shaped gap" already logged in this doc's "Known Issues" section for `labels` — pre-existing, shared by every
-model type's header, and out of scope for a Selection-Model-specific change. Not a regression: this model type's
-round trip simply wasn't exercised at all before `enabled` flipped to `true`.
+**Header round-trip gap — resolved (verified 2026-09-19)**: enabling `ModelType.SELECTION` (`model-versions.json`) made
+`AdvancedNewProjectModelsRoundTripTest` exercise `PersonSkills_NumberConversion_Se.json` for the first time; its header
+has none of `locales`/`labels`/`modelReferences`, and `A12Model.Header` used to re-serialize them as `[]`. `A12Model`
+now distinguishes an absent key from an explicit `[]` (null-backed header DTO + `*Explicit` flags, see CLAUDE.md
+"Known issues"), so the file — and every other model type's header — round-trips unchanged. Pinned by
+`A12ModelHeaderRoundTripTest`; the Basic, Advanced-new and Commerce round-trip suites all pass (Advanced-new: 96 tests,
+0 failures, 3 skipped for model types with `enabled=false`).
 
 ---
 
