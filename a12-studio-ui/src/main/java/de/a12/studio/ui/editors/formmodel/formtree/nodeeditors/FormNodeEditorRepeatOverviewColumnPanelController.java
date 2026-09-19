@@ -5,6 +5,7 @@ import de.a12.studio.models.formmodel.FieldBasedRepeatOverviewColumn;
 import de.a12.studio.models.formmodel.RepeatOverviewColumn;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextTypePanelController;
 import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.util.StudioBundle;
@@ -29,13 +30,13 @@ import java.util.ResourceBundle;
  * <p>
  * Covers the fields shared by both column types (label, width, sortable, filterable, preferred sorting, and
  * - the field-based variant only - the read-only bound element, readonly and message position) plus the
- * expression variant's own expression text, and embeds one panel each for the pin direction ({@link
- * RepeatColumnPinDirectionPanelController}), the header icon ({@link RepeatColumnIconPanelController}) and the
- * per-column hide condition ({@link HideConditionPanelController}). Deliberately does not (yet) expose
- * {@code filterExposition}/{@code labelHidden}/{@code headerStyle}/{@code fixedWidth}/{@code
- * specificHorizontalAlignment}/{@code specificVerticalAlignment}/{@code datePickerConfig}/{@code annotations};
- * the underlying data model already has all of these fields, so a future pass can add panels for them
- * without another data-model change.
+ * expression variant's own expression text, and embeds one panel each for the display options - hide label,
+ * fixed width, filter exposition ({@link RepeatColumnDisplayPanelController}) - the pin direction ({@link
+ * RepeatColumnPinDirectionPanelController}), the header icon ({@link RepeatColumnIconPanelController}), the
+ * header/content alignment overrides ({@link RepeatColumnAlignmentPanelController}), the per-column hide
+ * condition ({@link HideConditionPanelController}), the header styles ({@link
+ * RepeatColumnHeaderStylesPanelController}) and the annotations. Only {@code datePickerConfig} of a field-based
+ * column still has no UI.
  */
 public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -64,7 +65,15 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
   @FXML
   private RuleEditorController expressionController;
   @FXML
+  private RepeatColumnDisplayPanelController displayController;
+  @FXML
   private RepeatColumnPinDirectionPanelController pinDirectionController;
+  @FXML
+  private RepeatColumnAlignmentPanelController alignmentController;
+  @FXML
+  private RepeatColumnHeaderStylesPanelController headerStylesController;
+  @FXML
+  private AnnotationsPanelController annotationsController;
   @FXML
   private RepeatColumnIconPanelController iconController;
   @FXML
@@ -81,7 +90,10 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
 
     bindTextField(widthField, (el, value) -> column.setWidth(parseIntOrNull(value)));
     bindCheckBox(sortableCheckBox, (el, value) -> column.setSortable(value ? Boolean.TRUE : null));
-    bindCheckBox(filterableCheckBox, (el, value) -> column.setFilterable(value ? Boolean.TRUE : null));
+    bindCheckBox(filterableCheckBox, (el, value) -> {
+      column.setFilterable(value ? Boolean.TRUE : null);
+      displayController.refreshFilterable();
+    });
     bindComboBox(preferredSortingCombo, (el, value) -> column.setPreferredSorting(value));
     bindCheckBox(readonlyCheckBox, (el, value) -> asFieldBased().setReadonly(value ? Boolean.TRUE : null));
     bindComboBox(messageExpositionCombo, (el, value) -> asFieldBased().setMessageExposition(value));
@@ -97,7 +109,11 @@ public class FormNodeEditorRepeatOverviewColumnPanelController extends AbstractP
   public void setColumn(@NonNull RepeatOverviewColumn column, @Nullable ElementIndex elementIndex,
       HideConditionPanelController.@NonNull MasterFieldScope hideConditionScope) {
     this.column = column;
+    displayController.setColumn(column);
     pinDirectionController.setColumn(column);
+    alignmentController.setColumn(column);
+    headerStylesController.setColumn(column);
+    annotationsController.setCustom(column::getAnnotations);
     iconController.setColumn(column);
     hideConditionController.configure(column.getId(), column::getHideCondition, column::setHideCondition,
         elementIndex, hideConditionScope);

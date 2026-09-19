@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.FieldConfigEntry;
 import de.a12.studio.models.formmodel.FormModelContent;
@@ -30,6 +31,9 @@ import org.jspecify.annotations.Nullable;
  *   <li><b>Additional Settings</b> ({@link AdditionalSettingsPanelController}) — initial value/exposition
  *       (model-wide {@code FieldConfigEntry}), message position, readonly, readonly presentation and
  *       required-field asterisk marking.</li>
+ *   <li><b>Attachment Settings</b> ({@link AttachmentSettingsPanelController}) — only for a Control bound to an
+ *       attachment group: placeholder icon, default action and accepted MIME types (model-wide
+ *       {@code FieldConfigEntry.attachmentConfig}).</li>
  *   <li><b>External Enumeration</b> ({@link ExternalEnumerationPanelController}) — sources the bound field's
  *       enum options from an external URL (model-wide {@code FieldConfigEntry}).</li>
  *   <li><b>Dependent Enumeration</b> ({@link DependentEnumerationPanelController}) — constrains which of the
@@ -62,6 +66,8 @@ public class FormNodeEditorControlPanelController {
   @FXML
   private AdditionalSettingsPanelController additionalSettingsController;
   @FXML
+  private AttachmentSettingsPanelController attachmentSettingsController;
+  @FXML
   private ExternalEnumerationPanelController externalEnumerationController;
   @FXML
   private DependentEnumerationPanelController dependentEnumerationController;
@@ -85,6 +91,13 @@ public class FormNodeEditorControlPanelController {
     layoutController.setControl(control);
     additionalSettingsController.setControl(control, elementIndex, content);
     FieldConfigEntry fieldConfigEntry = FieldConfigEntryHelper.findOrCreate(control, content);
+    boolean attachmentGroup = elementIndex != null && elementIndex.resolveElement(control.getElementRef())
+        .filter(element -> element instanceof GroupElement group && group.getGroup() != null && group.getGroup().isAttachment())
+        .isPresent();
+    attachmentSettingsController.setVisible(attachmentGroup);
+    if (attachmentGroup) {
+      attachmentSettingsController.setEntry(fieldConfigEntry);
+    }
     externalEnumerationController.setEntry(fieldConfigEntry);
     dependentEnumerationController.setEntry(fieldConfigEntry, elementIndex,
         HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(control.getElementRef(), elementIndex));

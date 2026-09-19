@@ -27,6 +27,8 @@ import org.jspecify.annotations.Nullable;
  *   <li><b>Additional Settings</b> ({@link RepeatAdditionalSettingsPanelController}) — behavioural flags
  *       (enableAdd/Remove/Reorder/Copy/ColumnsResize, infiniteScrolling, readonlyPresentation, readonly,
  *       titleHidden, filterExpression, initialSorting).</li>
+ *   <li><b>Default Row Action</b> ({@link RepeatDefaultRowActionPanelController}) — Detached/Embedded Repeats
+ *       only: the row action executed on a row click, and whether its button is hidden.</li>
  *   <li><b>Row Actions</b> ({@link RepeatRowActionsPanelController}) — custom row action buttons
  *       ({@link AbstractRepeat#getRowActionGroup()}), distinct from the single built-in
  *       {@link AbstractRepeat#getDefaultRowAction()}.</li>
@@ -51,12 +53,20 @@ public class FormNodeEditorRepeatPanelController {
   @FXML private RepeatColumnSettingsPanelController columnSettingsController;
   @FXML private RepeatAlignmentPanelController alignmentController;
   @FXML private RepeatAdditionalSettingsPanelController additionalSettingsController;
+  @FXML private RepeatDefaultRowActionPanelController defaultRowActionController;
   @FXML private RepeatRowActionsPanelController rowActionsController;
   @FXML private RepeatMultiFileUploadPanelController multiFileUploadController;
   @FXML private HideConditionPanelController hideConditionController;
   @FXML private StylesPanelController stylesController;
   @FXML private RepeatHeaderStylesPanelController headerStylesController;
   @FXML private AnnotationsPanelController annotationsController;
+
+  @FXML
+  private void initialize() {
+    // The default row action's choices follow the row actions and multi file upload, edited in sibling panels.
+    rowActionsController.setOnChanged(defaultRowActionController::refresh);
+    multiFileUploadController.setOnChanged(defaultRowActionController::refresh);
+  }
 
   public void setRepeat(@NonNull AbstractRepeat repeat,
       @Nullable DocumentModel documentModel,
@@ -70,6 +80,7 @@ public class FormNodeEditorRepeatPanelController {
     columnSettingsController.setRepeat(repeat);
     alignmentController.setRepeat(repeat);
     additionalSettingsController.setRepeat(repeat);
+    defaultRowActionController.setRepeat(repeat);
     rowActionsController.setRepeat(repeat, elementIndex);
     multiFileUploadController.setRepeat(repeat, elementIndex);
     hideConditionController.configure(

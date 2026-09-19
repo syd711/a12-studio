@@ -37,8 +37,15 @@ public final class FxTestSupport {
   private static class NoSelectionRootController extends RootController {
     @Override
     public ProjectItem getSelectedProjectItem() {
-      return null;
+      return selectedProjectItem;
     }
+  }
+
+  private static volatile ProjectItem selectedProjectItem;
+
+  /** Makes {@code item} the "currently selected project item" panels see through {@code Studio}; null for none. */
+  public static void selectProjectItem(ProjectItem item) {
+    selectedProjectItem = item;
   }
 
   public static synchronized boolean startToolkit() throws Exception {

@@ -1,6 +1,9 @@
 package de.a12.studio.ui.editors.formmodel;
 
+import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.formmodel.FormStyleReferences;
 import de.a12.studio.models.formmodel.Style;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
@@ -11,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.DataFormat;
@@ -18,8 +22,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +45,13 @@ import java.util.function.Supplier;
  * instead (Overview Model's model-level style class list has no per-entry object).
  * <p>
  * Also serves the Form Model's own model-level style list ({@code FormModelContent.styles}, see {@link
- * #configureModelStyles()}), shown in the Model Settings dialog.
+ * #configureModelStyles()}), shown in the Model Settings dialog, where each name is typed.
+ * <p>
+ * Everywhere else in a Form Model the panel edits which of those model-level styles ("style presets") an
+ * element uses, like SME's reference picker: each entry is picked from a combo box of the defined styles, and
+ * with none defined "Add" is disabled and the empty hint says where to define them. A name that isn't (or is
+ * no longer) defined is still shown, so it can be seen and replaced; {@code FormStyleReferenceValidator}
+ * reports it. Outside a Form Model (no selected form) the panel falls back to typing the name.
  */
 public class StylesPanelController extends AbstractPropertyEditor {
 
@@ -53,6 +65,12 @@ public class StylesPanelController extends AbstractPropertyEditor {
   @FXML
   private Label stylesEmptyLabel;
 
+  @FXML
+  private Button addButton;
+
+  // True for the model-level list itself, whose names are typed rather than picked from that same list.
+  private boolean modelLevel;
+
   private Supplier<List<Style>> reader;
 
   private Supplier<List<Style>> writer;
@@ -65,6 +83,7 @@ public class StylesPanelController extends AbstractPropertyEditor {
   public void configureModelStyles() {
     setTitle(StudioBundle.get("model_styles"));
     setSettingsKeySuffix(".model");
+    modelLevel = true;
   }
 
   /** Shows or hides the whole panel, e.g. for the Model Settings dialog's non-Form model types. */
@@ -89,26 +108,62 @@ public class StylesPanelController extends AbstractPropertyEditor {
     stylesList.getChildren().clear();
 
     List<Style> styles = reader.get();
+    List<String> presets = presetNames();
+    boolean noPresets = presets != null && presets.isEmpty();
     boolean empty = styles.isEmpty();
+    stylesEmptyLabel.setText(StudioBundle.get(noPresets ? "no_styles_defined_in_model_settings" : "no_styles_defined"));
     stylesEmptyLabel.setVisible(empty);
     stylesEmptyLabel.setManaged(empty);
+    // Nothing to pick from yet: an added entry could not get a valid name.
+    addButton.setDisable(noPresets);
 
     for (int index = 0; index < styles.size(); index++) {
-      stylesList.getChildren().add(createRow(styles.get(index), index, styles.size()));
+      stylesList.getChildren().add(createRow(styles.get(index), index, styles.size(), presets));
     }
   }
 
-  private HBox createRow(Style style, int index, int rowCount) {
+  /**
+   * The names of the styles the open Form Model defines, or {@code null} when names are typed instead: this is
+   * the model-level list itself, or no Form Model is selected.
+   */
+  private @Nullable List<String> presetNames() {
+    if (modelLevel) {
+      return null;
+    }
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem == null || !(projectItem.getModel() instanceof FormModel formModel) || formModel.getContent() == null) {
+      return null;
+    }
+    return new ArrayList<>(FormStyleReferences.definedNames(formModel.getContent()));
+  }
+
+  private HBox createRow(Style style, int index, int rowCount, @Nullable List<String> presets) {
     FontIcon dragHandle = RowFactory.createDragHandle();
 
-    TextField nameField = new TextField();
-    nameField.setId("formStyleName-" + index);
-    nameField.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(nameField, Priority.ALWAYS);
-    setFieldValue(nameField, style.getName());
-    bindTextField(nameField, (el, value) -> style.setName(value.isEmpty() ? null : value));
+    javafx.scene.Node nameControl;
+    if (presets == null) {
+      TextField nameField = new TextField();
+      nameField.setId("formStyleName-" + index);
+      setFieldValue(nameField, style.getName());
+      bindTextField(nameField, (el, value) -> style.setName(value.isEmpty() ? null : value));
+      nameControl = nameField;
+    }
+    else {
+      ComboBox<String> nameCombo = new ComboBox<>();
+      nameCombo.setId("formStyleName-" + index);
+      List<String> items = new ArrayList<>(presets);
+      if (style.getName() != null && !style.getName().isBlank() && !items.contains(style.getName())) {
+        items.add(style.getName());
+      }
+      nameCombo.getItems().setAll(items);
+      setFieldValue(nameCombo, style.getName());
+      bindComboBox(nameCombo, (el, value) -> style.setName(value));
+      nameControl = nameCombo;
+    }
+    ((javafx.scene.layout.Region) nameControl).setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(nameControl, Priority.ALWAYS);
 
-    HBox row = new HBox(10.0, dragHandle, nameField, createActionsBox(style, index, rowCount));
+    HBox row = new HBox(10.0, dragHandle, nameControl, createActionsBox(style, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
     RowFactory.setupRowDragAndDrop(row, dragHandle, STYLE_INDEX, index, this::moveStyleViaDrag);

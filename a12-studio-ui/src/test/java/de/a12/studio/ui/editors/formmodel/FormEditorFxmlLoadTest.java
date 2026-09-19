@@ -49,6 +49,16 @@ class FormEditorFxmlLoadTest {
   }
 
   @Test
+  void controlEditorInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("formtree/nodeeditors/formnode-editor-control-panel.fxml");
+  }
+
+  @Test
+  void dataConfigurationTabInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("data-configuration-panel.fxml");
+  }
+
+  @Test
   void modelSettingsDialogInjectsAllFields() throws Exception {
     assertAllFieldsInjected("/de/a12/studio/ui/editors/dialogs/document-model-settings-dialog.fxml");
   }

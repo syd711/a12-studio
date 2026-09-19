@@ -14,6 +14,7 @@ import de.a12.studio.models.formmodel.GroupConfiguration;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.AttachmentSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentEnumerationPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentFieldPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentGroupPanelController;
@@ -99,6 +100,8 @@ public class DataConfigurationPanelController implements Initializable {
   private DependentFieldPanelController dependentFieldController;
   @FXML
   private DependentGroupPanelController dependentGroupController;
+  @FXML
+  private AttachmentSettingsPanelController attachmentSettingsController;
   @FXML
   private AnnotationsPanelController annotationsController;
   @FXML
@@ -243,7 +246,7 @@ public class DataConfigurationPanelController implements Initializable {
     return elementIndex.effectiveFieldType(field.getField().getFieldType());
   }
 
-  private @Nullable FieldConfigEntry findFieldEntry(@NonNull FieldElement field) {
+  private @Nullable FieldConfigEntry findFieldEntry(@NonNull Element field) {
     if (content.getFieldConfiguration() == null) {
       return null;
     }
@@ -270,7 +273,7 @@ public class DataConfigurationPanelController implements Initializable {
   /** Returns the field's existing {@link FieldConfigEntry}, or creates and attaches a new (still empty) one -
    * mirroring {@code FieldConfigEntryHelper#findOrCreate}. Only actually persisted once a value is set on it
    * and {@link #commitChange()} saves the model. */
-  private FieldConfigEntry findOrCreateFieldEntry(@NonNull FieldElement field) {
+  private FieldConfigEntry findOrCreateFieldEntry(@NonNull Element field) {
     FieldConfigEntry existing = findFieldEntry(field);
     if (existing != null) {
       return existing;
@@ -308,7 +311,10 @@ public class DataConfigurationPanelController implements Initializable {
     }
     if (element instanceof GroupElement group) {
       GroupConfigEntry entry = findGroupEntry(group);
-      return entry != null && hasConfiguredValues(entry);
+      // An attachment group's "Attachment Settings" live in a field entry keyed by the group's id.
+      FieldConfigEntry attachmentEntry = isAttachmentGroup(group) ? findFieldEntry(group) : null;
+      return entry != null && hasConfiguredValues(entry)
+          || attachmentEntry != null && attachmentEntry.getAttachmentConfig() != null;
     }
     return false;
   }
@@ -337,6 +343,10 @@ public class DataConfigurationPanelController implements Initializable {
         || entry.getLabel() != null
         || entry.getHint() != null
         || entry.getPlaceholder() != null;
+  }
+
+  private static boolean isAttachmentGroup(@NonNull GroupElement group) {
+    return group.getGroup() != null && group.getGroup().isAttachment();
   }
 
   private void showDetail(@Nullable Element element) {
@@ -375,6 +385,11 @@ public class DataConfigurationPanelController implements Initializable {
       GroupElement group = (GroupElement) element;
       GroupConfigEntry entry = findOrCreateGroupEntry(group);
       dependentGroupController.setEntry(entry, elementIndex);
+      boolean attachment = isAttachmentGroup(group);
+      attachmentSettingsController.setVisible(attachment);
+      if (attachment) {
+        attachmentSettingsController.setEntry(findOrCreateFieldEntry(group));
+      }
       numberOfInitialRowsField.setText(entry.getNumberOfInitialRows() == null ? "" : entry.getNumberOfInitialRows().toString());
     }
   }

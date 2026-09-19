@@ -78,9 +78,13 @@
                 </top>
             </BorderPane>
         </TitledPane>
+        <fx:include fx:id="display" source="repeat-column-display-panel.fxml" />
         <fx:include fx:id="pinDirection" source="repeat-column-pin-direction-panel.fxml" />
         <fx:include fx:id="icon" source="repeat-column-icon-panel.fxml" />
+        <fx:include fx:id="alignment" source="repeat-column-alignment-panel.fxml" />
         <fx:include fx:id="hideCondition" source="hide-condition-panel.fxml" />
+        <fx:include fx:id="headerStyles" source="repeat-column-header-styles-panel.fxml" />
+        <fx:include fx:id="annotations" source="../../../propertyeditors/annotations-panel.fxml" />
         </VBox>
     </content>
 </ScrollPane>

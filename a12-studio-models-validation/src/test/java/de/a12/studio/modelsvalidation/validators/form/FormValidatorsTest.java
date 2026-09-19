@@ -167,6 +167,20 @@ class FormValidatorsTest {
   }
 
   @Test
+  void styleReferenceValidatorReportsUndefinedAndNamelessStyles() {
+    FormModel model = load("FormStyleReferenceValidator_invalid");
+    List<ModelValidationError> errors = new FormStyleReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(3, errors.size(), errors.toString());
+    // The nameless entry of the model-level styles has no element of its own.
+    assertTrue(errors.stream().anyMatch(e -> FormStyleReferenceValidator.ELEMENT_ID.equals(e.elementId())));
+    ModelValidationError ghost = errors.stream().filter(e -> "section_ghost".equals(e.elementId())).findFirst().orElseThrow();
+    assertTrue(ghost.message().contains("ghost") && ghost.message().contains("Undefined"), ghost.message());
+    assertTrue(errors.stream().anyMatch(e -> "section_nameless".equals(e.elementId())));
+    assertTrue(errors.stream().noneMatch(e -> "section_ok".equals(e.elementId())), "a defined style is fine");
+  }
+
+  @Test
   void hideConditionSupportedValuesValidatorReportsUnsupportedValues() {
     FormModel model = load("HideConditionSupportedValuesValidator_invalid");
     List<ModelValidationError> errors = new HideConditionSupportedValuesValidator().validate(model,

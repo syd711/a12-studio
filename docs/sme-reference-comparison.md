@@ -110,10 +110,10 @@ Missing or worth checking against SME (`commonDocumentModel/api/editor/*`):
 | Move/rename refactoring | Auto-rewrites rule/computation condition text referencing a moved/renamed element (`moveElementApi.ts` → backend `/move-element-with-refactoring`) | **Present within one model** (2026-09-19): `DocumentModelRefactoring` (`a12-studio-models-validation/.../refactoring/`) + UI `RefactoringCommand` wrapping `RenameElementCommand`/`MoveNodeCommand`, so inline rename, the General Information panel's Rename and tree drag-and-drop are one undo step each. Clean-room (SME's rewrite lives in the proprietary kernel `MoveSupportDM`). Resolves each path to the *element* in the old tree and re-expresses it against the new one, so a moved *rule* (whose relative paths are measured from its own position) works as well as a moved field; only a reference that no longer resolves to the same element is rewritten, keeping its style (absolute vs relative, `..Group` turning-group name, `*` markers). Covers Rule `errorEntityRelPath`/`errorCondition`/`errorMessage` `$path$` parameters, Computation `computedFieldRelPath`/`commonPrecondition`/alternative `precondition`+`operation`/`errorMessage`, Group `indexFieldName`, `documentUniquenessCriteria[].fields[].fullName`. References by element id (Form/Overview/Tree/RelationshipUI `elementRef`/`fieldId`/`groupRef`, `ModelConfig` uniqueness criteria) cannot break — ids don't change on rename/move. **Other models' references (2026-09-19, `ProjectReferenceRefactoring`):** the same rename/move now also updates, in the same undo step, the references the project's other models hold on the changed Document Model — Print `FieldRef.path` (where `model` is the changed DM), Query `fields`/`sort`/top-level `constraint` field paths/`filterDefinition` `[/Path]` refs (where `targetDocumentModel` is the changed DM), Mapping `SortField.sortFieldFullName` (per `Source.dmId`), Structural Mapping `*FullName`s and Selection `Selected`/`Unselected` paths (both have no DM reference of their own, so they follow only when every Mapping/Combination Model using them agrees the changed DM is that side's/base model), and rules/computations of *other Document Models that include this one* (SME `calculateIncludedNameChanges`/`calculateIncludedPathChanges`; an Include mounts the children of the included model's root group, so the path tail after the Include group is re-derived from the included model's old/new tree). The affected models are edited in place (editors share the project tree's model instance and save on every edit, so there is no dirty state to clash with), saved, and announced via `ModelSaveEvent`; undo restores, saves and announces them again, and skips a model that was reloaded from disk meanwhile. Verified against every element of every DM in `testing/workspaces` (renames + moves; undo restores every model byte-for-byte; relative paths of including models still reach the same element). **Still missing:** Query relationship-link paths (`links[].fields`, constraints below `has` — they belong to the linked role's DM), Print calculation steps, Form `hostDocumentModelPath` (transclusion provenance, not a live reference; also ambiguous which DM it is relative to), paths through a *chain* of Includes or an Additive base model; an open editor of a rewritten non-DM model (Print/Query/...) isn't told to redraw, so it shows the old text until reopened (the model itself is already correct); conditions that don't parse are skipped (logged). Cut/Paste is delete + paste-as-clone with new ids, not a move, so it isn't refactored. | |
 | Ad hoc testing / live preview | Select elements (Alt+T), server generates a reduced test Document+Validation model, renders in a popup preview | Missing | |
 | Copy elements from another Document Model | "Insert from DM" modal, resolves includes, copies/imports type defs | Missing | |
-| Model diff / compare | `hasModelDiffEditor`, full settings/tree/typedef diff | Missing | |
+| Model diff / compare | `hasModelDiffEditor`, full settings/tree/typedef diff | **Won't do** (decided 2026-09-19) | |
 | Drag & drop reorder/reparent in tree | Per-element `dnd` metadata (`draggable`/`droppable`/`reorderable`) | **Present** (confirmed 2026-09-05) — `DocumentModelElementsTreeController.setupRowDragAndDrop`/`resolveDropPosition`: reorder above/below, reparent into, root-end drop, with fixed-children/attachment-adjacency vetoes | |
 | Tree filtering (by type, category, annotated-only, etc.) | Rich filter panel (`dmEditorView` filters) | Not confirmed present | |
-| AI-assisted model generation | `documentModel/ai/*` — generates a DM from a prompt/PDF via `@com.mgmtp.ai.generation` | Likely out of scope — needs a conscious decision | |
+| AI-assisted model generation | `documentModel/ai/*` — generates a DM from a prompt/PDF via `@com.mgmtp.ai.generation` | **Won't do** (decided 2026-09-19) | |
 | Additive Document Model (overlay/inherit/overwrite editing) | Separate module (`additiveDocumentModel`), full editing mode | `kernel-md-join` dependency present but no editor concept yet | |
 | Composed Document Model (graph composition via Element Picker) | Separate module (`composedDocumentModel`) | Missing | |
 | Multi-select bulk actions | Ctrl+M panel, bulk delete/cut/copy, bulk "Ad hoc Test" | Not confirmed present | |
@@ -365,7 +365,7 @@ repeats (Inline/Embedded/Detached), buttons, and a lightweight live preview. The
 | `ButtonPanel` (a button bar addable as its own node *inside* the screen tree) | — | **Absent** — a12-studio only supports buttons in the model-level/per-screen header+footer boxes (`HeaderFooterBox`), never as an inline, addable screen-tree node |
 | `DetachedRepeat` / `EmbeddedRepeat` / `InlineRepeat` | same | Has it structurally; see "Repeats" below for field-level gaps |
 | `Binding` / `BindingRepeat` (CDM relationship-driven selector/repeat) | — | **Completely absent** — no class, no UI, no validator. Confirmed by grep: zero matches for "Binding" anywhere in `a12-studio-models/.../formmodel/` |
-| `FieldBasedRepeatOverviewColumn` | `FieldBasedRepeatOverviewColumn` | Present, with "Add Column" and an editor panel (label/width/sortable/filterable/preferred sorting, readonly, message position) plus — since 2026-09-19 — panels for **pin direction**, **icon** and the per-column **hide condition** (`ConditionallyHidden`; master fields scoped to the column's own field, like a Control). Still no UI for `filterExposition`, `labelHidden`, `headerStyle`, `fixedWidth`, `specificHorizontal/VerticalAlignment` and annotations (all modeled, round-trip verified) |
+| `FieldBasedRepeatOverviewColumn` | `FieldBasedRepeatOverviewColumn` | Present, with "Add Column" and an editor panel (label/width/sortable/filterable/preferred sorting, readonly, message position) plus, since 2026-09-19, panels for **display** (hide label, fixed width, filter exposition - only enabled for a filterable column), **pin direction**, **icon**, **alignment** (independent horizontal/vertical overrides for header and content), the per-column **hide condition** (`ConditionallyHidden`; master fields scoped to the column's own field, like a Control), **header styles** and annotations. Only `datePickerConfig` (modeled) has no UI. The width field is still an integer field although SME allows 0.3+ in steps of 0.1 (the model keeps fractional values across a save) |
 | `ExpressionRepeatOverviewColumn` (compute a column via expression instead of a field) | `ExpressionRepeatOverviewColumn` | Present (step 2 below); its expression is edited with the rule editor (`RuleEditorController`), and it shares the pin direction / icon / hide-condition panels above (hide-condition master fields scoped to the enclosing repeat's group, as in SME's `resolveDmElementForFmElement`) |
 
 ### Field/group configuration & the dependency system
@@ -383,7 +383,10 @@ This is the area with the most concrete, well-defined gaps:
   - `externalEnumeration` (`ExternalEnumeration`: `src`, `customValuesAllowed`, `caseSensitive`) — sources a field's
     enum options from an external URL instead of the Document Model's own enum definition.
   - `attachmentConfig` (`placeholderIcon`, `accept` MIME filter, `defaultAction` replace/download) — upload-field
-    presentation config, also entirely absent.
+    presentation config. **Closed** (2026-09-19, second pass): the model had `placeholderIcon` only and no UI; it now has
+    all three fields and `AttachmentSettingsPanelController`, shown for a Control bound to an attachment group and for
+    the attachment group in the Data Configuration tab (the entry is keyed by the *group's* id, as in SME). Absent means
+    the default; an `attachmentConfig` with nothing set is removed again.
 - **`GroupConfigEntry`** is roughly at parity (`dependentGroup`, `groupRef`, `numberOfInitialRows`); a12-studio even
   adds `label`/`hint`/`placeholder` fields SME keeps elsewhere — not a gap, just a modeling difference.
 - **Hide condition** (`ScreenElement.hideConditionField`/`hideConditionValue`,
@@ -416,16 +419,22 @@ SME's shared `RepeatBase` (`fmElements/types/detachedRepeat.ts`) has several fie
   `confirmationDialogTitle`, and `scope`. **Closed** (step 4 below, completed 2026-09-19): the "Row Actions" table edits
   event/scope inline and an Edit dialog (`RowActionDialogController`, mirroring SME's `I_SectionRowAction-form.json`
   and the Button dialog) edits everything else — functions, confirmation title/message, visual settings, label,
-  description, styles, annotations. Not ported: SME's `updateRowAction`/`syncDefaultRowActionReducer` behaviour that
-  clears `defaultRowAction` when its row action gains a confirmation (a12-studio has no UI for `defaultRowAction`).
+  description, styles, annotations. **The default row action** (2026-09-19, second pass) has its own panel on
+  Detached/Embedded repeats (`RepeatDefaultRowActionPanelController`: Edit/View, Download with multi file upload, any
+  custom row action without a confirmation, plus hide-button) and SME's synchronisation is ported as
+  `DefaultRowActionSupport` (validation module): the default is cleared when its row action is deleted or gains a
+  confirmation, follows a rename, and a "Download" default is cleared when multi file upload is switched off.
+  `FormDefaultRowActionValidator` reports a default the editor could not have offered. Rename tracking assumes
+  the row-action list keeps its length (an inline event edit or the Edit dialog) - the same assumption as SME's
+  index-based lookup in the form-engine backup.
 - **`titleHidden`** — missing.
 - **`confirmationTexts`** per-repeat override — a12-studio only has a model-level default (`Defaults.confirmationTexts`),
   no per-repeat override.
 - **`MultiFileUploadOptions`** (attachment-repeat config: download toggle, upload description/button/helper text) —
   **Closed** (2026-09-19): `RepeatMultiFileUploadPanelController` on Inline/Embedded repeats (hidden for Detached). As
   the SME docs require, enabling picks the repeated group's single non-repeatable attachment group automatically
-  (`MultiFileUploadSupport`) and is refused with an error naming the group if there is none/several. Still open, from
-  the `attachmentConfig` gap above: `accept`, `placeholderIcon`, `defaultAction`.
+  (`MultiFileUploadSupport`) and is refused with an error naming the group if there is none/several. The
+  `attachmentConfig` gap above (`accept`, `placeholderIcon`, `defaultAction`) is closed too, see there.
 - **`TableStyle`**: SME's has `cardHeight`/`actionColumnWidth` in addition to `tableHeight`/`rowHeight`, which are all
   a12-studio's `TableStyle` has.
 - **No repeat-type conversion** (Detached⇄Embedded⇄Inline⇄Binding) exists in the UI — converting requires
@@ -453,11 +462,16 @@ a missing panel, the data model itself can't represent an include on any node.
 - **No structural consistency check** between the form model and its (possibly since-changed) document model. SME's
   is a categorized `Problem[]` (INFO/WARNING/ERROR) background check — a12-studio doesn't need the server-side
   architecture, but has no equivalent drift-detection pass of any kind today.
-- **Style presets.** `FormModelContent.styles` (a model-level named style-class list) now has a panel in the Model
-  Settings dialog (2026-09-19; the shared `StylesPanelController`, restored on Cancel via `ModelSnapshot`). **Not**
-  ported: SME uses this list as the candidate source of the per-element `style`/`headerStyle` reference pickers and
-  prunes a deleted preset from every element (`handleDeletedStyleMiddleware`); a12-studio's per-element style editors
-  are still free text, so a preset is a plain list for now.
+- **Style presets.** `FormModelContent.styles` (a model-level named style-class list) has a panel in the Model
+  Settings dialog (2026-09-19; the shared `StylesPanelController`, restored on Cancel via `ModelSnapshot`). Second
+  pass, same day: like SME, the list is now the source of the per-element `style`/`headerStyle` entries. Inside a
+  Form Model the Styles panel offers a combo of the defined styles (typing is only for the model-level list itself),
+  and Save in the Model Settings dialog carries renames and deletions over to every element that uses the style
+  (`FormStyleReferences`, a reflective walk over all `List<Style>` fields - checked against the JSON of every fixture
+  form model - so a new element type with a style list is covered automatically). `FormStyleReferenceValidator`
+  reports an undefined or nameless style. Deliberately at Save, not while editing, so Cancel can't orphan
+  references. Not covered: the Button dialog and Row Action dialog only see the presets through the selected
+  project item (fine in the app, where it is always the form).
 - **Live preview is architecturally different, not just less complete.** a12-studio's `PreviewServer` renders an
   explicitly-labeled "lightweight v1 wireframe" from the live in-memory model in an external browser tab. SME's
   preview drives the actual Form Engine runtime via postMessage sync. This is a reasonable simplification given

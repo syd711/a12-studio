@@ -1,5 +1,6 @@
 package de.a12.studio.models.documentmodel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.a12.studio.models.Label;
@@ -28,4 +29,10 @@ public class GroupConfig {
   private IncludeConfig includeConfig;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Element> elements = new ArrayList<>();
+
+  /** Whether this group is an attachment group (usage type {@value #USAGE_TYPE_ATTACHMENT}). */
+  @JsonIgnore
+  public boolean isAttachment() {
+    return USAGE_TYPE_ATTACHMENT.equals(usageType);
+  }
 }

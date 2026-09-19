@@ -67,6 +67,80 @@ class FormModelEditableFieldsRoundTripTest {
       }
       """;
 
+  // Second batch: attachment settings (FieldConfigEntry.attachmentConfig, SME's AttachmentConfig type) and the
+  // remaining column fields (alignment overrides as in Person_FM.json, display flags, header styles, annotations).
+  private static final String SECOND_JSON = """
+      {
+        "header": {"id": "Editable2_FM", "modelType": "form", "modelVersion": "39.0.0"},
+        "content": {
+          "styles": [{"name": "narrow"}],
+          "defaults": {}, "groupConfiguration": {},
+          "fieldConfiguration": {"field": [
+            {"elementRef": "group_attachments",
+             "attachmentConfig": {"placeholderIcon": "pdf", "accept": "image/jpeg, video/*", "defaultAction": "download"}}]},
+          "screens": [{
+            "id": "screen1", "name": "Screen1",
+            "screenElements": [{
+              "type": "InlineRepeat", "id": "repeat1", "name": "Items", "groupRef": "group_items",
+              "repeatOverviewColumn": [
+                {"type": "FieldBasedRepeatOverviewColumn", "id": "column1", "elementRef": "field_a",
+                 "filterable": true, "filterExposition": "STRING", "labelHidden": true, "fixedWidth": true,
+                 "specificHorizontalAlignment": {"head": "left", "body": "right"},
+                 "specificVerticalAlignment": {"head": "middle", "body": "top"},
+                 "headerStyle": [{"name": "narrow"}],
+                 "annotations": [{"name": "note", "value": "x"}]}
+              ]
+            }]
+          }]
+        }
+      }
+      """;
+
+  @Test
+  void attachmentSettingsAndRemainingColumnFieldsSurviveLoadThenSave() throws Exception {
+    FormModel model = load(SECOND_JSON);
+
+    FieldConfigEntry.AttachmentConfig config = model.getContent().getFieldConfiguration().getField().get(0).getAttachmentConfig();
+    assertEquals("pdf", config.getPlaceholderIcon());
+    assertEquals("image/jpeg, video/*", config.getAccept());
+    assertEquals("download", config.getDefaultAction());
+    assertFalse(config.isBlank());
+
+    InlineRepeat repeat = assertInstanceOf(InlineRepeat.class, model.getContent().getScreens().get(0).getScreenElements().get(0));
+    FieldBasedRepeatOverviewColumn column = assertInstanceOf(FieldBasedRepeatOverviewColumn.class, repeat.getRepeatOverviewColumn().get(0));
+    assertEquals("STRING", column.getFilterExposition());
+    assertEquals("right", column.getSpecificHorizontalAlignment().getBody());
+    assertEquals("top", column.getSpecificVerticalAlignment().getBody());
+    assertEquals("narrow", column.getHeaderStyle().get(0).getName());
+
+    JsonNode expected = JsonSettings.objectMapper.readTree(SECOND_JSON);
+    JsonNode actual = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(model));
+    assertEquals(expected.get("content"), actual.get("content"));
+  }
+
+  @Test
+  void aBlankAttachmentConfigAndAlignmentAreDetected() {
+    assertTrue(new FieldConfigEntry.AttachmentConfig().isBlank());
+    assertTrue(new Alignment().isBlank());
+
+    Alignment alignment = new Alignment();
+    alignment.setHead("left");
+    assertFalse(alignment.isBlank());
+    alignment.setHead("");
+    assertTrue(alignment.isBlank());
+  }
+
+  @Test
+  void anAlignmentWithOnlyOneSideWritesOnlyThatSide() throws Exception {
+    Alignment alignment = new Alignment();
+    alignment.setBody("center");
+
+    JsonNode json = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(alignment));
+
+    assertFalse(json.has("head"), "an absent side stays absent instead of becoming null");
+    assertEquals("center", json.get("body").asString());
+  }
+
   @Test
   void loadsAllFields() throws Exception {
     FormModel model = load(JSON);

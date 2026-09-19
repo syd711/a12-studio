@@ -19,11 +19,13 @@ import de.a12.studio.modelsvalidation.validators.form.ExternalEnumerationSourceR
 import de.a12.studio.modelsvalidation.validators.form.FormBindingRelationshipReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingTargetRoleValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormButtonScreenReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormDefaultRowActionValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormGroupReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormSiblingNameUniquenessValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormStyleReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormUnusedConfigEntryValidator;
 import de.a12.studio.modelsvalidation.validators.form.HideConditionAtLeastOneCaseValidator;
 import de.a12.studio.modelsvalidation.validators.form.HideConditionSupportedValuesValidator;
@@ -56,7 +58,9 @@ public final class FormModelValidationService {
       new DependentEnumerationMasterRequiredValidator(),
       new ExternalEnumerationSourceRequiredValidator(),
       new FormBindingRelationshipReferenceValidator(),
-      new FormBindingTargetRoleValidator()));
+      new FormBindingTargetRoleValidator(),
+      new FormDefaultRowActionValidator(),
+      new FormStyleReferenceValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

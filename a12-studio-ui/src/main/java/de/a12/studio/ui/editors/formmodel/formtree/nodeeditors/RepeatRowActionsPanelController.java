@@ -5,6 +5,7 @@ import de.a12.studio.models.formmodel.RowAction;
 import de.a12.studio.models.formmodel.RowActionGroup;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.form.DefaultRowActionSupport;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.formmodel.dialogs.Dialogs;
@@ -39,6 +40,10 @@ import java.util.ResourceBundle;
  * {@code confirmationDialogTitle} and {@code annotations} - is edited through the Edit dialog ({@link
  * de.a12.studio.ui.editors.formmodel.dialogs.RowActionDialogController}), opened via the Edit button or by
  * double-clicking a row.
+ * <p>
+ * Every change that can affect the repeat's default row action (a rename, a deletion, a confirmation added in
+ * the dialog) goes through {@link #applyChange}, which lets {@link DefaultRowActionSupport#reconcile} keep the
+ * default valid and then tells {@link #setOnChanged the owner} so the Default Row Action panel refreshes.
  */
 public class RepeatRowActionsPanelController implements Initializable {
 
@@ -62,6 +67,7 @@ public class RepeatRowActionsPanelController implements Initializable {
 
   private AbstractRepeat repeat;
   private @Nullable ElementIndex elementIndex;
+  private @Nullable Runnable onChanged;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -72,25 +78,20 @@ public class RepeatRowActionsPanelController implements Initializable {
 
     eventColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getEvent()));
     eventColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-    eventColumn.setOnEditCommit(event -> {
-      event.getRowValue().setEvent(event.getNewValue());
-      commitChange();
-    });
+    eventColumn.setOnEditCommit(event -> applyChange(() -> event.getRowValue().setEvent(event.getNewValue())));
 
     scopeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getScope()));
     scopeColumn.setCellFactory(ComboBoxTableCell.forTableColumn(FXCollections.observableArrayList(SCOPE_VALUES)));
-    scopeColumn.setOnEditCommit(event -> {
-      event.getRowValue().setScope(event.getNewValue());
-      commitChange();
-    });
+    scopeColumn.setOnEditCommit(event -> applyChange(() -> event.getRowValue().setScope(event.getNewValue())));
 
     addButton.setOnAction(e -> {
       RowAction action = new RowAction();
       action.setEvent("event_row_action");
       action.setScope("ALWAYS");
-      getOrCreate().getAction().add(action);
-      actionsTable.getItems().add(action);
-      commitChange();
+      applyChange(() -> {
+        getOrCreate().getAction().add(action);
+        actionsTable.getItems().add(action);
+      });
     });
 
     editButton.disableProperty().bind(actionsTable.getSelectionModel().selectedItemProperty().isNull());
@@ -110,11 +111,12 @@ public class RepeatRowActionsPanelController implements Initializable {
       if (selected == null) {
         return;
       }
-      if (repeat.getRowActionGroup() != null) {
-        repeat.getRowActionGroup().getAction().remove(selected);
-      }
-      actionsTable.getItems().remove(selected);
-      commitChange();
+      applyChange(() -> {
+        if (repeat.getRowActionGroup() != null) {
+          repeat.getRowActionGroup().getAction().remove(selected);
+        }
+        actionsTable.getItems().remove(selected);
+      });
     });
   }
 
@@ -138,12 +140,26 @@ public class RepeatRowActionsPanelController implements Initializable {
     if (index < 0) {
       return;
     }
-    Dialogs.showRowActionForEdit(Studio.stage, elementIndex, selected).ifPresent(edited -> {
+    Dialogs.showRowActionForEdit(Studio.stage, elementIndex, selected).ifPresent(edited -> applyChange(() -> {
       actions.set(index, edited);
       actionsTable.getItems().set(index, edited);
       actionsTable.getSelectionModel().select(index);
-      commitChange();
-    });
+    }));
+  }
+
+  /** Called after every change to the row actions, once the default row action was reconciled and saved. */
+  public void setOnChanged(@Nullable Runnable onChanged) {
+    this.onChanged = onChanged;
+  }
+
+  private void applyChange(Runnable mutation) {
+    List<String> previousEvents = DefaultRowActionSupport.events(repeat);
+    mutation.run();
+    DefaultRowActionSupport.reconcile(repeat, previousEvents);
+    commitChange();
+    if (onChanged != null) {
+      onChanged.run();
+    }
   }
 
   private RowActionGroup getOrCreate() {

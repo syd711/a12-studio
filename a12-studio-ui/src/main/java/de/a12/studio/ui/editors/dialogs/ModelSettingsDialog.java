@@ -5,6 +5,8 @@ import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.models.formmodel.FormStyleReferences;
+import de.a12.studio.models.formmodel.Style;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
@@ -41,7 +43,9 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ModelSettingsDialog implements Initializable, DialogController {
@@ -115,6 +119,10 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   private ModelSnapshot snapshot;
 
   private Stage stage;
+
+  // The name each live model-level Style had when the dialog opened (by identity), so onSave can tell a
+  // renamed style from a deleted one and bring the elements that use it along.
+  private final Map<Style, String> originalStyleNames = new IdentityHashMap<>();
 
   public void setStage(Stage stage) {
     this.stage = stage;
@@ -194,6 +202,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         subtitleController.setModel(formModel);
         subtitleController.setFieldSuggestionSource(generalSettingsController.getFieldIndex());
         subtitleController.setVisible(true);
+        ensureContent(formModel).getStyles().forEach(style -> originalStyleNames.put(style, style.getName()));
         modelStylesController.setCustom(() -> ensureContent(formModel).getStyles(), () -> ensureContent(formModel).getStyles());
         modelStylesController.setVisible(true);
       } else {
@@ -279,6 +288,13 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @FXML
   private void onSave() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem != null && projectItem.getModel() instanceof FormModel formModel && formModel.getContent() != null) {
+      // SME's style refactoring: renamed/deleted model-level styles are carried over to the elements using them.
+      // Done at Save, not while editing, so Cancel (which restores the list only) can't leave elements
+      // pointing at styles that were "deleted".
+      FormStyleReferences.applyPresetEdits(formModel.getContent(), originalStyleNames);
+    }
     saveMode.flush();
     StudioEventManager.getInstance().fireLocalesChangedEvent(Studio.getSelectedProjectItem());
     stage.close();

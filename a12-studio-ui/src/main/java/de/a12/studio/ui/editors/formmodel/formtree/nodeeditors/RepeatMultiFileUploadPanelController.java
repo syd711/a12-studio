@@ -8,6 +8,7 @@ import de.a12.studio.models.formmodel.InlineRepeat;
 import de.a12.studio.models.formmodel.MultiFileUploadOptions;
 import de.a12.studio.models.formmodel.TextContainer;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.form.DefaultRowActionSupport;
 import de.a12.studio.modelsvalidation.validators.form.MultiFileUploadSupport;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
@@ -65,6 +66,7 @@ public class RepeatMultiFileUploadPanelController extends AbstractPropertyEditor
 
   private AbstractRepeat repeat;
   private @Nullable ElementIndex elementIndex;
+  private @Nullable Runnable onChanged;
 
   // Set while fields are repopulated from the model, so those programmatic changes aren't taken for user edits.
   private boolean populating;
@@ -100,6 +102,14 @@ public class RepeatMultiFileUploadPanelController extends AbstractPropertyEditor
         commitHeaderChange();
       }
     });
+  }
+
+  /**
+   * Called after switching multi file upload on or off, once the repeat's default row action was reconciled
+   * (a "Download" default is cleared when it is switched off) and saved.
+   */
+  public void setOnChanged(@Nullable Runnable onChanged) {
+    this.onChanged = onChanged;
   }
 
   public void setRepeat(@NonNull AbstractRepeat repeat, @Nullable ElementIndex elementIndex) {
@@ -155,8 +165,10 @@ public class RepeatMultiFileUploadPanelController extends AbstractPropertyEditor
     if (!enabled) {
       hideError();
       setMultiFileUpload(null);
+      DefaultRowActionSupport.onMultiFileUploadDisabled(repeat);
       updateOptionsVisibility();
       commitHeaderChange();
+      notifyChanged();
       return;
     }
 
@@ -182,6 +194,13 @@ public class RepeatMultiFileUploadPanelController extends AbstractPropertyEditor
     setMultiFileUpload(Boolean.TRUE);
     updateOptionsVisibility();
     commitHeaderChange();
+    notifyChanged();
+  }
+
+  private void notifyChanged() {
+    if (onChanged != null) {
+      onChanged.run();
+    }
   }
 
   private void updateOptionsVisibility() {

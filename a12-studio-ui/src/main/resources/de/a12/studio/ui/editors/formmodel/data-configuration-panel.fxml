@@ -83,6 +83,7 @@
                                         <TextField fx:id="numberOfInitialRowsField" />
                                     </children>
                                 </VBox>
+                                <fx:include fx:id="attachmentSettings" source="formtree/nodeeditors/attachment-settings-panel.fxml" />
                                 <fx:include fx:id="dependentGroup" source="formtree/nodeeditors/dependent-group-panel.fxml" />
                             </children>
                             <padding>

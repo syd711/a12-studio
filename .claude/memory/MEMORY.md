@@ -11,4 +11,5 @@ This directory holds a12-studio-specific memories, stored in the repo (not under
 - [Web-build compile errors](feedback_web_build_compile_errors.md) — jspecify annotation placement on qualified types breaks Lombok project-wide; check local variable types match wrapper return types
 - [Self-update excludes JRE](project_self_update_no_jre.md) — self-update must never bundle/restage the JRE on any OS; JRE updates require a full reinstall
 - [Memory storage location](feedback_memory_storage_location.md) — project memories live in `.claude/memory/` in the repo, not the user home folder; home-folder memory only keeps a redirect pointer
+- [Out-of-scope features](project_out_of_scope_features.md) — AI-assisted DM generation and Model diff/compare editor will NOT be built (decided 2026-09-19); don't propose them
 - [Known failing tests at HEAD](project_known_failing_tests.md) — two pre-existing red tests (Query validator, application-groups) as of 2026-09-19; plus the FxTestSupport JavaFX test harness

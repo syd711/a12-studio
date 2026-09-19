@@ -1,5 +1,6 @@
 package de.a12.studio.models.formmodel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.a12.studio.models.Annotation;
@@ -52,7 +53,8 @@ public class FieldConfigEntry {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Annotation> annotations = new ArrayList<>();
   private String elementRef;
-  // Attachment-field display configuration, e.g. the icon shown before a file is uploaded.
+  // Attachment-field display configuration, e.g. the icon shown before a file is uploaded. Lives on the entry
+  // whose elementRef is the attachment *group* (usageType "attachment"), see SME's "Attachment Settings".
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private AttachmentConfig attachmentConfig;
 
@@ -60,7 +62,24 @@ public class FieldConfigEntry {
   @Getter
   @Setter
   public static class AttachmentConfig {
+    // "default", "image", "text", "spreadsheet", "pdf", "video", "sound" or "none"; absent = "default".
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String placeholderIcon;
+    // Comma-separated MIME types suggested by the file picker (e.g. "image/jpeg, video/*"); not enforced.
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String accept;
+    // What a click on an already uploaded attachment does: "replace" (absent = default) or "download".
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String defaultAction;
+
+    /** Whether no attachment setting is set, i.e. this object would serialize as an empty {@code {}}. */
+    @JsonIgnore
+    public boolean isBlank() {
+      return isEmpty(placeholderIcon) && isEmpty(accept) && isEmpty(defaultAction);
+    }
+
+    private static boolean isEmpty(String value) {
+      return value == null || value.isEmpty();
+    }
   }
 }
