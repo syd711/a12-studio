@@ -29,7 +29,7 @@ public class Updater {
   public static String LATEST_VERSION = null;
 
   public final static String STUDIO_ZIP = "A12-Studio.zip";
-  public final static long STUDIO_ZIP_SIZE = 80 * 1000 * 1000;
+  public final static long STUDIO_ZIP_SIZE = 188 * 1000 * 1000;
 
   private final static String DOWNLOAD_SUFFIX = ".bak";
 
@@ -134,7 +134,9 @@ public class Updater {
       // writes a script, then cmd.exe executes it and overwrites the app's own installed
       // binaries" as dropper-like behaviour and block it - having the signed exe perform its own
       // update avoids that shape entirely.
-      File exe = new File(getWriteableBaseFolder(), "A12-Studio.exe");
+      // The update runs from a copy of the exe: the launch4j exe wraps the jar, so a JVM running
+      // from A12-Studio.exe itself would keep it open and block its own replacement.
+      File exe = UpdateApplier.prepareHelperExe(getWriteableBaseFolder());
       List<String> commands = List.of(
           exe.getAbsolutePath(),
           UpdateApplier.APPLY_UPDATE_FLAG,
