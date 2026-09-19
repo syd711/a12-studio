@@ -32,7 +32,7 @@ public class UpdaterService {
   }
 
   public void installUpdate(String oldVersion, String newVersion) throws IOException {
-    Updater.installClientUpdate(oldVersion, newVersion);
+    Updater.installUpdate(oldVersion, newVersion);
   }
 
   private static boolean isNewer(String candidate, String current) {

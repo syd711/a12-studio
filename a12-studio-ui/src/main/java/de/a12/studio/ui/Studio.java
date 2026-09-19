@@ -1,28 +1,22 @@
 package de.a12.studio.ui;
 
-import de.a12.studio.ui.util.*;
-import de.a12.studio.models.NewModelFactory;
-import de.a12.studio.plugin.manager.IModelSaveInterceptor;
-import de.a12.studio.plugin.manager.IModelValidatorContribution;
-import de.a12.studio.plugin.manager.INewModelNameInterceptor;
-import de.a12.studio.plugin.manager.PluginManager;
-import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.A12Settings;
 import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
-import de.a12.studio.ui.events.PreferencesOpenRequestedEvent;
-import de.a12.studio.ui.events.ProjectClosedEvent;
-import de.a12.studio.ui.events.ProjectOpenedEvent;
-import de.a12.studio.ui.events.StudioEventListener;
-import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.plugin.manager.IModelSaveInterceptor;
+import de.a12.studio.plugin.manager.IModelValidatorContribution;
+import de.a12.studio.plugin.manager.INewModelNameInterceptor;
+import de.a12.studio.plugin.manager.PluginManager;
+import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.preview.PreviewServer;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
-import de.a12.studio.ui.updater.UpdateApplier;
-import de.a12.studio.ui.updater.Updater;
+import de.a12.studio.ui.util.*;
+import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.ui.versioncontrol.GitService;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -63,8 +57,6 @@ public class Studio extends Application implements StudioEventListener {
   @Override
   public void start(Stage stage) throws IOException {
     Studio.stage = stage;
-
-    UpdateApplier.cleanupBackupFiles(Updater.getWriteableBaseFolder());
 
     // Apply stored language preference before any FXML is loaded.
     String storedLang = LocalUISettings.getString(LocalUISettings.LANGUAGE);

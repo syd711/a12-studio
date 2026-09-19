@@ -117,32 +117,13 @@ public class Updater {
     }
   }
 
-  public static boolean installServerUpdate() throws IOException {
-    FileUtils.writeBatch("update-server.bat", loadTemplate("update-server.bat"));
-    List<String> commands = Arrays.asList("cmd", "/c", "start", "update-server.bat");
-    SystemCommandExecutor executor = new SystemCommandExecutor(commands);
-    executor.setDir(getWriteableBaseFolder());
-    executor.executeCommandAsync();
-    return true;
-  }
-
-  public static boolean installClientUpdate(@Nullable String oldVersion, @Nullable String newVersion) throws IOException {
+  public static boolean installUpdate(@Nullable String oldVersion, @Nullable String newVersion) throws IOException {
     if (OSUtil.isWindows()) {
-      // Relaunches the already-signed A12-Studio.exe itself in "apply update" mode (see
-      // UpdateApplier) instead of dropping a .bat script to disk and running it via `cmd /c
-      // start`. Endpoint security tools (e.g. Sophos Intercept X "Lockdown") treat "process
-      // writes a script, then cmd.exe executes it and overwrites the app's own installed
-      // binaries" as dropper-like behaviour and block it - having the signed exe perform its own
-      // update avoids that shape entirely.
-      // The update runs from a copy of the exe: the launch4j exe wraps the jar, so a JVM running
-      // from A12-Studio.exe itself would keep it open and block its own replacement.
-      File exe = UpdateApplier.prepareHelperExe(getWriteableBaseFolder());
-      List<String> commands = List.of(
-          exe.getAbsolutePath(),
-          UpdateApplier.APPLY_UPDATE_FLAG,
-          STUDIO_ZIP,
-          String.valueOf(ProcessHandle.current().pid()));
-      SystemCommandExecutor executor = new SystemCommandExecutor(commands, false);
+      String cmds = loadTemplate("update-client-windows.bat");
+      FileUtils.writeBatch("update-client.bat", cmds);
+      log.info("Written temporary batch: {}", cmds);
+      List<String> commands = Arrays.asList("cmd", "/c", "start", "update-client.bat");
+      SystemCommandExecutor executor = new SystemCommandExecutor(commands);
       executor.setDir(getWriteableBaseFolder());
       executor.executeCommandAsync();
       new Thread(() -> {
@@ -212,7 +193,7 @@ public class Updater {
   }
 
   /**
-   * Relaunches the client binary in place (no download/replace, unlike {@link #installClientUpdate}) and
+   * Relaunches the client binary in place (no download/replace, unlike {@link #installUpdate}) and
    * exits the current process, so preferences that only take effect on startup (e.g. the UI language) can
    * be applied immediately.
    */
