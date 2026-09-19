@@ -18,6 +18,7 @@ import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
 
 @Slf4j
 public class DocumentModelFieldEditorController implements ElementEditorController, Initializable {
@@ -94,6 +95,11 @@ public class DocumentModelFieldEditorController implements ElementEditorControll
 //      log.info("    bound {} in {}ms", propertyEditor.getClass().getSimpleName(), System.currentTimeMillis() - panelStart);
     });
     updateErrorMessagesVisibility();
+  }
+
+  @Override
+  public void setRenameHandler(@NonNull BiConsumer<Element, String> renameHandler) {
+    generalInformationController.setRenameHandler(renameHandler);
   }
 
   @Override

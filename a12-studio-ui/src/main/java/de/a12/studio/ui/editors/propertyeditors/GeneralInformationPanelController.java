@@ -16,6 +16,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class GeneralInformationPanelController extends AbstractPropertyEditor {
 
@@ -30,6 +31,9 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor {
 
   private List<Element> ancestors = List.of();
 
+  /** Applies a rename on this panel's behalf if set; see {@link #setRenameHandler}. Null = rename in place. */
+  private BiConsumer<Element, String> renameHandler;
+
   @FXML
   private void onEditName(ActionEvent event) {
     String newName = WidgetFactory.showInputDialog(Studio.stage, "Rename", "Name", null, null, element.getName());
@@ -40,6 +44,14 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor {
     Optional<String> error = NameConventionValidation.validate("Name", newName);
     if (error.isPresent()) {
       WidgetFactory.showAlert(Studio.stage, "Invalid name", error.get());
+      return;
+    }
+
+    if (renameHandler != null) {
+      // The owner applies the rename as an undoable command, rewrites the references to the old name and saves.
+      renameHandler.accept(element, newName);
+      setFieldValue(nameField, newName);
+      updatePathField(newName);
       return;
     }
 
@@ -58,6 +70,15 @@ public class GeneralInformationPanelController extends AbstractPropertyEditor {
 
   public void setAncestors(@NonNull List<Element> ancestors) {
     this.ancestors = ancestors;
+  }
+
+  /**
+   * Routes {@link #onEditName} through {@code renameHandler} instead of renaming the element in place, so the
+   * owner of the model (the Document Model elements tree) can make it an undoable step that also rewrites the
+   * references to the old name. Without one - e.g. in the Type Definition editor - the name is set directly.
+   */
+  public void setRenameHandler(@NonNull BiConsumer<Element, String> renameHandler) {
+    this.renameHandler = renameHandler;
   }
 
   public void focusNameField() {

@@ -6,10 +6,20 @@ import de.a12.studio.models.documentmodel.GroupElement;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public interface ElementEditorController {
 
   void setElement(@NonNull Element element, @NonNull List<Element> ancestors);
+
+  /**
+   * Lets the editor route a rename made in its General Information panel through the caller (the elements tree,
+   * see {@link DocumentModelElementsTreeController#renameElement}) instead of writing the new name straight into
+   * the element, so it's undoable and the paths that referred to the old name get rewritten. Editors without a
+   * rename field keep the default no-op.
+   */
+  default void setRenameHandler(@NonNull BiConsumer<Element, String> renameHandler) {
+  }
 
   /**
    * Releases resources held by this controller and its embedded property editor panels once it's replaced by

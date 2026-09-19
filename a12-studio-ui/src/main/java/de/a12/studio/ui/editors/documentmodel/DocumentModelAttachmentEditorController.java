@@ -12,6 +12,7 @@ import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
 
 public class DocumentModelAttachmentEditorController implements ElementEditorController, Initializable {
 
@@ -50,6 +51,11 @@ public class DocumentModelAttachmentEditorController implements ElementEditorCon
       propertyEditor.setElement(element);
       propertyEditor.setEditorDisabled(readOnly);
     });
+  }
+
+  @Override
+  public void setRenameHandler(@NonNull BiConsumer<Element, String> renameHandler) {
+    generalInformationController.setRenameHandler(renameHandler);
   }
 
   @Override

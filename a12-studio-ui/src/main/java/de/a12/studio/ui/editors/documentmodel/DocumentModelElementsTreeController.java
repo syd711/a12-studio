@@ -15,6 +15,8 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.commands.MoveNodeCommand;
+import de.a12.studio.ui.editors.documentmodel.commands.RefactoringCommand;
+import de.a12.studio.ui.editors.documentmodel.commands.RenameElementCommand;
 import de.a12.studio.ui.events.ElementValidatedEvent;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
@@ -24,6 +26,7 @@ import de.a12.studio.ui.util.AdditiveDocumentModels;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
+import de.a12.studio.ui.util.commandstack.Command;
 import de.a12.studio.ui.util.commandstack.CommandStack;
 import de.a12.studio.ui.util.localsettings.BaseTableSettings;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
@@ -543,12 +546,25 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   // ---------------------------------------------------------------------------
 
   /**
-   * Applies a rename commit from {@link ElementNameTreeCell}: sets the new name on the element
-   * and persists via {@link #onModelChanged}.
+   * Applies a rename - from {@link ElementNameTreeCell}'s inline editor or the General Information property
+   * panel: sets the new name on the element as an undoable command that also rewrites the rule/computation
+   * paths that pointed at the old name (see {@link #withReferenceRefactoring}), and persists via {@link
+   * #onModelChanged}.
    */
-  private void renameElement(@NonNull Element element, @NonNull String newName) {
-    element.setName(newName);
+  public void renameElement(@NonNull Element element, @NonNull String newName) {
+    commandStack.execute(withReferenceRefactoring(new RenameElementCommand(element, newName)));
     onModelChanged(element);
+  }
+
+  /**
+   * Wraps a rename or move in a {@link RefactoringCommand} so the path references it would break inside this
+   * Document Model are rewritten as part of the same undo step. Models that aren't Document Models (e.g. the
+   * Type Definition editor, which reuses this tree) have no such references, so their command runs as is.
+   */
+  private Command withReferenceRefactoring(@NonNull Command structuralChange) {
+    return projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel
+        ? new RefactoringCommand(documentModel, structuralChange)
+        : structuralChange;
   }
 
   /**
@@ -783,7 +799,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       targetIndex = position.location() == DropLocation.BELOW ? targetElementIndex + 1 : targetElementIndex;
     }
 
-    commandStack.execute(new MoveNodeCommand(sourceSiblings, targetSiblings, element, targetIndex));
+    commandStack.execute(withReferenceRefactoring(new MoveNodeCommand(sourceSiblings, targetSiblings, element, targetIndex)));
     onModelChanged(element);
   }
 
@@ -797,7 +813,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     List<? extends Element> sourceSiblings = siblingsOf(draggedItem);
     List<GroupElement> rootGroups = modelRoot.getRootGroups();
 
-    commandStack.execute(new MoveNodeCommand(sourceSiblings, rootGroups, draggedGroup, rootGroups.size()));
+    commandStack.execute(withReferenceRefactoring(new MoveNodeCommand(sourceSiblings, rootGroups, draggedGroup, rootGroups.size())));
     onModelChanged(draggedGroup);
   }
 

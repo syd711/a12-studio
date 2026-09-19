@@ -161,6 +161,7 @@ public class DocumentModelEditorController extends AbstractEditorController impl
     }
     if (controller != null) {
       long bindStart = System.currentTimeMillis();
+      controller.setRenameHandler(elementsTreeController::renameElement);
       controller.setElement(selected, elementsTreeController.getAncestors(selected));
       currentElementEditorController = controller;
       log.info("  bound '{}' in {}ms", fxml, System.currentTimeMillis() - bindStart);
