@@ -16,6 +16,7 @@
                 <fx:include fx:id="placeholder" source="control-placeholder-panel.fxml" />
                 <fx:include fx:id="layout" source="control-layout-panel.fxml" />
                 <fx:include fx:id="additionalSettings" source="additional-settings-panel.fxml" />
+                <fx:include fx:id="controlIndex" source="control-index-panel.fxml" />
                 <fx:include fx:id="datePicker" source="date-picker-config-panel.fxml" />
                 <fx:include fx:id="attachmentSettings" source="attachment-settings-panel.fxml" />
                 <fx:include fx:id="externalEnumeration" source="external-enumeration-panel.fxml" />

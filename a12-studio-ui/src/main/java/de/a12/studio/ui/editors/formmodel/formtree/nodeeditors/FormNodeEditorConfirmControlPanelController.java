@@ -46,6 +46,7 @@ public class FormNodeEditorConfirmControlPanelController {
   @FXML private ControlLabelPanelController labelController;
   @FXML private ControlHintPanelController hintController;
   @FXML private ControlPlaceholderPanelController placeholderController;
+  @FXML private ControlIndexPanelController controlIndexController;
   @FXML private HideConditionPanelController hideConditionController;
   @FXML private ControlAccessibilityPanelController accessibilityController;
   @FXML private StylesPanelController stylesController;
@@ -64,6 +65,7 @@ public class FormNodeEditorConfirmControlPanelController {
     labelController.setControl(control, documentModel, content);
     hintController.setControl(control, content);
     placeholderController.setControl(control, content);
+    controlIndexController.setControl(control, content, elementIndex);
     hideConditionController.configure(
         control.getId(), control::getHideCondition, control::setHideCondition,
         elementIndex, HideConditionPanelController.MasterFieldScope.anchoredOrUnbound(control.getElementRef(), elementIndex));

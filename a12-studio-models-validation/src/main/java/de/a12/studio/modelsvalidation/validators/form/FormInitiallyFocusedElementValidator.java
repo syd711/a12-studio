@@ -1,14 +1,12 @@
 package de.a12.studio.modelsvalidation.validators.form;
 
 import de.a12.studio.models.A12Model;
-import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.ValidationContext;
-import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
@@ -30,19 +28,8 @@ public final class FormInitiallyFocusedElementValidator implements ModelValidato
     FormModelContent content = formModel.getContent();
     List<ModelValidationError> errors = new ArrayList<>();
     for (Screen screen : content.getScreens()) {
-      String focusedId = screen.getInitiallyFocusedElementId();
-      if (focusedId == null || focusedId.isBlank()) {
-        continue;
-      }
-      String screenName = screen.getName() != null && !screen.getName().isBlank() ? screen.getName() : screen.getId();
-      if (!InitiallyFocusedElementSupport.isFirstScreen(content, screen)) {
-        errors.add(new ModelValidationError(model, screen.getId(),
-            ValidationMessages.get("validation.initiallyFocusedElement.notFirstScreen", screenName), Severity.ERROR.name()));
-      }
-      else if (InitiallyFocusedElementSupport.focusableControls(screen).stream().map(Control::getId).noneMatch(focusedId::equals)) {
-        errors.add(new ModelValidationError(model, screen.getId(),
-            ValidationMessages.get("validation.initiallyFocusedElement.notFocusable", focusedId, screenName), Severity.ERROR.name()));
-      }
+      InitiallyFocusedElementSupport.problem(content, screen).ifPresent(problem -> errors.add(new ModelValidationError(
+          model, screen.getId(), InitiallyFocusedElementSupport.message(problem, screen), Severity.ERROR.name())));
     }
     return errors;
   }

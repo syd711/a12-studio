@@ -32,6 +32,8 @@ import org.jspecify.annotations.Nullable;
  *   <li><b>Additional Settings</b> ({@link AdditionalSettingsPanelController}) — initial value/exposition
  *       (model-wide {@code FieldConfigEntry}), message position, readonly, readonly presentation and
  *       required-field asterisk marking.</li>
+ *   <li><b>Control Index</b> ({@link ControlIndexPanelController}) — only for a Control placed outside the
+ *       repeat of its repeatable group: which repetition it shows ({@link Control#getIndex()}).</li>
  *   <li><b>Date Picker</b> ({@link DatePickerConfigPanelController}) — only for a date, date-time or
  *       {@code YYYY-MM-DD} date-range field: the year range of the picker ({@link Control#getDatePickerConfig()}).</li>
  *   <li><b>Attachment Settings</b> ({@link AttachmentSettingsPanelController}) — only for a Control bound to an
@@ -69,6 +71,8 @@ public class FormNodeEditorControlPanelController {
   @FXML
   private AdditionalSettingsPanelController additionalSettingsController;
   @FXML
+  private ControlIndexPanelController controlIndexController;
+  @FXML
   private DatePickerConfigPanelController datePickerController;
   @FXML
   private AttachmentSettingsPanelController attachmentSettingsController;
@@ -95,6 +99,7 @@ public class FormNodeEditorControlPanelController {
     placeholderController.setControl(control, content);
     layoutController.setControl(control);
     additionalSettingsController.setControl(control, elementIndex, content);
+    controlIndexController.setControl(control, content, elementIndex);
     FieldConfigEntry fieldConfigEntry = FieldConfigEntryHelper.findOrCreate(control, content);
     boolean datePicker = DatePickerSupport.isSupportedElement(elementIndex, control.getElementRef());
     datePickerController.setVisible(datePicker);

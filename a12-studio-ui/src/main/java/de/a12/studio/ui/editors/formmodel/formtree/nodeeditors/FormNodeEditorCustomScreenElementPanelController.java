@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * The Form Model tree's right-hand editor pane for a selected {@link CustomScreenElement} node ({@link
- * FormModelTreeController}): Label, Hide Condition, Styles and Annotations, plus either a "Relationship UI
+ * FormModelTreeController}): Label, Height, Hide Condition, Styles and Annotations, plus either a "Relationship UI
  * Model Reference" combo box ({@link RelationshipUiReferencePanelController}) or a plain Name field ({@link
  * NamePanelController}), whichever fits the node's {@code reference} - a {@link CustomScreenElement} is used
  * for both a generic custom UI component (identified by a free-form {@code reference}) and an embedded
@@ -44,6 +44,8 @@ public class FormNodeEditorCustomScreenElementPanelController {
   private Node relationshipUiReference;
   @FXML
   private RelationshipUiReferencePanelController relationshipUiReferenceController;
+  @FXML
+  private CustomScreenElementHeightPanelController heightController;
   @FXML
   private LocalizedTextTypePanelController labelController;
   @FXML
@@ -72,6 +74,7 @@ public class FormNodeEditorCustomScreenElementPanelController {
       nameController.setCustom(element::getName, element::setName);
     }
 
+    heightController.setCustomScreenElement(element);
     labelController.setCustom(element::getTitle, element::setTitle);
     labelController.setFieldSuggestionSource(elementIndex);
     hideConditionController.configure(

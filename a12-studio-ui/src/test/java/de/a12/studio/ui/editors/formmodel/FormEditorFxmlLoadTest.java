@@ -54,6 +54,26 @@ class FormEditorFxmlLoadTest {
   }
 
   @Test
+  void confirmControlEditorInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("formtree/nodeeditors/formnode-editor-confirm-control-panel.fxml");
+  }
+
+  @Test
+  void screenEditorInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("formtree/nodeeditors/formnode-editor-screen-panel.fxml");
+  }
+
+  @Test
+  void customScreenElementEditorInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("formtree/nodeeditors/formnode-editor-custom-screen-element-panel.fxml");
+  }
+
+  @Test
+  void multiColumnSectionEditorInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("multi-column-section-editor-panel.fxml");
+  }
+
+  @Test
   void dataConfigurationTabInjectsAllFields() throws Exception {
     assertAllFieldsInjected("data-configuration-panel.fxml");
   }

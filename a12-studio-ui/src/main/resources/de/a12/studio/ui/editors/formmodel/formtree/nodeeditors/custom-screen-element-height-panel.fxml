@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css"
+            text="%custom_element_height" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.CustomScreenElementHeightPanelController">
+    <BorderPane>
+        <top>
+            <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+        <center>
+            <VBox spacing="6.0">
+                <children>
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                        <children>
+                            <Label styleClass="field-label" text="%custom_element_height_field" />
+                            <Label fx:id="infoIcon" />
+                        </children>
+                    </HBox>
+                    <TextField fx:id="heightField" promptText="%custom_element_height_prompt" />
+                </children>
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

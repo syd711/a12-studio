@@ -12,6 +12,7 @@
                 <fx:include fx:id="name" source="../../name-panel.fxml" />
                 <fx:include fx:id="relationshipUiReference" source="relationship-ui-reference-panel.fxml" />
                 <fx:include fx:id="label" source="../../../propertyeditors/localized-text-type-panel.fxml" />
+                <fx:include fx:id="height" source="custom-screen-element-height-panel.fxml" />
                 <fx:include fx:id="hideCondition" source="hide-condition-panel.fxml" />
                 <fx:include fx:id="styles" source="../../styles-panel.fxml" />
                 <fx:include fx:id="annotations" source="../../../propertyeditors/annotations-panel.fxml" />

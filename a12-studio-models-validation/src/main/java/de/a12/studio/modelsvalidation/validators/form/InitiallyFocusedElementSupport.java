@@ -6,10 +6,12 @@ import de.a12.studio.models.formmodel.ControlGrid;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.FormModelWalker;
 import de.a12.studio.models.formmodel.Screen;
+import de.a12.studio.modelsvalidation.ValidationMessages;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Which Controls can take the initial keyboard focus of a Form Model ({@link Screen#getInitiallyFocusedElementId()}),
@@ -20,7 +22,44 @@ import java.util.List;
  */
 public final class InitiallyFocusedElementSupport {
 
+  /** What can be wrong with a screen's initially focused element. */
+  public enum Problem {
+    NOT_FIRST_SCREEN("validation.initiallyFocusedElement.notFirstScreen"),
+    NOT_FOCUSABLE("validation.initiallyFocusedElement.notFocusable");
+
+    private final String messageKey;
+
+    Problem(String messageKey) {
+      this.messageKey = messageKey;
+    }
+
+    public String messageKey() {
+      return messageKey;
+    }
+  }
+
   private InitiallyFocusedElementSupport() {
+  }
+
+  /** The first problem with {@code screen}'s initially focused element, empty when it is fine or unset. */
+  public static Optional<Problem> problem(@Nullable FormModelContent content, @NonNull Screen screen) {
+    String focusedId = screen.getInitiallyFocusedElementId();
+    if (focusedId == null || focusedId.isBlank()) {
+      return Optional.empty();
+    }
+    if (!isFirstScreen(content, screen)) {
+      return Optional.of(Problem.NOT_FIRST_SCREEN);
+    }
+    return focusableControls(screen).stream().anyMatch(control -> focusedId.equals(control.getId()))
+        ? Optional.empty() : Optional.of(Problem.NOT_FOCUSABLE);
+  }
+
+  /** The localized message for {@code problem}, naming the screen and (if it is wrong) the focused element. */
+  public static String message(@NonNull Problem problem, @NonNull Screen screen) {
+    String screenName = screen.getName() != null && !screen.getName().isBlank() ? screen.getName() : screen.getId();
+    return problem == Problem.NOT_FIRST_SCREEN
+        ? ValidationMessages.get(problem.messageKey(), screenName)
+        : ValidationMessages.get(problem.messageKey(), screen.getInitiallyFocusedElementId(), screenName);
   }
 
   /** Whether {@code screen} is the first screen of {@code content}, the only one that may set an initial focus. */

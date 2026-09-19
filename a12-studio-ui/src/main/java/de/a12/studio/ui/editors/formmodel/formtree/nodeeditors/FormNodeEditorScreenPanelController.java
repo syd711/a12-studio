@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.formmodel.formtree.nodeeditors;
 
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.ButtonGroup;
+import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
@@ -24,7 +25,7 @@ import java.util.function.Consumer;
 
 /**
  * The Form Model tree's right-hand editor pane for a selected {@link Screen} node ({@link
- * FormModelTreeController}): a "Screen" tab (Name, Label, Annotations) and a "Subheader And Footer" tab -
+ * FormModelTreeController}): a "Screen" tab (Name, Label, Initially Focused Element, Annotations) and a "Subheader And Footer" tab -
  * Major/Minor button lists for this screen's own {@link Screen#getSubHeaderBox()}/{@link Screen#getFooterBox()},
  * matching {@link FormModelEditorController}'s model-wide "Subheader and Footer" tab but scoped to this one
  * screen instead of the whole model's content.
@@ -35,6 +36,8 @@ public class FormNodeEditorScreenPanelController {
   private NamePanelController nameController;
   @FXML
   private LocalizedTextTypePanelController labelController;
+  @FXML
+  private InitiallyFocusedElementPanelController initiallyFocusedElementController;
   @FXML
   private AnnotationsPanelController annotationsController;
 
@@ -56,12 +59,14 @@ public class FormNodeEditorScreenPanelController {
     labelController.configureCustom("label", StudioBundle.get("label"));
   }
 
-  public void setScreen(@NonNull Screen screen, @Nullable ElementIndex elementIndex, @NonNull List<String> screenIds) {
+  public void setScreen(@NonNull Screen screen, @Nullable FormModelContent content, @Nullable ElementIndex elementIndex,
+      @NonNull List<String> screenIds) {
     this.screen = screen;
     this.elementIndex = elementIndex;
     nameController.setCustom(screen::getName, screen::setName);
     labelController.setCustom(screen::getTitle, screen::setTitle);
     labelController.setFieldSuggestionSource(elementIndex);
+    initiallyFocusedElementController.setScreen(screen, content, elementIndex);
     annotationsController.setCustom(screen::getAnnotations);
 
     HeaderFooterBox subHeaderBox = ensureBox(screen.getSubHeaderBox(), screen.getId() + "-subHeaderBox", screen::setSubHeaderBox);

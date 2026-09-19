@@ -460,7 +460,7 @@ public class FormModelTreeController implements Initializable {
       multiColumnSectionEditorController.setSection((MultiColumnSection) node);
     }
     else if (isScreen) {
-      screenEditorController.setScreen((Screen) node, elementIndex, screenIds());
+      screenEditorController.setScreen((Screen) node, content, elementIndex, screenIds());
     }
     else if (isSection) {
       sectionEditorController.setSection((Section) node, elementIndex, containerHideConditionScope(selectedItem));
