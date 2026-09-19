@@ -300,6 +300,32 @@ public class ProjectItem {
     return null;
   }
 
+  /**
+   * Every model file of the project this item belongs to (found from the root, wherever {@code this} sits in it),
+   * as the very {@link ProjectItem} instances the tree holds - so a change made to one's {@link #getModel()} is
+   * the change every editor open on that model sees.
+   */
+  public List<ProjectItem> getProjectModelItems() {
+    ProjectItem root = this;
+    while (root.parent != null) {
+      root = root.parent;
+    }
+    List<ProjectItem> result = new ArrayList<>();
+    root.collectModelItems(result);
+    return result;
+  }
+
+  private void collectModelItems(List<ProjectItem> result) {
+    if (isFolder()) {
+      for (ProjectItem child : getChildren()) {
+        child.collectModelItems(result);
+      }
+    }
+    else if (model != null) {
+      result.add(this);
+    }
+  }
+
   public boolean isAncestorOf(ProjectItem other) {
     for (ProjectItem current = other.parent; current != null; current = current.parent) {
       if (current.equals(this)) {

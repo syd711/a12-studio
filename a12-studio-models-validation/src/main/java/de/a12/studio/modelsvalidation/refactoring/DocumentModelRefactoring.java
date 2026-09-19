@@ -57,10 +57,13 @@ import java.util.function.Supplier;
  * element id (uniqueness criteria on {@code ModelConfig}, and every reference from Form/Overview/Tree/... models)
  * are immune to renames and moves by construction.
  *
- * <p><b>Not covered</b>: path references held by other model files (Print, Selection, Structural Mapping, Mapping,
- * Query, Form's {@code hostDocumentModelPath}) and by other Document Models that include this one; a path that
- * reaches an element only through an Additive base model; a condition that doesn't parse (skipped, see {@link
- * Plan#skippedSites()}).
+ * <p><b>Other models</b>: the references other project models hold on this one are handled by {@link
+ * ProjectReferenceRefactoring}, which builds on {@link Plan#pathRewriter()} (absolute paths in Print/Query/Mapping/
+ * Selection/Structural Mapping models) and {@link Plan#computeEdits(IncludedModelChange)} (rules and computations of a
+ * Document Model that includes the changed one).
+ *
+ * <p><b>Not covered</b>: a path that reaches an element only through an Additive base model, or through a chain of
+ * more than one Include; a condition that doesn't parse (skipped, see {@link Plan#skippedSites()}).
  */
 public final class DocumentModelRefactoring {
 
@@ -69,6 +72,15 @@ public final class DocumentModelRefactoring {
   private static final Set<String> CONSTANTS = Set.of("RuleGroup", "BaseYear", "FirstDay", "LastDay");
 
   private DocumentModelRefactoring() {
+  }
+
+  /**
+   * How a Document Model that <em>includes</em> another one has to follow a change made in that other model: an
+   * Include group mounts the children of the included model's root group, so a condition path such as {@code
+   * Address/Street} in the including model ends in the included model's own element names, which the change may
+   * have renamed or moved. {@code modelId} is the id of the included (changed) model.
+   */
+  public record IncludedModelChange(String modelId, PathRewriter rewriter) {
   }
 
   /** One reversible text replacement; {@link #apply} sets the new value, {@link #revert} restores the old one. */
@@ -113,7 +125,7 @@ public final class DocumentModelRefactoring {
         }
       }
     }
-    return new Plan(model, sites);
+    return new Plan(model, sites, before);
   }
 
   private static void collectRule(Tree tree, List<Site> sites, RuleElement rule) {
@@ -335,12 +347,17 @@ public final class DocumentModelRefactoring {
 
     final ElementIndex index;
     final Map<String, Element> byPath = new HashMap<>();
+    // Each element's path as it was when this tree was taken: ElementIndex.getPath() reads the element names as they
+    // are now, so it can't tell an old tree's paths from a new one's once something has been renamed.
+    final Map<Element, String> pathOf = new IdentityHashMap<>();
     final Set<Element> present = Collections.newSetFromMap(new IdentityHashMap<>());
 
     Tree(DocumentModel model) {
       this.index = new ElementIndex(model);
       for (Element element : index.allElements()) {
-        byPath.put(index.getPath(element), element);
+        String path = index.getPath(element);
+        byPath.put(path, element);
+        pathOf.put(element, path);
         present.add(element);
       }
     }
@@ -413,11 +430,21 @@ public final class DocumentModelRefactoring {
 
     private final DocumentModel model;
     private final List<Site> sites;
+    private final Tree before;
     private int skippedSites;
 
-    private Plan(DocumentModel model, List<Site> sites) {
+    private Plan(DocumentModel model, List<Site> sites, Tree before) {
       this.model = model;
       this.sites = sites;
+      this.before = before;
+    }
+
+    /**
+     * Rewrites paths <em>into this model</em> that are held elsewhere, as they read after the structural change
+     * that just happened - see {@link PathRewriter}. Call after the change.
+     */
+    public PathRewriter pathRewriter() {
+      return new PathRewriter(before, new Tree(model));
     }
 
     /**
@@ -425,6 +452,15 @@ public final class DocumentModelRefactoring {
      * reference that still resolves to what it did, or whose target or base is gone, yields no edit.
      */
     public List<Edit> computeEdits() {
+      return computeEdits(null);
+    }
+
+    /**
+     * {@link #computeEdits()} for a model that includes another one which has just changed: a reference that ends in
+     * elements of the included model is expected to follow their new names and positions, see {@link
+     * IncludedModelChange}. {@code included} may be null.
+     */
+    public List<Edit> computeEdits(IncludedModelChange included) {
       Tree after = new Tree(model);
       List<Edit> edits = new ArrayList<>();
       skippedSites = 0;
@@ -443,11 +479,12 @@ public final class DocumentModelRefactoring {
           if (ref.constant()) {
             continue;
           }
+          Resolution expected = followIncludedChange(ref.old(), included);
           Optional<Resolution> now = resolve(ref.path(), base, after);
-          if (now.isPresent() && now.get().samePointAs(ref.old())) {
+          if (now.isPresent() && now.get().samePointAs(expected)) {
             continue;
           }
-          String rendered = render(site.mode(), base, ref.path(), ref.old(), after);
+          String rendered = render(site.mode(), base, ref.path(), expected, after);
           if (rendered != null) {
             replacements.put(ref.region(), rendered);
           }
@@ -496,6 +533,18 @@ public final class DocumentModelRefactoring {
       return targets;
     }
 
+    /** {@code old}, with the part of its tail that lies inside the changed included model brought up to date. */
+    private static Resolution followIncludedChange(Resolution old, IncludedModelChange included) {
+      if (included == null || old.tail().isEmpty()
+          || !(old.target() instanceof GroupElement group) || group.getGroup() == null
+          || group.getGroup().getIncludeConfig() == null
+          || !included.modelId().equals(group.getGroup().getIncludeConfig().getReference())) {
+        return old;
+      }
+      List<String> tail = included.rewriter().rewriteIncludedTail(old.tail());
+      return tail.equals(old.tail()) ? old : new Resolution(old.target(), tail, old.turningGroupName(), old.starred());
+    }
+
     private static String replace(String text, Map<Region, String> replacements) {
       List<Region> regions = new ArrayList<>(replacements.keySet());
       regions.sort(Comparator.comparingInt(Region::start).reversed());
@@ -504,6 +553,118 @@ public final class DocumentModelRefactoring {
         result.replace(region.start(), region.end(), replacements.get(region));
       }
       return result.toString();
+    }
+  }
+
+  /**
+   * Maps a path into the model as it was <em>before</em> a structural change to how it reads <em>after</em> it:
+   * every path is resolved to the element it named in the old tree and written again from that element's new
+   * position, so a rename or move of the element - or of any group above it - is followed. A path that still reads
+   * the same, doesn't resolve, or can't be parsed is returned untouched (never reformatted).
+   */
+  public static final class PathRewriter {
+
+    private final Tree before;
+    private final Tree after;
+
+    private PathRewriter(Tree before, Tree after) {
+      this.before = before;
+      this.after = after;
+    }
+
+    /**
+     * {@code path} in the form the JSON models hold it - absolute ({@code /Root/Group/Field}), optionally ending in
+     * {@code /} (a group and everything below it) or {@code /*} (a wildcard segment); that ending is kept. Any part
+     * of the path that lies beyond this model's own elements (inside an Include's model) is carried along unchanged.
+     */
+    public String rewriteAbsolute(String path) {
+      if (path == null || path.isBlank()) {
+        return path;
+      }
+      String suffix = "";
+      String core = path;
+      if (core.endsWith("/*")) {
+        suffix = "/*";
+        core = core.substring(0, core.length() - 2);
+      }
+      else if (core.endsWith("/")) {
+        suffix = "/";
+        core = core.substring(0, core.length() - 1);
+      }
+      Optional<PathText> parsed = PathText.parse(core);
+      if (parsed.isEmpty() || !parsed.get().absolute()) {
+        return path;
+      }
+      Optional<Resolution> resolution = resolve(parsed.get(), null, before);
+      if (resolution.isEmpty() || !after.present.contains(resolution.get().target())) {
+        return path;
+      }
+      Element target = resolution.get().target();
+      String newPath = after.pathOf.get(target);
+      if (newPath.equals(before.pathOf.get(target))) {
+        return path;
+      }
+      return join(List.of(newPath), resolution.get().tail()) + suffix;
+    }
+
+    /**
+     * {@code tail} - path segments below an Include group that name elements of the included model, that is
+     * children of one of its root groups - as they read after the change. The root group's own name is not part of
+     * such a path (the Include group stands in for it), so renaming the root leaves every tail alone.
+     */
+    List<String> rewriteIncludedTail(List<String> tail) {
+      List<PathText.Segment> segments = new ArrayList<>();
+      for (String text : tail) {
+        Optional<PathText> single = PathText.parse(text);
+        if (single.isEmpty() || single.get().absolute() || single.get().segments().size() != 1
+            || single.get().segments().get(0).up()) {
+          return tail;
+        }
+        segments.add(single.get().segments().get(0));
+      }
+      List<GroupElement> rootGroups = before.index.getModel().getContent().getModelRoot().getRootGroups();
+      if (rootGroups == null) {
+        return tail;
+      }
+      for (GroupElement root : rootGroups) {
+        List<Step> stack = new ArrayList<>();
+        stack.add(new Step(root.getName(), false, root.getName()));
+        for (PathText.Segment segment : segments) {
+          stack.add(new Step(segment.name(), segment.star(), segment.text()));
+        }
+        for (int depth = stack.size(); depth >= 2; depth--) {
+          Element target = before.byPath.get(pathOf(stack, depth));
+          if (target == null) {
+            continue;
+          }
+          if (!after.present.contains(target) || after.pathOf.get(target).equals(before.pathOf.get(target))) {
+            return tail;
+          }
+          // How each element on the way to the target was spelled (quotes, "*"), to spell it the same way again.
+          Map<Element, PathText.Segment> written = new IdentityHashMap<>();
+          Element cursor = target;
+          for (int i = depth - 1; i >= 1; i--) {
+            written.put(cursor, segments.get(i - 1));
+            cursor = before.index.parentOf(cursor);
+          }
+          List<Element> chain = new ArrayList<>();
+          for (Element element = target; element != null; element = after.index.parentOf(element)) {
+            chain.add(element);
+          }
+          Collections.reverse(chain);
+          List<String> rewritten = new ArrayList<>();
+          for (Element element : chain.subList(1, chain.size())) {
+            PathText.Segment old = written.get(element);
+            rewritten.add(PathText.Segment.down(element.getName(), old != null && old.quoted(), old != null && old.star())
+                .text());
+          }
+          for (int i = depth - 1; i < segments.size(); i++) {
+            rewritten.add(segments.get(i).text());
+          }
+          return rewritten;
+        }
+      }
+      return tail;
     }
   }
 }

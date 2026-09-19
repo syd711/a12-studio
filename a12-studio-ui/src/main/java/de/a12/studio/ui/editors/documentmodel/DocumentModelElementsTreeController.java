@@ -15,6 +15,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.commands.MoveNodeCommand;
+import de.a12.studio.ui.editors.documentmodel.commands.ProjectModelStore;
 import de.a12.studio.ui.editors.documentmodel.commands.RefactoringCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.RenameElementCommand;
 import de.a12.studio.ui.events.ElementValidatedEvent;
@@ -557,13 +558,13 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   }
 
   /**
-   * Wraps a rename or move in a {@link RefactoringCommand} so the path references it would break inside this
-   * Document Model are rewritten as part of the same undo step. Models that aren't Document Models (e.g. the
-   * Type Definition editor, which reuses this tree) have no such references, so their command runs as is.
+   * Wraps a rename or move in a {@link RefactoringCommand} so the path references it would break - inside this
+   * Document Model and in the other models of the project that refer to it - are rewritten as part of the same undo
+   * step. Models that aren't Document Models have no such references, so their command runs as is.
    */
   private Command withReferenceRefactoring(@NonNull Command structuralChange) {
     return projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel
-        ? new RefactoringCommand(documentModel, structuralChange)
+        ? new RefactoringCommand(documentModel, structuralChange, ProjectModelStore.of(projectItem))
         : structuralChange;
   }
 
