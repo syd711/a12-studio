@@ -74,7 +74,7 @@ public final class FormFieldReferenceValidator implements ModelValidator {
   }
 
   /** Every Control/Column in the Screen tree whose {@code elementRef} equals {@code elementRef}. */
-  private static List<Object> findReferencingNodes(FormModel formModel, String elementRef) {
+  static List<Object> findReferencingNodes(FormModel formModel, String elementRef) {
     List<Object> matches = new ArrayList<>();
     for (Screen screen : formModel.getContent().getScreens()) {
       visit(screen.getScreenElements(), elementRef, matches);
@@ -123,7 +123,7 @@ public final class FormFieldReferenceValidator implements ModelValidator {
     }
   }
 
-  private static String idOf(Object node) {
+  static String idOf(Object node) {
     if (node instanceof Control control) {
       return control.getId();
     }

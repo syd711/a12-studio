@@ -1,0 +1,87 @@
+{
+  "header": {
+    "id": "FormControlIndexRequiredValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "DependencyDrift_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "grid1",
+            "name": "grid1",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_grid1",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_needs",
+                    "elementRef": "field_item_bool"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_has_index",
+                    "elementRef": "field_item_name",
+                    "index": {
+                      "type": "NUMERIC",
+                      "value": "1"
+                    }
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_plain",
+                    "elementRef": "field_string"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "EmbeddedRepeat",
+            "id": "repeat1",
+            "name": "repeat1",
+            "groupRef": "group_items",
+            "controlGrid": {
+              "type": "ControlGrid",
+              "id": "grid_repeat",
+              "name": "grid_repeat",
+              "row": [
+                {
+                  "type": "Row",
+                  "id": "row_grid_repeat",
+                  "cell": [
+                    {
+                      "type": "Control",
+                      "id": "control_in_repeat",
+                      "elementRef": "field_item_bool"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

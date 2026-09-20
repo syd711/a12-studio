@@ -1,0 +1,258 @@
+{
+  "header": {
+    "id": "DependencyDrift_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "DependencyDrift_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_root",
+          "name": "Root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_bool",
+                "name": "IsActive",
+                "Field": {
+                  "fieldType": {
+                    "type": "BooleanType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "IsActive"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_enum",
+                "name": "Status",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "a",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "A"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "b",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Status"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_confirm",
+                "name": "Accepted",
+                "Field": {
+                  "fieldType": {
+                    "type": "ConfirmType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Accepted"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_string",
+                "name": "Title",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Title"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_enum_dep",
+                "name": "Kind",
+                "Field": {
+                  "fieldType": {
+                    "type": "EnumerationType",
+                    "EnumerationType": {
+                      "values": [
+                        {
+                          "value": "x",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "X"
+                            }
+                          ]
+                        },
+                        {
+                          "value": "y",
+                          "label": [
+                            {
+                              "locale": "en",
+                              "text": "Y"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Kind"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_single",
+                "name": "Single",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_single",
+                      "name": "SingleName",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "SingleName"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_attachment",
+                "name": "Attachment",
+                "Group": {
+                  "repeatability": 1,
+                  "usageType": "attachment",
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_attachment_name",
+                      "name": "OriginalFilename",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "OriginalFilename"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_items",
+                "name": "Items",
+                "Group": {
+                  "repeatability": 3,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_item_bool",
+                      "name": "ItemActive",
+                      "Field": {
+                        "fieldType": {
+                          "type": "BooleanType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "ItemActive"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "Field",
+                      "id": "field_item_name",
+                      "name": "ItemName",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        },
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "ItemName"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

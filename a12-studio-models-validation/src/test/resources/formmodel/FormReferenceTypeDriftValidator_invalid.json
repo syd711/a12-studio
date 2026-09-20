@@ -1,0 +1,107 @@
+{
+  "header": {
+    "id": "FormReferenceTypeDriftValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "DependencyDrift_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "grid1",
+            "name": "grid1",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_grid1",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_group",
+                    "elementRef": "group_single"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_ok",
+                    "elementRef": "field_string"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_attachment",
+                    "elementRef": "group_attachment"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "InlineRepeat",
+            "id": "repeat_field",
+            "name": "repeat_field",
+            "groupRef": "field_string"
+          },
+          {
+            "type": "InlineRepeat",
+            "id": "repeat_single",
+            "name": "repeat_single",
+            "groupRef": "group_single"
+          },
+          {
+            "type": "EmbeddedRepeat",
+            "id": "repeat_ok",
+            "name": "repeat_ok",
+            "groupRef": "group_items",
+            "controlGrid": {
+              "type": "ControlGrid",
+              "id": "grid_repeat",
+              "name": "grid_repeat",
+              "row": [
+                {
+                  "type": "Row",
+                  "id": "row_grid_repeat",
+                  "cell": [
+                    {
+                      "type": "Control",
+                      "id": "control_row",
+                      "elementRef": "field_item_name"
+                    }
+                  ]
+                }
+              ]
+            },
+            "repeatOverviewColumn": [
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "column_ok",
+                "elementRef": "field_item_name"
+              },
+              {
+                "type": "FieldBasedRepeatOverviewColumn",
+                "id": "column_group",
+                "elementRef": "group_single"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

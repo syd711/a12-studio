@@ -1,0 +1,66 @@
+{
+  "header": {
+    "id": "DependentControlsAtLeastOneOptionValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "First",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_ok",
+            "name": "OkSection",
+            "screenElements": []
+          },
+          {
+            "type": "ControlGrid",
+            "id": "grid1",
+            "name": "Grid",
+            "layout": { "lg": "6-6" },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row1",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_empty",
+                    "elementRef": "field_empty",
+                    "dependentControls": {
+                      "screenElement": []
+                    }
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_filled",
+                    "elementRef": "field_filled",
+                    "dependentControls": {
+                      "screenElement": [
+                        { "idref": "section_ok", "masterValue": "true" }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_plain",
+                    "elementRef": "field_plain"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

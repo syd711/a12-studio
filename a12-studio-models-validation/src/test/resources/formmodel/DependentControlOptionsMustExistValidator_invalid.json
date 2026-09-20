@@ -1,0 +1,92 @@
+{
+  "header": {
+    "id": "DependentControlOptionsMustExistValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "First",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_ok",
+            "name": "OkSection",
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "grid_master",
+                "name": "MasterGrid",
+                "layout": { "lg": "12" },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_master",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_master",
+                        "elementRef": "field_confirm",
+                        "dependentControls": {
+                          "screenElement": [
+                            { "idref": "section_ok", "masterValue": "true" },
+                            { "idref": "grid_ghost", "masterValue": "true" },
+                            { "masterValue": "true" },
+                            { "idref": "section_other_screen", "masterValue": "true" },
+                            { "idref": "buttonpanel1", "masterValue": "true" }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "ButtonPanel",
+            "id": "buttonpanel1",
+            "name": "Buttons"
+          }
+        ]
+      },
+      {
+        "type": "Screen",
+        "id": "screen2",
+        "name": "Second",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_other_screen",
+            "name": "OtherScreenSection",
+            "screenElements": []
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "elementRef": "field_confirm",
+          "dependentField": {
+            "masterField": "field_confirm",
+            "case": [
+              {
+                "masterValue": "true",
+                "notRelevantNodes": [ "section_ok", "section_deleted" ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

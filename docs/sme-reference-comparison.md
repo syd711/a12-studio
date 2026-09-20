@@ -402,10 +402,16 @@ This is the area with the most concrete, well-defined gaps:
   another field, when the master changes. a12-studio's `DependentCase` has no equivalent.
 - **`DependentGroup`**: at parity (`masterValue`/`notRelevant`/`readonly`).
 - **Dependent controls** (a control/group hiding *other* screen-tree nodes, SME's `dependentControls`/
-  `ScreenElementRef`): a12-studio implements the equivalent (`DependentCase.notRelevantNodes`) only for **Confirm-type
-  Controls**, via the dedicated `ConfirmDependenciesPanelController` Dependencies tab. SME's
-  `isPossibleDependentControlMaster` allows Boolean and Enumeration controls as masters too, not just Confirm — worth
-  checking whether that's a deliberate a12-studio scoping decision or an unaddressed gap before building on top of it.
+  `ScreenElementRef`): SME stores them on the master `Control` itself (`dependentControls.screenElement[]` of
+  `{idref, masterValue}`); a12-studio models exactly that (`Control.dependentControls`, lossless round-trip, validated
+  since 2026-09-19). **Closed 2026-09-20 (TODO #7):** the Dependencies tab (`DependentControlsPanelController`) now
+  edits it for Boolean, Confirm *and* Enumeration masters (SME's `isPossibleDependentControlMaster`) - the earlier
+  Confirm-only tab was an unaddressed gap, not a scoping decision, and wrote an a12-studio-only shape
+  (`notRelevantNodes` inside the bound field's `dependentField.case[]`, unknown to SME and the Form Engine). That shape
+  is now legacy: still loaded and shown, moved into `dependentControls` on the first change. Candidate rules are
+  ported in `DependentControlSupport` (allowed type, not a container of the master, compatible data context). Not
+  ported: SME's delete refactoring of the references (a deleted element leaves its id behind; validator + a warning on
+  the tab report it) and the T/D flags on the tree rows.
 
 ### Repeats
 
@@ -459,9 +465,20 @@ a missing panel, the data model itself can't represent an include on any node.
   a live referencing screen node or a resolvable DM field/group (`isInconsistentEntry`), and offers a one-click
   "Clean All". a12-studio's `FormFieldReferenceValidator` catches the same dangling-reference case but only as a
   validation *error* — there is no UI action to prune it, so the user has to hand-edit JSON or delete-and-recreate.
-- **No structural consistency check** between the form model and its (possibly since-changed) document model. SME's
-  is a categorized `Problem[]` (INFO/WARNING/ERROR) background check — a12-studio doesn't need the server-side
-  architecture, but has no equivalent drift-detection pass of any kind today.
+- **Structural consistency check** between the form model and its (possibly since-changed) document model. SME's
+  is a categorized `Problem[]` (INFO/WARNING/ERROR) background check done by the kernel's `ConsistencyValidator`
+  (`FormModelConsistencyCheck.kt`; its `FormModelCategory` list is not visible from the sources available here).
+  **Partly closed 2026-09-20 (TODO #7):** a12-studio has no server-side architecture and doesn't need one - the drift
+  cases are ordinary validators over the Document Models the project already holds: `FormDependencyDriftValidator`
+  (dependent field/group/enumeration, hide condition and control dependency masters: gone, wrong type, a case value
+  the field no longer has; dependent enumeration values; dependent field forced value / copy source),
+  `FormDependentControlContextValidator`, `FormReferenceTypeDriftValidator` (Control/column on a group, Repeat on a
+  field or a no longer repeatable group) and `FormControlIndexRequiredValidator`. All ERROR: unlike SME's three
+  severities a12-studio's validation only distinguishes what makes the form wrong. Missing field/group references were
+  already `FormFieldReferenceValidator`/`FormGroupReferenceValidator`, hide-condition values
+  `HideConditionSupportedValuesValidator`. Not detected (no SME category known / no fixture): field-type changes that
+  invalidate per-type Control settings other than the date picker range, and a `Control` whose field type no longer
+  suits its Control type.
 - **Style presets.** `FormModelContent.styles` (a model-level named style-class list) has a panel in the Model
   Settings dialog (2026-09-19; the shared `StylesPanelController`, restored on Cancel via `ModelSnapshot`). Second
   pass, same day: like SME, the list is now the source of the per-element `style`/`headerStyle` entries. Inside a
@@ -489,15 +506,16 @@ validators are the sole source of truth here.
 |---|---|---|
 | `FormDocumentModelReferenceValidator` | `ValidDocumentModelReference` / `ValidDocumentModelMustBeSelected` | Roughly at parity |
 | `FormFieldReferenceValidator` | field-config-entry path validation in `validateFieldConfigEntries`/kernel rules | Roughly at parity for existence-checking; SME's version also validates against the DM's *current* type, not just presence |
-| `FormButtonScreenReferenceValidator` | (likely a declarative kernel rule, not a custom condition) | Present in a12-studio but **untested** — no fixture/test exists (`FormValidatorsTest` has no case for it) |
+| `FormButtonScreenReferenceValidator` | (likely a declarative kernel rule, not a custom condition) | **Done** (2026-09-19) — test added (`FormValidatorsTest`, fixture `FormButtonScreenReferenceValidator_invalid`) covering an existing screen, a special token (`#next`) and stale targets in the model-level and a per-screen footer |
 | `FormLayoutColumnSumValidator` | `LayoutLgSumIsGreaterTwelveCustomCondition` | Matches (sum ≤ 12) |
 | `FormSiblingNameUniquenessValidator` | (likely a declarative kernel uniqueness rule) | No custom-condition equivalent found; probably fine as a12-studio-side logic since there's no kernel layer to duplicate |
 | `ControlGridLayoutValidator` | `InconsistentNumberOfColumnsCustomCondition` + kernel per-cell layout rules | a12-studio's version was reverse-engineered from a real fixture since the per-cell offset/span check isn't a custom condition in SME (kernel-declarative) |
 | — | `DependentEnumerationMasterRequired` / `DependentFieldMasterRequired` / `DependentGroupMasterRequired` | **Gap** — a12-studio has no validator ensuring `masterField` is set whenever a `dependentField`/`dependentGroup` block exists (and can't have one for `dependentEnumeration` since that field doesn't exist) |
 | — | `ExternalEnumerationSourceRequired` | N/A until `externalEnumeration` is modeled |
-| — | `DependentControlOptionsMustExistInFormModel(Editor)` | **Gap** — no validator catches a Confirm control's `notRelevantNodes` pointing at a since-deleted node |
-| — | `DependentControlsAtLeastOneOptionMustBeSelected(Editor)` | **Gap** — nothing requires at least one target node when dependent-controls is configured |
-| — | `DependentFieldAtLeastOneActionPerCaseMustBeSelectedCustomCondition` / `CaseValueIsUndefined` | **Gap** — nothing requires each dependent-field case to actually set readonly/notRelevant/value |
+| `DependentControlOptionsMustExistValidator` | `DependentControlOptionsMustExistInFormModel(Editor)` | **Done** (2026-09-19) — checks `Control.dependentControls` (exists / same top-level screen / allowed type, one message per reason) and the ids in the Confirm tab's `notRelevantNodes`. The `Editor` variant is SME-internal (form open in editor vs. workspace validation) and has no a12-studio counterpart |
+| `DependentControlsAtLeastOneOptionValidator` | `DependentControlsAtLeastOneOptionMustBeSelected(Editor)` | **Done** (2026-09-19) — a `dependentControls` block with no `screenElement` |
+| `FormDependencyDriftValidator`, `FormDependentControlContextValidator`, `FormReferenceTypeDriftValidator`, `FormControlIndexRequiredValidator` | kernel `ConsistencyValidator` (backend `checkConsistency`), `determineDependentEnumState`, `areControlAndScreenElementCompatible` | **Done** (2026-09-20, TODO #7) — form-vs-Document-Model drift, see "Structural consistency check" above |
+| `DependentFieldAtLeastOneActionValidator` | `DependentFieldAtLeastOneActionPerCaseMustBeSelectedCustomCondition` / `CaseValueIsUndefined` | **Done** (2026-09-19) — every case of a `dependentField` with a master field needs `notRelevant`/`readonly`/`value` (`""` counts)/`fieldRef` (or, a12-studio only, `notRelevantNodes`); see `DependentCase.hasAction()` |
 | — | `InitialFocusedElementOnlyOnFirstScreen` (+ the screen's `InvalidReference` on `initiallyFocusedElementId`) | **Done** (2026-09-19) — `FormInitiallyFocusedElementValidator` |
 | — | `AtLeastOneHideConditionCaseFilled` / `OnlySupportedHideConditionValuesPresent` | **Gap** — blocked on the hide-condition `cases[]` gap above; once that exists, needs a validator checking the chosen values are actually possible for the master field's type |
 | — | `SortableColumnCustomCondition` | N/A until `initialSorting` is modeled |

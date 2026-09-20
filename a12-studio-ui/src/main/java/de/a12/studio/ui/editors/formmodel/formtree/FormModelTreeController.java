@@ -29,6 +29,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.form.DependentControlSupport;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.SearchFieldController;
@@ -41,6 +42,7 @@ import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorBin
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorButtonPanelPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorConfirmControlPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorDependentMasterControlPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorCustomCellPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorCustomScreenElementPanelController;
@@ -182,6 +184,10 @@ public class FormModelTreeController implements Initializable {
   private Node confirmControlEditor;
   @FXML
   private FormNodeEditorConfirmControlPanelController confirmControlEditorController;
+  @FXML
+  private Node dependentMasterControlEditor;
+  @FXML
+  private FormNodeEditorDependentMasterControlPanelController dependentMasterControlEditorController;
   @FXML
   private Node repeatEditor;
   @FXML
@@ -423,7 +429,8 @@ public class FormModelTreeController implements Initializable {
     boolean isSection = node instanceof Section;
     boolean isControlGrid = node instanceof ControlGrid;
     boolean isConfirmControl = node instanceof Control && isConfirmField((Control) node);
-    boolean isControl = node instanceof Control && !isConfirmControl;
+    boolean isDependentMasterControl = node instanceof Control && !isConfirmControl && isDependentControlMaster((Control) node);
+    boolean isControl = node instanceof Control && !isConfirmControl && !isDependentMasterControl;
     boolean isRepeat = node instanceof AbstractRepeat;
     boolean isTextCell = node instanceof TextCell;
     boolean isExpressionCell = node instanceof ExpressionCell;
@@ -441,6 +448,7 @@ public class FormModelTreeController implements Initializable {
     setVisible(controlGridEditor, isControlGrid);
     setVisible(controlEditor, isControl);
     setVisible(confirmControlEditor, isConfirmControl);
+    setVisible(dependentMasterControlEditor, isDependentMasterControl);
     setVisible(repeatEditor, isRepeat);
     setVisible(textCellEditor, isTextCell);
     setVisible(expressionCellEditor, isExpressionCell);
@@ -450,7 +458,7 @@ public class FormModelTreeController implements Initializable {
     setVisible(customCellEditor, isCustomCell);
     setVisible(bindingEditor, isBinding);
     setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection
-        || isControlGrid || isControl || isConfirmControl || isRepeat || isTextCell || isExpressionCell
+        || isControlGrid || isControl || isConfirmControl || isDependentMasterControl || isRepeat || isTextCell || isExpressionCell
         || isRepeatOverviewColumn || isCustomScreenElement || isButtonPanel || isCustomCell || isBinding));
 
     if (isRow) {
@@ -473,6 +481,9 @@ public class FormModelTreeController implements Initializable {
     }
     else if (isConfirmControl) {
       confirmControlEditorController.setControl((Control) node, documentModel, elementIndex, content);
+    }
+    else if (isDependentMasterControl) {
+      dependentMasterControlEditorController.setControl((Control) node, documentModel, elementIndex, content);
     }
     else if (isRepeat) {
       repeatEditorController.setRepeat((AbstractRepeat) node, documentModel, content,
@@ -971,6 +982,16 @@ public class FormModelTreeController implements Initializable {
     return element instanceof FieldElement field
         && field.getField() != null
         && field.getField().getFieldType() instanceof de.a12.studio.models.documentmodel.ConfirmFieldType;
+  }
+
+  /**
+   * Returns true when the given {@link Control}'s field is a Boolean or Enumeration field (type definitions
+   * resolved), i.e. can be the master of dependent controls like a Confirm field (SME's
+   * {@code isPossibleDependentControlMaster}). {@link #updateEditorPane} gives such a Control the standard editor
+   * plus a Dependencies tab.
+   */
+  private boolean isDependentControlMaster(@NonNull Control control) {
+    return !DependentControlSupport.masterValues(control, elementIndex).isEmpty();
   }
 
   private static boolean isRepeatableGroup(@Nullable Element element) {

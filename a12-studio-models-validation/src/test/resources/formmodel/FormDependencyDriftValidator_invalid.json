@@ -1,0 +1,205 @@
+{
+  "header": {
+    "id": "FormDependencyDriftValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "DependencyDrift_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_ok",
+            "name": "section_ok",
+            "screenElements": []
+          },
+          {
+            "type": "Section",
+            "id": "section_hide_string",
+            "name": "section_hide_string",
+            "screenElements": [],
+            "hideCondition": {
+              "masterField": "field_string",
+              "cases": [
+                {
+                  "masterValue": "x"
+                }
+              ]
+            }
+          },
+          {
+            "type": "Section",
+            "id": "section_hide_gone",
+            "name": "section_hide_gone",
+            "screenElements": [],
+            "hideCondition": {
+              "masterField": "field_deleted",
+              "cases": [
+                {
+                  "masterValue": "true"
+                }
+              ]
+            }
+          },
+          {
+            "type": "ControlGrid",
+            "id": "grid1",
+            "name": "grid1",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_grid1",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_string",
+                    "elementRef": "field_string",
+                    "dependentControls": {
+                      "screenElement": [
+                        {
+                          "idref": "section_ok",
+                          "masterValue": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_enum",
+                    "elementRef": "field_enum",
+                    "dependentControls": {
+                      "screenElement": [
+                        {
+                          "idref": "section_ok",
+                          "masterValue": "a"
+                        },
+                        {
+                          "idref": "section_ok",
+                          "masterValue": "zz"
+                        },
+                        {
+                          "idref": "section_ok",
+                          "masterValue": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "elementRef": "field_string",
+          "dependentField": {
+            "masterField": "field_string",
+            "case": [
+              {
+                "masterValue": "true",
+                "readonly": true
+              }
+            ]
+          },
+          "dependentEnumeration": {
+            "masterField": "field_enum",
+            "constraint": []
+          }
+        },
+        {
+          "elementRef": "field_bool",
+          "dependentField": {
+            "masterField": "field_gone",
+            "case": [
+              {
+                "masterValue": "true",
+                "readonly": true
+              }
+            ]
+          }
+        },
+        {
+          "elementRef": "field_enum_dep",
+          "dependentField": {
+            "masterField": "field_enum",
+            "case": [
+              {
+                "masterValue": "a",
+                "value": "x"
+              },
+              {
+                "masterValue": "z",
+                "readonly": true
+              },
+              {
+                "masterValue": null,
+                "value": "gone"
+              },
+              {
+                "masterValue": "b",
+                "fieldRef": "field_ghost"
+              }
+            ]
+          },
+          "dependentEnumeration": {
+            "masterField": "field_bool",
+            "constraint": [
+              {
+                "masterValue": "true",
+                "constraintValues": [
+                  {
+                    "value": "x"
+                  },
+                  {
+                    "value": "q"
+                  }
+                ],
+                "valueForMasterChange": "w"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "groupConfiguration": {
+      "group": [
+        {
+          "groupRef": "group_items",
+          "dependentGroup": {
+            "masterField": "field_bool",
+            "case": [
+              {
+                "masterValue": "true",
+                "notRelevant": true
+              },
+              {
+                "masterValue": "maybe",
+                "notRelevant": true
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

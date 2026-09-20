@@ -1,0 +1,43 @@
+{
+  "header": {
+    "id": "DependentFieldAtLeastOneActionValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "elementRef": "field_dependent",
+          "dependentField": {
+            "masterField": "field_master",
+            "case": [
+              { "masterValue": "a" },
+              { "masterValue": "b", "notRelevant": true },
+              { "masterValue": "c", "notRelevant": false },
+              { "masterValue": "d", "readonly": true },
+              { "masterValue": "e", "value": "" },
+              { "masterValue": "f", "fieldRef": "field_other" },
+              { "masterValue": "g", "notRelevantNodes": [ "section1" ] },
+              { }
+            ]
+          }
+        },
+        {
+          "elementRef": "field_no_master",
+          "dependentField": {
+            "case": [
+              { "masterValue": "a" }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

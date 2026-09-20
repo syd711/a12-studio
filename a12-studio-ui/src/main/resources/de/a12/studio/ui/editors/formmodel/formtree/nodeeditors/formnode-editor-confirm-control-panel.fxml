@@ -36,12 +36,12 @@
             </content>
         </Tab>
 
-        <!-- Tab 2: Dependencies — tree selection for each confirm value -->
+        <!-- Tab 2: Dependencies — the screen blocks hidden for each confirm value -->
         <Tab text="%dependencies">
             <content>
                 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
                     <content>
-                        <fx:include fx:id="dependencies" source="confirm-dependencies-panel.fxml" />
+                        <fx:include fx:id="dependencies" source="dependent-controls-panel.fxml" />
                     </content>
                 </ScrollPane>
             </content>

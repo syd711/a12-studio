@@ -48,12 +48,20 @@ public final class ControlIndexSupport {
    * repeatable group whose current row the Control's data comes from; empty outside any repeat (the model root).
    */
   public static Optional<String> dataContextGroupRef(@NonNull Control control, @NonNull FormModelContent content) {
-    // A nested repeat is itself found inside the outer one, so the nearest enclosing repeat is the one holding
-    // the fewest Controls.
+    return enclosingRepeat(control, content).map(AbstractRepeat::getGroupRef);
+  }
+
+  /**
+   * The nearest Embedded/Detached Repeat {@code node} (any object of the form, e.g. a Control or a Section) is
+   * placed in; empty outside any repeat (the model root). A repeat is not its own data context.
+   */
+  public static Optional<AbstractRepeat> enclosingRepeat(@NonNull Object node, @NonNull FormModelContent content) {
+    // A nested repeat is itself found inside the outer one, so the nearest enclosing repeat is the one with the
+    // fewest nodes in total (strictly fewer than any repeat around it, whatever kind of node is looked for).
+    Class<?> type = node.getClass();
     return FormModelWalker.find(content, AbstractRepeat.class).stream()
-        .filter(repeat -> repeat instanceof EmbeddedRepeat || repeat instanceof DetachedRepeat)
-        .filter(repeat -> FormModelWalker.find(repeat, Control.class, node -> true).contains(control))
-        .min(Comparator.comparingInt(repeat -> FormModelWalker.find(repeat, Control.class, node -> true).size()))
-        .map(AbstractRepeat::getGroupRef);
+        .filter(repeat -> repeat != node && (repeat instanceof EmbeddedRepeat || repeat instanceof DetachedRepeat))
+        .filter(repeat -> FormModelWalker.find(repeat, type, n -> true).stream().anyMatch(n -> n == node))
+        .min(Comparator.comparingInt(repeat -> FormModelWalker.find(repeat, Object.class, n -> true).size()));
   }
 }

@@ -12,10 +12,14 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.form.ControlGridLayoutValidator;
+import de.a12.studio.modelsvalidation.validators.form.DependentControlOptionsMustExistValidator;
+import de.a12.studio.modelsvalidation.validators.form.DependentControlsAtLeastOneOptionValidator;
 import de.a12.studio.modelsvalidation.validators.form.DependentEnumerationMasterRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.form.DependentFieldAtLeastOneActionValidator;
 import de.a12.studio.modelsvalidation.validators.form.DependentFieldMasterRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.DependentGroupMasterRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.ExternalEnumerationSourceRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormControlIndexRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingRelationshipReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingTargetRoleValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormButtonScreenReferenceValidator;
@@ -23,11 +27,14 @@ import de.a12.studio.modelsvalidation.validators.form.FormColumnWidthValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormCustomScreenElementHeightValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDatePickerConfigValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDefaultRowActionValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormDependencyDriftValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormDependentControlContextValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormGroupReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormInitiallyFocusedElementValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormReferenceTypeDriftValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormSiblingNameUniquenessValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormStyleReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormUnusedConfigEntryValidator;
@@ -60,6 +67,9 @@ public final class FormModelValidationService {
       new DependentFieldMasterRequiredValidator(),
       new DependentGroupMasterRequiredValidator(),
       new DependentEnumerationMasterRequiredValidator(),
+      new DependentFieldAtLeastOneActionValidator(),
+      new DependentControlOptionsMustExistValidator(),
+      new DependentControlsAtLeastOneOptionValidator(),
       new ExternalEnumerationSourceRequiredValidator(),
       new FormBindingRelationshipReferenceValidator(),
       new FormBindingTargetRoleValidator(),
@@ -68,7 +78,11 @@ public final class FormModelValidationService {
       new FormDatePickerConfigValidator(),
       new FormColumnWidthValidator(),
       new FormInitiallyFocusedElementValidator(),
-      new FormCustomScreenElementHeightValidator()));
+      new FormCustomScreenElementHeightValidator(),
+      new FormDependencyDriftValidator(),
+      new FormDependentControlContextValidator(),
+      new FormReferenceTypeDriftValidator(),
+      new FormControlIndexRequiredValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

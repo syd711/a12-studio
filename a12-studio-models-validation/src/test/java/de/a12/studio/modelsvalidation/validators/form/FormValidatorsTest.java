@@ -35,6 +35,10 @@ class FormValidatorsTest {
     return TestModels.load("/documentmodel/HideConditionMaster_DM.json", DocumentModel.class);
   }
 
+  private DocumentModel dependencyDriftDm() {
+    return TestModels.load("/documentmodel/DependencyDrift_DM.json", DocumentModel.class);
+  }
+
   @Test
   void documentModelReferenceValidatorReportsMissingReference() {
     FormModel model = load("FormDocumentModelReferenceValidator_invalid");
@@ -215,6 +219,155 @@ class FormValidatorsTest {
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("field_dependent_enum"));
+  }
+
+  @Test
+  void buttonScreenReferenceValidatorReportsOnlyTargetsThatAreNeitherScreensNorSpecialTokens() {
+    FormModel model = load("FormButtonScreenReferenceValidator_invalid");
+    List<ModelValidationError> errors = new FormButtonScreenReferenceValidator().validate(model, TestModels.context(model));
+
+    // "ToSecond" (an existing screen) and "Next" (#next) are fine; the model-level and the per-screen footer
+    // each hold one button pointing at a deleted screen.
+    assertEquals(2, errors.size());
+    assertTrue(errors.stream().anyMatch(e -> e.elementId().equals("button_gone")
+        && e.message().contains("screen_gone") && e.message().contains("ToGone")));
+    assertTrue(errors.stream().anyMatch(e -> e.elementId().equals("button_stale")
+        && e.message().contains("screen_deleted") && e.message().contains("StaleScreenButton")));
+  }
+
+  @Test
+  void dependentControlOptionsMustExistValidatorReportsMissingOtherScreenAndWrongTypeOptions() {
+    FormModel model = load("DependentControlOptionsMustExistValidator_invalid");
+    List<ModelValidationError> errors = new DependentControlOptionsMustExistValidator().validate(model, TestModels.context(model));
+
+    // section_ok is fine. Left over: a deleted grid, an entry without idref, an element of another screen and a
+    // ButtonPanel (not a Section/Control Grid/Custom Screen Element), all reported on the master Control - plus
+    // the deleted node in the Confirm control's notRelevantNodes.
+    assertEquals(5, errors.size());
+    List<ModelValidationError> onControl = errors.stream().filter(e -> "control_master".equals(e.elementId())).toList();
+    assertEquals(4, onControl.size());
+    assertTrue(onControl.stream().allMatch(e -> e.message().contains("field_confirm")));
+    assertTrue(onControl.stream().anyMatch(e -> e.message().contains("grid_ghost") && e.message().contains("does not exist")));
+    assertTrue(onControl.stream().anyMatch(e -> e.message().contains("without a screen element selected")));
+    assertTrue(onControl.stream().anyMatch(e -> e.message().contains("section_other_screen") && e.message().contains("same screen")));
+    assertTrue(onControl.stream().anyMatch(e -> e.message().contains("buttonpanel1") && e.message().contains("not a section")));
+    assertTrue(errors.stream().anyMatch(e -> e.message().contains("section_deleted") && e.message().contains("field_confirm")));
+  }
+
+  @Test
+  void dependentControlsAtLeastOneOptionValidatorReportsOnlyEmptyDependency() {
+    FormModel model = load("DependentControlsAtLeastOneOptionValidator_invalid");
+    List<ModelValidationError> errors = new DependentControlsAtLeastOneOptionValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("control_empty", errors.get(0).elementId());
+    assertTrue(errors.get(0).message().contains("field_empty"));
+  }
+
+  @Test
+  void dependentFieldAtLeastOneActionValidatorReportsOnlyCasesWithoutAnyAction() {
+    FormModel model = load("DependentFieldAtLeastOneActionValidator_invalid");
+    List<ModelValidationError> errors = new DependentFieldAtLeastOneActionValidator().validate(model, TestModels.context(model));
+
+    // Case "a" and the "no value" case do nothing. notRelevant=false, readonly, value="", fieldRef and hidden nodes
+    // all count as an action; a dependentField without master field is DependentFieldMasterRequired's business.
+    assertEquals(2, errors.size());
+    assertTrue(errors.stream().allMatch(e -> e.message().contains("field_dependent")));
+    assertTrue(errors.stream().anyMatch(e -> e.message().contains("case \"a\"")));
+    assertTrue(errors.stream().anyMatch(e -> e.message().contains("(no value)")));
+  }
+
+  @Test
+  void dependencyDriftValidatorReportsMastersAndValuesTheDocumentModelNoLongerHas() {
+    FormModel model = load("FormDependencyDriftValidator_invalid");
+    List<ModelValidationError> errors = new FormDependencyDriftValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, dependencyDriftDm()));
+
+    List<String> messages = errors.stream().map(ModelValidationError::message).toList();
+    // Hide conditions: a master that is a String, and one that was deleted.
+    assertHasOne(messages, "hide condition", "section_hide_string", "field_string", "not a boolean, confirm or enumeration");
+    assertHasOne(messages, "hide condition", "section_hide_gone", "field_deleted", "no longer exists");
+    // Control dependencies: the trigger's own field is a String; the enumeration has no value "zz" ("a" and
+    // "(no value)" are fine).
+    assertHasOne(messages, "control dependency", "field_string", "not a boolean, confirm or enumeration");
+    assertHasOne(messages, "control dependency", "field_enum", "\"zz\"");
+    // Dependent field: master is a String / deleted; case "z" has no such master value; forced value "gone" and
+    // the copy source "field_ghost" no longer exist.
+    assertHasOne(messages, "dependent field configuration", "\"field_string\" uses the master field \"field_string\"", "not a boolean");
+    assertHasOne(messages, "dependent field configuration", "field_gone", "no longer exists");
+    assertHasOne(messages, "dependent field configuration", "field_enum_dep", "\"z\"");
+    assertHasOne(messages, "sets the value \"gone\"", "field_enum_dep");
+    assertHasOne(messages, "copies the value of the field \"field_ghost\"", "field_enum_dep");
+    // Dependent enumeration: on a String field; master is a Boolean; offered value "q" and switch-to value "w" gone.
+    assertHasOne(messages, "dependent enumeration of \"field_string\" is set up for a field that is not an enumeration");
+    assertHasOne(messages, "dependent enumeration", "field_enum_dep", "field_bool", "not an enumeration field");
+    assertHasOne(messages, "offers the value \"q\"");
+    assertHasOne(messages, "switches to the value \"w\"");
+    // Dependent group: master value "maybe" is no Boolean value.
+    assertHasOne(messages, "dependent group configuration", "group_items", "\"maybe\"");
+    assertEquals(14, errors.size(), messages.toString());
+  }
+
+  @Test
+  void dependencyDriftValidatorIsSilentWithoutTheDocumentModel() {
+    FormModel model = load("FormDependencyDriftValidator_invalid");
+
+    assertEquals(0, new FormDependencyDriftValidator().validate(model, TestModels.context(model)).size());
+  }
+
+  @Test
+  void dependentControlContextValidatorReportsAncestorsAndForeignDataContexts() {
+    FormModel model = load("FormDependentControlContextValidator_invalid");
+    List<ModelValidationError> errors = new FormDependentControlContextValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, dependencyDriftDm()));
+
+    List<String> found = errors.stream().map(e -> e.elementId() + "->" + e.message().replaceAll(".*hides \"([^\"]+)\", which (.*)\\.$", "$1:$2")).toList();
+    // control_master hides its own section and grid; hiding a plain grid and a grid inside a repeat is fine for
+    // a control outside every repeat. control_row (in the repeat) can hide its own grid neither, nor a grid
+    // outside the repeat (it has many instances of the trigger). control_outside needs an index, so it may only
+    // hide elements outside a repeat.
+    assertEquals(5, errors.size(), found.toString());
+    assertTrue(found.contains("control_master->section_top:contains the control itself"), found.toString());
+    assertTrue(found.contains("control_master->grid_master:contains the control itself"), found.toString());
+    assertTrue(found.contains("control_row->grid_repeat:contains the control itself"), found.toString());
+    assertTrue(found.contains("control_row->grid_ok:is in a data context (repeat) that the control cannot control uniquely"), found.toString());
+    assertTrue(found.contains("control_outside->grid_repeat:is in a data context (repeat) that the control cannot control uniquely"), found.toString());
+  }
+
+  @Test
+  void referenceTypeDriftValidatorReportsReferencesToTheWrongKindOfElement() {
+    FormModel model = load("FormReferenceTypeDriftValidator_invalid");
+    List<ModelValidationError> errors = new FormReferenceTypeDriftValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, dependencyDriftDm()));
+
+    assertEquals(4, errors.size(), errors.toString());
+    assertTrue(errors.stream().anyMatch(e -> e.elementId().equals("control_group")
+        && e.message().contains("group_single") && e.message().contains("not a field")));
+    assertTrue(errors.stream().anyMatch(e -> e.elementId().equals("column_group")
+        && e.message().contains("group_single") && e.message().contains("not a field")));
+    assertTrue(errors.stream().anyMatch(e -> e.elementId().equals("repeat_field")
+        && e.message().contains("field_string") && e.message().contains("not a group")));
+    assertTrue(errors.stream().anyMatch(e -> e.elementId().equals("repeat_single")
+        && e.message().contains("group_single") && e.message().contains("not repeatable")));
+  }
+
+  @Test
+  void controlIndexRequiredValidatorReportsOnlyIndexableControlsWithoutIndex() {
+    FormModel model = load("FormControlIndexRequiredValidator_invalid");
+    List<ModelValidationError> errors = new FormControlIndexRequiredValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, dependencyDriftDm()));
+
+    // control_needs shows a field of the repeatable group outside its repeat; the one with an index, the plain
+    // one and the one inside its repeat are fine.
+    assertEquals(1, errors.size(), errors.toString());
+    assertEquals("control_needs", errors.get(0).elementId());
+    assertTrue(errors.get(0).message().contains("field_item_bool"));
+  }
+
+  /** Every needle must be in exactly one of the messages (which also pins that a case is reported once). */
+  private static void assertHasOne(List<String> messages, String... needles) {
+    long matches = messages.stream().filter(message -> List.of(needles).stream().allMatch(message::contains)).count();
+    assertEquals(1, matches, "messages containing " + List.of(needles) + " in " + messages);
   }
 
   @Test

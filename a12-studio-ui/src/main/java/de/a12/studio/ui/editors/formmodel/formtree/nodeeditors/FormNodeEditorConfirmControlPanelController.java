@@ -29,11 +29,10 @@ import org.jspecify.annotations.Nullable;
  *   <li>Annotations</li>
  * </ol>
  *
- * <p>The "Dependencies" tab ({@link ConfirmDependenciesPanelController}) shows two sections — "true" and
- * "(no value)" — each with a checkable tree of the form's structural nodes (Screens down to
- * Section / ControlGrid level). Checked nodes are stored as
- * {@link de.a12.studio.models.formmodel.DependentCase#getNotRelevantNodes()} inside the
- * {@link de.a12.studio.models.formmodel.FieldConfigEntry#getDependentField()} for this control's field.</p>
+ * <p>The "Dependencies" tab ({@link DependentControlsPanelController}, shared with the Boolean/Enumeration
+ * editor {@link FormNodeEditorDependentMasterControlPanelController}) shows two sections — "true" and
+ * "(no value)" — each with a checkable tree of the screen's blocks. Checked blocks are stored as
+ * {@link Control#getDependentControls()}, SME's wire shape.</p>
  *
  * <p>Routing: {@link FormModelTreeController} routes a {@link Control} node here instead of to
  * {@link FormNodeEditorControlPanelController} when its {@link Control#getElementRef()} resolves to a
@@ -53,7 +52,7 @@ public class FormNodeEditorConfirmControlPanelController {
   @FXML private AnnotationsPanelController annotationsController;
 
   // ── "Dependencies" tab ───────────────────────────────────────────────────────────────────────
-  @FXML private ConfirmDependenciesPanelController dependenciesController;
+  @FXML private DependentControlsPanelController dependenciesController;
 
   public void setControl(@NonNull Control control,
       @Nullable DocumentModel documentModel,
@@ -74,6 +73,6 @@ public class FormNodeEditorConfirmControlPanelController {
     annotationsController.setCustom(control::getAnnotations);
 
     // Dependencies tab
-    dependenciesController.setControl(control, content);
+    dependenciesController.setControl(control, content, elementIndex);
   }
 }

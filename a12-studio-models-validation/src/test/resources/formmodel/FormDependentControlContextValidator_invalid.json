@@ -1,0 +1,164 @@
+{
+  "header": {
+    "id": "FormDependentControlContextValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "DependencyDrift_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_top",
+            "name": "section_top",
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "grid_master",
+                "name": "grid_master",
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_grid_master",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_master",
+                        "elementRef": "field_enum",
+                        "dependentControls": {
+                          "screenElement": [
+                            {
+                              "idref": "section_top",
+                              "masterValue": "a"
+                            },
+                            {
+                              "idref": "grid_master",
+                              "masterValue": "a"
+                            },
+                            {
+                              "idref": "grid_ok",
+                              "masterValue": "a"
+                            },
+                            {
+                              "idref": "grid_repeat",
+                              "masterValue": "b"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "ControlGrid",
+            "id": "grid_ok",
+            "name": "grid_ok",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_grid_ok",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_plain",
+                    "elementRef": "field_string"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "EmbeddedRepeat",
+            "id": "repeat1",
+            "name": "repeat1",
+            "groupRef": "group_items",
+            "controlGrid": {
+              "type": "ControlGrid",
+              "id": "grid_repeat",
+              "name": "grid_repeat",
+              "row": [
+                {
+                  "type": "Row",
+                  "id": "row_grid_repeat",
+                  "cell": [
+                    {
+                      "type": "Control",
+                      "id": "control_row",
+                      "elementRef": "field_item_bool",
+                      "dependentControls": {
+                        "screenElement": [
+                          {
+                            "idref": "grid_repeat",
+                            "masterValue": "true"
+                          },
+                          {
+                            "idref": "grid_ok",
+                            "masterValue": "true"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "type": "ControlGrid",
+            "id": "grid_outside",
+            "name": "grid_outside",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_grid_outside",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_outside",
+                    "elementRef": "field_item_bool",
+                    "index": {
+                      "type": "SEMANTIC",
+                      "value": "idx"
+                    },
+                    "dependentControls": {
+                      "screenElement": [
+                        {
+                          "idref": "grid_ok",
+                          "masterValue": "true"
+                        },
+                        {
+                          "idref": "grid_repeat",
+                          "masterValue": "true"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

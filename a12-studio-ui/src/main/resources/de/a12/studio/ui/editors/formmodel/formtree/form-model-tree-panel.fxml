@@ -143,6 +143,7 @@
                         <fx:include fx:id="controlGridEditor" source="nodeeditors/formnode-editor-control-grid-panel.fxml" />
                         <fx:include fx:id="controlEditor" source="nodeeditors/formnode-editor-control-panel.fxml" />
                         <fx:include fx:id="confirmControlEditor" source="nodeeditors/formnode-editor-confirm-control-panel.fxml" />
+                        <fx:include fx:id="dependentMasterControlEditor" source="nodeeditors/formnode-editor-dependent-master-control-panel.fxml" />
                         <fx:include fx:id="repeatEditor" source="nodeeditors/formnode-editor-repeat-panel.fxml" />
                         <fx:include fx:id="textCellEditor" source="nodeeditors/formnode-editor-text-cell-panel.fxml" />
                         <fx:include fx:id="expressionCellEditor" source="nodeeditors/formnode-editor-expression-cell-panel.fxml" />

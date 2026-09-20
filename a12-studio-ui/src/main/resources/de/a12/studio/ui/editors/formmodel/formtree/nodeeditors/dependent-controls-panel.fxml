@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="root" spacing="12.0" stylesheets="@/de/a12/studio/ui/stylesheet.css"
+      xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.DependentControlsPanelController">
+    <Label fx:id="staleLabel" managed="false" visible="false" wrapText="true"/>
+    <!-- One titled tree per master value, added by the controller. -->
+    <VBox fx:id="sections" spacing="12.0"/>
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+</VBox>

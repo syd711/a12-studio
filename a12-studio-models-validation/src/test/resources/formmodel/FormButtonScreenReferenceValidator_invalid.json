@@ -1,0 +1,66 @@
+{
+  "header": {
+    "id": "FormButtonScreenReferenceValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "First",
+        "screenElements": []
+      },
+      {
+        "type": "Screen",
+        "id": "screen2",
+        "name": "Second",
+        "screenElements": [],
+        "footerBox": {
+          "id": "footer_screen2",
+          "majorButtons": {
+            "button": [
+              {
+                "type": "NAVIGATION",
+                "id": "button_stale",
+                "name": "StaleScreenButton",
+                "target": "screen_deleted"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "footerBox": {
+      "id": "footer_model",
+      "minorButtons": {
+        "button": [
+          {
+            "type": "NAVIGATION",
+            "id": "button_ok",
+            "name": "ToSecond",
+            "target": "screen2"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_next",
+            "name": "Next",
+            "target": "#next"
+          },
+          {
+            "type": "NAVIGATION",
+            "id": "button_gone",
+            "name": "ToGone",
+            "target": "screen_gone"
+          }
+        ]
+      }
+    }
+  }
+}

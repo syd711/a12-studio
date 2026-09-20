@@ -65,7 +65,7 @@ public final class FormGroupReferenceValidator implements ModelValidator {
   }
 
   /** Every Repeat in the Screen tree whose {@code groupRef} equals {@code groupRef}. */
-  private static List<AbstractRepeat> findReferencingNodes(FormModel formModel, String groupRef) {
+  static List<AbstractRepeat> findReferencingNodes(FormModel formModel, String groupRef) {
     List<AbstractRepeat> matches = new ArrayList<>();
     for (Screen screen : formModel.getContent().getScreens()) {
       visit(screen.getScreenElements(), groupRef, matches);

@@ -1,0 +1,50 @@
+package de.a12.studio.modelsvalidation.validators.form;
+
+import de.a12.studio.models.A12Model;
+import de.a12.studio.models.formmodel.DependentCase;
+import de.a12.studio.models.formmodel.FieldConfigEntry;
+import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.Severity;
+import de.a12.studio.modelsvalidation.ValidationContext;
+import de.a12.studio.modelsvalidation.ValidationMessages;
+import de.a12.studio.modelsvalidation.validators.ModelValidator;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Every case of a {@code dependentField} must do something (SME's
+ * {@code DependentFieldAtLeastOneActionPerCaseMustBeSelectedCustomCondition} plus {@code CaseValueIsUndefined}:
+ * "At least one action must be selected for each chosen case."), see {@link DependentCase#hasAction()} for what
+ * counts - notably a forced {@code value} of {@code ""} is an action, only an absent one is not. Like SME, this
+ * is only checked once a master field is chosen; a missing master is {@link DependentFieldMasterRequiredValidator}'s
+ * business.
+ */
+public final class DependentFieldAtLeastOneActionValidator implements ModelValidator {
+
+  @Override
+  public List<ModelValidationError> validate(A12Model<?> model, ValidationContext context) {
+    if (!(model instanceof FormModel formModel) || formModel.getContent() == null
+        || formModel.getContent().getFieldConfiguration() == null) {
+      return List.of();
+    }
+    List<ModelValidationError> errors = new ArrayList<>();
+    for (FieldConfigEntry entry : formModel.getContent().getFieldConfiguration().getField()) {
+      if (entry.getDependentField() == null || entry.getDependentField().getMasterField() == null
+          || entry.getDependentField().getMasterField().isBlank()) {
+        continue;
+      }
+      for (DependentCase dependentCase : entry.getDependentField().getCases()) {
+        if (!dependentCase.hasAction()) {
+          String caseName = dependentCase.getMasterValue() != null ? dependentCase.getMasterValue()
+              : ValidationMessages.get("validation.dependentField.noValueCase");
+          errors.add(new ModelValidationError(model, FormFieldReferenceValidator.ELEMENT_ID,
+              ValidationMessages.get("validation.dependentField.atLeastOneAction", entry.getElementRef(), caseName),
+              Severity.ERROR.name()));
+        }
+      }
+    }
+    return errors;
+  }
+}

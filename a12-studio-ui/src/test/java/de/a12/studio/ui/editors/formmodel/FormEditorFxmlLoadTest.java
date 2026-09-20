@@ -59,6 +59,11 @@ class FormEditorFxmlLoadTest {
   }
 
   @Test
+  void dependentMasterControlEditorInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("formtree/nodeeditors/formnode-editor-dependent-master-control-panel.fxml");
+  }
+
+  @Test
   void screenEditorInjectsAllFields() throws Exception {
     assertAllFieldsInjected("formtree/nodeeditors/formnode-editor-screen-panel.fxml");
   }
