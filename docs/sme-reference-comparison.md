@@ -5,10 +5,15 @@ the original/reference implementation at `C:\workspace\sme`, part of the mgm A12
 from-scratch **Java reimplementation** of the same modeling tool concept — not a port. Use this doc to see what
 SME's editors do, what a12-studio currently has, and what's missing.
 
-Last analyzed: 2026-07-17 (Document Model section's field-level/validator detail refreshed 2026-09-05 — see
-"Field-level & validator gap analysis" below; rest of the doc not re-verified on that pass). SME evolves
-independently of this repo — re-verify specifics (file paths, endpoint names) against `C:\workspace\sme` before
-relying on them for anything but general orientation.
+Last analyzed: 2026-09-20 (TODO #14: the sections that were still dated 2026-07-17 / 2026-09-05 — Document Model
+editor-feature table and validator list, Form Model tables/gap lists, Query Model gap list, the "Other model types"
+survey and the Backend / kernel capability map — were re-verified against the code; every statement changed on that
+pass carries "(2026-09-20)". Sections that were already dated after 2026-09-05 were only touched where the code
+contradicted them). SME itself (`C:\workspace\sme`, HEAD `ba2e34687` of 2026-03-09, i.e. unchanged since before the July
+analysis) was only spot-checked on that pass: the module list under `client/src/modules`, the `isExperimental()`
+flags and the backend service/controller names in the capability map all still match; the SME-side behaviour
+descriptions were **not** re-read and stay as in the earlier analyses. SME evolves independently of this repo —
+re-verify specifics against `C:\workspace\sme` before relying on them for anything but general orientation.
 
 ## Architecture: how the two projects actually relate
 
@@ -22,7 +27,12 @@ no database, no file persistence, no session state; every endpoint takes model J
 result. File load/save is purely a frontend/Electron filesystem concern.
 
 **a12-studio does not depend on the kernel.** `a12-studio-data-services/build.gradle` has no kernel/print/base
-dependencies today — only `project(':a12-studio-models')` plus test libraries. An earlier version of this doc
+dependencies today — only `project(':a12-studio-models')` plus test libraries — and (2026-09-20) that module is
+now small: it holds only the wireframe-preview services/DTOs (`dataservices/preview/`). The `SmmService`,
+`SMEMappingModelService`, `PrintService` scaffolding that older versions of this doc (and `CLAUDE.md`) list there was
+deleted on 2026-07-20 (commit `6f526548`); model validation lives in `a12-studio-models-validation`, model classes in
+`a12-studio-models`. The only vendor-JVM code a12-studio runs is out of process: the Preview App server and the
+`WcfCli` conversion tool (`a12-studio-ui/.../previewapp/`), each launched as a subprocess. An earlier version of this doc
 claimed a12-studio "pulls in the same kernel libraries directly" and listed specific coordinates as already present;
 that was never actually true (no such `build.gradle` entries exist in git history, and there is no
 `ValidationRuleService.java` in this repo). The kernel's Community-edition artifacts (e.g. `kernel-md-facade`,
@@ -46,8 +56,9 @@ larger family of field/group/rule/computation config-validation rules SME's `Dom
 
 ## Document Model
 
-The one editor that exists in a12-studio today (`a12-studio-ui/src/main/java/de/a12/studio/ui/editors/documentmodel/`,
-data model in `a12-studio-data-services/.../models/documentmodel/`).
+The first editor a12-studio got, and still the most complete one (`a12-studio-ui/src/main/java/de/a12/studio/ui/editors/documentmodel/`,
+data model in `a12-studio-models/.../documentmodel/` — corrected 2026-09-20: it was never in `a12-studio-data-services`,
+and this is no longer the only editor; see "Other model types" for the rest).
 
 ### Data model — well aligned
 
@@ -89,8 +100,10 @@ DM version 28.6.0→29.0.0, with automatic migration; `modelAlias` is now ignore
 
 ### Editor features — gap list
 
-a12-studio's current editor: tree/detail split view (`DocumentModelElementsTreeController`), group vs. field
-detail editors, undo/redo via a `CommandStack`, search, `DeleteNodeCommand`, Settings + Type-Definitions dialogs.
+a12-studio's current editor (2026-09-20): tree/detail split view (`DocumentModelElementsTreeController`), group vs.
+field vs. rule vs. computation detail editors, undo/redo via a `CommandStack`, search + filter, drag and drop,
+clipboard/bulk actions, move/rename refactoring, insert-from-Document-Model, Settings + Type-Definitions dialogs, and a
+read-only "Additive Elements Only" preview for Additive Document Models.
 
 **Correction (2026-09-05):** this section previously claimed condition validation/formatting "already calls the
 same kernel APIs as SME" via Java `ValidationRuleService`/`ComputationRuleService` equivalents. Confirmed false
@@ -99,14 +112,23 @@ by grep — no such services, no kernel dependency anywhere in `a12-studio-data-
 language validation & formatting" row. Practical effect: Rule/Computation condition text (`errorCondition`,
 `precondition`, `operation`) is edited as plain text with no semantic validation, the same way
 `QueryModelContent.filterDefinition` and `overviewmodel.Column.expression` already work via
-`RichtextEditorController` — not blocked on porting a condition-language grammar, but also not actually checked
+`RuleEditorController` — not blocked on porting a condition-language grammar, but also not actually checked
 for validity beyond "non-blank".
+**Update (2026-09-20):** that last sentence is no longer true. A clean-room, syntax-only ANTLR grammar for the
+condition language exists (`RuleLang.g4` + `RuleLanguageSyntaxChecker` in `a12-studio-models`, added 2026-09-14/15,
+reproducing the kernel's parser-level messages `MVK_INCOMPLETE_INPUT` / `MVK_EXPECTED_TOKEN_NOT_FOUND` /
+`MVK_UNEXPECTED_TOKEN` / `MVK_LEXER_STANDARD_ERROR`) and is wired as the per-keystroke validator of the rule,
+computation-alternative and computation-precondition editors (`DocumentModelValidationRuleEditorController`,
+`ComputationAlternativesPanelController`, `ComputationOptionsPanelController`,
+`ComputationAlternativeDialogController`). It is **not** run by any `ModelValidator` (so a broken condition does not
+show up in the validation list or the tree), and it does no semantic checking — no field/type resolution, argument
+counts or path existence (kernel-side those need the model expanded; see the spike below).
 
 Missing or worth checking against SME (`commonDocumentModel/api/editor/*`):
 
 | Feature | SME reference | a12-studio status | Won't Fix |
 |---|---|---|---|
-| Rule contradiction / consistency check | TDG constraint solver (`checkRuleContradictions`, endpoint `/api/document-model/check-rule-contradictions`) detects logically unsatisfiable rule sets (e.g. a field required but an error rule fires whenever it's filled) | Missing — no `tdg` dependency at all | |
+| Rule contradiction / consistency check | TDG constraint solver (`checkRuleContradictions`, endpoint `/api/document-model/check-rule-contradictions`) detects logically unsatisfiable rule sets (e.g. a field required but an error rule fires whenever it's filled) | **Missing, and blocked** (re-verified 2026-09-20: no `tdg` dependency; the 2026-09-19 kernel spike found TDG enterprise-only, see the capability map) | |
 | Move/rename refactoring | Auto-rewrites rule/computation condition text referencing a moved/renamed element (`moveElementApi.ts` → backend `/move-element-with-refactoring`) | **Present within one model** (2026-09-19): `DocumentModelRefactoring` (`a12-studio-models-validation/.../refactoring/`) + UI `RefactoringCommand` wrapping `RenameElementCommand`/`MoveNodeCommand`, so inline rename, the General Information panel's Rename and tree drag-and-drop are one undo step each. Clean-room (SME's rewrite lives in the proprietary kernel `MoveSupportDM`). Resolves each path to the *element* in the old tree and re-expresses it against the new one, so a moved *rule* (whose relative paths are measured from its own position) works as well as a moved field; only a reference that no longer resolves to the same element is rewritten, keeping its style (absolute vs relative, `..Group` turning-group name, `*` markers). Covers Rule `errorEntityRelPath`/`errorCondition`/`errorMessage` `$path$` parameters, Computation `computedFieldRelPath`/`commonPrecondition`/alternative `precondition`+`operation`/`errorMessage`, Group `indexFieldName`, `documentUniquenessCriteria[].fields[].fullName`. References by element id (Form/Overview/Tree/RelationshipUI `elementRef`/`fieldId`/`groupRef`, `ModelConfig` uniqueness criteria) cannot break — ids don't change on rename/move. **Other models' references (2026-09-19, `ProjectReferenceRefactoring`):** the same rename/move now also updates, in the same undo step, the references the project's other models hold on the changed Document Model — Print `FieldRef.path` (where `model` is the changed DM), Query field paths wherever they sit (2026-09-20, `QueryReferenceRefactoring`, scoped by which Document Model each is evaluated against: root `fields`/`sort`/`constraint`/`filterDefinition` = the target DM; a relationship hop's `fields`/`constraint`/`filterDefinition`, a sort entry through a relationship and `has`/`Has(...)` constraints = the role's DM; `linkDocumentFields` and link constraints = the relationship's link DM), Mapping `SortField.sortFieldFullName` (per `Source.dmId`), Structural Mapping `*FullName`s and Selection `Selected`/`Unselected` paths (both have no DM reference of their own, so they follow only when every Mapping/Combination Model using them agrees the changed DM is that side's/base model), and rules/computations of *other Document Models that include this one* (SME `calculateIncludedNameChanges`/`calculateIncludedPathChanges`; an Include mounts the children of the included model's root group, so the path tail after the Include group is re-derived from the included model's old/new tree). The affected models are edited in place (editors share the project tree's model instance and save on every edit, so there is no dirty state to clash with), saved, and announced via `ModelSaveEvent`; undo restores, saves and announces them again, and skips a model that was reloaded from disk meanwhile. Verified against every element of every DM in `testing/workspaces` (renames + moves; undo restores every model byte-for-byte; relative paths of including models still reach the same element). **Still missing:** Print calculation steps, Form `hostDocumentModelPath` (include provenance: the path of the host DM's Include group the include was bound to; followed since 2026-09-20 for a form bound to the changed DM, `FormIncludeProvenanceValidator` reports one that still goes stale, e.g. a path that runs into a DM that is merely included), paths through a *chain* of Includes or an Additive base model; an open editor of a rewritten non-DM model (Print/Query/...) isn't told to redraw, so it shows the old text until reopened (the model itself is already correct); conditions that don't parse are skipped (logged). Cut/Paste is delete + paste-as-clone with new ids, not a move, so it isn't refactored. | |
 | Ad hoc testing / live preview | Select elements (Alt+T, or bulk from the Ctrl+M panel), backend `AdHocTestService` calls kernel `DocumentModelService.createReducedDocumentModel(selected, partiallySelected)` + `generateValidationCode`, the client generates a Form Model from the reduced DM (`fmm-support` `FormModelGeneratorAPI`) and renders both in the preview window | **Missing - open, and to be built later** (decided 2026-09-20: deferred, not a non-goal; re-verified 2026-09-20: no ad hoc/reduced-model/DM-to-Form-generator code anywhere). Three ingredients, none present: (1) the reduced-model computation (kernel-only, `internal` API; ancestors of a selected element are "partially selected", rules/computations that touch only selected fields are kept), (2) compiled `validationCode`, (3) a real Form Engine renderer (see the project memory on real Form Model rendering: `fmm-support` is private, licence unconfirmed). Only (1) is kernel-spike territory; (2) and (3) are open regardless | |
 | Copy elements from another Document Model | "Copy Document Model" (`event_copy_dm`, Ctrl+Shift+C; `copyDocumentModelSagas.ts`): pick a standalone DM (same TD mode as the open one), the backend expands it, every Include is turned into a plain Group, the locales are synced to the open model, and its content is appended under the selected node (root if none). Type definitions: a source that owns TDs gets them copied as new TDs (usages re-pointed); a source that only imports TDMs gets those imports added to the open model's references | **Present (2026-09-20)**: "Insert from Document Model..." in the tree's Add menu, the context menus and on Ctrl+Shift+C (`DocumentModelActions#insertFromModel`, picker `InsertFromModelDialogController`, one undo step via `InsertModelContentCommand`). The work is done by `DocumentModelInsertion` (`a12-studio-models-validation`, `documentinsertion`, `DocumentModelInsertionTest` incl. a sweep of every fixture Document Model): deep copies of the source's root groups; every Include (also inside included models, recursively) becomes a plain group holding the included root group's children; a missing or cyclic Include stays an Include and is reported; type definitions follow SME's all-or-nothing rule (`TypeDefinitionMode`, shared with `IncludeTypeDefinitionModeValidator`) - any used type definition owned by a regular Document Model means all used ones are copied as new local type definitions (fresh id, unique name, fields re-pointed), otherwise the owning Type Definition Models are imported (skipping ones the target imports already, or that another needed one imports) - and a target of the other mode gets an explanation instead of a plan; labels in locales the target does not declare are dropped. Fresh element ids and sibling-unique names come from `DocumentModelElementFactory`. Picker: standalone Document Models only (no Type Definition or Additive models), other than the open one, with a compatible type-definition mode (SME's `hasSameTDMode`); a source that includes the open model is refused. **Differences from SME:** only type definitions a copied field uses are carried over (SME copies every one the source sees); a missing translation for a target locale is not padded with an empty text (the validators report it); a source with an unresolvable Include is still inserted, that Include kept and reported, where SME's expansion fails. Like SME, paths in copied rules/computations are copied verbatim - relative ones keep working inside the copied subtree, an absolute one starting at the source's root group does not. | |
@@ -114,10 +136,10 @@ Missing or worth checking against SME (`commonDocumentModel/api/editor/*`):
 | Drag & drop reorder/reparent in tree | Per-element `dnd` metadata (`draggable`/`droppable`/`reorderable`) | **Present** (confirmed 2026-09-05) — `DocumentModelElementsTreeController.setupRowDragAndDrop`/`resolveDropPosition`: reorder above/below, reparent into, root-end drop, with fixed-children/attachment-adjacency vetoes | |
 | Tree filtering (by type, category, annotated-only, etc.) | Filter panel (`tree/filter/filters.ts`, `useData.ts`): search by **name / id / label**; *Annotated* only; per element type (Validation Rules, Computation Rules, Attachments, Multi-Selects, Includes, Fields); per field type (String, Number, Date, Date-Time, Time, Date Fragment, Date Range, Confirm, Boolean, Custom, Enumeration - by *effective* type, i.e. through type definitions); *Always Required*; *Required If Parent Group Filled*. A group stays visible while any descendant matches | **Present (2026-09-20)**: `DocumentModelTreeFilter` (pure state + predicates, `DocumentModelTreeFilterTest`) applied by `DocumentModelElementsTreeController#toFilteredTreeItem`, edited in a popup behind the filter button next to the search field (`DocumentModelTreeFilterController` / `document-model-tree-filter.fxml`; `DocumentModelTreeFxTest` drives it). Same rules as SME: a hidden element type takes its subtree with it, a group stays while something below it (or, by search, itself) matches, the annotation filter applies to every leaf, the field-type filter sees a type-definition field as the base type it resolves to (through `ElementIndex#effectiveFieldType`; one whose type definition is missing is never hidden), the search matches name, id or label (all locales; only groups/fields have labels). With nothing set the tree is shown unfiltered, empty groups included; the filter button turns filled while a narrowing filter is on and the empty tree says "No element matches". **Differences from SME, on purpose:** the two requiredness checkboxes are a12-studio's two requiredness modes (always / only if the parent group is filled) joined as alternatives - SME ANDs two flags one of which implies the other - and switching one on hides every non-field element (SME keeps all rules and computations listed next to the required fields); the search compares the element name, not the tree label ("Group [5]"); the synthetic Base Model node of an additive model is not an Include the filter could hide. The filter state is per open tree and not persisted. | |
 | AI-assisted model generation | `documentModel/ai/*` — generates a DM from a prompt/PDF via `@com.mgmtp.ai.generation` | **Won't do** (decided 2026-09-19) | |
-| Additive Document Model (overlay/inherit/overwrite editing) | Separate module (`additiveDocumentModel`), full editing mode | `kernel-md-join` dependency present but no editor concept yet | |
-| Composed Document Model (graph composition via Element Picker) | Separate module (`composedDocumentModel`) | Missing | |
+| Additive Document Model (overlay/inherit/overwrite editing) | Separate module (`additiveDocumentModel`), full editing mode | **Partly present** (corrected 2026-09-20; the old "`kernel-md-join` dependency present" was wrong, there is no kernel dependency). An Additive Document Model is a plain Document Model whose header carries the `additive-document` annotation; `ModelFactory` instantiates the marker subclass `AdditiveDocumentModel` (icon, tree toolbar). The editor is the normal Document Model editor plus a read-only **"Additive Elements Only"** tree toggle that previews the base model (`AdditiveDocumentModelResolver`: reverse lookup over the project's Combined Document Models' `Addition` steps, first hit wins), and the validators resolve relative paths against the base model's fields (`ElementIndex`). **Not present:** SME's overlay editing mode (mark elements included/overwritten/purely-additive, add/remove against the base) and a real join (kernel `DocumentModelJoiningService`, feasible per the spike but not adopted). | |
+| Composed Document Model (graph composition via Element Picker) | Separate module (`composedDocumentModel`) | Missing (re-verified 2026-09-20: `composed-document` is only a tolerated reference type and a `composeddocument` version entry in `model-versions.json`; no class, editor or validator. Data Services' `cdm.queryRoot` property has no editor here either) | |
 | Multi-select bulk actions | Ctrl+M toggles a checkbox multi-selection panel (Ctrl+Space toggles all, Space toggles one); bulk Delete / Ctrl+X / Ctrl+C on the selection, bulk "Ad hoc Test" (Alt+T). SME also distinguishes copy-node from copy-node-and-children | **Present (2026-09-20)**, with different mechanics: the tree is a `TreeTableView` in `SelectionMode.MULTIPLE` (Ctrl/Shift-click, no checkbox mode, and none is planned); `DocumentModelActions#cutSelection`/`copySelection`/`confirmAndDeleteSelection` act on the *top-level* part of the selection (descendants of a selected node are not handled twice; elements inside Include/Attachment/Multi-Select groups and the synthetic additive base node are skipped), paste inserts every clipboard entry as a fresh clone (new ids, unique names - now unique among the pasted copies too) after the selected leaf / as last child of the selected group, and the context menu's "Create Overview Model from Selection" is a bulk action SME does not have. **Closed 2026-09-20:** Ctrl+X / Ctrl+C / Ctrl+V (Cmd on a Mac) work on the tree like SME's, each only where its toolbar button is enabled (the buttons' tooltips and the context menu show the keys); a bulk delete, cut or paste is **one undo step** (`CompositeCommand`, before: one per element); pasting several elements no longer risks two clones drawing the same id (`DocumentModelElementFactory.regenerateIds` now tracks the ids it hands out). Still different: the bulk "Ad hoc Test" (see above), copy always includes the children. | |
-| Markdown report generation per element | `createMarkdownReport`, used for AI/export tooling | Missing | |
+| Markdown report generation per element | `createMarkdownReport`, used for AI/export tooling | Missing — **parked** (2026-09-20: not started, do not start unless asked; re-verified no code) | |
 
 Also undocumented until now: a12-studio has a context-menu action with **no SME equivalent** —
 "Create Overview Model from Selection" (`DocumentModelActions.onCreateOverviewModelFromSelection`), multi-select
@@ -150,7 +172,7 @@ kernel's relative-path string via the new `ElementIndex.relativePathTo`, reused 
 `computedFieldRelPath`), `ComputationAlternativesPanelController` (repeatable precondition/operation rows,
 following `AnnotationsPanelController`'s plain-Java dynamic-row pattern), and two new
 `LocalizedTextPanelController.configureRuleErrorMessage()`/`configureComputationErrorMessage()` methods for the
-per-language error text. `errorCondition`/`precondition`/`operation` are plain-text `RichtextEditorController`
+per-language error text. `errorCondition`/`precondition`/`operation` are plain-text `RuleEditorController`
 panels with no semantic validator (see the "Editor features" correction above — there's no condition-language
 backend to validate against). Two new `ElementProperty` tags (`RULE_PROPERTIES`/`COMPUTATION_PROPERTIES`) replace
 the previous `GENERAL` tag on these checks in `BasicConsistencyValidator`/`MissingReferenceValidator`, so their
@@ -213,7 +235,11 @@ all run together on tree rebuild/save): `SchemaVersionValidator`, `DuplicateIdVa
 `AttachmentGroupValidator`, `BasicConsistencyValidator`, `MissingReferenceValidator`,
 `StringPatternErrorMessageValidator`, plus generic header-level ones (`MissingLocaleValidator`,
 `LocaleCodeValidator`, `ModelIdFilenameValidator`, `ModelSuffixValidator`, `UniqueModelIdValidator`,
-`NameConventionValidator`, `TimeZoneValidator`). Coverage is already broad and roughly matches SME's custom
+`NameConventionValidator`, `TimeZoneValidator`). Added since this analysis (2026-09-20 check of
+`DocumentModelValidationService`, 22 validators in all): the per-type config validators `StringTypeConfigValidator`,
+`NumberTypeConfigValidator`, `EnumerationTypeConfigValidator`, `CustomFieldTypeConfigValidator`,
+`DateFormatConfigValidator`, and `IncludeTypeDefinitionModeValidator` (local vs. imported type definitions must not
+mix, shared with the insert-from-model feature). Coverage is already broad and roughly matches SME's custom
 structural checks (`DMValidationService.kt`'s `checkMissingErrors` family: dangling Include ref, missing index
 field, duplicate names, missing computed-field target, too-few multi-select enum values, missing TypeDef ref) —
 the gap is not "missing validators," it's "validators correctly demand data that the UI provides no way to enter"
@@ -319,7 +345,7 @@ a12-studio's editor therefore has no live Document Model tree/checkbox view (SME
 is nothing durable in the file to resolve one against, and building a transient "pick a DM just for this editing
 session" flow was judged out of scope for a first editor. `Selected`/`Unselected` path specifications are instead
 edited as plain, pattern-validated text — the same tier of fidelity `overviewmodel.Column.expression`/
-`QueryModelContent.filterDefinition` already get via `RichtextEditorController`, just with plain `TextField` rows
+`QueryModelContent.filterDefinition` already get via `RuleEditorController`, just with plain `TextField` rows
 here since paths are single-line.
 
 **Editor** (`a12-studio-ui/.../editors/selectionmodel/`): `SelectionModelEditorController`, a single-tab
@@ -364,10 +390,11 @@ now distinguishes an absent key from an explicit `[]` (null-backed header DTO + 
 *Analyzed 2026-09-06 (the previous version of this section, "Form Model — not started", was written before this
 module existed in a12-studio and is factually wrong — do not trust anything from before this date about Form Model).*
 
-a12-studio's Form Model editor is **substantial, not empty**: 55 data-model classes
-(`a12-studio-models/.../formmodel/`), ~35 UI controllers/panels (`a12-studio-ui/.../editors/formmodel/`, tree +
-per-node-type editors + dialogs + a preview server), and 6 validators
-(`a12-studio-models-validation/.../validators/form/`). It covers the core Screen/Section/ControlGrid/Row/Control
+a12-studio's Form Model editor is **substantial, not empty**: 76 data-model classes
+(`a12-studio-models/.../formmodel/`), 92 UI classes (`a12-studio-ui/.../editors/formmodel/`, tree +
+per-node-type editors + dialogs, plus the preview server in `.../ui/preview/`), and 30 form-specific validators
+(`a12-studio-models-validation/.../validators/form/`; counts as of 2026-09-20, the section was written against 55 /
+~35 / 6). It covers the core Screen/Section/ControlGrid/Row/Control
 tree, field/group configuration with dependent-field/group hide-and-readonly rules, responsive (lg/md/sm) layout,
 repeats (Inline/Embedded/Detached), buttons, and a lightweight live preview. The gaps below are real but are gaps
 *within* a mature editor, not a from-scratch build.
@@ -382,13 +409,13 @@ repeats (Inline/Embedded/Detached), buttons, and a lightweight live preview. The
 | `ControlGrid` | `ControlGrid` | Has it (layout, verticalAlignment, readonly/readonlyPresentation) |
 | `Row` | `Row` | Has it |
 | `Control` | `Control` | Has the fields. `index` (`ControlIndex`: `type` SEMANTIC/NUMERIC + `value`) since 2026-09-19 - despite the "search-indexing" reading it is SME's *Control Index*: which repetition of a repeatable group a Control shows when it is placed outside that group's repeat (numeric = row number, semantic = value of the group's index field). `ControlIndexPanelController` is shown when `ControlIndexSupport.isIndexable` says so (SME's `isIndexableControl`: granularity distance from the enclosing Embedded/Detached Repeat to the field is positive, needs `ElementIndex.granularity`) or an index is already set. No real fixture carries an `index` (the wire shape is SME's mapping rule + the editor's `Index` group), and SME applies no checks to the value. Not done: SME's backend consistency error for an indexable Control *without* index (belongs with the form-vs-DM drift check, TODO #7b) and the heterogeneous-to-many initial-value rule. `nameForTree` is deliberately **not** modeled: SME derives it from the Document Model element's name for the editor tree (`transformWithDocumentModel.ts`), it is not in the wire mapping (`mappingRules/control.ts`) and appears in no fixture. `datePickerConfig` (year range of the date picker) has a panel since 2026-09-19 (third pass), shown for date, date-time and `YYYY-MM-DD` date-range fields - `DatePickerConfigPanelController`, shared with the column editor; an empty config is dropped like SME's `removeEmptyDatePickerConfig`, and `FormDatePickerConfigValidator` ports the three range rules of `I_DatePickerConfig.json` |
-| `TextCell` | `TextCell` | Data model has it (`decoration`, `content`); **no editor panel** — once added via the tree it can't be edited |
-| `ExpressionCell` | `ExpressionCell` | Data model has it (`expression`); **no editor panel**, same as TextCell |
-| `CustomCell` (a named custom-component cell inside a grid row) | — | **Absent** — unknown cell types fall back to a generic, unnamed placeholder, unlike `CustomScreenElement` which *is* a first-class type |
+| `TextCell` | `TextCell` | Has it, with an editor panel (`FormNodeEditorTextCellPanelController`, step 2 below; corrected 2026-09-20, this row said "no editor panel") |
+| `ExpressionCell` | `ExpressionCell` | Has it, with an editor panel (`formnode-editor-expression-cell-panel.fxml`; corrected 2026-09-20). Its expression is still edited in a plain `TextArea`, not the rule editor - see the CLAUDE.md convention on expression fields |
+| `CustomCell` (a named custom-component cell inside a grid row) | `CustomCell` | Has it, with an editor panel (`FormNodeEditorCustomCellPanelController`, step 6 below; corrected 2026-09-20, this row said "Absent") |
 | `CustomScreenElement` | `CustomScreenElement` | Has it, including `height` (2026-09-19): `CustomScreenElementHeightPanelController` edits it as whole pixels (blank = component's own height) and `FormCustomScreenElementHeightValidator` ports SME's `zeroNotAllowed`; all 16 `height` values in the fixture workspaces are on this element type |
-| `ButtonPanel` (a button bar addable as its own node *inside* the screen tree) | — | **Absent** — a12-studio only supports buttons in the model-level/per-screen header+footer boxes (`HeaderFooterBox`), never as an inline, addable screen-tree node |
+| `ButtonPanel` (a button bar addable as its own node *inside* the screen tree) | `ButtonPanel` | Has it, addable inline in the tree with its own editor (`FormNodeEditorButtonPanelPanelController`, step 6 below; corrected 2026-09-20, this row said "Absent" and that buttons only live in the header/footer boxes) |
 | `DetachedRepeat` / `EmbeddedRepeat` / `InlineRepeat` | same | Has it structurally; see "Repeats" below for field-level gaps |
-| `Binding` / `BindingRepeat` (CDM relationship-driven selector/repeat) | — | **Completely absent** — no class, no UI, no validator. Confirmed by grep: zero matches for "Binding" anywhere in `a12-studio-models/.../formmodel/` |
+| `Binding` / `BindingRepeat` (CDM relationship-driven selector/repeat) | `Binding` only | **`Binding` partly present since 2026-09-18** (corrected 2026-09-20, this row said "Completely absent"): `Binding`/`BindingContent`/`BindingDetails`/`BindingMetaInformation`, created by dragging a relationship from the Relationships panel onto the tree (`RelationshipModelPanelController` → `FormModelTreeController#dropRelationshipModel`), edited in `FormNodeEditorBindingPanelController` (name, relationship, target role) and checked by `FormBindingRelationshipReferenceValidator` / `FormBindingTargetRoleValidator`. Only the relationship linkage is modeled; SME's UI-component configuration (dropdown / dual-pane / table-list selection widgets, CDM child-activity wiring, edit-modal) is ignored on load and **lost on save** (`BindingContent` is `ignoreUnknown`). **`BindingRepeat` does not exist** (no `ScreenElementType`), and everything CDM-specific stays parked |
 | `FieldBasedRepeatOverviewColumn` | `FieldBasedRepeatOverviewColumn` | Present, with "Add Column" and an editor panel (label/width/sortable/filterable/preferred sorting, readonly, message position) plus, since 2026-09-19, panels for **display** (hide label, fixed width, filter exposition - only enabled for a filterable column), **pin direction**, **icon**, **alignment** (independent horizontal/vertical overrides for header and content), the per-column **hide condition** (`ConditionallyHidden`; master fields scoped to the column's own field, like a Control), **header styles**, annotations and, for a column bound to a date field, the **date picker** year range. The width field takes decimals (SME: at least 0.3, one decimal place; `FormColumnWidthValidator`), which the editor used to truncate to an integer - `RepeatOverviewColumn.getWidth()` is now a `Double` and still writes an integral width as an integer, like the fixtures |
 | `ExpressionRepeatOverviewColumn` (compute a column via expression instead of a field) | `ExpressionRepeatOverviewColumn` | Present (step 2 below); its expression is edited with the rule editor (`RuleEditorController`), and it shares the pin direction / icon / hide-condition panels above (hide-condition master fields scoped to the enclosing repeat's group, as in SME's `resolveDmElementForFmElement`) |
 
@@ -400,7 +427,9 @@ This is the area with the most concrete, well-defined gaps:
   `initialValue`, `suffix`, `exposition`, `readonly`, `dependentField`, `elementRef`. SME's `FieldConfigurationEntry`
   additionally has: `enableSelectAll` (multi-select "select all" toggle), `formatting`, `secret` (password masking),
   `annotations`, and — the two biggest ones — **`dependentEnumeration`** and **`externalEnumeration`**, each an
-  entire feature a12-studio has no representation of at all:
+  entire feature a12-studio had no representation of at all. **All of these were added on 2026-09-06 (step 1 and
+  step 3 in the build order below; re-checked 2026-09-20) - the description that follows is the baseline that
+  motivated that work:**
   - `dependentEnumeration` (`DependentEnumeration`: `masterField` + `constraint[]`, each `{masterValue,
     constraintValues[], valueForMasterChange}`) — constrains *which enum values* a dependent field may offer based
     on a master field's value (distinct from `dependentField`'s readonly/notRelevant, which only affects visibility).
@@ -413,8 +442,8 @@ This is the area with the most concrete, well-defined gaps:
     the default; an `attachmentConfig` with nothing set is removed again.
 - **`GroupConfigEntry`** is roughly at parity (`dependentGroup`, `groupRef`, `numberOfInitialRows`); a12-studio even
   adds `label`/`hint`/`placeholder` fields SME keeps elsewhere — not a gap, just a modeling difference.
-- **Hide condition** (`ScreenElement.hideConditionField`/`hideConditionValue`,
-  `a12-studio-models/.../formmodel/ScreenElement.java`): a12-studio models exactly **one** trigger value per master
+- **Hide condition — closed 2026-09-06 (step 1), text below is the baseline.** (`ScreenElement.hideConditionField`/`hideConditionValue`,
+  `a12-studio-models/.../formmodel/ScreenElement.java`, both since replaced by `HideCondition`/`HideConditionCase`): a12-studio modeled exactly **one** trigger value per master
   field. SME's `HideCondition` (`fmElements/types/hideCondition.ts`) is `{masterField, cases: HideConditionCase[]}`
   — a list of trigger values. This matters concretely for Enum-typed master fields: SME can hide an element when the
   master is any of several enum values, a12-studio can only match one. This is a structural data-model gap (not
@@ -422,8 +451,9 @@ This is the area with the most concrete, well-defined gaps:
   `masterField`/`cases[]` shape, which is also what would let a12-studio implement SME's two hide-condition
   validators (see below).
 - **`DependentField`**: present and matches closely (`masterField` + cases of `masterValue`/`notRelevant`/`readonly`),
-  but SME's `DependentFieldCase` additionally supports `value`/`fieldRef` — force a specific value, or copy one from
-  another field, when the master changes. a12-studio's `DependentCase` has no equivalent.
+  and `DependentCase` also carries `value`/`fieldRef` - force a specific value, or copy one from another field, when
+  the master changes (the Dependent Field panel's Value-Type picker, step 3 below; corrected 2026-09-20, this bullet
+  said a12-studio had no equivalent).
 - **`DependentGroup`**: at parity (`masterValue`/`notRelevant`/`readonly`).
 - **Dependent controls** (a control/group hiding *other* screen-tree nodes, SME's `dependentControls`/
   `ScreenElementRef`): SME stores them on the master `Control` itself (`dependentControls.screenElement[]` of
@@ -440,11 +470,11 @@ This is the area with the most concrete, well-defined gaps:
 ### Repeats
 
 SME's shared `RepeatBase` (`fmElements/types/detachedRepeat.ts`) has several fields `AbstractRepeat.java` doesn't:
-- **`filterExpression`** — a per-repeat filter expression. Completely missing (a12-studio only has per-node
-  `elementRef`/config, no repeat-level filter).
-- **`initialSorting`** — which overview column the repeat is initially sorted by. Missing (and its matching SME
-  validator, "a repeat's `initialSorting` column must itself be sortable", has no a12-studio equivalent since neither
-  side exists).
+- **`filterExpression`** — a per-repeat filter expression. **Present since 2026-09-06 (step 4)** on `AbstractRepeat`, with UI.
+- **`initialSorting`** — which overview column the repeat is initially sorted by. **Present since 2026-09-06 (step 4)**
+  on `AbstractRepeat`, with UI. Its matching SME validator ("a repeat's `initialSorting` column must itself be
+  sortable", `SortableColumnCustomCondition`) is **still not ported** (re-verified 2026-09-20: nothing under
+  `validators/form/` checks it; the Overview Model has its own `OverviewInitialSortingReferenceValidator`).
 - **`rowActionGroup`** — a list of custom row actions, each with its own `buttonStyling`, `event`, `confirmation`/
   `confirmationDialogTitle`, and `scope`. **Closed** (step 4 below, completed 2026-09-19): the "Row Actions" table edits
   event/scope inline and an Edit dialog (`RowActionDialogController`, mirroring SME's `I_SectionRowAction-form.json`
@@ -457,16 +487,16 @@ SME's shared `RepeatBase` (`fmElements/types/detachedRepeat.ts`) has several fie
   `FormDefaultRowActionValidator` reports a default the editor could not have offered. Rename tracking assumes
   the row-action list keeps its length (an inline event edit or the Edit dialog) - the same assumption as SME's
   index-based lookup in the form-engine backup.
-- **`titleHidden`** — missing.
-- **`confirmationTexts`** per-repeat override — a12-studio only has a model-level default (`Defaults.confirmationTexts`),
-  no per-repeat override.
+- **`titleHidden`** — present since 2026-09-06 (step 4).
+- **`confirmationTexts`** per-repeat override — present since 2026-09-06 (step 4), next to the model-level default
+  (`Defaults.confirmationTexts`).
 - **`MultiFileUploadOptions`** (attachment-repeat config: download toggle, upload description/button/helper text) —
   **Closed** (2026-09-19): `RepeatMultiFileUploadPanelController` on Inline/Embedded repeats (hidden for Detached). As
   the SME docs require, enabling picks the repeated group's single non-repeatable attachment group automatically
   (`MultiFileUploadSupport`) and is refused with an error naming the group if there is none/several. The
   `attachmentConfig` gap above (`accept`, `placeholderIcon`, `defaultAction`) is closed too, see there.
-- **`TableStyle`**: SME's has `cardHeight`/`actionColumnWidth` in addition to `tableHeight`/`rowHeight`, which are all
-  a12-studio's `TableStyle` has.
+- **`TableStyle`**: SME's has `cardHeight`/`actionColumnWidth` in addition to `tableHeight`/`rowHeight`; both were
+  added to a12-studio's `TableStyle` on 2026-09-06 (step 4).
 - **No repeat-type conversion** (Detached⇄Embedded⇄Inline⇄Binding) exists in the UI — converting requires
   delete-and-recreate, confirmed by reading `FormModelActions`/`FormModelNodeTypes`.
 
@@ -539,13 +569,13 @@ editor, not of the include.
 
 ### Model-level / editor-structure gaps
 
-- **No "Data Configuration" tab.** SME centralizes all dependent-enum/field/group and hide-condition authoring in one
+- **"Data Configuration" tab — added 2026-09-06 (step 3 below; the bullet is the baseline).** SME centralizes all dependent-enum/field/group and hide-condition authoring in one
   tab with a fields tree, candidate-value pickers, and refactor-safe editing
   (`editor.elements/dependencies/`, ~35 files). a12-studio spreads the equivalent across per-node panels only
   (Hide Condition panel per node, Confirm Dependencies tab for Confirm controls) — there's no centralized place to
   see/manage every dependent-enum or dependent-field rule in the model, and no authoring path at all for
   `dependentEnumeration`/`externalEnumeration` since those don't exist yet.
-- **No "Cleanup" tab.** SME's `editor.cleanup/` flags `FieldConfigEntry`/`GroupConfigEntry` rows that no longer have
+- **"Cleanup" tab — added 2026-09-06 (step 3 below; the bullet is the baseline).** SME's `editor.cleanup/` flags `FieldConfigEntry`/`GroupConfigEntry` rows that no longer have
   a live referencing screen node or a resolvable DM field/group (`isInconsistentEntry`), and offers a one-click
   "Clean All". a12-studio's `FormFieldReferenceValidator` catches the same dangling-reference case but only as a
   validation *error* — there is no UI action to prune it, so the user has to hand-edit JSON or delete-and-recreate.
@@ -577,11 +607,15 @@ editor, not of the include.
   explicitly-labeled "lightweight v1 wireframe" from the live in-memory model in an external browser tab. SME's
   preview drives the actual Form Engine runtime via postMessage sync. This is a reasonable simplification given
   a12-studio doesn't embed the Form Engine, but anyone relying on preview fidelity (e.g. to check real control
-  rendering, not just layout) should know it's a wireframe, not a rendering-accurate preview.
+  rendering, not just layout) should know it's a wireframe, not a rendering-accurate preview. **Added 2026-09-20 for
+  completeness:** a12-studio also has SME's *other* preview concept, "Deploy → Preview App": `PreviewAppProcess` /
+  `PreviewAppDeployer` (`a12-studio-ui/.../previewapp/`) run the real `preview-app-server` from an A12 installation for
+  the open project, after `ModelConversionService` (the vendor's `WcfCli`, separate JVM) has converted the Document
+  Models to runtime form. That is a real render of a *deployed* project, not the instant in-editor preview.
 
 ### Validators — gap list
 
-a12-studio's 6 validators (`FormModelValidationService`) map onto a slice of SME's validation surface. SME combines
+a12-studio's form validators (`FormModelValidationService`; **2026-09-20: 30 form-specific ones plus the 6 generic header validators, the table below was written against 6 - rows are marked where they have since been closed**) map onto SME's validation surface. SME combines
 declarative kernel meta-model rules (structural/type checks, not hand-written) with 21 hand-written "custom
 conditions" (`validation/customConditions/index.ts`) — a12-studio has no declarative meta-model layer, so its
 validators are the sole source of truth here.
@@ -594,16 +628,18 @@ validators are the sole source of truth here.
 | `FormLayoutColumnSumValidator` | `LayoutLgSumIsGreaterTwelveCustomCondition` | Matches (sum ≤ 12) |
 | `FormSiblingNameUniquenessValidator` | (likely a declarative kernel uniqueness rule) | No custom-condition equivalent found; probably fine as a12-studio-side logic since there's no kernel layer to duplicate |
 | `ControlGridLayoutValidator` | `InconsistentNumberOfColumnsCustomCondition` + kernel per-cell layout rules | a12-studio's version was reverse-engineered from a real fixture since the per-cell offset/span check isn't a custom condition in SME (kernel-declarative) |
-| — | `DependentEnumerationMasterRequired` / `DependentFieldMasterRequired` / `DependentGroupMasterRequired` | **Gap** — a12-studio has no validator ensuring `masterField` is set whenever a `dependentField`/`dependentGroup` block exists (and can't have one for `dependentEnumeration` since that field doesn't exist) |
-| — | `ExternalEnumerationSourceRequired` | N/A until `externalEnumeration` is modeled |
+| `DependentEnumerationMasterRequiredValidator`, `DependentFieldMasterRequiredValidator`, `DependentGroupMasterRequiredValidator` | `DependentEnumerationMasterRequired` / `DependentFieldMasterRequired` / `DependentGroupMasterRequired` | **Done** (2026-09-06, step 1; row corrected 2026-09-20, it said "Gap") |
+| `ExternalEnumerationSourceRequiredValidator` | `ExternalEnumerationSourceRequired` | **Done** (2026-09-06, step 1; row corrected 2026-09-20, it said "N/A") |
 | `DependentControlOptionsMustExistValidator` | `DependentControlOptionsMustExistInFormModel(Editor)` | **Done** (2026-09-19) — checks `Control.dependentControls` (exists / same top-level screen / allowed type, one message per reason) and the ids in the Confirm tab's `notRelevantNodes`. The `Editor` variant is SME-internal (form open in editor vs. workspace validation) and has no a12-studio counterpart |
 | `DependentControlsAtLeastOneOptionValidator` | `DependentControlsAtLeastOneOptionMustBeSelected(Editor)` | **Done** (2026-09-19) — a `dependentControls` block with no `screenElement` |
 | `FormDependencyDriftValidator`, `FormDependentControlContextValidator`, `FormReferenceTypeDriftValidator`, `FormControlIndexRequiredValidator` | kernel `ConsistencyValidator` (backend `checkConsistency`), `determineDependentEnumState`, `areControlAndScreenElementCompatible` | **Done** (2026-09-20, TODO #7) — form-vs-Document-Model drift, see "Structural consistency check" above |
 | `DependentFieldAtLeastOneActionValidator` | `DependentFieldAtLeastOneActionPerCaseMustBeSelectedCustomCondition` / `CaseValueIsUndefined` | **Done** (2026-09-19) — every case of a `dependentField` with a master field needs `notRelevant`/`readonly`/`value` (`""` counts)/`fieldRef` (or, a12-studio only, `notRelevantNodes`); see `DependentCase.hasAction()` |
 | — | `InitialFocusedElementOnlyOnFirstScreen` (+ the screen's `InvalidReference` on `initiallyFocusedElementId`) | **Done** (2026-09-19) — `FormInitiallyFocusedElementValidator` |
-| — | `AtLeastOneHideConditionCaseFilled` / `OnlySupportedHideConditionValuesPresent` | **Gap** — blocked on the hide-condition `cases[]` gap above; once that exists, needs a validator checking the chosen values are actually possible for the master field's type |
-| — | `SortableColumnCustomCondition` | N/A until `initialSorting` is modeled |
-| — | `DescendantOfHeterogeneous(ToMany)Relationship`, `InitialValueAndDescendantOfHeterogeneousToManyRelationship`, `InvalidBindingRepeatRepetitionAndMultiplicity` | N/A — all CDM/`Binding`-specific, blocked on that feature not existing |
+| `HideConditionAtLeastOneCaseValidator`, `HideConditionSupportedValuesValidator` | `AtLeastOneHideConditionCaseFilled` / `OnlySupportedHideConditionValuesPresent` | **Done** (2026-09-06, step 1; row corrected 2026-09-20, it said "Gap") |
+| — | `SortableColumnCustomCondition` | **Gap** (2026-09-20) — `initialSorting` has been modeled since 2026-09-06 but no validator checks that the chosen column is sortable |
+| `FormBindingRelationshipReferenceValidator`, `FormBindingTargetRoleValidator` | Binding relationship/role reference rules | **Done** (2026-09-18) for the linkage fields `Binding` models; the other CDM/`Binding` rules below stay N/A |
+| `FormGroupReferenceValidator`, `FormUnusedConfigEntryValidator`, `FormStyleReferenceValidator`, `FormDefaultRowActionValidator`, `FormDatePickerConfigValidator`, `FormColumnWidthValidator`, `FormCustomScreenElementHeightValidator`, `FormIncludeProvenanceValidator` | (kernel-declarative / editor rules, see the per-feature sections) | Added 2026-09-06 to 2026-09-20 along with the features they guard; each is described where its feature is |
+| — | `DescendantOfHeterogeneous(ToMany)Relationship`, `InitialValueAndDescendantOfHeterogeneousToManyRelationship`, `InvalidBindingRepeatRepetitionAndMultiplicity` | N/A — all CDM/`BindingRepeat`-specific, blocked on that feature not existing (no `BindingRepeat`, no Composed Document Model) |
 
 ### Proposed build order
 
@@ -705,8 +741,11 @@ covered by round-trip tests.**
 - **Found and fixed along the way**: a pre-existing round-trip bug unrelated to this work —
   `Row.cell` lacked `@JsonInclude(NON_EMPTY)`, so an empty row's `[]` cell list was written back as an explicit
   `"cell": []` instead of matching source files that omit it.
-- **Not done**: step 7 (`Binding`/`BindingRepeat`) — still correctly blocked on Relationship Model/CDM support per
-  the reasoning above; not attempted.
+- **Not done**: step 7 (`Binding`/`BindingRepeat`) — still correctly blocked on Composed Document Model support per
+  the reasoning above. **Update 2026-09-20:** the Relationship Model half of that blocker is gone (the Relationship
+  Model editor exists), and a minimal `Binding` (relationship + target role only, created by dragging a relationship
+  onto the tree) has existed since 2026-09-18 — see the `Binding` row in "Element types". `BindingRepeat` and Binding's
+  UI-component configuration remain unbuilt; per the "Parked" list in TODO.md this stays parked.
 
 ---
 
@@ -745,14 +784,14 @@ needs to copy architecturally.
 
 | Feature | SME reference | a12-studio status |
 |---|---|---|
-| Editable tree / document graph | Add a root DM via an ER-diagram picker (reuses the Model Graph Diagram component); add relationship-traversal nodes (only relationships actually connected to the selected node are offered) | **Missing** — tree is a fixed, read-only mirror of one target DM's fields/groups; no traversal nodes, no add/remove |
+| Editable tree / document graph | Add a root DM via an ER-diagram picker (reuses the Model Graph Diagram component); add relationship-traversal nodes (only relationships actually connected to the selected node are offered) | **Present since 2026-09-06** (corrected 2026-09-20; this row said "Missing — fixed, read-only mirror"): `content.links[]` (`QueryLink`) traversal hops, nested to any depth, added/removed in `QueryModelTreeController`; see "Status (2026-09-06): Phase 2". Still not like SME: the root DM is chosen in the Settings tab, not through an ER-diagram picker |
 | Per-node filter/constraint | Query-language grammar editor (ANTLR-backed, field/relationship autocomplete against the model graph), compiles to the `Operator` AST; semantically validated (field exists, type-correct operator, valid relationship+role) | Present, per graph node (`QueryDocumentNodePanelController`'s embedded `RuleEditorController`, `QueryLanguageEmitter`-validated, bracketed-path autocomplete via `BracketedPathSuggestionProvider`) — free-text QL grammar rather than SME's structured-AST editor, and only syntax is checked (field existence inside the expression isn't) |
 | Target Document Model selection | Settings tab, editable at any time | Present (Settings tab, `QuerySettingsPanelController`), roughly at parity |
-| In-result field toggles | Inline tree checkboxes, tri-state on groups, disabled+forced for non-indexed fields | Present (`QueryModelTreeController`'s In-Result column, tri-state on groups) **and** the right panel's "Fields included in Result Set" list (add/remove + "All Fields of the Document Model") — a12-studio has no `indexed`-annotation concept at all, so non-indexed fields aren't specially disabled |
+| In-result field toggles | Inline tree checkboxes, tri-state on groups, disabled+forced for non-indexed fields | Present (`QueryModelTreeController`'s In-Result column, tri-state on groups) **and** the right panel's "Fields included in Result Set" list (add/remove + "All Fields of the Document Model") — non-indexed fields are still not specially disabled or forced in the tree (corrected 2026-09-20: the `indexed = false` annotation *is* known since the aggregation work, and the filter, aggregation and sort validators use it; the *field projection* check `QueryFieldReferenceValidator` and the tree checkbox do not) |
 | Sort | Multi-field, relationship-hop, direction, null-handling, ignore-case | Present (`QuerySort`/`QuerySortBy`/sorting panel), roughly at parity — `QueryTraversalOption.options()` scopes to *every* relationship in the project rather than only ones connected to the target DM |
 | Paging | pageNumber/pageSize | Present, roughly at parity |
 | Aggregation/grouping | Full group-by + count/sum/max/min/avg mode | **Present** (2026-09-20) — `QueryAggregationPanelController` on the Post Processing tab: the switch, group fields, aggregations (function, field, alias); offers only eligible fields (non-repeatable, not `indexed = false`) and, per aggregation, only fields the chosen function fits; `QueryAggregationValidator` (see the Validation row and "Status (2026-09-20): aggregation done") |
-| Multi-target-type queries (CDM, Transformer Model as target) | Supported | Not supported — DM only |
+| Multi-target-type queries (CDM, Transformer Model as target) | Supported | Not supported — DM only (**parked**, 2026-09-20; also blocked: there is no Composed Document Model or Transformer Model here) |
 | Reference/rename tracking | Target-DM, relationship, sort/aggregation field-path references are all first-class in SME's refactoring graph; renaming a DM/field auto-updates or flags the query (`qmModule.ts` `refactorDocument()`) | **Present** (2026-09-20; was partly present 2026-09-19) — renaming/moving an element of a Document Model rewrites every query field path evaluated against it, at any depth: root and hop `fields`, `sort` (also through a relationship), `constraint` (also below `has`), `filterDefinition` text (`[/Path]` refs, also inside `Has(...)` constraints), a hop's `linkDocumentFields` (`ProjectReferenceRefactoring` → `QueryReferenceRefactoring`, one undo step with the DM edit). Renaming a Document Model or Relationship Model *file* (id) rewrites `targetDocumentModel`, `relationshipModel` of hops/sorts/`has` operators (nested included, `ModelReferenceRewriter`) and, new, the relationship named in `Has("<rel>", ...)` inside `filterDefinition` text; SME's own `refactorDocument()` only handles `targetDocumentModel`. An unresolvable target is now an explicit error (validator + banner in the Model Tree tab + message in the Settings tab's target combo), see the Validation row. **Still missing:** a *role* rename in a Relationship Model (the role field commits per keystroke and nothing — Query, Form bindings, Relationship UI — reacts to it; the Query validators flag the dangling `targetRole`), an aggregation's paths are covered since 2026-09-20 (`aggregation.group[].field`, `aggregation.aggregations[].field`, target DM only) |
 | Validation | Root-required, per-node schema validation, constraint semantic validity, target-role validity, field-projection sanity, tab-level validation counts | Present (`QueryModelValidationService`, `a12-studio-models-validation/.../validators/query/`): target-DM required **and must exist in the project** (2026-09-20; before, a dangling target was only caught when the header's DOCUMENT reference still named it, otherwise the tree was just empty), `fields[]`/sort field-path resolution (root and per-link, recursive), relationship+role resolution (sort traversal and graph links, recursive), paging bounds, and `filterDefinition` QL syntax (root and per-link, recursive) — field-projection sanity is reachability-only (the "Add" combo only offers real field paths, so an invalid path isn't reachable through the UI at all); refs *inside* a filter expression's text are resolved too since 2026-09-20 (see "Status (2026-09-20): semantic filter validation done"); `content.aggregation` (`QueryAggregationValidator`, 2026-09-20): every group/aggregation field must resolve to a non-repeatable field that is not `indexed = false`, function/field-type compatibility, no links, `document` projection (see "Status (2026-09-20): aggregation done") |
 
@@ -784,7 +823,7 @@ that happens to target TypeScript today, not something wrapping a closed kernel 
   `moduleSupport/qmm/test/core/checker/*.test.ts`), not a from-scratch design.
 - **Only the Monaco-editor integration layer (~1,800 lines: completion/hover/inlay-hint providers, theming) doesn't
   port** — that's genuinely IDE-specific and would need a JavaFX/RichTextFX-based replacement (building on
-  `RichtextEditorController`, which already hosts a `CodeArea`), reusing the ported binder/checker for the semantic
+  `RuleEditorController`, which already hosts a `CodeArea`), reusing the ported binder/checker for the semantic
   data (field types, valid completions) rather than reimplementing that logic twice.
 - **The emitted target shape, `Query.Operator`**, comes from `@com.mgmtp.a12.dataservices/dataservices-access` (a
   real published package, not workspace-local) — but since a12-studio only needs to *author and validate* this JSON
@@ -797,7 +836,7 @@ from-scratch structured filter-builder.** This is more work than a simple field/
 gets a12-studio to the exact same query language and JSON output SME produces (so files stay
 interchangeable/round-trippable) instead of inventing a parallel, incompatible filter representation. The
 editor-integration (autocomplete/highlighting) can be scoped down initially — ship the grammar/compiler port with a
-plain syntax-highlighted `RichtextEditorController`-style editor first, add autocomplete as a follow-up once the
+plain syntax-highlighted `RuleEditorController`-style editor first, add autocomplete as a follow-up once the
 semantic layer (binder/checker) exists to drive it.
 
 **Status (2026-09-05): grammar/parser step done.** `QL.g4` (byte-identical to SME's, since the grammar itself has
@@ -909,7 +948,7 @@ it's still one whole-query expression, not yet a per-node constraint.
   (`QueryFilterDefinitionSyntaxValidator`, via `QueryLanguageEmitter`). A sort entry that *does* traverse a
   relationship has its field-path validation skipped for now — resolving the hop's own target DM to check the
   field against needs more infrastructure than this pass adds; the traversal itself is still validated.
-- **Filter dialog validation**: `RichtextEditorController` (the shared expression-editor panel also used by
+- **Filter dialog validation**: `RuleEditorController` (the shared expression-editor panel also used by
   Overview/Form) gained a generic `setValidator(Function<String, String>)` hook — on every change (and once on
   load) it shows the validator's message in its own error container, or clears it. `QueryFilterDefinitionDialogController`
   wires this to `QueryLanguageEmitter`, and binds the OK button's disabled state to the panel's `errorProperty()` —
@@ -1125,22 +1164,39 @@ Every SME module implements `SMEModule`/`DefaultSMEModule` and (if it's a standa
 `ExplorerEntry`. Load/save nearly always follows the same pattern: parse raw workspace files into an in-memory
 document, serialize back to JSON (occasionally YAML) on save.
 
-### Priority order for a12-studio, cross-referenced against existing kernel deps/scaffolding
+### Status and priority (re-verified 2026-09-20)
 
-| # | Module | Why this priority |
-|---|---|---|
-| 1 | **structuralMappingModel** | Kernel lib present (`kernel-md-structuralmapping-tool`); `SmmService`/`AddFieldMappingDto` scaffolding exists in `a12-studio-data-services`. SME's editor: source-tree/target-tree drag&drop field mapper, resolution-strategy editor for conflicts. Foundational — referenced by mappingModel and combinationModel. |
-| 2 | **mappingModel** | Depends on structuralMappingModel + additiveDocumentModel; scaffolding exists (`SMEMappingModelService`, `MappingModelComputationDto`, `StructuralMappingModelGenerationDto`). ETL-style: source DM(s) + target DM + optional precomputation, driven by a referenced SMM. |
-| 3 | **combinationModel** | **Structural editor + validators built 2026-09-08** (see dedicated section above) — fields and the 7 structural `Rule`s are ported, and base/additive-model loop detection since 2026-09-20 (reference graph only); DM-expansion/SMT validation is not, since no kernel expansion service exists in this repo despite the "combination model" kernel lib being present. |
-| 4 | **additiveDocumentModel** | Kernel lib present (`kernel-md-join`) but no dedicated data model/editor yet. Hard dependency of both mappingModel and combinationModel — needed before those are fully usable. Overlay editing mode: elements are included/overwritten/purely-additive relative to a base DM. |
-| 5 | **relationshipModel** | No current scaffolding, but foundational — link, masterDetailModel, treeModel, modelGraphDiagram, and formModel's `Binding`/`BindingRepeat` all reference it. |
-| 6 | **selectionModel** | **Structural editor + validators built 2026-09-13** (see dedicated section above) — `enabled: true`. Fields (Data/Computation/Validation, each Default+Selected+Unselected) and all 7 structural rules are ported; the live Document Model tree SME's standalone editor has is not, since SME never persists a reference DM in the file to build one against. |
-| 7 | **printModel** | Kernel libs present (`print-engine-api/runtime`); `PrintService`/`DocumentModelResolver`/`PrintParameters` scaffolding exists. Most editor-complex of the print family — relies on an external print-engine component library for the layout canvas. Backend renders PDF only (PDFBox or legacy engine), no HTML path. |
-| 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. `print-typesetting` lib already present; no dedicated model/service for either exists yet. |
-| 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model (don't confuse with Document Model itself). |
-| 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side (built on top of a DM), not blocking other model types. See dedicated "Query Model" section above for a12-studio's current gap list. |
-| — | **appModel, masterDetailModel, modelGraphDiagram, treeModel, transformerModel, contentModel, typeDefinitionModel, umModule, settingsModule, filesModule, attachment, data** | Standalone but lower cross-reference count or explicitly experimental in SME itself (contentModel, mappingModel, queryModel, selectionModel, combinationModel, transformerModel, structuralMappingModel are all marked `isExperimental()` in SME). |
-| n/a | **common, preview** | Not model types. `common` = shared editor UI building blocks (element picker, expression editor, tabbed-frame scaffolding) used across modules. `preview` = pure runtime capability (opens a browser window running the live app, synced via postMessage), no persistence, no explorer entry. |
+The original priority column ("Why this priority", written 2026-07-17) is kept because it still explains the
+ordering, but its claims about existing kernel libraries and `a12-studio-data-services` scaffolding were wrong (see the
+architecture section: there is no kernel dependency, and that scaffolding was deleted on 2026-07-20). The "a12-studio
+today" column is what the code shows on 2026-09-20. **Editor enablement** comes from `model-versions.json`: a type
+with `"enabled": false` has classes and possibly an editor, but opening a file shows "not supported yet"
+(`EditorFactory`), so treat it as not shipped. SME itself marks additive, combination, composed, content, mapping,
+query, selection, structural mapping and transformer as `isExperimental()` (checked 2026-09-20).
+
+| # | Module | Why this priority (2026-07-17) | a12-studio today (2026-09-20) |
+|---|---|---|---|
+| 1 | **structuralMappingModel** | Foundational — referenced by mappingModel and combinationModel. SME's editor: source-tree/target-tree drag&drop field mapper, resolution-strategy editor for conflicts. | **Data model only, disabled.** `ModelType.STRUCTURALMAPPING` + full content classes (`FieldMapping`, `Slice`, `ResolutionStrategy`, `GroupToClearOnFirstFill`); `StructuralMappingModelEditorController` is a 24-line stub; no validation service, no kernel dependency (the old "`kernel-md-structuralmapping-tool` present, `SmmService` scaffolding exists" was wrong). Rename/move refactoring already rewrites its `*FullName` paths. |
+| 2 | **mappingModel** | Depends on structuralMappingModel + additiveDocumentModel. ETL-style: source DM(s) + target DM + optional precomputation, driven by a referenced SMM. | **Started, disabled.** Content classes (`MappingSource`, `MappingTarget`, `SortField`, `PreComputationFragmentRef`, `StructuralMappingModelRef`, ...) and a 141-line editor with the Target Model panel and an editable Sources list (`SourceModelsPanelController` + dialog); no validation service. The precomputation fragment and the Structural Mapping Model link are not editable yet (the controller's own comment says "added later"). |
+| 3 | **combinationModel** | Built on additive + structural mapping. | **Present, enabled.** Structural editor + 7 structural rules (2026-09-08), base/additive loop detection (2026-09-20, reference graph only); DM expansion/SMT validation is not, see the dedicated section. |
+| 4 | **additiveDocumentModel** | Hard dependency of both mappingModel and combinationModel. Overlay editing mode: elements are included/overwritten/purely-additive relative to a base DM. | **Partly present, enabled** (a Document Model with an annotation): read-only "Additive Elements Only" preview and base-aware path resolution; no overlay editing mode, no join. See the Document Model gap-list row. |
+| 5 | **relationshipModel** | Foundational — link, masterDetailModel, treeModel, modelGraphDiagram and formModel's `Binding`/`BindingRepeat` all reference it. | **Present, enabled** (the old "no current scaffolding" is obsolete): `RelationshipModelEditorController` (8 files) + `RelationshipModelValidationService` (6 relationship-specific validators). The **Relationship UI Model** (`relationship-ui`, `Ru`) also has an editor (8 files) and 3 validators. A role rename does not propagate to Query/Form/Relationship UI references (TODO decision). |
+| 6 | **selectionModel** | Reusable selection spec. | **Present, enabled** (2026-09-13), see the dedicated section. |
+| 7 | **printModel** | Most editor-complex of the print family — relies on an external print-engine component library for the layout canvas. Backend renders PDF only. | **Large editor, disabled.** 28 content classes, an 811-line `PrintModelEditorController`, 7 print validators; no print-engine dependency and no PDF rendering (the old `PrintService`/`DocumentModelResolver`/`PrintParameters` scaffolding was deleted 2026-07-20). Rename/move refactoring rewrites `FieldRef.path`. |
+| 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. | **Not present.** Only a `printtypesettings` entry in `model-versions.json` (`enabled: false`, suffix `TSM`) and an icon; no `ModelType`, class or editor. Print Setting (deprecated in the platform) has nothing at all. |
+| 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model. | **Not present.** |
+| 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side, not blocking other model types. | **Both present, enabled.** Query: see the dedicated section. Overview: `OverviewModelEditorController` + 21 editor files (columns, filter items with per-type options, sub-header slots, initial sorting, styles, query-model link) and 16 overview validators; no dedicated section in this doc yet. |
+| — | **appModel** | Standalone. | **Present, enabled** (`ApplicationModelEditorController` + module/scene/region editors, 3 application validators, wireframe preview via `ApplicationModelPreviewService`, real Preview App deploy). |
+| — | **masterDetailModel** | Standalone. | **Present, enabled** (`MainDetailModelEditorController`, 2 validators; `MasterDetailModuleGenerator` is used by the Preview App deploy). |
+| — | **treeModel** | Standalone. | **Editor present, disabled** (474-line `TreeModelEditorController`, 6 validators). |
+| — | **contentModel** | Experimental in SME itself. | **Editor present, disabled** (276-line `ContentModelEditorController`, 2 validators). |
+| — | **typeDefinitionModel** | Reuses the whole DM editor infrastructure. | **Present, enabled** (`TypeDefintionModelEditorController`; the type-definition mode rules are validated, see the Document Model section). |
+| — | **umModule** | User-management config: two YAML file types, "roles" and "users". | **Present** as `RolesEditorController` / `UsersEditorController` over `RolesDocument` / `UsersDocument` (`editors/auth`, `AuthFileFactory`). |
+| — | **transformerModel, modelGraphDiagram** | Lower cross-reference count / experimental in SME. | **Not present** (no `ModelType`, no classes; only a transformer icon). |
+| — | **settingsModule, filesModule, attachment, data** | Workspace-level resources, no structured model editing. | **Not assessed on 2026-09-20.** a12-studio has its own project settings (`ProjectSettings`); whether SME's `settings.yaml` is read is unconfirmed (no reference to it in the code). |
+| n/a | **common, preview** | Not model types. `common` = shared editor UI building blocks used across modules. `preview` = pure runtime capability (opens a browser window running the live app), no persistence. | a12-studio's equivalents are the shared `propertyeditors` package, and two previews: the wireframe `PreviewServer` and the real Preview App deploy (see the Form Model "Live preview" note). |
+
+The parked / rejected list for the whole tool lives in `TODO.md` ("Won't do" and "Parked").
 
 ### One-line descriptions of every other module (for orientation)
 
@@ -1182,23 +1238,24 @@ on its own:
 |---|---|---|
 | Rule contradiction / consistency (constraint solver) | `RuleContradictionCheckService` → `com.mgmtp.a12.tdg.lib.TestDataGenerator.checkModel(...)` | **Missing, and blocked** (spike 2026-09-19): `com.mgmtp.a12.tdg:tdg-lib` is not in any community Maven repo (404) and the enterprise repos answer 401, so it cannot be pulled anonymously. Needs mgm credentials/commercial licence, or a clean-room solver |
 | Document model structural/consistency validation | `DMValidationService` (kernel `getElementProblems` + custom checks) | Hand-ported clean-room validators only (`BasicConsistencyValidator` etc.) — corrected 2026-09-19: the `ValidationRuleService`/`ComputationRuleService` previously listed here never existed in this repo. **Feasible on kernel 31.1.1 through the public API**: `IDocumentModelService.checkConsistency` flags corrupted conditions, unexpanded includes and invalid entity paths (message only, no line/column) |
-| Condition/expression language validation & formatting | `ValidationRuleService`, `ComputationRuleService` (Kotlin) | **Missing** (corrected 2026-09-05 — previously claimed present; no such Java services exist, no kernel dependency in this repo). `RuleConfig.errorCondition`/`ComputationAlternative.precondition`/`operation` are edited as plain text with no semantic validation — see the Document Model "Editor features" correction above. **Spike 2026-09-19: works in-process on kernel 31.1.1** (`DocumentModelService.hasValidConditionText` / `isValidComputation` / `formatComputationOperation`, all `a12internal`), with line/column positions; needs the model expanded first |
-| Print rendering (PDF) | `PrintService` — PDFBox or legacy engine via `a12.print.engine.runtime` | Scaffolding present (`PrintService.java`, `DocumentModelResolver.java`, print-engine deps) but editor missing |
+| Condition/expression language validation & formatting | `ValidationRuleService`, `ComputationRuleService` (Kotlin) | **Missing** (corrected 2026-09-05 — previously claimed present; no such Java services exist, no kernel dependency in this repo). `RuleConfig.errorCondition`/`ComputationAlternative.precondition`/`operation` are edited as text with a **syntax-only** check (clean-room `RuleLang.g4` / `RuleLanguageSyntaxChecker`, per-keystroke in the editors only, since 2026-09-14/15; verified 2026-09-20) and no semantic validation — see the Document Model "Editor features" correction above. **Spike 2026-09-19: works in-process on kernel 31.1.1** (`DocumentModelService.hasValidConditionText` / `isValidComputation` / `formatComputationOperation`, all `a12internal`), with line/column positions; needs the model expanded first |
+| Print rendering (PDF) | `PrintService` — PDFBox or legacy engine via `a12.print.engine.runtime` | **Missing** (corrected 2026-09-20): the `PrintService`/`DocumentModelResolver` scaffolding was deleted 2026-07-20 and no print-engine dependency exists. A Print Model editor and validators exist but the type is disabled |
 | Document model expansion (includes/imports) | `ExpansionService` | **Missing** (confirmed 2026-09-19: no include/import expansion anywhere in this repo). **Feasible on kernel 31.1.1** (`DocumentModelExpandService.expand`, `internal`): `Invoice_DM` 6 → 135 elements in 23 ms |
 | Combination Model expansion | `CombinationModelExpansionService` | **Missing** (corrected 2026-09-08 — previously claimed present; no such service, or `services/combinationmodel/` directory, exists in this repo). The Combined Document Model editor built 2026-09-08 only validates the structural rules from `DomainCombination.json` (missing/not-allowed/duplicate references per step); DM expansion, rule-contradiction/SMT solving and the "Validate model up to this step" action all still depend on this (loop detection does not: it needs only the reference graph and was ported 2026-09-20) |
 | Additive Model join | `AdditiveModelController` (`kernel-md-join`) | **Missing** — corrected 2026-09-19: no kernel dependency is present (this row previously said it was). **Feasible on kernel 31.1.1**: `kernel-md-join` no longer exists there, the join moved into `kernel-md-facade` (`DocumentModelJoiningService.join`, `internal`); `Person_Dc` + `PersonEmployee_Ad` joined to 42 elements |
-| Selection Model join/validate | `SelectionModelController` | Not yet present |
-| Structural Mapping Model consistency | `StructuralMappingModelService` (`SmmService`) | Present — `services/structuralmappingmodel/` |
-| Mapping Model consistency/generation | `SMEMappingModelService` | Present — `services/mappingmodel/` |
+| Selection Model join/validate | `SelectionModelController` | **Missing** (2026-09-20). Only the clean-room structural rules of `DomainSelection.json` are ported (`validators/selection/`, 5 validators); no join/apply of a selection against a Document Model |
+| Structural Mapping Model consistency | `StructuralMappingModelService` (`SmmService`) | **Missing** (corrected 2026-09-20: the `services/structuralmappingmodel/` scaffolding listed here was deleted 2026-07-20). No validation service for this type at all; the editor is a stub and the type is disabled |
+| Mapping Model consistency/generation | `SMEMappingModelService` | **Missing** (corrected 2026-09-20: `services/mappingmodel/` was deleted 2026-07-20). No validation service; the editor covers target + sources only and the type is disabled |
 | Test data generation | `TestDataService` (same TDG lib, generative mode) | Missing, and blocked on the same TDG availability problem as rule contradiction |
-| Formula/computation execution over content documents | `DocumentValidationService` (`docRtService.compute(...)`) | Not yet confirmed |
-| XSD → Document Model transformation | `TransformerService` | Not present |
+| Formula/computation execution over content documents | `DocumentValidationService` (`docRtService.compute(...)`) | **Missing** (confirmed 2026-09-20: nothing in any module evaluates computations or validates document instances; there is no `document` model type either). Not covered by the kernel spike, which only exercised model-level calls |
+| XSD → Document Model transformation | `TransformerService` | Not present (re-verified 2026-09-20: no XSD code, no Transformer Model type; the create-from-Access/-Excel plugins are unrelated converters) |
 | Move/rename refactoring (rewrite condition text) | `MoveRefactoringService` | Present in-process (clean-room `DocumentModelRefactoring` + `ProjectReferenceRefactoring`, no kernel call), within the model and across the project's Print/Query/Mapping/Structural Mapping/Selection models and including Document Models; remaining gaps listed in the Document Model gap list above |
 | File load/save persistence | None on SME's backend either — frontend/Electron-owned | a12-studio owns this directly (single JVM app) |
 
-`a12-studio-server` currently contains only `A12StudioServer.java`, `A12StudioServerTest.java`, and
-`SystemResource.java` — it is not yet where kernel calls happen; that logic currently lives in
-`a12-studio-data-services`.
+`a12-studio-server` currently contains only `A12StudioServer.java` and `A12StudioServerTest.java` (2026-09-20; the
+`SystemResource.java` this note used to list is gone) — it is not where kernel calls happen, and neither is
+`a12-studio-data-services` (preview services only, see the architecture section): today no module calls the kernel.
+The one place vendor JVM code runs is out of process, in the Preview App deploy (`a12-studio-ui/.../previewapp/`).
 
 ### Kernel dependency spike (2026-09-19) — decision: **hybrid, kernel pinned to 31.1.1**
 
@@ -1298,7 +1355,7 @@ messages only.
 **What it would unlock, ranked by value per effort:**
 
 1. **Semantic validation and formatting of rule/computation conditions**, with positions. Plugs into
-   `RichtextEditorController.setValidator(...)`, which already exists and currently has nothing semantic to call.
+   `RuleEditorController.setValidator(...)`, which already exists and currently has nothing semantic to call.
 2. **DM expansion.** Prerequisite for the kernel to validate any model with includes at all, for the Combined Document
    Model's "validate model up to this step", for Form Model includes, and for any view of the effective element tree.
 3. **Additive join.** Unblocks the Additive Document Model editor and is a hard dependency of the Mapping and
@@ -1320,7 +1377,8 @@ The scratch project is not in the repo; it was ~200 lines of Java over the calls
 
 ## How to keep this doc useful
 
-This is a snapshot (2026-07-17). SME modules marked "experimental" here may graduate or change; kernel dependency
-versions will drift. When picking up work in an area covered here, spot-check the relevant SME module/backend
+This is a snapshot (2026-09-20 for the sections re-verified on that day, see the header; older dates on individual
+sections and rows still apply where a section says so). SME modules marked "experimental" here may graduate or change;
+kernel dependency versions will drift. When picking up work in an area covered here, spot-check the relevant SME module/backend
 service still looks the way this doc describes before trusting the gap list — SME is under active, independent
 development.
