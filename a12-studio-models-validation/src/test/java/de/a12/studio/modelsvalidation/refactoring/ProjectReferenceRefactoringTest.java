@@ -35,6 +35,9 @@ import de.a12.studio.models.querymodel.operator.DoubleRangeOperator;
 import de.a12.studio.models.querymodel.operator.ExactMatchOperator;
 import de.a12.studio.models.querymodel.operator.HasOperator;
 import de.a12.studio.models.querymodel.operator.NotOperator;
+import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.relationshipmodel.RelationshipModelContent;
 import de.a12.studio.models.selectionmodel.PathSpecification;
 import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.selectionmodel.SelectionModelContent;
@@ -244,6 +247,179 @@ class ProjectReferenceRefactoringTest {
 
     assertEquals(List.of(), renameAndCompute(street, "Road", query));
     assertEquals(List.of("/Person/Address/Street"), query.getContent().getFields());
+  }
+
+  // ---- Query Model: relationship hops, sorts through relationships, has ---------------------------------------
+  //
+  // "Owns" relates Order_DM (role "Order") to Person_DM (role "Owner"), with Link_DM as its link document.
+
+  @Test
+  void aQueryHopFollowsTheRenameWhenItsRolePlaysTheChangedModel() {
+    QueryModel query = queryModel("Q", "Order_DM");
+    QueryLink toPerson = hop("Owns", "Owner");
+    toPerson.getFields().addAll(List.of("/Person/Name", "/Person/Address/Street"));
+    QueryLink back = hop("Owns", "Order");
+    back.getFields().add("/Person/Address/Street");
+    query.getContent().getLinks().addAll(List.of(toPerson, back));
+
+    List<ModelEdits> edits = renameAndCompute(street, "Road", query, owns());
+
+    assertEquals(1, edits.size());
+    assertEquals(List.of("/Person/Name", "/Person/Address/Road"), toPerson.getFields());
+    assertEquals(List.of("/Person/Address/Street"), back.getFields());
+  }
+
+  @Test
+  void aNestedQueryHopIsScopedByItsOwnRole() {
+    QueryModel query = queryModel("Q", "Person_DM");
+    query.getContent().getFields().add("/Person/Address/Street");
+    QueryLink toOrder = hop("Owns", "Order");
+    toOrder.getFields().add("/Person/Address/Street");
+    QueryLink backToPerson = hop("Owns", "Owner");
+    backToPerson.getFields().add("/Person/Address/Street");
+    toOrder.getLinks().add(backToPerson);
+    query.getContent().getLinks().add(toOrder);
+
+    renameAndCompute(street, "Road", query, owns());
+
+    assertEquals(List.of("/Person/Address/Road"), query.getContent().getFields());
+    assertEquals(List.of("/Person/Address/Street"), toOrder.getFields());
+    assertEquals(List.of("/Person/Address/Road"), backToPerson.getFields());
+  }
+
+  @Test
+  void aQueryHopFollowsItsFilterAndConstraintButNotItsLinkFieldsWhichBelongToTheLinkModel() {
+    QueryModel query = queryModel("Q", "Order_DM");
+    QueryLink toPerson = hop("Owns", "Owner");
+    toPerson.setFilterDefinition("[/Person/Address/Street] == \"a\"");
+    ExactMatchOperator exact = new ExactMatchOperator();
+    exact.setField("/Person/Address/Street");
+    toPerson.setConstraint(exact);
+    toPerson.getLinkDocumentFields().add("/Person/Address/Street");
+    query.getContent().getLinks().add(toPerson);
+
+    renameAndCompute(street, "Road", query, owns());
+
+    assertEquals("[/Person/Address/Road] == \"a\"", toPerson.getFilterDefinition());
+    assertEquals("/Person/Address/Road", exact.getField());
+    assertEquals(List.of("/Person/Address/Street"), toPerson.getLinkDocumentFields());
+  }
+
+  @Test
+  void aQuerySortThroughARelationshipFollowsTheModelOfItsRole() {
+    QueryModel query = queryModel("Q", "Order_DM");
+    QuerySort throughOwner = new QuerySort();
+    throughOwner.setRelationshipModel("Owns");
+    throughOwner.setTargetRole("Owner");
+    throughOwner.getSortBy().setField("/Person/Address/Street");
+    QuerySort throughOrder = new QuerySort();
+    throughOrder.setRelationshipModel("Owns");
+    throughOrder.setTargetRole("Order");
+    throughOrder.getSortBy().setField("/Person/Address/Street");
+    QuerySort direct = new QuerySort();
+    direct.getSortBy().setField("/Person/Address/Street");
+    query.getContent().getSort().addAll(List.of(throughOwner, throughOrder, direct));
+
+    renameAndCompute(street, "Road", query, owns());
+
+    assertEquals("/Person/Address/Road", throughOwner.getSortBy().getField());
+    assertEquals("/Person/Address/Street", throughOrder.getSortBy().getField());
+    assertEquals("/Person/Address/Street", direct.getSortBy().getField());
+  }
+
+  @Test
+  void aHasOperatorConstraintFollowsTheModelOfItsRoleNotTheQueryTarget() {
+    QueryModel query = queryModel("Q", "Order_DM");
+    ExactMatchOperator inOwner = new ExactMatchOperator();
+    inOwner.setField("/Person/Address/Street");
+    ExactMatchOperator inLink = new ExactMatchOperator();
+    inLink.setField("/Person/Address/Street");
+    HasOperator has = new HasOperator();
+    has.setRelationshipModel("Owns");
+    has.setTargetRole("Owner");
+    has.setConstraint(inOwner);
+    has.setLinkDocumentConstraint(inLink);
+    query.getContent().setConstraint(has);
+
+    renameAndCompute(street, "Road", query, owns());
+
+    assertEquals("/Person/Address/Road", inOwner.getField());
+    assertEquals("/Person/Address/Street", inLink.getField());
+  }
+
+  @Test
+  void aHasCallInTheFilterTextFollowsTheModelOfItsRoleNotTheEnclosingScope() {
+    QueryModel query = queryModel("Q", "Person_DM");
+    query.getContent().setFilterDefinition("[/Person/Address/Street] == \"a\" and "
+        + "Has(\"Owns\", \"Order\", [/Person/Address/Street] == \"b\", Null)");
+    QueryModel fromOrder = queryModel("Q2", "Order_DM");
+    fromOrder.getContent().setFilterDefinition("[/Person/Address/Street] == \"a\" or "
+        + "Has(\"Owns\", \"Owner\", [/Person/Address/Street] == \"b\", [/Person/Address/Street] == \"c\")");
+
+    renameAndCompute(street, "Road", query, fromOrder, owns());
+
+    assertEquals("[/Person/Address/Road] == \"a\" and "
+        + "Has(\"Owns\", \"Order\", [/Person/Address/Street] == \"b\", Null)",
+        query.getContent().getFilterDefinition());
+    assertEquals("[/Person/Address/Street] == \"a\" or "
+        + "Has(\"Owns\", \"Owner\", [/Person/Address/Road] == \"b\", [/Person/Address/Street] == \"c\")",
+        fromOrder.getContent().getFilterDefinition());
+  }
+
+  @Test
+  void aHopOrHasThatDoesNotResolveIsLeftAlone() {
+    QueryModel query = queryModel("Q", "Order_DM");
+    QueryLink unknownRelationship = hop("Gone", "Owner");
+    unknownRelationship.getFields().add("/Person/Address/Street");
+    QueryLink unknownRole = hop("Owns", "Nobody");
+    unknownRole.getFields().add("/Person/Address/Street");
+    query.getContent().getLinks().addAll(List.of(unknownRelationship, unknownRole));
+    query.getContent().setFilterDefinition("Has(\"Gone\", \"Owner\", [/Person/Address/Street] == \"b\")");
+
+    assertEquals(List.of(), renameAndCompute(street, "Road", query, owns()));
+    assertEquals(List.of("/Person/Address/Street"), unknownRelationship.getFields());
+    assertEquals(List.of("/Person/Address/Street"), unknownRole.getFields());
+  }
+
+  @Test
+  void aFilterThatIsNotValidQueryLanguageStillFollowsUnlessItHasAHasCall() {
+    QueryModel query = queryModel("Q", "Person_DM");
+    query.getContent().setFilterDefinition("[/Person/Address/Street] = 1");
+    QueryLink hop = hop("Owns", "Owner");
+    hop.setFilterDefinition("Has(\"Owns\", \"Order\", [/Person/Address/Street] = 1");
+    query.getContent().getLinks().add(hop);
+
+    renameAndCompute(street, "Road", query, owns());
+
+    assertEquals("[/Person/Address/Road] = 1", query.getContent().getFilterDefinition());
+    assertEquals("Has(\"Owns\", \"Order\", [/Person/Address/Street] = 1", hop.getFilterDefinition());
+  }
+
+  @Test
+  void aFilterPathIsRewrittenAtTheRightOffsetWithNonBmpCharactersBeforeIt() {
+    QueryModel query = queryModel("Q", "Person_DM");
+    query.getContent().setFilterDefinition("Match([/Person/Name], \"😀\") or "
+        + "[/Person/Address/Street] == \"😀\"");
+
+    renameAndCompute(street, "Road", query);
+
+    assertEquals("Match([/Person/Name], \"😀\") or [/Person/Address/Road] == \"😀\"",
+        query.getContent().getFilterDefinition());
+  }
+
+  @Test
+  void revertingAHopEditRestoresIt() {
+    QueryModel query = queryModel("Q", "Order_DM");
+    QueryLink toPerson = hop("Owns", "Owner");
+    toPerson.getFields().add("/Person/Address/Street");
+    toPerson.setFilterDefinition("[/Person/Address/Street] == \"a\"");
+    query.getContent().getLinks().add(toPerson);
+
+    List<ModelEdits> edits = renameAndCompute(street, "Road", query, owns());
+    revert(edits);
+
+    assertEquals(List.of("/Person/Address/Street"), toPerson.getFields());
+    assertEquals("[/Person/Address/Street] == \"a\"", toPerson.getFilterDefinition());
   }
 
   // ---- Mapping Model / Structural Mapping Model -------------------------------------------------------------
@@ -486,6 +662,32 @@ class ProjectReferenceRefactoringTest {
     model.setId(id);
     model.setContent(content);
     return model;
+  }
+
+  private static QueryLink hop(String relationshipModel, String targetRole) {
+    QueryLink link = new QueryLink();
+    link.setRelationshipModel(relationshipModel);
+    link.setTargetRole(targetRole);
+    return link;
+  }
+
+  /** {@code Owns}: Order_DM plays "Order", Person_DM plays "Owner"; Link_DM is the link document. */
+  private static RelationshipModel owns() {
+    RelationshipModelContent content = new RelationshipModelContent();
+    content.setLinkDocumentModelValue("Link_DM");
+    content.getEntityCharacteristics().add(entity("Order", "Order_DM"));
+    content.getEntityCharacteristics().add(entity("Owner", "Person_DM"));
+    RelationshipModel model = new RelationshipModel();
+    model.setId("Owns");
+    model.setContent(content);
+    return model;
+  }
+
+  private static EntityCharacteristic entity(String role, String documentModel) {
+    EntityCharacteristic entity = new EntityCharacteristic();
+    entity.setRole(role);
+    entity.setDocumentModel(documentModel);
+    return entity;
   }
 
   private static SortField sortField(String path) {

@@ -1,7 +1,9 @@
 package de.a12.studio.modelsvalidation.validators.query;
 
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.querymodel.QueryModel;
+import de.a12.studio.models.querymodel.QueryModelContent;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.TestModels;
@@ -22,6 +24,48 @@ class QueryValidatorsTest {
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("Target Document Model is required"));
+  }
+
+  @Test
+  void targetDocumentModelRequiredValidatorReportsATargetThatDoesNotExistInTheProject() {
+    QueryModel model = queryWithTarget("Gone_DM");
+    DocumentModel other = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+
+    List<ModelValidationError> errors = new QueryTargetDocumentModelRequiredValidator()
+        .validate(model, TestModels.contextWithDocumentModels(model, other));
+
+    assertEquals(1, errors.size());
+    assertEquals(QueryTargetDocumentModelRequiredValidator.ELEMENT_ID, errors.get(0).elementId());
+    assertTrue(errors.get(0).message().contains("\"Gone_DM\""), errors.get(0).message());
+    assertTrue(errors.get(0).message().contains("does not exist"), errors.get(0).message());
+  }
+
+  @Test
+  void targetDocumentModelRequiredValidatorAcceptsATargetThatExists() {
+    DocumentModel target = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    QueryModel model = queryWithTarget(target.getId());
+
+    assertEquals(List.of(), new QueryTargetDocumentModelRequiredValidator()
+        .validate(model, TestModels.contextWithDocumentModels(model, target)));
+  }
+
+  @Test
+  void targetDocumentModelRequiredValidatorDoesNotCallACombinedDocumentModelDangling() {
+    CombinedDocumentModel combined = new CombinedDocumentModel();
+    combined.setId("Combined_CmM");
+    QueryModel model = queryWithTarget("Combined_CmM");
+
+    assertEquals(List.of(), new QueryTargetDocumentModelRequiredValidator()
+        .validate(model, TestModels.contextWithOtherModels(model, combined)));
+  }
+
+  private static QueryModel queryWithTarget(String targetDocumentModel) {
+    QueryModelContent content = new QueryModelContent();
+    content.setTargetDocumentModel(targetDocumentModel);
+    QueryModel model = new QueryModel();
+    model.setId("Q");
+    model.setContent(content);
+    return model;
   }
 
   @Test

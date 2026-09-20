@@ -2,9 +2,15 @@ package de.a12.studio.models.util;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.querymodel.ql.QueryLanguageException;
+import de.a12.studio.models.querymodel.ql.QueryLanguageReferences;
+import de.a12.studio.models.querymodel.ql.QueryLanguageReferences.HasCall;
+import de.a12.studio.models.querymodel.ql.QueryLanguageReferences.Reference;
+import de.a12.studio.models.querymodel.ql.QueryLanguageReferences.Replacement;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +26,9 @@ import java.util.Set;
  *       the special {@code name} field inside a {@code ModelDescriptor} shape (one that also has a
  *       {@code modelType} sibling), plus the {@code id} field inside a
  *       {@code StructuralMappingModel} wrapper.</li>
+ *   <li>Query Language text – the relationship model named in a {@code Has("<relationship>", "<role>", ...)} call
+ *       of a {@code filterDefinition} (a Query Model's, root or per relationship hop). Text that isn't valid Query
+ *       Language is left alone.</li>
  * </ol>
  *
  * <p>The field-name set mirrors the one maintained by the Application Groups plugin – both sites
@@ -42,7 +51,41 @@ public final class ModelReferenceRewriter {
   // See REFERENCE_FIELD_NAMES javadoc above: the one "id"-named reference field, scoped to its wrapper.
   private static final String STRUCTURAL_MAPPING_MODEL_REF_FIELD_NAME = "StructuralMappingModel";
 
+  private static final String FILTER_DEFINITION_FIELD_NAME = "filterDefinition";
+
   private ModelReferenceRewriter() {
+  }
+
+  /** {@code text} with the relationship model of every {@code Has(...)} call (nested ones included) mapped via
+   * {@code idMap}; the field paths of a filter are element paths, not model ids, and are not touched here. */
+  private static String rewriteFilterDefinition(String text, Map<String, String> idMap) {
+    List<Reference> references;
+    try {
+      references = QueryLanguageReferences.extract(text);
+    }
+    catch (QueryLanguageException e) {
+      return text;
+    }
+    List<Replacement> replacements = new ArrayList<>();
+    collectHasRewrites(references, idMap, replacements);
+    return replacements.isEmpty() ? text : QueryLanguageReferences.replace(text, replacements);
+  }
+
+  private static void collectHasRewrites(List<Reference> references, Map<String, String> idMap,
+      List<Replacement> replacements) {
+    if (references == null) {
+      return;
+    }
+    for (Reference reference : references) {
+      if (reference instanceof HasCall has) {
+        String mapped = idMap.get(has.relationshipModel());
+        if (mapped != null) {
+          replacements.add(new Replacement(has.relationshipStart(), has.relationshipStop(), '"' + mapped + '"'));
+        }
+        collectHasRewrites(has.constraint(), idMap, replacements);
+        collectHasRewrites(has.linkConstraint(), idMap, replacements);
+      }
+    }
   }
 
   /**
@@ -101,6 +144,14 @@ public final class ModelReferenceRewriter {
             changed = true;
             continue;
           }
+        }
+        if (FILTER_DEFINITION_FIELD_NAME.equals(fieldName) && value.isString()) {
+          String rewritten = rewriteFilterDefinition(value.asString(), idMap);
+          if (!rewritten.equals(value.asString())) {
+            objectNode.put(fieldName, rewritten);
+            changed = true;
+          }
+          continue;
         }
         if (value.isObject() || value.isArray()) {
           changed |= rewriteNode(value, idMap, fieldName);

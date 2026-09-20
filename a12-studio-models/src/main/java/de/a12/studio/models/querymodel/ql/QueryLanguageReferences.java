@@ -20,14 +20,37 @@ public final class QueryLanguageReferences {
   public sealed interface Reference permits FieldReference, HasCall {
   }
 
-  /** A bracketed field path such as {@code /Root/Name}, without the brackets. */
-  public record FieldReference(String path) implements Reference {
+  /**
+   * A bracketed field path such as {@code /Root/Name}, without the brackets. {@code start}/{@code stop} delimit
+   * the whole {@code [/Root/Name]} token in the source: code-point indexes (as ANTLR counts them, not UTF-16
+   * units), {@code stop} inclusive.
+   */
+  public record FieldReference(String path, int start, int stop) implements Reference {
   }
 
-  /** A {@code Has(...)} call; {@code constraint}/{@code linkConstraint} are the nested scopes, or {@code null}
-   * when the argument is absent or {@code Null}. */
+  /**
+   * A {@code Has(...)} call; {@code constraint}/{@code linkConstraint} are the nested scopes, or {@code null}
+   * when the argument is absent or {@code Null}. {@code relationshipStart}/{@code relationshipStop} delimit the
+   * relationship's string literal including its quotes (same indexing as {@link FieldReference}).
+   */
   public record HasCall(String relationshipModel, String targetRole, List<Reference> constraint,
-      List<Reference> linkConstraint) implements Reference {
+      List<Reference> linkConstraint, int relationshipStart, int relationshipStop) implements Reference {
+  }
+
+  /** {@code text} replaces the source range {@code start..stop} (same indexing as {@link FieldReference}). */
+  public record Replacement(int start, int stop, String text) {
+  }
+
+  /**
+   * {@code source} with every {@code replacements} range replaced. Ranges must not overlap; they come from {@link
+   * #extract}, which counts code points where {@link String} counts UTF-16 units, hence the conversion.
+   */
+  public static String replace(String source, List<Replacement> replacements) {
+    StringBuilder result = new StringBuilder(source);
+    replacements.stream().sorted(java.util.Comparator.comparingInt(Replacement::start).reversed()).forEach(replacement ->
+        result.replace(source.offsetByCodePoints(0, replacement.start()),
+            source.offsetByCodePoints(0, replacement.stop() + 1), replacement.text()));
+    return result.toString();
   }
 
   /**
@@ -82,7 +105,8 @@ public final class QueryLanguageReferences {
       return; // not a well-formed Has; the emitter already reports that as a syntax problem
     }
     out.add(new HasCall(stringValue(args.get(0)), stringValue(args.get(1)),
-        args.size() >= 3 ? scopeOf(args.get(2)) : null, args.size() >= 4 ? scopeOf(args.get(3)) : null));
+        args.size() >= 3 ? scopeOf(args.get(2)) : null, args.size() >= 4 ? scopeOf(args.get(3)) : null,
+        args.get(0).getStart().getStartIndex(), args.get(0).getStop().getStopIndex()));
   }
 
   private static List<Reference> scopeOf(QLParser.ArgumentContext arg) {
@@ -105,6 +129,7 @@ public final class QueryLanguageReferences {
 
   private static FieldReference fieldReference(QLParser.FieldRefContext ctx) {
     String text = ctx.getText();
-    return new FieldReference(text.substring(1, text.length() - 1));
+    return new FieldReference(text.substring(1, text.length() - 1), ctx.getStart().getStartIndex(),
+        ctx.getStop().getStopIndex());
   }
 }

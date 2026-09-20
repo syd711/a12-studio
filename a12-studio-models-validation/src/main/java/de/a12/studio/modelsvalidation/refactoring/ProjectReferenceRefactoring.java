@@ -16,19 +16,6 @@ import de.a12.studio.models.printmodel.PrintFieldElement;
 import de.a12.studio.models.printmodel.PrintElementDefinition;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.querymodel.QueryModel;
-import de.a12.studio.models.querymodel.QueryModelContent;
-import de.a12.studio.models.querymodel.QuerySort;
-import de.a12.studio.models.querymodel.ql.QLLexer;
-import de.a12.studio.models.querymodel.operator.AndOperator;
-import de.a12.studio.models.querymodel.operator.DateFragmentRangeOperator;
-import de.a12.studio.models.querymodel.operator.DateRangeOperator;
-import de.a12.studio.models.querymodel.operator.DoubleRangeOperator;
-import de.a12.studio.models.querymodel.operator.ExactMatchOperator;
-import de.a12.studio.models.querymodel.operator.NotOperator;
-import de.a12.studio.models.querymodel.operator.Operator;
-import de.a12.studio.models.querymodel.operator.OrOperator;
-import de.a12.studio.models.querymodel.operator.SimpleSearchOperator;
-import de.a12.studio.models.querymodel.operator.UndefinedMatchOperator;
 import de.a12.studio.models.selectionmodel.PathSpecification;
 import de.a12.studio.models.selectionmodel.SelectionCategory;
 import de.a12.studio.models.selectionmodel.SelectionModel;
@@ -42,14 +29,11 @@ import de.a12.studio.modelsvalidation.formincludes.FormIncludeExpander;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.Edit;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.IncludedModelChange;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.PathRewriter;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,9 +56,10 @@ import java.util.function.Supplier;
  *   <li><b>Print Model</b> - a Field element's {@code FieldRef.path} whose {@code model} is the changed one. (An
  *       {@code OverridableValue.path} is a path into the print model's own content, not a Document Model path, so it
  *       is not a reference to this model.)</li>
- *   <li><b>Query Model</b> whose {@code targetDocumentModel} is the changed one - {@code fields}, {@code sort}
- *       entries without a relationship, the field paths of the top-level {@code constraint} operators, and the
- *       {@code [/Path]} field references of {@code filterDefinition}.</li>
+ *   <li><b>Query Model</b> - every field path evaluated against the changed model, wherever in the query it sits:
+ *       the root's {@code fields}/{@code sort}/{@code constraint}/{@code filterDefinition} when it is the {@code
+ *       targetDocumentModel}, and those of a relationship hop, a sort entry through a relationship and a {@code
+ *       has} constraint when the changed model is the one the role plays (see {@link QueryReferenceRefactoring}).</li>
  *   <li><b>Mapping Model</b> - {@code SortField.sortFieldFullName} of every {@code Source} whose {@code dmId} is the
  *       changed one.</li>
  *   <li><b>Structural Mapping Model</b> - its {@code *FullName} paths. It has no Document Model reference of its own,
@@ -86,8 +71,7 @@ import java.util.function.Supplier;
  *       the Include group the included elements were bound to).</li>
  * </ul>
  *
- * <p><b>Not covered</b>: a Query's relationship links ({@code links[].fields}, and constraints below a {@code has}),
- * whose Document Model is that of the linked role, not the query's; Print calculation steps; Form {@code
+ * <p><b>Not covered</b>: Print calculation steps; Form {@code
  * hostDocumentModelPath} of a form bound to a Document Model that merely <em>includes</em> the changed one (a path
  * into the included model); paths that reach an element through a chain of Includes or an Additive base model.
  * References by element id (Form, Overview, Tree, ...) can't break.
@@ -146,7 +130,7 @@ public final class ProjectReferenceRefactoring {
       printEdits(print, changedId, rewriter, edits);
     }
     else if (other instanceof QueryModel query) {
-      queryEdits(query, changedId, rewriter, edits);
+      queryEdits(query, changedId, rewriter, projectModels, edits);
     }
     else if (other instanceof MappingModel mapping) {
       mappingEdits(mapping, changedId, rewriter, edits);
@@ -201,101 +185,9 @@ public final class ProjectReferenceRefactoring {
 
   // ---- Query Model ------------------------------------------------------------------------------------------
 
-  private static void queryEdits(QueryModel query, String changedId, PathRewriter rewriter, List<Edit> edits) {
-    QueryModelContent content = query.getContent();
-    if (content == null || !changedId.equals(content.getTargetDocumentModel())) {
-      return;
-    }
-    listSites(edits, rewriter, content.getFields());
-    for (QuerySort sort : content.getSort()) {
-      if (sort.getRelationshipModel() == null && sort.getSortBy() != null) {
-        pathSite(edits, rewriter, sort.getSortBy()::getField, sort.getSortBy()::setField);
-      }
-    }
-    operatorSites(edits, rewriter, content.getConstraint());
-    if (content.getFilterDefinition() != null) {
-      String text = content.getFilterDefinition();
-      String rewritten = rewriteQueryLanguage(text, rewriter);
-      if (!rewritten.equals(text)) {
-        edits.add(new Edit(content::setFilterDefinition, text, rewritten));
-      }
-    }
-  }
-
-  /** Field paths of {@code operator} and everything below it, except below a {@code has} (a linked model's fields). */
-  private static void operatorSites(List<Edit> edits, PathRewriter rewriter, Operator operator) {
-    if (operator instanceof AndOperator and) {
-      if (and.getOperands() != null) {
-        and.getOperands().forEach(operand -> operatorSites(edits, rewriter, operand));
-      }
-    }
-    else if (operator instanceof OrOperator or) {
-      if (or.getOperands() != null) {
-        or.getOperands().forEach(operand -> operatorSites(edits, rewriter, operand));
-      }
-    }
-    else if (operator instanceof NotOperator not) {
-      operatorSites(edits, rewriter, not.getOperand());
-    }
-    else if (operator instanceof ExactMatchOperator exact) {
-      pathSite(edits, rewriter, exact::getField, exact::setField);
-    }
-    else if (operator instanceof UndefinedMatchOperator undefined) {
-      pathSite(edits, rewriter, undefined::getField, undefined::setField);
-    }
-    else if (operator instanceof DoubleRangeOperator range) {
-      pathSite(edits, rewriter, range::getField, range::setField);
-    }
-    else if (operator instanceof DateRangeOperator range) {
-      pathSite(edits, rewriter, range::getField, range::setField);
-    }
-    else if (operator instanceof DateFragmentRangeOperator range) {
-      pathSite(edits, rewriter, range::getField, range::setField);
-    }
-    else if (operator instanceof SimpleSearchOperator search) {
-      listSites(edits, rewriter, search.getFields());
-    }
-  }
-
-  /**
-   * {@code text} with every {@code [/Path/To/Field]} field reference of the query language rewritten. Found through
-   * the lexer, so a path-looking string literal is never touched; text that doesn't lex cleanly is left alone.
-   */
-  static String rewriteQueryLanguage(String text, PathRewriter rewriter) {
-    QLLexer lexer = new QLLexer(CharStreams.fromString(text));
-    lexer.removeErrorListeners();
-    boolean[] failed = {false};
-    lexer.addErrorListener(new org.antlr.v4.runtime.BaseErrorListener() {
-      @Override
-      public void syntaxError(org.antlr.v4.runtime.Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-          int charPositionInLine, String msg, org.antlr.v4.runtime.RecognitionException e) {
-        failed[0] = true;
-      }
-    });
-    List<? extends Token> tokens = lexer.getAllTokens();
-    if (failed[0]) {
-      return text;
-    }
-    List<Token> fields = new ArrayList<>();
-    for (Token token : tokens) {
-      if (token.getType() == QLLexer.I_FIELD) {
-        fields.add(token);
-      }
-    }
-    fields.sort(Comparator.comparingInt(Token::getStartIndex).reversed());
-    StringBuilder result = new StringBuilder(text);
-    for (Token token : fields) {
-      String reference = token.getText();
-      String path = reference.substring(1, reference.length() - 1);
-      String rewritten = rewriter.rewriteAbsolute(path);
-      if (!rewritten.equals(path)) {
-        // ANTLR's CharStream indexes by code point, String by UTF-16 unit (see PathLocator).
-        int start = text.offsetByCodePoints(0, token.getStartIndex());
-        int end = text.offsetByCodePoints(0, token.getStopIndex() + 1);
-        result.replace(start, end, "[" + rewritten + "]");
-      }
-    }
-    return result.toString();
+  private static void queryEdits(QueryModel query, String changedId, PathRewriter rewriter,
+      Collection<? extends A12Model<?>> projectModels, List<Edit> edits) {
+    QueryReferenceRefactoring.collect(query, changedId, rewriter, projectModels, edits);
   }
 
   // ---- Mapping Model / Structural Mapping Model -------------------------------------------------------------
@@ -449,17 +341,6 @@ public final class ProjectReferenceRefactoring {
     String rewritten = rewriter.rewriteAbsolute(old);
     if (!rewritten.equals(old)) {
       edits.add(new Edit(setter, old, rewritten));
-    }
-  }
-
-  /** The paths held in {@code paths}, rewritten in place (the list itself is what a model holds on to). */
-  private static void listSites(List<Edit> edits, PathRewriter rewriter, List<String> paths) {
-    if (paths == null) {
-      return;
-    }
-    for (int i = 0; i < paths.size(); i++) {
-      int index = i;
-      pathSite(edits, rewriter, () -> paths.get(index), value -> paths.set(index, value));
     }
   }
 }

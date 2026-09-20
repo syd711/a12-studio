@@ -79,6 +79,48 @@ class ProjectReferenceRefactoringFixturesTest {
     assertTrue(after.contains("/Contract/WeeklyWorkhours"), "a path below a relationship belongs to another model");
   }
 
+  // The query's root is Person_Dc; its one hop goes through TeamPerson_Re to the role "Team" (Team_Dc), and the
+  // relationship's link document is TeamPerson_LinkFields_Dc.
+  private static final String HOP_QUERY = "PersonTeamAssignment_Ru_SelectedItems_Ov_Qe";
+
+  @Test
+  void aQueryHopFollowsARenameInTheModelItsRolePlaysAndNothingElseMoves() throws IOException {
+    List<A12Model<?>> project = loadWorkspace("advanced_new");
+    DocumentModel team = documentModel(project, "Team_Dc");
+    A12Model<?> query = model(project, HOP_QUERY);
+    String before = JsonSettings.objectMapper.writeValueAsString(query);
+    assertTrue(before.contains("\"/Team/TeamName\""), before);
+
+    renameAndApply(project, team, "/Team/TeamName", "TeamTitle");
+
+    String after = JsonSettings.objectMapper.writeValueAsString(query);
+    assertEquals(before.replace("\"/Team/TeamName\"", "\"/Team/TeamTitle\""), after);
+  }
+
+  @Test
+  void aQueryHopFollowsARenameInTheRelationshipsLinkModelInItsLinkDocumentFields() throws IOException {
+    List<A12Model<?>> project = loadWorkspace("advanced_new");
+    DocumentModel linkModel = documentModel(project, "TeamPerson_LinkFields_Dc");
+    A12Model<?> query = model(project, HOP_QUERY);
+    String before = JsonSettings.objectMapper.writeValueAsString(query);
+    assertTrue(before.contains("\"/LinkFields/Position\""), before);
+
+    renameAndApply(project, linkModel, "/LinkFields/Position", "Role");
+
+    String after = JsonSettings.objectMapper.writeValueAsString(query);
+    assertEquals(before.replace("\"/LinkFields/Position\"", "\"/LinkFields/Role\""), after);
+  }
+
+  private static void renameAndApply(List<A12Model<?>> project, DocumentModel changed, String path, String newName) {
+    ElementIndex index = new ElementIndex(changed);
+    Element element = index.allElements().stream().filter(candidate -> index.getPath(candidate).equals(path))
+        .findFirst().orElseThrow();
+    DocumentModelRefactoring.Plan plan = DocumentModelRefactoring.prepare(changed);
+    element.setName(newName);
+    ProjectReferenceRefactoring.computeEdits(changed, plan, project)
+        .forEach(modelEdits -> modelEdits.edits().forEach(Edit::apply));
+  }
+
   @Test
   void renamesAndMovesInEveryFixtureModelKeepThePathsOfIncludingModelsValidAndUndoRestoresEverything()
       throws IOException {

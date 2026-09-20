@@ -9,6 +9,7 @@ import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.querymodel.QueryModelContent;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
 import de.a12.studio.ui.editors.querymodel.dialogs.Dialogs;
@@ -66,6 +67,9 @@ public class QueryModelTreeController implements Initializable {
   private SearchFieldController searchController;
 
   @FXML
+  private ErrorContainerController errorContainerController;
+
+  @FXML
   private Button addRelationshipButton;
 
   @FXML
@@ -94,6 +98,7 @@ public class QueryModelTreeController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    errorContainerController.hide();
     elementsTreeTable.setShowRoot(true);
     nameColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue().getName()));
     nameColumn.setCellFactory(column -> new QueryTreeNameCell());
@@ -114,6 +119,7 @@ public class QueryModelTreeController implements Initializable {
     this.projectItem = projectItem;
     this.model = model;
     resolveTargetDocumentModel();
+    showTargetProblem();
     rebuildTree();
   }
 
@@ -135,6 +141,24 @@ public class QueryModelTreeController implements Initializable {
         .filter(dm -> dm.getId().equals(targetId))
         .findFirst()
         .orElse(null);
+  }
+
+  /**
+   * Says why the tree below is empty when the target Document Model is unset or no longer in the project (deleted,
+   * or renamed outside the app - a rename inside it is followed, see {@code ModelReferenceRewriter}); without this
+   * the tree simply renders nothing under its root, indistinguishable from a model with no elements.
+   */
+  private void showTargetProblem() {
+    String targetId = content().getTargetDocumentModel();
+    if (targetDocumentModel != null) {
+      errorContainerController.hide();
+    }
+    else if (targetId == null || targetId.isBlank()) {
+      errorContainerController.show("ERROR", StudioBundle.get("query_model_tree.target_missing"));
+    }
+    else {
+      errorContainerController.show("ERROR", StudioBundle.get("query_model_tree.target_not_found", targetId));
+    }
   }
 
   private void rebuildTree() {

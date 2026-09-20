@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.propertyeditors;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -111,8 +112,14 @@ public class TargetModelPanelController implements Initializable {
   }
 
   private void validate() {
-    if (required && targetModelField.getValue() == null) {
+    String value = targetModelField.getValue();
+    if (required && value == null) {
       errorContainerController.show("ERROR", "A Target Model must be selected.");
+    }
+    else if (value != null && !targetModelField.getItems().contains(value)) {
+      // The combo box happily displays a stored id it has no item for (the model was deleted or renamed outside
+      // the app), which looks exactly like a valid selection.
+      errorContainerController.show("ERROR", StudioBundle.get("target_model_panel.not_found", value));
     }
     else {
       errorContainerController.hide();
