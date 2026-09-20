@@ -27,6 +27,8 @@ import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.events.TabSelectionChangedEvent;
 import de.a12.studio.ui.preview.PreviewLauncher;
+import de.a12.studio.ui.projecttree.ProjectItemViewModel;
+import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -41,6 +43,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -51,6 +54,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -129,6 +133,8 @@ public class FormModelEditorController extends AbstractEditorController implemen
   private DataConfigurationPanelController dataConfigurationController;
 
   @FXML
+  private TitledPane documentModelPane;
+  @FXML
   private SplitPane overviewSplitPane;
   @FXML
   private StackPane documentRelationshipModelPane;
@@ -183,6 +189,13 @@ public class FormModelEditorController extends AbstractEditorController implemen
    */
   private void loadOverview(@NonNull FormModel formModel) {
     DocumentModel documentModel = resolveDataBindingDocumentModel(formModel);
+    // Title the pane after the linked model's id (the referenced one, not documentModel.getId(), which is
+    // synthetic for a Combination Model); the bundled "Document Model" text stays as the fallback.
+    String linkedDocumentModelId = currentDocumentModelId(formModel);
+    documentModelPane.setText(linkedDocumentModelId != null && !linkedDocumentModelId.isBlank()
+        ? linkedDocumentModelId
+        : StudioBundle.get("document_model"));
+    documentModelPane.setGraphic(WidgetFactory.createModelIcon(documentModelIconPath(linkedDocumentModelId)));
     documentSourceTreeController.load(documentModel, projectItem);
     relationshipModelPanelController.load(documentModel, projectItem);
     formModelTreeController.setModel(formModel, documentModel, projectItem);
@@ -225,7 +238,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
     if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
       return null;
     }
-    return new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
+    return new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem));
   }
 
   /**
@@ -244,8 +257,25 @@ public class FormModelEditorController extends AbstractEditorController implemen
     if (documentModelId == null) {
       return null;
     }
-    List<DocumentModel> documentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
-    return documentModels.stream().filter(candidate -> documentModelId.equals(candidate.getId())).findFirst().orElse(null);
+    // The reference may name a Combination Model (e.g. PersonEmployee_Cm), which a plain Document Model lookup
+    // skips - resolve it to the synthetic merged Document Model whose ids match the form's elementRefs.
+    return ProjectDocumentModels.resolveDocumentModelForFieldReferences(documentModelId);
+  }
+
+  /**
+   * The project tree's icon for the model behind {@code documentModelId} (plain Document Model, Additive
+   * Document Model, or Combination Model - the same choice {@link ProjectItemViewModel#getIconPath} makes), so
+   * the pane title matches how the linked model looks in the tree. Falls back to the plain Document Model icon
+   * while nothing is linked or the reference doesn't resolve.
+   */
+  private static @NonNull String documentModelIconPath(@Nullable String documentModelId) {
+    if (documentModelId == null || documentModelId.isBlank()) {
+      return Icons.PNG_MODEL_DOCUMENT;
+    }
+    String iconPath = ProjectDocumentModels.findProjectItemByModelId(documentModelId)
+        .map(item -> new ProjectItemViewModel(item, Map.of()).getIconPath())
+        .orElse(null);
+    return iconPath != null ? iconPath : Icons.PNG_MODEL_DOCUMENT;
   }
 
   private @Nullable String currentDocumentModelId(@NonNull FormModel formModel) {

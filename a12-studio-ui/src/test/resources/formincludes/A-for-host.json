@@ -1,0 +1,126 @@
+{
+  "header": {
+    "id": "A-for-host",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "B-for-include",
+        "modelType": "document",
+        "purpose": "include",
+        "reference": "B-for-include"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "A-for-host",
+      "immutable": false
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_42015",
+          "name": "Person",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_e3022",
+                "name": "firstName",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "First Name"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_f0599",
+                "name": "familyName",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "familyName"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_51242",
+                "name": "age",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {
+                      "minValue": 0
+                    }
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Age"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_8a4ea",
+                "name": "address",
+                "Group": {
+                  "repeatability": 1,
+                  "includeConfig": {
+                    "reference": "B-for-include"
+                  }
+                }
+              },
+              {
+                "type": "Group",
+                "id": "include_5c0d1",
+                "name": "billing",
+                "Group": {
+                  "repeatability": 1,
+                  "includeConfig": {
+                    "reference": "B-for-include"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

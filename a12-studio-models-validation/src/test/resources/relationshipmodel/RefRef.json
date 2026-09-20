@@ -1,0 +1,30 @@
+{
+  "header": {
+    "id": "RefRef",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": [
+      {
+        "role": "Parent",
+        "documentModel": "Ref_DM",
+        "ordered": false,
+        "labels": []
+      },
+      {
+        "role": "Child",
+        "documentModel": "Ref_DM",
+        "ordered": false,
+        "labels": []
+      }
+    ]
+  }
+}

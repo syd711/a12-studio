@@ -1,0 +1,115 @@
+{
+  "header": {
+    "id": "B-for-include",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "B-for-include"
+    },
+    "modelConfig": {
+      "decimalSeparator": ".",
+      "timeZone": "UTC",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_c2e8b",
+          "name": "Address",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_b0b4d",
+                "name": "country",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Country"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_dcc51",
+                "name": "region",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Region"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_c1723",
+                "name": "postal_code",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Postal Code"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_e2fea",
+                "name": "street",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Street"
+                    }
+                  ],
+                  "helperText": [
+                    {
+                      "locale": "en",
+                      "text": "street incl. house number"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

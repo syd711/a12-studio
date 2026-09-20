@@ -107,7 +107,7 @@ Missing or worth checking against SME (`commonDocumentModel/api/editor/*`):
 | Feature | SME reference | a12-studio status | Won't Fix |
 |---|---|---|---|
 | Rule contradiction / consistency check | TDG constraint solver (`checkRuleContradictions`, endpoint `/api/document-model/check-rule-contradictions`) detects logically unsatisfiable rule sets (e.g. a field required but an error rule fires whenever it's filled) | Missing — no `tdg` dependency at all | |
-| Move/rename refactoring | Auto-rewrites rule/computation condition text referencing a moved/renamed element (`moveElementApi.ts` → backend `/move-element-with-refactoring`) | **Present within one model** (2026-09-19): `DocumentModelRefactoring` (`a12-studio-models-validation/.../refactoring/`) + UI `RefactoringCommand` wrapping `RenameElementCommand`/`MoveNodeCommand`, so inline rename, the General Information panel's Rename and tree drag-and-drop are one undo step each. Clean-room (SME's rewrite lives in the proprietary kernel `MoveSupportDM`). Resolves each path to the *element* in the old tree and re-expresses it against the new one, so a moved *rule* (whose relative paths are measured from its own position) works as well as a moved field; only a reference that no longer resolves to the same element is rewritten, keeping its style (absolute vs relative, `..Group` turning-group name, `*` markers). Covers Rule `errorEntityRelPath`/`errorCondition`/`errorMessage` `$path$` parameters, Computation `computedFieldRelPath`/`commonPrecondition`/alternative `precondition`+`operation`/`errorMessage`, Group `indexFieldName`, `documentUniquenessCriteria[].fields[].fullName`. References by element id (Form/Overview/Tree/RelationshipUI `elementRef`/`fieldId`/`groupRef`, `ModelConfig` uniqueness criteria) cannot break — ids don't change on rename/move. **Other models' references (2026-09-19, `ProjectReferenceRefactoring`):** the same rename/move now also updates, in the same undo step, the references the project's other models hold on the changed Document Model — Print `FieldRef.path` (where `model` is the changed DM), Query `fields`/`sort`/top-level `constraint` field paths/`filterDefinition` `[/Path]` refs (where `targetDocumentModel` is the changed DM), Mapping `SortField.sortFieldFullName` (per `Source.dmId`), Structural Mapping `*FullName`s and Selection `Selected`/`Unselected` paths (both have no DM reference of their own, so they follow only when every Mapping/Combination Model using them agrees the changed DM is that side's/base model), and rules/computations of *other Document Models that include this one* (SME `calculateIncludedNameChanges`/`calculateIncludedPathChanges`; an Include mounts the children of the included model's root group, so the path tail after the Include group is re-derived from the included model's old/new tree). The affected models are edited in place (editors share the project tree's model instance and save on every edit, so there is no dirty state to clash with), saved, and announced via `ModelSaveEvent`; undo restores, saves and announces them again, and skips a model that was reloaded from disk meanwhile. Verified against every element of every DM in `testing/workspaces` (renames + moves; undo restores every model byte-for-byte; relative paths of including models still reach the same element). **Still missing:** Query relationship-link paths (`links[].fields`, constraints below `has` — they belong to the linked role's DM), Print calculation steps, Form `hostDocumentModelPath` (transclusion provenance, not a live reference; also ambiguous which DM it is relative to), paths through a *chain* of Includes or an Additive base model; an open editor of a rewritten non-DM model (Print/Query/...) isn't told to redraw, so it shows the old text until reopened (the model itself is already correct); conditions that don't parse are skipped (logged). Cut/Paste is delete + paste-as-clone with new ids, not a move, so it isn't refactored. | |
+| Move/rename refactoring | Auto-rewrites rule/computation condition text referencing a moved/renamed element (`moveElementApi.ts` → backend `/move-element-with-refactoring`) | **Present within one model** (2026-09-19): `DocumentModelRefactoring` (`a12-studio-models-validation/.../refactoring/`) + UI `RefactoringCommand` wrapping `RenameElementCommand`/`MoveNodeCommand`, so inline rename, the General Information panel's Rename and tree drag-and-drop are one undo step each. Clean-room (SME's rewrite lives in the proprietary kernel `MoveSupportDM`). Resolves each path to the *element* in the old tree and re-expresses it against the new one, so a moved *rule* (whose relative paths are measured from its own position) works as well as a moved field; only a reference that no longer resolves to the same element is rewritten, keeping its style (absolute vs relative, `..Group` turning-group name, `*` markers). Covers Rule `errorEntityRelPath`/`errorCondition`/`errorMessage` `$path$` parameters, Computation `computedFieldRelPath`/`commonPrecondition`/alternative `precondition`+`operation`/`errorMessage`, Group `indexFieldName`, `documentUniquenessCriteria[].fields[].fullName`. References by element id (Form/Overview/Tree/RelationshipUI `elementRef`/`fieldId`/`groupRef`, `ModelConfig` uniqueness criteria) cannot break — ids don't change on rename/move. **Other models' references (2026-09-19, `ProjectReferenceRefactoring`):** the same rename/move now also updates, in the same undo step, the references the project's other models hold on the changed Document Model — Print `FieldRef.path` (where `model` is the changed DM), Query `fields`/`sort`/top-level `constraint` field paths/`filterDefinition` `[/Path]` refs (where `targetDocumentModel` is the changed DM), Mapping `SortField.sortFieldFullName` (per `Source.dmId`), Structural Mapping `*FullName`s and Selection `Selected`/`Unselected` paths (both have no DM reference of their own, so they follow only when every Mapping/Combination Model using them agrees the changed DM is that side's/base model), and rules/computations of *other Document Models that include this one* (SME `calculateIncludedNameChanges`/`calculateIncludedPathChanges`; an Include mounts the children of the included model's root group, so the path tail after the Include group is re-derived from the included model's old/new tree). The affected models are edited in place (editors share the project tree's model instance and save on every edit, so there is no dirty state to clash with), saved, and announced via `ModelSaveEvent`; undo restores, saves and announces them again, and skips a model that was reloaded from disk meanwhile. Verified against every element of every DM in `testing/workspaces` (renames + moves; undo restores every model byte-for-byte; relative paths of including models still reach the same element). **Still missing:** Query relationship-link paths (`links[].fields`, constraints below `has` — they belong to the linked role's DM), Print calculation steps, Form `hostDocumentModelPath` (include provenance: the path of the host DM's Include group the include was bound to; followed since 2026-09-20 for a form bound to the changed DM, `FormIncludeProvenanceValidator` reports one that still goes stale, e.g. a path that runs into a DM that is merely included), paths through a *chain* of Includes or an Additive base model; an open editor of a rewritten non-DM model (Print/Query/...) isn't told to redraw, so it shows the old text until reopened (the model itself is already correct); conditions that don't parse are skipped (logged). Cut/Paste is delete + paste-as-clone with new ids, not a move, so it isn't refactored. | |
 | Ad hoc testing / live preview | Select elements (Alt+T), server generates a reduced test Document+Validation model, renders in a popup preview | Missing | |
 | Copy elements from another Document Model | "Insert from DM" modal, resolves includes, copies/imports type defs | Missing | |
 | Model diff / compare | `hasModelDiffEditor`, full settings/tree/typedef diff | **Won't do** (decided 2026-09-19) | |
@@ -446,12 +446,72 @@ SME's shared `RepeatBase` (`fmElements/types/detachedRepeat.ts`) has several fie
 - **No repeat-type conversion** (Detached⇄Embedded⇄Inline⇄Binding) exists in the UI — converting requires
   delete-and-recreate, confirmed by reading `FormModelActions`/`FormModelNodeTypes`.
 
-### Includes / transclusion — entirely absent
+### Includes / transclusion — present (2026-09-20, TODO #8)
 
-SME's `ScreenElementBase` mixin (`fmElements/types/basicScreenElement.ts`) carries an `Included` mixin
-(`includeId`/`formModelRef`/`hostDocumentModelPath`) on **every** screen element type, letting a subtree be
-transcluded from another Form Model. a12-studio's `ScreenElement.java` has no equivalent fields at all — this isn't
-a missing panel, the data model itself can't represent an include on any node.
+**What SME does.** SME's editor has no include-insertion code: `ScreenElementBase` only carries the `Included` mixin
+(`includeId`/`formModelRef`/`hostDocumentModelPath`) and shows a "link" icon (`isIncluded()`). The expansion is a
+build-time batch, `FormModelExpansionBatchCLI` from `com.mgmtp.a12.formengine:formengine-model` (SME's Gradle task
+`resolveFormIncludes`, commit "A12SME-2367 Form Model Dev-Includes"), which rewrites the model files in place.
+**The library is published with sources** in the community repo (`artifacts.geta12.com/artifactory/a12-community-maven`,
+`com/mgmtp/a12/formengine/formengine-model/<version>/...-sources.jar`, 38.4.0–39.0.1 at the time; SME's own 38.3.0 is not
+there; EUPL-1.2/commercial), so the exact semantics of `IncludeExpansion`/`IncludeMapper` were read, not guessed. What it does:
+
+- The unit is the **first screen** of the referenced Form Model, not an arbitrary subtree: all its screen elements
+  replace the include element. Only Section, ControlGrid, ButtonPanel and the three repeats can carry an include; the
+  parent must be a Screen, a Section or (single ControlGrid) an EmbeddedRepeat.
+- Every copied id gets `<includeId>_` in front (Screen, Section, repeats, ControlGrid, Row, Control, TextCell, columns,
+  ButtonPanel, Button, header/footer). `includeId` is not an id of the source form.
+- `elementRef`/`groupRef` (Control, field column, the three repeats) are rebound **by path**, not by prefix: id ->
+  path in the source Document Model, source root group name dropped, appended to `hostDocumentModelPath`, resolved in
+  the host Document Model (a `/` path keeps the source path). With `hostDocumentModelPath` = an Include group of the
+  source's Document Model this yields `<includeGroupId>_<sourceId>`.
+- Provenance goes on each copied top-level element only. A single element takes the include element's name, several get
+  `<includeId>-<name>`.
+- The source's field/group configuration entries for what the copy binds to are re-keyed and merged (host attribute
+  wins, only unset attributes are filled). Expression cells make it fail.
+- Re-running the expansion on a model that already contains it re-expands it (neighbors with the same `includeId` count as
+  one include), so an include is refreshable.
+- The Form Engine leaves hide-condition/dependency masters, dependent controls and everything inside expression
+  columns untouched.
+
+**What a12-studio does.** `FormIncludeExpander` (`a12-studio-models-validation`, package `formincludes`) ports that
+behavior (clean-room, written against the behavior above) and additionally rebinds hide-condition masters, dependency
+masters/cases and `dependentControls` (an id outside the copied screen is dropped with a warning), and refuses
+expression cells/columns and Bindings. `ElementIndex.resolveIdByPath` is the new path -> form-id lookup. UI: tree "Add"
+menu (context menu and toolbar) -> *Include Form Model...* on a Screen, Section or Multi-Column Section
+(`IncludeFormModelDialogController`: source form, Document Model path - candidates are the host DM's Include groups of the
+source's DM, but any path is accepted -, optional name; every change is a dry run, so OK is only enabled for an include that
+works); *Refresh Include* on an included element (replaces the whole run, undo brings the old one back);
+`ExpandIncludeCommand` makes either one undo step (config entries added or merged, undo puts the original instances back);
+included elements show a link badge; duplicating/pasting an included element drops the provenance of the copy (two
+neighbors with one `includeId` would be refreshed as one). `FormIncludeProvenanceValidator` checks the three fields are
+complete, the form exists and the path still exists in the host's DM. Tests: `FormIncludeExpanderTest` (a golden test:
+SME's `HostModel_expanded.json` with the address section emptied is expanded and must equal SME's own output),
+`FormIncludeProvenanceValidatorTest`, `ExpandIncludeCommandTest`, `IncludeFormModelDialogControllerTest`,
+`FormModelActionsIncludeMenuTest`, `FormModelActionsIncludeProvenanceTest`; fixtures are SME's four files
+(`formincludes/`, the Document Models converted to `includeConfig` - SME's copy still uses `modelAlias`, plus a second
+Include group `billing`).
+
+**Follow-ups, done the same day.**
+- *Embedded Repeat grid slot.* Include Form Model is also offered on an Embedded Repeat (the Form Engine's third parent
+  kind): the included form's first screen must be exactly one Control Grid (`Expansion.isSingleControlGrid()`; the dialog
+  says so by naming the form and disables OK otherwise), it replaces the repeat's grid (asking first if the current grid has
+  cells), and such a grid can be refreshed although it has no siblings. `ExpandIncludeCommand` takes a list range or the slot.
+- *Rename/move.* `ProjectReferenceRefactoring` now rewrites the `hostDocumentModelPath` of the includes of every Form Model
+  bound to the changed Document Model (data-binding reference, else the first Document Model reference), through the same
+  `PathRewriter` as the other absolute paths, in the same undo step. The element references of the included elements are ids
+  (`<includeGroupId>_<id>`) and don't change. Not covered: a form bound to a Document Model that merely *includes* the
+  changed one, with a path that runs into the included model.
+- *Combined Document Model as the source's DM.* A form bound to a Combination Model can be included: the UI hands the
+  expander `ProjectDocumentModels.getOtherDocumentModelsWithCombinations`, i.e. the plain Document Models plus the stand-in
+  `CombinedDocumentModelElements` makes of every combination (it carries the combination's id). Base fields keep their ids,
+  additive ones stay `md5(additiveId)_<id>` below the Include group (tested on the real `PersonEmployee_Fm`, 32 references).
+  It inherits that class's approximation: Selection and Decoration steps are not applied, and below an Include group the
+  elements of *all* root groups (base and additive) are one name space, so equal names in two of them resolve to the first.
+
+**Not done:** a Form Model that is *bound to* a combination as the include's **host**: the form editor does not resolve a
+combination for its own tree at all (`documentModel` is null there, so the Include action is not offered) - a limit of the
+editor, not of the include.
 
 ### Model-level / editor-structure gaps
 
@@ -540,8 +600,7 @@ validators are the sole source of truth here.
 4. **Repeat feature completion**: `filterExpression`, `initialSorting` (+ its validator), real `rowActionGroup`
    (replacing the currently-dead `defaultRowAction`), `titleHidden`, per-repeat `confirmationTexts`,
    `MultiFileUploadOptions`/`attachmentConfig`. Group these together since several share the attachment-field theme.
-5. **Includes/transclusion.** Cross-cutting (affects every `ScreenElement` type's data model plus load/save/resolve
-   flow) — needs a design pass before implementation, not a small add.
+5. **Includes/transclusion.** Done 2026-09-20 - see "Includes / transclusion" above.
 6. **`ButtonPanel` screen element + `CustomCell` type.** Smaller, self-contained additions once the tree/editor
    infrastructure changes above have landed.
 7. **`Binding`/`BindingRepeat` (CDM relationship-driven selector/repeat).** Lowest priority — by far the most
@@ -612,8 +671,8 @@ covered by round-trip tests.**
   with rewritten ids) and keeps `includeId`/`formModelRef`/`hostDocumentModelPath` purely as provenance metadata,
   not a live reference resolved at render time. So the scoped, correct fix was just adding those three fields to
   `ScreenElement` for round-trip fidelity (verified against that fixture's exact shape) — a12-studio still has no
-  UI action that performs the copy-and-rewrite itself, which remains real future work, but the round-trip hazard
-  (silently dropping this data on load-then-save) is closed.
+  UI action that performs the copy-and-rewrite itself, but the round-trip hazard (silently dropping this data on
+  load-then-save) is closed. The copy-and-rewrite action followed on 2026-09-20 (see "Includes / transclusion").
 - **Step 6**: `ButtonPanel` (new `ScreenElement`, addable inline in the screen tree, own button list reusing
   `ToolbarButtonsPanelController`) and `CustomCell` (new `Cell` type) added, both with editor panels. While in this
   area, also closed a pre-existing gap found by inspection: `CustomScreenElement` had **no editor pane at all**
@@ -782,7 +841,9 @@ checker binds field paths to their Document Model type to disambiguate `double_r
 the Java emitter dispatches purely syntactically and gets the same result without needing a Document Model schema
 lookup at all. Field/function *validity* (does this field exist, is this target role real) is therefore not
 checked here — only syntactic well-formedness is; semantic validation is a separate, later concern (SME's own
-`checker.ts`/custom conditions) that would need real schema access and hasn't been ported.
+`checker.ts`/custom conditions) that would need real schema access and hasn't been ported. *(2026-09-20: the
+existence half is now a separate pass over the parse tree, `QueryFilterReferenceChecker` - see "Status
+(2026-09-20)" in the Query Model section below; the emitter itself is unchanged and still type-blind.)*
 
 Two shapes the emitter can never produce have no clean QL surface syntax and are formatted with a documented,
 lossy fallback in `QueryLanguageFormatter` rather than failing: `exact_match` with a `values` list (expanded to an
@@ -913,17 +974,50 @@ its own Filter Definition and Fields-in-Result-Set editor, not just the root:
   an `indexed = false` annotation - a12-studio's `DocumentModel` has no `indexed`-annotation concept at all, so
   there is nothing to port that check against; not a gap this pass could close.
 
-**Still remaining**: real semantic validation of the *filter expression's own* field references (does
-`[/Foo/Bar]` inside a `filterDefinition` string actually exist) still isn't checked - only its syntax is.
-Aggregation and reference/rename tracking are unchanged from the plan below.
+**Status (2026-09-20): semantic filter validation done** (was: "does `[/Foo/Bar]` inside a `filterDefinition`
+actually exist isn't checked - only its syntax is"). A port of the *existence* half of SME's binder/`Resolver`
+(`moduleSupport/qmm` `binder.ts`, `base/resolver.ts`), deliberately without the checker's type/overload/enum-value
+diagnostics (the emitter still does no type checking either):
+- **`QueryLanguageReferences`** (`a12-studio-models`, `querymodel.ql`) walks the same parse tree as the emitter
+  (both now share `QueryLanguageSyntax.parse`) and returns, in source order, the bracketed field paths of a scope
+  and every `Has(relationship, role, constraint, linkConstraint)` call with its nested scopes. No project access.
+- **`QueryFilterReferenceChecker`** (`a12-studio-models-validation`, `validators.query`) resolves those against the
+  project: each `[/Path]` in the Document Model the filter runs against (the root filter: the target DM; a hop's
+  filter: the DM its role plays), following Includes/Additive bases (new `ElementIndex.resolveAbsolutePath`, unlike
+  `QueryElementResolution.resolveByPath`'s plain scan of the model's own elements); "unknown field" (SME 2024),
+  "not a field" (2023, e.g. `[/Root]`) and "annotated `indexed = false`" (2036); `Has`: unknown relationship (2025),
+  role not in the relationship, role not reachable from the current DM (all roles for a self-referencing
+  relationship, otherwise the roles of the *other* DM - `getExpectedTargetRoles`, 2026/2027), target DM missing
+  (2029), and for a link constraint the relationship's link DM missing/unset (2030/2031). The `constraint` is then
+  checked in the role's DM and the `linkConstraint` in the link DM, recursively. A scope whose DM cannot be
+  determined skips its field paths (the broken hop is reported once, by the link validator) but its nested `Has`
+  calls are still checked. `/__meta/...` paths are skipped like in the sibling validators. No "Did you mean ..."
+  candidates (SME 2024/2033) - the editor's autocomplete covers that.
+- **`QueryFilterDefinitionReferenceValidator`** runs it for the root and every hop (recursively) from
+  `QueryModelValidationService`, error ids `content/filterDefinition` / `content/links` like the syntax validator;
+  a syntactically invalid filter is left to `QueryFilterDefinitionSyntaxValidator`. **Editor**:
+  `QueryDocumentNodePanelController`'s per-keystroke validator now returns the syntax error, else one line per
+  unresolved reference (the checker is built once per `load`, from a snapshot of the project's models, like the
+  suggestion provider's index - a DM edited in another tab is picked up on the next selection, not per keystroke).
+- Tests: `QueryFilterReferenceCheckerTest` (16). No real SME fixture has a `filterDefinition` with references
+  (`grep` over `testing/` and SME's `client/resources`, `integrationTest`, `moduleSupport/qmm/resources` finds only
+  the two synthetic invalid-syntax fixtures), so nothing could be swept for false positives; the messages and
+  scoping rules come from SME's `checker.test.ts` and the sources above.
+- Correction to the "Not ported" bullet above: a12-studio's `Element` carries generic `annotations`, so an
+  `indexed = false` check *is* possible - it is done for the filter expression now. The **field projection**
+  (`fields[]`, `QueryFieldReferenceValidator`) still does not reject non-indexed fields; not changed here.
+
+**Still remaining**: type checking of a filter expression (operator/value vs. field type, enumeration values -
+SME 2007-2019/2035) and "Did you mean" suggestions. Aggregation and reference/rename tracking are unchanged from
+the plan below.
 
 ### Proposed build order
 
 1. ~~**Settings + validators**~~ — done, see Status above (2026-09-05).
 2. ~~**Editable graph tree**~~ — done, see Status above (2026-09-06).
 3. ~~**Per-node filtering**~~ — UI done, see Status above (2026-09-14). Autocomplete already existed (reused
-   from the old whole-query dialog); a semantic (field-existence-aware) layer for the filter expression's own
-   references remains a separate follow-up.
+   from the old whole-query dialog); the semantic (existence-aware) layer for the filter expression's own
+   references was added 2026-09-20, see "Status (2026-09-20)" above; type checking remains open.
 4. **Aggregation** — only once it's confirmed the kernel path a12-studio would use actually supports an
    aggregation-mode query result; otherwise a documented non-goal.
 5. **Reference/rename tracking** — hook into whatever a12-studio's existing rename/move refactoring mechanism is

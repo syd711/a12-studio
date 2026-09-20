@@ -191,7 +191,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         subtitlesController.setVisible(false);
       }
       if (model instanceof FormModel formModel) {
-        generalSettingsController.setModel(formModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
+        generalSettingsController.setModel(formModel, ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem));
         generalSettingsController.setVisible(true);
         generalDetachedRepeatSettingsController.setModel(formModel);
         generalDetachedRepeatSettingsController.setVisible(true);

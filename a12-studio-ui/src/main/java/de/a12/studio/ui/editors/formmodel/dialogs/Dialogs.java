@@ -1,9 +1,12 @@
 package de.a12.studio.ui.editors.formmodel.dialogs;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.EventButton;
+import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.RowAction;
 import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.modelsvalidation.formincludes.FormIncludeExpander;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -83,6 +86,24 @@ public class Dialogs {
 
     stage.showAndWait();
     return controller.isConfirmed() ? Optional.of(controller.getRowAction()) : Optional.empty();
+  }
+
+  /**
+   * Opens the Include Form Model dialog (see {@link IncludeFormModelDialogController}) and returns the expansion the
+   * user confirmed, ready to be inserted by the caller; empty if cancelled. {@code gridSlot} is true when it goes
+   * into the grid slot of an Embedded Repeat, which needs the include to be exactly one Control Grid.
+   */
+  public static Optional<FormIncludeExpander.Expansion> showIncludeFormModel(Stage owner, FormModel host, DocumentModel hostModel,
+      List<FormModel> sources, List<DocumentModel> documentModels, String includeId, boolean gridSlot) {
+    FXMLLoader fxmlLoader = new FXMLLoader(IncludeFormModelDialogController.class.getResource("include-form-model-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("include-form-model-dialog", fxmlLoader, owner, StudioBundle.get("include_form_model.title"));
+    IncludeFormModelDialogController controller = (IncludeFormModelDialogController) stage.getUserData();
+    controller.init(stage, host, hostModel, sources, documentModels, includeId, gridSlot);
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.getExpansion();
   }
 
   private static RowAction cloneRowAction(RowAction rowAction) {

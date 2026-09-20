@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Button;
 import de.a12.studio.models.formmodel.ButtonGroup;
@@ -11,6 +12,7 @@ import de.a12.studio.models.formmodel.DetachedRepeat;
 import de.a12.studio.models.formmodel.EmbeddedRepeat;
 import de.a12.studio.models.formmodel.ExpressionCell;
 import de.a12.studio.models.formmodel.FormModelContent;
+import de.a12.studio.models.formmodel.FormModelWalker;
 import de.a12.studio.models.formmodel.HeaderFooterBox;
 import de.a12.studio.models.formmodel.InlineRepeat;
 import de.a12.studio.models.formmodel.MultiColumnSection;
@@ -20,6 +22,7 @@ import de.a12.studio.models.formmodel.Screen;
 import de.a12.studio.models.formmodel.ScreenElement;
 import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.formmodel.TextCell;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.AddNodeCommand;
@@ -77,10 +80,14 @@ class FormModelActions {
   private final CommandStack commandStack;
   private final Consumer<Object> onModelChanged;
 
-  FormModelActions(@NonNull FormModelContent content, @NonNull CommandStack commandStack, @NonNull Consumer<Object> onModelChanged) {
+  private final FormModelIncludeActions includes;
+
+  FormModelActions(@NonNull FormModelContent content, @NonNull CommandStack commandStack, @NonNull Consumer<Object> onModelChanged,
+      @NonNull ProjectItem projectItem, @Nullable DocumentModel documentModel) {
     this.content = content;
     this.commandStack = commandStack;
     this.onModelChanged = onModelChanged;
+    this.includes = new FormModelIncludeActions(content, commandStack, onModelChanged, projectItem, documentModel);
   }
 
   ContextMenu createContextMenu(@Nullable FormElementViewModel selected) {
@@ -106,6 +113,14 @@ class FormModelActions {
 
     List<Object> siblings = siblingsOf(selected);
     boolean reorderable = siblings != null;
+
+    // An include in the grid slot of an Embedded Repeat has no siblings, but can be refreshed all the same.
+    if (includes.isRefreshable(selected.getNode()) && (siblings != null || selected.getParentNode() instanceof EmbeddedRepeat)) {
+      MenuItem refreshIncludeItem = createMenuItem(StudioBundle.get("form_model_tree.refresh_include"), Icons.RELOAD);
+      refreshIncludeItem.setOnAction(event -> includes.refresh(selected, siblings));
+      contextMenu.getItems().add(refreshIncludeItem);
+      contextMenu.getItems().add(new SeparatorMenuItem());
+    }
 
     MenuItem cutItem = createMenuItem(StudioBundle.get("form_model_tree.cut"), Icons.CUT);
     cutItem.setOnAction(event -> cut(selected));
@@ -164,6 +179,12 @@ class FormModelActions {
       MenuItem item = createMenuItem(descriptor.label(), descriptor.icon());
       item.setOnAction(event -> addChild(selected, descriptor));
       items.add(item);
+    }
+    if (includes.canIncludeInto(selected.getNode())) {
+      items.add(new SeparatorMenuItem());
+      MenuItem includeItem = createMenuItem(StudioBundle.get("form_model_tree.include_form_model"), Icons.ELEMENT_INCLUDE);
+      includeItem.setOnAction(event -> includes.includeInto(selected));
+      items.add(includeItem);
     }
     return items;
   }
@@ -232,6 +253,7 @@ class FormModelActions {
       return;
     }
     regenerateIds(clone);
+    clearIncludeProvenance(clone);
     int index = siblings.indexOf(item.getNode());
     commandStack.execute(new AddNodeCommand(siblings, clone, index + 1));
     onModelChanged.accept(clone);
@@ -275,6 +297,7 @@ class FormModelActions {
     try {
       Object clone = JsonSettings.objectMapper.readValue(clipboardJson, clipboardType);
       regenerateIds(clone);
+      clearIncludeProvenance(clone);
       Command command = createAttachCommand(target.getNode(), clone);
       if (command == null) {
         return;
@@ -381,6 +404,19 @@ class FormModelActions {
     catch (Exception e) {
       log.warn("Failed to duplicate form model node: {}", e.getMessage(), e);
       return null;
+    }
+  }
+
+  /**
+   * Makes the copy a plain element: a duplicate or pasted copy of an included element is no part of the include any
+   * more. Left in, its neighbor(s) would share the include id, so refreshing the include would treat the two as one
+   * and replace both.
+   */
+  static void clearIncludeProvenance(@NonNull Object node) {
+    for (ScreenElement element : FormModelWalker.find(node, ScreenElement.class, child -> true)) {
+      element.setIncludeId(null);
+      element.setFormModelRef(null);
+      element.setHostDocumentModelPath(null);
     }
   }
 

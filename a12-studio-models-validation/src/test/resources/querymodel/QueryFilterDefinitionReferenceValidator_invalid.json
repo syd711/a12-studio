@@ -1,0 +1,39 @@
+{
+  "header": {
+    "id": "QueryFilterDefinitionReferenceValidator_invalid",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Ref_DM",
+    "filterDefinition": "[/Root/Name] == \"a\" and [/Root/DoesNotExist] == \"b\"",
+    "links": [
+      {
+        "relationshipModel": "RefRef",
+        "targetRole": "Child",
+        "fields": [],
+        "filterDefinition": "[/Root/Hidden] == \"c\"",
+        "links": [
+          {
+            "relationshipModel": "RefRef",
+            "targetRole": "Parent",
+            "fields": [],
+            "filterDefinition": "[/Root/AlsoMissing] == \"d\""
+          }
+        ]
+      },
+      {
+        "relationshipModel": "NoSuchRelationship",
+        "targetRole": "X",
+        "fields": [],
+        "filterDefinition": "[/Root/NotCheckedBecauseTheHopIsBroken] == \"e\""
+      }
+    ]
+  }
+}

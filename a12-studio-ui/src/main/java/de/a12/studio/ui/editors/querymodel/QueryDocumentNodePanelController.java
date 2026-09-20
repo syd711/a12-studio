@@ -1,17 +1,23 @@
 package de.a12.studio.ui.editors.querymodel;
 
+import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.querymodel.ql.QueryLanguageEmitter;
 import de.a12.studio.models.querymodel.ql.QueryLanguageException;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.query.QueryFilterReferenceChecker;
 import de.a12.studio.ui.editors.propertyeditors.BracketedPathSuggestionProvider;
 import de.a12.studio.ui.editors.propertyeditors.RuleEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import org.jspecify.annotations.NonNull;
+
+import java.util.List;
 
 /**
  * The right-hand panel shown by {@link QueryModelTreeController} whenever a "document node" row is selected
@@ -49,13 +55,15 @@ public class QueryDocumentNodePanelController {
   private QueryOnlyLinksPanelController onlyLinksPanelController;
 
   private ProjectItem projectItem;
+  private DocumentModel scopeModel;
+  private QueryFilterReferenceChecker referenceChecker;
   private Runnable onChange = () -> {
   };
 
   @FXML
   private void initialize() {
     filterDefinitionPanelController.configureCustom("filterDefinition", StudioBundle.get("filter_definition"));
-    filterDefinitionPanelController.setValidator(QueryDocumentNodePanelController::validate);
+    filterDefinitionPanelController.setValidator(this::validate);
     fieldsProjectionPanelController.setOnChange(() -> onChange.run());
     onlyLinksPanelController.setOnChange(() -> onChange.run());
   }
@@ -72,6 +80,15 @@ public class QueryDocumentNodePanelController {
     this.projectItem = projectItem;
     targetDocumentModelLabel.setText(StudioBundle.get(
         isRoot ? "query_document_node.target_document_model" : "query_document_node.linked_document_model", targetDocumentModelId));
+
+    // Snapshot of the project's models for the semantic filter check, taken once per load like the suggestion
+    // provider's index below: the validator runs (debounced) on every keystroke, and collecting the project's
+    // models is a tree walk. Must be in place before setCustom, which validates the initial value.
+    scopeModel = targetDocumentModel;
+    referenceChecker = new QueryFilterReferenceChecker(new QueryFilterReferenceChecker.Models(
+        ProjectDocumentModels.getOtherDocumentModels(projectItem),
+        ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.RELATIONSHIP).stream()
+            .filter(RelationshipModel.class::isInstance).map(RelationshipModel.class::cast).toList()));
 
     if (targetDocumentModel != null) {
       filterDefinitionPanelController.setSuggestionProvider(new BracketedPathSuggestionProvider(new ElementIndex(targetDocumentModel)));
@@ -100,13 +117,19 @@ public class QueryDocumentNodePanelController {
     onChange.run();
   }
 
-  private static String validate(String text) {
+  /** Syntax first (nothing else can be resolved in an expression that does not parse), then every field/
+   * relationship reference that does not resolve - one line per problem. */
+  private String validate(String text) {
     try {
       EMITTER.emit(text);
-      return null;
     } catch (QueryLanguageException e) {
       return "Invalid filter expression: " + e.getMessage();
     }
+    if (referenceChecker == null) {
+      return null;
+    }
+    List<String> problems = referenceChecker.check(text, scopeModel);
+    return problems.isEmpty() ? null : String.join("\n", problems);
   }
 
   /** Flushes any still-debounced Filter Definition edit and releases {@link #filterDefinitionPanelController}'s

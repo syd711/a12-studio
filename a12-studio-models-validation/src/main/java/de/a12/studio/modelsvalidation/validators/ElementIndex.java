@@ -16,6 +16,7 @@ import de.a12.studio.models.documentmodel.TypeDefinition;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -402,6 +403,19 @@ public class ElementIndex {
   }
 
   /**
+   * Resolves an absolute "/"-separated name path such as {@code /Person/address/street} (the shape of a Query
+   * Model's {@code fields[]} and of a Query Language field reference), following an Include into the included
+   * model's own elements and an Additive Document Model into its base - unlike a plain scan over {@link
+   * #allElements()} with {@link #getPath}, which only sees this model's own file. Empty if it does not resolve.
+   */
+  public Optional<Element> resolveAbsolutePath(String path) {
+    if (path == null || model.getContent() == null || model.getContent().getModelRoot() == null) {
+      return Optional.empty();
+    }
+    return resolveByNamePath(Arrays.stream(path.split("/")).filter(segment -> !segment.isEmpty()).toList());
+  }
+
+  /**
    * The inverse of {@link #resolveRelativePath}: the relative-path string that, passed to that method with
    * {@code from} as the referencing element, resolves back to {@code to} - e.g. {@code "../fieldName"} for a
    * Rule/Computation reaching a sibling field. Used by the UI's target-element picker (Rule's
@@ -452,6 +466,55 @@ public class ElementIndex {
         .map(GroupElement.class::cast)
         .map(group -> group.getGroup() != null && group.getGroup().getElements() != null ? group.getGroup().getElements() : List.<Element>of())
         .orElse(List.of());
+  }
+
+  /**
+   * The id a Form Model's {@code elementRef}/{@code groupRef} has to use for the element at the absolute
+   * "/"-separated path {@code path} (e.g. {@code /Person/address/street}) - the inverse of {@link
+   * #resolveDisplayPath}. An element inside an Include is not addressed by its own id but by the compound
+   * {@code "<includeGroupId>_<targetId>"} (one prefix per Include on the way, outermost first), while the Include
+   * group itself and everything outside an Include keep their plain id. Walks the Include chain like {@link
+   * #descendByName}: the include group's name stands in for the included model's own root group, so the next path
+   * segment is looked up among that root group's elements. Empty if the path does not resolve.
+   */
+  public Optional<String> resolveIdByPath(String path) {
+    if (path == null || model.getContent() == null || model.getContent().getModelRoot() == null) {
+      return Optional.empty();
+    }
+    List<String> names = Arrays.stream(path.split("/")).filter(segment -> !segment.isEmpty()).toList();
+    List<GroupElement> rootGroups = model.getContent().getModelRoot().getRootGroups();
+    if (names.isEmpty() || rootGroups == null) {
+      return Optional.empty();
+    }
+    Element current = findByName(rootGroups, names.get(0));
+    Set<String> visitedModelIds = new HashSet<>(List.of(model.getId()));
+    StringBuilder includePrefix = new StringBuilder();
+    for (int i = 1; current != null && i < names.size(); i++) {
+      if (!(current instanceof GroupElement group) || group.getGroup() == null) {
+        return Optional.empty();
+      }
+      if (group.getGroup().getIncludeConfig() != null) {
+        DocumentModel included = resolveIncludedModel(group.getGroup().getIncludeConfig().getReference());
+        if (included == null || included.getContent() == null || included.getContent().getModelRoot() == null
+            || !visitedModelIds.add(included.getId()) || current.getId() == null) {
+          return Optional.empty();
+        }
+        includePrefix.append(current.getId()).append('_');
+        List<GroupElement> includedRootGroups = included.getContent().getModelRoot().getRootGroups();
+        String name = names.get(i);
+        current = includedRootGroups == null ? null : findByName(includedRootGroups.stream()
+            .filter(rootGroup -> rootGroup.getGroup() != null && rootGroup.getGroup().getElements() != null)
+            .flatMap(rootGroup -> rootGroup.getGroup().getElements().stream())
+            .toList(), name);
+      }
+      else if (group.getGroup().getElements() != null) {
+        current = findByName(group.getGroup().getElements(), names.get(i));
+      }
+      else {
+        return Optional.empty();
+      }
+    }
+    return current == null || current.getId() == null ? Optional.empty() : Optional.of(includePrefix + current.getId());
   }
 
   private Optional<Element> resolveByNamePath(List<String> names) {

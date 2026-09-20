@@ -1,0 +1,173 @@
+{
+  "header": {
+    "id": "HostModel",
+    "modelType": "form",
+    "modelVersion": "37.3.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "A-for-host",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "A-for-host"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1"
+    },
+    "screens": [
+      {
+        "id": "screen_33a22",
+        "name": "Screen 1",
+        "screenElements": [
+          {
+            "type": "Section",
+            "id": "section_18a7f",
+            "name": "person-section",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Person Information"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_fe6aa",
+                "name": "person-cg",
+                "layout": {
+                  "lg": "5-5-2"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "row_e857c",
+                    "name": "row-1",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "control_f0a1e",
+                        "elementRef": "field_e3022"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_ab414",
+                        "elementRef": "field_f0599"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "control_b03f4",
+                        "elementRef": "field_51242"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "TOP"
+              }
+            ]
+          },
+          {
+            "type": "Section",
+            "id": "section_8189d",
+            "name": "address-section",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Address Information"
+                  }
+                ]
+              }
+            },
+            "screenElements": [
+              {
+                "type": "ControlGrid",
+                "id": "controlgrid_130cc_controlgrid_248a7",
+                "name": "address-cg",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": [
+                      {
+                        "locale": "en",
+                        "text": "Address"
+                      }
+                    ]
+                  }
+                },
+                "includeId": "controlgrid_130cc",
+                "formModelRef": "IncludedModel",
+                "hostDocumentModelPath": "/Person/address",
+                "layout": {
+                  "lg": "6-6"
+                },
+                "row": [
+                  {
+                    "type": "Row",
+                    "id": "controlgrid_130cc_row_e9d1b",
+                    "name": "row-1",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "controlgrid_130cc_control_e03ed",
+                        "elementRef": "include_8a4ea_field_b0b4d"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "controlgrid_130cc_control_54d81",
+                        "elementRef": "include_8a4ea_field_dcc51"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Row",
+                    "id": "controlgrid_130cc_row_444b2",
+                    "name": "row-2",
+                    "cell": [
+                      {
+                        "type": "Control",
+                        "id": "controlgrid_130cc_control_57536",
+                        "elementRef": "include_8a4ea_field_c1723"
+                      },
+                      {
+                        "type": "Control",
+                        "id": "controlgrid_130cc_control_1d496",
+                        "elementRef": "include_8a4ea_field_e2fea"
+                      }
+                    ]
+                  }
+                ],
+                "verticalAlignment": "TOP"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

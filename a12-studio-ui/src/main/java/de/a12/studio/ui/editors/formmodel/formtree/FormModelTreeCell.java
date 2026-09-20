@@ -1,5 +1,8 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
+import de.a12.studio.models.formmodel.ScreenElement;
+import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -41,6 +44,14 @@ class FormModelTreeCell extends TreeCell<FormElementViewModel> {
     Label nameLabel = new Label(item.getName());
     nameLabel.getStyleClass().add("tree-cell-name-label");
     HBox graphic = new HBox(4, icon, nameLabel);
+    if (item.getNode() instanceof ScreenElement element && element.getIncludeId() != null && !element.getIncludeId().isEmpty()
+        && element.getFormModelRef() != null && !element.getFormModelRef().isEmpty()) {
+      // Marks what an include was expanded from, like SME's "link" icon on included elements.
+      Node includeIcon = WidgetFactory.createIcon(Icons.ELEMENT_INCLUDE);
+      includeIcon.getStyleClass().add("tree-icon");
+      Tooltip.install(includeIcon, WidgetFactory.createTooltip(StudioBundle.get("form_model_tree.included_from", element.getFormModelRef())));
+      graphic.getChildren().add(1, includeIcon);
+    }
     graphic.setAlignment(Pos.CENTER_LEFT);
     setText(null);
     setGraphic(graphic);

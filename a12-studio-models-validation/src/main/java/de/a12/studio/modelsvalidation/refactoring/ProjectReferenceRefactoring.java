@@ -6,6 +6,9 @@ import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.formmodel.FormModelWalker;
+import de.a12.studio.models.formmodel.ScreenElement;
 import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.mappingmodel.MappingSource;
 import de.a12.studio.models.mappingmodel.SortField;
@@ -35,6 +38,7 @@ import de.a12.studio.models.structuralmappingmodel.MappingBlock;
 import de.a12.studio.models.structuralmappingmodel.ResolutionStrategy;
 import de.a12.studio.models.structuralmappingmodel.Slice;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
+import de.a12.studio.modelsvalidation.formincludes.FormIncludeExpander;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.Edit;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.IncludedModelChange;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.PathRewriter;
@@ -78,12 +82,15 @@ import java.util.function.Supplier;
  *       Mapping Model using it agrees that the changed model is that side's one model.</li>
  *   <li><b>Selection Model</b> - {@code Selected}/{@code Unselected} paths. Same reason: rewritten only when every
  *       Combination Model that uses it has the changed model as its base.</li>
+ *   <li><b>Form Model</b> bound to the changed model - the {@code hostDocumentModelPath} of its includes (the path of
+ *       the Include group the included elements were bound to).</li>
  * </ul>
  *
  * <p><b>Not covered</b>: a Query's relationship links ({@code links[].fields}, and constraints below a {@code has}),
  * whose Document Model is that of the linked role, not the query's; Print calculation steps; Form {@code
- * hostDocumentModelPath} (transclusion provenance, not a live reference); paths that reach an element through a chain
- * of Includes or an Additive base model. References by element id (Form, Overview, Tree, ...) can't break.
+ * hostDocumentModelPath} of a form bound to a Document Model that merely <em>includes</em> the changed one (a path
+ * into the included model); paths that reach an element through a chain of Includes or an Additive base model.
+ * References by element id (Form, Overview, Tree, ...) can't break.
  */
 public final class ProjectReferenceRefactoring {
 
@@ -149,6 +156,9 @@ public final class ProjectReferenceRefactoring {
     }
     else if (other instanceof SelectionModel selection) {
       selectionEdits(selection, changedId, rewriter, projectModels, edits);
+    }
+    else if (other instanceof FormModel form) {
+      formEdits(form, changedId, rewriter, edits);
     }
     return edits;
   }
@@ -407,6 +417,25 @@ public final class ProjectReferenceRefactoring {
 
   private static boolean uses(CombinationStep step, String selectionId) {
     return step.getSelectionModel() != null && selectionId.equals(step.getSelectionModel().getSmId());
+  }
+
+  // ---- Form Model -------------------------------------------------------------------------------------------
+
+  /**
+   * The {@code hostDocumentModelPath} of the includes in a Form Model bound to the changed Document Model: the path
+   * of the Include group the included elements were bound to, so renaming or moving that group (or a group above it)
+   * must carry it along, or {@code FormIncludeProvenanceValidator} reports the include as pointing nowhere and a
+   * refresh would fail. The element references of the included elements are ids and cannot break.
+   */
+  private static void formEdits(FormModel form, String changedId, PathRewriter rewriter, List<Edit> edits) {
+    if (form.getContent() == null || !changedId.equals(FormIncludeExpander.documentModelIdOf(form))) {
+      return;
+    }
+    for (ScreenElement element : FormModelWalker.find(form.getContent(), ScreenElement.class)) {
+      if (element.getIncludeId() != null && !element.getIncludeId().isEmpty()) {
+        pathSite(edits, rewriter, element::getHostDocumentModelPath, element::setHostDocumentModelPath);
+      }
+    }
   }
 
   // ---- helpers ----------------------------------------------------------------------------------------------

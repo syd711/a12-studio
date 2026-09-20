@@ -65,7 +65,7 @@ class FixtureWorkspacesFormValidatorsTest {
   void realFormModelsHaveNoDriftAgainstTheirDocumentModels() throws IOException {
     Path workspaces = locateWorkspaces();
     List<ModelValidator> validators = List.of(new FormDependencyDriftValidator(), new FormDependentControlContextValidator(),
-        new FormReferenceTypeDriftValidator(), new FormControlIndexRequiredValidator());
+        new FormReferenceTypeDriftValidator(), new FormControlIndexRequiredValidator(), new FormIncludeProvenanceValidator());
     List<String> problems = new ArrayList<>();
     int formModels = 0;
     int withDocumentModel = 0;

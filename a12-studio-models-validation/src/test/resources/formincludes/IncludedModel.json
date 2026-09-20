@@ -1,0 +1,101 @@
+{
+  "header": {
+    "id": "IncludedModel",
+    "modelType": "form",
+    "modelVersion": "37.3.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "admin"
+      }
+    ],
+    "modelReferences": [
+      {
+        "alias": "B-for-include",
+        "modelType": "document",
+        "purpose": "data binding",
+        "reference": "B-for-include"
+      }
+    ]
+  },
+  "content": {
+    "subHeaderBox": {
+      "id": "subHeaderBox1"
+    },
+    "footerBox": {
+      "id": "footerBox1"
+    },
+    "screens": [
+      {
+        "id": "screen_d01fd",
+        "name": "Screen 1",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "controlgrid_248a7",
+            "name": "address-cg",
+            "title": {
+              "type": "Multilingual",
+              "multilingualText": {
+                "text": [
+                  {
+                    "locale": "en",
+                    "text": "Address"
+                  }
+                ]
+              }
+            },
+            "layout": {
+              "lg": "6-6"
+            },
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_e9d1b",
+                "name": "row-1",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_e03ed",
+                    "elementRef": "field_b0b4d"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_54d81",
+                    "elementRef": "field_dcc51"
+                  }
+                ]
+              },
+              {
+                "type": "Row",
+                "id": "row_444b2",
+                "name": "row-2",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_57536",
+                    "elementRef": "field_c1723"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_1d496",
+                    "elementRef": "field_e2fea"
+                  }
+                ]
+              }
+            ],
+            "verticalAlignment": "TOP"
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {},
+    "defaults": {}
+  }
+}

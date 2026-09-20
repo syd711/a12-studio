@@ -71,11 +71,16 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -85,6 +90,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -110,6 +116,28 @@ public class FormModelTreeController implements Initializable {
 
   private static final String TABLE_SETTINGS_ID = ModelType.FORM.getValue();
   private static final String TREE_DIVIDER_ID = "treeEditorDivider";
+
+  // Keyboard shortcuts, active while the tree has focus (so text fields elsewhere keep their own Ctrl+C/V/X/Z) and
+  // appended to the matching toolbar tooltip. Ctrl+Shift+Z ("revert model") and Ctrl+D ("deploy model") are taken
+  // by StudioKeyEventHandler, hence Ctrl+Y for redo and Ctrl+Alt+D for duplicate.
+  private static final KeyCombination UNDO_KEYS = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+  private static final KeyCombination REDO_KEYS = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
+  private static final KeyCombination ADD_KEYS = new KeyCodeCombination(KeyCode.INSERT);
+  private static final KeyCombination CUT_KEYS = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+  private static final KeyCombination COPY_KEYS = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
+  private static final KeyCombination PASTE_KEYS = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN);
+  private static final KeyCombination DUPLICATE_KEYS =
+      new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN);
+  private static final KeyCombination MOVE_UP_KEYS = new KeyCodeCombination(KeyCode.UP, KeyCombination.ALT_DOWN);
+  private static final KeyCombination MOVE_DOWN_KEYS = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.ALT_DOWN);
+  private static final KeyCombination DELETE_KEYS = new KeyCodeCombination(KeyCode.DELETE);
+  private static final KeyCombination SEARCH_KEYS = new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+  private static final KeyCombination EXPAND_ALL_KEYS = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN);
+  private static final KeyCombination COLLAPSE_ALL_KEYS = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
+  // Numpad variants of expand/collapse all - the "+" of a US layout needs Shift, which Ctrl+Plus above doesn't match.
+  private static final KeyCombination EXPAND_ALL_NUMPAD_KEYS = new KeyCodeCombination(KeyCode.ADD, KeyCombination.CONTROL_DOWN);
+  private static final KeyCombination COLLAPSE_ALL_NUMPAD_KEYS =
+      new KeyCodeCombination(KeyCode.SUBTRACT, KeyCombination.CONTROL_DOWN);
 
 
   @FXML
@@ -141,6 +169,12 @@ public class FormModelTreeController implements Initializable {
 
   @FXML
   private Button deleteButton;
+
+  @FXML
+  private Button expandAllButton;
+
+  @FXML
+  private Button collapseAllButton;
 
   @FXML
   private SearchFieldController searchController;
@@ -267,11 +301,73 @@ public class FormModelTreeController implements Initializable {
     updateEditorPane(null);
     updateUndoRedoState();
     updateToolbarActionsState();
+    installKeyboardShortcuts();
 
     BaseTableSettings tableSettings = LocalUISettings.getTablePreference(TABLE_SETTINGS_ID);
     applyDividerPosition(tableSettings);
     treeEditorSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) ->
         saveDividerPosition(newValue.doubleValue()));
+  }
+
+  /**
+   * Binds every toolbar action to its keyboard shortcut (see the {@code *_KEYS} constants) and appends the
+   * shortcut to the button's tooltip. The buttons are fired rather than their handlers called directly, so a
+   * shortcut is exactly as available as its button (e.g. Paste is a no-op while {@link #pasteButton} is disabled)
+   * and both share one code path. A matched shortcut is consumed even when its button is disabled, so it never
+   * falls through to the global shortcuts of {@link de.a12.studio.ui.StudioKeyEventHandler}.
+   */
+  private void installKeyboardShortcuts() {
+    Map<KeyCombination, Runnable> shortcuts = new LinkedHashMap<>();
+    shortcuts.put(UNDO_KEYS, undoButton::fire);
+    shortcuts.put(REDO_KEYS, redoButton::fire);
+    shortcuts.put(ADD_KEYS, () -> {
+      if (!addButton.isDisabled()) {
+        addButton.show();
+      }
+    });
+    shortcuts.put(CUT_KEYS, cutButton::fire);
+    shortcuts.put(COPY_KEYS, copyButton::fire);
+    shortcuts.put(PASTE_KEYS, pasteButton::fire);
+    shortcuts.put(DUPLICATE_KEYS, duplicateButton::fire);
+    shortcuts.put(MOVE_UP_KEYS, moveUpButton::fire);
+    shortcuts.put(MOVE_DOWN_KEYS, moveDownButton::fire);
+    shortcuts.put(DELETE_KEYS, deleteButton::fire);
+    shortcuts.put(SEARCH_KEYS, searchController::requestFocus);
+    shortcuts.put(EXPAND_ALL_KEYS, expandAllButton::fire);
+    shortcuts.put(EXPAND_ALL_NUMPAD_KEYS, expandAllButton::fire);
+    shortcuts.put(COLLAPSE_ALL_KEYS, collapseAllButton::fire);
+    shortcuts.put(COLLAPSE_ALL_NUMPAD_KEYS, collapseAllButton::fire);
+
+    // A filter, so the shortcuts win over the TreeView's own key bindings.
+    tree.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+      for (Map.Entry<KeyCombination, Runnable> shortcut : shortcuts.entrySet()) {
+        if (shortcut.getKey().match(event)) {
+          shortcut.getValue().run();
+          event.consume();
+          return;
+        }
+      }
+    });
+
+    appendShortcutToTooltip(undoButton.getTooltip(), UNDO_KEYS);
+    appendShortcutToTooltip(redoButton.getTooltip(), REDO_KEYS);
+    appendShortcutToTooltip(addButton.getTooltip(), ADD_KEYS);
+    appendShortcutToTooltip(cutButton.getTooltip(), CUT_KEYS);
+    appendShortcutToTooltip(copyButton.getTooltip(), COPY_KEYS);
+    appendShortcutToTooltip(pasteButton.getTooltip(), PASTE_KEYS);
+    appendShortcutToTooltip(duplicateButton.getTooltip(), DUPLICATE_KEYS);
+    appendShortcutToTooltip(moveUpButton.getTooltip(), MOVE_UP_KEYS);
+    appendShortcutToTooltip(moveDownButton.getTooltip(), MOVE_DOWN_KEYS);
+    appendShortcutToTooltip(deleteButton.getTooltip(), DELETE_KEYS);
+    appendShortcutToTooltip(expandAllButton.getTooltip(), EXPAND_ALL_KEYS);
+    appendShortcutToTooltip(collapseAllButton.getTooltip(), COLLAPSE_ALL_KEYS);
+    // The search field is a shared component without a tooltip of its own, so the hint goes into its prompt text.
+    searchController.setPromptText(StudioBundle.get("search") + " (" + SEARCH_KEYS.getDisplayText() + ")");
+  }
+
+  // Extends the tooltip declared in the FXML (already localized by the loader) instead of duplicating its text.
+  private static void appendShortcutToTooltip(@NonNull Tooltip tooltip, @NonNull KeyCombination keys) {
+    tooltip.setText(tooltip.getText() + " (" + keys.getDisplayText() + ")");
   }
 
   private void applyDividerPosition(BaseTableSettings tableSettings) {
@@ -580,9 +676,9 @@ public class FormModelTreeController implements Initializable {
     this.documentModel = documentModel;
     this.documentElementsById = indexDocumentModel(documentModel);
     this.elementIndex = hasModelRoot(documentModel)
-        ? new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+        ? new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem))
         : null;
-    this.actions = new FormModelActions(content, commandStack, this::onModelChanged);
+    this.actions = new FormModelActions(content, commandStack, this::onModelChanged, projectItem, documentModel);
     tree.setContextMenu(createContextMenu(null));
     applyFilter(searchController.getText());
     updateToolbarActionsState();

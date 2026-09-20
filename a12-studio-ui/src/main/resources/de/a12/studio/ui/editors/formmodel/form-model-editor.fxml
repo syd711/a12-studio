@@ -82,7 +82,7 @@
                                                                <fx:include fx:id="relationshipModelPanel" source="relationship-model-panel.fxml" />
                                                            </content>
                                                        </TitledPane>
-                                                       <TitledPane animated="false" expanded="true" maxHeight="Infinity" styleClass="titled-pane-embedded" text="%document_model" VBox.vgrow="ALWAYS">
+                                                       <TitledPane fx:id="documentModelPane" animated="false" expanded="true" maxHeight="Infinity" styleClass="titled-pane-embedded" text="%document_model" VBox.vgrow="ALWAYS">
                                                            <content>
                                                                <fx:include fx:id="documentSourceTree" source="documenttree/document-source-tree-panel.fxml" />
                                                            </content>

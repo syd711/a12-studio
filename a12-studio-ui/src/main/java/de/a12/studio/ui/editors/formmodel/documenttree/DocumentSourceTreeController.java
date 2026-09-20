@@ -83,7 +83,7 @@ public class DocumentSourceTreeController implements Initializable {
   public void load(@Nullable DocumentModel model, @NonNull ProjectItem formModelProjectItem) {
     this.modelRoot = model != null && model.getContent() != null ? model.getContent().getModelRoot() : null;
     this.documentModelId = model != null ? model.getId() : null;
-    this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(formModelProjectItem);
+    this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModelsWithCombinations(formModelProjectItem);
     boolean hasModel = modelRoot != null;
     tree.setVisible(hasModel);
     tree.setManaged(hasModel);

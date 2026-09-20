@@ -47,18 +47,19 @@ public abstract class ScreenElement {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private HideCondition hideCondition;
 
-  // Transclusion provenance (SME's "Included" mixin): set when this node was copied in from another Form
-  // Model's screen tree rather than authored directly here. SME expands an include at author-time (copies
-  // the referenced subtree's nodes into this model's own screens with rewritten ids, keeping these three
-  // fields as provenance metadata) rather than resolving it live at render time - so modeling these fields
-  // is enough for round-trip fidelity even without a12-studio itself performing that expansion yet.
-  // includeId: the node's own id within formModelRef's tree (as opposed to this.id, its id in this model).
+  // Include provenance (SME's "Included" mixin), set on the top-level elements an include was expanded into. The A12
+  // Form Engine's include expansion (FormIncludeExpander is our port) copies the elements of the first screen of the
+  // referenced Form Model into this model's own screens with rewritten ids and keeps these three fields on them, so
+  // an include stays recognizable and can be expanded again. It is not resolved live at render time.
+  // includeId: identifies the include; every copied id is prefixed with "<includeId>_" (so it is not an id of the
+  // source Form Model). Neighbors with the same includeId belong to the same include.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String includeId;
   // The Form Model this subtree was included from.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String formModelRef;
-  // Where in this model's own Document Model the included subtree's field/group references were remapped to.
+  // The group of this model's own Document Model (e.g. /Person/address) that stands for the root group of the included
+  // Form Model's Document Model: the included elements' references were rebound to what is below it.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String hostDocumentModelPath;
 }

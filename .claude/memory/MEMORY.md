@@ -13,3 +13,5 @@ This directory holds a12-studio-specific memories, stored in the repo (not under
 - [Memory storage location](feedback_memory_storage_location.md) — project memories live in `.claude/memory/` in the repo, not the user home folder; home-folder memory only keeps a redirect pointer
 - [Out-of-scope features](project_out_of_scope_features.md) — AI-assisted DM generation and Model diff/compare editor will NOT be built (decided 2026-09-19); don't propose them
 - [Known failing tests at HEAD](project_known_failing_tests.md) — two pre-existing red tests (Query validator, application-groups) as of 2026-09-19; plus the FxTestSupport JavaFX test harness
+- [Form Engine sources](reference_formengine_model_sources.md) — `formengine-model` is downloadable with sources from the community repo; read it for Form Engine behavior (include expansion etc.) instead of guessing
+- [Properties bundles: append only](feedback_properties_bundles_mixed_encoding.md) — messages*/validation-messages* mix raw UTF-8 and \u escapes and hold uncommitted work; never re-encode or rewrite them

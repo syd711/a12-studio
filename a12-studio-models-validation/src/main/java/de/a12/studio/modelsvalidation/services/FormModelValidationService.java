@@ -31,6 +31,7 @@ import de.a12.studio.modelsvalidation.validators.form.FormDependencyDriftValidat
 import de.a12.studio.modelsvalidation.validators.form.FormDependentControlContextValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormIncludeProvenanceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormGroupReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormInitiallyFocusedElementValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
@@ -82,7 +83,8 @@ public final class FormModelValidationService {
       new FormDependencyDriftValidator(),
       new FormDependentControlContextValidator(),
       new FormReferenceTypeDriftValidator(),
-      new FormControlIndexRequiredValidator()));
+      new FormControlIndexRequiredValidator(),
+      new FormIncludeProvenanceValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

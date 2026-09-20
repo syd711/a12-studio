@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.DocumentModelHeterogeneity;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
@@ -15,8 +16,10 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Looks up sibling {@link DocumentModel}s in the same project, needed for cross-model settings validation
@@ -25,6 +28,23 @@ import java.util.Optional;
 public final class ProjectDocumentModels {
 
   private ProjectDocumentModels() {
+  }
+
+  /**
+   * {@link #getOtherDocumentModels}, plus for every Combination Model of the project the synthetic Document Model
+   * that stands in for it (see {@link CombinedDocumentModelElements}; it carries the combination's own id, so a
+   * reference to the combination resolves to it). For whoever has to follow a Document Model reference that may
+   * name a combination - e.g. the Document Model of a Form Model bound to one.
+   */
+  public static List<DocumentModel> getOtherDocumentModelsWithCombinations(@NonNull ProjectItem projectItem) {
+    List<DocumentModel> result = new ArrayList<>(getOtherDocumentModels(projectItem));
+    for (A12Model<?> combination : getOtherModelsOfType(projectItem, ModelType.COMBINATION)) {
+      DocumentModel standIn = resolveDocumentModelForFieldReferences(combination.getId());
+      if (standIn != null) {
+        result.add(standIn);
+      }
+    }
+    return result;
   }
 
   /**
@@ -88,13 +108,22 @@ public final class ProjectDocumentModels {
   /**
    * Every {@link RelationshipModel} in {@code projectItem}'s project, sorted by id. Unfiltered when {@code
    * documentModelId} is {@code null}; otherwise limited to relationships with an {@link EntityCharacteristic}
-   * whose {@code documentModel} equals it - the Form Model "Relationships" panel's candidate list ({@link
-   * de.a12.studio.ui.editors.formmodel.RelationshipModelPanelController}). Mirrors the same relationship
-   * lookup {@code de.a12.studio.ui.editors.querymodel.QueryTraversalOption} already does per-role; this
-   * variant dedups to one row per relationship model instead of one per role.
+   * whose {@code documentModel} is {@code documentModelId} or one of its reachable super types (see {@link
+   * DocumentModelHeterogeneity}) - the Form Model "Relationships" panel's candidate list ({@link
+   * de.a12.studio.ui.editors.formmodel.RelationshipModelPanelController}), same as SME's {@code
+   * calculateRelationshipModelListData}. A Combination Model id has no super types there, so only relationships
+   * naming the combination itself match. Mirrors the same relationship lookup {@code
+   * de.a12.studio.ui.editors.querymodel.QueryTraversalOption} already does per-role; this variant dedups to one
+   * row per relationship model instead of one per role.
    */
   public static List<RelationshipModel> getRelationshipModelsConnectedTo(@NonNull ProjectItem projectItem, @Nullable String documentModelId) {
     List<A12Model<?>> models = getOtherModelsOfType(projectItem, ModelType.RELATIONSHIP);
+    Set<String> relevantDocumentModelIds = new HashSet<>();
+    if (documentModelId != null) {
+      relevantDocumentModelIds.add(documentModelId);
+      relevantDocumentModelIds.addAll(
+          DocumentModelHeterogeneity.reachableSuperTypes(getOtherDocumentModels(projectItem), documentModelId));
+    }
     List<RelationshipModel> result = new ArrayList<>();
     for (A12Model<?> model : models) {
       if (!(model instanceof RelationshipModel relationshipModel) || relationshipModel.getContent() == null) {
@@ -102,7 +131,7 @@ public final class ProjectDocumentModels {
       }
       if (documentModelId == null || relationshipModel.getContent().getEntityCharacteristics().stream()
           .map(EntityCharacteristic::getDocumentModel)
-          .anyMatch(documentModelId::equals)) {
+          .anyMatch(relevantDocumentModelIds::contains)) {
         result.add(relationshipModel);
       }
     }
