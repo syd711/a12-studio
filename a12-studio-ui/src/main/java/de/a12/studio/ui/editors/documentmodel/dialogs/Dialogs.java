@@ -53,6 +53,23 @@ public class Dialogs {
     return controller.getResult();
   }
 
+  /**
+   * Opens the "Insert from Document Model" picker; {@code otherModels} is every other Document Model of the project,
+   * the dialog itself keeps only those {@link de.a12.studio.modelsvalidation.documentinsertion.DocumentModelInsertion#isCandidate}
+   * accepts for {@code target}.
+   */
+  public static Optional<DocumentModel> showInsertFromModel(Stage owner, @NonNull DocumentModel target, @NonNull List<DocumentModel> otherModels) {
+    FXMLLoader fxmlLoader = new FXMLLoader(InsertFromModelDialogController.class.getResource("insert-from-model-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("insert-from-model-dialog", fxmlLoader, owner, StudioBundle.get("insert_from_model.title"));
+    InsertFromModelDialogController controller = (InsertFromModelDialogController) stage.getUserData();
+    controller.init(stage, target, otherModels);
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.getResult();
+  }
+
   public static Optional<Result> showCreateOverviewModel(Stage owner, @NonNull ProjectItem targetFolder,
       @NonNull DocumentModel documentModel, @NonNull List<FieldOption> fields, @NonNull String defaultName) {
     FXMLLoader fxmlLoader = new FXMLLoader(CreateOverviewModelDialogController.class.getResource("create-overview-model-dialog.fxml"));

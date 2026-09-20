@@ -19,6 +19,11 @@ public class CompositeCommand implements Command {
     this.commands = List.of(commands);
   }
 
+  /** For a bulk action whose number of steps is only known at run time, e.g. deleting a multi-selection. */
+  public CompositeCommand(@NonNull List<? extends Command> commands) {
+    this.commands = List.copyOf(commands);
+  }
+
   @Override
   public void execute() {
     for (Command command : commands) {

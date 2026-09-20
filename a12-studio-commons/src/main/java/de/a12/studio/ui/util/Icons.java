@@ -29,6 +29,10 @@ public interface Icons {
   String CLOSE = "mdi2c-close";
   String TRASH = "mdi2t-trash-can-outline";
   String COPY = "mdi2c-content-copy";
+  String FILTER = "mdi2f-filter-outline";
+  // the filled variant, for a filter that is switched on
+  String FILTER_ACTIVE = "mdi2f-filter";
+  String FILE_IMPORT = "mdi2f-file-import-outline";
   String COG_OUTLINE = "mdi2c-cog-outline";
   String ACCOUNT_KEY_OUTLINE = "mdi2a-account-key-outline";
   String ACCOUNT_MULTIPLE_OUTLINE = "mdi2a-account-multiple-outline";

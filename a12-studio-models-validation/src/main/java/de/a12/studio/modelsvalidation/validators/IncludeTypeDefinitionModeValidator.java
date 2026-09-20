@@ -1,7 +1,6 @@
 package de.a12.studio.modelsvalidation.validators;
 
 import de.a12.studio.models.A12Model;
-import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupElement;
@@ -25,16 +24,14 @@ import java.util.List;
  */
 public final class IncludeTypeDefinitionModeValidator implements ModelValidator {
 
-  private enum TypeDefMode { NONE, LOCAL, IMPORT }
-
   @Override
   public List<ModelValidationError> validate(A12Model<?> model, ValidationContext context) {
     if (!(model instanceof DocumentModel documentModel)) {
       return List.of();
     }
 
-    TypeDefMode ownMode = modeOf(documentModel);
-    if (ownMode == TypeDefMode.NONE) {
+    TypeDefinitionMode ownMode = TypeDefinitionMode.modeOf(documentModel);
+    if (ownMode == TypeDefinitionMode.NONE) {
       return List.of();
     }
 
@@ -52,24 +49,12 @@ public final class IncludeTypeDefinitionModeValidator implements ModelValidator 
       if (included == null) {
         continue;
       }
-      TypeDefMode includedMode = modeOf(included);
-      if (includedMode != TypeDefMode.NONE && includedMode != ownMode) {
+      if (!ownMode.isCompatibleWith(TypeDefinitionMode.modeOf(included))) {
         errors.add(new ModelValidationError(model, groupElement.getId(), ElementProperty.INCLUDE_REFERENCE,
             ValidationMessages.get("validation.includeTypeDefinitionMode.mismatch", included.getId()), Severity.ERROR.name()));
       }
     }
     return errors;
-  }
-
-  private static TypeDefMode modeOf(DocumentModel documentModel) {
-    List<ModelReference> references = documentModel.getModelReferences();
-    boolean hasImport = references != null
-        && references.stream().anyMatch(reference -> ModelReference.PURPOSE_TYPE_DEFINITIONS.equals(reference.getPurpose()));
-    if (hasImport) {
-      return TypeDefMode.IMPORT;
-    }
-    List<?> typeDefinitions = documentModel.getContent().getTypeDefinitions();
-    return typeDefinitions != null && !typeDefinitions.isEmpty() ? TypeDefMode.LOCAL : TypeDefMode.NONE;
   }
 
   /** Mirrors the strip-path-and-.json-suffix resolution the a12 kernel's reference resolver used (see

@@ -1,12 +1,14 @@
 package de.a12.studio.ui.editors.documentmodel;
 
 import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.FieldType;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.IncludeConfig;
@@ -24,6 +26,7 @@ import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventListener;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.AdditiveDocumentModels;
+import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -36,22 +39,31 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.stage.Popup;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Slf4j
 public class DocumentModelElementsTreeController implements Initializable, StudioEventListener {
@@ -70,6 +82,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   // drag source; the actual dragged node is tracked directly via the draggedTreeItem field below since it's
   // an in-process, same-tree drag (no need to serialize the element itself onto the dragboard).
   private static final DataFormat ELEMENT_DRAG_FORMAT = new DataFormat("application/x-a12-document-model-element");
+
+  private static final String EMPTY_TREE_PLACEHOLDER = "Add a new document element to the tree.";
 
   private static final List<String> DROP_STYLE_CLASSES =
       List.of("tree-row-drop-above", "tree-row-drop-below", "tree-row-drop-into");
@@ -108,6 +122,12 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private SearchFieldController searchController;
 
   @FXML
+  private Button filterButton;
+
+  @FXML
+  private FontIcon filterIcon;
+
+  @FXML
   private TreeTableView<ElementViewModel> elementsTreeTable;
 
   @FXML
@@ -142,6 +162,14 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private GroupElement baseModelNode;
 
   private final CommandStack commandStack = new CommandStack();
+
+  // What the tree shows besides the full model: the search text and the popup's narrowing filters. Survives every
+  // rebuild of the tree (edits, undo/redo, saves elsewhere) and is not persisted.
+  private final DocumentModelTreeFilter treeFilter = new DocumentModelTreeFilter();
+
+  private Popup filterPopup;
+
+  private DocumentModelTreeFilterController filterController;
 
   private DocumentModelActions documentModelActions;
 
@@ -390,21 +418,27 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     selectionListener.accept(selectedElements);
   }
 
-  private void applyFilter(String filter) {
+  /**
+   * Rebuilds the tree for {@code searchText} and the {@link #treeFilter}'s other settings; with none of them set
+   * the whole model is shown, otherwise only what {@link #toFilteredTreeItem} lets through.
+   */
+  private void applyFilter(String searchText) {
     if (modelRoot == null) {
       return;
     }
 
-    String term = filter == null ? "" : filter.trim().toLowerCase();
+    treeFilter.setSearchText(searchText);
+    treeFilter.setEffectiveTypeResolver(effectiveTypeResolver());
+    boolean narrowed = treeFilter.isActive();
     TreeItem<ElementViewModel> root = new TreeItem<>();
     if (baseModelNode != null && !additiveElementsOnlyCheckBox.isSelected()) {
-      TreeItem<ElementViewModel> baseItem = term.isEmpty() ? toTreeItem(baseModelNode) : toFilteredTreeItem(baseModelNode, term);
+      TreeItem<ElementViewModel> baseItem = narrowed ? toFilteredTreeItem(baseModelNode) : toTreeItem(baseModelNode);
       if (baseItem != null) {
         root.getChildren().add(baseItem);
       }
     }
     for (GroupElement group : modelRoot.getRootGroups()) {
-      TreeItem<ElementViewModel> treeItem = term.isEmpty() ? toTreeItem(group) : toFilteredTreeItem(group, term);
+      TreeItem<ElementViewModel> treeItem = narrowed ? toFilteredTreeItem(group) : toTreeItem(group);
       if (treeItem != null) {
         root.getChildren().add(treeItem);
       }
@@ -412,6 +446,67 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     elementsTreeTable.setRoot(root);
     applyValidationState(root);
     expandAll(root);
+    updateFilterIndicators(narrowed && root.getChildren().isEmpty());
+  }
+
+  /**
+   * How the field-type filter sees through a type definition to the base type of a field: the open model's own
+   * {@link ElementIndex} does that, built only when a field's type is actually asked for.
+   */
+  private Function<FieldType, FieldType> effectiveTypeResolver() {
+    if (!(projectItem.getModel() instanceof DocumentModel documentModel)) {
+      return Function.identity();
+    }
+    ElementIndex[] index = new ElementIndex[1];
+    return fieldType -> {
+      if (index[0] == null) {
+        index[0] = new ElementIndex(documentModel, otherDocumentModels);
+      }
+      return index[0].effectiveFieldType(fieldType);
+    };
+  }
+
+  /** Shows on the toolbar and in the empty tree whether a filter is what hides the elements. */
+  private void updateFilterIndicators(boolean nothingMatches) {
+    filterIcon.setIconLiteral(treeFilter.hasNarrowingFilters() ? Icons.FILTER_ACTIVE : Icons.FILTER);
+    filterButton.setTooltip(WidgetFactory.createTooltip(StudioBundle.get(treeFilter.hasNarrowingFilters()
+        ? "document_model_tree_filter.tooltip_active" : "document_model_tree_filter.tooltip")));
+    searchController.setPromptText(StudioBundle.get("document_model_tree_filter.prompt."
+        + treeFilter.getSearchIn().name().toLowerCase(java.util.Locale.ROOT)));
+    elementsTreeTable.setPlaceholder(WidgetFactory.createDefaultLabel(nothingMatches
+        ? StudioBundle.get("document_model_tree_filter.no_match") : EMPTY_TREE_PLACEHOLDER));
+  }
+
+  @FXML
+  private void onFilterButton() {
+    if (filterPopup.isShowing()) {
+      filterPopup.hide();
+      return;
+    }
+    filterController.syncControls();
+    Bounds bounds = filterButton.localToScreen(filterButton.getBoundsInLocal());
+    filterPopup.show(filterButton, bounds.getMinX(), bounds.getMaxY() + 2);
+  }
+
+  private void onFilterChanged() {
+    applyFilter(searchController.getText());
+  }
+
+  private void initFilterPopup() {
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("document-model-tree-filter.fxml"), StudioBundle.getBundle());
+      Parent content = loader.load();
+      filterController = loader.getController();
+      filterController.init(treeFilter, this::onFilterChanged);
+      filterPopup = new Popup();
+      filterPopup.setAutoHide(true);
+      filterPopup.getContent().add(content);
+    }
+    catch (java.io.IOException e) {
+      // The tree works without its filter popup, so a broken FXML must not take the whole editor down with it.
+      log.error("Failed to load the Document Model tree filter: {}", e.getMessage(), e);
+      filterButton.setDisable(true);
+    }
   }
 
   /**
@@ -474,17 +569,31 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return treeItem;
   }
 
-  private TreeItem<ElementViewModel> toFilteredTreeItem(@NonNull Element element, @NonNull String term) {
+  /**
+   * The row for {@code element} and whatever of its subtree {@link #treeFilter} lets through, or {@code null} if
+   * nothing of it is shown: an element of a hidden type takes its whole subtree with it (except the synthetic
+   * base model node, which only stands in for the base model and is not an Include the user could hide), a leaf
+   * must pass the filter itself, a group stays while something below it does or when it matches the search text
+   * itself.
+   */
+  private TreeItem<ElementViewModel> toFilteredTreeItem(@NonNull Element element) {
+    if (!isBaseModelNode(element) && treeFilter.isHiddenByType(element)) {
+      return null;
+    }
     ElementViewModel viewModel = new ElementViewModel(element, otherDocumentModels);
+    if (!(element instanceof GroupElement)) {
+      return treeFilter.isLeafShown(element) ? new TreeItem<>(viewModel) : null;
+    }
+
     List<TreeItem<ElementViewModel>> matchingChildren = new ArrayList<>();
     for (ElementViewModel child : viewModel.getChildren()) {
-      TreeItem<ElementViewModel> filteredChild = toFilteredTreeItem(child.getElement(), term);
+      TreeItem<ElementViewModel> filteredChild = toFilteredTreeItem(child.getElement());
       if (filteredChild != null) {
         matchingChildren.add(filteredChild);
       }
     }
 
-    boolean selfMatches = viewModel.getName() != null && viewModel.getName().toLowerCase().contains(term);
+    boolean selfMatches = treeFilter.hasSearchText() && treeFilter.matchesSearch(element);
     if (!selfMatches && matchingChildren.isEmpty()) {
       return null;
     }
@@ -515,8 +624,59 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     return false;
   }
 
+  /** Appends the shortcut to the toolbar button's tooltip, e.g. "Cut the selected element(s) (Ctrl+X)". */
+  private static void addShortcutHint(@NonNull Button button, @NonNull KeyCombination shortcut) {
+    Tooltip tooltip = button.getTooltip();
+    if (tooltip != null && tooltip.getText() != null) {
+      tooltip.setText(tooltip.getText() + " (" + shortcut.getDisplayText() + ")");
+    }
+  }
+
   private void onDeleteKeyPressed() {
     documentModelActions.confirmAndDeleteSelection();
+  }
+
+  /**
+   * Delete, F2 (rename) and SME's tree shortcuts: Ctrl+X / Ctrl+C / Ctrl+V for the toolbar's Cut / Copy / Paste and
+   * Ctrl+Shift+C for "Insert from Document Model". Each is only acted on when the matching toolbar button is
+   * enabled, so a shortcut never does what its button would refuse to. The inline rename editor keeps its own
+   * text-editing keys.
+   */
+  private void onTreeKeyPressed(KeyEvent event) {
+    if (event.getCode() == KeyCode.DELETE) {
+      onDeleteKeyPressed();
+      return;
+    }
+    if (documentModelActions == null || event.getTarget() instanceof TextInputControl) {
+      return;
+    }
+    if (event.getCode() == KeyCode.F2) {
+      documentModelActions.startRename();
+    }
+    else if (DocumentModelActions.CUT_SHORTCUT.match(event)) {
+      if (!cutButton.isDisable()) {
+        onCut();
+      }
+    }
+    else if (DocumentModelActions.COPY_SHORTCUT.match(event)) {
+      if (!copyButton.isDisable()) {
+        onCopy();
+      }
+    }
+    else if (DocumentModelActions.PASTE_SHORTCUT.match(event)) {
+      if (!pasteButton.isDisable()) {
+        onPaste();
+      }
+    }
+    else if (DocumentModelActions.INSERT_FROM_MODEL_SHORTCUT.match(event)) {
+      if (!modelTreeAddButton.isDisable()) {
+        documentModelActions.insertFromModel();
+      }
+    }
+    else {
+      return;
+    }
+    event.consume();
   }
 
   @FXML
@@ -975,7 +1135,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     additiveElementsOnlyCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> applyFilter(searchController.getText()));
 
     elementsTreeTable.setShowRoot(true);
-    elementsTreeTable.setPlaceholder(WidgetFactory.createDefaultLabel("Add a new document element to the tree."));
+    elementsTreeTable.setPlaceholder(WidgetFactory.createDefaultLabel(EMPTY_TREE_PLACEHOLDER));
     elementsTreeTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     elementsTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ElementViewModel>>() {
       @Override
@@ -984,15 +1144,12 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
       }
     });
     elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());
-    elementsTreeTable.setOnKeyPressed(event -> {
-      if (event.getCode() == KeyCode.DELETE) {
-        onDeleteKeyPressed();
-      }
-      else if (event.getCode() == KeyCode.F2) {
-        documentModelActions.startRename();
-        event.consume();
-      }
-    });
+    elementsTreeTable.setOnKeyPressed(this::onTreeKeyPressed);
+    addShortcutHint(cutButton, DocumentModelActions.CUT_SHORTCUT);
+    addShortcutHint(copyButton, DocumentModelActions.COPY_SHORTCUT);
+    addShortcutHint(pasteButton, DocumentModelActions.PASTE_SHORTCUT);
+    addShortcutHint(deleteButton, new KeyCodeCombination(KeyCode.DELETE));
+    initFilterPopup();
     elementsTreeTable.setRowFactory(treeTable -> {
       TreeTableRow<ElementViewModel> row = new TreeTableRow<>() {
         @Override

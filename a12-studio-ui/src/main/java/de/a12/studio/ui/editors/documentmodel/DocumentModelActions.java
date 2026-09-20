@@ -14,10 +14,12 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.modelsvalidation.documentinsertion.DocumentModelInsertion;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.documentmodel.commands.InsertModelContentCommand;
 import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.FieldOption;
 import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.Result;
 import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
@@ -31,6 +33,7 @@ import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.Command;
 import de.a12.studio.ui.util.commandstack.CommandStack;
+import de.a12.studio.ui.util.commandstack.CompositeCommand;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
@@ -38,6 +41,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -68,6 +74,14 @@ public class DocumentModelActions {
   // rather than the live objects so repeated pastes each get their own fresh clone with fresh ids (see
   // #pasteSelection), and so multi-selection Copy/Cut carries every selected top-level element.
   private static List<String> clipboardJson = List.of();
+
+  // The tree's keyboard shortcuts, shown as accelerator hints on the context menu and matched by
+  // DocumentModelElementsTreeController#onTreeKeyPressed (SME binds the same keys, see its keyboardShortcuts.ts).
+  public static final KeyCombination CUT_SHORTCUT = new KeyCodeCombination(KeyCode.X, KeyCombination.SHORTCUT_DOWN);
+  public static final KeyCombination COPY_SHORTCUT = new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
+  public static final KeyCombination PASTE_SHORTCUT = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
+  public static final KeyCombination INSERT_FROM_MODEL_SHORTCUT =
+      new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
   private final ProjectItem projectItem;
   private final ModelRoot modelRoot;
@@ -158,6 +172,8 @@ public class DocumentModelActions {
     MenuItem includeItem = createMenuItem(StudioBundle.get("document_model_tree.add_include"), Icons.ELEMENT_INCLUDE);
     includeItem.setOnAction(event -> onAddInclude());
     contextMenu.getItems().add(includeItem);
+    contextMenu.getItems().add(new SeparatorMenuItem());
+    contextMenu.getItems().add(createInsertFromModelMenuItem());
 
     return contextMenu;
   }
@@ -187,15 +203,18 @@ public class DocumentModelActions {
     }
     MenuItem cutItem = createMenuItem(StudioBundle.get("document_model_tree.cut"), Icons.CUT);
     cutItem.setOnAction(event -> cutSelection());
+    cutItem.setAccelerator(CUT_SHORTCUT);
     items.add(cutItem);
 
     MenuItem copyItem = createMenuItem(StudioBundle.get("document_model_tree.copy"), Icons.COPY);
     copyItem.setOnAction(event -> copySelection());
+    copyItem.setAccelerator(COPY_SHORTCUT);
     items.add(copyItem);
 
     MenuItem pasteItem = createMenuItem(StudioBundle.get("document_model_tree.paste"), Icons.PASTE);
     pasteItem.setDisable(!hasClipboardContent());
     pasteItem.setOnAction(event -> pasteSelection());
+    pasteItem.setAccelerator(PASTE_SHORTCUT);
     items.add(pasteItem);
     items.add(new SeparatorMenuItem());
 
@@ -231,6 +250,8 @@ public class DocumentModelActions {
     MenuItem includeItem = createMenuItem(StudioBundle.get("document_model_tree.add_include"), Icons.ELEMENT_INCLUDE);
     includeItem.setOnAction(event -> onAddInclude());
     items.add(includeItem);
+    items.add(new SeparatorMenuItem());
+    items.add(createInsertFromModelMenuItem());
 
     updateAddMenuItemsState();
     return items;
@@ -304,6 +325,77 @@ public class DocumentModelActions {
 
     commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), newElement, insertionPoint.index()));
     onModelChanged.accept(newElement);
+  }
+
+  private MenuItem createInsertFromModelMenuItem() {
+    MenuItem insertItem = createMenuItem(StudioBundle.get("document_model_tree.insert_from_model"), Icons.FILE_IMPORT);
+    insertItem.setOnAction(event -> insertFromModel());
+    insertItem.setAccelerator(INSERT_FROM_MODEL_SHORTCUT);
+    return insertItem;
+  }
+
+  /**
+   * "Insert from Document Model...": asks for another Document Model of the project and copies its content in
+   * as one undoable step - at the same insertion point {@link #onAddElement} would use (last child of the selected
+   * group, after a selected leaf, or at the end of the root groups when nothing is selected), like SME's "Copy
+   * Document Model". What exactly is copied (Includes flattened, type definitions, locales) is decided by {@link
+   * DocumentModelInsertion}; here the copy only gets fresh ids and names that are unique among its new siblings.
+   * A plan that cannot be applied, and every Include or type definition that could not be resolved, is reported.
+   */
+  public void insertFromModel() {
+    if (resolveInsertionPointForAdd() == null || !(projectItem.getModel() instanceof DocumentModel target)) {
+      return;
+    }
+    Dialogs.showInsertFromModel(Studio.stage, target, ProjectDocumentModels.getOtherDocumentModels(projectItem))
+        .ifPresent(this::insertFrom);
+  }
+
+  /** Everything {@link #insertFromModel} does once the user has picked {@code source}. */
+  void insertFrom(@NonNull DocumentModel source) {
+    InsertionPoint insertionPoint = resolveInsertionPointForAdd();
+    if (insertionPoint == null || !(projectItem.getModel() instanceof DocumentModel target)) {
+      return;
+    }
+
+    List<DocumentModel> otherModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    List<DocumentModel> projectModels = new ArrayList<>(otherModels);
+    projectModels.add(target);
+    DocumentModelInsertion.Plan plan = DocumentModelInsertion.plan(target, source, projectModels);
+    if (!plan.isUsable()) {
+      WidgetFactory.showAlert(Studio.stage,
+          StudioBundle.get("insert_from_model.problem." + plan.problem().name().toLowerCase(), source.getId()));
+      return;
+    }
+    if (plan.groups().isEmpty()) {
+      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("insert_from_model.nothing_to_insert", source.getId()));
+      return;
+    }
+
+    Set<String> usedIds = DocumentModelElementFactory.usedIds(modelRoot);
+    List<Element> takenNames = new ArrayList<>(insertionPoint.siblings());
+    for (GroupElement group : plan.groups()) {
+      DocumentModelElementFactory.regenerateIds(group, usedIds);
+      group.setName(DocumentModelElementFactory.uniqueName(group.getName(), takenNames));
+      takenNames.add(group);
+    }
+
+    commandStack.execute(new InsertModelContentCommand(target, insertionPoint.siblings(), insertionPoint.index(),
+        plan.groups(), plan.typeDefinitions(), plan.importReferences()));
+    onModelChanged.accept(plan.groups().get(0));
+
+    if (!plan.warnings().isEmpty()) {
+      WidgetFactory.showInformation(Studio.stage, StudioBundle.get("insert_from_model.warnings", source.getId()),
+          describeWarnings(plan.warnings()));
+    }
+  }
+
+  private static String describeWarnings(@NonNull List<DocumentModelInsertion.Warning> warnings) {
+    List<String> lines = new ArrayList<>();
+    for (DocumentModelInsertion.Warning warning : warnings) {
+      lines.add(StudioBundle.get("insert_from_model.warning." + warning.kind().name().toLowerCase(),
+          warning.subject(), warning.detail()));
+    }
+    return String.join("\n", lines);
   }
 
   /**
@@ -648,21 +740,39 @@ public class DocumentModelActions {
 
     Element firstPasted = null;
     int index = insertionPoint.index();
+    Set<String> usedIds = DocumentModelElementFactory.usedIds(modelRoot);
+    List<Element> takenNames = new ArrayList<>(insertionPoint.siblings());
+    List<Command> commands = new ArrayList<>();
     for (String json : clipboardJson) {
       Element clone = cloneFromClipboard(json);
       if (clone == null) {
         continue;
       }
-      DocumentModelElementFactory.regenerateIds(clone, modelRoot);
-      clone.setName(DocumentModelElementFactory.uniqueName(clone.getName(), insertionPoint.siblings()));
-      commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), clone, index));
+      DocumentModelElementFactory.regenerateIds(clone, usedIds);
+      clone.setName(DocumentModelElementFactory.uniqueName(clone.getName(), takenNames));
+      takenNames.add(clone);
+      commands.add(new AddNodeCommand<>(insertionPoint.siblings(), clone, index));
       index++;
       if (firstPasted == null) {
         firstPasted = clone;
       }
     }
     if (firstPasted != null) {
+      executeAsOneStep(commands);
       onModelChanged.accept(firstPasted);
+    }
+  }
+
+  /**
+   * Runs {@code commands} as one undo step - a bulk action (paste or delete of a multi-selection) is undone in a
+   * single {@code Undo}, not once per element.
+   */
+  private void executeAsOneStep(@NonNull List<Command> commands) {
+    if (commands.size() == 1) {
+      commandStack.execute(commands.get(0));
+    }
+    else if (!commands.isEmpty()) {
+      commandStack.execute(new CompositeCommand(commands));
     }
   }
 
@@ -736,12 +846,14 @@ public class DocumentModelActions {
     // triggered (toolbar button, Delete key, context menu). The synthetic base-model node itself is
     // skipped for the same reason (see #baseModelNode).
     selection.removeIf(item -> hasFixedChildrenAncestor(item) || isBaseModelNode(item));
+    List<Command> commands = new ArrayList<>();
     for (TreeItem<ElementViewModel> treeItem : topLevelSelection(selection)) {
       Command command = createDeleteCommand(treeItem);
       if (command != null) {
-        commandStack.execute(command);
+        commands.add(command);
       }
     }
+    executeAsOneStep(commands);
 
     onModelChanged.accept(null);
   }

@@ -253,12 +253,27 @@ public class DocumentModelElementFactory {
    * once its usage type/includeConfig has already been set by the original creation.
    */
   public static void regenerateIds(@NonNull Element element, @NonNull ModelRoot modelRoot) {
-    element.setId(generateId(idPrefix(element), modelRoot));
+    regenerateIds(element, collectIds(modelRoot));
+  }
+
+  /**
+   * {@link #regenerateIds(Element, ModelRoot)} against an explicit set of ids in use, which every id generated
+   * here is added to: the ids of several clones regenerated in one go (or of one large clone) then cannot
+   * collide with each other either, which the {@code ModelRoot} variant cannot guarantee before the clone is
+   * part of the model. Start from {@link #usedIds}.
+   */
+  public static void regenerateIds(@NonNull Element element, @NonNull Set<String> usedIds) {
+    element.setId(generateId(idPrefix(element), usedIds));
     if (element instanceof GroupElement groupElement && groupElement.getGroup() != null) {
       for (Element child : groupElement.getGroup().getElements()) {
-        regenerateIds(child, modelRoot);
+        regenerateIds(child, usedIds);
       }
     }
+  }
+
+  /** Every element id currently in {@code modelRoot}, as a mutable set to pass to {@link #regenerateIds(Element, Set)}. */
+  public static Set<String> usedIds(@NonNull ModelRoot modelRoot) {
+    return collectIds(modelRoot);
   }
 
   private static String idPrefix(@NonNull Element element) {
@@ -309,11 +324,15 @@ public class DocumentModelElementFactory {
   }
 
   private static String generateId(@NonNull String prefix, @NonNull ModelRoot modelRoot) {
-    Set<String> usedIds = collectIds(modelRoot);
+    return generateId(prefix, collectIds(modelRoot));
+  }
+
+  private static String generateId(@NonNull String prefix, @NonNull Set<String> usedIds) {
     String id;
     do {
       id = prefix + "_" + String.format("%05x", ID_RANDOM.nextInt(0x100000));
     } while (usedIds.contains(id));
+    usedIds.add(id);
     return id;
   }
 
