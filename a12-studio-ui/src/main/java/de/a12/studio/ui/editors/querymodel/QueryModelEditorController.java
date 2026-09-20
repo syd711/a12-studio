@@ -21,7 +21,11 @@ public class QueryModelEditorController extends AbstractEditorController {
 
   @FXML
   private void initialize() {
-    querySettingsPanelController.setOnTargetModelChanged(() -> queryModelTreeController.load(projectItem, (QueryModel) projectItem.getModel()));
+    querySettingsPanelController.setOnTargetModelChanged(() -> {
+      queryModelTreeController.load(projectItem, (QueryModel) projectItem.getModel());
+      // The aggregation's field choices are the new target's.
+      postProcessingPanelController.load(projectItem, (QueryModel) projectItem.getModel());
+    });
   }
 
   @Override
@@ -50,6 +54,7 @@ public class QueryModelEditorController extends AbstractEditorController {
     super.modelClosed(event);
     if (event.getItem().equals(projectItem)) {
       queryModelTreeController.destroy();
+      postProcessingPanelController.destroy();
     }
   }
 

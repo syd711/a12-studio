@@ -12,6 +12,7 @@ import de.a12.studio.modelsvalidation.validators.ModelSuffixValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
+import de.a12.studio.modelsvalidation.validators.query.QueryAggregationValidator;
 import de.a12.studio.modelsvalidation.validators.query.QueryFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.query.QueryFilterDefinitionReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.query.QueryFilterDefinitionSyntaxValidator;
@@ -43,7 +44,8 @@ public final class QueryModelValidationService {
       new QueryLinkValidator(),
       new QueryPagingBoundsValidator(),
       new QueryFilterDefinitionSyntaxValidator(),
-      new QueryFilterDefinitionReferenceValidator()));
+      new QueryFilterDefinitionReferenceValidator(),
+      new QueryAggregationValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

@@ -26,6 +26,9 @@ import de.a12.studio.models.printmodel.FieldRef;
 import de.a12.studio.models.printmodel.PrintFieldElement;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.printmodel.PrintModelContent;
+import de.a12.studio.models.querymodel.QueryAggregation;
+import de.a12.studio.models.querymodel.QueryAggregationEntry;
+import de.a12.studio.models.querymodel.QueryAggregationGroup;
 import de.a12.studio.models.querymodel.QueryLink;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.querymodel.QueryModelContent;
@@ -234,6 +237,47 @@ class ProjectReferenceRefactoringTest {
     assertEquals("/Person/Address/Street", linked.getField());
     assertEquals("[/Person/Address/Road] = \"[/Person/Address/Street]\" And [/Person/Name] > 1",
         content.getFilterDefinition());
+  }
+
+  @Test
+  void aQueryAggregationFollowsTheRenameOfItsTargetModelsFieldsAndUndoRestoresThem() {
+    QueryModel query = queryModel("Q", "Person_DM");
+    QueryAggregation aggregation = new QueryAggregation();
+    aggregation.getGroup().addAll(List.of(new QueryAggregationGroup("/Person/Address/Street"), new QueryAggregationGroup("/Person/Name")));
+    aggregation.getAggregations().addAll(List.of(aggregationEntry("count", "/Person/Address/Street"), aggregationEntry("max", "/Person/Name")));
+    query.getContent().setAggregation(aggregation);
+
+    List<ModelEdits> edits = renameAndCompute(street, "Road", query);
+
+    assertEquals(1, edits.size());
+    assertEquals("/Person/Address/Road", aggregation.getGroup().get(0).getField());
+    assertEquals("/Person/Name", aggregation.getGroup().get(1).getField());
+    assertEquals("/Person/Address/Road", aggregation.getAggregations().get(0).getField());
+    assertEquals("/Person/Name", aggregation.getAggregations().get(1).getField());
+
+    revert(edits);
+    assertEquals("/Person/Address/Street", aggregation.getGroup().get(0).getField());
+    assertEquals("/Person/Address/Street", aggregation.getAggregations().get(0).getField());
+  }
+
+  @Test
+  void aQueryAggregationOnAnotherModelIsNotTouched() {
+    QueryModel query = queryModel("Q", "Other_DM");
+    QueryAggregation aggregation = new QueryAggregation();
+    aggregation.getGroup().add(new QueryAggregationGroup("/Person/Address/Street"));
+    aggregation.getAggregations().add(aggregationEntry("count", "/Person/Address/Street"));
+    query.getContent().setAggregation(aggregation);
+
+    assertEquals(List.of(), renameAndCompute(street, "Road", query));
+    assertEquals("/Person/Address/Street", aggregation.getGroup().get(0).getField());
+    assertEquals("/Person/Address/Street", aggregation.getAggregations().get(0).getField());
+  }
+
+  private static QueryAggregationEntry aggregationEntry(String function, String field) {
+    QueryAggregationEntry entry = new QueryAggregationEntry();
+    entry.setFunction(function);
+    entry.setField(field);
+    return entry;
   }
 
   @Test

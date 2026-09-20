@@ -1,6 +1,9 @@
 package de.a12.studio.modelsvalidation.refactoring;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.querymodel.QueryAggregation;
+import de.a12.studio.models.querymodel.QueryAggregationEntry;
+import de.a12.studio.models.querymodel.QueryAggregationGroup;
 import de.a12.studio.models.querymodel.QueryLink;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.querymodel.QueryModelContent;
@@ -44,8 +47,8 @@ import java.util.function.Supplier;
  * may be rewritten - the scoping is SME's ({@code binder.ts}/{@code resolver.ts}), the same one {@code
  * QueryFilterReferenceChecker} resolves against:
  * <ul>
- *   <li>the root's {@code fields}, {@code constraint} and {@code filterDefinition} belong to the query's {@code
- *       targetDocumentModel};</li>
+ *   <li>the root's {@code fields}, {@code aggregation} (group and aggregated fields), {@code constraint} and
+ *       {@code filterDefinition} belong to the query's {@code targetDocumentModel};</li>
  *   <li>a relationship hop's ({@link QueryLink}) {@code fields}, {@code constraint}, {@code filterDefinition} and a
  *       {@code sort} entry that goes through a relationship belong to the Document Model the hop's {@code
  *       targetRole} plays in its Relationship Model; its {@code linkDocumentFields} to that relationship's link
@@ -99,9 +102,24 @@ final class QueryReferenceRefactoring {
         }
       }
     }
+    aggregation(content.getAggregation(), targetId);
     operator(content.getConstraint(), targetId);
     filter(content.getFilterDefinition(), targetId, content::setFilterDefinition);
     links(content.getLinks());
+  }
+
+  /** {@code aggregation.group[].field} and {@code aggregation.aggregations[].field} are always fields of the target
+   * Document Model - Data Services does not aggregate over links. */
+  private void aggregation(QueryAggregation aggregation, String targetId) {
+    if (aggregation == null || !changedId.equals(targetId)) {
+      return;
+    }
+    for (QueryAggregationGroup group : aggregation.getGroup()) {
+      pathSite(group::getField, group::setField);
+    }
+    for (QueryAggregationEntry entry : aggregation.getAggregations()) {
+      pathSite(entry::getField, entry::setField);
+    }
   }
 
   private void links(List<QueryLink> links) {

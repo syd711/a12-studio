@@ -1,0 +1,46 @@
+{
+  "header": {
+    "id": "QueryModelWithAggregation",
+    "modelType": "query",
+    "modelVersion": "0.1.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "alias": "DM",
+        "purpose": "document-model-for-query",
+        "reference": "Contract_DM"
+      }
+    ]
+  },
+  "content": {
+    "projectionName": "document",
+    "targetDocumentModel": "Contract_DM",
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    },
+    "aggregation": {
+      "aggregations": [
+        {
+          "function": "sum",
+          "field": "/ContractRoot/Liability"
+        },
+        {
+          "function": "count",
+          "field": "/ContractRoot/Type",
+          "alias": "contracts"
+        }
+      ],
+      "group": [
+        {
+          "field": "/ContractRoot/Type"
+        }
+      ]
+    }
+  }
+}

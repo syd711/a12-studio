@@ -29,7 +29,7 @@ class QueryModelLoadTest {
     assertEquals(4, content.getFields().size());
     assertEquals("/People/Addresses/Street", content.getFields().get(0));
     assertNull(content.getFilterDefinition());
-    assertNull(content.getAggregateResults());
+    assertNull(content.getAggregation());
 
     assertNotNull(content.getPaging());
     assertEquals(10, content.getPaging().getPageSize());

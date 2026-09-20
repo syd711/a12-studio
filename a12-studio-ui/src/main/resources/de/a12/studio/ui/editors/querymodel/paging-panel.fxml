@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TitledPane?>
@@ -34,12 +33,6 @@
                             </VBox>
                         </children>
                     </HBox>
-                    <VBox spacing="10.0">
-                        <children>
-                            <Label styleClass="section-header" text="%aggregation" />
-                            <CheckBox fx:id="aggregateResultsField" mnemonicParsing="false" text="%aggregate_results" />
-                        </children>
-                    </VBox>
                 </children>
             </VBox>
         </center>

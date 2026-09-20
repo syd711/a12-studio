@@ -1,0 +1,174 @@
+{
+  "header": {
+    "id": "Aggregation_DM",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Aggregation_DM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_contract",
+          "name": "Contract",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_type",
+                "name": "Type",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_liability",
+                "name": "Liability",
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {}
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_amount",
+                "name": "Amount",
+                "Field": {
+                  "fieldType": {
+                    "type": "TypeDefType",
+                    "TypeDefType": {
+                      "typeDefinitionId": "typedef_money"
+                    }
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_signed",
+                "name": "Signed",
+                "Field": {
+                  "fieldType": {
+                    "type": "DateType",
+                    "DateType": {}
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_signed_at",
+                "name": "SignedAt",
+                "Field": {
+                  "fieldType": {
+                    "type": "DateTimeType",
+                    "DateTimeType": {}
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_opening",
+                "name": "Opening",
+                "Field": {
+                  "fieldType": {
+                    "type": "TimeType",
+                    "TimeType": {}
+                  }
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_secret",
+                "name": "Secret",
+                "annotations": [
+                  {
+                    "name": "indexed",
+                    "value": "false"
+                  }
+                ],
+                "Field": {
+                  "fieldType": {
+                    "type": "NumberType",
+                    "NumberType": {}
+                  }
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_details",
+                "name": "Details",
+                "Group": {
+                  "repeatability": 1,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_note",
+                      "name": "Note",
+                      "Field": {
+                        "fieldType": {
+                          "type": "StringType"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Group",
+                "id": "group_items",
+                "name": "Items",
+                "Group": {
+                  "repeatability": 999,
+                  "elements": [
+                    {
+                      "type": "Field",
+                      "id": "field_price",
+                      "name": "Price",
+                      "Field": {
+                        "fieldType": {
+                          "type": "NumberType",
+                          "NumberType": {}
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_money",
+        "name": "Money",
+        "fieldType": {
+          "type": "NumberType",
+          "NumberType": {}
+        }
+      }
+    ]
+  }
+}

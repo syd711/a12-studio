@@ -13,8 +13,10 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationAdditiveModelDuplicateValidator;
+import de.a12.studio.modelsvalidation.validators.combination.CombinationAdditiveModelLoopValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationAdditiveModelMissingValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationAdditiveModelNotAllowedValidator;
+import de.a12.studio.modelsvalidation.validators.combination.CombinationBaseModelLoopValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationDecorationModelMissingValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationDecorationModelNotAllowedValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationSelectionModelMissingValidator;
@@ -25,9 +27,9 @@ import java.util.List;
 
 /**
  * Validates a {@link CombinedDocumentModel}: generic header checks plus the structural per-step rules ported
- * from SME's {@code DomainCombination.json}. Real semantic validation (DM expansion, rule-contradiction
- * solving, loop detection) has no backing implementation in a12-studio yet - see
- * {@code docs/sme-reference-comparison.md}.
+ * from SME's {@code DomainCombination.json}, and the base/additive-model reference-loop checks (a walk over the
+ * reference graph, no expansion needed). Real semantic validation (DM expansion, rule-contradiction solving)
+ * has no backing implementation in a12-studio yet - see {@code docs/sme-reference-comparison.md}.
  */
 public final class CombinationModelValidationService {
 
@@ -45,7 +47,9 @@ public final class CombinationModelValidationService {
       new CombinationAdditiveModelNotAllowedValidator(),
       new CombinationSelectionModelNotAllowedValidator(),
       new CombinationDecorationModelNotAllowedValidator(),
-      new CombinationAdditiveModelDuplicateValidator()));
+      new CombinationAdditiveModelDuplicateValidator(),
+      new CombinationBaseModelLoopValidator(),
+      new CombinationAdditiveModelLoopValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

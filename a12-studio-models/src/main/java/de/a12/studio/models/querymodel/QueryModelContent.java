@@ -50,8 +50,10 @@ public class QueryModelContent {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private QueryPaging paging;
 
+  // Aggregation mode (group-by + count/sum/max/min/avg): when present, the query returns aggregation results
+  // instead of documents. Its presence is SME's "Aggregate Results" switch - there is no separate flag on the wire.
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Boolean aggregateResults;
+  private QueryAggregation aggregation;
 
   // Inverts "constraint"/"links" into an exclusion filter (used by e.g. an "AvailableItems" query that
   // projects everything NOT already linked).

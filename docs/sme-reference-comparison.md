@@ -254,10 +254,34 @@ a step built through the UI can't violate them.
 Validation (`de.a12.studio.modelsvalidation.validators.combination`, wired into `CombinationModelValidationService`)
 ports all 7 structural `Rule`s from `DomainCombination.json`'s `CombinationSteps` group (missing/not-allowed per
 step type, duplicate additive model) plus the generic `HeaderModelReferenceValidator` for invalid references —
-**not** ported: base/step loop detection (SME's `CombModelReferenceHelper`), the full DM-expansion + SMT
-rule-contradiction pass, and the "Validate model up to this step" row action, none of which have any backing
-implementation in a12-studio (see the Backend/kernel capability map above — `CombinationModelExpansionService`
-does not exist in this repo).
+**not** ported: the full DM-expansion + SMT rule-contradiction pass and the "Validate model up to this step" row
+action, neither of which has any backing implementation in a12-studio (see the Backend/kernel capability map
+above — `CombinationModelExpansionService` does not exist in this repo).
+
+**Loop detection ported 2026-09-20** (it needs the reference graph only, not DM expansion — SME's
+`CombModelReferenceHelper.modelCausesOrHasLoop` just collects the transitively reachable model ids and checks whether
+the candidate itself or the open model is among them). `CombinationBaseModelLoopValidator` (error on
+`content/baseModelId`) and `CombinationAdditiveModelLoopValidator` (error on `content/combinationSteps/<i>` for an
+`Addition` step), both on top of `CombinationReferenceGraph`, registered in `CombinationModelValidationService`;
+messages `validation.combinationBaseModelLoop` / `validation.combinationAdditiveModelLoop` name the model and the
+cycle (`A -> B -> A`). Ported semantics, read from the TS rather than assumed: the walk starts at the candidate;
+a Combined Document Model contributes its base model and, per step, the additive model (of an `Addition` step),
+selection and decoration models; a Document Model contributes its header `modelReferences`, **only those with
+purpose `include`** — except below the additive model of an `Addition` step of a Combined Document Model reached on
+the walk, where every purpose counts (SME passes `undefined` there, apparently unintentionally, but it is the
+behaviour). Selection and decoration models are recorded but **not** followed (SME does not either; the walk into a
+decoration model's own references is therefore not checked). A loop is reported when the candidate is the model
+itself, leads back to it, or holds a cycle of its own (as SME's `modelCausesOrHasLoop`). Differences to SME: the walk
+tracks (model, purpose filter) pairs so a model reached first on an include-only path is still expanded on an
+all-purposes path, and a model missing from the project is a leaf (SME throws; the invalid-reference rules report
+it). Two things SME does that are **not** ported: the Base Model picker still lists candidates that would loop
+(SME's `baseModelReferenceProvider` filters them out; here the loop is reported after the selection), and SME's
+`createsIncludeLoop` hook (a Document Model's Include picker asking the combination module about loops) has no
+counterpart. Note also that SME registers the conditions `BaseModelMustBeValid`/`AdmShouldNotCauseLoop` but no rule
+in the shipped `DomainCombination.json` references them (only `InvalidReference`), so in SME itself the loop
+protection is essentially the picker filtering. Tests: `CombinationLoopValidatorsTest` (self-reference, two-model
+cycle, cycle the model is not part of, include-vs-untagged purposes, leaf semantics, 3-model chain without a loop),
+`FixtureWorkspacesCombinationLoopTest` (every real Combined Document Model of every fixture workspace is loop-free).
 
 A Combination Step's Selection Model reference (`SelectionModel.smId`) needed a real, project-aware picker, but
 a12-studio had no `ModelType.SELECTION` at all. Added a minimal stub (`ModelType.SELECTION`, an empty
@@ -694,9 +718,9 @@ a12-studio's Query Model editor (`a12-studio-ui/.../editors/querymodel/`, data m
 `a12-studio-models/.../querymodel/`) has an editable, split-view tree (`QueryModelTreeController`: the graph on
 the left, a per-selected-"document node" property panel — `QueryDocumentNodePanelController` — on the right,
 mirroring `document-model-editor.fxml`'s own tree+editorContainer split) with per-node filter/field-projection
-authoring, validators, and a target-DM Settings tab. Aggregation config and reference/rename tracking are still
-gaps — see comparison below. SME's `queryModel` (`client/src/modules/queryModel/`) remains the fuller reference
-for those two.
+authoring, validators, a target-DM Settings tab, reference/rename tracking (2026-09-20) and aggregation
+(2026-09-20) — see the comparison below. SME's `queryModel` (`client/src/modules/queryModel/`) remains the
+reference for how each of them behaves.
 
 ### Data model
 
@@ -709,7 +733,7 @@ for those two.
 | Traversal | `links[]` — nested relationship traversals (`relationshipModel`, `targetRole`, optional `maxDepth` for self-reference recursion); `constraint` (structured `Operator`)/`linkDocumentFields` map for lossless round-tripping only, no editor UI | `links[]` — nested relationship traversals (`relationshipModel`, `targetRole`, optional `constraint`, optional `maxDepth` for self-reference recursion), plus `has(...)` as a filter-only traversal |
 | Sort | `sort[]` (`QuerySort`: optional relationship+role hop, then `QuerySortBy` — field/direction/nullHandling/ignoreCase) | `sort` — same shape (field/direction/nullHandling/ignoreCase) |
 | Paging | `paging` (pageNumber, pageSize) | `paging` — same shape |
-| Aggregation | `aggregateResults` (Boolean) — **dangling flag, no config behind it** | `aggregation` — `group: {field}[]` + `aggregations: {function: count\|sum\|max\|min\|avg, field}[]`, a distinct result-shape mode |
+| Aggregation | `aggregation` (`QueryAggregation`, 2026-09-20) — `group: {field}[]` + `aggregations: {function: count\|sum\|max\|min\|avg, field, alias?}[]`; the block's presence is the "Aggregate Results" switch. Replaces the former dangling `aggregateResults` boolean, which was never on the wire | `aggregation` — the same; SME's `technical_useAggregation` switch is editor-only (`qmTransformer.ts` writes `aggregation` only when it is on) |
 | Root exclusion | `exclude` (Boolean, root only) — "Only Links" checkbox (`QueryOnlyLinksPanelController`) | `exclude` — omit the root document itself, return only linked docs |
 
 SME's in-editor representation additionally splits into three independently-validated sub-documents (`settings`
@@ -727,10 +751,10 @@ needs to copy architecturally.
 | In-result field toggles | Inline tree checkboxes, tri-state on groups, disabled+forced for non-indexed fields | Present (`QueryModelTreeController`'s In-Result column, tri-state on groups) **and** the right panel's "Fields included in Result Set" list (add/remove + "All Fields of the Document Model") — a12-studio has no `indexed`-annotation concept at all, so non-indexed fields aren't specially disabled |
 | Sort | Multi-field, relationship-hop, direction, null-handling, ignore-case | Present (`QuerySort`/`QuerySortBy`/sorting panel), roughly at parity — `QueryTraversalOption.options()` scopes to *every* relationship in the project rather than only ones connected to the target DM |
 | Paging | pageNumber/pageSize | Present, roughly at parity |
-| Aggregation/grouping | Full group-by + count/sum/max/min/avg mode | **Missing** — `aggregateResults` boolean has no config surface behind it |
+| Aggregation/grouping | Full group-by + count/sum/max/min/avg mode | **Present** (2026-09-20) — `QueryAggregationPanelController` on the Post Processing tab: the switch, group fields, aggregations (function, field, alias); offers only eligible fields (non-repeatable, not `indexed = false`) and, per aggregation, only fields the chosen function fits; `QueryAggregationValidator` (see the Validation row and "Status (2026-09-20): aggregation done") |
 | Multi-target-type queries (CDM, Transformer Model as target) | Supported | Not supported — DM only |
-| Reference/rename tracking | Target-DM, relationship, sort/aggregation field-path references are all first-class in SME's refactoring graph; renaming a DM/field auto-updates or flags the query (`qmModule.ts` `refactorDocument()`) | **Present** (2026-09-20; was partly present 2026-09-19) — renaming/moving an element of a Document Model rewrites every query field path evaluated against it, at any depth: root and hop `fields`, `sort` (also through a relationship), `constraint` (also below `has`), `filterDefinition` text (`[/Path]` refs, also inside `Has(...)` constraints), a hop's `linkDocumentFields` (`ProjectReferenceRefactoring` → `QueryReferenceRefactoring`, one undo step with the DM edit). Renaming a Document Model or Relationship Model *file* (id) rewrites `targetDocumentModel`, `relationshipModel` of hops/sorts/`has` operators (nested included, `ModelReferenceRewriter`) and, new, the relationship named in `Has("<rel>", ...)` inside `filterDefinition` text; SME's own `refactorDocument()` only handles `targetDocumentModel`. An unresolvable target is now an explicit error (validator + banner in the Model Tree tab + message in the Settings tab's target combo), see the Validation row. **Still missing:** a *role* rename in a Relationship Model (the role field commits per keystroke and nothing — Query, Form bindings, Relationship UI — reacts to it; the Query validators flag the dangling `targetRole`), aggregation paths (no aggregation yet) |
-| Validation | Root-required, per-node schema validation, constraint semantic validity, target-role validity, field-projection sanity, tab-level validation counts | Present (`QueryModelValidationService`, `a12-studio-models-validation/.../validators/query/`): target-DM required **and must exist in the project** (2026-09-20; before, a dangling target was only caught when the header's DOCUMENT reference still named it, otherwise the tree was just empty), `fields[]`/sort field-path resolution (root and per-link, recursive), relationship+role resolution (sort traversal and graph links, recursive), paging bounds, and `filterDefinition` QL syntax (root and per-link, recursive) — field-projection sanity is reachability-only (the "Add" combo only offers real field paths, so an invalid path isn't reachable through the UI at all); refs *inside* a filter expression's text are resolved too since 2026-09-20 (see "Status (2026-09-20): semantic filter validation done") |
+| Reference/rename tracking | Target-DM, relationship, sort/aggregation field-path references are all first-class in SME's refactoring graph; renaming a DM/field auto-updates or flags the query (`qmModule.ts` `refactorDocument()`) | **Present** (2026-09-20; was partly present 2026-09-19) — renaming/moving an element of a Document Model rewrites every query field path evaluated against it, at any depth: root and hop `fields`, `sort` (also through a relationship), `constraint` (also below `has`), `filterDefinition` text (`[/Path]` refs, also inside `Has(...)` constraints), a hop's `linkDocumentFields` (`ProjectReferenceRefactoring` → `QueryReferenceRefactoring`, one undo step with the DM edit). Renaming a Document Model or Relationship Model *file* (id) rewrites `targetDocumentModel`, `relationshipModel` of hops/sorts/`has` operators (nested included, `ModelReferenceRewriter`) and, new, the relationship named in `Has("<rel>", ...)` inside `filterDefinition` text; SME's own `refactorDocument()` only handles `targetDocumentModel`. An unresolvable target is now an explicit error (validator + banner in the Model Tree tab + message in the Settings tab's target combo), see the Validation row. **Still missing:** a *role* rename in a Relationship Model (the role field commits per keystroke and nothing — Query, Form bindings, Relationship UI — reacts to it; the Query validators flag the dangling `targetRole`), an aggregation's paths are covered since 2026-09-20 (`aggregation.group[].field`, `aggregation.aggregations[].field`, target DM only) |
+| Validation | Root-required, per-node schema validation, constraint semantic validity, target-role validity, field-projection sanity, tab-level validation counts | Present (`QueryModelValidationService`, `a12-studio-models-validation/.../validators/query/`): target-DM required **and must exist in the project** (2026-09-20; before, a dangling target was only caught when the header's DOCUMENT reference still named it, otherwise the tree was just empty), `fields[]`/sort field-path resolution (root and per-link, recursive), relationship+role resolution (sort traversal and graph links, recursive), paging bounds, and `filterDefinition` QL syntax (root and per-link, recursive) — field-projection sanity is reachability-only (the "Add" combo only offers real field paths, so an invalid path isn't reachable through the UI at all); refs *inside* a filter expression's text are resolved too since 2026-09-20 (see "Status (2026-09-20): semantic filter validation done"); `content.aggregation` (`QueryAggregationValidator`, 2026-09-20): every group/aggregation field must resolve to a non-repeatable field that is not `indexed = false`, function/field-type compatibility, no links, `document` projection (see "Status (2026-09-20): aggregation done") |
 
 ### Feasibility spike: the query-grammar dependency (2026-09-05) — **feasible, not kernel-gated**
 
@@ -1036,12 +1060,50 @@ followed, and a dangling target was an empty tree). Three parts:
   `ProjectReferenceRefactoringFixturesTest` (+2, real hop), `FixtureWorkspacesQueryValidatorsTest` (every real
   query's target resolves in its workspace),
   `QueryModelTreeTargetProblemTest`/`TargetModelPanelControllerTest` (JavaFX thread, skip without a display).
-- **Not done, on purpose:** role rename tracking (see the comparison table row above) and aggregation paths.
+- **Not done, on purpose:** role rename tracking (see the comparison table row above). Aggregation paths were added with
+  the aggregation itself, see "Status (2026-09-20): aggregation done".
   Verified on the real `advanced_new` workspace (`ProjectReferenceRefactoringFixturesTest`: a rename in the role's DM
   moves a hop's `fields`, a rename in the relationship's link DM moves its `linkDocumentFields`, nothing else changes;
   the every-element sweep still undoes byte for byte). Not verified on a real file: a `Has(...)` in filter *text* -
   no fixture has any `filterDefinition` - and a `has` operator whose constraint holds a real field path (the fixtures'
   `has` constraints only test `/__meta/docRef`); those come from the model classes and SME's checker tests.
+
+**Status (2026-09-20): aggregation done** (was: `aggregateResults`, a boolean that appears in no wire format).
+
+- **Gate — does the runtime support an aggregation-mode result? Yes, so it was built rather than recorded as a
+  non-goal.** The runtime that executes a Query Model is Data Services' Query API, not the kernel the #3 spike looked
+  at, and nothing in it is enterprise-gated: `POST /api/aggregation` (and the `QUERY` JSON-RPC operation with an
+  `aggregation` block) takes `aggregation: {aggregations: [{function, field}], group: [{field}]}` and returns one
+  generated document per group (`C:\workspace\a12\2606-06-doc\data_services-dataservices-documentation-src.md`,
+  "Aggregations"; tutorial `overall-dev_tutorial_query_discovering_queries.md`, "Aggregation Example 1/2"). SME's
+  backend has no aggregation code at all - it is purely the editor's wire format.
+- **Wire shape:** `content.aggregation` (`QueryAggregation` > `QueryAggregationGroup`, `QueryAggregationEntry`). It
+  replaces the old `aggregateResults` boolean, which SME and Data Services never had; no fixture or real file contains
+  it, so nothing is lost, and because the model classes ignore unknown keys a file that did carry it simply loses it
+  on the next save. SME's switch (`technical_useAggregation`) is editor-only, so here too the presence of the block
+  *is* the switch. `group` is optional on the wire (no group = aggregate the whole result set) and is kept absent-vs-
+  explicit-`[]` like `sort`/`fields`. `alias` is only in SME's meta model (`QMPostProcessingMetaModel`), not in the
+  Data Services docs, and is round-tripped as optional.
+- **Editor:** `QueryAggregationPanelController` + `aggregation-panel.fxml`, embedded in the Post Processing tab (the
+  switch moved out of the Paging panel). Inline rows, no dialog: group fields, and aggregations as function / field /
+  alias. Like SME, switching the switch off keeps the configuration for the editing session. The field combos offer
+  only what is eligible (`QueryAggregationSupport`) and an aggregation's field combo only what its function fits; a
+  stored value that no longer fits stays visible, is marked and is listed with the validator's messages.
+- **Rules (`QueryAggregationValidator`, `QueryAggregationSupport`):** group/aggregation fields must be non-repeatable
+  fields without `indexed = false` (SME Query Model docs, "Validation"); function availability per type is Data
+  Services': `count` any, `sum`/`avg` numbers, `min`/`max` numbers, dates, date-times, times; the query must have no
+  `links` and the `document` projection (errors: an aggregation result has no roots to hang links on). Warnings: no
+  aggregation entry (it only groups) and a `sort` (ignored in aggregation mode). A target that does not resolve
+  skips the field checks - `QueryTargetDocumentModelRequiredValidator` reports that.
+- **Refactoring:** `QueryReferenceRefactoring` rewrites the group and aggregation field paths when an element of the
+  target Document Model is renamed or moved (one undo step with the rest).
+- **Tests:** `QueryAggregationTest` (wire shape, absent-vs-empty `group`, the switch), `QueryAggregationValidatorTest`
+  (18, against `Aggregation_DM.json`), `ProjectReferenceRefactoringTest` +2, JavaFX-thread `QueryAggregationPanelTest`
+  (11, against the real `advanced_new` query/`Person_Dc`, including what reaches the file).
+- **Not verified on a real file:** no fixture anywhere has an `aggregation` block, so the wire shape comes from the Data
+  Services documentation and SME's meta model/transformer, not from an SME-authored file. Also open: for a field
+  reached through an Include or Additive base the repeatability check cannot see the enclosing repeatable group (the
+  same limitation `ElementIndex.granularity` has), so that case gets no error rather than a wrong one.
 
 ### Proposed build order
 
@@ -1050,8 +1112,8 @@ followed, and a dangling target was an empty tree). Three parts:
 3. ~~**Per-node filtering**~~ — UI done, see Status above (2026-09-14). Autocomplete already existed (reused
    from the old whole-query dialog); the semantic (existence-aware) layer for the filter expression's own
    references was added 2026-09-20, see "Status (2026-09-20)" above; type checking remains open.
-4. **Aggregation** — only once it's confirmed the kernel path a12-studio would use actually supports an
-   aggregation-mode query result; otherwise a documented non-goal.
+4. ~~**Aggregation**~~ — done 2026-09-20, see "Status (2026-09-20): aggregation done" below (the gate held: Data
+   Services executes aggregation-mode queries).
 5. ~~**Reference/rename tracking**~~ — done 2026-09-20, see "Status (2026-09-20): reference/rename tracking done"
    above (element rename/move, model-id rename, explicit error for an unresolvable target; role rename not covered).
 
@@ -1069,7 +1131,7 @@ document, serialize back to JSON (occasionally YAML) on save.
 |---|---|---|
 | 1 | **structuralMappingModel** | Kernel lib present (`kernel-md-structuralmapping-tool`); `SmmService`/`AddFieldMappingDto` scaffolding exists in `a12-studio-data-services`. SME's editor: source-tree/target-tree drag&drop field mapper, resolution-strategy editor for conflicts. Foundational — referenced by mappingModel and combinationModel. |
 | 2 | **mappingModel** | Depends on structuralMappingModel + additiveDocumentModel; scaffolding exists (`SMEMappingModelService`, `MappingModelComputationDto`, `StructuralMappingModelGenerationDto`). ETL-style: source DM(s) + target DM + optional precomputation, driven by a referenced SMM. |
-| 3 | **combinationModel** | **Structural editor + validators built 2026-09-08** (see dedicated section above) — fields and the 7 structural `Rule`s are ported; DM-expansion/SMT validation and loop detection are not, since no kernel expansion service exists in this repo despite the "combination model" kernel lib being present. |
+| 3 | **combinationModel** | **Structural editor + validators built 2026-09-08** (see dedicated section above) — fields and the 7 structural `Rule`s are ported, and base/additive-model loop detection since 2026-09-20 (reference graph only); DM-expansion/SMT validation is not, since no kernel expansion service exists in this repo despite the "combination model" kernel lib being present. |
 | 4 | **additiveDocumentModel** | Kernel lib present (`kernel-md-join`) but no dedicated data model/editor yet. Hard dependency of both mappingModel and combinationModel — needed before those are fully usable. Overlay editing mode: elements are included/overwritten/purely-additive relative to a base DM. |
 | 5 | **relationshipModel** | No current scaffolding, but foundational — link, masterDetailModel, treeModel, modelGraphDiagram, and formModel's `Binding`/`BindingRepeat` all reference it. |
 | 6 | **selectionModel** | **Structural editor + validators built 2026-09-13** (see dedicated section above) — `enabled: true`. Fields (Data/Computation/Validation, each Default+Selected+Unselected) and all 7 structural rules are ported; the live Document Model tree SME's standalone editor has is not, since SME never persists a reference DM in the file to build one against. |
@@ -1123,7 +1185,7 @@ on its own:
 | Condition/expression language validation & formatting | `ValidationRuleService`, `ComputationRuleService` (Kotlin) | **Missing** (corrected 2026-09-05 — previously claimed present; no such Java services exist, no kernel dependency in this repo). `RuleConfig.errorCondition`/`ComputationAlternative.precondition`/`operation` are edited as plain text with no semantic validation — see the Document Model "Editor features" correction above. **Spike 2026-09-19: works in-process on kernel 31.1.1** (`DocumentModelService.hasValidConditionText` / `isValidComputation` / `formatComputationOperation`, all `a12internal`), with line/column positions; needs the model expanded first |
 | Print rendering (PDF) | `PrintService` — PDFBox or legacy engine via `a12.print.engine.runtime` | Scaffolding present (`PrintService.java`, `DocumentModelResolver.java`, print-engine deps) but editor missing |
 | Document model expansion (includes/imports) | `ExpansionService` | **Missing** (confirmed 2026-09-19: no include/import expansion anywhere in this repo). **Feasible on kernel 31.1.1** (`DocumentModelExpandService.expand`, `internal`): `Invoice_DM` 6 → 135 elements in 23 ms |
-| Combination Model expansion | `CombinationModelExpansionService` | **Missing** (corrected 2026-09-08 — previously claimed present; no such service, or `services/combinationmodel/` directory, exists in this repo). The Combined Document Model editor built 2026-09-08 only validates the structural rules from `DomainCombination.json` (missing/not-allowed/duplicate references per step); DM expansion, rule-contradiction/SMT solving, loop detection and the "Validate model up to this step" action all still depend on this |
+| Combination Model expansion | `CombinationModelExpansionService` | **Missing** (corrected 2026-09-08 — previously claimed present; no such service, or `services/combinationmodel/` directory, exists in this repo). The Combined Document Model editor built 2026-09-08 only validates the structural rules from `DomainCombination.json` (missing/not-allowed/duplicate references per step); DM expansion, rule-contradiction/SMT solving and the "Validate model up to this step" action all still depend on this (loop detection does not: it needs only the reference graph and was ported 2026-09-20) |
 | Additive Model join | `AdditiveModelController` (`kernel-md-join`) | **Missing** — corrected 2026-09-19: no kernel dependency is present (this row previously said it was). **Feasible on kernel 31.1.1**: `kernel-md-join` no longer exists there, the join moved into `kernel-md-facade` (`DocumentModelJoiningService.join`, `internal`); `Person_Dc` + `PersonEmployee_Ad` joined to 42 elements |
 | Selection Model join/validate | `SelectionModelController` | Not yet present |
 | Structural Mapping Model consistency | `StructuralMappingModelService` (`SmmService`) | Present — `services/structuralmappingmodel/` |

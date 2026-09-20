@@ -18,8 +18,11 @@
                         <!-- Sorting -->
                         <fx:include fx:id="querySortingPanel" source="query-sorting-panel.fxml" />
 
-                        <!-- Paging & Aggregation -->
+                        <!-- Paging -->
                         <fx:include fx:id="pagingPanel" source="paging-panel.fxml" />
+
+                        <!-- Aggregation -->
+                        <fx:include fx:id="queryAggregationPanel" source="aggregation-panel.fxml" />
                     </children>
                 </VBox>
             </content>

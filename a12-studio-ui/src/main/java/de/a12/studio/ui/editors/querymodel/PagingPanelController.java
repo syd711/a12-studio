@@ -7,7 +7,6 @@ import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import org.jspecify.annotations.NonNull;
@@ -16,9 +15,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Edits a {@link QueryModel}'s {@code content.paging} and {@code content.aggregateResults}. Not bound to a
- * single {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g.
- * {@link QuerySortingPanelController}.
+ * Edits a {@link QueryModel}'s {@code content.paging}. Not bound to a single {@link
+ * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g. {@link
+ * QuerySortingPanelController}. The aggregation next to it lives in {@link QueryAggregationPanelController}.
  */
 public class PagingPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -29,9 +28,6 @@ public class PagingPanelController extends AbstractPropertyEditor implements Ini
   private Spinner<Integer> pageNumberField;
   @FXML
   private Spinner<Integer> pageSizeField;
-
-  @FXML
-  private CheckBox aggregateResultsField;
 
   private QueryModel model;
 
@@ -62,14 +58,6 @@ public class PagingPanelController extends AbstractPropertyEditor implements Ini
       ensurePaging().setPageSize(newValue);
       commitHeaderChange();
     });
-
-    aggregateResultsField.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if (updatingFromModel) {
-        return;
-      }
-      content().setAggregateResults(newValue ? Boolean.TRUE : null);
-      commitHeaderChange();
-    });
   }
 
   public void load(@NonNull QueryModel model) {
@@ -80,7 +68,6 @@ public class PagingPanelController extends AbstractPropertyEditor implements Ini
       QueryPaging paging = content().getPaging();
       pageNumberField.getValueFactory().setValue(paging != null && paging.getPageNumber() != null ? paging.getPageNumber() : DEFAULT_PAGE_NUMBER);
       pageSizeField.getValueFactory().setValue(paging != null && paging.getPageSize() != null ? paging.getPageSize() : DEFAULT_PAGE_SIZE);
-      aggregateResultsField.setSelected(Boolean.TRUE.equals(content().getAggregateResults()));
     }
     finally {
       updatingFromModel = false;
