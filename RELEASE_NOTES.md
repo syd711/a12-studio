@@ -1,8 +1,5 @@
-# Release Notes 2026.06-ext0-0.0.9
+# Release Notes 2026.06-ext0-0.0.12
 
 ## Changes
 
-- **Form Model Editor**: Validator and property editor improvements.
-- **Document Model Editor**: Validator and property editor improvements.
-- **Overview Model Editor**: Validator and property editor improvements.
-- **Query Model Editor**: Initial build.
+- Dialog and macOS fixes.
