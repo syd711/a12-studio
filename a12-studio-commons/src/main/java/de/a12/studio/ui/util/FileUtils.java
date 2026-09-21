@@ -59,13 +59,7 @@ public class FileUtils {
   }
 
   public static File writeBatch(String name, String content) throws IOException {
-    File path;
-    if (!OSUtil.isMac()) {
-      path = new File("./" + name);
-    }
-    else {
-      path = new File(System.getProperty("MAC_WRITE_PATH") + name);
-    }
+    File path = new File(AppPaths.getWriteableBaseFolder(), name);
 
     if (path.exists() && !path.delete()) {
       log.error("Failed to delete existing script file {}", path.getAbsolutePath());
