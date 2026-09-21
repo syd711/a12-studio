@@ -41,6 +41,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
@@ -310,6 +311,8 @@ public class WidgetFactory {
   // public so callers that install FXResizeHelper on a dialog Stage can keep its edge/drag
   // hit-zones aligned with the visible border instead of this padding (see FXResizeHelper.MARGIN)
   public static final int DIALOG_SHADOW_MARGIN = 24;
+  // upper bound for a dialog's initial height when no size was restored from the settings
+  private static final double DIALOG_MAX_INITIAL_HEIGHT = 800;
 
   public static Stage createStage() {
     Stage stage = new Stage();
@@ -393,12 +396,39 @@ fxmlLoader.setResources(StudioBundle.getBundle());
       }
     });
 
+    boolean sizeRestored = false;
     if(stateId != null) {
-      restoreStagePosition(stateId, stage);
+      sizeRestored = restoreStagePosition(stateId, stage);
       installStatePersistence(stateId, stage, controller);
     }
+    installShowGuards(stage, sizeRestored);
 
     return stage;
+  }
+
+  /**
+   * Keeps a freshly shown dialog on screen: unless its size was restored from the local settings, the
+   * initial height is capped at {@link #DIALOG_MAX_INITIAL_HEIGHT} (never below the stage's own minimum
+   * height), and a negative y coordinate after show (a tall dialog centered on a small screen, or a stale
+   * saved position) is reset to 0 so the title bar stays reachable.
+   */
+  private static void installShowGuards(Stage stage, boolean sizeRestored) {
+    if (!sizeRestored) {
+      // Runs before the stage is sized to its scene: an explicit height set here wins over the scene's
+      // preferred height, and the stage is then centered using the capped height.
+      stage.addEventHandler(WindowEvent.WINDOW_SHOWING, e -> {
+        Parent sceneRoot = stage.getScene().getRoot();
+        sceneRoot.applyCss();
+        if (sceneRoot.prefHeight(-1) > DIALOG_MAX_INITIAL_HEIGHT) {
+          stage.setHeight(Math.max(DIALOG_MAX_INITIAL_HEIGHT, stage.getMinHeight()));
+        }
+      });
+    }
+    stage.addEventHandler(WindowEvent.WINDOW_SHOWN, e -> {
+      if (stage.getY() < 0) {
+        stage.setY(0);
+      }
+    });
   }
 
   /**
@@ -416,8 +446,12 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     stage.setMinHeight(content.minHeight(-1) + 2 * DIALOG_SHADOW_MARGIN);
   }
 
-  private static void restoreStagePosition(String stateId, Stage stage) {
+  /**
+   * @return true if a saved height was applied to the stage
+   */
+  private static boolean restoreStagePosition(String stateId, Stage stage) {
     Rectangle position = LocalUISettings.getPosition(stateId);
+    boolean heightRestored = false;
     if (position != null && position.getX() >= 0) {
       stage.setX(position.getX());
       stage.setY(position.getY());
@@ -426,8 +460,10 @@ fxmlLoader.setResources(StudioBundle.getBundle());
       }
       if (position.getHeight() > 0) {
         stage.setHeight(position.getHeight());
+        heightRestored = true;
       }
     }
+    return heightRestored;
   }
 
   private static void installStatePersistence(String stateId, Stage stage, DialogController controller) {
