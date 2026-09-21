@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.documentmodel.commands;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.Edit;
 import de.a12.studio.modelsvalidation.refactoring.ProjectReferenceRefactoring;
@@ -45,6 +46,17 @@ public class RefactoringCommand implements Command {
   private List<Edit> edits;
 
   private List<ModelEdits> externalEdits = Collections.emptyList();
+
+  /**
+   * {@code structuralChange} wrapped for the Document Model {@code item} holds, so that a rename or move made in its
+   * editor also rewrites the references it would break (see the class comment); for any other model - which has no such
+   * references - {@code structuralChange} itself.
+   */
+  public static Command around(ProjectItem item, @NonNull Command structuralChange) {
+    return item != null && item.getModel() instanceof DocumentModel documentModel
+        ? new RefactoringCommand(documentModel, structuralChange, ProjectModelStore.of(item))
+        : structuralChange;
+  }
 
   public RefactoringCommand(@NonNull DocumentModel model, @NonNull Command structuralChange) {
     this(model, structuralChange, null);

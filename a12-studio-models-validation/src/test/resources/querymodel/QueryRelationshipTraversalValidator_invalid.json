@@ -16,18 +16,14 @@
       {
         "relationshipModel": "NoSuchRelationship",
         "targetRole": "Company",
-        "sortBy": {
-          "field": "/Root/Name",
-          "direction": "ASC"
-        }
+        "field": "/Root/Name",
+        "direction": "ASC"
       },
       {
         "relationshipModel": "PersonCompany",
         "targetRole": "WrongRole",
-        "sortBy": {
-          "field": "/Root/Name",
-          "direction": "ASC"
-        }
+        "field": "/Root/Name",
+        "direction": "ASC"
       }
     ]
   }

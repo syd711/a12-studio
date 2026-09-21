@@ -33,8 +33,10 @@ import de.a12.studio.modelsvalidation.validators.form.FormDocumentModelReference
 import de.a12.studio.modelsvalidation.validators.form.FormFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormIncludeProvenanceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormGroupReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormInitialSortingColumnSortableValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormInitiallyFocusedElementValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormMultiColumnSectionLayoutValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormReferenceTypeDriftValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormSiblingNameUniquenessValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormStyleReferenceValidator;
@@ -61,6 +63,7 @@ public final class FormModelValidationService {
       new FormUnusedConfigEntryValidator(),
       new FormButtonScreenReferenceValidator(),
       new FormLayoutColumnSumValidator(),
+      new FormMultiColumnSectionLayoutValidator(),
       new FormSiblingNameUniquenessValidator(),
       new ControlGridLayoutValidator(),
       new HideConditionAtLeastOneCaseValidator(),
@@ -78,6 +81,7 @@ public final class FormModelValidationService {
       new FormStyleReferenceValidator(),
       new FormDatePickerConfigValidator(),
       new FormColumnWidthValidator(),
+      new FormInitialSortingColumnSortableValidator(),
       new FormInitiallyFocusedElementValidator(),
       new FormCustomScreenElementHeightValidator(),
       new FormDependencyDriftValidator(),

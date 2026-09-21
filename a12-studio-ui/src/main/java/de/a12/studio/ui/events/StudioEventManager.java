@@ -85,6 +85,13 @@ public class StudioEventManager {
     }
   }
 
+  public void fireModelRefactoredEvent(@NonNull ProjectItem projectItem) {
+    ModelRefactoredEvent event = new ModelRefactoredEvent(projectItem);
+    for (StudioEventListener listener : new ArrayList<>(listeners)) {
+      listener.modelRefactored(event);
+    }
+  }
+
   public void fireModelSavedEvent(@NonNull ProjectItem projectItem) {
     ModelSaveEvent event = new ModelSaveEvent(projectItem);
     for (StudioEventListener listener : new ArrayList<>(listeners)) {

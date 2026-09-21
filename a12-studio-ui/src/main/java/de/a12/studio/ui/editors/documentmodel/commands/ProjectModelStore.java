@@ -19,7 +19,8 @@ public interface ProjectModelStore {
   List<A12Model<?>> models();
 
   /**
-   * {@code model} has just been edited in place (by a refactoring, or the undo/redo of one): persist and announce it.
+   * {@code model} has just been edited in place (by a refactoring, or the undo/redo of one): persist and announce it,
+   * so that an editor open on it redraws (see {@link de.a12.studio.ui.events.ModelRefactoredEvent}).
    */
   void changed(@NonNull A12Model<?> model);
 
@@ -45,6 +46,7 @@ public interface ProjectModelStore {
           if (candidate.getModel() == model) {
             candidate.save();
             StudioEventManager.getInstance().fireModelSavedEvent(candidate);
+            StudioEventManager.getInstance().fireModelRefactoredEvent(candidate);
             return;
           }
         }

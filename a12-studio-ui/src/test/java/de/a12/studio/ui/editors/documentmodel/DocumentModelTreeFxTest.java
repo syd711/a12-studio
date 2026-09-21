@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -201,30 +205,186 @@ class DocumentModelTreeFxTest {
     setShown(fixture, ElementKind.VALIDATION_RULES, false);
     int filtered = rowNames(fixture).size();
 
+    // An edit that rebuilds the tree: a Cut/Paste moves the date into another group.
     Element date = element(fixture, "OrderingDate");
+    GroupElement information = (GroupElement) element(fixture, "OrderInformation");
     select(fixture, date);
     press(fixture, KeyCode.X);
+    select(fixture, information);
+    press(fixture, KeyCode.V);
 
-    assertEquals(filtered - 1, rowNames(fixture).size(), "the tree is rebuilt with the filter still applied");
+    assertTrue(information.getGroup().getElements().contains(date), "the edit happened");
+    assertEquals(filtered, rowNames(fixture).size(), "the tree is rebuilt with the filter still applied");
+    assertTrue(shownElements(fixture).stream().noneMatch(element -> element instanceof RuleElement));
   }
 
   // ---- shortcuts and bulk actions ----------------------------------------------------------------------------
 
+  // Cut removes nothing by itself (like SME): the elements wait, dimmed, and the Paste that follows moves them.
   @Test
-  void cutOfAMultiSelectionIsOneUndoStep() throws Exception {
+  void cutOnlyMarksTheElementsAndRemovesNothing() throws Exception {
     Fixture fixture = open("Order_DM");
     GroupElement order = rootGroup(fixture);
     List<String> before = names(order);
-    select(fixture, element(fixture, "OrderingDate"), element(fixture, "DeliveryDate"));
+    Element orderingDate = element(fixture, "OrderingDate");
+    select(fixture, orderingDate, element(fixture, "DeliveryDate"));
 
     press(fixture, KeyCode.X);
 
-    assertFalse(names(order).contains("OrderingDate"));
-    assertFalse(names(order).contains("DeliveryDate"));
+    assertEquals(before, names(order));
+    assertTrue(actions(fixture).isCutPending(orderingDate));
+    assertFalse(actions(fixture).isCutPending(element(fixture, "Currency")));
+    Button undo = FxTestSupport.field(fixture.controller, "undoButton");
+    assertTrue(undo.isDisable(), "nothing has happened yet that could be undone");
+  }
+
+  @Test
+  void pastingACutMovesTheElementsKeepingTheirIdsAndFollowingReferencesAsOneUndoStep() throws Exception {
+    Fixture fixture = open("Order_DM");
+    GroupElement order = rootGroup(fixture);
+    GroupElement information = (GroupElement) element(fixture, "OrderInformation");
+    Element orderingDate = element(fixture, "OrderingDate");
+    Element deliveryDate = element(fixture, "DeliveryDate");
+    String orderingId = orderingDate.getId();
+    String deliveryId = deliveryDate.getId();
+    List<String> orderBefore = names(order);
+    List<String> informationBefore = names(information);
+    RuleElement rule = (RuleElement) element(fixture, "OrderBeforeDelivery");
+    String conditionBefore = rule.getRule().getErrorCondition();
+    String entityBefore = rule.getRule().getErrorEntityRelPath();
+    assertTrue(conditionBefore.contains("AllFieldsFilled(OrderingDate, DeliveryDate)"), conditionBefore);
+    select(fixture, orderingDate, deliveryDate);
+    press(fixture, KeyCode.X);
+    select(fixture, information);
+
+    press(fixture, KeyCode.V);
+
+    assertFalse(names(order).contains("OrderingDate") || names(order).contains("DeliveryDate"));
+    List<Element> children = information.getGroup().getElements();
+    assertEquals(informationBefore.size() + 2, children.size());
+    assertSame(orderingDate, children.get(children.size() - 2), "the very same element, not a copy");
+    assertSame(deliveryDate, children.get(children.size() - 1));
+    assertEquals(orderingId, orderingDate.getId());
+    assertEquals(deliveryId, deliveryDate.getId());
+    assertTrue(rule.getRule().getErrorCondition().contains("AllFieldsFilled(OrderInformation/OrderingDate, OrderInformation/DeliveryDate)"),
+        rule.getRule().getErrorCondition());
+    assertEquals("../OrderInformation/DeliveryDate", rule.getRule().getErrorEntityRelPath());
+    assertFalse(actions(fixture).isCutPending(orderingDate), "the cut is used up");
+    assertFalse(actions(fixture).hasClipboardContent(), "and pasting again would only duplicate what was moved");
+
     Button undo = FxTestSupport.field(fixture.controller, "undoButton");
     FxTestSupport.onFx(undo::fire);
-    assertEquals(before, names(order), "one Undo brings back both, in their old places");
+    assertEquals(orderBefore, names(order), "one Undo puts both back in their old places");
+    assertEquals(informationBefore, names(information));
+    assertEquals(conditionBefore, rule.getRule().getErrorCondition());
+    assertEquals(entityBefore, rule.getRule().getErrorEntityRelPath());
     assertTrue(undo.isDisable(), "and that was the only step");
+  }
+
+  @Test
+  void aNameThatIsTakenWhereACutLandsIsMadeUniqueAsPartOfTheMove() throws Exception {
+    Fixture fixture = open("Order_DM");
+    GroupElement information = (GroupElement) element(fixture, "OrderInformation");
+    GroupElement business = (GroupElement) element(fixture, "OrderInformationBusiness");
+    Element orderNumber = information.getGroup().getElements().stream()
+        .filter(child -> "OrderNumber".equals(child.getName())).findFirst().orElseThrow();
+    String id = orderNumber.getId();
+    select(fixture, orderNumber);
+    press(fixture, KeyCode.X);
+    select(fixture, business);
+
+    press(fixture, KeyCode.V);
+
+    assertTrue(business.getGroup().getElements().contains(orderNumber));
+    assertEquals(id, orderNumber.getId());
+    assertNotEquals("OrderNumber", orderNumber.getName(), "OrderInformationBusiness already has an OrderNumber");
+    List<String> siblings = names(business);
+    assertEquals(siblings.size(), siblings.stream().distinct().count(), siblings.toString());
+    Button undo = FxTestSupport.field(fixture.controller, "undoButton");
+    FxTestSupport.onFx(undo::fire);
+    assertEquals("OrderNumber", orderNumber.getName(), "the rename is part of the same undo step");
+    assertTrue(information.getGroup().getElements().contains(orderNumber));
+    assertTrue(undo.isDisable());
+  }
+
+  @Test
+  void aCutGroupCannotBePastedIntoItself() throws Exception {
+    Fixture fixture = open("Order_DM");
+    GroupElement information = (GroupElement) element(fixture, "OrderInformation");
+    List<String> before = names(information);
+    select(fixture, information);
+    press(fixture, KeyCode.X);
+    select(fixture, information);
+
+    press(fixture, KeyCode.V);
+
+    assertEquals(before, names(information));
+    assertTrue(rootGroup(fixture).getGroup().getElements().contains(information));
+    assertTrue(actions(fixture).isCutPending(information), "the cut is still waiting for a valid place");
+  }
+
+  @Test
+  void aCopyAfterACutGivesTheCutUpAndPasteThenCopies() throws Exception {
+    Fixture fixture = open("Order_DM");
+    GroupElement order = rootGroup(fixture);
+    GroupElement information = (GroupElement) element(fixture, "OrderInformation");
+    Element orderingDate = element(fixture, "OrderingDate");
+    select(fixture, orderingDate);
+    press(fixture, KeyCode.X);
+    select(fixture, element(fixture, "DeliveryDate"));
+    press(fixture, KeyCode.C);
+    select(fixture, information);
+
+    press(fixture, KeyCode.V);
+
+    assertFalse(actions(fixture).isCutPending(orderingDate));
+    assertTrue(names(order).contains("OrderingDate") && names(order).contains("DeliveryDate"), "nothing was moved");
+    assertTrue(names(information).contains("DeliveryDate"), "the copy landed");
+  }
+
+  // Two editors open: what is cut in one is copied into the other and only then removed from where it was cut.
+  @Test
+  void aCutPastedIntoAnotherModelIsCopiedThereAndRemovedFromTheSource() throws Exception {
+    Fixture source = open("Order_DM");
+    GroupElement order = rootGroup(source);
+    Element currency = element(source, "Currency");
+    List<String> orderBefore = names(order);
+    Fixture target = open("Invoice_DM");
+    GroupElement invoice = rootGroup(target);
+    int invoiceBefore = invoice.getGroup().getElements().size();
+    select(source, currency);
+    press(source, KeyCode.X);
+    assertEquals(orderBefore, names(order), "nothing is removed by the Cut");
+    select(target, invoice);
+
+    press(target, KeyCode.V);
+
+    assertEquals(invoiceBefore + 1, invoice.getGroup().getElements().size());
+    Element copy = invoice.getGroup().getElements().get(invoiceBefore);
+    assertEquals("Currency", copy.getName());
+    assertNotEquals(currency.getId(), copy.getId(), "a copy in another model gets its own id");
+    assertFalse(names(order).contains("Currency"), "and the original is gone");
+    assertFalse(actions(source).isCutPending(currency));
+    Button undo = FxTestSupport.field(source.controller, "undoButton");
+    FxTestSupport.onFx(undo::fire);
+    assertEquals(orderBefore, names(order), "the removal is one undo step of the tree it was cut in");
+  }
+
+  @Test
+  void aDeletedCutIsPastedBackAsACopy() throws Exception {
+    Fixture fixture = open("Order_DM");
+    GroupElement order = rootGroup(fixture);
+    GroupElement information = (GroupElement) element(fixture, "OrderInformation");
+    Element currency = element(fixture, "Currency");
+    select(fixture, currency);
+    press(fixture, KeyCode.X);
+    FxTestSupport.onFx(() -> order.getGroup().getElements().remove(currency));
+    select(fixture, information);
+
+    press(fixture, KeyCode.V);
+
+    assertTrue(names(information).contains("Currency"));
+    assertFalse(information.getGroup().getElements().contains(currency), "a fresh clone, the original is gone");
   }
 
   @Test
@@ -351,10 +511,10 @@ class DocumentModelTreeFxTest {
     assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
     Path source = locateBasicModels();
     Path models = Files.createDirectories(workspace.resolve("models"));
-    Files.copy(source.resolve("Invoice_DM.json"), models.resolve("Invoice_DM.json"));
+    Files.copy(source.resolve("Invoice_DM.json"), models.resolve("Invoice_DM.json"), StandardCopyOption.REPLACE_EXISTING);
     try (var files = Files.list(source.resolve("Invoice-Includes"))) {
       for (Path file : files.toList()) {
-        Files.copy(file, models.resolve(file.getFileName().toString()));
+        Files.copy(file, models.resolve(file.getFileName().toString()), StandardCopyOption.REPLACE_EXISTING);
       }
     }
 
@@ -379,6 +539,10 @@ class DocumentModelTreeFxTest {
   private static void insertFrom(Fixture fixture, DocumentModel source) throws Exception {
     DocumentModelActions actions = FxTestSupport.field(fixture.controller, "documentModelActions");
     FxTestSupport.onFx(() -> actions.insertFrom(source));
+  }
+
+  private static DocumentModelActions actions(Fixture fixture) throws Exception {
+    return FxTestSupport.field(fixture.controller, "documentModelActions");
   }
 
   private static DocumentModel otherModel(String id) {

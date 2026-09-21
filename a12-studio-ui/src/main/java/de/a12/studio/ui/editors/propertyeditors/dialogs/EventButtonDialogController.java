@@ -1,6 +1,8 @@
 package de.a12.studio.ui.editors.propertyeditors.dialogs;
 
 import de.a12.studio.models.Label;
+import de.a12.studio.models.overviewmodel.BoxElement;
+import de.a12.studio.models.overviewmodel.BoxElementType;
 import de.a12.studio.models.overviewmodel.Confirmation;
 import de.a12.studio.models.overviewmodel.OverviewButtonLike;
 import de.a12.studio.ui.components.DialogController;
@@ -16,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 
@@ -34,6 +37,10 @@ import java.util.Optional;
  * {@code button} starts out unattached (Add) or a JSON clone of the real row (Edit, see {@link
  * Dialogs#showEventButtonForEdit}) - the caller only splices it into its owning list once {@link #isConfirmed()}
  * is true, mirroring {@link de.a12.studio.ui.editors.formmodel.dialogs.FormButtonDialogController}.
+ * <p>
+ * A Subheader Search/Filter/Multi-Selection element takes the same dialog (SME gives every Subheader element
+ * the same fields) but without the button-only Event/Confirmation/Priority/Icon block, and without the
+ * mandatory Event: see {@link #isButton}.
  */
 public class EventButtonDialogController implements DialogController {
 
@@ -42,6 +49,9 @@ public class EventButtonDialogController implements DialogController {
   // documented defaults (plus the other common CRUD-style events actually seen in SME reference fixtures) are
   // offered; the field stays freely editable for any other event name.
   private static final List<String> EVENT_SUGGESTIONS = List.of("add", "edit", "delete", "copy");
+
+  @FXML
+  private VBox buttonOnlyBox;
 
   @FXML
   private ComboBox<String> eventField;
@@ -118,9 +128,26 @@ public class EventButtonDialogController implements DialogController {
     });
   }
 
+  /**
+   * Whether {@code row} is an actual button (a Row Action, a Relationship UI button or a {@code type: "button"}
+   * Subheader/Footer element) rather than a Search/Filter/Multi-Selection Subheader element. Only buttons have
+   * an Event, Confirmation, Priority and Icon, and SME requires the Event for them alone.
+   */
+  static boolean isButton(@NonNull OverviewButtonLike row) {
+    return !(row instanceof BoxElement element) || element.getType() == BoxElementType.BUTTON;
+  }
+
   void init(@NonNull Stage stage, @NonNull OverviewButtonLike button) {
     this.stage = stage;
     this.button = button;
+
+    boolean isButton = isButton(button);
+    buttonOnlyBox.setVisible(isButton);
+    buttonOnlyBox.setManaged(isButton);
+    if (!isButton) {
+      okButton.disableProperty().unbind();
+      okButton.setDisable(false);
+    }
 
     updatingFromModel = true;
     try {
@@ -134,10 +161,14 @@ public class EventButtonDialogController implements DialogController {
     hideLabelField.selectedProperty().addListener((observable, oldValue, newValue) ->
         button.setLabelHidden(newValue ? Boolean.TRUE : null));
 
-    confirmationTitleController.setCustom(this::currentConfirmationTitle, this::writeConfirmationTitle);
-    confirmationMessageController.setCustom(this::currentConfirmationMessage, this::writeConfirmationMessage);
-    priorityController.setButton(button);
-    iconController.setCustom(button::getIcon, button::setIcon);
+    // The button-only panels stay unbound for a Search/Filter/Multi-Selection element, so that nothing they
+    // normalize on load (e.g. the default "SECONDARY" priority) can leak into an element that has none of it.
+    if (isButton) {
+      confirmationTitleController.setCustom(this::currentConfirmationTitle, this::writeConfirmationTitle);
+      confirmationMessageController.setCustom(this::currentConfirmationMessage, this::writeConfirmationMessage);
+      priorityController.setButton(button);
+      iconController.setCustom(button::getIcon, button::setIcon);
+    }
     labelController.setCustom(button::getLabel);
     descriptionController.setCustom(button::getDescription);
     stylesController.setCustom(button::getStyles);

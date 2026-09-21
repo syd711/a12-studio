@@ -92,7 +92,8 @@ fxmlLoader.setResources(StudioBundle.getBundle());
    * caller only replaces the original row with the returned one once present.
    */
   public static Optional<OverviewButtonLike> showEventButtonForEdit(Stage owner, OverviewButtonLike row) {
-    return showEventButton(owner, StudioBundle.get("edit_event_button_title"), cloneRow(row));
+    String title = StudioBundle.get(EventButtonDialogController.isButton(row) ? "edit_event_button_title" : "edit_subheader_element_title");
+    return showEventButton(owner, title, cloneRow(row));
   }
 
   private static Optional<OverviewButtonLike> showEventButton(Stage owner, String title, OverviewButtonLike row) {
@@ -110,7 +111,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
       return Optional.empty();
     }
     OverviewButtonLike result = controller.getButton();
-    if (result.getEvent() == null || result.getEvent().isBlank()) {
+    if (EventButtonDialogController.isButton(result) && (result.getEvent() == null || result.getEvent().isBlank())) {
       return Optional.empty();
     }
     return Optional.of(result);

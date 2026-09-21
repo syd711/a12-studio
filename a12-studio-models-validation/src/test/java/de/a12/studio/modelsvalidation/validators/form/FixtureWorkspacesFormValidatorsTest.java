@@ -30,7 +30,7 @@ class FixtureWorkspacesFormValidatorsTest {
   void realFormModelsHaveNoErrorsFromTheStrictReferenceAndRangeValidators() throws IOException {
     Path workspaces = locateWorkspaces();
     List<ModelValidator> validators = List.of(new FormStyleReferenceValidator(), new FormDefaultRowActionValidator(),
-        new FormDatePickerConfigValidator(), new FormColumnWidthValidator(),
+        new FormDatePickerConfigValidator(), new FormColumnWidthValidator(), new FormInitialSortingColumnSortableValidator(), new FormMultiColumnSectionLayoutValidator(),
         new FormInitiallyFocusedElementValidator(), new FormCustomScreenElementHeightValidator(),
         new DependentControlOptionsMustExistValidator(), new DependentControlsAtLeastOneOptionValidator(),
         new DependentFieldAtLeastOneActionValidator());
@@ -52,9 +52,6 @@ class FixtureWorkspacesFormValidatorsTest {
     assertTrue(formModels > 0, "no fixture form models found under " + workspaces);
     assertEquals(List.of(), problems);
   }
-
-  private static final String KNOWN_STALE_CASE =
-      "has a case for the value \"false\" of the master field \"field_69593\"";
 
   /**
    * The drift validators compare a Form Model against its Document Model, so unlike the strict validators above they
@@ -101,11 +98,6 @@ class FixtureWorkspacesFormValidatorsTest {
       }
     }
     assertTrue(formModels > 0 && withDocumentModel > 0, "no fixture form models with a document model found under " + workspaces);
-    // A genuine finding, not a false positive: advanced_new's City_Fm.json has a dependent group case for the value
-    // "false" on HelperDistrict, which is a Confirm field (only "true" or no value) - a leftover of the field having
-    // been a Boolean. Pinned so the exemption cannot outlive the fixture being fixed.
-    assertTrue(problems.removeIf(problem -> problem.startsWith("advanced_new") && problem.contains("City_Fm.json")
-        && problem.contains(KNOWN_STALE_CASE)), "the known stale case in City_Fm.json is gone - drop the exemption");
     assertEquals(List.of(), problems);
   }
 

@@ -79,6 +79,24 @@ class ProjectReferenceRefactoringFixturesTest {
     assertTrue(after.contains("/Contract/WeeklyWorkhours"), "a path below a relationship belongs to another model");
   }
 
+  // PersonEmployee_Ad overlays Person_Dc (through PersonEmployee_Cm): its computation writes "../Type" and reads
+  // FirstName/LastName, all of which the overlay's own file does not hold.
+  @Test
+  void anAdditiveDocumentModelOfTheAdvancedWorkspaceFollowsARenameInItsBaseModel() throws IOException {
+    List<A12Model<?>> project = loadWorkspace("advanced_new");
+    DocumentModel base = documentModel(project, "Person_Dc");
+    A12Model<?> overlay = model(project, "PersonEmployee_Ad");
+    String before = JsonSettings.objectMapper.writeValueAsString(overlay);
+    assertTrue(before.contains("\"../Type\"") && before.contains("AtLeastOneFieldFilled(FirstName, LastName)"), before);
+
+    renameAndApply(project, base, "/Person/Type", "Kind");
+    renameAndApply(project, base, "/Person/FirstName", "GivenName");
+
+    String after = JsonSettings.objectMapper.writeValueAsString(overlay);
+    assertEquals(before.replace("\"../Type\"", "\"../Kind\"")
+        .replace("AtLeastOneFieldFilled(FirstName, LastName)", "AtLeastOneFieldFilled(GivenName, LastName)"), after);
+  }
+
   // The query's root is Person_Dc; its one hop goes through TeamPerson_Re to the role "Team" (Team_Dc), and the
   // relationship's link document is TeamPerson_LinkFields_Dc.
   private static final String HOP_QUERY = "PersonTeamAssignment_Ru_SelectedItems_Ov_Qe";

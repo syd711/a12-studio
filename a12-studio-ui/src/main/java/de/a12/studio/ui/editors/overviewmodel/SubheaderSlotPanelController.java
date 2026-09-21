@@ -34,12 +34,14 @@ import de.a12.studio.ui.util.StudioBundle;
 /**
  * Edits one slot (left or right) of an {@link de.a12.studio.models.overviewmodel.OverviewModel}'s
  * {@code subHeaderBox}: a mixed list of {@link BoxElement}s - a {@link ButtonElement} configured like {@link
- * de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}'s rows, or a position-only marker
- * ({@link SearchElement}, {@link FilterElement}, {@link MultiSelectionElement}) with no further configuration
- * - per the SME reference's Subheader documentation ("By clicking ADD ... create a respective action type:
- * Button, Search, Filter, or Multi-Selection"). The Action Type is chosen once, from {@link #addButton}'s
- * menu, when a row is created - it isn't editable afterward, so the Action Type column is a plain label like
- * every other column. Reused for both Major (right slot) and Minor (left slot) via {@link #configure}. Footer
+ * de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}'s rows, or a {@link SearchElement},
+ * {@link FilterElement} or {@link MultiSelectionElement} - per the SME reference's Subheader documentation
+ * ("By clicking ADD ... create a respective action type: Button, Search, Filter, or Multi-Selection"). The
+ * Action Type is chosen once, from {@link #addButton}'s menu, when a row is created - it isn't editable
+ * afterward, so the Action Type column is a plain label. Every row is editable, as in SME (which gives all four
+ * types the same fields): a Button through its full dialog, the other three through the same dialog without the
+ * button-only Event/Confirmation/Priority/Icon block, so they still carry a label, description, styles and
+ * annotations. Only an unrecognized (generic) element type has nothing to edit. Reused for both Major (right slot) and Minor (left slot) via {@link #configure}. Footer
  * is Button-only, so it uses the simpler {@link de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}
  * instead.
  */
@@ -116,8 +118,9 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     typeLabel.setId("subheaderSlotType-" + index);
     typeLabel.setMaxWidth(Double.MAX_VALUE);
 
-    boolean isButton = element instanceof OverviewButtonLike;
-    OverviewButtonLike button = isButton ? (OverviewButtonLike) element : null;
+    boolean isButton = element instanceof ButtonElement;
+    OverviewButtonLike editable = element instanceof OverviewButtonLike configurable ? configurable : null;
+    OverviewButtonLike button = isButton ? editable : null;
 
     Label eventLabel = new Label(isButton ? button.getEvent() : "");
     eventLabel.setId("subheaderSlotEvent-" + index);
@@ -132,14 +135,13 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     Label iconLabel = new Label(isButton ? button.getIconName() : "");
     iconLabel.setId("subheaderSlotIcon-" + index);
 
-    if (isButton) {
-      makeClickableToEdit(eventLabel, button);
-      makeClickableToEdit(priorityLabel, button);
-      makeClickableToEdit(destructiveLabel, button);
-      makeClickableToEdit(iconLabel, button);
+    if (editable != null) {
+      for (Label cell : List.of(typeLabel, eventLabel, priorityLabel, destructiveLabel, iconLabel)) {
+        makeClickableToEdit(cell, editable);
+      }
     }
 
-    rowsGrid.addRow(index + 1, typeLabel, eventLabel, priorityLabel, destructiveLabel, iconLabel, createActionsBox(element, button, index, rowCount));
+    rowsGrid.addRow(index + 1, typeLabel, eventLabel, priorityLabel, destructiveLabel, iconLabel, createActionsBox(element, editable, index, rowCount));
   }
 
   private void makeClickableToEdit(Label label, OverviewButtonLike button) {
@@ -175,7 +177,7 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     return StudioBundle.get("subheader_slot.type_button");
   }
 
-  private HBox createActionsBox(BoxElement element, OverviewButtonLike button, int index, int rowCount) {
+  private HBox createActionsBox(BoxElement element, OverviewButtonLike editable, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
@@ -187,8 +189,8 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
       }
     });
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(button));
-    editButton.setDisable(button == null);
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(editable));
+    editButton.setDisable(editable == null);
 
     HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);

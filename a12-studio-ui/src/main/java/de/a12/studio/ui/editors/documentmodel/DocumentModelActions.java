@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -20,6 +21,9 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.documentmodel.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.DeleteNodeCommand;
 import de.a12.studio.ui.editors.documentmodel.commands.InsertModelContentCommand;
+import de.a12.studio.ui.editors.documentmodel.commands.MoveNodeCommand;
+import de.a12.studio.ui.editors.documentmodel.commands.RefactoringCommand;
+import de.a12.studio.ui.editors.documentmodel.commands.RenameElementCommand;
 import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.FieldOption;
 import de.a12.studio.ui.editors.documentmodel.dialogs.CreateOverviewModelDialogController.Result;
 import de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs;
@@ -74,6 +78,22 @@ public class DocumentModelActions {
   // rather than the live objects so repeated pastes each get their own fresh clone with fresh ids (see
   // #pasteSelection), and so multi-selection Copy/Cut carries every selected top-level element.
   private static List<String> clipboardJson = List.of();
+
+  /**
+   * A Cut that has not been pasted yet. Like in SME (whose tree engine keeps the cut nodes until they are pasted), Cut
+   * removes nothing by itself: the elements stay where they are, shown dimmed, and Paste into the same model then
+   * <em>moves</em> them - same ids, so references by id stay valid, and the path references the move would break are
+   * rewritten as for a drag-and-drop (see {@link RefactoringCommand}). Pasted into another model they are copied
+   * there and removed from {@code source}. Set together with {@link #clipboardJson}; a Copy or a new Cut replaces it.
+   *
+   * @param source   the tree the elements were cut in
+   * @param model    that tree's model
+   * @param elements the live elements, in selection order
+   */
+  private record PendingCut(DocumentModelActions source, A12Model<?> model, List<Element> elements) {
+  }
+
+  private static PendingCut pendingCut;
 
   // The tree's keyboard shortcuts, shown as accelerator hints on the context menu and matched by
   // DocumentModelElementsTreeController#onTreeKeyPressed (SME binds the same keys, see its keyboardShortcuts.ts).
@@ -692,7 +712,7 @@ public class DocumentModelActions {
 
   /**
    * Copies the current top-level selection to the clipboard (see {@link #selectionForClipboard()}), leaving
-   * the tree unchanged.
+   * the tree unchanged. A Cut that was waiting to be pasted is given up.
    */
   public void copySelection() {
     List<Element> elements = selectionForClipboard();
@@ -700,12 +720,12 @@ public class DocumentModelActions {
       return;
     }
     copyToClipboard(elements);
+    forgetPendingCut();
   }
 
   /**
-   * Copies the current top-level selection to the clipboard, then deletes it the same way {@link
-   * #confirmAndDeleteSelection()} does - but without a confirmation prompt, matching standard Cut behavior
-   * (the removed elements are still recoverable via Paste or Undo).
+   * Puts the current top-level selection on the clipboard as a Cut (see {@link PendingCut}): nothing is removed yet,
+   * the elements are only marked (dimmed), and the next Paste moves them.
    */
   public void cutSelection() {
     List<Element> elements = selectionForClipboard();
@@ -713,7 +733,23 @@ public class DocumentModelActions {
       return;
     }
     copyToClipboard(elements);
-    onDeleteModelItem();
+    forgetPendingCut();
+    pendingCut = new PendingCut(this, projectItem.getModel(), List.copyOf(elements));
+    elementsTreeTable.refresh();
+  }
+
+  /** Whether {@code element} is one of the elements this tree has cut and that wait for their Paste. */
+  public boolean isCutPending(Element element) {
+    PendingCut cut = pendingCut;
+    return cut != null && cut.source() == this && cut.elements().stream().anyMatch(candidate -> candidate == element);
+  }
+
+  private void forgetPendingCut() {
+    PendingCut cut = pendingCut;
+    pendingCut = null;
+    if (cut != null) {
+      cut.source().elementsTreeTable.refresh();
+    }
   }
 
   /**
@@ -738,6 +774,13 @@ public class DocumentModelActions {
       return;
     }
 
+    PendingCut cut = pendingCut;
+    if (cut != null && cut.model() == projectItem.getModel()
+        && cut.elements().stream().allMatch(element -> siblingsContaining(element) != null)) {
+      moveCutElements(cut, insertionPoint);
+      return;
+    }
+
     Element firstPasted = null;
     int index = insertionPoint.index();
     Set<String> usedIds = DocumentModelElementFactory.usedIds(modelRoot);
@@ -759,8 +802,109 @@ public class DocumentModelActions {
     }
     if (firstPasted != null) {
       executeAsOneStep(commands);
+      if (cut != null && cut.model() != projectItem.getModel()) {
+        // Cut in another tree: what was copied here is now removed there.
+        cut.source().removeCutElements(cut.elements());
+        finishCut();
+      }
       onModelChanged.accept(firstPasted);
     }
+  }
+
+  /** The Cut has been carried out: nothing left to paste, and the marks come off. */
+  private static void finishCut() {
+    PendingCut cut = pendingCut;
+    pendingCut = null;
+    clipboardJson = List.of();
+    if (cut != null) {
+      cut.source().elementsTreeTable.refresh();
+    }
+  }
+
+  /**
+   * Paste of a Cut into the tree it was cut in: moves the elements to {@code insertionPoint} as one undo step, keeping
+   * their ids and rewriting the references the move breaks ({@link RefactoringCommand}). A name that is taken at the
+   * destination is made unique first (part of the same step). Does nothing if the destination lies inside one of the
+   * elements themselves - a group cannot move into its own subtree.
+   */
+  private void moveCutElements(@NonNull PendingCut cut, @NonNull InsertionPoint insertionPoint) {
+    List<Element> targetSiblings = insertionPoint.siblings();
+    for (Element element : cut.elements()) {
+      if (element instanceof GroupElement group && containsList(group, targetSiblings)) {
+        return;
+      }
+    }
+
+    List<Command> moves = new ArrayList<>();
+    List<Element> takenNames = new ArrayList<>(targetSiblings);
+    takenNames.removeIf(sibling -> cut.elements().stream().anyMatch(cutElement -> cutElement == sibling));
+    int index = insertionPoint.index();
+    for (Element element : cut.elements()) {
+      List<Element> sourceSiblings = siblingsContaining(element);
+      List<Element> taken = new ArrayList<>(takenNames);
+      sourceSiblings.stream().filter(sibling -> sibling != element).forEach(taken::add);
+      String name = DocumentModelElementFactory.uniqueName(element.getName(), taken);
+      if (!name.equals(element.getName())) {
+        moves.add(new RenameElementCommand(element, name));
+      }
+      moves.add(new MoveNodeCommand(sourceSiblings, targetSiblings, element, index));
+      takenNames.add(element);
+      index++;
+    }
+
+    commandStack.execute(RefactoringCommand.around(projectItem, moves.size() == 1 ? moves.get(0) : new CompositeCommand(moves)));
+    finishCut();
+    onModelChanged.accept(cut.elements().get(0));
+  }
+
+  /** Deletes {@code elements} - cut here and pasted into another model - as one undo step of this tree. */
+  private void removeCutElements(@NonNull List<Element> elements) {
+    List<Command> commands = new ArrayList<>();
+    for (Element element : elements) {
+      List<Element> siblings = siblingsContaining(element);
+      if (siblings != null) {
+        commands.add(new DeleteNodeCommand<>(siblings, element));
+      }
+    }
+    if (!commands.isEmpty()) {
+      executeAsOneStep(commands);
+      onModelChanged.accept(null);
+    }
+  }
+
+  /** The list of this model that currently holds {@code element} (by identity), or null if it is not in the model. */
+  @SuppressWarnings("unchecked")
+  private List<Element> siblingsContaining(@NonNull Element element) {
+    return findList((List<Element>) (List<?>) modelRoot.getRootGroups(), element);
+  }
+
+  private static List<Element> findList(List<Element> list, Element element) {
+    for (Element candidate : list) {
+      if (candidate == element) {
+        return list;
+      }
+    }
+    for (Element candidate : list) {
+      if (candidate instanceof GroupElement group && group.getGroup() != null && group.getGroup().getElements() != null) {
+        List<Element> found = findList(group.getGroup().getElements(), element);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
+  }
+
+  /** Whether {@code list} is the child list of {@code group} or of a group anywhere below it. */
+  private static boolean containsList(@NonNull GroupElement group, @NonNull List<Element> list) {
+    if (group.getGroup() == null || group.getGroup().getElements() == null) {
+      return false;
+    }
+    if (group.getGroup().getElements() == list) {
+      return true;
+    }
+    return group.getGroup().getElements().stream()
+        .anyMatch(child -> child instanceof GroupElement childGroup && containsList(childGroup, list));
   }
 
   /**

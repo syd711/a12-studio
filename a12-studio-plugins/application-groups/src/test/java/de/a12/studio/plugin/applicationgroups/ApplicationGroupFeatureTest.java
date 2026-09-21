@@ -45,6 +45,27 @@ class ApplicationGroupFeatureTest {
   @Test
   void prefixesEveryModelAndRewritesReferences(@TempDir Path tempDir) throws Exception {
     Path projectDir = copyBasicProject(tempDir);
+    // The checked-in basic workspace has no Query Model (its QueryModel.json fixture was removed), so this test
+    // brings its own: one bare targetDocumentModel id plus a relationship-hop sort entry that both have to follow.
+    writeModel(new File(projectDir.toFile(), "models"), "QueryModel.json", """
+        {
+          "header": {
+            "id": "QueryModel",
+            "modelType": "query",
+            "modelVersion": "0.1.0",
+            "modelReferences": [
+              {"modelType": "document", "alias": "DM", "purpose": "document-model-for-query", "reference": "Person_DM"}
+            ]
+          },
+          "content": {
+            "projectionName": "document",
+            "targetDocumentModel": "Person_DM",
+            "sort": [
+              {"relationshipModel": "PersonCompany", "targetRole": "Company", "field": "/Company/Name", "direction": "ASC"}
+            ]
+          }
+        }
+        """);
     Project project = loadProject(projectDir);
     setGroupName(projectDir, "App");
 

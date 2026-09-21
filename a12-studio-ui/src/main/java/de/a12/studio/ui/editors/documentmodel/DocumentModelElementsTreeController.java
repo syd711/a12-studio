@@ -723,9 +723,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    * step. Models that aren't Document Models have no such references, so their command runs as is.
    */
   private Command withReferenceRefactoring(@NonNull Command structuralChange) {
-    return projectItem != null && projectItem.getModel() instanceof DocumentModel documentModel
-        ? new RefactoringCommand(documentModel, structuralChange, ProjectModelStore.of(projectItem))
-        : structuralChange;
+    return RefactoringCommand.around(projectItem, structuralChange);
   }
 
   /**
@@ -1155,6 +1153,16 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         @Override
         protected void updateItem(ElementViewModel item, boolean empty) {
           super.updateItem(item, empty);
+          boolean cutPending = !empty && item != null && documentModelActions != null
+              && documentModelActions.isCutPending(item.getElement());
+          if (cutPending) {
+            if (!getStyleClass().contains("cut-row")) {
+              getStyleClass().add("cut-row");
+            }
+          }
+          else {
+            getStyleClass().remove("cut-row");
+          }
           boolean fixedChildLeaf = !empty && item != null
               && (hasFixedChildrenAncestor(item.getElement()) || isBaseModelNode(item.getElement()));
           if (fixedChildLeaf) {

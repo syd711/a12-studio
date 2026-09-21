@@ -1,7 +1,9 @@
 package de.a12.studio.modelsvalidation.refactoring;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.combineddocumentmodel.CombinationStep;
+import de.a12.studio.models.combineddocumentmodel.DocumentModelIdRef;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelContent;
 import de.a12.studio.models.combineddocumentmodel.SelectionModelIdRef;
@@ -23,6 +25,9 @@ import de.a12.studio.models.mappingmodel.SortField;
 import de.a12.studio.models.mappingmodel.SortInfo;
 import de.a12.studio.models.mappingmodel.StructuralMappingModelRef;
 import de.a12.studio.models.printmodel.FieldRef;
+import de.a12.studio.models.printmodel.Calculation;
+import de.a12.studio.models.printmodel.ComputationStep;
+import de.a12.studio.models.printmodel.PrintCalculationElement;
 import de.a12.studio.models.printmodel.PrintFieldElement;
 import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.models.printmodel.PrintModelContent;
@@ -179,6 +184,113 @@ class ProjectReferenceRefactoringTest {
     assertEquals("[Person/Address/Street] < 0", rule.getRule().getErrorCondition());
   }
 
+  // A includes B, B includes the changed Person_DM: a path of A ends in Person_DM's elements two Includes further on.
+  @Test
+  void aDocumentModelThatReachesTheChangedOneThroughAChainOfIncludesFollowsARename() {
+    RuleElement inMid = rule("MidRule", "../Person/Address/Street", "[Person/Address/Street] < 0");
+    DocumentModel mid = documentModel("Mid_DM", group("Mid", includeGroup("Person", "Person_DM"), inMid));
+    RuleElement inShop = rule("ShopRule", "../Mid/Person/Address/Street", "[Mid/Person/Address/Street] < 0 And [Mid/Note] > 0");
+    DocumentModel shop = documentModel("Shop_DM", group("Shop", includeGroup("Mid", "Mid_DM"), inShop));
+
+    List<ModelEdits> edits = renameAndCompute(street, "Road", shop, mid);
+
+    assertEquals(2, edits.size());
+    assertEquals("[Person/Address/Road] < 0", inMid.getRule().getErrorCondition());
+    assertEquals("../Mid/Person/Address/Road", inShop.getRule().getErrorEntityRelPath());
+    assertEquals("[Mid/Person/Address/Road] < 0 And [Mid/Note] > 0", inShop.getRule().getErrorCondition());
+
+    revert(edits);
+    assertEquals("[Mid/Person/Address/Street] < 0 And [Mid/Note] > 0", inShop.getRule().getErrorCondition());
+    assertEquals("[Person/Address/Street] < 0", inMid.getRule().getErrorCondition());
+  }
+
+  @Test
+  void aChainOfIncludesFollowsAMoveAndLeavesPathsThatEndInTheIntermediateModelAlone() {
+    RuleElement rule = rule("ShopRule", "../Mid/Person/Address/Street", "[Mid/Person/Address/Street] < 0 And [Mid/Extra] > 0");
+    DocumentModel mid = documentModel("Mid_DM", group("Mid", includeGroup("Person", "Person_DM"), field("Extra")));
+    DocumentModel shop = documentModel("Shop_DM", group("Shop", includeGroup("Mid", "Mid_DM"), rule));
+
+    DocumentModelRefactoring.Plan plan = DocumentModelRefactoring.prepare(personModel);
+    children(address).remove(street);
+    children(person).add(street);
+    apply(ProjectReferenceRefactoring.computeEdits(personModel, plan, List.of(personModel, mid, shop)));
+
+    assertEquals("../Mid/Person/Street", rule.getRule().getErrorEntityRelPath());
+    assertEquals("[Mid/Person/Street] < 0 And [Mid/Extra] > 0", rule.getRule().getErrorCondition());
+  }
+
+  @Test
+  void aChainThatDoesNotLeadToTheChangedModelIsNotTouched() {
+    DocumentModel mid = documentModel("Mid_DM", group("Mid", includeGroup("Person", "Other_DM")));
+    RuleElement rule = rule("ShopRule", "../Mid/Person/Address/Street", "[Mid/Person/Address/Street] < 0");
+    DocumentModel shop = documentModel("Shop_DM", group("Shop", includeGroup("Mid", "Mid_DM"), rule));
+
+    assertEquals(List.of(), renameAndCompute(street, "Road", shop, mid));
+    assertEquals("[Mid/Person/Address/Street] < 0", rule.getRule().getErrorCondition());
+  }
+
+  @Test
+  void includeCyclesInTheProjectDoNotSendTheChainWalkAroundForever() {
+    DocumentModel first = documentModel("First_DM", group("First", includeGroup("Second", "Second_DM")));
+    DocumentModel second = documentModel("Second_DM", group("Second", includeGroup("First", "First_DM")));
+
+    assertEquals(List.of(), renameAndCompute(street, "Road", first, second));
+  }
+
+  // ---- Additive Document Model over the changed one ---------------------------------------------------------
+
+  // The overlay mirrors Person_DM's root group "Person" and adds a field there; its rule also reads what the base
+  // provides below it, which the overlay's own file does not contain.
+  @Test
+  void anAdditiveDocumentModelFollowsARenameInItsBaseModel() {
+    RuleElement rule = rule("NickRule", "../Nick", "[Address/Street] < 0 And [Nick] > 0");
+    AdditiveDocumentModel overlay = additiveModel("Person_Ad", group("Person", field("Nick"), rule));
+    CombinedDocumentModel combination = additionCombination("Person_Cm", "Person_DM", "Person_Ad");
+
+    List<ModelEdits> edits = renameAndCompute(street, "Road", overlay, combination);
+
+    assertEquals(1, edits.size());
+    assertEquals("[Address/Road] < 0 And [Nick] > 0", rule.getRule().getErrorCondition());
+    assertEquals("../Nick", rule.getRule().getErrorEntityRelPath());
+
+    revert(edits);
+    assertEquals("[Address/Street] < 0 And [Nick] > 0", rule.getRule().getErrorCondition());
+  }
+
+  @Test
+  void anAdditiveDocumentModelFollowsAMoveOfABaseFieldOutOfItsGroup() {
+    RuleElement rule = rule("NickRule", "../Nick", "[Address/Street] < 0");
+    AdditiveDocumentModel overlay = additiveModel("Person_Ad", group("Person", field("Nick"), rule));
+    CombinedDocumentModel combination = additionCombination("Person_Cm", "Person_DM", "Person_Ad");
+
+    DocumentModelRefactoring.Plan plan = DocumentModelRefactoring.prepare(personModel);
+    children(address).remove(street);
+    children(person).add(street);
+    apply(ProjectReferenceRefactoring.computeEdits(personModel, plan, List.of(personModel, overlay, combination)));
+
+    assertEquals("[Street] < 0", rule.getRule().getErrorCondition());
+  }
+
+  @Test
+  void anAdditiveDocumentModelWhoseBaseIsAnotherModelIsNotTouched() {
+    RuleElement rule = rule("NickRule", "../Nick", "[Address/Street] < 0");
+    AdditiveDocumentModel overlay = additiveModel("Person_Ad", group("Person", field("Nick"), rule));
+    CombinedDocumentModel combination = additionCombination("Other_Cm", "Other_DM", "Person_Ad");
+
+    assertEquals(List.of(), renameAndCompute(street, "Road", overlay, combination));
+    assertEquals("[Address/Street] < 0", rule.getRule().getErrorCondition());
+  }
+
+  @Test
+  void aMirroredGroupThatTheBaseRenamesIsNotFollowedByTheOverlayPaths() {
+    RuleElement rule = rule("NickRule", "../Nick", "[Address/Street] < 0");
+    AdditiveDocumentModel overlay = additiveModel("Person_Ad", group("Person", field("Nick"), rule));
+    CombinedDocumentModel combination = additionCombination("Person_Cm", "Person_DM", "Person_Ad");
+
+    assertEquals(List.of(), renameAndCompute(person, "Human", overlay, combination));
+    assertEquals("[Address/Street] < 0", rule.getRule().getErrorCondition());
+  }
+
   // ---- Print Model ------------------------------------------------------------------------------------------
 
   @Test
@@ -192,6 +304,35 @@ class ProjectReferenceRefactoringTest {
     assertEquals(1, edits.size());
     assertEquals("/Person/Address/Road", mine.getPath());
     assertEquals("/Person/Address/Street", foreign.getPath());
+  }
+
+  @Test
+  void aPrintCalculationStepFollowsTheRenameForTheReferencesToTheChangedModelOnly() {
+    ComputationStep step = step("[Person_DM/Person/Address/Street] + [Other_DM/Person/Address/Street] + [Person_DM/Person/Name]");
+    ComputationStep untouched = step("[Other_DM/Person/Address/Street]");
+    ComputationStep blank = step(null);
+    PrintModel print = printModel("Letter_Pt");
+    print.getContent().getElementDefinitions().add(calculation(step, untouched, blank));
+
+    List<ModelEdits> edits = renameAndCompute(street, "Road", print);
+
+    assertEquals(1, edits.size());
+    assertEquals("[Person_DM/Person/Address/Road] + [Other_DM/Person/Address/Street] + [Person_DM/Person/Name]",
+        step.getOperation());
+    assertEquals("[Other_DM/Person/Address/Street]", untouched.getOperation());
+    assertNull(blank.getOperation());
+  }
+
+  @Test
+  void aPrintCalculationStepIsRestoredByUndoingTheEdit() {
+    ComputationStep step = step("[Person_DM/Person/Address/Street]");
+    PrintModel print = printModel("Letter_Pt");
+    print.getContent().getElementDefinitions().add(calculation(step));
+
+    List<ModelEdits> edits = renameAndCompute(street, "Road", print);
+    edits.get(0).edits().forEach(DocumentModelRefactoring.Edit::revert);
+
+    assertEquals("[Person_DM/Person/Address/Street]", step.getOperation());
   }
 
   // ---- Query Model ------------------------------------------------------------------------------------------
@@ -685,6 +826,23 @@ class ProjectReferenceRefactoringTest {
     return ref;
   }
 
+  private static ComputationStep step(String operation) {
+    ComputationStep step = new ComputationStep();
+    step.setOperation(operation);
+    return step;
+  }
+
+  private static PrintCalculationElement calculation(ComputationStep... steps) {
+    Calculation calculation = new Calculation();
+    calculation.setModel("Person_DM");
+    calculation.setName("Calculation");
+    calculation.getComputationAlternatives().addAll(List.of(steps));
+    PrintCalculationElement element = new PrintCalculationElement();
+    element.setType("Calculation");
+    element.setCalculation(calculation);
+    return element;
+  }
+
   private static PrintModel printModel(String id, FieldRef... refs) {
     PrintModelContent content = new PrintModelContent();
     for (FieldRef ref : refs) {
@@ -799,6 +957,29 @@ class ProjectReferenceRefactoringTest {
     content.getData().setSelected(selected == null ? null : new ArrayList<>(selected));
     content.getData().setUnselected(unselected == null ? null : new ArrayList<>(unselected));
     SelectionModel model = new SelectionModel();
+    model.setId(id);
+    model.setContent(content);
+    return model;
+  }
+
+  private static AdditiveDocumentModel additiveModel(String id, GroupElement... roots) {
+    DocumentModel plain = documentModel(id, roots);
+    AdditiveDocumentModel model = new AdditiveDocumentModel();
+    model.setId(id);
+    model.setContent(plain.getContent());
+    return model;
+  }
+
+  /** A Combination Model of {@code baseModelId} with one Addition step for {@code additiveModelId}. */
+  private static CombinedDocumentModel additionCombination(String id, String baseModelId, String additiveModelId) {
+    CombinationStep step = new CombinationStep();
+    DocumentModelIdRef ref = new DocumentModelIdRef();
+    ref.setDmId(additiveModelId);
+    step.setAdditiveModel(ref);
+    CombinedDocumentModelContent content = new CombinedDocumentModelContent();
+    content.setBaseModelId(baseModelId);
+    content.getCombinationSteps().add(step);
+    CombinedDocumentModel model = new CombinedDocumentModel();
     model.setId(id);
     model.setContent(content);
     return model;

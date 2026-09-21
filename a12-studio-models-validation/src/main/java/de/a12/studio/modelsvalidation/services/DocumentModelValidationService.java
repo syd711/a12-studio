@@ -22,6 +22,7 @@ import de.a12.studio.modelsvalidation.validators.MultiSelectGroupValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.NumberFieldValueLimitValidator;
 import de.a12.studio.modelsvalidation.validators.NumberTypeConfigValidator;
+import de.a12.studio.modelsvalidation.validators.RuleConditionSyntaxValidator;
 import de.a12.studio.modelsvalidation.validators.SchemaVersionValidator;
 import de.a12.studio.modelsvalidation.validators.StringPatternErrorMessageValidator;
 import de.a12.studio.modelsvalidation.validators.StringTypeConfigValidator;
@@ -57,7 +58,8 @@ public final class DocumentModelValidationService {
       new EnumerationTypeConfigValidator(),
       new CustomFieldTypeConfigValidator(),
       new DateFormatConfigValidator(),
-      new IncludeTypeDefinitionModeValidator()));
+      new IncludeTypeDefinitionModeValidator(),
+      new RuleConditionSyntaxValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

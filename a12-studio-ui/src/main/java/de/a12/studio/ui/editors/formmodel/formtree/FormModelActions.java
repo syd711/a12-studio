@@ -27,6 +27,7 @@ import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.DeleteNodeCommand;
+import de.a12.studio.ui.editors.formmodel.formtree.commands.RemoveDependentControlEntriesCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.ReplaceNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.SetSingleChildCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.SwapCommand;
@@ -35,6 +36,7 @@ import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.Command;
 import de.a12.studio.ui.util.commandstack.CommandStack;
+import de.a12.studio.ui.util.commandstack.CompositeCommand;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -46,9 +48,11 @@ import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -263,7 +267,7 @@ class FormModelActions {
     if (!copyToClipboard(item.getNode())) {
       return;
     }
-    Command command = createDetachCommand(item);
+    Command command = createRemoveCommand(item);
     if (command != null) {
       commandStack.execute(command);
     }
@@ -354,11 +358,30 @@ class FormModelActions {
     if (item.getNode() instanceof Screen screen) {
       removeNavigationButtonsTargeting(screen.getId());
     }
-    Command command = createDetachCommand(item);
+    Command command = createRemoveCommand(item);
     if (command != null) {
       commandStack.execute(command);
     }
     onModelChanged.accept(null);
+  }
+
+  /**
+   * {@link #createDetachCommand} plus the cleanup a removal (delete, cut) needs: the entries other Controls hold
+   * in {@code dependentControls} for the removed screen elements go with them, so no dangling id is left behind
+   * (SME's delete refactoring does the same). One command, so a single undo restores both.
+   */
+  private Command createRemoveCommand(@NonNull FormElementViewModel item) {
+    Command detach = createDetachCommand(item);
+    if (detach == null) {
+      return null;
+    }
+    Set<String> removedIds = new HashSet<>();
+    FormModelWalker.find(item.getNode(), ScreenElement.class, node -> true).forEach(element -> removedIds.add(element.getId()));
+    removedIds.remove(null);
+    if (!RemoveDependentControlEntriesCommand.isNeeded(content, removedIds)) {
+      return detach;
+    }
+    return new CompositeCommand(detach, new RemoveDependentControlEntriesCommand(content, removedIds));
   }
 
   /**

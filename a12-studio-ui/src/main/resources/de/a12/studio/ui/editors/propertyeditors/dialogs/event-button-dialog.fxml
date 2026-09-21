@@ -22,19 +22,24 @@
                   <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
                </padding>
                <children>
-                  <VBox spacing="6.0">
+                  <!-- Only a button uses these; a Search/Filter/Multi-Selection Subheader element hides the box. -->
+                  <VBox fx:id="buttonOnlyBox" spacing="14.0">
                      <children>
-                        <Label styleClass="field-label" text="%event" />
-                        <ComboBox fx:id="eventField" maxWidth="Infinity" />
+                        <VBox spacing="6.0">
+                           <children>
+                              <Label styleClass="field-label" text="%event" />
+                              <ComboBox fx:id="eventField" maxWidth="Infinity" />
+                           </children>
+                        </VBox>
+
+                        <fx:include fx:id="confirmationTitle" source="../localized-text-panel.fxml" />
+                        <fx:include fx:id="confirmationMessage" source="../localized-text-panel.fxml" />
+
+                        <fx:include fx:id="priority" source="../priority-panel.fxml" />
+
+                        <fx:include fx:id="icon" source="../icon-panel.fxml" />
                      </children>
                   </VBox>
-
-                  <fx:include fx:id="confirmationTitle" source="../localized-text-panel.fxml" />
-                  <fx:include fx:id="confirmationMessage" source="../localized-text-panel.fxml" />
-
-                  <fx:include fx:id="priority" source="../priority-panel.fxml" />
-
-                  <fx:include fx:id="icon" source="../icon-panel.fxml" />
                   <CheckBox fx:id="hideLabelField" mnemonicParsing="false" text="%hide_label" />
 
                   <fx:include fx:id="label" source="../localized-text-panel.fxml" />

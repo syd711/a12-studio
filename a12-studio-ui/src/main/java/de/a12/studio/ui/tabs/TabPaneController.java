@@ -197,7 +197,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
     for (Tab tab : tabPane.getTabs()) {
       ProjectItem tabItem = (ProjectItem) tab.getUserData();
       if (tabItem != null && tabItem.getPath().equals(item.getPath())) {
-        refreshRevertedTab(tab, item);
+        rebuildTab(tab, item);
         return;
       }
     }
@@ -211,7 +211,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
    * {@link EditorFactory#create} finds nothing to show for the reverted content), the tab is closed
    * and a fresh one reopened instead of leaving stale content on screen.
    */
-  private void refreshRevertedTab(@NonNull Tab tab, @NonNull ProjectItem item) {
+  private void rebuildTab(@NonNull Tab tab, @NonNull ProjectItem item) {
     StudioEventManager.getInstance().fireModelClosedEvent(item);
     tab.setUserData(item);
 
@@ -228,6 +228,24 @@ public class TabPaneController implements Initializable, StudioEventListener {
         project.getSettings().getUISettings().save();
       }
       open(item);
+    }
+  }
+
+  /**
+   * A refactoring in another model (see {@link ModelRefactoredEvent}) edited the model behind an open tab in place, so
+   * its editor is rebuilt from that model like after a revert - otherwise it keeps showing the text it had before, until
+   * the tab is closed and reopened. The rebuild resets what the editor had selected, which is the price for not needing
+   * every editor type to know how to refresh itself.
+   */
+  @Override
+  public void modelRefactored(@NonNull ModelRefactoredEvent event) {
+    ProjectItem item = event.getItem();
+    for (Tab tab : tabPane.getTabs()) {
+      ProjectItem tabItem = (ProjectItem) tab.getUserData();
+      if (tabItem != null && tabItem.getPath().equals(item.getPath())) {
+        rebuildTab(tab, item);
+        return;
+      }
     }
   }
 

@@ -19,12 +19,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -62,8 +64,10 @@ import java.util.function.Supplier;
  * Selection/Structural Mapping models) and {@link Plan#computeEdits(IncludedModelChange)} (rules and computations of a
  * Document Model that includes the changed one).
  *
- * <p><b>Not covered</b>: a path that reaches an element only through an Additive base model, or through a chain of
- * more than one Include; a condition that doesn't parse (skipped, see {@link Plan#skippedSites()}).
+ * <p><b>Not covered</b>: a mirrored group of an Additive Document Model whose base model renames or moves it (the
+ * overlay keeps matching its base by name, so the overlay's own group would have to follow as well); an Additive
+ * Document Model whose base only reaches the changed model through an Include of its own; a condition that doesn't
+ * parse (skipped, see {@link Plan#skippedSites()}).
  */
 public final class DocumentModelRefactoring {
 
@@ -79,8 +83,21 @@ public final class DocumentModelRefactoring {
    * Include group mounts the children of the included model's root group, so a condition path such as {@code
    * Address/Street} in the including model ends in the included model's own element names, which the change may
    * have renamed or moved. {@code modelId} is the id of the included (changed) model.
+   *
+   * <p>{@code models} finds a Document Model of the project by id. With it a path is followed through a <em>chain</em>
+   * of Includes as well: A includes B includes the changed C, so a path {@code IncB/IncC/Name} in A is looked up in B
+   * until it reaches the Include of C. Without it (the two-argument constructor) only direct Includes are followed.
+   *
+   * <p>{@code additiveBase} says the including model is an Additive Document Model whose <em>base</em> model is the
+   * changed one: a path of the overlay that leaves its own groups goes on into the base model, whose elements the
+   * overlay does not hold itself, so the part of it below the overlay's own group is re-derived from the base.
    */
-  public record IncludedModelChange(String modelId, PathRewriter rewriter) {
+  public record IncludedModelChange(String modelId, PathRewriter rewriter, Function<String, DocumentModel> models,
+                                    boolean additiveBase) {
+
+    public IncludedModelChange(String modelId, PathRewriter rewriter) {
+      this(modelId, rewriter, id -> null, false);
+    }
   }
 
   /** One reversible text replacement; {@link #apply} sets the new value, {@link #revert} restores the old one. */
@@ -479,7 +496,7 @@ public final class DocumentModelRefactoring {
           if (ref.constant()) {
             continue;
           }
-          Resolution expected = followIncludedChange(ref.old(), included);
+          Resolution expected = followIncludedChange(ref.old(), included, after);
           Optional<Resolution> now = resolve(ref.path(), base, after);
           if (now.isPresent() && now.get().samePointAs(expected)) {
             continue;
@@ -533,16 +550,101 @@ public final class DocumentModelRefactoring {
       return targets;
     }
 
-    /** {@code old}, with the part of its tail that lies inside the changed included model brought up to date. */
-    private static Resolution followIncludedChange(Resolution old, IncludedModelChange included) {
-      if (included == null || old.tail().isEmpty()
-          || !(old.target() instanceof GroupElement group) || group.getGroup() == null
-          || group.getGroup().getIncludeConfig() == null
-          || !included.modelId().equals(group.getGroup().getIncludeConfig().getReference())) {
+    /**
+     * {@code old}, with the part of its tail that lies inside the changed model - reached through an Include, a chain
+     * of Includes, or as the base of an Additive Document Model - brought up to date.
+     */
+    private static Resolution followIncludedChange(Resolution old, IncludedModelChange included, Tree tree) {
+      if (included == null || old.tail().isEmpty()) {
         return old;
       }
-      List<String> tail = included.rewriter().rewriteIncludedTail(old.tail());
+      List<String> tail;
+      if (old.target() instanceof GroupElement group && group.getGroup() != null
+          && group.getGroup().getIncludeConfig() != null) {
+        String reference = group.getGroup().getIncludeConfig().getReference();
+        tail = reference == null ? old.tail() : followThroughModel(reference, old.tail(), included, new HashSet<>());
+      }
+      else if (included.additiveBase()) {
+        tail = followIntoAdditiveBase(old, included, tree);
+      }
+      else {
+        return old;
+      }
       return tail.equals(old.tail()) ? old : new Resolution(old.target(), tail, old.turningGroupName(), old.starred());
+    }
+
+    /**
+     * {@code tail} - segments below the root group of the model {@code modelId} - as they read after the change to
+     * {@code included}. If {@code modelId} is that model itself the tail is rewritten right away; otherwise it is
+     * followed through {@code modelId}'s own groups to the next Include and continues in the model that Include
+     * mounts. {@code tail} is returned as it was when the chain doesn't lead to the changed model.
+     */
+    private static List<String> followThroughModel(String modelId, List<String> tail, IncludedModelChange included,
+                                                   Set<String> visited) {
+      if (modelId.equals(included.modelId())) {
+        return included.rewriter().rewriteIncludedTail(tail);
+      }
+      DocumentModel model = included.models().apply(modelId);
+      if (model == null || !visited.add(modelId) || model.getContent() == null
+          || model.getContent().getModelRoot() == null || model.getContent().getModelRoot().getRootGroups() == null) {
+        return tail;
+      }
+      for (GroupElement root : model.getContent().getModelRoot().getRootGroups()) {
+        Element current = root;
+        for (int i = 0; i < tail.size(); i++) {
+          Optional<PathText> segment = PathText.parse(tail.get(i));
+          if (segment.isEmpty() || segment.get().absolute() || segment.get().segments().size() != 1
+              || segment.get().segments().get(0).up()) {
+            return tail;
+          }
+          current = childNamed(current, segment.get().segments().get(0).name());
+          if (current == null) {
+            break;
+          }
+          if (current instanceof GroupElement group && group.getGroup() != null
+              && group.getGroup().getIncludeConfig() != null && group.getGroup().getIncludeConfig().getReference() != null) {
+            if (i == tail.size() - 1) {
+              return tail;
+            }
+            List<String> inner = tail.subList(i + 1, tail.size());
+            List<String> rewritten = followThroughModel(group.getGroup().getIncludeConfig().getReference(), inner,
+                included, visited);
+            if (rewritten.equals(inner)) {
+              return tail;
+            }
+            List<String> result = new ArrayList<>(tail.subList(0, i + 1));
+            result.addAll(rewritten);
+            return result;
+          }
+        }
+      }
+      return tail;
+    }
+
+    private static Element childNamed(Element parent, String name) {
+      if (!(parent instanceof GroupElement group) || group.getGroup() == null || group.getGroup().getElements() == null) {
+        return null;
+      }
+      return group.getGroup().getElements().stream().filter(child -> name.equals(child.getName())).findFirst().orElse(null);
+    }
+
+    /**
+     * The tail of a path that runs from an element of the Additive Document Model on into its base model, as it reads
+     * after the change to the base: the whole path is rewritten as an absolute path into the base and cut off again
+     * below the overlay's own element. Left alone if the change also moved that element's own position (a mirrored
+     * group renamed or moved in the base), where the overlay has nothing to hold on to.
+     */
+    private static List<String> followIntoAdditiveBase(Resolution old, IncludedModelChange included, Tree tree) {
+      String ownPath = tree.pathOf.get(old.target());
+      if (ownPath == null) {
+        return old.tail();
+      }
+      String full = join(List.of(ownPath), old.tail());
+      String rewritten = included.rewriter().rewriteAbsolute(full);
+      if (rewritten.equals(full) || !rewritten.startsWith(ownPath + "/")) {
+        return old.tail();
+      }
+      return List.of(rewritten.substring(ownPath.length() + 1).split("/"));
     }
 
     private static String replace(String text, Map<Region, String> replacements) {

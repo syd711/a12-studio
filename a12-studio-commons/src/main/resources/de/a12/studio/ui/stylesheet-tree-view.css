@@ -458,3 +458,10 @@
     -fx-text-fill: -fx-text-faint;
     -fx-font-size: 13.5px;
 }
+
+/*
+ * Elements that were cut (Ctrl+X) and wait for their Paste, which moves them: still in the tree, but dimmed.
+ */
+.tree-table-row-cell.cut-row .tree-table-cell {
+    -fx-opacity: 0.5;
+}

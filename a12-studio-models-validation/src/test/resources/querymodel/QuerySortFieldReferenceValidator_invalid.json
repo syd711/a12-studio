@@ -14,10 +14,8 @@
     "targetDocumentModel": "Ref_DM",
     "sort": [
       {
-        "sortBy": {
-          "field": "/Root/DoesNotExist",
-          "direction": "ASC"
-        }
+        "field": "/Root/DoesNotExist",
+        "direction": "ASC"
       }
     ]
   }

@@ -35,6 +35,10 @@ public interface StudioEventListener {
 
   }
 
+  default void modelRefactored(@NonNull ModelRefactoredEvent event) {
+
+  }
+
   default void modelFocusRequested(@NonNull ModelFocusRequestedEvent event) {
 
   }

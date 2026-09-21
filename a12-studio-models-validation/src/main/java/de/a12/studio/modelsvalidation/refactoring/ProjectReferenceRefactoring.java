@@ -1,6 +1,8 @@
 package de.a12.studio.modelsvalidation.refactoring;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModelResolver;
 import de.a12.studio.models.combineddocumentmodel.CombinationStep;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -12,6 +14,8 @@ import de.a12.studio.models.formmodel.ScreenElement;
 import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.mappingmodel.MappingSource;
 import de.a12.studio.models.mappingmodel.SortField;
+import de.a12.studio.models.printmodel.ComputationStep;
+import de.a12.studio.models.printmodel.PrintCalculationElement;
 import de.a12.studio.models.printmodel.PrintFieldElement;
 import de.a12.studio.models.printmodel.PrintElementDefinition;
 import de.a12.studio.models.printmodel.PrintModel;
@@ -34,11 +38,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Keeps the references <em>other project models</em> hold on a Document Model valid while one of its elements is
@@ -52,10 +60,14 @@ import java.util.function.Supplier;
  * <ul>
  *   <li><b>Document Models that include the changed one</b> - rules and computations whose paths run through the
  *       Include group into the changed model (SME: {@code calculateIncludedNameChanges}/{@code
- *       calculateIncludedPathChanges}); see {@link DocumentModelRefactoring.Plan#computeEdits(IncludedModelChange)}.</li>
- *   <li><b>Print Model</b> - a Field element's {@code FieldRef.path} whose {@code model} is the changed one. (An
- *       {@code OverridableValue.path} is a path into the print model's own content, not a Document Model path, so it
- *       is not a reference to this model.)</li>
+ *       calculateIncludedPathChanges}); see {@link DocumentModelRefactoring.Plan#computeEdits(IncludedModelChange)}.
+ *       That includes models that reach the changed one through a <em>chain</em> of Includes (A includes B includes the
+ *       changed C), and an <b>Additive Document Model</b> whose base model (see {@link AdditiveDocumentModelResolver})
+ *       is the changed one: its paths into the base, which its own file does not hold, follow as well.</li>
+ *   <li><b>Print Model</b> - a Field element's {@code FieldRef.path} whose {@code model} is the changed one, and the
+ *       {@code [<model id>/<path>]} field references in the operations of its calculation steps. (An {@code
+ *       OverridableValue.path} is a path into the print model's own content, not a Document Model path, so it is not
+ *       a reference to this model.)</li>
  *   <li><b>Query Model</b> - every field path evaluated against the changed model, wherever in the query it sits:
  *       the root's {@code fields}/{@code sort}/{@code constraint}/{@code filterDefinition} when it is the {@code
  *       targetDocumentModel}, and those of a relationship hop, a sort entry through a relationship and a {@code
@@ -71,14 +83,18 @@ import java.util.function.Supplier;
  *       the Include group the included elements were bound to).</li>
  * </ul>
  *
- * <p><b>Not covered</b>: Print calculation steps; Form {@code
+ * <p><b>Not covered</b>: Form {@code
  * hostDocumentModelPath} of a form bound to a Document Model that merely <em>includes</em> the changed one (a path
- * into the included model); paths that reach an element through a chain of Includes or an Additive base model.
+ * into the included model); the mirrored groups of an Additive Document Model that its base renames or moves.
  * References by element id (Form, Overview, Tree, ...) can't break.
  */
 public final class ProjectReferenceRefactoring {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectReferenceRefactoring.class);
+
+  // "[Person_DM/Person/Name]": a field a Print calculation step reads, qualified by the id of its Document Model.
+  // Group 1 is that id, group 2 the absolute path (with its leading slash).
+  private static final Pattern PRINT_FIELD_REFERENCE = Pattern.compile("\\[([^/\\]\\s]+)(/[^\\]]*)]");
 
   private ProjectReferenceRefactoring() {
   }
@@ -121,9 +137,13 @@ public final class ProjectReferenceRefactoring {
       Collection<? extends A12Model<?>> projectModels) {
     List<Edit> edits = new ArrayList<>();
     if (other instanceof DocumentModel documentModel) {
-      if (includes(documentModel, changedId)) {
-        edits.addAll(DocumentModelRefactoring.prepare(documentModel)
-            .computeEdits(new IncludedModelChange(changedId, rewriter)));
+      Map<String, DocumentModel> documentModels = documentModelsById(projectModels);
+      boolean includesChanged = includes(documentModel, changedId, documentModels, new HashSet<>());
+      boolean additiveOverChanged = documentModel instanceof AdditiveDocumentModel additive
+          && baseModelIs(additive, changedId, projectModels);
+      if (includesChanged || additiveOverChanged) {
+        edits.addAll(DocumentModelRefactoring.prepare(documentModel).computeEdits(
+            new IncludedModelChange(changedId, rewriter, documentModels::get, additiveOverChanged)));
       }
     }
     else if (other instanceof PrintModel print) {
@@ -149,24 +169,54 @@ public final class ProjectReferenceRefactoring {
 
   // ---- Document Models --------------------------------------------------------------------------------------
 
-  private static boolean includes(DocumentModel model, String includedId) {
+  private static Map<String, DocumentModel> documentModelsById(Collection<? extends A12Model<?>> projectModels) {
+    Map<String, DocumentModel> byId = new HashMap<>();
+    for (A12Model<?> model : projectModels) {
+      if (model instanceof DocumentModel documentModel && documentModel.getId() != null) {
+        byId.putIfAbsent(documentModel.getId(), documentModel);
+      }
+    }
+    return byId;
+  }
+
+  /** Whether {@code baseId} is the id of the base model of {@code additive} (see {@link AdditiveDocumentModelResolver}). */
+  private static boolean baseModelIs(AdditiveDocumentModel additive, String baseId,
+      Collection<? extends A12Model<?>> projectModels) {
+    List<A12Model<?>> models = new ArrayList<>(projectModels);
+    List<DocumentModel> documentModels = models.stream().filter(DocumentModel.class::isInstance)
+        .map(DocumentModel.class::cast).toList();
+    return AdditiveDocumentModelResolver.findBaseModel(additive, models, documentModels)
+        .map(base -> baseId.equals(base.getId())).orElse(false);
+  }
+
+  /** Whether {@code model} includes {@code includedId} - directly, or through the Includes of the models it includes. */
+  private static boolean includes(DocumentModel model, String includedId, Map<String, DocumentModel> documentModels,
+      Set<String> visited) {
     if (model.getContent() == null || model.getContent().getModelRoot() == null
         || model.getContent().getModelRoot().getRootGroups() == null) {
       return false;
     }
-    return model.getContent().getModelRoot().getRootGroups().stream().anyMatch(root -> includes(root, includedId));
+    return model.getContent().getModelRoot().getRootGroups().stream()
+        .anyMatch(root -> includes(root, includedId, documentModels, visited));
   }
 
-  private static boolean includes(Element element, String includedId) {
+  private static boolean includes(Element element, String includedId, Map<String, DocumentModel> documentModels,
+      Set<String> visited) {
     if (!(element instanceof GroupElement group) || group.getGroup() == null) {
       return false;
     }
-    if (group.getGroup().getIncludeConfig() != null
-        && includedId.equals(group.getGroup().getIncludeConfig().getReference())) {
-      return true;
+    String reference = group.getGroup().getIncludeConfig() == null ? null : group.getGroup().getIncludeConfig().getReference();
+    if (reference != null) {
+      if (includedId.equals(reference)) {
+        return true;
+      }
+      DocumentModel included = documentModels.get(reference);
+      if (included != null && visited.add(reference) && includes(included, includedId, documentModels, visited)) {
+        return true;
+      }
     }
     return group.getGroup().getElements() != null
-        && group.getGroup().getElements().stream().anyMatch(child -> includes(child, includedId));
+        && group.getGroup().getElements().stream().anyMatch(child -> includes(child, includedId, documentModels, visited));
   }
 
   // ---- Print Model ------------------------------------------------------------------------------------------
@@ -180,6 +230,37 @@ public final class ProjectReferenceRefactoring {
           && changedId.equals(field.getField().getModel())) {
         pathSite(edits, rewriter, field.getField()::getPath, field.getField()::setPath);
       }
+      else if (definition instanceof PrintCalculationElement element && element.getCalculation() != null) {
+        for (ComputationStep step : element.getCalculation().getComputationAlternatives()) {
+          operationSite(edits, changedId, rewriter, step);
+        }
+      }
+    }
+  }
+
+  /**
+   * A calculation step reads fields as {@code [<Document Model id>/<absolute path>]} (e.g. {@code
+   * [Person_DM/Person/Name]}); the ones that read the changed model follow it, the rest of the operation - and the
+   * references to other models - stay as they are.
+   */
+  private static void operationSite(List<Edit> edits, String changedId, PathRewriter rewriter, ComputationStep step) {
+    String old = step.getOperation();
+    if (old == null || old.isBlank()) {
+      return;
+    }
+    Matcher matcher = PRINT_FIELD_REFERENCE.matcher(old);
+    StringBuilder rewritten = new StringBuilder();
+    int copiedUpTo = 0;
+    while (matcher.find()) {
+      if (!changedId.equals(matcher.group(1))) {
+        continue;
+      }
+      rewritten.append(old, copiedUpTo, matcher.start(2)).append(rewriter.rewriteAbsolute(matcher.group(2)));
+      copiedUpTo = matcher.end(2);
+    }
+    rewritten.append(old, copiedUpTo, old.length());
+    if (!rewritten.toString().equals(old)) {
+      edits.add(new Edit(step::setOperation, old, rewritten.toString()));
     }
   }
 
