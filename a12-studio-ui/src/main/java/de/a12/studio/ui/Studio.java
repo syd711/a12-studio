@@ -141,7 +141,9 @@ public class Studio extends Application implements StudioEventListener {
           FXResizeHelper.install(stage, 30, 6);
           stage.show();
           if (splash != null) {
-            splash.hide();
+            Platform.runLater(() -> {
+              splash.hide();
+            });
           }
 
           // Windows denies focus/z-order to windows created by a background process (e.g. launched

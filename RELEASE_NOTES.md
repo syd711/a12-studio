@@ -2,4 +2,4 @@
 
 ## Changes
 
-- Dialog and macOS fixes.
+- UI stuff.
