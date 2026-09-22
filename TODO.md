@@ -70,6 +70,10 @@ Features:
 - Query Model multi-target types (Composed Document Model / Transformer as target) and SME's structured-AST filter editor.
 - Real Form Engine preview (the current in-editor preview is a wireframe; the real "Deploy → Preview App" exists separately).
 
+## Misc
+- Open after create from plugins
+- Init datetime format for access generated fields
+
 ## Won't do (decided 2026-09-19)
 
 - AI-assisted Document Model generation (SME `documentModel/ai/*`).
