@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.documentmodel.dialogs;
 
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModelResolver.AdditiveContext;
 import de.a12.studio.models.documentmodel.ComputationAlternative;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
@@ -77,6 +78,23 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("create-overview-model-dialog", fxmlLoader, owner, StudioBundle.get("create_overview_model_from_selection"));
     CreateOverviewModelDialogController controller = (CreateOverviewModelDialogController) stage.getUserData();
     controller.init(stage, targetFolder, documentModel, fields, defaultName);
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.getResult();
+  }
+
+  /**
+   * Opens the "Select Combination Model" picker shown when an Additive Document Model is referenced by more
+   * than one Combination Model (see {@link AdditiveContextDialogController}); {@code candidates} must have at
+   * least two entries, since a single candidate is resolved silently without asking.
+   */
+  public static Optional<AdditiveContext> showAdditiveContext(Stage owner, @NonNull List<AdditiveContext> candidates) {
+    FXMLLoader fxmlLoader = new FXMLLoader(AdditiveContextDialogController.class.getResource("additive-context-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("additive-context-dialog", fxmlLoader, owner, StudioBundle.get("additive_context_dialog.title"));
+    AdditiveContextDialogController controller = (AdditiveContextDialogController) stage.getUserData();
+    controller.init(stage, candidates);
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();

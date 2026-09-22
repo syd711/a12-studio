@@ -5,6 +5,8 @@ import javafx.scene.Node;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 
+import java.util.Optional;
+
 /**
  * Extension point interface for plugins that contribute entries to the
  * "New &gt; Document Model" create menu in the project tree.
@@ -44,6 +46,9 @@ public interface ICreateItemMenuEntry {
    *
    * @param owner        the owner {@link Stage} to use as parent for any modal dialogs
    * @param targetFolder the project tree folder into which any new model should be placed
+   * @return the newly created {@link ProjectItem}, so the caller can refresh the project tree
+   *         and open it; {@link Optional#empty()} if the user cancelled or creation failed
    */
-  void execute(@NonNull Stage owner, @NonNull ProjectItem targetFolder);
+  @NonNull
+  Optional<ProjectItem> execute(@NonNull Stage owner, @NonNull ProjectItem targetFolder);
 }

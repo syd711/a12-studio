@@ -9,5 +9,5 @@ import lombok.Setter;
 @Setter
 public class DateTimeTypeOptions {
 
-  private String format;
+  private String format = "yyyy-MM-dd'T'HH:mm:ss";
 }

@@ -6,6 +6,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -33,6 +34,21 @@ public final class AdditiveDocumentModels {
    */
   public static Optional<DocumentModel> findBaseModel(@NonNull ProjectItem projectItem, @NonNull DocumentModel additiveModel) {
     return AdditiveDocumentModelResolver.findBaseModel(additiveModel,
+        ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.COMBINATION),
+        ProjectDocumentModels.getOtherDocumentModels(projectItem));
+  }
+
+  /**
+   * Every Combination Model that references {@code additiveModel}, each paired with its resolved base
+   * Document Model - see {@link AdditiveDocumentModelResolver#findCandidateContexts}. Used by {@link
+   * de.a12.studio.ui.editors.documentmodel.DocumentModelElementsTreeController} to detect when {@link
+   * #findBaseModel}'s silent first-wins resolution is actually ambiguous, so it can ask the user which
+   * Combination Model to preview against instead - matching SME's own behavior for opening an Additive
+   * Document Model (silently when there is exactly one candidate, by asking when there are several).
+   */
+  public static List<AdditiveDocumentModelResolver.AdditiveContext> findCandidateContexts(
+      @NonNull ProjectItem projectItem, @NonNull DocumentModel additiveModel) {
+    return AdditiveDocumentModelResolver.findCandidateContexts(additiveModel,
         ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.COMBINATION),
         ProjectDocumentModels.getOtherDocumentModels(projectItem));
   }

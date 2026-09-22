@@ -113,7 +113,12 @@ public class ProjectTreeMenuActions {
 
   void executePluginEntry(@NonNull ICreateItemMenuEntry entry, @NonNull ProjectItem targetFolder) {
     ProjectItem resolvedTargetFolder = targetFolder.isRoot() ? ProjectModelFolders.resolveDefaultModelFolder(targetFolder) : targetFolder;
-    entry.execute(getStage(), resolvedTargetFolder);
+    Optional<ProjectItem> created = entry.execute(getStage(), resolvedTargetFolder);
+    if (created.isEmpty()) {
+      return;
+    }
+    onReload.run();
+    onOpen.accept(new ProjectItemViewModel(created.get(), Map.of()));
   }
 
   void onRenameItem(@NonNull ProjectItem item) {

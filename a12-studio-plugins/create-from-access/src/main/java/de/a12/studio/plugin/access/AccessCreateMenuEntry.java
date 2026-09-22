@@ -42,11 +42,12 @@ public class AccessCreateMenuEntry implements ICreateItemMenuEntry {
   }
 
   @Override
-  public void execute(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
+  @NonNull
+  public Optional<ProjectItem> execute(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
     Optional<ImportFromAccessDialogController.AccessImportInput> input =
         ImportFromAccessDialogController.show(owner, targetFolder);
     if (input.isEmpty()) {
-      return;
+      return Optional.empty();
     }
 
     ImportFromAccessDialogController.AccessImportInput data = input.get();
@@ -69,11 +70,13 @@ public class AccessCreateMenuEntry implements ICreateItemMenuEntry {
       if (needsSave) {
         item.save();
       }
+      return Optional.of(item);
     }
     catch (IOException e) {
       log.error("Failed to create document model from Access table '{}': {}",
           data.tableName(), e.getMessage(), e);
       WidgetFactory.showAlert(owner, "Error", e.getMessage());
+      return Optional.empty();
     }
   }
 

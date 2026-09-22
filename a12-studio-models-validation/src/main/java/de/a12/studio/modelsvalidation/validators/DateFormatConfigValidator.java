@@ -23,7 +23,8 @@ import java.util.List;
 /**
  * Every date-family field type must specify a format, ported from SME/kernel's {@code DomainField.json}
  * rules {@code FORMAT_MISSING}/{@code FORMAT_DATE_RANGE_MISSING}. The Java data classes default {@code
- * DateTypeOptions.format} to {@code "yyyy-MM-dd"} and the property panels auto-select the first preset for
+ * DateTypeOptions.format} to {@code "yyyy-MM-dd"} and {@code DateTimeTypeOptions.format} to {@code
+ * "yyyy-MM-dd'T'HH:mm:ss"}, and the property panels auto-select the first preset for
  * every other date-family type as soon as it's chosen, so this is defense-in-depth for a blank format
  * reaching disk some other way (hand-edited JSON, an import path) rather than something the UI normally
  * allows. Runs both against fields and, since a Type Definition Model's own type definitions aren't

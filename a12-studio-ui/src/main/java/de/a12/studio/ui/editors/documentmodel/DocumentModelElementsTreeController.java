@@ -5,6 +5,7 @@ import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModelResolver;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -150,6 +151,13 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private boolean additive;
   private DocumentModel referenceBaseModel;
 
+  // Which Combination Model #referenceBaseModel was resolved from, when this is an AdditiveDocumentModel
+  // referenced by more than one Combination Model (see #resolveContext). Remembered across #modelSaved
+  // re-resolves within this same editor tab so an unrelated save elsewhere doesn't silently swap the
+  // preview's base model or reopen the picker; never persisted, and forgotten once the tab is closed -
+  // matching SME's own ephemeral, ask-again-on-reopen handling of the same ambiguity.
+  private String selectedContextCombinationModelId;
+
   // A synthetic, non-persisted Include-shaped GroupElement standing in for referenceBaseModel's own root
   // content, injected as the tree's first top-level row so its elements are shown read-only for editing
   // context (hidden instead when additiveElementsOnlyCheckBox is checked) - see #applyFilter and
@@ -192,7 +200,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     this.projectItem = projectItem;
     this.modelRoot = modelRoot;
     this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
-    resolveAdditiveState();
+    resolveAdditiveState(true);
     this.documentModelActions =
         new DocumentModelActions(projectItem, modelRoot, commandStack, elementsTreeTable, this::onModelChanged);
     documentModelActions.setStartRenameCallback(this::startRenameOnSelectedCell);
@@ -232,8 +240,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
    * de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController}'s equivalent handling for a Form
    * Model's linked Document Model. Also refreshes when a Combination Model is saved elsewhere and this
    * model is additive, since that's what determines {@link #referenceBaseModel} (see {@link
-   * AdditiveDocumentModels#findBaseModel}). Registers itself directly rather than going through {@link
-   * de.a12.studio.ui.editors.AbstractEditorController}, same as this class's other event handling above.
+   * AdditiveDocumentModels#findCandidateContexts} and {@link #resolveContext}). Registers itself directly
+   * rather than going through {@link de.a12.studio.ui.editors.AbstractEditorController}, same as this
+   * class's other event handling above.
    */
   @Override
   public void modelSaved(@NonNull ModelSaveEvent event) {
@@ -243,7 +252,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     A12Model<?> savedModel = event.getItem().getModel();
     if (savedModel instanceof DocumentModel || (additive && savedModel instanceof CombinedDocumentModel)) {
       this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
-      resolveAdditiveState();
+      resolveAdditiveState(false);
       documentModelActions.setBaseModelNode(baseModelNode);
       applyFilter(searchController.getText());
     }
@@ -252,27 +261,77 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   /**
    * Determines whether the loaded model is an {@link AdditiveDocumentModel} and, if so, resolves {@link
    * #referenceBaseModel} and rebuilds {@link #baseModelNode}; toggles the second toolbar's visibility and
-   * the checkbox's availability accordingly. Called once from {@link #load} and again from {@link
-   * #modelSaved} whenever the reverse lookup it depends on may have changed.
+   * the checkbox's availability accordingly. Called once from {@link #load} ({@code interactive = true}) and
+   * again from {@link #modelSaved} ({@code interactive = false}) whenever the reverse lookup it depends on
+   * may have changed.
+   *
+   * @param interactive whether {@link #resolveContext} may show the "Select Combination Model" picker
+   *                     (see its javadoc) if the lookup turns out ambiguous - only when this is the tab's
+   *                     initial load, not when a save elsewhere (possibly of a model in a completely
+   *                     different, currently unfocused tab) happens to re-trigger this resolution.
    */
-  private void resolveAdditiveState() {
+  private void resolveAdditiveState(boolean interactive) {
     this.additive = projectItem.getModel() instanceof AdditiveDocumentModel;
     additiveToolbarBar.setVisible(additive);
     additiveToolbarBar.setManaged(additive);
     if (!additive) {
       this.referenceBaseModel = null;
       this.baseModelNode = null;
+      this.selectedContextCombinationModelId = null;
       return;
     }
-    this.referenceBaseModel = AdditiveDocumentModels
-        .findBaseModel(projectItem, (DocumentModel) projectItem.getModel())
-        .orElse(null);
+    List<AdditiveDocumentModelResolver.AdditiveContext> candidates =
+        AdditiveDocumentModels.findCandidateContexts(projectItem, (DocumentModel) projectItem.getModel());
+    AdditiveDocumentModelResolver.AdditiveContext resolved = resolveContext(candidates, interactive);
+    this.referenceBaseModel = resolved == null ? null : resolved.baseModel();
+    this.selectedContextCombinationModelId = resolved == null ? null : resolved.combinationModelId();
     this.baseModelNode = buildBaseModelNode();
     additiveElementsOnlyCheckBox.setDisable(referenceBaseModel == null);
     additiveElementsOnlyCheckBox.setSelected(false);
-    additiveElementsOnlyCheckBox.setTooltip(referenceBaseModel == null
-        ? WidgetFactory.createTooltip(StudioBundle.get("document_model_tree.additive_elements_only_no_base_model"))
-        : WidgetFactory.createTooltip(StudioBundle.get("document_model_tree.additive_elements_only")));
+    additiveElementsOnlyCheckBox.setTooltip(WidgetFactory.createTooltip(additiveElementsOnlyTooltipText(candidates)));
+  }
+
+  /**
+   * Picks which of {@code candidates} (every Combination Model that references this Additive Document
+   * Model, see {@link AdditiveDocumentModels#findCandidateContexts}) to preview against - mirroring SME's
+   * own resolution of the identical ambiguity ({@code SelectModelWithContextView}): silently when there is
+   * at most one candidate, by asking (via {@link
+   * de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs#showAdditiveContext}) when there are several and
+   * {@code interactive} allows it, and by falling back to the first candidate - i.e. {@link
+   * AdditiveDocumentModelResolver#findBaseModel}'s own silent first-wins behavior - when {@code interactive}
+   * is {@code false} (a background {@link #modelSaved} re-resolve) or the user dismisses the picker. Keeps
+   * {@link #selectedContextCombinationModelId} from a previous resolution if it is still among the
+   * candidates, so a save elsewhere doesn't silently swap out an already-chosen base model.
+   */
+  private AdditiveDocumentModelResolver.AdditiveContext resolveContext(
+      List<AdditiveDocumentModelResolver.AdditiveContext> candidates, boolean interactive) {
+    if (candidates.isEmpty()) {
+      return null;
+    }
+    if (selectedContextCombinationModelId != null) {
+      Optional<AdditiveDocumentModelResolver.AdditiveContext> stillValid = candidates.stream()
+          .filter(candidate -> selectedContextCombinationModelId.equals(candidate.combinationModelId()))
+          .findFirst();
+      if (stillValid.isPresent()) {
+        return stillValid.get();
+      }
+    }
+    if (candidates.size() == 1 || !interactive) {
+      return candidates.get(0);
+    }
+    return de.a12.studio.ui.editors.documentmodel.dialogs.Dialogs
+        .showAdditiveContext(Studio.stage, candidates)
+        .orElseGet(() -> candidates.get(0));
+  }
+
+  private String additiveElementsOnlyTooltipText(List<AdditiveDocumentModelResolver.AdditiveContext> candidates) {
+    if (referenceBaseModel == null) {
+      return StudioBundle.get("document_model_tree.additive_elements_only_no_base_model");
+    }
+    if (candidates.size() > 1) {
+      return StudioBundle.get("document_model_tree.additive_elements_only_ambiguous", selectedContextCombinationModelId);
+    }
+    return StudioBundle.get("document_model_tree.additive_elements_only");
   }
 
   /**

@@ -30,7 +30,9 @@
         "name": "Timestamp",
         "fieldType": {
           "type": "DateTimeType",
-          "DateTimeType": {}
+          "DateTimeType": {
+            "format": ""
+          }
         }
       }
     ]

@@ -5,6 +5,7 @@ import de.a12.studio.models.combineddocumentmodel.CombinationStep;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,13 +26,22 @@ import java.util.Optional;
  * <p>
  * This is purely a best-effort reverse lookup for editor assistance, not a persisted or semantically
  * authoritative relationship, and a12-studio has no real Document Model join/expansion engine (unlike
- * SME's kernel-backed {@code DocumentModelJoiningService}) to compute the actual combined result. If more
- * than one Combination Model uses the same Additive Document Model, the first one found (in {@code
- * otherModels} order) wins.
+ * SME's kernel-backed {@code DocumentModelJoiningService}) to compute the actual combined result. {@link
+ * #findBaseModel} silently picks the first Combination Model found (in {@code otherModels} order) when more
+ * than one uses the same Additive Document Model; callers that can ask the user instead (the tree editor's
+ * "Additive Elements Only" preview) should use {@link #findCandidateContexts} and only fall back to a silent
+ * pick when there is nothing to ask about.
  */
 public final class AdditiveDocumentModelResolver {
 
   private AdditiveDocumentModelResolver() {
+  }
+
+  /**
+   * One Combination Model found to reference an Additive Document Model, paired with the base Document Model
+   * its {@code baseModelId} resolves to. See {@link #findCandidateContexts}.
+   */
+  public record AdditiveContext(String combinationModelId, DocumentModel baseModel) {
   }
 
   /**
@@ -42,11 +52,28 @@ public final class AdditiveDocumentModelResolver {
    */
   public static Optional<DocumentModel> findBaseModel(DocumentModel additiveModel, List<A12Model<?>> otherModels,
       List<DocumentModel> otherDocumentModels) {
+    return findCandidateContexts(additiveModel, otherModels, otherDocumentModels).stream()
+        .findFirst()
+        .map(AdditiveContext::baseModel);
+  }
+
+  /**
+   * Every Combination Model in {@code otherModels} whose Addition step references {@code additiveModel}, each
+   * paired with the base Document Model it resolves onto - in {@code otherModels} order, same order {@link
+   * #findBaseModel} silently picks its first-wins result from. Used by the UI to detect when that silent
+   * resolution is actually ambiguous (more than one entry) so it can ask the user instead - see {@code
+   * AdditiveDocumentModels} in a12-studio-ui and SME's own {@code SelectModelWithContextView}, which resolves
+   * the same ambiguity the same way: silently when there is exactly one candidate, by asking when there are
+   * several, and by refusing when there are none.
+   */
+  public static List<AdditiveContext> findCandidateContexts(DocumentModel additiveModel, List<A12Model<?>> otherModels,
+      List<DocumentModel> otherDocumentModels) {
     String additiveId = additiveModel.getId();
     if (additiveId == null) {
-      return Optional.empty();
+      return List.of();
     }
 
+    List<AdditiveContext> result = new ArrayList<>();
     for (A12Model<?> model : otherModels) {
       if (!(model instanceof CombinedDocumentModel combinedModel) || combinedModel.getContent() == null) {
         continue;
@@ -58,12 +85,10 @@ public final class AdditiveDocumentModelResolver {
       if (!addsThisModel) {
         continue;
       }
-      Optional<DocumentModel> baseModel = findDocumentModelById(otherDocumentModels, combinedModel.getContent().getBaseModelId());
-      if (baseModel.isPresent()) {
-        return baseModel;
-      }
+      findDocumentModelById(otherDocumentModels, combinedModel.getContent().getBaseModelId())
+          .ifPresent(baseModel -> result.add(new AdditiveContext(combinedModel.getId(), baseModel)));
     }
-    return Optional.empty();
+    return result;
   }
 
   private static Optional<DocumentModel> findDocumentModelById(List<DocumentModel> otherDocumentModels, String modelId) {

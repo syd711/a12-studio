@@ -43,11 +43,12 @@ public class ExcelCreateMenuEntry implements ICreateItemMenuEntry {
   }
 
   @Override
-  public void execute(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
+  @NonNull
+  public Optional<ProjectItem> execute(@NonNull Stage owner, @NonNull ProjectItem targetFolder) {
     Optional<ImportFromExcelDialogController.ExcelImportInput> input =
         ImportFromExcelDialogController.show(owner, targetFolder);
     if (input.isEmpty()) {
-      return;
+      return Optional.empty();
     }
 
     ImportFromExcelDialogController.ExcelImportInput data = input.get();
@@ -70,11 +71,13 @@ public class ExcelCreateMenuEntry implements ICreateItemMenuEntry {
       if (needsSave) {
         item.save();
       }
+      return Optional.of(item);
     }
     catch (IOException e) {
       log.error("Failed to create document model from Excel file '{}': {}",
           data.excelFile().getName(), e.getMessage(), e);
       WidgetFactory.showAlert(owner, "Error", e.getMessage());
+      return Optional.empty();
     }
   }
 
