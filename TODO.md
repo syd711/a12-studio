@@ -71,9 +71,8 @@ Features:
 - Real Form Engine preview (the current in-editor preview is a wireframe; the real "Deploy → Preview App" exists separately).
 
 ## Misc
-- Do not use border radius when shown in full screen.
-- Fix dialog title for update installer and some other dialogs.
-- Fix german uppercase DATENKONFIGURATION.
+- Open after create from plugins
+- Init datetime format for access generated fields
 
 ## Won't do (decided 2026-09-19)
 
