@@ -3,9 +3,13 @@ package de.a12.studio.ui.editors.relationshipmodel;
 import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.Edit;
+import de.a12.studio.modelsvalidation.refactoring.ProjectReferenceRefactoring.ModelEdits;
+import de.a12.studio.modelsvalidation.refactoring.RoleRenameRefactoring;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipEntityCountValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.documentmodel.commands.ProjectModelStore;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
 import de.a12.studio.ui.editors.relationshipmodel.dialogs.Dialogs;
 import de.a12.studio.ui.util.Icons;
@@ -24,6 +28,7 @@ import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -145,10 +150,33 @@ public class RelatedEntitiesPanelController extends AbstractPropertyEditor {
   }
 
   private void openEditDialog(EntityCharacteristic entity) {
+    String oldRole = entity.getRole();
     boolean changed = Dialogs.showEntityForEdit(Studio.stage, documentModelOptions, entity);
     rebuildRows();
     if (changed) {
+      String newRole = entity.getRole();
+      if (!Objects.equals(oldRole, newRole) && model.getId() != null) {
+        applyRoleRename(model.getId(), oldRole, newRole);
+      }
       notifyChanged();
+    }
+  }
+
+  /**
+   * Propagates a role rename in this Relationship Model to all other project models that reference
+   * the old role name (Query Models, Form Model bindings, Relationship UI Models, Overview columns).
+   */
+  private void applyRoleRename(String relationshipModelId, String oldRole, String newRole) {
+    var projectItem = Studio.getSelectedProjectItem();
+    if (projectItem == null) {
+      return;
+    }
+    ProjectModelStore store = ProjectModelStore.of(projectItem);
+    List<ModelEdits> edits = RoleRenameRefactoring.computeEdits(
+        relationshipModelId, oldRole, newRole, store.models());
+    for (ModelEdits modelEdits : edits) {
+      modelEdits.edits().forEach(Edit::apply);
+      store.changed(modelEdits.model());
     }
   }
 

@@ -89,6 +89,28 @@
 .window-header-title {
     -fx-font-family: "Impact";
     -fx-font-size: 18px;
+    -fx-text-fill: white;
+}
+
+/**
+ * Maximized / full-screen: remove rounded corners so the window fills the screen edge-to-edge.
+ */
+.root.maximized,
+.main.maximized {
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.root.maximized .window-header,
+.main.maximized .window-header {
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.root.maximized .footer-bar,
+.main.maximized .footer-bar {
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
 }
 
 /**

@@ -85,6 +85,14 @@ public class HeaderController implements Initializable {
     icon.getStyleClass().add("header-icon");
     icon.setIconSize(16);
     maximizeBtn.setGraphic(icon);
+
+    if (header.getScene() != null && header.getScene().getRoot() != null) {
+      if (isMaximized) {
+        header.getScene().getRoot().getStyleClass().add("maximized");
+      } else {
+        header.getScene().getRoot().getStyleClass().remove("maximized");
+      }
+    }
   }
 
   @FXML
