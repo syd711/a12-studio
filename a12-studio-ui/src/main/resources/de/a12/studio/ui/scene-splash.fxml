@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefWidth="560.0" prefHeight="320.0"
+           style="-fx-background-color: #272828; -fx-border-color: #111111; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8;"
+           xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="de.a12.studio.ui.SplashScreenController">
+   <children>
+      <VBox alignment="CENTER" spacing="12.0">
+         <children>
+            <ImageView fitHeight="96.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@logo-180.png" />
+               </image>
+            </ImageView>
+            <Label text="A12 Studio" textFill="WHITE">
+               <font>
+                  <Font name="Impact" size="36.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+      <Label fx:id="versionLabel" textFill="WHITE" StackPane.alignment="BOTTOM_LEFT">
+         <font>
+            <Font size="12.0" />
+         </font>
+         <StackPane.margin>
+            <Insets bottom="14.0" left="16.0" />
+         </StackPane.margin>
+      </Label>
+      <Label fx:id="statusLabel" textFill="WHITE" StackPane.alignment="BOTTOM_RIGHT">
+         <font>
+            <Font size="12.0" />
+         </font>
+         <StackPane.margin>
+            <Insets bottom="14.0" right="16.0" />
+         </StackPane.margin>
+      </Label>
+   </children>
+</StackPane>

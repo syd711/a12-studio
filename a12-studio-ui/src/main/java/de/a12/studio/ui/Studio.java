@@ -27,6 +27,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
@@ -49,6 +50,8 @@ import java.util.Optional;
 public class Studio extends Application implements StudioEventListener {
 
   public static Stage stage;
+  private static Stage splash;
+  private static SplashScreenController splashController;
   private static RootController rootController;
   private static Project currentProject;
   private static ValidationService validationService;
@@ -64,67 +67,120 @@ public class Studio extends Application implements StudioEventListener {
       Locale.setDefault(Locale.forLanguageTag(storedLang));
     }
 
+    splash = createSplash();
+
     StudioEventManager.getInstance().addListener(this);
     StudioEventManager.getInstance().addListener(RecentEditsTracker.getInstance());
 
-    // Initialize plugin manager – scans the plugins/ directory next to the application root.
-    PluginManager.initialize(new java.io.File(System.getProperty("user.dir")));
-    for (IModelSaveInterceptor interceptor : PluginManager.getInstance().getModelSaveInterceptors()) {
-      ProjectItem.registerBeforeSaveHook(interceptor::beforeSave);
+    // Offload plugin scanning/loading to a background thread so the splash screen can actually
+    // render before the (potentially slow) startup work begins.
+    JFXFuture.runAsync(() -> {
+          if (splashController != null) {
+            splashController.setStatus(StudioBundle.get("studio_splash.loading_plugins"));
+          }
+
+          // Initialize plugin manager – scans the plugins/ directory next to the application root.
+          PluginManager.initialize(new java.io.File(System.getProperty("user.dir")));
+          for (IModelSaveInterceptor interceptor : PluginManager.getInstance().getModelSaveInterceptors()) {
+            ProjectItem.registerBeforeSaveHook(interceptor::beforeSave);
+          }
+          for (INewModelNameInterceptor interceptor : PluginManager.getInstance().getNewModelNameInterceptors()) {
+            NewModelFactory.registerNameHook(interceptor::adjustName);
+          }
+        })
+        .thenLater(() -> {
+          if (splashController != null) {
+            splashController.setStatus(StudioBundle.get("studio_splash.building_user_interface"));
+          }
+
+          FXMLLoader loader = new FXMLLoader(Studio.class.getResource("scene-root.fxml"));
+          loader.setResources(StudioBundle.getBundle());
+          Parent root;
+          try {
+            root = loader.load();
+          }
+          catch (IOException e) {
+            log.error("Failed to load Studio: {}", e.getMessage(), e);
+            return;
+          }
+          rootController = loader.getController();
+
+          Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+          double width = 1480;
+          double height = 900;
+
+          Rectangle position = LocalUISettings.getPosition();
+          if (position.getWidth() > width && position.getHeight() > height) {
+            width = position.getWidth();
+            height = position.getHeight();
+          }
+
+          Scene scene = new Scene(root, width, height, Color.TRANSPARENT);
+          StudioKeyEventHandler keyEventHandler = new StudioKeyEventHandler(stage);
+          scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
+          // also listen for KEY_RELEASED so StudioKeyEventHandler can track when the Windows key
+          // (Win+arrow window snapping) is released, since it isn't reported as a KeyEvent modifier
+          scene.addEventHandler(KeyEvent.KEY_RELEASED, keyEventHandler);
+          stage.setTitle("A12 Studio - " + StudioVersion.get());
+          rootController.setTitle("A12 Studio - " + StudioVersion.get());
+          stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-180.png")));
+          stage.setScene(scene);
+          stage.setMinWidth(1480);
+          stage.setMinHeight(900);
+          stage.setResizable(true);
+          stage.initStyle(StageStyle.TRANSPARENT);
+          if (position.getX() != -1) {
+            stage.setX(position.getX());
+            stage.setY(position.getY());
+          }
+          else {
+            stage.setX((screenBounds.getWidth() / 2) - (width / 2));
+            stage.setY((screenBounds.getHeight() / 2) - (height / 2));
+          }
+
+          FXResizeHelper.install(stage, 30, 6);
+          stage.show();
+          if (splash != null) {
+            splash.hide();
+          }
+
+          // Windows denies focus/z-order to windows created by a background process (e.g. launched
+          // from IDEA), so the stage can open behind the IDE. Toggling always-on-top forces it front.
+          stage.setAlwaysOnTop(true);
+          stage.toFront();
+          stage.requestFocus();
+          stage.setAlwaysOnTop(false);
+
+          Platform.runLater(Studio::checkA12InstallationFolder);
+        })
+        .onErrorLater(ex -> log.error("Failed to start Studio: {}", ex.getMessage(), ex));
+  }
+
+  private static Stage createSplash() {
+    try {
+      FXMLLoader loader = new FXMLLoader(Studio.class.getResource("scene-splash.fxml"));
+      loader.setResources(StudioBundle.getBundle());
+      StackPane root = loader.load();
+      splashController = loader.getController();
+
+      double width = root.prefWidth(-1);
+      double height = root.prefHeight(-1);
+      Scene scene = new Scene(root, width, height, Color.TRANSPARENT);
+      Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+
+      Stage splashStage = new Stage(StageStyle.TRANSPARENT);
+      splashStage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-180.png")));
+      splashStage.setScene(scene);
+      splashStage.setX((screenBounds.getWidth() / 2) - (width / 2));
+      splashStage.setY((screenBounds.getHeight() / 2) - (height / 2));
+      splashStage.setResizable(false);
+      splashStage.show();
+      return splashStage;
     }
-    for (INewModelNameInterceptor interceptor : PluginManager.getInstance().getNewModelNameInterceptors()) {
-      NewModelFactory.registerNameHook(interceptor::adjustName);
+    catch (Exception e) {
+      log.error("Failed to create splash screen: {}", e.getMessage(), e);
+      return null;
     }
-
-    FXMLLoader loader = new FXMLLoader(Studio.class.getResource("scene-root.fxml"));
-    loader.setResources(StudioBundle.getBundle());
-    Parent root = loader.load();
-    rootController = loader.getController();
-
-    Rectangle2D screenBounds = Screen.getPrimary().getBounds();
-    double width = 1480;
-    double height = 900;
-
-    Rectangle position = LocalUISettings.getPosition();
-    if (position.getWidth() > width && position.getHeight() > height) {
-      width = position.getWidth();
-      height = position.getHeight();
-    }
-
-    Scene scene = new Scene(root, width, height, Color.TRANSPARENT);
-    StudioKeyEventHandler keyEventHandler = new StudioKeyEventHandler(stage);
-    scene.addEventHandler(KeyEvent.KEY_PRESSED, keyEventHandler);
-    // also listen for KEY_RELEASED so StudioKeyEventHandler can track when the Windows key
-    // (Win+arrow window snapping) is released, since it isn't reported as a KeyEvent modifier
-    scene.addEventHandler(KeyEvent.KEY_RELEASED, keyEventHandler);
-    stage.setTitle("A12 Studio - " + StudioVersion.get());
-    rootController.setTitle("A12 Studio - " + StudioVersion.get());
-    stage.getIcons().add(new Image(Studio.class.getResourceAsStream("logo-180.png")));
-    stage.setScene(scene);
-    stage.setMinWidth(1480);
-    stage.setMinHeight(900);
-    stage.setResizable(true);
-    stage.initStyle(StageStyle.TRANSPARENT);
-    if (position.getX() != -1) {
-      stage.setX(position.getX());
-      stage.setY(position.getY());
-    }
-    else {
-      stage.setX((screenBounds.getWidth() / 2) - (width / 2));
-      stage.setY((screenBounds.getHeight() / 2) - (height / 2));
-    }
-
-    FXResizeHelper.install(stage, 30, 6);
-    stage.show();
-
-    // Windows denies focus/z-order to windows created by a background process (e.g. launched
-    // from IDEA), so the stage can open behind the IDE. Toggling always-on-top forces it front.
-    stage.setAlwaysOnTop(true);
-    stage.toFront();
-    stage.requestFocus();
-    stage.setAlwaysOnTop(false);
-
-    Platform.runLater(Studio::checkA12InstallationFolder);
   }
 
   private static void checkA12InstallationFolder() {
