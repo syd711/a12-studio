@@ -10,6 +10,7 @@ import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
+import de.a12.studio.ui.editors.overviewmodel.OverviewColumnOptions;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
 import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions.ElementKind;
 import de.a12.studio.ui.editors.overviewmodel.StylesPanelController;
@@ -149,6 +150,11 @@ public class OverviewColumnDialogController implements DialogController {
   private Column column;
 
   private ElementIndex documentModelIndex;
+
+  /** {@link #documentModelIndex}, or - for a column carrying {@code linkReferences} - the relationship's own
+   * link document model's index, whichever {@link #column}'s {@code elementRef} actually resolves against.
+   * See {@link OverviewColumnOptions#indexFor}. */
+  private ElementIndex effectiveIndex;
 
   private ColumnSnapshot snapshot;
 
@@ -320,14 +326,17 @@ public class OverviewColumnDialogController implements DialogController {
     });
   }
 
-  void init(Stage stage, ElementIndex documentModelIndex, String documentModelId, @NonNull Column column) {
+  void init(Stage stage, ElementIndex documentModelIndex, String documentModelId, @NonNull Column column, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
     this.stage = stage;
     this.column = column;
     this.documentModelIndex = documentModelIndex;
+    this.effectiveIndex = OverviewColumnOptions.indexFor(column, documentModelIndex, linkDocumentModelIndexResolver);
     this.snapshot = new ColumnSnapshot(column);
 
-    elementRefCombo.getItems().setAll(OverviewElementOptions.elementIds(documentModelIndex));
-    OverviewElementOptions.applyElementRefConverter(elementRefCombo, documentModelIndex);
+    // A link column's field lives on the relationship's own link document model, not the primary one, so
+    // its picker offers (and resolves against) that model's fields instead - see effectiveIndex's doc.
+    elementRefCombo.getItems().setAll(OverviewElementOptions.elementIds(effectiveIndex));
+    OverviewElementOptions.applyElementRefConverter(elementRefCombo, effectiveIndex);
     suffixRefCombo.getItems().setAll(OverviewElementOptions.enumerationElementIds(documentModelIndex));
     OverviewElementOptions.applyElementRefConverter(suffixRefCombo, documentModelIndex);
     if (documentModelIndex != null) {
@@ -336,7 +345,8 @@ public class OverviewColumnDialogController implements DialogController {
 
     updatingFromModel = true;
     try {
-      targetDocumentModelField.setText(documentModelId);
+      targetDocumentModelField.setText(effectiveIndex != null && effectiveIndex.getModel() != null
+          ? effectiveIndex.getModel().getId() : documentModelId);
       idField.setText(column.getId());
 
       columnTypeCombo.setValue(isExpressionType(column) ? TYPE_EXPRESSION : TYPE_REFERENCE);
@@ -432,7 +442,7 @@ public class OverviewColumnDialogController implements DialogController {
 
   private void updateElementKindVisibility() {
     boolean expression = TYPE_EXPRESSION.equals(columnTypeCombo.getValue());
-    ElementKind kind = expression ? ElementKind.PLAIN : OverviewElementOptions.elementKind(documentModelIndex, elementRefCombo.getValue());
+    ElementKind kind = expression ? ElementKind.PLAIN : OverviewElementOptions.elementKind(effectiveIndex, elementRefCombo.getValue());
     boolean attachment = kind == ElementKind.ATTACHMENT;
     boolean multiSelect = kind == ElementKind.MULTI_SELECT;
     boolean number = kind == ElementKind.NUMBER;
@@ -524,7 +534,7 @@ public class OverviewColumnDialogController implements DialogController {
    * to a field with a label (e.g. an attachment group, or a dangling reference).
    */
   private void syncLabelFromElement(String elementRef) {
-    List<Label> elementLabel = OverviewElementOptions.fieldLabel(documentModelIndex, elementRef);
+    List<Label> elementLabel = OverviewElementOptions.fieldLabel(effectiveIndex, elementRef);
     if (elementLabel.isEmpty()) {
       return;
     }

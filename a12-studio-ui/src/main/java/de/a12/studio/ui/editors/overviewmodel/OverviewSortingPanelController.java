@@ -29,6 +29,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
@@ -59,6 +60,8 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
 
   private ElementIndex documentModelIndex;
 
+  private Function<String, ElementIndex> linkDocumentModelIndexResolver = relationshipId -> null;
+
   // Set while a row's combo box is being repopulated from the model, so that isn't mistaken for a user edit.
   private boolean updatingFromModel;
 
@@ -67,9 +70,12 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     rebuildRows();
   }
 
-  /** Re-points the column picker's "Field" summary at the currently referenced Document Model. */
-  public void setDocumentModelIndex(ElementIndex documentModelIndex) {
+  /** Re-points the column picker's "Field" summary at the currently referenced Document Model. {@code
+   * linkDocumentModelIndexResolver} resolves a relationship id (from a column's {@code linkReferences}) to
+   * the {@link ElementIndex} its field actually lives in - see {@link OverviewColumnOptions#indexFor}. */
+  public void setDocumentModelIndex(ElementIndex documentModelIndex, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
     this.documentModelIndex = documentModelIndex;
+    this.linkDocumentModelIndexResolver = linkDocumentModelIndexResolver != null ? linkDocumentModelIndexResolver : relationshipId -> null;
     rebuildRows();
   }
 
@@ -164,7 +170,7 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     columnField.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(columnField, Priority.ALWAYS);
     columnField.getItems().setAll(OverviewColumnOptions.columnIds(columns));
-    OverviewColumnOptions.applyColumnConverter(columnField, columns, documentModelIndex);
+    OverviewColumnOptions.applyColumnConverter(columnField, columns, documentModelIndex, linkDocumentModelIndexResolver);
 
     updatingFromModel = true;
     try {
@@ -205,7 +211,7 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
         .filter(candidate -> candidate.getId() != null && candidate.getId().equals(columnRef.getIdref()))
         .findFirst()
         .orElse(null);
-    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex)) {
+    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex, linkDocumentModelIndexResolver)) {
       if (!columnField.getStyleClass().contains("validation-error")) {
         columnField.getStyleClass().add("validation-error");
       }

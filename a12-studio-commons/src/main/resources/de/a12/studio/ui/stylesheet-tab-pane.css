@@ -2,7 +2,7 @@
  * Tab Pane
  */
 .tab-pane {
-    -fx-tab-min-height: 30px;
+    -fx-tab-min-height: 34px;
 }
 
 .tab-pane .tab-label {

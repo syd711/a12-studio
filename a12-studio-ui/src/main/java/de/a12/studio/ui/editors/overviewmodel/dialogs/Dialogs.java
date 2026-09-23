@@ -17,33 +17,34 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 public class Dialogs {
 
   private Dialogs() {
   }
 
-  public static Optional<Column> showColumnForAdd(Stage owner, ElementIndex documentModelIndex, String documentModelId) {
+  public static Optional<Column> showColumnForAdd(Stage owner, ElementIndex documentModelIndex, String documentModelId, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
     Column column = new Column();
     column.setId("column-" + shortId());
     column.setWidth(1.0);
-    return showColumn(owner, StudioBundle.get("add_column_title"), documentModelIndex, documentModelId, column)
+    return showColumn(owner, StudioBundle.get("add_column_title"), documentModelIndex, documentModelId, column, linkDocumentModelIndexResolver)
         ? Optional.of(column) : Optional.empty();
   }
 
-  public static boolean showColumnForEdit(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column) {
-    return showColumn(owner, StudioBundle.get("edit_column_title"), documentModelIndex, documentModelId, column);
+  public static boolean showColumnForEdit(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+    return showColumn(owner, StudioBundle.get("edit_column_title"), documentModelIndex, documentModelId, column, linkDocumentModelIndexResolver);
   }
 
   /**
    * Opens the column editor for {@code column}, editing it live so a Cancel can undo the changes.
    */
-  private static boolean showColumn(Stage owner, String title, ElementIndex documentModelIndex, String documentModelId, Column column) {
+  private static boolean showColumn(Stage owner, String title, ElementIndex documentModelIndex, String documentModelId, Column column, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
     FXMLLoader fxmlLoader = new FXMLLoader(OverviewColumnDialogController.class.getResource("overview-column-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("overview-column-dialog", fxmlLoader, owner, title);
     OverviewColumnDialogController controller = (OverviewColumnDialogController) stage.getUserData();
-    controller.init(stage, documentModelIndex, documentModelId, column);
+    controller.init(stage, documentModelIndex, documentModelId, column, linkDocumentModelIndexResolver);
     stage.setOnHidden(event -> controller.destroy());
     WidgetFactory.installResizable(stage);
 

@@ -15,6 +15,7 @@ import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 
@@ -35,6 +36,8 @@ public class OverviewAccessibilityPanelController extends AbstractPropertyEditor
   private OverviewModel model;
 
   private ElementIndex documentModelIndex;
+
+  private Function<String, ElementIndex> linkDocumentModelIndexResolver = relationshipId -> null;
 
   // Set while screenReaderColumnField is being repopulated from the model, so those programmatic updates
   // aren't mistaken for user edits and don't trigger a save.
@@ -60,9 +63,12 @@ public class OverviewAccessibilityPanelController extends AbstractPropertyEditor
     populate();
   }
 
-  /** Re-points the picker's column summaries at the currently referenced Document Model. */
-  public void setDocumentModelIndex(ElementIndex documentModelIndex) {
+  /** Re-points the picker's column summaries at the currently referenced Document Model. {@code
+   * linkDocumentModelIndexResolver} resolves a relationship id (from a column's {@code linkReferences}) to
+   * the {@link ElementIndex} its field actually lives in - see {@link OverviewColumnOptions#indexFor}. */
+  public void setDocumentModelIndex(ElementIndex documentModelIndex, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
     this.documentModelIndex = documentModelIndex;
+    this.linkDocumentModelIndexResolver = linkDocumentModelIndexResolver != null ? linkDocumentModelIndexResolver : relationshipId -> null;
     populate();
   }
 
@@ -85,7 +91,7 @@ public class OverviewAccessibilityPanelController extends AbstractPropertyEditor
       return;
     }
     List<Column> columns = getColumns();
-    OverviewColumnOptions.applyColumnConverter(screenReaderColumnField, columns, documentModelIndex);
+    OverviewColumnOptions.applyColumnConverter(screenReaderColumnField, columns, documentModelIndex, linkDocumentModelIndexResolver);
 
     updatingFromModel = true;
     try {
@@ -108,7 +114,7 @@ public class OverviewAccessibilityPanelController extends AbstractPropertyEditor
         .filter(candidate -> candidate.getId() != null && candidate.getId().equals(columnId))
         .findFirst()
         .orElse(null);
-    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex)) {
+    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex, linkDocumentModelIndexResolver)) {
       if (!screenReaderColumnField.getStyleClass().contains("validation-error")) {
         screenReaderColumnField.getStyleClass().add("validation-error");
       }

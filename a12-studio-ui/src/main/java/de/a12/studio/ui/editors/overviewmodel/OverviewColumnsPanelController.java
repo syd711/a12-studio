@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
@@ -86,6 +87,8 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   private ElementIndex documentModelIndex;
 
   private String documentModelId;
+
+  private Function<String, ElementIndex> linkDocumentModelIndexResolver = relationshipId -> null;
 
   // Set while enableColumnsResizeField/showRowCountField are being repopulated from the model, so those
   // programmatic updates aren't mistaken for user edits and don't trigger a save.
@@ -168,10 +171,13 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
     return model.getContent().getConfiguration();
   }
 
-  /** Re-points the "Field" summary of every row at the currently referenced Document Model. */
-  public void setDocumentModelIndex(ElementIndex documentModelIndex, String documentModelId) {
+  /** Re-points the "Field" summary of every row at the currently referenced Document Model. {@code
+   * linkDocumentModelIndexResolver} resolves a relationship id (from a column's {@code linkReferences}) to
+   * the {@link ElementIndex} its field actually lives in - see {@link OverviewColumnOptions#indexFor}. */
+  public void setDocumentModelIndex(ElementIndex documentModelIndex, String documentModelId, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
     this.documentModelIndex = documentModelIndex;
     this.documentModelId = documentModelId;
+    this.linkDocumentModelIndexResolver = linkDocumentModelIndexResolver != null ? linkDocumentModelIndexResolver : relationshipId -> null;
     rebuildRows();
   }
 
@@ -181,7 +187,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
 
   @FXML
   private void onAdd() {
-    Dialogs.showColumnForAdd(Studio.stage, documentModelIndex, documentModelId).ifPresent(column -> {
+    Dialogs.showColumnForAdd(Studio.stage, documentModelIndex, documentModelId, linkDocumentModelIndexResolver).ifPresent(column -> {
       getColumns().add(column);
       if (column.getPinDirection() != null) {
         resortByPinDirection();
@@ -260,7 +266,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
     Label label = new Label(summary);
     label.setId("overviewColumnField-" + index);
     label.getStyleClass().add("path-text");
-    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex)) {
+    if (OverviewColumnOptions.isUnresolvedElementRef(column, documentModelIndex, linkDocumentModelIndexResolver)) {
       label.getStyleClass().add("validation-error");
       label.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("path_could_not_be_resolved", summary)));
     }
@@ -268,7 +274,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
       label.getStyleClass().add("validation-error");
       label.setTooltip(WidgetFactory.createTooltip(
           ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing",
-              OverviewElementOptions.displayPath(documentModelIndex, column.getElementRef()))));
+              OverviewElementOptions.displayPath(OverviewColumnOptions.indexFor(column, documentModelIndex, linkDocumentModelIndexResolver), column.getElementRef()))));
     }
     else {
       label.setTooltip(WidgetFactory.createTooltip(summary));
@@ -306,12 +312,12 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   }
 
   private String fieldSummary(Column column) {
-    return OverviewColumnOptions.describe(column, documentModelIndex);
+    return OverviewColumnOptions.describe(column, documentModelIndex, linkDocumentModelIndexResolver);
   }
 
   private void openEditDialog(Column column) {
     String pinDirectionBefore = column.getPinDirection();
-    boolean confirmed = Dialogs.showColumnForEdit(Studio.stage, documentModelIndex, documentModelId, column);
+    boolean confirmed = Dialogs.showColumnForEdit(Studio.stage, documentModelIndex, documentModelId, column, linkDocumentModelIndexResolver);
     if (confirmed && !Objects.equals(pinDirectionBefore, column.getPinDirection())) {
       resortByPinDirection();
       commitHeaderChange();

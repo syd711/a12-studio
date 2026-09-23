@@ -5,6 +5,8 @@ import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.auth.RolesDocument;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.EditorFactory;
+import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ProgressDialog;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.A12Model;
@@ -44,6 +46,15 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
   private boolean restoringSelection;
 
+  /**
+   * Set for the duration of {@link #loadTabContent}'s own {@code select(tab)} call. That call can
+   * synchronously re-enter {@link #onSelectionChanged} (selecting a tab that wasn't already selected fires
+   * the selection listener inline, not on a later pulse), which would otherwise call back into
+   * {@link #loadTabContentWithProgress} for the very tab already being loaded - building its content twice
+   * and silently discarding the first (never-shown, never-cleaned-up) editor instance.
+   */
+  private boolean loadingTabContent;
+
   @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
     Project project = event.getProject();
@@ -58,14 +69,15 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
   /**
    * Restores one previously-open tab per FX pulse (via {@link Platform#runLater}) instead of looping
-   * through all of them in a single call. {@link EditorFactory#create} builds a full Scene Graph (FXML +
-   * controller {@code load()}) per tab, which - unlike the project/model loading that already happens on a
-   * background thread before this fires - must run on the FX Application Thread. Chaining one
-   * {@code runLater} per tab lets a pulse (and with it, e.g. the open-project progress dialog's
-   * indeterminate animation) run between tabs instead of the FX thread being blocked solid for the whole
-   * restore. Fires {@link TabsRestoredEvent} once done (or on error) so callers that need to know when the
-   * restore actually finished - see {@link de.a12.studio.ui.OpenProjectProgressModel} - can wait for it
-   * instead of assuming {@code projectOpened} dispatch means tabs are already showing.
+   * through all of them in a single call. Each restored tab is added as an empty shell only - see
+   * {@link #createTabShell} - without building its editor content: {@link EditorFactory#create} builds a
+   * full Scene Graph (FXML + controller {@code load()}) per tab, which is the expensive part, so it is
+   * deferred until the tab actually becomes selected (see {@link #loadTabContent}) instead of paid upfront
+   * for every restored tab. Chaining one {@code runLater} per tab still lets a pulse (and with it, e.g. the
+   * open-project progress dialog's indeterminate animation) run between tabs instead of the FX thread being
+   * blocked solid for the whole restore. Fires {@link TabsRestoredEvent} once done (or on error) so callers
+   * that need to know when the restore actually finished - see {@link de.a12.studio.ui.OpenProjectProgressModel}
+   * - can wait for it instead of assuming {@code projectOpened} dispatch means tabs are already showing.
    */
   private void restoreNextTab(@NonNull Project project, @NonNull List<String> openedFiles, int index, String selectedFile) {
     if (this.project != project) {
@@ -76,9 +88,9 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
 
     if (index >= openedFiles.size()) {
-      // Selected once, here, rather than as each matching tab is opened below: open() always selects
-      // the tab it just added, so selecting mid-loop would just get clobbered by every subsequent
-      // tab's open() call, leaving the last-opened tab selected instead of the previously-active one.
+      // Selected once, here, rather than as each tab is added above: only the selected tab's editor
+      // content is actually built (see selectRestoredTab/loadTabContent), so building it mid-loop would
+      // just get thrown away as soon as a later tab in the loop became selected instead.
       selectRestoredTab(selectedFile);
       restoringSelection = false;
       StudioEventManager.getInstance().fireTabsRestoredEvent(project);
@@ -95,7 +107,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
       // validation-error updates.
       ProjectItem item = file.exists() ? project.getRoot().findByPath(path) : null;
       if (item != null && item.isModelSupported()) {
-        open(item);
+        tabPane.getTabs().add(createTabShell(item));
       }
     }
     catch (Exception e) {
@@ -105,17 +117,36 @@ public class TabPaneController implements Initializable, StudioEventListener {
     Platform.runLater(() -> restoreNextTab(project, openedFiles, index + 1, selectedFile));
   }
 
+  /**
+   * Selects the tab matching {@code selectedFile} (or, if none matches - e.g. the previously-active file
+   * was closed/removed - whichever tab ended up selected by default, such as the first tab added in
+   * {@link #restoreNextTab}) and, unlike every other tab added during restore, actually builds its editor
+   * content right away via {@link #loadTabContent}. Called while {@link #restoringSelection} is still
+   * {@code true}, so the general lazy-load-on-selection path in {@link #onSelectionChanged} deliberately
+   * skips it and this is the one place that loads it.
+   */
   private void selectRestoredTab(String selectedFile) {
-    if (selectedFile == null) {
-      return;
+    Tab target = findTabByPath(selectedFile);
+    if (target == null) {
+      target = tabPane.getSelectionModel().getSelectedItem();
+    }
+    if (target != null) {
+      tabPane.getSelectionModel().select(target);
+      loadTabContent(target, (ProjectItem) target.getUserData());
+    }
+  }
+
+  private Tab findTabByPath(String path) {
+    if (path == null) {
+      return null;
     }
     for (Tab tab : tabPane.getTabs()) {
       ProjectItem item = (ProjectItem) tab.getUserData();
-      if (item != null && item.getPath().equals(selectedFile)) {
-        tabPane.getSelectionModel().select(tab);
-        return;
+      if (item != null && item.getPath().equals(path)) {
+        return tab;
       }
     }
+    return null;
   }
 
   @Override
@@ -162,7 +193,6 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
   private void reloadTab(@NonNull Tab tab, @NonNull ModelRenamedEvent event) {
     ProjectItem item = event.getItem();
-    StudioEventManager.getInstance().fireModelClosedEvent(item);
 
     // Set before EditorFactory.create() (not after): same reasoning as open() below - if this is the selected
     // tab, panels populated synchronously while the new controller's load() runs resolve their model via
@@ -170,9 +200,17 @@ public class TabPaneController implements Initializable, StudioEventListener {
     tab.setText(item.getDisplayName());
     tab.setUserData(item);
 
-    Parent content = EditorFactory.create(item);
-    if (content != null) {
-      tab.setContent(content);
+    // Only rebuild content for a tab that was actually loaded - see loadTabContent. A still-lazy (never
+    // selected) restored tab has no editor/controller registered to unregister, and rebuilding its content
+    // now would wrongly build it against whatever tab actually is selected (EditorFactory.create()'s property
+    // panels resolve their model via Studio.getSelectedProjectItem(), not the tab being rebuilt). It stays
+    // lazy and gets built correctly - with itself selected - whenever it is eventually selected.
+    if (tab.getContent() != null) {
+      StudioEventManager.getInstance().fireModelClosedEvent(item);
+      Parent content = EditorFactory.create(item);
+      if (content != null) {
+        tab.setContent(content);
+      }
     }
 
     if (project != null) {
@@ -210,8 +248,17 @@ public class TabPaneController implements Initializable, StudioEventListener {
    * project's opened-files settings are left alone. If the editor can't be rebuilt in place (e.g.
    * {@link EditorFactory#create} finds nothing to show for the reverted content), the tab is closed
    * and a fresh one reopened instead of leaving stale content on screen.
+   *
+   * <p>If {@code tab} is still lazy (never selected, so never had content built - see
+   * {@link #loadTabContent}), there is no editor to rebuild: just refresh its user data and leave it lazy,
+   * same reasoning as {@link #reloadTab}.
    */
   private void rebuildTab(@NonNull Tab tab, @NonNull ProjectItem item) {
+    if (tab.getContent() == null) {
+      tab.setUserData(item);
+      return;
+    }
+
     StudioEventManager.getInstance().fireModelClosedEvent(item);
     tab.setUserData(item);
 
@@ -254,6 +301,18 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   private void open(@NonNull ProjectItem item) {
+    Tab tab = createTabShell(item);
+    tabPane.getTabs().add(tab);
+    loadTabContentWithProgress(tab, item);
+  }
+
+  /**
+   * Builds a tab's title/icon/context menu/close handler - everything needed to show it in the tab strip -
+   * without building its (expensive) editor content, so it can be added to {@link #tabPane} up front while
+   * restoring previously-open tabs (see {@link #restoreNextTab}) and have its content deferred until it is
+   * actually selected (see {@link #loadTabContent}).
+   */
+  private Tab createTabShell(@NonNull ProjectItem item) {
     Tab tab = new Tab(item.getDisplayName());
     tab.setUserData(item);
     tab.setClosable(true);
@@ -276,26 +335,74 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
     tab.setContextMenu(createTabContextMenu(tab));
     tab.setOnClosed(closeEvent -> onTabClosed(tab));
+    return tab;
+  }
 
-    // Added and selected before the editor content is built (and only then handed its content below): several
-    // property editor panels populate themselves synchronously while EditorFactory.create() -> controller.load()
-    // runs, and resolve the model they should bind to via Studio.getSelectedProjectItem() (e.g.
-    // LocalizedTextPanelController.buildLocaleFields(), used for model-header fields like
-    // CustomFilterConfigurationPanelController's Header Subtitle/Filter Button Label). If this tab weren't
-    // already selected by then, that lookup would still resolve to whichever tab was selected before, not `item`.
-    Tab previousSelection = tabPane.getSelectionModel().getSelectedItem();
-    tabPane.getTabs().add(tab);
-    tabPane.getSelectionModel().select(tab);
-
-    Parent content = EditorFactory.create(item);
-    if (content == null) {
-      tabPane.getTabs().remove(tab);
-      if (previousSelection != null) {
-        tabPane.getSelectionModel().select(previousSelection);
-      }
+  /**
+   * Builds {@code tab}'s editor content via {@link EditorFactory#create} if it hasn't been built yet
+   * (a no-op otherwise - see the {@link #onSelectionChanged}/{@link #selectRestoredTab} callers, which may
+   * call this for a tab that turns out to already be loaded). Selects {@code tab} first (and restores the
+   * previous selection if building fails): several property editor panels populate themselves synchronously
+   * while EditorFactory.create() -> controller.load() runs, and resolve the model they should bind to via
+   * Studio.getSelectedProjectItem() (e.g. LocalizedTextPanelController.buildLocaleFields(), used for
+   * model-header fields like CustomFilterConfigurationPanelController's Header Subtitle/Filter Button Label).
+   * If {@code tab} weren't already selected by then, that lookup would still resolve to whichever tab was
+   * selected before, not {@code item}.
+   *
+   * <p>{@link #loadingTabContent} guards the {@code select(tab)} call below: if {@code tab} wasn't already
+   * selected, selecting it fires {@link #onSelectionChanged} synchronously (JavaFX selection listeners run
+   * inline, not on a later pulse), which would otherwise re-enter this method for the same still-unloaded
+   * tab and build its content a second time before this call gets a chance to.
+   */
+  private void loadTabContent(@NonNull Tab tab, @NonNull ProjectItem item) {
+    if (tab.getContent() != null) {
       return;
     }
-    tab.setContent(content);
+
+    Tab previousSelection = tabPane.getSelectionModel().getSelectedItem();
+    boolean alreadyLoading = loadingTabContent;
+    loadingTabContent = true;
+    try {
+      tabPane.getSelectionModel().select(tab);
+
+      Parent content = EditorFactory.create(item);
+      if (content == null) {
+        tabPane.getTabs().remove(tab);
+        if (previousSelection != null && previousSelection != tab) {
+          tabPane.getSelectionModel().select(previousSelection);
+        }
+        return;
+      }
+      tab.setContent(content);
+    }
+    finally {
+      loadingTabContent = alreadyLoading;
+    }
+  }
+
+  /**
+   * Same as {@link #loadTabContent}, but wrapped in its own progress dialog (see
+   * {@link LoadTabProgressModel}) - used for the two "live" ways a not-yet-loaded tab's editor gets built
+   * outside of project restore: {@link #open} (a brand-new tab) and {@link #onSelectionChanged} (switching
+   * to a previously-restored tab that is still lazy). Restoring a project's own previously-selected tab
+   * (see {@link #selectRestoredTab}) deliberately calls {@link #loadTabContent} directly instead - that
+   * load is already covered by the "Restoring Tabs" dialog (see {@link de.a12.studio.ui.RestoreTabsProgressModel}),
+   * so stacking a second dialog on top of it would be redundant.
+   *
+   * <p>Skips the dialog when {@link ProjectItem#isModelSupported()} is {@code false}: {@link
+   * EditorFactory#create} won't build an editor for such a tab anyway - it just shows a "not supported yet"
+   * alert and returns {@code null} (see that method) - so there is nothing worth putting a progress bar in
+   * front of.
+   */
+  private void loadTabContentWithProgress(@NonNull Tab tab, @NonNull ProjectItem item) {
+    if (tab.getContent() != null) {
+      return;
+    }
+    if (!item.isModelSupported()) {
+      loadTabContent(tab, item);
+      return;
+    }
+    ProgressDialog.createProgressDialog(Studio.stage, new LoadTabProgressModel(() -> loadTabContent(tab, item)));
   }
 
   /**
@@ -468,8 +575,24 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
   }
 
+  /**
+   * Besides notifying listeners and persisting the newly selected file, lazily builds {@code newTab}'s
+   * editor content (behind its own progress dialog - see {@link #loadTabContentWithProgress}) if it doesn't
+   * have any yet - i.e. a tab added lazily by {@link #restoreNextTab} that is only now being selected for
+   * the first time. Skipped while {@link #restoringSelection} is set: during that window, {@link
+   * #selectRestoredTab} is the one place responsible for loading the (single) tab that should end up with
+   * content, and every other selection change firing here is just the transient default selection JavaFX
+   * assigns as lazy tabs get added one by one - not a real user selection worth loading. Also skipped while
+   * {@link #loadingTabContent} is set - see that field's javadoc - since this same selection change is what
+   * a {@link #loadTabContent} call already in progress for {@code newTab} is itself triggering.
+   */
   private void onSelectionChanged(Tab newTab) {
     ProjectItem item = newTab == null ? null : (ProjectItem) newTab.getUserData();
+
+    if (newTab != null && item != null && !restoringSelection && !loadingTabContent) {
+      loadTabContentWithProgress(newTab, item);
+    }
+
     StudioEventManager.getInstance().fireTabSelectionChangedEvent(item);
 
     if (restoringSelection || project == null) {

@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.overviewmodel.BoxElement;
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.ButtonElement;
@@ -13,6 +14,7 @@ import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.overviewmodel.RowActionGroup;
 import de.a12.studio.models.querymodel.QueryModel;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController;
@@ -25,9 +27,15 @@ import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Edits an {@link OverviewModel}'s "Overview" and "Custom Actions" tabs.
@@ -142,7 +150,10 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   private OverviewModel model;
   private List<DocumentModel> otherDocumentModels = List.of();
   private List<QueryModel> otherQueryModels = List.of();
+  private List<RelationshipModel> otherRelationshipModels = List.of();
   private ElementIndex documentModelIndex;
+  private final Map<String, ElementIndex> linkDocumentModelIndexByRelationshipId = new HashMap<>();
+  private final Function<String, ElementIndex> linkDocumentModelIndexResolver = linkDocumentModelIndexByRelationshipId::get;
 
   @Override
   public void initialize(URL url, ResourceBundle resources) {
@@ -215,6 +226,10 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       otherQueryModels = ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.QUERY).stream()
           .filter(QueryModel.class::isInstance)
           .map(QueryModel.class::cast)
+          .toList();
+      otherRelationshipModels = ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.RELATIONSHIP).stream()
+          .filter(RelationshipModel.class::isInstance)
+          .map(RelationshipModel.class::cast)
           .toList();
       overviewReferenceController.load(model, otherDocumentModels, otherQueryModels);
       refreshDocumentModelIndex();
@@ -292,38 +307,24 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     if (model.getModelReferences() == null) {
       return null;
     }
-    return model.getModelReferences().stream()
+    String explicitDocumentModelId = model.getModelReferences().stream()
         .filter(reference -> ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW.equals(reference.getPurpose()))
         .map(ModelReference::getReference)
         .findFirst()
         .orElse(null);
+    if (explicitDocumentModelId != null) {
+      return explicitDocumentModelId;
+    }
+    // No direct Document Model reference: this Overview Model may instead be bound only through a Query
+    // Model (query-model-for-overview), a pattern SME itself uses (see e.g. its own
+    // IntegrationTestModelQmRef.json fixture) - it resolves the Document Model to use for every
+    // field-reference picker from the Query Model's own target Document Model rather than requiring a
+    // second, redundant header reference (see importTransformations.ts#transformModelReference).
+    QueryModel queryModel = currentQueryModel();
+    return queryModel != null && queryModel.getContent() != null ? queryModel.getContent().getTargetDocumentModel() : null;
   }
 
-  private void refreshDocumentModelIndex() {
-    String documentModelId = currentDocumentModelId();
-    DocumentModel documentModel = otherDocumentModels.stream()
-        .filter(candidate -> documentModelId != null && documentModelId.equals(candidate.getId()))
-        .findFirst()
-        .orElseGet(() -> ProjectDocumentModels.resolveDocumentModelForFieldReferences(documentModelId));
-    documentModelIndex = OverviewElementOptions.indexOf(documentModel, otherDocumentModels);
-    OverviewElementOptions.restrictFieldIds(documentModelIndex, queryModelFieldRestriction());
-    overviewColumnsController.setDocumentModelIndex(documentModelIndex, documentModelId);
-    overviewSortingController.setDocumentModelIndex(documentModelIndex);
-    overviewAccessibilityController.setDocumentModelIndex(documentModelIndex);
-    customSelectionOfFieldsController.setDocumentModelIndex(documentModelIndex);
-    overviewSectionDataController.setDocumentModelIndex(documentModelIndex);
-    customFilterConfigurationController.setDocumentModelIndex(documentModelIndex);
-  }
-
-  /**
-   * When this Overview Model is bound through a Query Model (a {@link
-   * ModelReference#PURPOSE_QUERY_MODEL_FOR_OVERVIEW} header reference is present), every field-reference
-   * picker should only offer fields the Query Model actually projects ({@code QueryModelContent.fields}),
-   * mirroring SME's {@code getExtendedGetDmCandidates}. {@code null} - meaning "no restriction" - both in
-   * Document-Model mode and when the referenced Query Model can't be resolved or hasn't projected any
-   * fields yet, so a not-yet-configured Query Model doesn't lock every picker to zero options.
-   */
-  private Set<String> queryModelFieldRestriction() {
+  private QueryModel currentQueryModel() {
     if (model.getModelReferences() == null) {
       return null;
     }
@@ -335,12 +336,87 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     if (queryModelId == null || queryModelId.isBlank()) {
       return null;
     }
-    List<String> fields = otherQueryModels.stream()
-        .filter(queryModel -> queryModelId.equals(queryModel.getId()))
+    return otherQueryModels.stream().filter(queryModel -> queryModelId.equals(queryModel.getId())).findFirst().orElse(null);
+  }
+
+  private void refreshDocumentModelIndex() {
+    String documentModelId = currentDocumentModelId();
+    DocumentModel documentModel = otherDocumentModels.stream()
+        .filter(candidate -> documentModelId != null && documentModelId.equals(candidate.getId()))
         .findFirst()
-        .map(queryModel -> queryModel.getContent().getFields())
-        .orElse(null);
-    return fields == null || fields.isEmpty() ? null : Set.copyOf(fields);
+        .orElseGet(() -> ProjectDocumentModels.resolveDocumentModelForFieldReferences(documentModelId));
+    documentModelIndex = OverviewElementOptions.indexOf(documentModel, otherDocumentModels);
+    OverviewElementOptions.restrictFieldIds(documentModelIndex, queryModelFieldRestriction());
+    refreshLinkDocumentModelIndexes();
+    overviewColumnsController.setDocumentModelIndex(documentModelIndex, documentModelId, linkDocumentModelIndexResolver);
+    overviewSortingController.setDocumentModelIndex(documentModelIndex, linkDocumentModelIndexResolver);
+    overviewAccessibilityController.setDocumentModelIndex(documentModelIndex, linkDocumentModelIndexResolver);
+    customSelectionOfFieldsController.setDocumentModelIndex(documentModelIndex);
+    overviewSectionDataController.setDocumentModelIndex(documentModelIndex);
+    customFilterConfigurationController.setDocumentModelIndex(documentModelIndex);
+  }
+
+  /**
+   * Rebuilds {@link #linkDocumentModelIndexByRelationshipId}: for every Relationship Model in the project
+   * that declares a {@code linkDocumentModel} (the fields attached to the relationship's own link, e.g. a
+   * Relationship UI Model's "Proficiency"/"Acknowledged" columns - see {@code PersonSkills_Re.json}), an
+   * {@link ElementIndex} over that model, keyed by the relationship's id. A Column whose {@code
+   * linkReferences} names that relationship resolves its {@code elementRef} against this index instead of
+   * {@link #documentModelIndex}, since the field lives on the link document, not the primary one (see {@link
+   * OverviewColumnOptions#indexFor}). Rebuilt on every {@link #refreshDocumentModelIndex()} call so it stays
+   * in sync with {@link #otherDocumentModels}/{@link #otherRelationshipModels}.
+   */
+  private void refreshLinkDocumentModelIndexes() {
+    linkDocumentModelIndexByRelationshipId.clear();
+    for (RelationshipModel relationshipModel : otherRelationshipModels) {
+      if (relationshipModel.getContent() == null || relationshipModel.getId() == null) {
+        continue;
+      }
+      String linkDocumentModelId = relationshipModel.getContent().getLinkDocumentModelValue();
+      if (linkDocumentModelId == null || linkDocumentModelId.isBlank()) {
+        continue;
+      }
+      DocumentModel linkDocumentModel = otherDocumentModels.stream()
+          .filter(candidate -> linkDocumentModelId.equals(candidate.getId()))
+          .findFirst()
+          .orElseGet(() -> ProjectDocumentModels.resolveDocumentModelForFieldReferences(linkDocumentModelId));
+      ElementIndex linkIndex = OverviewElementOptions.indexOf(linkDocumentModel, otherDocumentModels);
+      if (linkIndex != null) {
+        linkDocumentModelIndexByRelationshipId.put(relationshipModel.getId(), linkIndex);
+      }
+    }
+  }
+
+  /**
+   * When this Overview Model is bound through a Query Model (a {@link
+   * ModelReference#PURPOSE_QUERY_MODEL_FOR_OVERVIEW} header reference is present), every field-reference
+   * picker should only offer fields the Query Model actually projects ({@code QueryModelContent.fields}),
+   * mirroring SME's {@code getExtendedGetDmCandidates}. {@code null} - meaning "no restriction" - both in
+   * Document-Model mode and when the referenced Query Model can't be resolved or hasn't projected any
+   * fields yet, so a not-yet-configured Query Model doesn't lock every picker to zero options. {@code
+   * QueryModelContent.fields} are absolute "/"-separated paths (e.g. {@code "/Person/FirstName"}), not
+   * element ids, so each is resolved against {@link #documentModelIndex} via {@link
+   * ElementIndex#resolveAbsolutePath} first - a path that doesn't resolve (yet) is dropped rather than
+   * passed through verbatim, since {@link OverviewElementOptions#elementIds} compares against {@code
+   * Element#getId()}.
+   */
+  private Set<String> queryModelFieldRestriction() {
+    QueryModel queryModel = currentQueryModel();
+    if (queryModel == null || queryModel.getContent() == null || documentModelIndex == null) {
+      return null;
+    }
+    List<String> fieldPaths = queryModel.getContent().getFields();
+    if (fieldPaths == null || fieldPaths.isEmpty()) {
+      return null;
+    }
+    Set<String> ids = fieldPaths.stream()
+        .map(documentModelIndex::resolveAbsolutePath)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .map(Element::getId)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
+    return ids.isEmpty() ? null : ids;
   }
 
   /**
