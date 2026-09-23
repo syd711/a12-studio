@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
 import de.a12.studio.models.formmodel.Binding;
+import de.a12.studio.models.formmodel.BindingRepeat;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
@@ -103,7 +104,7 @@ final class FormModelNodeTypes {
       types.add(DETAIL_SCREEN_TYPE);
       return types;
     }
-    if (node instanceof InlineRepeat) {
+    if (node instanceof InlineRepeat || node instanceof BindingRepeat) {
       return REPEAT_OVERVIEW_COLUMN_CHILD_TYPES;
     }
     // CustomScreenElement, Control, TextCell, ExpressionCell, RepeatOverviewColumn: no children can be added.
@@ -111,12 +112,12 @@ final class FormModelNodeTypes {
   }
 
   /**
-   * Whether an object of {@code childClass} may be added as a child of {@code node}. {@link Binding} is
-   * deliberately left out of {@link #allowedChildTypes}'s {@code SCREEN_ELEMENT_CHILD_TYPES} - as in the SME
-   * reference, it can't be created via the generic "Add" menu, only by dragging a row from the Form Model
-   * editor's Relationships panel (see {@code RelationshipModelPanelController}/{@code
+   * Whether an object of {@code childClass} may be added as a child of {@code node}. {@link Binding}/{@link
+   * BindingRepeat} are deliberately left out of {@link #allowedChildTypes}'s {@code SCREEN_ELEMENT_CHILD_TYPES}
+   * - as in the SME reference, neither can be created via the generic "Add" menu, only by dragging a row from
+   * the Form Model editor's Relationships panel (see {@code RelationshipModelPanelController}/{@code
    * FormModelTreeController#dropRelationshipModel}) - but a {@link Screen}/{@link Section}/{@link
-   * MultiColumnSection} must still recognize it as a valid child here so an already-created Binding can be
+   * MultiColumnSection} must still recognize them as valid children here so an already-created one can be
    * cut/copied/pasted or reparented via drag-and-drop like any other {@code ScreenElement}.
    */
   static boolean canContain(@NonNull Object node, @NonNull Class<?> childClass) {
@@ -126,7 +127,7 @@ final class FormModelNodeTypes {
       }
     }
     if ((node instanceof Screen || node instanceof Section || node instanceof MultiColumnSection)
-        && Binding.class.isAssignableFrom(childClass)) {
+        && (Binding.class.isAssignableFrom(childClass) || BindingRepeat.class.isAssignableFrom(childClass))) {
       return true;
     }
     return false;

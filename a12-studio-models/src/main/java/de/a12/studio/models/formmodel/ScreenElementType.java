@@ -11,6 +11,7 @@ public enum ScreenElementType {
   CUSTOM_SCREEN_ELEMENT("CustomScreenElement"),
   BUTTON_PANEL("ButtonPanel"),
   BINDING("Binding"),
+  BINDING_REPEAT("BindingRepeat"),
   INLINE_REPEAT("InlineRepeat"),
   EMBEDDED_REPEAT("EmbeddedRepeat"),
   DETACHED_REPEAT("DetachedRepeat"),

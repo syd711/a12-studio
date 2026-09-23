@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -41,6 +42,14 @@
                                     </VBox>
                                 </children>
                             </HBox>
+                            <HBox spacing="24.0">
+                                <children>
+                                    <CheckBox fx:id="isFixedRelationshipCheckBox" text="%binding_is_fixed_relationship" />
+                                    <CheckBox fx:id="cdmChildActivitiesEnabledCheckBox" text="%binding_cdm_child_activities_enabled" />
+                                </children>
+                            </HBox>
+                            <fx:include fx:id="mainComponent" source="../../../propertyeditors/binding-component-panel.fxml" />
+                            <fx:include fx:id="editModalComponent" source="../../../propertyeditors/binding-component-panel.fxml" />
                         </children>
                         <padding>
                             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

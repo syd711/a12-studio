@@ -4,6 +4,7 @@ import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
+import de.a12.studio.models.composeddocumentmodel.ComposedDocumentModel;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
@@ -37,6 +38,11 @@ public class ModelFactory {
   // DocumentModels flagged with this header annotation instead. See AdditiveDocumentModel's javadoc.
   private static final String ADDITIVE_DOCUMENT_ANNOTATION = "additive-document";
 
+  // Composed Document Models likewise have no modelType of their own (still "document"); they are
+  // DocumentModels carrying this header annotation instead, whose value (not just presence, unlike the two
+  // flags above) is the root Document Model's id. See ComposedDocumentModel's javadoc.
+  private static final String CDM_QUERY_ROOT_ANNOTATION = "cdm.queryRoot";
+
   @Nullable
   public static A12Model<?> load(@NonNull ProjectItem projectItem) {
     if (projectItem.isFolder() || !projectItem.getName().toLowerCase().endsWith(".json")) {
@@ -63,6 +69,9 @@ public class ModelFactory {
           }
           else if (isAdditiveDocument(root)) {
             targetClass = AdditiveDocumentModel.class;
+          }
+          else if (isComposedDocument(root)) {
+            targetClass = ComposedDocumentModel.class;
           }
           else {
             targetClass = DocumentModel.class;
@@ -103,6 +112,10 @@ public class ModelFactory {
     return hasAnnotation(root, ADDITIVE_DOCUMENT_ANNOTATION);
   }
 
+  private static boolean isComposedDocument(@NonNull JsonNode root) {
+    return findAnnotationValue(root, CDM_QUERY_ROOT_ANNOTATION) != null;
+  }
+
   private static boolean hasAnnotation(@NonNull JsonNode root, @NonNull String annotationName) {
     for (JsonNode annotation : root.path("header").path("annotations")) {
       if (annotationName.equals(annotation.path("name").asString(null))
@@ -111,5 +124,15 @@ public class ModelFactory {
       }
     }
     return false;
+  }
+
+  @Nullable
+  private static String findAnnotationValue(@NonNull JsonNode root, @NonNull String annotationName) {
+    for (JsonNode annotation : root.path("header").path("annotations")) {
+      if (annotationName.equals(annotation.path("name").asString(null))) {
+        return annotation.path("value").asString(null);
+      }
+    }
+    return null;
   }
 }

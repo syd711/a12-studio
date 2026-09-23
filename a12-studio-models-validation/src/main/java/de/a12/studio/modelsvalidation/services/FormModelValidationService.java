@@ -20,7 +20,10 @@ import de.a12.studio.modelsvalidation.validators.form.DependentFieldMasterRequir
 import de.a12.studio.modelsvalidation.validators.form.DependentGroupMasterRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.ExternalEnumerationSourceRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormControlIndexRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormBindingComponentReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormBindingComponentRequiredFieldsValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingRelationshipReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormBindingRepeatCdmRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingTargetRoleValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormButtonScreenReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormColumnWidthValidator;
@@ -77,6 +80,9 @@ public final class FormModelValidationService {
       new ExternalEnumerationSourceRequiredValidator(),
       new FormBindingRelationshipReferenceValidator(),
       new FormBindingTargetRoleValidator(),
+      new FormBindingComponentReferenceValidator(),
+      new FormBindingComponentRequiredFieldsValidator(),
+      new FormBindingRepeatCdmRequiredValidator(),
       new FormDefaultRowActionValidator(),
       new FormStyleReferenceValidator(),
       new FormDatePickerConfigValidator(),

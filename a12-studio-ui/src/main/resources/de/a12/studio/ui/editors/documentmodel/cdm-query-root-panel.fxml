@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%cdm_query_root_panel.title" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.documentmodel.CdmQueryRootPanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="12.0">
+    <children>
+      <VBox>
+        <children>
+          <Label styleClass="field-label" text="%cdm_query_root_panel.query_root" />
+          <ComboBox fx:id="queryRootCombo" editable="false" maxWidth="Infinity" />
+        </children>
+      </VBox>
+      <VBox spacing="6.0">
+        <children>
+          <Label styleClass="field-label" text="%cdm_query_root_panel.relationship_chain" />
+          <GridPane fx:id="stepsGrid" hgap="8.0" vgap="4.0">
+            <columnConstraints>
+              <ColumnConstraints hgrow="ALWAYS" percentWidth="33.0" />
+              <ColumnConstraints hgrow="ALWAYS" percentWidth="27.0" />
+              <ColumnConstraints hgrow="ALWAYS" percentWidth="27.0" />
+              <ColumnConstraints hgrow="NEVER" />
+            </columnConstraints>
+            <children>
+              <Label styleClass="field-label" text="%cdm_query_root_panel.relationship_header" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+              <Label styleClass="field-label" text="%cdm_query_root_panel.source_role_header" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+              <Label styleClass="field-label" text="%cdm_query_root_panel.target_role_header" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+            </children>
+          </GridPane>
+          <Label fx:id="emptyStepsLabel" styleClass="hint-label" text="%cdm_query_root_panel.no_steps" />
+          <Button mnemonicParsing="false" onAction="#onAddStep" styleClass="default-button" text="%cdm_query_root_panel.add_step" />
+        </children>
+      </VBox>
+    </children>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

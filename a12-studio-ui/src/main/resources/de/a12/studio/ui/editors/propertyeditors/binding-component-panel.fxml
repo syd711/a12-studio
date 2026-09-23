@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="Component" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.BindingComponentPanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="10.0">
+    <children>
+      <VBox>
+        <children>
+          <Label styleClass="field-label" text="%binding_component_panel.component_type" />
+          <ComboBox fx:id="typeCombo" editable="false" maxWidth="Infinity" />
+        </children>
+      </VBox>
+      <HBox spacing="16.0">
+        <children>
+          <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+            <children>
+              <Label styleClass="field-label" text="%binding_component_panel.available_items_overview" />
+              <ComboBox fx:id="availableItemsOverviewCombo" editable="false" maxWidth="Infinity" />
+            </children>
+          </VBox>
+          <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+            <children>
+              <Label styleClass="field-label" text="%binding_component_panel.selected_items_overview" />
+              <ComboBox fx:id="selectedItemsOverviewCombo" editable="false" maxWidth="Infinity" />
+            </children>
+          </VBox>
+        </children>
+      </HBox>
+      <HBox spacing="16.0">
+        <children>
+          <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+            <children>
+              <Label styleClass="field-label" text="%binding_component_panel.additional_fields_form" />
+              <ComboBox fx:id="additionalFieldsFormCombo" editable="false" maxWidth="Infinity" />
+            </children>
+          </VBox>
+          <VBox spacing="6.0">
+            <children>
+              <Label styleClass="field-label" text="%binding_component_panel.candidate_page_size" />
+              <TextField fx:id="candidatePageSizeField" prefWidth="140.0" />
+            </children>
+          </VBox>
+          <VBox spacing="6.0">
+            <children>
+              <Label styleClass="field-label" text="%binding_component_panel.link_page_size" />
+              <TextField fx:id="linkPageSizeField" prefWidth="140.0" />
+            </children>
+          </VBox>
+        </children>
+      </HBox>
+      <VBox fx:id="dualPaneSection" spacing="10.0">
+        <children>
+          <VBox spacing="6.0">
+            <children>
+              <Label styleClass="field-label" text="%binding_component_panel.height" />
+              <TextField fx:id="heightField" prefWidth="140.0" />
+            </children>
+          </VBox>
+          <fx:include fx:id="availableItemsTableLabel" source="localized-text-panel.fxml" />
+          <fx:include fx:id="selectedItemsTableLabel" source="localized-text-panel.fxml" />
+        </children>
+      </VBox>
+      <VBox fx:id="tableListSection" spacing="10.0">
+        <children>
+          <HBox spacing="16.0">
+            <children>
+              <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                <children>
+                  <Label styleClass="field-label" text="%binding_component_panel.edit_component" />
+                  <ComboBox fx:id="editComponentCombo" editable="false" maxWidth="Infinity" />
+                </children>
+              </VBox>
+              <VBox spacing="6.0">
+                <children>
+                  <Label styleClass="field-label" text="%binding_component_panel.edit_dialog_width" />
+                  <TextField fx:id="editDialogWidthField" prefWidth="140.0" />
+                </children>
+              </VBox>
+            </children>
+          </HBox>
+          <fx:include fx:id="editDialogTitle" source="localized-text-panel.fxml" />
+          <fx:include fx:id="editDialogCancelButtonLabel" source="localized-text-panel.fxml" />
+          <fx:include fx:id="editDialogCloseButtonLabel" source="localized-text-panel.fxml" />
+        </children>
+      </VBox>
+    </children>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

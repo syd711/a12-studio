@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Binding;
+import de.a12.studio.models.formmodel.BindingRepeat;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.ColumnLayout;
@@ -107,11 +108,14 @@ public class FormElementViewModel {
     if (node instanceof Screen screen) {
       return screen.getName();
     }
-    // Binding's display name lives under binding.details.name (mirroring the SME reference's own getName()
-    // override for its Binding element type), not the generic ScreenElement "name" field every other subtype
-    // uses - so this must be checked before the generic ScreenElement fallback below.
+    // Binding/BindingRepeat's display name lives under binding.details.name (mirroring the SME reference's own
+    // getName() override for its Binding element type), not the generic ScreenElement "name" field every other
+    // subtype uses - so this must be checked before the generic ScreenElement fallback below.
     if (node instanceof Binding binding) {
       return binding.getBinding().getDetails().getName();
+    }
+    if (node instanceof BindingRepeat bindingRepeat && bindingRepeat.getBinding() != null && bindingRepeat.getBinding().getDetails() != null) {
+      return bindingRepeat.getBinding().getDetails().getName();
     }
     if (node instanceof ScreenElement screenElement) {
       return screenElement.getName();
@@ -248,6 +252,9 @@ public class FormElementViewModel {
     if (node instanceof ButtonPanel) {
       return "Button Panel";
     }
+    if (node instanceof BindingRepeat) {
+      return "Binding Repeat";
+    }
     if (node instanceof Binding) {
       return "Binding";
     }
@@ -300,7 +307,7 @@ public class FormElementViewModel {
     if (node instanceof ButtonPanel) {
       return Icons.FORM_BUTTON_PANEL;
     }
-    if (node instanceof Binding) {
+    if (node instanceof Binding || node instanceof BindingRepeat) {
       return Icons.FORM_BINDING;
     }
     if (node instanceof Row) {

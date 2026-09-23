@@ -78,6 +78,9 @@
 
                           <!-- Immutable / Comment (Document Model only) -->
                           <fx:include fx:id="modelInfo" source="../propertyeditors/model-info-panel.fxml" />
+
+                          <!-- Composed Document Model: Query Root / Relationship Chain (Document Model only) -->
+                          <fx:include fx:id="cdmQueryRoot" source="../documentmodel/cdm-query-root-panel.fxml" />
                       </VBox>
                   </content>
                <padding>

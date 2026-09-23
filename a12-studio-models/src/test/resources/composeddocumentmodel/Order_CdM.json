@@ -1,0 +1,52 @@
+{
+  "header": {
+    "id": "Order_CdM",
+    "modelType": "document",
+    "modelVersion": "28.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "cdm.queryRoot",
+        "value": "Order_DM"
+      },
+      {
+        "name": "cdm.relationship",
+        "value": "OrderPosition_ReM"
+      },
+      {
+        "name": "cdm.sourceRole",
+        "value": "order"
+      },
+      {
+        "name": "cdm.targetRole",
+        "value": "position"
+      },
+      {
+        "name": "cdm.targetDocumentModel",
+        "value": "Position_DM"
+      }
+    ],
+    "modelReferences": []
+  },
+  "content": {
+    "modelInfo": {
+      "name": "Order_CdM",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    }
+  }
+}

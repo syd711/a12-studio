@@ -1,6 +1,8 @@
 package de.a12.studio.models;
 
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.composeddocumentmodel.ComposedDocumentModel;
+import de.a12.studio.models.composeddocumentmodel.ComposedDocumentModelResolver;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.formmodel.FormModel;
@@ -63,6 +65,17 @@ class ModelFactoryTest {
 
     TypeDefinitionModel typeDefinitionModel = assertInstanceOf(TypeDefinitionModel.class, model);
     assertEquals("Basic_TDM", typeDefinitionModel.getId());
+  }
+
+  @Test
+  void loadsCdmQueryRootAnnotatedDocumentAsComposedDocumentModel() {
+    File file = resource("/composeddocumentmodel/Order_CdM.json");
+    A12Model<?> model = ModelFactory.load(new ProjectItem(file));
+
+    ComposedDocumentModel composedDocumentModel = assertInstanceOf(ComposedDocumentModel.class, model);
+    assertEquals("Order_CdM", composedDocumentModel.getId());
+    assertEquals("Order_DM", ComposedDocumentModelResolver.getQueryRootId(composedDocumentModel).orElseThrow());
+    assertEquals(1, ComposedDocumentModelResolver.getRelationshipSteps(composedDocumentModel).size());
   }
 
   @Test

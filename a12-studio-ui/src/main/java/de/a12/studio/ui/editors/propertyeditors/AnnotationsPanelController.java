@@ -46,6 +46,10 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   // Managed separately by RoleEditorPanelController; hidden here so it isn't shown/edited twice.
   private static final String ROLES_ANNOTATION_NAME = "roles";
 
+  // Managed separately by CdmQueryRootPanelController (query root + relationship-chain annotations, which
+  // "must not be changed manually" per the BA docs); hidden here so it isn't shown/edited twice.
+  private static final String CDM_ANNOTATION_PREFIX = "cdm.";
+
   // Internal form-engine bookkeeping annotation, not meant to be user-editable; never shown here.
   private static final String BINDING_CONFIGURATION_ANNOTATION_NAME = "bindingConfiguration";
 
@@ -149,6 +153,9 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
         continue;
       }
       if (model != null && ROLES_ANNOTATION_NAME.equals(name)) {
+        continue;
+      }
+      if (model != null && name != null && name.startsWith(CDM_ANNOTATION_PREFIX)) {
         continue;
       }
       visible.add(annotation);

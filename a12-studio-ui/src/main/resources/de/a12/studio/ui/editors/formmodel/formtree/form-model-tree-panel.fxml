@@ -152,6 +152,7 @@
                         <fx:include fx:id="buttonPanelEditor" source="nodeeditors/formnode-editor-button-panel-panel.fxml" />
                         <fx:include fx:id="customCellEditor" source="nodeeditors/formnode-editor-custom-cell-panel.fxml" />
                         <fx:include fx:id="bindingEditor" source="nodeeditors/formnode-editor-binding-panel.fxml" />
+                        <fx:include fx:id="bindingRepeatEditor" source="nodeeditors/formnode-editor-binding-repeat-panel.fxml" />
                     </children>
                 </StackPane>
             </items>

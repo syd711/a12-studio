@@ -1,0 +1,123 @@
+{
+  "header": {
+    "id": "BindingComponent_FM",
+    "modelType": "form",
+    "modelVersion": "37.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "Binding",
+            "id": "binding1",
+            "binding": {
+              "type": "relationship",
+              "elementId": "position",
+              "details": {
+                "name": "OrderPosition_Binding",
+                "relationshipName": "OrderPosition_ReM",
+                "targetRole": "position",
+                "metaInformation": {
+                  "version": "1.0.0"
+                },
+                "isFixedRelationship": true,
+                "cdmChildActivitiesEnabled": true,
+                "mainComponent": {
+                  "id": "component1",
+                  "name": "DualPaneSelection",
+                  "modelsSME": {
+                    "availableItemsOverview": "Position_Available_Ov",
+                    "selectedItemsOverview": "Position_Selected_Ov",
+                    "additionalFieldsForm": "Position_Additional_FM"
+                  },
+                  "candidatePageSize": 10,
+                  "linkPageSize": 5,
+                  "propsExtensions": {
+                    "dualPaneProps": {
+                      "height": 400,
+                      "availableItemsTable": {
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Available Positions"
+                          }
+                        ]
+                      },
+                      "selectedItemsTable": {
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Selected Positions"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "editModalComponent": {
+                  "id": "component2",
+                  "name": "TableList",
+                  "propsExtensions": {
+                    "tableListProps": {
+                      "editComponent": "PositionEdit_FM",
+                      "editDialogWidth": 600,
+                      "editDialogTitle": {
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Edit Position"
+                          }
+                        ]
+                      },
+                      "editDialogCancelButtonLabel": {
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Cancel"
+                          }
+                        ]
+                      },
+                      "editDialogCloseButtonLabel": {
+                        "label": [
+                          {
+                            "locale": "en",
+                            "text": "Close"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "modificationConfiguration": {
+                  "scdmAddEditDescriptor": "extendParent",
+                  "addButtonLabel": [
+                    {
+                      "locale": "en",
+                      "text": "Add Position"
+                    }
+                  ],
+                  "editButtonLabel": [
+                    {
+                      "locale": "en",
+                      "text": "Edit Position"
+                    }
+                  ],
+                  "extendParentActivityDescriptor": true
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -8,9 +8,12 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.relationshipmodel.EntityCharacteristic;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
+import de.a12.studio.ui.editors.propertyeditors.BindingComponentPanelController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import org.jspecify.annotations.NonNull;
@@ -42,6 +45,14 @@ public class FormNodeEditorBindingPanelController extends AbstractPropertyEditor
   private ComboBox<String> relationshipCombo;
   @FXML
   private ComboBox<String> targetRoleCombo;
+  @FXML
+  private CheckBox isFixedRelationshipCheckBox;
+  @FXML
+  private CheckBox cdmChildActivitiesEnabledCheckBox;
+  @FXML
+  private BindingComponentPanelController mainComponentController;
+  @FXML
+  private BindingComponentPanelController editModalComponentController;
 
   private Binding binding;
   private List<RelationshipModel> relationshipModels = List.of();
@@ -56,6 +67,10 @@ public class FormNodeEditorBindingPanelController extends AbstractPropertyEditor
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
     bindTextField(nameField, (el, value) -> details().setName(value));
+    bindCheckBox(isFixedRelationshipCheckBox, (el, value) -> details().setIsFixedRelationship(value));
+    bindCheckBox(cdmChildActivitiesEnabledCheckBox, (el, value) -> details().setCdmChildActivitiesEnabled(value));
+    mainComponentController.configure(StudioBundle.get("binding_component_panel.main_component"), ".mainComponent");
+    editModalComponentController.configure(StudioBundle.get("binding_component_panel.edit_modal_component"), ".editModalComponent");
 
     relationshipCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel) {
@@ -80,11 +95,15 @@ public class FormNodeEditorBindingPanelController extends AbstractPropertyEditor
     BindingDetails details = details();
 
     setFieldValue(nameField, details.getName());
+    setFieldValue(isFixedRelationshipCheckBox, Boolean.TRUE.equals(details.getIsFixedRelationship()));
+    setFieldValue(cdmChildActivitiesEnabledCheckBox, Boolean.TRUE.equals(details.getCdmChildActivitiesEnabled()));
     withModelUpdateGuard(() -> {
       relationshipCombo.getItems().setAll(relevantRelationshipIds(details.getRelationshipName()));
       relationshipCombo.setValue(details.getRelationshipName());
       populateTargetRoleOptions(details.getRelationshipName(), details.getTargetRole());
     });
+    mainComponentController.setComponent(details::getMainComponent, details::setMainComponent, projectItem);
+    editModalComponentController.setComponent(details::getEditModalComponent, details::setEditModalComponent, projectItem);
   }
 
   /**

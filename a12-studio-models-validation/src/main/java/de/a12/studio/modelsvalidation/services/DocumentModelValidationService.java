@@ -28,6 +28,8 @@ import de.a12.studio.modelsvalidation.validators.StringPatternErrorMessageValida
 import de.a12.studio.modelsvalidation.validators.StringTypeConfigValidator;
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
+import de.a12.studio.modelsvalidation.validators.composeddocument.CdmQueryRootReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.composeddocument.CdmRelationshipStepValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +61,9 @@ public final class DocumentModelValidationService {
       new CustomFieldTypeConfigValidator(),
       new DateFormatConfigValidator(),
       new IncludeTypeDefinitionModeValidator(),
-      new RuleConditionSyntaxValidator()));
+      new RuleConditionSyntaxValidator(),
+      new CdmQueryRootReferenceValidator(),
+      new CdmRelationshipStepValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

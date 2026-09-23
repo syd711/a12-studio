@@ -88,6 +88,16 @@ class FormEditorFxmlLoadTest {
     assertAllFieldsInjected("/de/a12/studio/ui/editors/dialogs/document-model-settings-dialog.fxml");
   }
 
+  @Test
+  void bindingEditorInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("formtree/nodeeditors/formnode-editor-binding-panel.fxml");
+  }
+
+  @Test
+  void bindingRepeatEditorInjectsAllFields() throws Exception {
+    assertAllFieldsInjected("formtree/nodeeditors/formnode-editor-binding-repeat-panel.fxml");
+  }
+
   private void assertAllFieldsInjected(String fxml) throws Exception {
     assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
 

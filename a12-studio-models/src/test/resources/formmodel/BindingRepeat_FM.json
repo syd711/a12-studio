@@ -1,0 +1,49 @@
+{
+  "header": {
+    "id": "BindingRepeat_FM",
+    "modelType": "form",
+    "modelVersion": "37.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "BindingRepeat",
+            "id": "bindingrepeat1",
+            "enableAdd": true,
+            "enableRemove": true,
+            "binding": {
+              "type": "relationship",
+              "elementId": "position",
+              "details": {
+                "name": "OrderPosition_Binding",
+                "relationshipName": "OrderPosition_ReM",
+                "targetRole": "position",
+                "metaInformation": {
+                  "version": "1.0.0"
+                },
+                "mainComponent": {
+                  "id": "component1",
+                  "name": "TableList",
+                  "modelsSME": {
+                    "selectedItemsOverview": "Position_Selected_Ov"
+                  },
+                  "linkPageSize": 10
+                }
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

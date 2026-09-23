@@ -2,6 +2,8 @@ package de.a12.studio.modelsvalidation.refactoring;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.formmodel.Binding;
+import de.a12.studio.models.formmodel.BindingDetails;
+import de.a12.studio.models.formmodel.BindingRepeat;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelWalker;
 import de.a12.studio.models.formmodel.ScreenElement;
@@ -163,12 +165,20 @@ public final class RoleRenameRefactoring {
       if (element instanceof Binding binding
           && binding.getBinding() != null
           && binding.getBinding().getDetails() != null) {
-        var details = binding.getBinding().getDetails();
-        if (relationshipModelId.equals(details.getRelationshipName())
-            && oldRole.equals(details.getTargetRole())) {
-          edits.add(new Edit(details::setTargetRole, oldRole, newRole));
-        }
+        bindingEdit(binding.getBinding().getDetails(), relationshipModelId, oldRole, newRole, edits);
       }
+      else if (element instanceof BindingRepeat bindingRepeat
+          && bindingRepeat.getBinding() != null
+          && bindingRepeat.getBinding().getDetails() != null) {
+        bindingEdit(bindingRepeat.getBinding().getDetails(), relationshipModelId, oldRole, newRole, edits);
+      }
+    }
+  }
+
+  private static void bindingEdit(BindingDetails details, String relationshipModelId,
+      String oldRole, String newRole, List<Edit> edits) {
+    if (relationshipModelId.equals(details.getRelationshipName()) && oldRole.equals(details.getTargetRole())) {
+      edits.add(new Edit(details::setTargetRole, oldRole, newRole));
     }
   }
 

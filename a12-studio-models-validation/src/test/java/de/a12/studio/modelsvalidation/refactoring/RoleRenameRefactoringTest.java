@@ -2,6 +2,7 @@ package de.a12.studio.modelsvalidation.refactoring;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.formmodel.Binding;
+import de.a12.studio.models.formmodel.BindingRepeat;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.Screen;
@@ -81,6 +82,28 @@ class RoleRenameRefactoringTest {
     Binding matching = binding(RELATIONSHIP, OLD_ROLE);
     Binding otherRole = binding(RELATIONSHIP, "Order");
     Binding otherRelationship = binding("Gone", OLD_ROLE);
+
+    Screen screen = new Screen();
+    screen.getScreenElements().addAll(List.of(matching, otherRole, otherRelationship));
+    FormModelContent content = new FormModelContent();
+    content.getScreens().add(screen);
+    FormModel form = new FormModel();
+    form.setId("F");
+    form.setContent(content);
+
+    List<ModelEdits> edits = renameAndApply(form);
+
+    assertEquals(1, edits.size());
+    assertEquals(NEW_ROLE, matching.getBinding().getDetails().getTargetRole());
+    assertEquals("Order", otherRole.getBinding().getDetails().getTargetRole());
+    assertEquals(OLD_ROLE, otherRelationship.getBinding().getDetails().getTargetRole());
+  }
+
+  @Test
+  void aFormBindingRepeatFollowsTheRenameOnlyWhenItsRelationshipAndRoleMatch() {
+    BindingRepeat matching = bindingRepeat(RELATIONSHIP, OLD_ROLE);
+    BindingRepeat otherRole = bindingRepeat(RELATIONSHIP, "Order");
+    BindingRepeat otherRelationship = bindingRepeat("Gone", OLD_ROLE);
 
     Screen screen = new Screen();
     screen.getScreenElements().addAll(List.of(matching, otherRole, otherRelationship));
@@ -201,6 +224,17 @@ class RoleRenameRefactoringTest {
     binding.getBinding().getDetails().setRelationshipName(relationshipName);
     binding.getBinding().getDetails().setTargetRole(targetRole);
     return binding;
+  }
+
+  private static BindingRepeat bindingRepeat(String relationshipName, String targetRole) {
+    BindingRepeat repeat = new BindingRepeat();
+    de.a12.studio.models.formmodel.BindingContent content = new de.a12.studio.models.formmodel.BindingContent();
+    de.a12.studio.models.formmodel.BindingDetails details = new de.a12.studio.models.formmodel.BindingDetails();
+    details.setRelationshipName(relationshipName);
+    details.setTargetRole(targetRole);
+    content.setDetails(details);
+    repeat.setBinding(content);
+    return repeat;
   }
 
   private static ColumnLinkReference linkReference(String relationship, String targetRole) {

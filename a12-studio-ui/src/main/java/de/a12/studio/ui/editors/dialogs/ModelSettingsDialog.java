@@ -1,8 +1,10 @@
 package de.a12.studio.ui.editors.dialogs;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.FormStyleReferences;
@@ -17,6 +19,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
+import de.a12.studio.ui.editors.documentmodel.CdmQueryRootPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralDetachedRepeatSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralInlineRepeatSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralSettingsPanelController;
@@ -110,6 +113,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   @FXML
   private ModelInfoPanelController modelInfoController;
 
+  @FXML
+  private CdmQueryRootPanelController cdmQueryRootController;
+
   // Shared by every property editor panel above so their comm/its are only persisted once #onSave is
   // triggered, rather than immediately as they would be outside of this dialog.
   private final PropertyEditorSaveMode.Deferred saveMode = new PropertyEditorSaveMode.Deferred();
@@ -155,6 +161,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     timezoneController.setSaveMode(saveMode);
     modelConfigController.setSaveMode(saveMode);
     modelInfoController.setSaveMode(saveMode);
+    cdmQueryRootController.setSaveMode(saveMode);
 
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem != null && projectItem.getModel() != null) {
@@ -183,6 +190,12 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         timezoneController.setVisible(false);
         modelConfigController.setVisible(false);
         modelInfoController.setVisible(false);
+      }
+      if (model instanceof DocumentModel && !(model instanceof AdditiveDocumentModel) && !(model instanceof TypeDefinitionModel)) {
+        cdmQueryRootController.setModel(model, projectItem);
+        cdmQueryRootController.setVisible(true);
+      } else {
+        cdmQueryRootController.setVisible(false);
       }
       if (model instanceof OverviewModel overviewModel) {
         subtitlesController.setCustom(() -> ensureConfiguration(overviewModel).getSubtitle());
@@ -262,7 +275,8 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         modelReferencesController,
         timezoneController,
         modelConfigController,
-        modelInfoController);
+        modelInfoController,
+        cdmQueryRootController);
 
     Runnable updateErrorContainer = () -> {
       boolean anyError = panels.stream()

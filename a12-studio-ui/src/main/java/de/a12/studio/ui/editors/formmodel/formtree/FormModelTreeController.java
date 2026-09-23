@@ -7,6 +7,7 @@ import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.formmodel.AbstractRepeat;
 import de.a12.studio.models.formmodel.Binding;
+import de.a12.studio.models.formmodel.BindingRepeat;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Cell;
 import de.a12.studio.models.formmodel.Control;
@@ -23,6 +24,7 @@ import de.a12.studio.models.formmodel.MultiColumnSection;
 import de.a12.studio.models.formmodel.RepeatOverviewColumn;
 import de.a12.studio.models.formmodel.Row;
 import de.a12.studio.models.formmodel.Screen;
+import de.a12.studio.models.formmodel.ScreenElement;
 import de.a12.studio.models.formmodel.Section;
 import de.a12.studio.models.formmodel.TextCell;
 import de.a12.studio.models.projects.ProjectItem;
@@ -39,6 +41,7 @@ import de.a12.studio.ui.editors.formmodel.documenttree.DocumentSourceTreeControl
 import de.a12.studio.ui.editors.formmodel.formtree.commands.AddNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.commands.MoveNodeCommand;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorBindingPanelController;
+import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorBindingRepeatPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorButtonPanelPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorControlGridPanelController;
 import de.a12.studio.ui.editors.formmodel.formtree.nodeeditors.FormNodeEditorConfirmControlPanelController;
@@ -254,6 +257,10 @@ public class FormModelTreeController implements Initializable {
   private Node bindingEditor;
   @FXML
   private FormNodeEditorBindingPanelController bindingEditorController;
+  @FXML
+  private Node bindingRepeatEditor;
+  @FXML
+  private FormNodeEditorBindingRepeatPanelController bindingRepeatEditorController;
 
   private ProjectItem projectItem;
   private FormModelContent content;
@@ -527,7 +534,8 @@ public class FormModelTreeController implements Initializable {
     boolean isConfirmControl = node instanceof Control && isConfirmField((Control) node);
     boolean isDependentMasterControl = node instanceof Control && !isConfirmControl && isDependentControlMaster((Control) node);
     boolean isControl = node instanceof Control && !isConfirmControl && !isDependentMasterControl;
-    boolean isRepeat = node instanceof AbstractRepeat;
+    boolean isBindingRepeat = node instanceof BindingRepeat;
+    boolean isRepeat = node instanceof AbstractRepeat && !isBindingRepeat;
     boolean isTextCell = node instanceof TextCell;
     boolean isExpressionCell = node instanceof ExpressionCell;
     // GenericRepeatOverviewColumn (unrecognized column type) stays read-only, like other Generic* fallbacks.
@@ -553,9 +561,10 @@ public class FormModelTreeController implements Initializable {
     setVisible(buttonPanelEditor, isButtonPanel);
     setVisible(customCellEditor, isCustomCell);
     setVisible(bindingEditor, isBinding);
+    setVisible(bindingRepeatEditor, isBindingRepeat);
     setVisible(noSelectionLabel, !(isRow || isMultiColumnSection || isScreen || isSection
         || isControlGrid || isControl || isConfirmControl || isDependentMasterControl || isRepeat || isTextCell || isExpressionCell
-        || isRepeatOverviewColumn || isCustomScreenElement || isButtonPanel || isCustomCell || isBinding));
+        || isRepeatOverviewColumn || isCustomScreenElement || isButtonPanel || isCustomCell || isBinding || isBindingRepeat));
 
     if (isRow) {
       rowEditorController.setRow((Row) node, elementIndex, containerHideConditionScope(selectedItem));
@@ -608,6 +617,10 @@ public class FormModelTreeController implements Initializable {
     }
     else if (isBinding) {
       bindingEditorController.setBinding((Binding) node, documentModel, projectItem);
+    }
+    else if (isBindingRepeat) {
+      bindingRepeatEditorController.setBindingRepeat((BindingRepeat) node, documentModel, elementIndex,
+          containerHideConditionScope(selectedItem), projectItem);
     }
   }
 
@@ -1204,9 +1217,10 @@ public class FormModelTreeController implements Initializable {
   }
 
   /**
-   * Creates a {@link Binding} pre-wired to the dropped {@link RelationshipModel} (see {@link
-   * FormModelElementFactory#newBinding}) and attaches it as a child of {@code position}'s target - the Form
-   * Model analogue of the SME reference's relationship-model-list drop handling.
+   * Creates a {@link Binding} (or, for a to-many target role, a {@link BindingRepeat} - see {@link
+   * FormModelElementFactory#isToManyTargetRole}) pre-wired to the dropped {@link RelationshipModel} and attaches
+   * it as a child of {@code position}'s target - the Form Model analogue of the SME reference's
+   * relationship-model-list drop handling.
    */
   private void dropRelationshipModel(@NonNull Dragboard dragboard, @NonNull DropTarget position) {
     Object relationshipId = dragboard.getContent(RelationshipModelPanelController.RELATIONSHIP_DRAG_FORMAT);
@@ -1222,12 +1236,15 @@ public class FormModelTreeController implements Initializable {
       return;
     }
     Object targetNode = position.targetItem().getValue().getNode();
-    Binding binding = FormModelElementFactory.newBinding(relationshipModel, documentModel != null ? documentModel.getId() : null);
-    Command command = actions.createAttachCommand(targetNode, binding);
+    String boundDocumentModelId = documentModel != null ? documentModel.getId() : null;
+    ScreenElement newElement = FormModelElementFactory.isToManyTargetRole(relationshipModel, boundDocumentModelId)
+        ? FormModelElementFactory.newBindingRepeat(relationshipModel, boundDocumentModelId)
+        : FormModelElementFactory.newBinding(relationshipModel, boundDocumentModelId);
+    Command command = actions.createAttachCommand(targetNode, newElement);
     if (command == null) {
       return;
     }
     commandStack.execute(command);
-    actions.notifyChanged(binding);
+    actions.notifyChanged(newElement);
   }
 }

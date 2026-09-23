@@ -1,8 +1,10 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
 import de.a12.studio.models.formmodel.Binding;
+import de.a12.studio.models.formmodel.BindingContent;
 import de.a12.studio.models.formmodel.BindingDetails;
 import de.a12.studio.models.formmodel.BindingMetaInformation;
+import de.a12.studio.models.formmodel.BindingRepeat;
 import de.a12.studio.models.formmodel.ButtonPanel;
 import de.a12.studio.models.formmodel.Control;
 import de.a12.studio.models.formmodel.ControlGrid;
@@ -201,6 +203,55 @@ final class FormModelElementFactory {
     metaInformation.setVersion(BINDING_META_INFORMATION_VERSION);
     details.setMetaInformation(metaInformation);
     return binding;
+  }
+
+  /**
+   * A new {@link BindingRepeat} pre-wired to {@code relationshipModel}, exactly like {@link #newBinding} but for
+   * a to-many target role (see {@link #isToManyTargetRole}) - dropping such a relationship creates a repeat
+   * instead of a single {@link Binding}, since one row per linked entity makes sense but a single-entity Binding
+   * doesn't.
+   */
+  static BindingRepeat newBindingRepeat(@NonNull RelationshipModel relationshipModel, @Nullable String boundDocumentModelId) {
+    BindingRepeat repeat = new BindingRepeat();
+    repeat.setId(generateId("bindingrepeat"));
+    BindingContent content = new BindingContent();
+    content.setType("relationship");
+    BindingDetails details = new BindingDetails();
+    details.setName(relationshipModel.getId() + BINDING_NAME_SUFFIX);
+    details.setRelationshipName(relationshipModel.getId());
+    details.setTargetRole(calculateTargetRole(relationshipModel, boundDocumentModelId));
+    BindingMetaInformation metaInformation = new BindingMetaInformation();
+    metaInformation.setVersion(BINDING_META_INFORMATION_VERSION);
+    details.setMetaInformation(metaInformation);
+    content.setDetails(details);
+    repeat.setBinding(content);
+    return repeat;
+  }
+
+  /**
+   * Whether dropping {@code relationshipModel} onto the tree should create a {@link BindingRepeat} rather than a
+   * plain {@link Binding}: true when the target role calculated by {@link #calculateTargetRole} has a to-many
+   * multiplicity (unbounded, or an upper limit greater than 1) - one linked entity per row only makes sense
+   * when there can be more than one.
+   */
+  static boolean isToManyTargetRole(@NonNull RelationshipModel relationshipModel, @Nullable String boundDocumentModelId) {
+    String targetRole = calculateTargetRole(relationshipModel, boundDocumentModelId);
+    if (targetRole == null || relationshipModel.getContent() == null) {
+      return false;
+    }
+    return relationshipModel.getContent().getEntityCharacteristics().stream()
+        .filter(characteristic -> targetRole.equals(characteristic.getRole()))
+        .findFirst()
+        .map(FormModelElementFactory::isToMany)
+        .orElse(false);
+  }
+
+  private static boolean isToMany(@NonNull EntityCharacteristic characteristic) {
+    if (characteristic.getLinkConstraints() == null || characteristic.getLinkConstraints().getMultiplicity() == null) {
+      return false;
+    }
+    var multiplicity = characteristic.getLinkConstraints().getMultiplicity();
+    return Boolean.TRUE.equals(multiplicity.getUnbounded()) || (multiplicity.getUpperLimit() != null && multiplicity.getUpperLimit() > 1);
   }
 
   private static @Nullable String calculateTargetRole(@NonNull RelationshipModel relationshipModel, @Nullable String boundDocumentModelId) {
