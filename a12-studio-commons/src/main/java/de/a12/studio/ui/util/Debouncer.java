@@ -5,7 +5,11 @@ import java.util.concurrent.*;
 import javafx.application.Platform;
 
 public class Debouncer {
-  private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+  private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
+    Thread thread = new Thread(runnable, "debouncer");
+    thread.setDaemon(true);
+    return thread;
+  });
   private final ConcurrentHashMap<String, Future<?>> delayedMap = new ConcurrentHashMap<>();
 
   public void debounce(final String key, final Runnable runnable, int ms) {

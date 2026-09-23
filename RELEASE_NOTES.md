@@ -1,5 +1,5 @@
-# Release Notes 2026.06-ext0-0.0.13
+# Release Notes 2026.06-ext0-0.0.14
 
 ## Changes
 
-- UI stuff.
+- Fixed killing of Studio zombie processes.
