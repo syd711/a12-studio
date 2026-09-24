@@ -70,6 +70,9 @@ public class Control extends Cell {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private DependentControls dependentControls;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean autoExpand;
+
   public Control() {
     setType(CellType.CONTROL);
   }

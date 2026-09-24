@@ -2,6 +2,7 @@ package de.a12.studio.models.treemodel;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,7 @@ import java.util.Map;
 @Setter
 public class TreeConfiguration {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Map<String, Object> dnd;
   private String hierarchicalColumnRef;
   private ExpansionStrategy expansionStrategy;

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class FieldBasedRepeatOverviewColumn extends RepeatOverviewColumn {
@@ -15,6 +18,15 @@ public class FieldBasedRepeatOverviewColumn extends RepeatOverviewColumn {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private DatePickerConfig datePickerConfig;
   private String elementRef;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean autoExpand;
+
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String readonlyPresentation;
+
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Style> style = new ArrayList<>();
 
   public FieldBasedRepeatOverviewColumn() {
     setType(RepeatOverviewColumnType.FIELD_BASED);

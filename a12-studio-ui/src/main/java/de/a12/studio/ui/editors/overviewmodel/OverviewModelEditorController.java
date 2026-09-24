@@ -291,14 +291,14 @@ public class OverviewModelEditorController extends AbstractEditorController impl
 
   private ElementBox ensureSubHeaderBox() {
     if (model.getContent().getSubHeaderBox() == null) {
-      model.getContent().setSubHeaderBox(new ElementBox());
+      model.getContent().setSubHeaderBox(ElementBox.createEmpty());
     }
     return model.getContent().getSubHeaderBox();
   }
 
   private ElementBox ensureFooterBox() {
     if (model.getContent().getFooterBox() == null) {
-      model.getContent().setFooterBox(new ElementBox());
+      model.getContent().setFooterBox(ElementBox.createEmpty());
     }
     return model.getContent().getFooterBox();
   }

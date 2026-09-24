@@ -25,6 +25,7 @@ public class MultiSelectionConfig {
 
   private String collapseOption;
   private String counterOption;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String selectionArea;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Button> buttons = new ArrayList<>();

@@ -39,4 +39,10 @@ public class FormModelContent {
   private String disableRuleConfirmation;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean hideConfirmationSummary;
+
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String openNewDocumentPreProcessing;
+
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String openExistingDocumentPreProcessing;
 }

@@ -35,6 +35,10 @@ public class RelationshipModelContent {
 
   private List<EntityCharacteristic> entityCharacteristics = new ArrayList<>();
 
+  // Removed from the A12 RelationshipModel; kept so legacy files survive a load/save cycle unchanged.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String associationType;
+
   @JsonIgnore
   public String getLinkDocumentModelValue() {
     if (linkDocumentModel == null || linkDocumentModel.isNull()) {

@@ -1,6 +1,8 @@
 package de.a12.studio.models.formmodel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +20,25 @@ public abstract class AbstractRepeat extends ScreenElement {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean readonly;
+  // Some files omit "repeatOverviewColumn" while others write it as "[]"; the explicit flag preserves that distinction
+  // across a load/save cycle (same approach as A12Model labels/locales).
+  @JsonIgnore
   private List<RepeatOverviewColumn> repeatOverviewColumn = new ArrayList<>();
+
+  @JsonIgnore
+  private boolean repeatOverviewColumnExplicit;
+
+  @JsonProperty("repeatOverviewColumn")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private List<RepeatOverviewColumn> getRepeatOverviewColumnForJson() {
+    return repeatOverviewColumnExplicit || !repeatOverviewColumn.isEmpty() ? repeatOverviewColumn : null;
+  }
+
+  @JsonProperty("repeatOverviewColumn")
+  private void setRepeatOverviewColumnForJson(List<RepeatOverviewColumn> value) {
+    repeatOverviewColumnExplicit = value != null;
+    repeatOverviewColumn = value != null ? value : new ArrayList<>();
+  }
   // Reference to the repeatable Document Model group this repeat iterates over.
   private String groupRef;
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -57,6 +77,9 @@ public abstract class AbstractRepeat extends ScreenElement {
   // Per-repeat override of the model-wide Defaults.confirmationTexts (e.g. "REMOVE").
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private Map<String, ConfirmationText> confirmationTexts = new LinkedHashMap<>();
+
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private Map<String, TextContainer> buttonLabels = new LinkedHashMap<>();
   // Per-Repeat overrides for label, hint and placeholder (take precedence over GroupConfigEntry values).
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private LocalizedText label;

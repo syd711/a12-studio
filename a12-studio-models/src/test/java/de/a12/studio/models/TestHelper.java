@@ -17,6 +17,16 @@ public class TestHelper {
     return resolveTestingWorkspaceDir("e-commerce");
   }
 
+  public static Path resolveTestingWorkspacesDir() {
+    for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
+      Path candidate = dir.resolve("testing").resolve("workspaces");
+      if (Files.isDirectory(candidate)) {
+        return candidate;
+      }
+    }
+    throw new IllegalStateException("Could not locate 'testing/workspaces' above " + Path.of("").toAbsolutePath());
+  }
+
   private static Path resolveTestingWorkspaceDir(String workspaceName) {
     for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
       Path candidate = dir.resolve("testing").resolve("workspaces").resolve(workspaceName);

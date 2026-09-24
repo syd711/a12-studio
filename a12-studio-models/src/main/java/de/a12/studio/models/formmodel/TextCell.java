@@ -15,6 +15,9 @@ public class TextCell extends Cell {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private HideCondition hideCondition;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private GridSpan offset;
+
   public TextCell() {
     setType(CellType.TEXT_CELL);
   }

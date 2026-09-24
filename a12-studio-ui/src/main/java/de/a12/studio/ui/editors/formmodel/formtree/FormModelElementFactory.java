@@ -100,6 +100,7 @@ final class FormModelElementFactory {
   static InlineRepeat newInlineRepeat() {
     InlineRepeat repeat = new InlineRepeat();
     repeat.setId(generateId("inlinerepeat"));
+    repeat.setRepeatOverviewColumnExplicit(true);
     repeat.setName("InlineRepeat");
     return repeat;
   }
@@ -113,6 +114,7 @@ final class FormModelElementFactory {
   static EmbeddedRepeat newEmbeddedRepeat() {
     EmbeddedRepeat repeat = new EmbeddedRepeat();
     repeat.setId(generateId("embeddedrepeat"));
+    repeat.setRepeatOverviewColumnExplicit(true);
     repeat.setName("EmbeddedRepeat");
     return repeat;
   }
@@ -120,6 +122,7 @@ final class FormModelElementFactory {
   static DetachedRepeat newDetachedRepeat() {
     DetachedRepeat repeat = new DetachedRepeat();
     repeat.setId(generateId("detachedrepeat"));
+    repeat.setRepeatOverviewColumnExplicit(true);
     repeat.setName("DetachedRepeat");
     return repeat;
   }
@@ -214,6 +217,7 @@ final class FormModelElementFactory {
   static BindingRepeat newBindingRepeat(@NonNull RelationshipModel relationshipModel, @Nullable String boundDocumentModelId) {
     BindingRepeat repeat = new BindingRepeat();
     repeat.setId(generateId("bindingrepeat"));
+    repeat.setRepeatOverviewColumnExplicit(true);
     BindingContent content = new BindingContent();
     content.setType("relationship");
     BindingDetails details = new BindingDetails();
