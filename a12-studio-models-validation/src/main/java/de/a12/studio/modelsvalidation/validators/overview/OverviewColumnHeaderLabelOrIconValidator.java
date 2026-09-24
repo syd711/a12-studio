@@ -41,9 +41,10 @@ public final class OverviewColumnHeaderLabelOrIconValidator implements ModelVali
       return List.of();
     }
 
-    ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
+    ElementIndex documentModelIndex = new ElementIndex(documentModel, context.otherDocumentModels());
     List<ModelValidationError> errors = new ArrayList<>();
     for (Column column : overviewModel.getContent().getColumns()) {
+      ElementIndex index = OverviewElementResolution.indexFor(column, documentModelIndex, context);
       // A dangling elementRef is already flagged separately (as an ERROR) by
       // OverviewFieldReferenceValidator - only report this accessibility warning once the field is known to
       // actually exist, identified by its resolved display path rather than its raw internal id.

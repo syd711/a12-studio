@@ -66,21 +66,29 @@ public class DocumentModelElementFactory {
     return field;
   }
 
-  public static Element newRuleElement(@NonNull List<Element> siblings, @NonNull ModelRoot modelRoot) {
+  /**
+   * @param targetField the field the rule validates (its name prefixes the rule's default name), or {@code null}
+   *                    if none was selected - the rule is then named {@code "ValidationRule"}
+   */
+  public static Element newRuleElement(@NonNull List<Element> siblings, @NonNull ModelRoot modelRoot, FieldElement targetField) {
     RuleElement rule = new RuleElement();
     String id = generateId(ID_PREFIX_RULE, modelRoot);
     rule.setId(id);
-    rule.setName(uniqueName("ValidationRule", siblings));
+    rule.setName(uniqueName(targetField == null ? "ValidationRule" : targetField.getName() + "Validation", siblings));
     RuleConfig config = new RuleConfig();
     config.setErrorCode("Error " + id);
     rule.setRule(config);
     return rule;
   }
 
-  public static Element newComputationElement(@NonNull List<Element> siblings, @NonNull ModelRoot modelRoot) {
+  /**
+   * @param targetField the field the computation computes (its name prefixes the computation's default name), or
+   *                    {@code null} if none was selected - the computation is then named {@code "ComputationRule"}
+   */
+  public static Element newComputationElement(@NonNull List<Element> siblings, @NonNull ModelRoot modelRoot, FieldElement targetField) {
     ComputationElement computation = new ComputationElement();
     computation.setId(generateId(ID_PREFIX_COMPUTATION, modelRoot));
-    computation.setName(uniqueName("ComputationRule", siblings));
+    computation.setName(uniqueName(targetField == null ? "ComputationRule" : targetField.getName() + "Computation", siblings));
     computation.setComputation(new ComputationConfig());
     return computation;
   }

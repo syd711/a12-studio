@@ -9,7 +9,10 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.querymodel.QueryModel;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +46,52 @@ public final class DocumentModelFieldResolver {
         .findFirst()
         .orElse(null);
     return CombinedDocumentModelElements.resolveForFieldReferences(contextItem, documentModelId);
+  }
+
+  /**
+   * The Document Model {@code overviewModel}'s columns resolve against: the one named by a {@link
+   * ModelReference#PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW} reference, or - when there's no such reference (a
+   * legitimate alternative binding, see {@link ModelReference#PURPOSE_QUERY_MODEL_FOR_OVERVIEW}'s own doc) -
+   * the target Document Model of the Query Model named by a {@code query-model-for-overview} reference
+   * instead. Mirrors the Overview Model editor's own fallback ({@code
+   * OverviewModelEditorController#currentDocumentModelId} in {@code a12-studio-ui}) and the validation
+   * service's ({@code OverviewElementResolution#referencedDocumentModel} in {@code
+   * a12-studio-models-validation}).
+   */
+  public static DocumentModel resolveOverviewDocumentModel(OverviewModel overviewModel, ProjectItem contextItem) {
+    DocumentModel explicit = resolveReferencedDocumentModel(overviewModel, ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW, contextItem);
+    if (explicit != null) {
+      return explicit;
+    }
+    if (overviewModel.getModelReferences() == null) {
+      return null;
+    }
+    String queryModelId = overviewModel.getModelReferences().stream()
+        .filter(reference -> ModelReference.PURPOSE_QUERY_MODEL_FOR_OVERVIEW.equals(reference.getPurpose()))
+        .map(ModelReference::getReference)
+        .findFirst()
+        .orElse(null);
+    ProjectItem queryItem = queryModelId == null ? null : contextItem.findByModelId(queryModelId);
+    if (queryItem == null || !(queryItem.getModel() instanceof QueryModel queryModel) || queryModel.getContent() == null) {
+      return null;
+    }
+    return CombinedDocumentModelElements.resolveForFieldReferences(contextItem, queryModel.getContent().getTargetDocumentModel());
+  }
+
+  /**
+   * The Document Model a column carrying {@code linkReferences} actually resolves against: the named
+   * relationship's own {@code linkDocumentModel} (the fields attached to the relationship's own link, e.g. a
+   * Relationship UI Model's "Proficiency"/"Acknowledged" columns - see {@code PersonSkills_Re.json}), not the
+   * Overview Model's primary Document/Query Model. {@code null} if {@code relationshipId} is {@code null} or
+   * doesn't resolve to a Relationship Model with a link document model of its own.
+   */
+  public static DocumentModel resolveLinkDocumentModel(String relationshipId, ProjectItem contextItem) {
+    ProjectItem relationshipItem = relationshipId == null ? null : contextItem.findByModelId(relationshipId);
+    if (relationshipItem == null || !(relationshipItem.getModel() instanceof RelationshipModel relationshipModel)
+        || relationshipModel.getContent() == null) {
+      return null;
+    }
+    return CombinedDocumentModelElements.resolveForFieldReferences(contextItem, relationshipModel.getContent().getLinkDocumentModelValue());
   }
 
   /**

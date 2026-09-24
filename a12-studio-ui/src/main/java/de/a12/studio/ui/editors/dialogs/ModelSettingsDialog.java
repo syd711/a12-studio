@@ -38,6 +38,7 @@ import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.editors.propertyeditors.SupportedCharactersPanelController;
 import de.a12.studio.ui.editors.propertyeditors.TimezonePanelController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.AdditiveDocumentModels;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
@@ -49,6 +50,7 @@ import java.net.URL;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ModelSettingsDialog implements Initializable, DialogController {
@@ -91,6 +93,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @FXML
   private AnnotationsPanelController annotationsController;
+
+  @FXML
+  private AnnotationsPanelController referenceModelAnnotationsController;
 
   @FXML
   private DocumentUniquenessCriteriaPanelController documentUniquenessCriteriaController;
@@ -141,6 +146,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     labelsController.configureModelLabels();
     subtitlesController.configureCustom("subtitle", StudioBundle.get("subtitles"));
     annotationsController.hideAnnotationDatasetsButton();
+    referenceModelAnnotationsController.hideAnnotationDatasetsButton();
     modelStylesController.configureModelStyles();
 
     modelSettingsNameController.setSaveMode(saveMode);
@@ -156,6 +162,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     subtitlesController.setSaveMode(saveMode);
     rolesController.setSaveMode(saveMode);
     annotationsController.setSaveMode(saveMode);
+    referenceModelAnnotationsController.setSaveMode(saveMode);
     documentUniquenessCriteriaController.setSaveMode(saveMode);
     modelReferencesController.setSaveMode(saveMode);
     timezoneController.setSaveMode(saveMode);
@@ -177,19 +184,32 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       annotationsController.setModel(model);
       modelReferencesController.setModel(model);
       if (model instanceof DocumentModel documentModel) {
+        boolean additive = documentModel instanceof AdditiveDocumentModel;
         documentUniquenessCriteriaController.setModel(documentModel);
         documentUniquenessCriteriaController.setVisible(true);
         timezoneController.setModel(documentModel);
-        timezoneController.setVisible(true);
+        timezoneController.setVisible(!additive);
         modelConfigController.setModel(documentModel);
-        modelConfigController.setVisible(true);
+        modelConfigController.setVisible(!additive);
         modelInfoController.setModel(documentModel);
-        modelInfoController.setVisible(true);
+        modelInfoController.setVisible(!additive);
+        if (additive) {
+          annotationsController.setTitle(StudioBundle.get("additive_model_annotations"));
+          Optional<DocumentModel> referenceModel = AdditiveDocumentModels.findBaseModel(projectItem, documentModel);
+          referenceModel.ifPresent(referenceModelAnnotationsController::setModel);
+          referenceModelAnnotationsController.setEditorDisabled(true);
+          referenceModelAnnotationsController.setVisible(referenceModel.isPresent());
+        } else {
+          annotationsController.setTitle(StudioBundle.get("annotations"));
+          referenceModelAnnotationsController.setVisible(false);
+        }
       } else {
         documentUniquenessCriteriaController.setVisible(false);
         timezoneController.setVisible(false);
         modelConfigController.setVisible(false);
         modelInfoController.setVisible(false);
+        annotationsController.setTitle(StudioBundle.get("annotations"));
+        referenceModelAnnotationsController.setVisible(false);
       }
       if (model instanceof DocumentModel && !(model instanceof AdditiveDocumentModel) && !(model instanceof TypeDefinitionModel)) {
         cdmQueryRootController.setModel(model, projectItem);
@@ -228,9 +248,10 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       }
       supportedCharactersController.setVisible(
           !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel)
-              && !(model instanceof RelationshipModel) && !(model instanceof QueryModel));
+              && !(model instanceof RelationshipModel) && !(model instanceof QueryModel) && !(model instanceof AdditiveDocumentModel));
       modelReferencesController.setVisible(
-          !(model instanceof OverviewModel) && !(model instanceof FormModel) && !(model instanceof QueryModel));
+          !(model instanceof OverviewModel) && !(model instanceof FormModel) && !(model instanceof QueryModel)
+              && !(model instanceof AdditiveDocumentModel));
     }
 
     bindErrorContainer();
@@ -271,6 +292,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         subtitlesController,
         rolesController,
         annotationsController,
+        referenceModelAnnotationsController,
         documentUniquenessCriteriaController,
         modelReferencesController,
         timezoneController,

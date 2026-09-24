@@ -3,11 +3,15 @@ package de.a12.studio.modelsvalidation.validators.overview;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.querymodel.QueryModel;
+import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 
@@ -23,18 +27,73 @@ public final class OverviewElementResolution {
   private OverviewElementResolution() {
   }
 
-  /** The single Document Model referenced by this Overview Model's header, if any. */
+  /**
+   * The Document Model this Overview Model's columns/filters resolve against: the one named by a header
+   * {@code modelType: "document"} reference (following it through a Combination Model stand-in, e.g. {@code
+   * PersonEmployee_Ov.json} -> {@code PersonEmployee_Cm}, via {@link
+   * CombinedDocumentModelElements#resolveForFieldReferences}), or - when there's no such reference at all, or
+   * it doesn't resolve - the target Document Model of the Query Model named by a {@link
+   * ModelReference#PURPOSE_QUERY_MODEL_FOR_OVERVIEW} reference instead (a legitimate alternative binding, see
+   * that constant's own doc; mirrors the Overview Model editor's own fallback, {@code
+   * OverviewModelEditorController#currentDocumentModelId} in {@code a12-studio-ui}).
+   */
   public static DocumentModel referencedDocumentModel(OverviewModel model, ValidationContext context) {
     if (model.getModelReferences() == null) {
       return null;
     }
-    return model.getModelReferences().stream()
+    String documentModelId = model.getModelReferences().stream()
         .filter(reference -> reference.getModelType() == ModelType.DOCUMENT)
         .map(ModelReference::getReference)
-        .map(context::findOtherDocumentModel)
-        .filter(documentModel -> documentModel != null)
         .findFirst()
         .orElse(null);
+    DocumentModel explicit = resolveDocumentModelOrCombination(documentModelId, context);
+    if (explicit != null) {
+      return explicit;
+    }
+    String queryModelId = model.getModelReferences().stream()
+        .filter(reference -> ModelReference.PURPOSE_QUERY_MODEL_FOR_OVERVIEW.equals(reference.getPurpose()))
+        .map(ModelReference::getReference)
+        .findFirst()
+        .orElse(null);
+    if (!(context.findOtherModel(queryModelId) instanceof QueryModel queryModel) || queryModel.getContent() == null) {
+      return null;
+    }
+    return resolveDocumentModelOrCombination(queryModel.getContent().getTargetDocumentModel(), context);
+  }
+
+  /** {@code documentModelId} resolved as a plain Document Model, or - if it names a Combination Model instead
+   * - the synthetic merge {@link CombinedDocumentModelElements#resolveForFieldReferences} makes of it. */
+  private static DocumentModel resolveDocumentModelOrCombination(String documentModelId, ValidationContext context) {
+    if (documentModelId == null) {
+      return null;
+    }
+    DocumentModel direct = context.findOtherDocumentModel(documentModelId);
+    return direct != null ? direct : CombinedDocumentModelElements.resolveForFieldReferences(context.projectItem(), documentModelId);
+  }
+
+  /**
+   * The {@link ElementIndex} {@code column}'s {@code elementRef} actually resolves against: {@code
+   * documentModelIndex} for a plain column, or - for a column carrying {@code linkReferences} (a
+   * Relationship UI Model's Available/Selected Items overview projecting a field that lives on the
+   * relationship's own link document, e.g. {@code PersonSkills_Re.json}'s {@code linkDocumentModel}) - an
+   * index over that relationship's link document model instead, falling back to {@code documentModelIndex} if
+   * the relationship or its link document model doesn't resolve. Mirrors {@code
+   * OverviewColumnOptions#indexFor} in {@code a12-studio-ui}.
+   */
+  public static ElementIndex indexFor(Column column, ElementIndex documentModelIndex, ValidationContext context) {
+    if (column == null || column.getLinkReferences() == null || column.getLinkReferences().isEmpty()) {
+      return documentModelIndex;
+    }
+    String relationshipId = column.getLinkReferences().get(0).getRelationship();
+    DocumentModel linkDocumentModel = relationshipId == null ? null : referencedLinkDocumentModel(relationshipId, context);
+    return linkDocumentModel != null ? new ElementIndex(linkDocumentModel, context.otherDocumentModels()) : documentModelIndex;
+  }
+
+  private static DocumentModel referencedLinkDocumentModel(String relationshipId, ValidationContext context) {
+    if (!(context.findOtherModel(relationshipId) instanceof RelationshipModel relationshipModel) || relationshipModel.getContent() == null) {
+      return null;
+    }
+    return resolveDocumentModelOrCombination(relationshipModel.getContent().getLinkDocumentModelValue(), context);
   }
 
   /**

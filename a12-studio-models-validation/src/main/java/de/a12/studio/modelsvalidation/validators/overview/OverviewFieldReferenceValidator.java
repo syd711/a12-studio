@@ -34,13 +34,14 @@ public final class OverviewFieldReferenceValidator implements ModelValidator {
       return List.of();
     }
 
-    ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
+    ElementIndex documentModelIndex = new ElementIndex(documentModel, context.otherDocumentModels());
     List<ModelValidationError> errors = new ArrayList<>();
     for (Column column : overviewModel.getContent().getColumns()) {
       String elementRef = column.getElementRef();
       if (elementRef == null || elementRef.isBlank() || OverviewElementResolution.isMetaFieldId(elementRef)) {
         continue;
       }
+      ElementIndex index = OverviewElementResolution.indexFor(column, documentModelIndex, context);
       Element element = OverviewElementResolution.resolve(index, elementRef);
       if (element == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,

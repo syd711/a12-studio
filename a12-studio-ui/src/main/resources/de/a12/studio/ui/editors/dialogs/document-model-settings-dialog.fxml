@@ -61,7 +61,10 @@
                           <!-- Roles -->
                           <fx:include fx:id="roles" source="../propertyeditors/roles-panel.fxml" />
 
-                          <!-- Annotations -->
+                          <!-- Additive Document Model only: Reference Model Annotations (read-only) -->
+                          <fx:include fx:id="referenceModelAnnotations" source="../propertyeditors/reference-model-annotations-panel.fxml" />
+
+                          <!-- Annotations (Additive Document Model: Additive Model Annotations) -->
                           <fx:include fx:id="annotations" source="../propertyeditors/annotations-panel.fxml" />
 
                           <!-- Document Uniqueness Criteria -->

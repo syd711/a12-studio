@@ -12,6 +12,7 @@ import de.a12.studio.models.applicationmodel.ViewAddDirective;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.ProjectItem;
 
@@ -29,8 +30,6 @@ import java.util.Map;
  * over {@code a12-studio-models} types - no JavaFX, no HTTP.
  */
 public class ApplicationModelPreviewService {
-
-  private static final String PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW = "document-model-for-overview";
 
   public PreviewApplicationDto buildPreview(ProjectItem projectItem) {
     ApplicationModel model = (ApplicationModel) projectItem.getModel();
@@ -144,24 +143,43 @@ public class ApplicationModelPreviewService {
 
   /**
    * Mirrors the reference implementation's field resolution: each Overview Model column has an
-   * {@code elementRef} pointing into the {@code document-model-for-overview}-referenced Document Model's
-   * element tree ({@code modelRoot.rootGroups}, searched recursively through groups). The effective label is
-   * the column's own label if set, else the resolved Document Model field's label, else its name.
+   * {@code elementRef} pointing into the referenced Document Model's element tree ({@code
+   * modelRoot.rootGroups}, searched recursively through groups) - the {@code document-model-for-overview}-
+   * or {@code query-model-for-overview}-referenced one (see {@link
+   * DocumentModelFieldResolver#resolveOverviewDocumentModel}), or, for a column carrying {@code
+   * linkReferences}, the named relationship's own link document model instead (see {@link
+   * DocumentModelFieldResolver#resolveLinkDocumentModel}). The effective label is the column's own label if
+   * set, else the resolved Document Model field's label, else its name.
    */
   private List<PreviewFieldDto> resolveOverviewFields(OverviewModel overviewModel, ProjectItem contextItem) {
-    DocumentModel documentModel = DocumentModelFieldResolver.resolveReferencedDocumentModel(
-        overviewModel, PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW, contextItem);
-    if (documentModel == null) {
-      return List.of();
-    }
+    DocumentModel documentModel = DocumentModelFieldResolver.resolveOverviewDocumentModel(overviewModel, contextItem);
     Map<String, Element> elementsById = DocumentModelFieldResolver.index(documentModel);
+    Map<String, Map<String, Element>> linkElementsByRelationshipId = new HashMap<>();
 
     List<PreviewFieldDto> fields = new ArrayList<>();
     for (Column column : overviewModel.getContent().getColumns()) {
-      Element element = elementsById.get(column.getElementRef());
+      Map<String, Element> elements = elementsForColumn(column, elementsById, linkElementsByRelationshipId, contextItem);
+      Element element = elements.get(column.getElementRef());
       fields.add(new PreviewFieldDto(resolveColumnLabel(column, element), DocumentModelFieldResolver.fieldType(element)));
     }
     return fields;
+  }
+
+  /** {@code elementsById} for a plain column, or - for one carrying {@code linkReferences} - the (lazily
+   * resolved and cached) element index of the named relationship's own link document model instead. */
+  private Map<String, Element> elementsForColumn(Column column, Map<String, Element> elementsById,
+      Map<String, Map<String, Element>> linkElementsByRelationshipId, ProjectItem contextItem) {
+    List<ColumnLinkReference> linkReferences = column.getLinkReferences();
+    if (linkReferences == null || linkReferences.isEmpty()) {
+      return elementsById;
+    }
+    String relationshipId = linkReferences.get(0).getRelationship();
+    if (relationshipId == null) {
+      return elementsById;
+    }
+    Map<String, Element> linkElements = linkElementsByRelationshipId.computeIfAbsent(relationshipId,
+        id -> DocumentModelFieldResolver.index(DocumentModelFieldResolver.resolveLinkDocumentModel(id, contextItem)));
+    return linkElements.containsKey(column.getElementRef()) ? linkElements : elementsById;
   }
 
   private String resolveColumnLabel(Column column, Element element) {

@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.documentmodel;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.NewModelFactory;
+import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
@@ -10,6 +11,7 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.documentmodel.ModelRoot;
+import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.Project;
@@ -130,6 +132,9 @@ public class DocumentModelActions {
    */
   private Element baseModelNode;
 
+  /** The field most recently selected in the tree; the default target of a new Validation/Computation Rule. */
+  private FieldElement lastSelectedField;
+
   /**
    * Sets the callback that triggers inline rename on the currently selected cell.
    */
@@ -158,6 +163,34 @@ public class DocumentModelActions {
     this.commandStack = commandStack;
     this.elementsTreeTable = elementsTreeTable;
     this.onModelChanged = onModelChanged;
+    elementsTreeTable.getSelectionModel().selectedItemProperty().addListener((observable, oldItem, newItem) -> {
+      if (newItem != null && newItem.getValue() != null && newItem.getValue().getElement() instanceof FieldElement field) {
+        lastSelectedField = field;
+      }
+    });
+  }
+
+  /**
+   * The field a new Validation/Computation Rule targets: the selected element if it is a field, else the field
+   * most recently selected (a rule is often added while its group or a sibling rule is selected) - as long as
+   * that field still exists in the model (or its base model, for an Additive Document Model). {@code null} if none.
+   */
+  private FieldElement resolveTargetField(@NonNull ElementIndex index) {
+    TreeItem<ElementViewModel> selectedItem = elementsTreeTable.getSelectionModel().getSelectedItem();
+    FieldElement candidate = lastSelectedField;
+    if (selectedItem != null && selectedItem.getValue() != null && selectedItem.getValue().getElement() instanceof FieldElement selected) {
+      candidate = selected;
+    }
+    if (candidate == null || !(index.allElements().contains(candidate) || index.additiveFieldElements().contains(candidate))) {
+      return null;
+    }
+    return candidate;
+  }
+
+  private ElementIndex newElementIndex() {
+    DocumentModel documentModel = (DocumentModel) projectItem.getModel();
+    return new ElementIndex(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem),
+        ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.COMBINATION));
   }
 
   /**
@@ -256,11 +289,11 @@ public class DocumentModelActions {
     fieldMenuItem = createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_field"), Icons.ELEMENT_FIELD),
         siblings -> DocumentModelElementFactory.newFieldElement(siblings, modelRoot));
     items.add(fieldMenuItem);
-    ruleMenuItem = createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_validation_rule"), Icons.ELEMENT_VALIDATION_RULE),
-        siblings -> DocumentModelElementFactory.newRuleElement(siblings, modelRoot));
+    ruleMenuItem = createMenuItem(StudioBundle.get("document_model_tree.add_validation_rule"), Icons.ELEMENT_VALIDATION_RULE);
+    ruleMenuItem.setOnAction(event -> onAddTargetingElement(DocumentModelElementFactory::newRuleElement));
     items.add(ruleMenuItem);
-    computationMenuItem = createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_computation_rule"), Icons.ELEMENT_COMPUTATION),
-        siblings -> DocumentModelElementFactory.newComputationElement(siblings, modelRoot));
+    computationMenuItem = createMenuItem(StudioBundle.get("document_model_tree.add_computation_rule"), Icons.ELEMENT_COMPUTATION);
+    computationMenuItem.setOnAction(event -> onAddTargetingElement(DocumentModelElementFactory::newComputationElement));
     items.add(computationMenuItem);
     items.add(createAddMenuItem(createMenuItem(StudioBundle.get("document_model_tree.add_attachment"), Icons.ELEMENT_ATTACHMENT),
         siblings -> DocumentModelElementFactory.newAttachmentElement(siblings, modelRoot)));
@@ -301,6 +334,28 @@ public class DocumentModelActions {
   }
 
   private void onAddElement(@NonNull Function<List<Element>, Element> elementFactory) {
+    addElement(elementFactory, null);
+  }
+
+  /** Factory of a Validation/Computation Rule that is named after, and targets, a field; see {@link #onAddTargetingElement}. */
+  @FunctionalInterface
+  private interface TargetingElementFactory {
+
+    Element create(List<Element> siblings, ModelRoot modelRoot, FieldElement targetField);
+  }
+
+  /**
+   * Adds a Validation/Computation Rule targeting the selected field (see {@link #resolveTargetField}): the
+   * field's name prefixes the rule's default name, and it becomes the rule's "Error Entity" / "Computed Field".
+   * The relative path can only be worked out once the new element sits in the tree, so it is set right after
+   * the add - as part of the new element, so undo/redo of the add keeps it.
+   */
+  private void onAddTargetingElement(@NonNull TargetingElementFactory elementFactory) {
+    FieldElement targetField = resolveTargetField(newElementIndex());
+    addElement(siblings -> elementFactory.create(siblings, modelRoot, targetField), targetField);
+  }
+
+  private void addElement(@NonNull Function<List<Element>, Element> elementFactory, FieldElement targetField) {
     InsertionPoint insertionPoint = resolveInsertionPointForAdd();
     if (insertionPoint == null) {
       return;
@@ -314,7 +369,20 @@ public class DocumentModelActions {
     newElement.setName(name);
 
     commandStack.execute(new AddNodeCommand<>(insertionPoint.siblings(), newElement, insertionPoint.index()));
+    if (targetField != null) {
+      applyTargetField(newElement, targetField);
+    }
     onModelChanged.accept(newElement);
+  }
+
+  private void applyTargetField(@NonNull Element newElement, @NonNull FieldElement targetField) {
+    String relPath = newElementIndex().relativePathTo(newElement, targetField);
+    if (newElement instanceof RuleElement rule && rule.getRule() != null) {
+      rule.getRule().setErrorEntityRelPath(relPath);
+    }
+    else if (newElement instanceof ComputationElement computation && computation.getComputation() != null) {
+      computation.getComputation().setComputedFieldRelPath(relPath);
+    }
   }
 
   /**

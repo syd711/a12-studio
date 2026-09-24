@@ -103,6 +103,26 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
   }
 
   /**
+   * Shows/hides this panel entirely, e.g. the "Reference Model Annotations" instance in {@link
+   * de.a12.studio.ui.editors.dialogs.ModelSettingsDialog}, which only applies to an {@link
+   * de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel} whose base model actually resolved.
+   */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
+  /**
+   * Overrides this panel's title - widens {@link AbstractPropertyEditor#setTitle} to {@code public} so a
+   * dialog embedding several instances of this same controller class (e.g. {@code ModelSettingsDialog}'s
+   * plain "Annotations" vs. an Additive Document Model's "Additive Model Annotations") can pick the right
+   * one per instance.
+   */
+  @Override
+  public void setTitle(@NonNull String title) {
+    super.setTitle(title);
+  }
+
+  /**
    * Binds this panel to an arbitrary owner's {@code List<Annotation>} field via a getter, e.g. {@code
    * button::getAnnotations} - for an owner that is neither a single {@link Element} nor a whole {@link
    * A12Model}'s header (see {@link de.a12.studio.ui.editors.formmodel.dialogs.FormButtonDialogController}).
