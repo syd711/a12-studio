@@ -21,7 +21,6 @@ Fixed 2026-09-23: Composed Document Model (CDM) is now a real recognized type, a
 
 ### Form Models
 Manual checks (no known defect, just not yet verified):
-- Detached and embedded repeats.
 - Drag and drop in general; error handling when dropping from a repeatable group into a regular group; dnd of sections with multi-select.
 - Trigger and dependency icons on tree rows: SME's T/D flags are not ported, so check what is shown and add them.
 - Merge the Settings and Control tabs of the field editor; note that dependencies are only shown for fields that have values.
@@ -33,18 +32,15 @@ Features:
 
 ### Document Model
 Manual checks:
-- How the fields of a new validation rule are initialised.
-- Whitespace in rule names and other name fields.
-- References in error messages that use the `$path$` notation. (Rename/move rewriting for these is unit-tested; what is left is checking it in the UI.)
-- The tree updates after moving groups or creating validation rules.
-- Validation rules for repeatable groups and "field not filled" (kcp3).
+- When a new validation rule is created, initialize the newly created validation rules field "Error Entity" with the field that was selected when the new rule was created. Apply the same logic for the computation rule and use the latest field selection for the "Computed Field" value. Also use the selected field name as default name for rules and validations and append the suffix "Validation" or "Computation".
+- Check the SME for references in where in error messages the `$path$` notation is used. (Rename/move rewriting for these is unit-tested; what is left is checking it in the UI.)
 
 Features:
 - Base Model / Include pickers should not offer candidates that would create a loop: SME filters the Base Model picker, and calls the combination module from a Document Model's Include picker (`createsIncludeLoop`). Here the loop is only reported after selection.
 
 ### Additive Document Model
-- Verify manually: an Additive Document Model opened on its own must hide the heterogeneity annotations in the raw annotations panel too (the filter keys off `instanceof DocumentModel`, and `AdditiveDocumentModel` extends it, so it should hold).
-- Add and remove elements against the base model (SME's overlay editing mode; only the read-only "Additive Elements Only" preview exists).
+- [⧉ In TODO.md] @..\..\mnt\c\workspace\a12-studio\TODO.md Verify manually: an Additive Document Model opened on its own must hide the heterogeneity annotations in the raw annotations panel too (the filter keys off instanceof DocumentModel, and AdditiveDocumentModel extends it, so it should hold). I have checked this. compare this against the SME. the additive
+  document model must have "Reference Model Annotations" and "Additive Model Annotations". the "Reference Model Annotations" are displayed read-only. customize the model settings dialog for additive document models in this way. do not show the editors for supported characters, model references, timezone, model configuration and model info.
 
 ### Relationship Models
 - The Labels (entity add/edit dialog, `entity-characteristic-dialog.fxml`) are not used by the default UI for relationships: hide them.
