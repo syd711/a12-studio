@@ -5,7 +5,7 @@
   "typedefinition":     { "version": "29.4.0", "enabled": true,  "suffix": "TDM" },
   "form":               { "version": "39.0.0", "enabled": true,  "suffix": "FM"  },
   "overview":           { "version": "39.0.0", "enabled": true,  "suffix": "OM"  },
-  "tree":               { "version": "11.0.0", "enabled": false,  "suffix": "TM"  },
+  "tree":               { "version": "11.0.0", "enabled": true,  "suffix": "TM"  },
   "print":              { "version": "4.0.0",  "enabled": false, "suffix": "PM"  },
   "printtypesettings":  { "version": "3.2.0",  "enabled": false, "suffix": "TSM" },
   "module-masterdetail":{ "version": "1.0.0",  "enabled": true,  "suffix": "MDM" },

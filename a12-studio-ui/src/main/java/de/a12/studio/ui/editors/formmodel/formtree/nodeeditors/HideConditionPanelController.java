@@ -168,7 +168,9 @@ public class HideConditionPanelController implements Initializable {
 
     updatingFromModel = true;
     try {
+      // Leading null entry = empty choice, lets the user reset (remove) the hide condition.
       fieldCombo.getItems().setAll(masterFieldIds);
+      fieldCombo.getItems().add(0, null);
       HideCondition current = getter.get();
       fieldCombo.setValue(current == null ? null : current.getMasterField());
     } finally {

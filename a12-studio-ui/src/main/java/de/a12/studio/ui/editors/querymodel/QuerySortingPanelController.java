@@ -20,7 +20,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -43,6 +44,9 @@ public class QuerySortingPanelController extends AbstractPropertyEditor {
 
   // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into getSort().
   private static final DataFormat SORT_INDEX = new DataFormat("application/x-a12-query-sort-index");
+
+  // Must match the drag handle spacer and the column widths declared in query-sorting-panel.fxml's header row.
+  private static final double DRAG_HANDLE_WIDTH = 18.0;
 
   @FXML
   private HBox sortingHeaderRow;
@@ -96,21 +100,25 @@ public class QuerySortingPanelController extends AbstractPropertyEditor {
   private HBox createSortRow(@NonNull QuerySort sort, int index, int rowCount, @NonNull List<QueryTraversalOption> traversalOptions) {
     FontIcon dragHandle = RowFactory.createDragHandle();
 
-    HBox traversalCell = createTraversalCell(sort, traversalOptions);
+    Label traversalCell = createTraversalCell(sort, traversalOptions);
     Label fieldLabel = createRowLabel(sort.getSortBy().getField(), 200.0, sort);
     fieldLabel.getStyleClass().add("path-text");
     Label directionLabel = createRowLabel(directionDisplay(sort.getSortBy().getDirection()), 110.0, sort);
     Label ignoreCaseLabel = createRowLabel(Boolean.TRUE.equals(sort.getSortBy().getIgnoreCase()) ? "Yes" : "No", 90.0, sort);
     Label nullHandlingLabel = createRowLabel(nullHandlingDisplay(sort.getSortBy().getNullHandling()), 140.0, sort);
 
-    HBox row = new HBox(10.0, dragHandle, traversalCell, fieldLabel, directionLabel, ignoreCaseLabel, nullHandlingLabel, createSortActionsBox(sort, index, rowCount));
+    // Fixed-width slot so the handle's glyph width can't shift the columns relative to the header row.
+    StackPane dragHandleSlot = new StackPane(dragHandle);
+    fixWidth(dragHandleSlot, DRAG_HANDLE_WIDTH);
+
+    HBox row = new HBox(10.0, dragHandleSlot, traversalCell, fieldLabel, directionLabel, ignoreCaseLabel, nullHandlingLabel, createSortActionsBox(sort, index, rowCount));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
     RowFactory.setupRowDragAndDrop(row, dragHandle, SORT_INDEX, index, this::moveSort);
     return row;
   }
 
-  private HBox createTraversalCell(QuerySort sort, List<QueryTraversalOption> traversalOptions) {
+  private Label createTraversalCell(QuerySort sort, List<QueryTraversalOption> traversalOptions) {
     QueryTraversalOption current = new QueryTraversalOption(sort.getRelationshipModel(), sort.getTargetRole());
     boolean unresolved = !traversalOptions.contains(current);
 
@@ -119,15 +127,18 @@ public class QuerySortingPanelController extends AbstractPropertyEditor {
       label.getStyleClass().add("validation-error");
       label.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("relationship_could_not_be_resolved")));
     }
+    return label;
+  }
 
-    HBox cell = new HBox(label);
-    HBox.setHgrow(cell, Priority.ALWAYS);
-    return cell;
+  private static void fixWidth(Region region, double width) {
+    region.setMinWidth(width);
+    region.setPrefWidth(width);
+    region.setMaxWidth(width);
   }
 
   private Label createRowLabel(String text, double width, QuerySort sort) {
     Label label = new Label(text);
-    label.setPrefWidth(width);
+    fixWidth(label, width);
     label.setCursor(Cursor.HAND);
     label.setOnMouseClicked(event -> {
       if (event.getClickCount() == 1) {

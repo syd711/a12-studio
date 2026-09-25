@@ -30,20 +30,26 @@
     "modelReferences": [
       {
         "alias": "PersonFreelancer_Cm",
-        "modelType": "document",
         "purpose": "data binding",
-        "reference": "PersonFreelancer_Cm"
+        "reference": "PersonFreelancer_Cm",
+        "modelType": "document"
       },
       {
         "purpose": "relationship-ui",
-        "modelType": "relationship-ui",
-        "reference": "PersonSkills_Skills_Ru"
+        "reference": "PersonSkills_Skills_Ru",
+        "modelType": "relationship-ui"
       }
     ]
   },
   "content": {
     "subHeaderBox": {
-      "id": "subHeaderBox"
+      "id": "subHeaderBox",
+      "minorButtons": {
+        "button": []
+      },
+      "majorButtons": {
+        "button": []
+      }
     },
     "footerBox": {
       "id": "footerBox",
@@ -195,6 +201,16 @@
               {
                 "type": "CustomScreenElement",
                 "id": "relationshipuimodel_1c356",
+                "title": {
+                  "type": "Multilingual",
+                  "multilingualText": {
+                    "text": []
+                  }
+                },
+                "hideCondition": {
+                  "masterField": "field_285d3",
+                  "cases": []
+                },
                 "reference": "PersonSkills_Skills_Ru"
               }
             ]

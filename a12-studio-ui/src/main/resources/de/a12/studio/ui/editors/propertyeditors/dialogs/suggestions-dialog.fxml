@@ -4,21 +4,20 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="450.0" minWidth="550.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.a12.studio.ui.editors.propertyeditors.dialogs.SuggestionsDialogController">
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="450.0" minWidth="550.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.propertyeditors.dialogs.SuggestionsDialogController">
    <top>
       <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
    </top>
    <center>
       <VBox spacing="10.0" BorderPane.alignment="TOP_LEFT">
          <children>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" VBox.vgrow="ALWAYS">
                <content>
                   <VBox spacing="8.0">
                      <children>
@@ -35,8 +34,8 @@
                </content>
             </ScrollPane>
             <HBox spacing="8.0">
-               <Button fx:id="addItemButton" mnemonicParsing="false" onAction="#onAddItem" styleClass="primary-button" text="%add_suggestion" >
-                  <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+               <Button fx:id="addItemButton" mnemonicParsing="false" onAction="#onAddItem" styleClass="primary-button" text="%add_suggestion">
+                  <graphic><FontIcon iconLiteral="mdi2p-plus" iconSize="16" styleClass="button-icon" /></graphic>
                   <tooltip><Tooltip text="%add_suggestion" /></tooltip>
                </Button>
                <VBox.margin>

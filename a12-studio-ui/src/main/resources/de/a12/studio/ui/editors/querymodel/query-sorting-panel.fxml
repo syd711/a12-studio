@@ -19,14 +19,15 @@
         <center>
             <VBox spacing="10.0">
                 <children>
-                    <HBox fx:id="sortingHeaderRow" spacing="10.0">
+                    <!-- Left inset = .module-row's 12px padding + 1px border, so header columns line up with the rows below. -->
+                    <HBox fx:id="sortingHeaderRow" spacing="10.0" style="-fx-padding: 0 0 0 13;">
                         <children>
-                            <Label styleClass="field-label" prefWidth="18.0" text="" />
-                            <Label styleClass="field-label" prefWidth="220.0" text="%relationship_traversal" />
-                            <Label styleClass="field-label" prefWidth="200.0" text="%field" />
-                            <Label styleClass="field-label" prefWidth="110.0" text="%direction" />
-                            <Label styleClass="field-label" prefWidth="90.0" text="%ignore_case" />
-                            <Label styleClass="field-label" prefWidth="140.0" text="%null_handling" />
+                            <Label styleClass="field-label" minWidth="18.0" prefWidth="18.0" maxWidth="18.0" text="" />
+                            <Label styleClass="field-label" minWidth="220.0" prefWidth="220.0" maxWidth="220.0" text="%relationship_traversal" />
+                            <Label styleClass="field-label" minWidth="200.0" prefWidth="200.0" maxWidth="200.0" text="%field" />
+                            <Label styleClass="field-label" minWidth="110.0" prefWidth="110.0" maxWidth="110.0" text="%direction" />
+                            <Label styleClass="field-label" minWidth="90.0" prefWidth="90.0" maxWidth="90.0" text="%ignore_case" />
+                            <Label styleClass="field-label" minWidth="140.0" prefWidth="140.0" maxWidth="140.0" text="%null_handling" />
                         </children>
                     </HBox>
                     <VBox fx:id="sortingRows" spacing="8.0" />

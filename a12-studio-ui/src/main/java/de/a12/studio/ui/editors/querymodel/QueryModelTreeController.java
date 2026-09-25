@@ -76,6 +76,9 @@ public class QueryModelTreeController implements Initializable {
   private Button removeRelationshipButton;
 
   @FXML
+  private Button openModelButton;
+
+  @FXML
   private TreeTableView<QueryTreeRow> elementsTreeTable;
 
   @FXML
@@ -402,6 +405,11 @@ public class QueryModelTreeController implements Initializable {
 
   private ContextMenu createContextMenu(@NonNull TreeItem<QueryTreeRow> treeItem) {
     ContextMenu contextMenu = new ContextMenu();
+    if (treeItem.getValue().isDocumentNode()) {
+      MenuItem openItem = new MenuItem(StudioBundle.get("open_model"));
+      openItem.setOnAction(event -> openLinkedModel(treeItem.getValue()));
+      contextMenu.getItems().add(openItem);
+    }
     String sourceDocumentModelId = sourceDocumentModelIdFor(treeItem.getValue());
     if (sourceDocumentModelId != null) {
       MenuItem addItem = new MenuItem(StudioBundle.get("query_model_tree.add_relationship"));
@@ -476,6 +484,24 @@ public class QueryModelTreeController implements Initializable {
     QueryTreeRow row = selected != null ? selected.getValue() : null;
     addRelationshipButton.setDisable(row == null || sourceDocumentModelIdFor(row) == null);
     removeRelationshipButton.setDisable(row == null || !row.isRelationshipLink());
+    openModelButton.setDisable(row == null || !row.isDocumentNode());
+  }
+
+  /** Opens the Document Model a "document node" row (the target Document Model, or a resolved relationship hop)
+   * points at in its own editor tab - see {@link ProjectDocumentModels#openModelInEditor(String)}. */
+  private void openLinkedModel(@NonNull QueryTreeRow row) {
+    DocumentModel linked = row.getResolvedTargetDocumentModel();
+    if (linked != null) {
+      ProjectDocumentModels.openModelInEditor(linked.getId());
+    }
+  }
+
+  @FXML
+  private void onOpenModelButton() {
+    TreeItem<QueryTreeRow> selected = elementsTreeTable.getSelectionModel().getSelectedItem();
+    if (selected != null) {
+      openLinkedModel(selected.getValue());
+    }
   }
 
   @FXML

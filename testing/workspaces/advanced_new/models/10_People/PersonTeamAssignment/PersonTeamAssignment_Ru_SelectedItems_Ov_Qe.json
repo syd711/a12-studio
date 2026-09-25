@@ -19,28 +19,22 @@
     ],
     "modelReferences": [
       {
-        "modelType": "document",
         "alias": "DM",
         "purpose": "document-model-for-query",
-        "reference": "Person_Dc"
+        "reference": "Person_Dc",
+        "modelType": "document"
       },
       {
-        "modelType": "relationship",
         "alias": "RM",
         "purpose": "relationship-model-for-query",
-        "reference": "TeamPerson_Re"
+        "reference": "TeamPerson_Re",
+        "modelType": "relationship"
       }
     ]
   },
   "content": {
     "projectionName": "document",
     "targetDocumentModel": "Person_Dc",
-    "paging": {
-      "pageSize": 10,
-      "pageNumber": 0
-    },
-    "exclude": true,
-    "fields": [],
     "constraint": {
       "operator": "exact_match",
       "field": "/__meta/docRef",
@@ -50,6 +44,7 @@
       {
         "relationshipModel": "TeamPerson_Re",
         "targetRole": "Team",
+        "maxDepth": 1,
         "constraint": {
           "operator": "has",
           "relationshipModel": "TeamPerson_Re",
@@ -60,15 +55,30 @@
             "value": "${Person_Dc, [/__meta/docRef]}"
           }
         },
-        "maxDepth": 1,
-        "fields": [
-          "/Team/TeamName",
-          "/Team/Location"
-        ],
         "linkDocumentFields": [
           "/LinkFields/Position",
           "/LinkFields/TimeShare"
+        ],
+        "fields": [
+          "/Team/TeamName",
+          "/Team/Location"
         ]
+      }
+    ],
+    "paging": {
+      "pageSize": 10,
+      "pageNumber": 0
+    },
+    "exclude": true,
+    "fields": [],
+    "sort": [
+      {
+        "relationshipModel": "CityPerson_Re",
+        "targetRole": "City",
+        "field": "/City/Density",
+        "direction": "ASC",
+        "nullHandling": null,
+        "ignoreCase": true
       }
     ]
   }

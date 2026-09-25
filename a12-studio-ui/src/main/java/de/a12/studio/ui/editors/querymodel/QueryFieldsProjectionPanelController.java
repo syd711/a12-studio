@@ -135,6 +135,7 @@ public class QueryFieldsProjectionPanelController extends AbstractPropertyEditor
 
   private HBox createFieldRow(@NonNull String path) {
     Label label = new Label(path);
+    label.getStyleClass().add("path-text");
     label.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(label, Priority.ALWAYS);
 

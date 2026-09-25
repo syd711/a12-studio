@@ -33,7 +33,6 @@ Manual checks (no known defect, just not yet verified):
 
 ### Document Model
 Manual checks:
-- When a new validation rule is created, initialize the newly created validation rules field "Error Entity" with the field that was selected when the new rule was created. Apply the same logic for the computation rule and use the latest field selection for the "Computed Field" value. Also use the selected field name as default name for rules and validations and append the suffix "Validation" or "Computation".
 - Check the SME for references in where in error messages the `$path$` notation is used. (Rename/move rewriting for these is unit-tested; what is left is checking it in the UI.)
 
 Features:
@@ -63,7 +62,6 @@ Features:
 
 ## Parked (do not start unless asked)
 
-- Query Model multi-target types (Composed Document Model / Transformer as target) and SME's structured-AST filter editor.
 - Real Form Engine preview (the current in-editor preview is a wireframe; the real "Deploy → Preview App" exists separately).
 
 ## Misc
