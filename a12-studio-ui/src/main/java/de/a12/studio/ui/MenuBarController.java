@@ -26,6 +26,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CustomMenuItem;
@@ -62,6 +64,9 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
   @FXML
   private MenuBar menuBar;
+
+  @FXML
+  private HBox menuBarRightPanel;
 
   @FXML
   private Button updateBtn;
@@ -183,16 +188,19 @@ public class MenuBarController implements Initializable, StudioEventListener {
     }
   }
 
-  private static final Font RECENT_PROJECT_FONT = Font.font(14);
   // Space reserved for the remove button, its padding and the row's own spacing/padding,
   // on top of the measured text width.
   private static final double RECENT_PROJECT_ROW_CHROME_WIDTH = 60;
+  // Min/max/chrome widths are authored for LocalUISettings.DEFAULT_FONT_SIZE and scaled with it.
   private static final double RECENT_PROJECT_ROW_MIN_WIDTH = 240;
   private static final double RECENT_PROJECT_ROW_MAX_WIDTH = 720;
 
   private double calculateRecentProjectRowWidth(List<String> paths) {
+    int fontSize = LocalUISettings.getFontSize();
+    double scale = (double) fontSize / LocalUISettings.DEFAULT_FONT_SIZE;
+
     Text measurer = new Text();
-    measurer.setFont(RECENT_PROJECT_FONT);
+    measurer.setFont(Font.font(fontSize));
 
     double maxTextWidth = 0;
     for (String path : paths) {
@@ -200,8 +208,8 @@ public class MenuBarController implements Initializable, StudioEventListener {
       maxTextWidth = Math.max(maxTextWidth, measurer.getLayoutBounds().getWidth());
     }
 
-    double rowWidth = maxTextWidth + RECENT_PROJECT_ROW_CHROME_WIDTH;
-    return Math.min(Math.max(rowWidth, RECENT_PROJECT_ROW_MIN_WIDTH), RECENT_PROJECT_ROW_MAX_WIDTH);
+    double rowWidth = maxTextWidth + RECENT_PROJECT_ROW_CHROME_WIDTH * scale;
+    return Math.min(Math.max(rowWidth, RECENT_PROJECT_ROW_MIN_WIDTH * scale), RECENT_PROJECT_ROW_MAX_WIDTH * scale);
   }
 
   private CustomMenuItem createRecentProjectMenuItem(File file, double rowWidth) {
@@ -429,6 +437,20 @@ public class MenuBarController implements Initializable, StudioEventListener {
     Dialogs.openUpdateInfoDialog(newVersion);
   }
 
+  /** The button icons are sized in the FXML (a stylesheet can't scale them, see
+   *  {@link WidgetFactory#bindIconSizeToFontSize(FontIcon)}), so they follow the font size here. */
+  private void bindToolbarIconsToFontSize() {
+    for (Node node : menuBarRightPanel.lookupAll(".menu-bar-button")) {
+      if (node instanceof Button button) {
+        if (button.getGraphic() instanceof FontIcon icon) {
+          WidgetFactory.bindIconSizeToFontSize(icon);
+        } else if (button.getGraphic() instanceof ImageView image) {
+          WidgetFactory.bindIconSizeToFontSize(image);
+        }
+      }
+    }
+  }
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     newMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
@@ -436,6 +458,9 @@ public class MenuBarController implements Initializable, StudioEventListener {
 
     LocalUISettings.pruneMissingRecentProjects();
     refreshRecentProjectsMenu();
+    // Row widths are computed from the font size, so they have to be rebuilt when it changes.
+    WidgetFactory.fontSizeProperty().addListener((observable, oldSize, newSize) -> refreshRecentProjectsMenu());
+    bindToolbarIconsToFontSize();
     updateBtn.managedProperty().bind(updateBtn.visibleProperty());
     runUpdateCheck();
 

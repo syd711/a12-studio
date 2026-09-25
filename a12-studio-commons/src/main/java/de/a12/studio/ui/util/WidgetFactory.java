@@ -10,8 +10,12 @@ import de.a12.studio.ui.components.OutputDialogController;
 import de.a12.studio.ui.components.TextAreaInputDialogController;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -20,6 +24,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.PopupControl;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
@@ -325,6 +330,79 @@ public class WidgetFactory {
    */
   public static void applyFontSize(Parent root) {
     root.setStyle("-fx-font-size: " + LocalUISettings.getFontSize() + "px;");
+    installPopupFontSizeListener();
+  }
+
+  private static final ReadOnlyIntegerWrapper fontSize = new ReadOnlyIntegerWrapper(LocalUISettings.getFontSize());
+
+  /** The configured base UI text size in px; updated by {@link #applyFontSizeToAllOpenWindows()},
+   *  i.e. whenever the user changes it, for sizes that can't be expressed in the stylesheet. */
+  public static ReadOnlyIntegerProperty fontSizeProperty() {
+    return fontSize.getReadOnlyProperty();
+  }
+
+  /**
+   * Makes {@code icon} scale with the UI font size. The size it has right now is taken as the size
+   * authored for {@link LocalUISettings#DEFAULT_FONT_SIZE}. A stylesheet can't do this: an em-based
+   * "-fx-icon-size" is resolved against the icon's own font, which itself derives from the icon
+   * size, so it compounds.
+   */
+  public static void bindIconSizeToFontSize(FontIcon icon) {
+    int base = icon.getIconSize();
+    icon.iconSizeProperty().bind(Bindings.createIntegerBinding(
+        () -> (int) Math.round((double) base * fontSize.get() / LocalUISettings.DEFAULT_FONT_SIZE), fontSize));
+  }
+
+  /** {@link #bindIconSizeToFontSize(FontIcon)} for bitmap icons: scales the fit size. */
+  public static void bindIconSizeToFontSize(ImageView icon) {
+    double baseWidth = icon.getFitWidth();
+    double baseHeight = icon.getFitHeight();
+    icon.fitWidthProperty().bind(Bindings.createDoubleBinding(
+        () -> baseWidth * fontSize.get() / LocalUISettings.DEFAULT_FONT_SIZE, fontSize));
+    icon.fitHeightProperty().bind(Bindings.createDoubleBinding(
+        () -> baseHeight * fontSize.get() / LocalUISettings.DEFAULT_FONT_SIZE, fontSize));
+  }
+
+  private static final String FONT_SIZE_STYLE = "-fx-font-size:";
+  private static boolean popupFontSizeListenerInstalled;
+
+  /**
+   * Menus, context menus, tooltips and combo box dropdowns are {@link PopupControl}s: they live in
+   * their own window whose scene is not a child of the window root {@link #applyFontSize} styles,
+   * so they would otherwise stay at the JavaFX default size. This applies the configured size to
+   * each popup as it is created; already-open ones are covered by
+   * {@link #applyFontSizeToAllOpenWindows()}.
+   */
+  private static void installPopupFontSizeListener() {
+    if (popupFontSizeListenerInstalled) {
+      return;
+    }
+    popupFontSizeListenerInstalled = true;
+    Window.getWindows().addListener((ListChangeListener<Window>) change -> {
+      while (change.next()) {
+        for (Window window : change.getAddedSubList()) {
+          if (window instanceof PopupControl popup) {
+            applyFontSize(popup);
+          }
+        }
+      }
+    });
+  }
+
+  /** Sets the configured font size on a popup while keeping any other inline style it already has
+   *  (e.g. the font family {@link #createTooltip} sets). */
+  private static void applyFontSize(PopupControl popup) {
+    StringBuilder style = new StringBuilder();
+    String existing = popup.getStyle();
+    if (existing != null) {
+      for (String declaration : existing.split(";")) {
+        if (!declaration.isBlank() && !declaration.strip().startsWith(FONT_SIZE_STYLE)) {
+          style.append(declaration.strip()).append("; ");
+        }
+      }
+    }
+    style.append(FONT_SIZE_STYLE).append(' ').append(LocalUISettings.getFontSize()).append("px;");
+    popup.setStyle(style.toString());
   }
 
   /**
@@ -346,7 +424,12 @@ public class WidgetFactory {
    *  window, every open dialog, the preview app console), so moving the Preferences slider takes
    *  effect immediately instead of requiring a restart. */
   public static void applyFontSizeToAllOpenWindows() {
+    fontSize.set(LocalUISettings.getFontSize());
     for (Window window : Window.getWindows()) {
+      if (window instanceof PopupControl popup) {
+        applyFontSize(popup);
+        continue;
+      }
       Scene scene = window.getScene();
       if (scene == null || scene.getRoot() == null) {
         continue;
