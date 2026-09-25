@@ -2,19 +2,14 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
@@ -35,7 +30,7 @@
             <items>
                 <BorderPane>
                     <top>
-                        <ToolBar BorderPane.alignment="CENTER">
+                        <ToolBar styleClass="panel-toolbar" BorderPane.alignment="CENTER">
                             <items>
                                 <Button mnemonicParsing="false" onAction="#onAddChild" styleClass="default-button">
                                     <graphic>
@@ -89,37 +84,31 @@
                 </StackPane>
                 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
                     <content>
-                        <VBox spacing="16.0" styleClass="field-editor">
+                        <VBox fx:id="settingsBox" spacing="12.0" styleClass="field-editor">
                             <children>
-                                <VBox spacing="4.0">
-                                    <children>
-                                        <Label styleClass="field-label" text="%id" />
-                                        <TextField fx:id="elementIdField" editable="false" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="4.0">
-                                    <children>
-                                        <Label styleClass="field-label" text="%type" />
-                                        <ComboBox fx:id="elementTypeField" maxWidth="Infinity" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="4.0">
-                                    <children>
-                                        <Label styleClass="field-label" text="%namespace" />
-                                        <TextField fx:id="elementNamespaceField" editable="false" />
-                                    </children>
-                                </VBox>
-                                <VBox spacing="4.0" VBox.vgrow="ALWAYS">
-                                    <children>
-                                        <HBox spacing="8.0">
-                                            <children>
-                                                <Label styleClass="field-label" text="%props_json" />
-                                                <Label fx:id="propsErrorLabel" styleClass="error-label" visible="false" />
-                                            </children>
-                                        </HBox>
-                                        <TextArea fx:id="elementPropsField" prefRowCount="20" wrapText="false" VBox.vgrow="ALWAYS" />
-                                    </children>
-                                </VBox>
+<!--                                <fx:include fx:id="elementPanel" source="element-panel.fxml" />-->
+                                <fx:include fx:id="configurationPanel" source="configuration-panel.fxml" />
+                                <fx:include fx:id="sourcePanel" source="source-panel.fxml" />
+                                <fx:include fx:id="eventsPanel" source="events-panel.fxml" />
+                                <fx:include fx:id="contentPanel" source="content-panel.fxml" />
+                                <fx:include fx:id="variantPanel" source="variant-panel.fxml" />
+                                <fx:include fx:id="appearancePanel" source="appearance-panel.fxml" />
+                                <fx:include fx:id="iconsPanel" source="icons-panel.fxml" />
+                                <fx:include fx:id="mediaQueryPanel" source="media-query-panel.fxml" />
+                                <fx:include fx:id="tableColumnsPanel" source="table-columns-panel.fxml" />
+                                <fx:include fx:id="layoutPanel" source="layout-panel.fxml" />
+                                <fx:include fx:id="responsivePanel" source="responsive-panel.fxml" />
+                                <fx:include fx:id="rowPanel" source="row-panel.fxml" />
+                                <fx:include fx:id="displayOptionsPanel" source="display-options-panel.fxml" />
+                                <fx:include fx:id="dimensionsPanel" source="dimensions-panel.fxml" />
+                                <fx:include fx:id="colorPanel" source="color-panel.fxml" />
+                                <fx:include fx:id="backgroundImagePanel" source="background-image-panel.fxml" />
+                                <fx:include fx:id="borderPanel" source="border-panel.fxml" />
+                                <fx:include fx:id="shadowPanel" source="shadow-panel.fxml" />
+                                <fx:include fx:id="accessibilityPanel" source="accessibility-panel.fxml" />
+                                <fx:include fx:id="advancedPanel" source="advanced-panel.fxml" />
+                                <fx:include fx:id="tableEventPanel" source="table-event-panel.fxml" />
+                                <fx:include fx:id="rawPropsPanel" source="raw-props-panel.fxml" />
                             </children>
                             <padding>
                                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

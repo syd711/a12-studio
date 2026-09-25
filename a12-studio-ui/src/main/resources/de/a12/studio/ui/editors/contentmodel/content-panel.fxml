@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.a12.studio.ui.editors.contentmodel.fields.*?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.content"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.contentmodel.ContentSettingsPanelController">
+    <BorderPane>
+        <top>
+            <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+        <center>
+            <VBox spacing="2.0">
+            <SettingGroup types="Button">
+            <TextRow label="%content_settings.label" path="label" prompt="%content_settings.enter_button_label"/>
+            <SwitchRow label="%content_settings.hide_label" path="labelHidden"/>
+            <IconRow label="%content_settings.icon" path="icon"/>
+            <SwitchRow label="%content_settings.vertical" path="vertical"/>
+            <TextRow label="%content_settings.description" path="title" prompt="%content_settings.enter_button_description"/>
+            </SettingGroup>
+            <SettingGroup types="Link">
+            <TextRow label="%content_settings.url" path="href" secureUrl="true" prompt="%content_settings.https_example_com"/>
+            <SwitchRow label="%content_settings.open_in_new_tab" path="openInNewTab"/>
+            <TextRow label="%content_settings.link_text" path="label" prompt="%content_settings.enter_link_label"/>
+            <SwitchRow label="%content_settings.hide_link_text" path="labelHidden"/>
+            <TextRow label="%content_settings.title" path="title" prompt="%content_settings.optional_hover_text"/>
+            </SettingGroup>
+            <SettingGroup types="MessageBox">
+            <TextRow label="%content_settings.message" path="label" multiline="true" prompt="%content_settings.enter_a_message"/>
+            <ToggleRow label="%content_settings.variant" path="variant" initial="error">
+                <ToggleOption value="info" label="%content_settings.info"/>
+                <ToggleOption value="success" label="%content_settings.success"/>
+                <ToggleOption value="warning" label="%content_settings.warning"/>
+                <ToggleOption value="error" label="%content_settings.error"/>
+            </ToggleRow>
+            <IconRow label="%content_settings.icon" path="icon"/>
+            </SettingGroup>
+            <SettingGroup types="Tooltip">
+            <TextRow label="%content_settings.text" path="text" multiline="true" prompt="%content_settings.enter_tooltip_message"/>
+            </SettingGroup>
+            <SettingGroup types="InteractiveListItem">
+            <TextRow label="%content_settings.text" path="text" prompt="%content_settings.enter_text"/>
+            <TextRow label="%content_settings.secondary_text" path="secondaryText" prompt="%content_settings.enter_secondary_text"/>
+            </SettingGroup>
+            <SettingGroup types="InteractiveTile">
+            <TextRow label="%content_settings.title" path="title" prompt="%content_settings.enter_title"/>
+            <ToggleRow label="%content_settings.role" path="role" initial="button">
+                <ToggleOption value="button" label="%content_settings.button"/>
+                <ToggleOption value="link" label="%content_settings.link"/>
+            </ToggleRow>
+            <SwitchRow label="%content_settings.primary" path="primary"/>
+            </SettingGroup>
+            <SettingGroup types="Icon">
+            <IconRow label="%content_settings.icon" path="icon"/>
+            </SettingGroup>
+            <SettingGroup types="TableHeadCell,TableBodyCell,TableFootCell">
+            <TextRow label="%content_settings.content" path="content" prompt="%content_settings.enter_cell_content"/>
+            </SettingGroup>
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

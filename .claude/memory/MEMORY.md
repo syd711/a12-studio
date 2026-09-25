@@ -20,3 +20,5 @@ This directory holds a12-studio-specific memories, stored in the repo (not under
 - [Bash heredoc eats backslashes](reference_bash_tool_heredoc_backslashes.md) — `cat <<EOF` halves `\` and expands `\u`; write regex/escape-heavy files with Write, append bundles via snippet + `cat >>`, never run two gradlew at once
 - [Installed SME backend + client](reference_installed_sme_backend_and_client.md) — sme.jar REST endpoints and static client in the A12 installation; request shapes drift from the SME source checkout, verify with javap
 - [Content Model preview](project_content_model_preview.md) — editor center = JavaFX WebView on the installed SME client (built 2026-09-25); WebView/bundle traps (no IndexedDB, minified kernel export, resend churn, FX-thread hangs)
+
+- [Content Model property panels](project_content_model_property_panels.md) — right column mirrors SME setting panel per element type (2026-09-25); SME source location, row/panel design, traps

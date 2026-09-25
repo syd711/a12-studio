@@ -78,6 +78,19 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
     root.setCollapsible(false);
   }
 
+  /** The panel's root {@link TitledPane}, for subclasses that need to inspect or decorate their own content. */
+  protected TitledPane getRootPane() {
+    return root;
+  }
+
+  /**
+   * Whether this panel starts expanded when the user has not expanded/collapsed it yet (the persisted state wins
+   * afterwards). Panels whose content is rarely needed (e.g. SME's "Advanced" sections) start collapsed.
+   */
+  protected boolean isExpandedByDefault() {
+    return true;
+  }
+
   public void setSaveMode(@NonNull PropertyEditorSaveMode saveMode) {
     this.saveMode = saveMode;
   }
@@ -150,7 +163,7 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
     StudioEventManager.getInstance().addListener(this);
     String settingsKey = getExpandedSettingsKey();
     if (settingsKey != null) {
-      bindExpandedState(root, settingsKey);
+      bindExpandedState(root, settingsKey, isExpandedByDefault());
     }
     showValidationError(null);
     errorContainerController.errorProperty().addListener((observable, oldValue, newValue) -> {
@@ -547,10 +560,14 @@ abstract public class AbstractPropertyEditor implements Initializable, StudioEve
   }
 
   private static void bindExpandedState(@NonNull TitledPane pane, @NonNull String settingsKey) {
+    bindExpandedState(pane, settingsKey, true);
+  }
+
+  private static void bindExpandedState(@NonNull TitledPane pane, @NonNull String settingsKey, boolean expandedByDefault) {
     Platform.runLater(() -> {
       boolean animated = pane.isAnimated();
       pane.setAnimated(false);
-      pane.setExpanded(LocalUISettings.getBoolean(settingsKey, true));
+      pane.setExpanded(LocalUISettings.getBoolean(settingsKey, expandedByDefault));
       pane.setAnimated(animated);
       pane.expandedProperty().addListener((observable, oldValue, newValue) ->
           LocalUISettings.saveProperty(settingsKey, String.valueOf(newValue)));

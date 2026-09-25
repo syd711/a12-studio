@@ -646,3 +646,78 @@
 #relationshipList .list-cell:filled:selected:hover .tree-icon {
     -fx-icon-color: -fx-text-color-inverse;
 }
+
+/* -----------------------------------------------------------------------
+ * Content Model editor: property rows (mirror of SME's setting panel)
+ * --------------------------------------------------------------------- */
+.content-setting-label {
+    -fx-text-fill: -fx-text-color;
+}
+
+.content-setting-heading {
+    -fx-font-weight: bold;
+}
+
+.content-setting-invalid,
+.content-setting-invalid:focused {
+    -fx-border-color: -fx-error-bg;
+}
+
+.content-setting-card {
+    -fx-border-color: -fx-border-subtle;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+/* Segmented ToggleButtons: unselected mirrors .secondary-button, selected mirrors .primary-button. Modena's
+ * layered default backgrounds are replaced by a single flat background plus a border, so the selected accent
+ * fill shows no grey rim. Each segment after the first drops its left border to avoid a doubled divider. */
+.content-setting-segments > .content-setting-segment {
+    -fx-background-color: -fx-surface-color;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-color: -fx-border-color-theme;
+    -fx-border-width: 1 1 1 0;
+    -fx-border-radius: 0;
+    -fx-text-fill: -fx-text-color;
+    -fx-font-weight: bold;
+    -fx-padding: 3 10 3 10;
+    -fx-cursor: hand;
+}
+
+.content-setting-segments > .content-setting-segment:hover {
+    -fx-background-color: -fx-panel-color;
+    -fx-border-color: -fx-accent-color;
+}
+
+.content-setting-segments > .content-setting-segment:selected,
+.content-setting-segments > .content-setting-segment:selected:hover {
+    -fx-background-color: -fx-accent-color;
+    -fx-border-color: -fx-accent-color;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+.content-setting-segments > .content-setting-segment:selected:hover {
+    -fx-background-color: derive(-fx-accent-color, -15%);
+    -fx-border-color: derive(-fx-accent-color, -15%);
+}
+
+.content-setting-segments > .content-setting-segment:focused {
+    -fx-border-color: -fx-accent-color;
+}
+
+.content-setting-segments > .content-setting-segment.first {
+    -fx-background-radius: 6 0 0 6;
+    -fx-border-radius: 6 0 0 6;
+    -fx-border-width: 1;
+}
+
+.content-setting-segments > .content-setting-segment.last {
+    -fx-background-radius: 0 6 6 0;
+    -fx-border-radius: 0 6 6 0;
+}
+
+.content-setting-segments > .content-setting-segment.first.last {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+}

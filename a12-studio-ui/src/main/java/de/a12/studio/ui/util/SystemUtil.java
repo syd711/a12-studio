@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import static de.a12.studio.ui.util.OSUtil.isLinux;
@@ -276,6 +277,75 @@ public class SystemUtil {
       case SYSTEM_DEFAULT -> throw new IllegalStateException("handled by the caller");
     };
     return List.of(executable, newWindowFlag, url);
+  }
+
+  /**
+   * Opens the given URL in its own browser window without toolbar and address bar (Chromium's {@code --app} mode),
+   * in a browser instance of its own: a dedicated profile folder keeps it from joining a browser that is already
+   * running. Browsers without such a mode (Firefox) fall back to {@link #openUrl(String, PreviewAppSettings.BrowserType)}.
+   *
+   * @param url The URL to open.
+   * @param browserType Which browser to launch the URL in.
+   */
+  public static void openUrlInAppWindow(String url, PreviewAppSettings.BrowserType browserType) {
+    try {
+      List<String> command = appWindowCommand(browserType, url);
+      if (command != null) {
+        new ProcessBuilder(command).start();
+        return;
+      }
+    }
+    catch (IOException e) {
+      log.warn("Failed to launch {} in an app window: {}", browserType, e.getMessage());
+    }
+    openUrl(url, browserType);
+  }
+
+  /** The command opening {@code url} in a Chromium app window, or {@code null} if the browser has no such mode. */
+  private static @Nullable List<String> appWindowCommand(PreviewAppSettings.BrowserType browserType, String url)
+      throws IOException {
+    List<String> appArguments = List.of("--app=" + url, "--user-data-dir=" + appWindowProfileFolder().getAbsolutePath(),
+        "--no-first-run", "--no-default-browser-check");
+    List<String> command = new ArrayList<>();
+
+    if (browserType == PreviewAppSettings.BrowserType.SYSTEM_DEFAULT) {
+      String executable = isWindows() ? defaultChromiumExecutableOnWindows() : null;
+      if (executable == null) {
+        return null;
+      }
+      command.add(executable);
+    }
+    else if (browserType == PreviewAppSettings.BrowserType.FIREFOX) {
+      return null;
+    }
+    else if (isWindows()) {
+      command.addAll(List.of("cmd.exe", "/c", "start", "",
+          browserType == PreviewAppSettings.BrowserType.CHROME ? "chrome" : "msedge"));
+    }
+    else if (isMac()) {
+      command.addAll(List.of("open", "-n", "-a",
+          browserType == PreviewAppSettings.BrowserType.CHROME ? "Google Chrome" : "Microsoft Edge", "--args"));
+    }
+    else {
+      command.add(browserType == PreviewAppSettings.BrowserType.CHROME ? "google-chrome" : "microsoft-edge");
+    }
+    command.addAll(appArguments);
+    return command;
+  }
+
+  private static File appWindowProfileFolder() {
+    File folder = new File(new File(System.getProperty("user.home"), ".a12-studio"), "preview-browser-profile");
+    folder.mkdirs();
+    return folder;
+  }
+
+  private static @Nullable String defaultChromiumExecutableOnWindows() throws IOException {
+    String progId = queryRegistryValue(
+        "HKCU\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\http\\UserChoice", "ProgId");
+    if (progId == null || !"--kiosk".equals(kioskFlagForProgId(progId))) {
+      return null;
+    }
+    return queryDefaultCommandExecutable(progId);
   }
 
   /**

@@ -48,17 +48,18 @@ public class PreviewLauncher {
       openPreview(projectItem);
       return;
     }
-    openFormEnginePreview("form-" + projectItem.getModel().getId(), new FormModelPreviewSession(projectItem));
+    openFormEnginePreview("form-" + projectItem.getModel().getId(), new FormModelPreviewSession(projectItem), false);
   }
 
   /**
    * Used by the Document Model editor's "Ad Hoc Testing" action: renders a Form Model generated for {@code
    * selectedElementIds} of the Document Model (all of it if empty) with the real Form Engine, see {@link
-   * AdHocTestPreviewSession}.
+   * AdHocTestPreviewSession}. It opens in a browser window of its own without toolbar and address bar, see {@link
+   * SystemUtil#openUrlInAppWindow}.
    */
   public static void openAdHocTest(@NonNull ProjectItem documentModelItem, @NonNull Set<String> selectedElementIds) {
     openFormEnginePreview("adhoc-" + documentModelItem.getModel().getId(),
-        new AdHocTestPreviewSession(documentModelItem, selectedElementIds));
+        new AdHocTestPreviewSession(documentModelItem, selectedElementIds), true);
   }
 
   /**
@@ -87,10 +88,17 @@ public class PreviewLauncher {
     }
   }
 
-  private static void openFormEnginePreview(String sessionId, FormEnginePreviewSession session) {
+  private static void openFormEnginePreview(String sessionId, FormEnginePreviewSession session, boolean appWindow) {
     PreviewServer server = PreviewServer.getOrStart();
     server.registerFormEngineSession(sessionId, session);
-    SystemUtil.openUrl(server.getFormEnginePreviewUrl(sessionId), getPreviewAppSettings().getBrowserType());
+    String url = server.getFormEnginePreviewUrl(sessionId);
+    PreviewAppSettings.BrowserType browserType = getPreviewAppSettings().getBrowserType();
+    if (appWindow) {
+      SystemUtil.openUrlInAppWindow(url, browserType);
+    }
+    else {
+      SystemUtil.openUrl(url, browserType);
+    }
   }
 
   private static void openPreview(@NonNull ProjectItem projectItem, @NonNull Consumer<String> opener) {

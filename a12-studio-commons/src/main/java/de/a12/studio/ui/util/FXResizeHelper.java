@@ -15,9 +15,6 @@ import java.util.HashMap;
 /**
  * Adds drag-to-move and edge-drag-to-resize behavior to an undecorated (StageStyle.TRANSPARENT)
  * JavaFX Stage.
- *
- * @author Simon Reinisch
- * @version 0.0.2
  */
 public class FXResizeHelper {
 

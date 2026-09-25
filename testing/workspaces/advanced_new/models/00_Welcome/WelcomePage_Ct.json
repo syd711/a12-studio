@@ -40,7 +40,7 @@
           "display": "flex",
           "width": "1000px",
           "height": "fit-content",
-          "flexDirection": "column",
+          "flexDirection": "row",
           "padding": "8px",
           "margin": "0px",
           "gap": "8px",
@@ -918,8 +918,8 @@
                       "children": [
                         {
                           "id": "4a2f72e1",
-                          "namespace": "com.mgmtp.a12.contentengine",
                           "type": "Table",
+                          "namespace": "com.mgmtp.a12.contentengine",
                           "props": {
                             "columns": [
                               {
@@ -946,20 +946,20 @@
                           "children": [
                             {
                               "id": "cd28d6bc",
-                              "namespace": "com.mgmtp.a12.contentengine",
                               "type": "TableHead",
+                              "namespace": "com.mgmtp.a12.contentengine",
                               "props": {},
                               "children": [
                                 {
                                   "id": "63809b0b",
-                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "type": "TableHeadRow",
+                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "props": {},
                                   "children": [
                                     {
                                       "id": "6df81987",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableHeadCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "User"
                                       },
@@ -967,8 +967,8 @@
                                     },
                                     {
                                       "id": "5f90c8a4",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableHeadCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "Role"
                                       },
@@ -976,8 +976,8 @@
                                     },
                                     {
                                       "id": "5cdc5edd",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableHeadCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "Is authorized to..."
                                       },
@@ -989,20 +989,20 @@
                             },
                             {
                               "id": "187db436",
-                              "namespace": "com.mgmtp.a12.contentengine",
                               "type": "TableBody",
+                              "namespace": "com.mgmtp.a12.contentengine",
                               "props": {},
                               "children": [
                                 {
                                   "id": "1394d284",
-                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "type": "TableBodyRow",
+                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "props": {},
                                   "children": [
                                     {
                                       "id": "c7401c1c",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "enduser"
                                       },
@@ -1010,8 +1010,8 @@
                                     },
                                     {
                                       "id": "c5aea823",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "tester"
                                       },
@@ -1019,8 +1019,8 @@
                                     },
                                     {
                                       "id": "e76045cb",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "access the end user application modules to create, edit and delete Documents."
                                       },
@@ -1030,14 +1030,14 @@
                                 },
                                 {
                                   "id": "e6b12589",
-                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "type": "TableBodyRow",
+                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "props": {},
                                   "children": [
                                     {
                                       "id": "8a330918",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "reader"
                                       },
@@ -1045,8 +1045,8 @@
                                     },
                                     {
                                       "id": "49bdf44a",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "reviewer"
                                       },
@@ -1054,8 +1054,8 @@
                                     },
                                     {
                                       "id": "49dd4715",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "access the end user application modules to read existing Documents."
                                       },
@@ -1065,14 +1065,14 @@
                                 },
                                 {
                                   "id": "c4fd7189",
-                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "type": "TableBodyRow",
+                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "props": {},
                                   "children": [
                                     {
                                       "id": "ac680843",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "ba"
                                       },
@@ -1080,8 +1080,8 @@
                                     },
                                     {
                                       "id": "3ea09cac",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "modeler"
                                       },
@@ -1089,8 +1089,8 @@
                                     },
                                     {
                                       "id": "811d8628",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "create, edit and deploy models from SME to the Preview App and test them end-to-end."
                                       },
@@ -1100,14 +1100,14 @@
                                 },
                                 {
                                   "id": "91b9e25c",
-                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "type": "TableBodyRow",
+                                  "namespace": "com.mgmtp.a12.contentengine",
                                   "props": {},
                                   "children": [
                                     {
                                       "id": "c934afb3",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "admin"
                                       },
@@ -1115,8 +1115,8 @@
                                     },
                                     {
                                       "id": "5f0bf60f",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "systemAdmin"
                                       },
@@ -1124,8 +1124,8 @@
                                     },
                                     {
                                       "id": "351c9546",
-                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "type": "TableBodyCell",
+                                      "namespace": "com.mgmtp.a12.contentengine",
                                       "props": {
                                         "content": "access the end user application modules to create, edit and delete Documents as well as create, edit and deploy models from SME to the Preview App Server. In addition, the administrator can perform workflow actions."
                                       },
@@ -1137,8 +1137,8 @@
                             },
                             {
                               "id": "de184768",
-                              "namespace": "com.mgmtp.a12.contentengine",
                               "type": "TableFoot",
+                              "namespace": "com.mgmtp.a12.contentengine",
                               "props": {},
                               "children": []
                             }
@@ -1192,8 +1192,8 @@
                       "children": [
                         {
                           "id": "c03c6730",
-                          "namespace": "com.mgmtp.a12.contentengine",
                           "type": "MessageBox",
+                          "namespace": "com.mgmtp.a12.contentengine",
                           "props": {
                             "label": "There is a special Access Right \"MODEL_MANAGE\", that allows a Role to add, change or read models even if the Role is not listed in the model. \nThis Access Right is assigned to the Roles \"modeler\" and \"systemAdmin\". Hence, these Roles (and the Users \"ba\" and \"admin\") can work with the models although they are not  listed in the model files.",
                             "focusOnMessage": false,
@@ -1254,8 +1254,8 @@
                       "children": [
                         {
                           "id": "e0ed18a1",
-                          "namespace": "com.mgmtp.a12.contentengine",
                           "type": "Paragraph",
+                          "namespace": "com.mgmtp.a12.contentengine",
                           "props": {
                             "style": {
                               "width": "100%"

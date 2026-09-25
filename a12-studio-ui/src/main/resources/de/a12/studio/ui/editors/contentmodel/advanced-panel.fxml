@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.a12.studio.ui.editors.contentmodel.fields.*?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.advanced"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.contentmodel.ContentSettingsPanelController">
+    <BorderPane>
+        <top>
+            <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+        <center>
+            <VBox spacing="2.0">
+            <SettingGroup types="Grid">
+            <SwitchRow label="%content_settings.cell_border" path="cellBorder"/>
+            <SwitchRow label="%content_settings.no_gutter" path="noGutter"/>
+            <SwitchRow label="%content_settings.fit_to_parent" path="fitToParent"/>
+            </SettingGroup>
+            <SettingGroup types="GridRow">
+            <SwitchRow label="%content_settings.fit_to_content" path="fitToContent"/>
+            </SettingGroup>
+            <SettingGroup types="GridColumn">
+            <SwitchRow label="%content_settings.spacer_column" path="spacerColumn"/>
+            </SettingGroup>
+            <ToggleRow label="%content_settings.alignment" path="verticalAlignment" types="Grid,GridRow,GridColumn" initial="top">
+                <ToggleOption value="top" label="%content_settings.top"/>
+                <ToggleOption value="middle" label="%content_settings.middle"/>
+                <ToggleOption value="bottom" label="%content_settings.bottom"/>
+            </ToggleRow>
+            <TextRow label="%content_settings.anchor" path="anchor" types="Heading"/>
+            <TextRow label="%content_settings.alternative_text" path="alt" types="Image" multiline="true"/>
+            <SliderRow label="%content_settings.opacity" path="style.opacity" types="Image" min="0" max="1" step="0.1" defaultValue="1"/>
+            <TextRow label="%content_settings.aria_label" path="ariaLabel" types="Button"/>
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

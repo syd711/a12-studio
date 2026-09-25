@@ -715,6 +715,30 @@ editor, not of the include.
   sends when something changed. Measured in the WebView: ~4 s to render a plain model, ~9 s for one bound to a Document
   Model (includes starting the backend). **Not wired (as for the Form Model preview):** themes and sample documents
   (`themeNames`/`documentIds` are empty, so the Theme/Data menus are empty), and edits made inside the preview.
+- **Content Model property column (2026-09-25) - mirrors SME's setting panel per element type.** SME's panel is not
+  in the SME repo: it is the `settingsRenderer` of each module in `@com.mgmtp.a12.contentengine/contentengine-editor`
+  (`internal/core/default-editor-elements/*/*.settings.tsx` + `*.controllers.ts`; the community npm ships `src/`; SME
+  pins 0.10.0 which is not published, 0.11.0 was read) and `@com.mgmtp.a12.formengine/formengine-content-elements-editor`
+  (form elements). The studio replaces the old id/type/namespace/raw-JSON column by a stack of `ContentSettingsPanel`s
+  (`editors/contentmodel`), each shown only for the types it has settings for, in SME's section order: Element,
+  Configuration (group/field reference), Source, Events, Content, Variant, Appearance, Icons, Queries, Columns, Layout,
+  Responsive behavior, Row, Display Options, Dimensions, Color, Background Image, Border, Shadow, Accessibility,
+  Advanced, Event, Raw properties. Most panels are pure FXML: rows (`editors/contentmodel/fields`: `ToggleRow`,
+  `LengthRow`, `SpacingRow`, `ColorRow`, `SwitchRow`, `TextRow`, `SliderRow`, `IconRow`, `ShadowRow`, `ClickEventRow`)
+  declare a props `path` and the element `types` they apply to, and one `ContentSettingsPanelController` shows/edits them
+  (adding a setting means adding a row). Custom controllers: element, raw props,
+  responsive (Grid row/column), table columns, media query. Values are written the way SME's formatters do (`ContentProps`:
+  `false` flags and unspecified keywords are omitted, `enableColumnsResizing`-style default-true flags get an explicit
+  `false`, padding/margin/radius as CSS shorthand with a "Mixed" 4-value mode, colors as `rgb()`/`rgba()`, background
+  images as `url('...')`, URLs checked against DOMPurify's scheme allow-list). Table column insert/delete/move/pin go
+  through `ContentTableColumns`, which keeps head/body/foot cells index-aligned like SME's middleware. New children and
+  retyped elements get SME's default props (`ContentElementDefaults`, additive). **Deliberate deviations:** the Grid switch
+  SME labels "Gutter" (it stores `noGutter`, so switching it on removes the gutter) is labeled "No gutter"; the type stays
+  editable (SME fixes it when the element is created); a "Raw properties (JSON)" panel stays for what has no typed panel,
+  notably the Lexical text of Paragraph/Heading (SME edits it inline on the canvas); "Group Reference", "Field",
+  "Field reference" and "Screen Reader Column" are plain text fields (SME offers a picker over the Document Model / the
+  table's columns). **Still missing:** the form-content elements (Text Line, Checkbox, ... with elementId, localized
+  label/hint/placeholder, annotations), the Conditional element's condition editor, and the pickers above.
 
 ### Validators — gap list
 
@@ -1294,7 +1318,7 @@ query, selection, structural mapping and transformer as `isExperimental()` (chec
 | — | **appModel** | Standalone. | **Present, enabled** (`ApplicationModelEditorController` + module/scene/region editors, 3 application validators, wireframe preview via `ApplicationModelPreviewService`, real Preview App deploy). |
 | — | **masterDetailModel** | Standalone. | **Present, enabled** (`MainDetailModelEditorController`, 2 validators; `MasterDetailModuleGenerator` is used by the Preview App deploy). |
 | — | **treeModel** | Standalone. | **Editor present, disabled** (`TreeModelEditorController` wiring 3 tabs, 2026-09-25: *Columns* = `TreeRootPanelController` (SME "Root", `configuration.rootRef`: picks one of the nodes' `childRelationshipConfigurations`, shown as "DM → relationship" like SME; a dangling ref is kept and reported), `TreeColumnsPanelController` (row-based columns editor + Hierarchical Column, matching SME's placement) and `TreeNodeTypesPanelController` (one draggable/movable row per node type, click or Edit opens `TreeNodeDialogController` for Document Model / drag & drop / per-column field mapping, Add button below the rows; replaces the old list+detail *Nodes* tab); *Configuration* = `TreeConfigurationPanelController`; *Layout* = `TreeAccessibilityPanelController` (Hide Label, `configuration.labelHidden`) and the Overview editor's `StylesPanelController` bound to `content.styles` - 6 validators). **Still missing vs. SME's Node Types:** editing a node's Child Relationship Configurations (so Root can only offer configurations already in the JSON), actions, context menu, default row action, row title, icon, inherit-from-supertype, styles. |
-| — | **contentModel** | Experimental in SME itself. | **Editor present, disabled** (`ContentModelEditorController`, 2 validators; the center renders the model with the real Content Engine in a `WebView`, see "Content Model preview"). |
+| — | **contentModel** | Experimental in SME itself. | **Editor present, disabled** (`ContentModelEditorController`, 2 validators; the center renders the model with the real Content Engine in a `WebView`, see "Content Model preview"; the right column mirrors SME's per-type setting panel, see "Content Model property column"). |
 | — | **typeDefinitionModel** | Reuses the whole DM editor infrastructure. | **Present, enabled** (`TypeDefintionModelEditorController`; the type-definition mode rules are validated, see the Document Model section). |
 | — | **umModule** | User-management config: two YAML file types, "roles" and "users". | **Present** as `RolesEditorController` / `UsersEditorController` over `RolesDocument` / `UsersDocument` (`editors/auth`, `AuthFileFactory`). |
 | — | **transformerModel, modelGraphDiagram** | Lower cross-reference count / experimental in SME. | **Not present** (no `ModelType`, no classes; only a transformer icon). |

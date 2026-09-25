@@ -696,6 +696,10 @@ public class RootController implements Initializable, StudioEventListener {
     tabPaneController.closeSelectedTab();
   }
 
+  public void openSelectedTabInNewWindow() {
+    tabPaneController.openSelectedTabInNewWindow();
+  }
+
   public void selectNextTab() {
     tabPaneController.selectNextTab();
   }

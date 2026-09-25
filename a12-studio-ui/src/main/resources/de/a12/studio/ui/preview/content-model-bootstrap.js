@@ -44,6 +44,13 @@
     window.__previewErrors.push("IndexedDB stand-in: " + error);
   }
 
+  // The preview window's sidebar menu (width / theme / locale / data / validate) is not offered: the editor embeds
+  // the page as a plain rendering of the Content Model, and SME hides the menu there as well.
+  var hideMenu = document.createElement("style");
+  hideMenu.textContent = "[data-role='application-frame-sidebar-wrapper']," +
+      "[data-role='application-frame-toggle-sidebar-button']{display:none !important}";
+  (document.head || document.documentElement).appendChild(hideMenu);
+
   // ContentPreviewMessage.BaseMessage
   function toPreview(message) {
     message.origin = location.origin;

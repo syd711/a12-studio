@@ -220,6 +220,10 @@ public class Studio extends Application implements StudioEventListener {
     rootController.closeSelectedTab();
   }
 
+  public static void openSelectedTabInNewWindow() {
+    rootController.openSelectedTabInNewWindow();
+  }
+
   public static void selectNextTab() {
     rootController.selectNextTab();
   }

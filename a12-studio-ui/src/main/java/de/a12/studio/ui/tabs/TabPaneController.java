@@ -24,7 +24,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -33,7 +37,9 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 @Slf4j
@@ -43,6 +49,13 @@ public class TabPaneController implements Initializable, StudioEventListener {
   private StudioTabPane tabPane;
 
   private Project project;
+
+  /**
+   * Tabs that were taken out of {@link #tabPane} via {@link #openSelectedTabInNewWindow}, by the path of their
+   * model. They are no longer tabs (nor restored as such on the next start) but their editors are still live, so
+   * the model events that concern open tabs are routed to them here as well.
+   */
+  private final Map<String, DetachedTabWindow> detachedWindows = new HashMap<>();
 
   private boolean restoringSelection;
 
@@ -56,9 +69,15 @@ public class TabPaneController implements Initializable, StudioEventListener {
   private boolean loadingTabContent;
 
   @Override
+  public void projectClosed(@NonNull ProjectClosedEvent event) {
+    closeDetachedWindows();
+  }
+
+  @Override
   public void projectOpened(@NonNull ProjectOpenedEvent event) {
     Project project = event.getProject();
     this.project = project;
+    closeDetachedWindows();
     tabPane.getTabs().clear();
     restoringSelection = true;
 
@@ -151,6 +170,12 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
   @Override
   public void modelOpened(@NonNull ModelOpenedEvent event) {
+    DetachedTabWindow detached = detachedWindows.get(event.getItem().getPath());
+    if (detached != null) {
+      detached.focus();
+      return;
+    }
+
     for (Tab existingTab : tabPane.getTabs()) {
       ProjectItem existingItem = (ProjectItem) existingTab.getUserData();
       if (existingItem != null && existingItem.getPath().equals(event.getItem().getPath())) {
@@ -171,6 +196,11 @@ public class TabPaneController implements Initializable, StudioEventListener {
         closeTab(tab);
       }
     }
+    for (DetachedTabWindow window : new ArrayList<>(detachedWindows.values())) {
+      if (isSameOrDescendant(window.getItem().getPath(), deletedPath)) {
+        window.close();
+      }
+    }
   }
 
   /**
@@ -188,6 +218,14 @@ public class TabPaneController implements Initializable, StudioEventListener {
         reloadTab(tab, event);
         return;
       }
+    }
+    DetachedTabWindow detached = detachedWindows.remove(event.getOldPath());
+    if (detached != null) {
+      ProjectItem item = event.getItem();
+      StudioEventManager.getInstance().fireModelClosedEvent(item);
+      detached.setItem(item);
+      detached.setContent(EditorFactory.create(item));
+      detachedWindows.put(item.getPath(), detached);
     }
   }
 
@@ -239,6 +277,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
         return;
       }
     }
+    rebuildDetachedWindow(item);
   }
 
   /**
@@ -293,6 +332,24 @@ public class TabPaneController implements Initializable, StudioEventListener {
         rebuildTab(tab, item);
         return;
       }
+    }
+    rebuildDetachedWindow(item);
+  }
+
+  /** Same as {@link #rebuildTab}, for the editor of a tab that lives in its own window. */
+  private void rebuildDetachedWindow(@NonNull ProjectItem item) {
+    DetachedTabWindow detached = detachedWindows.get(item.getPath());
+    if (detached == null) {
+      return;
+    }
+    StudioEventManager.getInstance().fireModelClosedEvent(item);
+    detached.setItem(item);
+    Parent content = EditorFactory.create(item);
+    if (content != null) {
+      detached.setContent(content);
+    }
+    else {
+      detached.close();
     }
   }
 
@@ -494,7 +551,61 @@ public class TabPaneController implements Initializable, StudioEventListener {
       }
     });
 
-    return new ContextMenu(close, closeAll, closeOthers);
+    MenuItem openInNewWindow = new MenuItem(StudioBundle.get("open_tab_in_new_window"));
+    openInNewWindow.setAccelerator(new KeyCodeCombination(KeyCode.F4, KeyCombination.SHIFT_DOWN));
+    openInNewWindow.setOnAction(event -> openInNewWindow(tab));
+
+    return new ContextMenu(close, closeAll, closeOthers, new SeparatorMenuItem(), openInNewWindow);
+  }
+
+  /**
+   * Takes {@code tab} out of the tab pane and shows its editor in a window of its own. The already built editor
+   * content moves over as is - the editor keeps running, so unsaved state and selection are preserved - and the
+   * tab is dropped without a {@link ModelClosedEvent}, since the model is still open. That event (and removing
+   * the model from the project's opened files, so it isn't restored as a tab on the next start) is what closing
+   * the window does. Nothing links the window back to the tab pane afterwards.
+   */
+  private void openInNewWindow(@NonNull Tab tab) {
+    ProjectItem item = (ProjectItem) tab.getUserData();
+    if (item == null || detachedWindows.containsKey(item.getPath())) {
+      return;
+    }
+
+    // a restored tab that was never selected has no editor yet
+    loadTabContent(tab, item);
+    if (!(tab.getContent() instanceof Parent content)) {
+      return;
+    }
+
+    tab.setContent(null);
+    tabPane.getTabs().remove(tab);
+
+    DetachedTabWindow window = new DetachedTabWindow(item, content, this::onDetachedWindowClosed);
+    detachedWindows.put(item.getPath(), window);
+    if (project != null) {
+      project.getSettings().getUISettings().removeOpenedFile(item.getPath());
+      project.getSettings().getUISettings().save();
+    }
+    window.show();
+  }
+
+  private void onDetachedWindowClosed(@NonNull DetachedTabWindow window) {
+    if (detachedWindows.remove(window.getItem().getPath(), window)) {
+      StudioEventManager.getInstance().fireModelClosedEvent(window.getItem());
+    }
+  }
+
+  private void closeDetachedWindows() {
+    for (DetachedTabWindow window : new ArrayList<>(detachedWindows.values())) {
+      window.close();
+    }
+  }
+
+  public void openSelectedTabInNewWindow() {
+    Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+    if (selectedTab != null) {
+      openInNewWindow(selectedTab);
+    }
   }
 
   private void closeTab(@NonNull Tab tab) {

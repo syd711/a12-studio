@@ -75,7 +75,8 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut(StudioBundle.get("ctrl_shift_z"), StudioBundle.get("revert_the_active_model"), Category.EDITOR),
       new Shortcut(StudioBundle.get("ctrl_w"), StudioBundle.get("close_the_selected_tab"), Category.EDITOR),
       new Shortcut(StudioBundle.get("ctrl_tab"), StudioBundle.get("select_the_next_tab"), Category.EDITOR),
-      new Shortcut(StudioBundle.get("ctrl_shift_tab"), StudioBundle.get("select_the_previous_tab"), Category.EDITOR)
+      new Shortcut(StudioBundle.get("ctrl_shift_tab"), StudioBundle.get("select_the_previous_tab"), Category.EDITOR),
+      new Shortcut(StudioBundle.get("shift_f4"), StudioBundle.get("open_the_selected_tab_in_a_new_window"), Category.EDITOR)
   );
 
   private final Stage stage;
@@ -113,6 +114,10 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
 
     if (ke.getCode() == KeyCode.F3) {
       Studio.getRootController().showProjectTree();
+      ke.consume();
+    }
+    else if (ke.getCode() == KeyCode.F4 && ke.isShiftDown()) {
+      Studio.openSelectedTabInNewWindow();
       ke.consume();
     }
     else if (ke.getCode() == KeyCode.F4) {

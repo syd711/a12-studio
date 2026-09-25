@@ -15,13 +15,13 @@
   },
   "previewApp": {
     "enabled": true,
-    "browserType": "SYSTEM_DEFAULT",
+    "browserType": "EDGE",
     "autoRefreshEnabled": true,
     "autoRefreshDelayMillis": 500,
     "url": "http://localhost:8082/api",
     "username": "admin",
     "password": "a12"
   },
-  "settingsName": "settings.json",
-  "settingsType": "PROJECT_ROOT"
+  "settingsType": "PROJECT_ROOT",
+  "settingsName": "settings.json"
 }
