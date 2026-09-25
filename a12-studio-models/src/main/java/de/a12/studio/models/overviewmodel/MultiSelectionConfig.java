@@ -27,6 +27,9 @@ public class MultiSelectionConfig {
   private String counterOption;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String selectionArea;
+  // Tree Model only ("Select parent node when all child nodes are selected"); written as `true` or omitted.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean selectParent;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Button> buttons = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_NULL)

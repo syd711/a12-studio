@@ -1,7 +1,9 @@
 package de.a12.studio.ui.editors.overviewmodel;
 
 import de.a12.studio.models.overviewmodel.BoxElement;
+import de.a12.studio.models.overviewmodel.BoxElementType;
 import de.a12.studio.models.overviewmodel.ButtonElement;
+import de.a12.studio.models.overviewmodel.ExpandAllPopupElement;
 import de.a12.studio.models.overviewmodel.FilterElement;
 import de.a12.studio.models.overviewmodel.MultiSelectionElement;
 import de.a12.studio.models.overviewmodel.OverviewButtonLike;
@@ -28,6 +30,7 @@ import org.jspecify.annotations.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import de.a12.studio.ui.util.StudioBundle;
 
@@ -43,11 +46,20 @@ import de.a12.studio.ui.util.StudioBundle;
  * button-only Event/Confirmation/Priority/Icon block, so they still carry a label, description, styles and
  * annotations. Only an unrecognized (generic) element type has nothing to edit. Reused for both Major (right slot) and Minor (left slot) via {@link #configure}. Footer
  * is Button-only, so it uses the simpler {@link de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController}
- * instead.
+ * instead. The Tree Model's Subheader reuses this panel with its own type set (Button, Multi-Selection, Expand All
+ * PopUp), see {@link #configure(String, String, List, List)}.
  */
 public class SubheaderSlotPanelController extends AbstractPropertyEditor {
 
   private static final String DEFAULT_PRIORITY = "SECONDARY";
+
+  /** The Overview Model's Subheader element types, in the order of the Add menu. */
+  public static final List<BoxElementType> OVERVIEW_TYPES =
+      List.of(BoxElementType.BUTTON, BoxElementType.SEARCH, BoxElementType.FILTER, BoxElementType.MULTI_SELECTION);
+
+  /** The Tree Model's Subheader element types, in the order of the Add menu. */
+  public static final List<BoxElementType> TREE_TYPES =
+      List.of(BoxElementType.BUTTON, BoxElementType.MULTI_SELECTION, BoxElementType.EXPAND_ALL_POPUP);
 
   @FXML
   private GridPane rowsGrid;
@@ -64,12 +76,29 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   private Runnable onChange = () -> {
   };
 
+  // Lets the owning editor initialize a freshly created element, e.g. the Tree Model gives its buttons an id.
+  private Consumer<BoxElement> onElementCreated = element -> {
+  };
+
+  private List<BoxElementType> availableTypes = OVERVIEW_TYPES;
+
   public void configure(@NonNull String title, @NonNull String settingsKeySuffix, @NonNull List<BoxElement> rows) {
+    configure(title, settingsKeySuffix, rows, OVERVIEW_TYPES);
+  }
+
+  /** Like {@link #configure(String, String, List)}, but the Add menu only offers {@code availableTypes}. */
+  public void configure(@NonNull String title, @NonNull String settingsKeySuffix, @NonNull List<BoxElement> rows,
+      @NonNull List<BoxElementType> availableTypes) {
     setTitle(title);
     setSettingsKeySuffix(settingsKeySuffix);
     this.rows = rows;
+    this.availableTypes = availableTypes;
     initAddMenu();
     rebuildRows();
+  }
+
+  public void setOnElementCreated(@NonNull Consumer<BoxElement> onElementCreated) {
+    this.onElementCreated = onElementCreated;
   }
 
   public void setOnChange(@NonNull Runnable onChange) {
@@ -79,17 +108,27 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   // Rebuilt (via setAll, so re-running configure() on the same instance doesn't duplicate items) instead of
   // declared in FXML because each item's action needs to close over the specific element type it creates.
   private void initAddMenu() {
-    addButton.getItems().setAll(
-        createAddMenuItem(StudioBundle.get("subheader_slot.type_button"), ButtonElement::new),
-        createAddMenuItem(StudioBundle.get("subheader_slot.type_search"), SearchElement::new),
-        createAddMenuItem(StudioBundle.get("subheader_slot.type_filter"), FilterElement::new),
-        createAddMenuItem(StudioBundle.get("subheader_slot.type_multi_selection"), MultiSelectionElement::new));
+    addButton.getItems().setAll(availableTypes.stream()
+        .map(type -> createAddMenuItem(displayNameFor(type), () -> newElement(type)))
+        .toList());
+  }
+
+  private static BoxElement newElement(BoxElementType type) {
+    return switch (type) {
+      case SEARCH -> new SearchElement();
+      case FILTER -> new FilterElement();
+      case MULTI_SELECTION -> new MultiSelectionElement();
+      case EXPAND_ALL_POPUP -> new ExpandAllPopupElement();
+      default -> new ButtonElement();
+    };
   }
 
   private MenuItem createAddMenuItem(String label, Supplier<BoxElement> factory) {
     MenuItem item = new MenuItem(label);
     item.setOnAction(event -> {
-      rows.add(factory.get());
+      BoxElement element = factory.get();
+      onElementCreated.accept(element);
+      rows.add(element);
       rebuildRows();
       notifyChanged();
     });
@@ -165,16 +204,17 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   }
 
   private static String displayNameFor(BoxElement element) {
-    if (element instanceof SearchElement) {
-      return StudioBundle.get("subheader_slot.type_search");
-    }
-    if (element instanceof FilterElement) {
-      return StudioBundle.get("subheader_slot.type_filter");
-    }
-    if (element instanceof MultiSelectionElement) {
-      return StudioBundle.get("subheader_slot.type_multi_selection");
-    }
-    return StudioBundle.get("subheader_slot.type_button");
+    return displayNameFor(element.getType());
+  }
+
+  private static String displayNameFor(BoxElementType type) {
+    return switch (type) {
+      case SEARCH -> StudioBundle.get("subheader_slot.type_search");
+      case FILTER -> StudioBundle.get("subheader_slot.type_filter");
+      case MULTI_SELECTION -> StudioBundle.get("subheader_slot.type_multi_selection");
+      case EXPAND_ALL_POPUP -> StudioBundle.get("subheader_slot.type_expand_all_popup");
+      default -> StudioBundle.get("subheader_slot.type_button");
+    };
   }
 
   private HBox createActionsBox(BoxElement element, OverviewButtonLike editable, int index, int rowCount) {

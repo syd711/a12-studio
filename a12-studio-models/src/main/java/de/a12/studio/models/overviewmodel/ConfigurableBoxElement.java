@@ -23,6 +23,9 @@ import java.util.List;
 @Setter
 public abstract class ConfigurableBoxElement extends BoxElement implements OverviewButtonLike {
 
+  // Tree Model buttons carry an id ("button-026dc"); Overview Model elements don't.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String id;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String event;
   @JsonInclude(JsonInclude.Include.NON_NULL)

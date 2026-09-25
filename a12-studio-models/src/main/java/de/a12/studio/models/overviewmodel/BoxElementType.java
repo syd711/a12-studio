@@ -9,6 +9,8 @@ public enum BoxElementType {
   FILTER("filter"),
   BUTTON("button"),
   MULTI_SELECTION("multi_selection"),
+  // Tree Model only: the popup that expands/collapses the whole tree.
+  EXPAND_ALL_POPUP("expand_all_popup"),
   // Falls back to this instead of throwing so unrecognized/future box element types (deserialized as
   // GenericBoxElement, see BoxElement's defaultImpl) still load instead of failing the whole model.
   OTHER("other");

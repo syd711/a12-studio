@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.treemodel.dialogs;
 
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.treemodel.ExpansionDepth;
 import de.a12.studio.models.treemodel.TreeColumn;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
@@ -9,6 +10,7 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
+import java.util.List;
 import java.util.Optional;
 
 public class Dialogs {
@@ -22,6 +24,14 @@ public class Dialogs {
 
   public static Optional<TreeColumn> showColumnForEdit(Stage owner, TreeColumn existing) {
     return showColumn(owner, StudioBundle.get("edit_column_title"), existing);
+  }
+
+  public static Optional<ExpansionDepth> showExpansionDepthForAdd(Stage owner, List<String> relationships) {
+    return showExpansionDepth(owner, StudioBundle.get("tree_expansion_depths_panel.add_title"), relationships, null);
+  }
+
+  public static Optional<ExpansionDepth> showExpansionDepthForEdit(Stage owner, List<String> relationships, ExpansionDepth existing) {
+    return showExpansionDepth(owner, StudioBundle.get("tree_expansion_depths_panel.edit_title"), relationships, existing);
   }
 
   /** Returns a draft node (no id yet) carrying the chosen Document Model, drag &amp; drop flag and column mapping. */
@@ -40,6 +50,18 @@ public class Dialogs {
     Stage stage = WidgetFactory.createDialogStage("tree-node-dialog", fxmlLoader, owner, title);
     TreeNodeDialogController controller = (TreeNodeDialogController) stage.getUserData();
     controller.init(stage, model, projectItem, existing);
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.getResult();
+  }
+
+  private static Optional<ExpansionDepth> showExpansionDepth(Stage owner, String title, List<String> relationships, ExpansionDepth existing) {
+    FXMLLoader fxmlLoader = new FXMLLoader(TreeExpansionDepthDialogController.class.getResource("tree-expansion-depth-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("tree-expansion-depth-dialog", fxmlLoader, owner, title);
+    TreeExpansionDepthDialogController controller = (TreeExpansionDepthDialogController) stage.getUserData();
+    controller.init(stage, relationships, existing);
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();

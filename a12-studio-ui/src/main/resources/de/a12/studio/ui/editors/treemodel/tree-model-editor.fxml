@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
@@ -22,7 +23,7 @@
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="%columns">
+                <Tab text="%tree_model_editor.tab_columns">
                     <content>
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
                             <content>
@@ -47,6 +48,9 @@
                                 <VBox spacing="12.0" styleClass="field-editor">
                                     <children>
                                         <fx:include fx:id="configurationPanel" source="tree-configuration-panel.fxml" />
+                                        <fx:include fx:id="expansionDepthsPanel" source="tree-expansion-depths-panel.fxml" />
+                                        <fx:include fx:id="multiSelectionPanel" source="tree-multi-selection-panel.fxml" />
+                                        <fx:include fx:id="dragAndDropPanel" source="tree-drag-and-drop-panel.fxml" />
                                     </children>
                                     <padding>
                                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
@@ -56,12 +60,39 @@
                         </ScrollPane>
                     </content>
                 </Tab>
-                <Tab text="%layout">
+                <Tab text="%custom_actions">
                     <content>
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
                             <content>
                                 <VBox spacing="12.0" styleClass="field-editor">
                                     <children>
+                                        <!-- Subheader -->
+                                        <Label styleClass="editor-type-label " text="%subheader" />
+                                        <fx:include fx:id="subheaderMajor" source="../overviewmodel/subheader-slot-panel.fxml" />
+                                        <fx:include fx:id="subheaderMinor" source="../overviewmodel/subheader-slot-panel.fxml" />
+
+                                        <!-- Footer -->
+                                        <Label styleClass="editor-type-label " text="%footer" />
+                                        <fx:include fx:id="footerMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                        <fx:include fx:id="footerMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab text="%tree_model_editor.tab_layout">
+                    <content>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                            <content>
+                                <VBox spacing="12.0" styleClass="field-editor">
+                                    <children>
+                                        <fx:include fx:id="virtualScrollingPanel" source="tree-virtual-scrolling-panel.fxml" />
+                                        <fx:include fx:id="rowHeightActionColumnWidthPanel" source="tree-row-height-action-column-width-panel.fxml" />
+                                        <fx:include fx:id="columnsResizePanel" source="tree-columns-resize-panel.fxml" />
                                         <fx:include fx:id="accessibilityPanel" source="tree-accessibility-panel.fxml" />
                                         <fx:include fx:id="stylesPanel" source="/de/a12/studio/ui/editors/overviewmodel/styles-panel.fxml" />
                                     </children>

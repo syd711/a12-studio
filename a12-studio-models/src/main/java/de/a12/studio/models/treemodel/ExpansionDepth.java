@@ -2,21 +2,25 @@ package de.a12.studio.models.treemodel;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
+/**
+ * One entry of the "Tree" {@link ExpansionStrategy}: how many levels of the relationship model
+ * {@link #getRelationshipModel()} the Tree Engine loads in a single query (SME {@code ExpansionDepth}).
+ */
 @Getter
 @Setter
-public class SlotBox {
+public class ExpansionDepth {
 
-  // Slot entries are box elements owned by the client runtime; the studio only preserves them.
-  private List<Object> leftSlot = new ArrayList<>();
-  private List<Object> rightSlot = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String relationshipModel;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Integer maxDepth;
 
   private final Map<String, Object> extras = new LinkedHashMap<>();
 

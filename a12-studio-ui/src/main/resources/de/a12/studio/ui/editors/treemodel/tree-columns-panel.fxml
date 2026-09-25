@@ -37,7 +37,13 @@
             </Button>
       <VBox spacing="2.0">
         <children>
-          <Label styleClass="field-label" text="%hierarchical_column" />
+          <HBox alignment="CENTER_LEFT" spacing="6.0">
+            <Label styleClass="field-label" text="%hierarchical_column" />
+            <Label>
+              <graphic><FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18" /></graphic>
+              <tooltip><Tooltip prefWidth="300.0" text="%tree_columns_panel.hierarchical_column_info" wrapText="true" /></tooltip>
+            </Label>
+          </HBox>
           <ComboBox fx:id="hierarchicalColumnField" editable="false" prefWidth="240.0" />
         </children>
       </VBox>

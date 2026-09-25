@@ -38,6 +38,9 @@ public class FXResizeHelper {
   private double mWidthStore, mHeightStore, mXStore, mYStore;
   private boolean verticalOnly;
 
+  // the resize/drag mode chosen at MOUSE_PRESSED; stays fixed until the button is released
+  private Cursor activeCursor = Cursor.DEFAULT;
+
   private Object userData;
 
   // tracks how the stage's geometry was last set, so keyboard/mouse maximize, snap, and
@@ -315,6 +318,11 @@ public class FXResizeHelper {
     // gesture is captured before a descendant control - e.g. a ToolBar, which is known to
     // swallow MOUSE_PRESSED/MOUSE_DRAGGED even over its empty background - can consume it first.
     SCENE.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+      // Decide the gesture from the press position, not SCENE.getCursor(): the scene cursor is
+      // only refreshed on MOUSE_MOVED and can be stale (e.g. a SplitPane divider sets its own
+      // cursor on its node), which used to resize the window while dragging an inner splitter.
+      activeCursor = event.isPrimaryButtonDown() ? cursorAt(event.getSceneX(), event.getSceneY()) : Cursor.DEFAULT;
+
       mPresSceneX = event.getSceneX();
       mPresSceneY = event.getSceneY();
 
@@ -326,7 +334,7 @@ public class FXResizeHelper {
     });
 
     SCENE.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
-      EventHandler<MouseEvent> handler = LISTENER.get(SCENE.getCursor());
+      EventHandler<MouseEvent> handler = LISTENER.get(activeCursor);
       if (handler != null) {
         // a manual move/resize makes the geometry user-defined again, so a later restore
         // shouldn't jump back to a stale maximized/snapped position
@@ -335,51 +343,9 @@ public class FXResizeHelper {
       }
     });
 
-    SCENE.setOnMouseMoved(event -> {
-      double sx = event.getSceneX();
-      double sy = event.getSceneY();
+    SCENE.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> activeCursor = Cursor.DEFAULT);
 
-      double left = MARGIN;
-      double top = MARGIN;
-      double right = SCENE.getWidth() - MARGIN;
-      double bottom = SCENE.getHeight() - MARGIN;
-
-      boolean l_trigger = sx > left - TR && sx < left + TR;
-      boolean r_trigger = sx < right + TR && sx > right - TR;
-      boolean u_trigger = sy < bottom + TR && sy > bottom - TR;
-      boolean d_trigger = sy > top - TR && sy < top + TR;
-
-      if (l_trigger && d_trigger && !verticalOnly) {
-        fireAction(Cursor.NW_RESIZE);
-      }
-      else if (l_trigger && u_trigger && !verticalOnly) {
-        fireAction(Cursor.SW_RESIZE);
-      }
-      else if (r_trigger && d_trigger && !verticalOnly) {
-        fireAction(Cursor.NE_RESIZE);
-      }
-      else if (r_trigger && u_trigger && !verticalOnly) {
-        fireAction(Cursor.SE_RESIZE);
-      }
-      else if (l_trigger && !verticalOnly) {
-        fireAction(Cursor.W_RESIZE);
-      }
-      else if (r_trigger && !verticalOnly) {
-        fireAction(Cursor.E_RESIZE);
-      }
-      else if (d_trigger) {
-        fireAction(Cursor.N_RESIZE);
-      }
-      else if (sy < top + TM && !u_trigger) {
-        fireAction(Cursor.OPEN_HAND);
-      }
-      else if (u_trigger) {
-        fireAction(Cursor.S_RESIZE);
-      }
-      else {
-        fireAction(Cursor.DEFAULT);
-      }
-    });
+    SCENE.setOnMouseMoved(event -> fireAction(cursorAt(event.getSceneX(), event.getSceneY())));
 
     // Once the pointer leaves the window, no further MOUSE_MOVED events arrive on this scene,
     // so a cursor set while hovering the drag/resize zones (e.g. OPEN_HAND) would otherwise stay
@@ -389,6 +355,51 @@ public class FXResizeHelper {
         fireAction(Cursor.DEFAULT);
       }
     });
+  }
+
+  /**
+   * Maps a Scene position to the resize/drag cursor of the hit-zone it falls into
+   * ({@link Cursor#DEFAULT} if it is in none).
+   */
+  private Cursor cursorAt(double sx, double sy) {
+    double left = MARGIN;
+    double top = MARGIN;
+    double right = SCENE.getWidth() - MARGIN;
+    double bottom = SCENE.getHeight() - MARGIN;
+
+    boolean l_trigger = sx > left - TR && sx < left + TR;
+    boolean r_trigger = sx < right + TR && sx > right - TR;
+    boolean u_trigger = sy < bottom + TR && sy > bottom - TR;
+    boolean d_trigger = sy > top - TR && sy < top + TR;
+
+    if (l_trigger && d_trigger && !verticalOnly) {
+      return Cursor.NW_RESIZE;
+    }
+    else if (l_trigger && u_trigger && !verticalOnly) {
+      return Cursor.SW_RESIZE;
+    }
+    else if (r_trigger && d_trigger && !verticalOnly) {
+      return Cursor.NE_RESIZE;
+    }
+    else if (r_trigger && u_trigger && !verticalOnly) {
+      return Cursor.SE_RESIZE;
+    }
+    else if (l_trigger && !verticalOnly) {
+      return Cursor.W_RESIZE;
+    }
+    else if (r_trigger && !verticalOnly) {
+      return Cursor.E_RESIZE;
+    }
+    else if (d_trigger) {
+      return Cursor.N_RESIZE;
+    }
+    else if (sy < top + TM && !u_trigger) {
+      return Cursor.OPEN_HAND;
+    }
+    else if (u_trigger) {
+      return Cursor.S_RESIZE;
+    }
+    return Cursor.DEFAULT;
   }
 
   private void fireAction(Cursor c) {

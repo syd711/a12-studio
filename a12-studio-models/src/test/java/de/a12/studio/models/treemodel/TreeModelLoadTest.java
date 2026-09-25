@@ -2,6 +2,11 @@ package de.a12.studio.models.treemodel;
 
 import de.a12.studio.models.ModelRoundTrip;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.overviewmodel.BoxElementType;
+import de.a12.studio.models.overviewmodel.ButtonElement;
+import de.a12.studio.models.overviewmodel.ElementBox;
+import de.a12.studio.models.overviewmodel.ExpandAllPopupElement;
+import de.a12.studio.models.overviewmodel.MultiSelectionElement;
 import de.a12.studio.models.util.JsonSettings;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;
@@ -9,7 +14,9 @@ import tools.jackson.databind.node.ObjectNode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TreeModelLoadTest {
@@ -60,6 +67,49 @@ class TreeModelLoadTest {
   }
 
   @Test
+  void loadsAndRoundTripsTheSubheaderAndFooterElements() throws Exception {
+    TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModelActions.json", TreeModel.class);
+
+    ElementBox subHeader = model.getContent().getSubHeaderBox();
+    assertEquals(2, subHeader.getLeftSlot().size());
+    assertInstanceOf(ExpandAllPopupElement.class, subHeader.getLeftSlot().get(0));
+    assertEquals(BoxElementType.EXPAND_ALL_POPUP, subHeader.getLeftSlot().get(0).getType());
+    assertInstanceOf(MultiSelectionElement.class, subHeader.getLeftSlot().get(1));
+    ButtonElement button = assertInstanceOf(ButtonElement.class, subHeader.getRightSlot().get(0));
+    assertEquals("button-026dc", button.getId());
+    assertEquals("event_add_root_node", button.getEvent());
+    assertEquals("add", button.getIconName());
+
+    ButtonElement footerButton = assertInstanceOf(ButtonElement.class, model.getContent().getFooterBox().getRightSlot().get(0));
+    assertEquals("button-8c1f2", footerButton.getId());
+    assertTrue(footerButton.getPrimary());
+
+    ModelRoundTrip.assertRoundTrip(getClass(), "/treemodel/TreeModelActions.json", TreeModel.class);
+  }
+
+  @Test
+  void loadsAndRoundTripsTheTreeStrategyExpansionDepths() throws Exception {
+    TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModelTreeStrategy.json", TreeModel.class);
+
+    ExpansionStrategy strategy = model.getContent().getConfiguration().getExpansionStrategy();
+    assertEquals(ExpansionStrategy.TREE, strategy.getType());
+    assertEquals(2, strategy.getExpansionDepths().size());
+    assertEquals("TeamTeam_Re", strategy.getExpansionDepths().get(0).getRelationshipModel());
+    assertEquals(5, strategy.getExpansionDepths().get(0).getMaxDepth());
+    assertEquals(1, strategy.getExpansionDepths().get(1).getMaxDepth());
+    assertTrue(strategy.getExtras().isEmpty(), "expansionDepths is a real property, not an extra");
+
+    ModelRoundTrip.assertRoundTrip(getClass(), "/treemodel/TreeModelTreeStrategy.json", TreeModel.class);
+  }
+
+  @Test
+  void aLevelByLevelStrategyWithoutDepthsDoesNotGainTheKey() throws Exception {
+    TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModel.json", TreeModel.class);
+
+    assertNull(model.getContent().getConfiguration().getExpansionStrategy().getExpansionDepths());
+  }
+
+  @Test
   void rootHideLabelAndStylesAreTypedFieldsThatRoundTrip() throws Exception {
     ObjectNode tree = (ObjectNode) JsonSettings.objectMapper.readTree(
         ModelRoundTrip.readResource(getClass(), "/treemodel/TreeModel.json"));
@@ -82,8 +132,8 @@ class TreeModelLoadTest {
   @Test
   void absentRootHideLabelAndStylesStayAbsent() throws Exception {
     TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModel.json", TreeModel.class);
-    assertEquals(null, model.getContent().getConfiguration().getRootRef());
-    assertEquals(null, model.getContent().getConfiguration().getLabelHidden());
+    assertNull(model.getContent().getConfiguration().getRootRef());
+    assertNull(model.getContent().getConfiguration().getLabelHidden());
     assertTrue(model.getContent().getStyles().isEmpty());
 
     JsonNode content = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(model)).get("content");

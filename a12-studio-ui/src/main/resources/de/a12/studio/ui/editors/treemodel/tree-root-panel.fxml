@@ -13,7 +13,7 @@
   <VBox spacing="4.0">
     <children>
       <Label styleClass="field-label" text="%relationship" />
-      <ComboBox fx:id="rootField" editable="false" maxWidth="Infinity" />
+      <ComboBox fx:id="rootField" editable="false" />
     </children>
   </VBox>
  </center>

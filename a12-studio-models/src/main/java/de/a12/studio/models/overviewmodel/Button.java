@@ -16,6 +16,9 @@ import java.util.List;
 @Setter
 public class Button implements OverviewButtonLike {
 
+  // Tree Model multi-selection buttons carry an id ("button-74736"); Overview Model buttons don't.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String id;
   private String event;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Confirmation confirmation;

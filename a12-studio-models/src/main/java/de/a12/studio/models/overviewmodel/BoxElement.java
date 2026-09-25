@@ -13,7 +13,8 @@ import lombok.Setter;
     @JsonSubTypes.Type(value = SearchElement.class, name = "search"),
     @JsonSubTypes.Type(value = FilterElement.class, name = "filter"),
     @JsonSubTypes.Type(value = ButtonElement.class, name = "button"),
-    @JsonSubTypes.Type(value = MultiSelectionElement.class, name = "multi_selection")
+    @JsonSubTypes.Type(value = MultiSelectionElement.class, name = "multi_selection"),
+    @JsonSubTypes.Type(value = ExpandAllPopupElement.class, name = "expand_all_popup")
 })
 @Getter
 @Setter
