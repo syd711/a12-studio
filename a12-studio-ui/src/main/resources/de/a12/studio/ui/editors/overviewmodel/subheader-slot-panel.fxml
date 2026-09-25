@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
@@ -17,24 +16,20 @@
     <BorderPane>
         <center>
             <VBox spacing="10.0">
-                <GridPane fx:id="rowsGrid" hgap="10.0" vgap="6.0">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="NEVER" minWidth="140.0" prefWidth="140.0"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
-                        <ColumnConstraints hgrow="NEVER" minWidth="120.0" prefWidth="120.0"/>
-                        <ColumnConstraints hgrow="NEVER" minWidth="90.0" prefWidth="90.0"/>
-                        <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
-                        <ColumnConstraints hgrow="NEVER" minWidth="90.0" prefWidth="90.0"/>
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints/>
-                    </rowConstraints>
-                    <Label styleClass="field-label" text="%action_type" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <Label styleClass="field-label" text="%event" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                    <Label styleClass="field-label" text="%priority" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <Label styleClass="field-label" text="%destructive" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
-                    <Label styleClass="field-label" text="%icon" GridPane.columnIndex="4" GridPane.rowIndex="0"/>
-                </GridPane>
+                <HBox fx:id="rowsHeader" spacing="10.0">
+                    <padding>
+                        <Insets left="12.0" right="12.0"/>
+                    </padding>
+                    <Label styleClass="field-label" text="" prefWidth="18.0"/>
+                    <Label styleClass="field-label" text="%action_type" prefWidth="140.0"/>
+                    <Label styleClass="field-label" text="%event" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <Label styleClass="field-label" text="%priority" prefWidth="140.0"/>
+                    <Label styleClass="field-label" text="%destructive" prefWidth="110.0"/>
+                    <Label styleClass="field-label" text="%icon" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                    <!-- Placeholder matching the move-up/move-down + edit + delete actions box width (3 * 34px buttons + 2 * 4px spacing) at the end of each row. -->
+                    <Label styleClass="field-label" text="" prefWidth="110.0"/>
+                </HBox>
+                <VBox fx:id="rowsList" spacing="8.0"/>
                 <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet"/>
                 <MenuButton fx:id="addButton" mnemonicParsing="false" styleClass="primary-button"
                         text="%add_slot">

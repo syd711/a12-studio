@@ -28,7 +28,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.junit.jupiter.api.AfterEach;
@@ -121,7 +120,7 @@ class TreeModelEditorPanelsTest {
     FxTestSupport.Loaded<TreeModelEditorController> loaded = FxTestSupport.load(EDITOR_FXML);
     TabPane tabs = (TabPane) ((BorderPane) loaded.root()).getCenter();
 
-    assertEquals(List.of(StudioBundle.get("tree_model_editor.tab_columns"), StudioBundle.get("configuration"),
+    assertEquals(List.of(StudioBundle.get("tree_model_editor.tab_tree"), StudioBundle.get("configuration"),
             StudioBundle.get("custom_actions"), StudioBundle.get("tree_model_editor.tab_layout")),
         tabs.getTabs().stream().map(Tab::getText).toList(),
         "the former Nodes tab is gone; Custom Actions is the third tab, followed by Layout");
@@ -197,7 +196,7 @@ class TreeModelEditorPanelsTest {
     FxTestSupport.Loaded<TreeModelEditorController> loaded = loadEditor(item);
 
     SubheaderSlotPanelController minor = FxTestSupport.field(loaded.controller(), "subheaderMinorController");
-    GridPane grid = FxTestSupport.field(minor, "rowsGrid");
+    VBox grid = FxTestSupport.field(minor, "rowsList");
     assertEquals(StudioBundle.get("subheader_slot.type_expand_all_popup"), ((Label) grid.lookup("#subheaderSlotType-0")).getText());
     assertEquals("", ((Label) grid.lookup("#subheaderSlotEvent-0")).getText());
     assertEquals(StudioBundle.get("subheader_slot.type_button"), ((Label) grid.lookup("#subheaderSlotType-1")).getText());

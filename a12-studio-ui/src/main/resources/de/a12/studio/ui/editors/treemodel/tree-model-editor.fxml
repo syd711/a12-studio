@@ -23,7 +23,7 @@
     <center>
         <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
             <tabs>
-                <Tab text="%tree_model_editor.tab_columns">
+                <Tab text="%tree_model_editor.tab_tree">
                     <content>
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
                             <content>
@@ -60,6 +60,26 @@
                         </ScrollPane>
                     </content>
                 </Tab>
+                <Tab text="%tree_model_editor.tab_layout">
+                    <content>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                            <content>
+                                <VBox spacing="12.0" styleClass="field-editor">
+                                    <children>
+                                        <fx:include fx:id="virtualScrollingPanel" source="tree-virtual-scrolling-panel.fxml" />
+                                        <fx:include fx:id="rowHeightActionColumnWidthPanel" source="tree-row-height-action-column-width-panel.fxml" />
+                                        <fx:include fx:id="columnsResizePanel" source="tree-columns-resize-panel.fxml" />
+                                        <fx:include fx:id="accessibilityPanel" source="tree-accessibility-panel.fxml" />
+                                        <fx:include fx:id="stylesPanel" source="/de/a12/studio/ui/editors/overviewmodel/styles-panel.fxml" />
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
                 <Tab text="%custom_actions">
                     <content>
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
@@ -75,26 +95,6 @@
                                         <Label styleClass="editor-type-label " text="%footer" />
                                         <fx:include fx:id="footerMinorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
                                         <fx:include fx:id="footerMajorButtons" source="../propertyeditors/event-buttons-panel.fxml" />
-                                    </children>
-                                    <padding>
-                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                    </padding>
-                                </VBox>
-                            </content>
-                        </ScrollPane>
-                    </content>
-                </Tab>
-                <Tab text="%tree_model_editor.tab_layout">
-                    <content>
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
-                            <content>
-                                <VBox spacing="12.0" styleClass="field-editor">
-                                    <children>
-                                        <fx:include fx:id="virtualScrollingPanel" source="tree-virtual-scrolling-panel.fxml" />
-                                        <fx:include fx:id="rowHeightActionColumnWidthPanel" source="tree-row-height-action-column-width-panel.fxml" />
-                                        <fx:include fx:id="columnsResizePanel" source="tree-columns-resize-panel.fxml" />
-                                        <fx:include fx:id="accessibilityPanel" source="tree-accessibility-panel.fxml" />
-                                        <fx:include fx:id="stylesPanel" source="/de/a12/studio/ui/editors/overviewmodel/styles-panel.fxml" />
                                     </children>
                                     <padding>
                                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

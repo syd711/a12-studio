@@ -22,14 +22,17 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.GridPane;
+import javafx.scene.input.DataFormat;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.kordamp.ikonli.javafx.FontIcon;
 import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import de.a12.studio.ui.util.StudioBundle;
@@ -61,14 +64,25 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   public static final List<BoxElementType> TREE_TYPES =
       List.of(BoxElementType.BUTTON, BoxElementType.MULTI_SELECTION, BoxElementType.EXPAND_ALL_POPUP);
 
+  // javafx.scene.input.DataFormat registers its mime type in a process-wide static registry and throws if the
+  // same string is registered twice, so a counter keeps each panel instance's row-reorder format unique (this
+  // panel is instantiated for every subheader slot of every opened Overview/Tree Model editor).
+  private static final AtomicLong INSTANCE_COUNTER = new AtomicLong();
+
   @FXML
-  private GridPane rowsGrid;
+  private HBox rowsHeader;
+  @FXML
+  private VBox rowsList;
   @FXML
   private Label emptyLabel;
   @FXML
   private MenuButton addButton;
 
   private List<BoxElement> rows;
+
+  // Identifies a row-reorder drag; unique per panel instance so drags from a sibling slot's row list are
+  // rejected rather than accepted into this one. Created once in configure().
+  private DataFormat indexFormat;
 
   // Notified after every structural change (add/reorder/delete/type change), so the owning editor can keep
   // sibling panels whose validation derives from this list (e.g. the Multi-Selection panel's "exactly one
@@ -93,6 +107,9 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     setSettingsKeySuffix(settingsKeySuffix);
     this.rows = rows;
     this.availableTypes = availableTypes;
+    if (indexFormat == null) {
+      indexFormat = new DataFormat("application/x-a12-subheader-slot-index" + settingsKeySuffix + "-" + INSTANCE_COUNTER.incrementAndGet());
+    }
     initAddMenu();
     rebuildRows();
   }
@@ -136,26 +153,25 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   }
 
   private void rebuildRows() {
-    rowsGrid.getChildren().removeIf(node -> {
-      Integer rowIndex = GridPane.getRowIndex(node);
-      return rowIndex != null && rowIndex > 0;
-    });
+    rowsList.getChildren().clear();
 
     boolean empty = rows.isEmpty();
-    rowsGrid.setVisible(!empty);
-    rowsGrid.setManaged(!empty);
+    rowsHeader.setVisible(!empty);
+    rowsHeader.setManaged(!empty);
     emptyLabel.setVisible(empty);
     emptyLabel.setManaged(empty);
 
     for (int index = 0; index < rows.size(); index++) {
-      addRow(rows.get(index), index, rows.size());
+      rowsList.getChildren().add(createRow(rows.get(index), index, rows.size()));
     }
   }
 
-  private void addRow(BoxElement element, int index, int rowCount) {
+  private HBox createRow(BoxElement element, int index, int rowCount) {
+    FontIcon dragHandle = RowFactory.createDragHandle();
+
     Label typeLabel = new Label(displayNameFor(element));
     typeLabel.setId("subheaderSlotType-" + index);
-    typeLabel.setMaxWidth(Double.MAX_VALUE);
+    typeLabel.setPrefWidth(140.0);
 
     boolean isButton = element instanceof ButtonElement;
     OverviewButtonLike editable = element instanceof OverviewButtonLike configurable ? configurable : null;
@@ -164,15 +180,20 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     Label eventLabel = new Label(isButton ? button.getEvent() : "");
     eventLabel.setId("subheaderSlotEvent-" + index);
     eventLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(eventLabel, Priority.ALWAYS);
 
     Label priorityLabel = new Label(isButton ? (Boolean.TRUE.equals(button.getPrimary()) ? "PRIMARY" : DEFAULT_PRIORITY) : "");
     priorityLabel.setId("subheaderSlotPriority-" + index);
+    priorityLabel.setPrefWidth(140.0);
 
     Label destructiveLabel = new Label(isButton && Boolean.TRUE.equals(button.getDestructive()) ? "✓" : "");
     destructiveLabel.setId("subheaderSlotDestructive-" + index);
+    destructiveLabel.setPrefWidth(110.0);
 
     Label iconLabel = new Label(isButton ? button.getIconName() : "");
     iconLabel.setId("subheaderSlotIcon-" + index);
+    iconLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(iconLabel, Priority.ALWAYS);
 
     if (editable != null) {
       for (Label cell : List.of(typeLabel, eventLabel, priorityLabel, destructiveLabel, iconLabel)) {
@@ -180,7 +201,19 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
       }
     }
 
-    rowsGrid.addRow(index + 1, typeLabel, eventLabel, priorityLabel, destructiveLabel, iconLabel, createActionsBox(element, editable, index, rowCount));
+    HBox rowBox = new HBox(10.0, dragHandle, typeLabel, eventLabel, priorityLabel, destructiveLabel, iconLabel,
+        createActionsBox(element, editable, index, rowCount));
+    rowBox.setAlignment(Pos.CENTER_LEFT);
+    rowBox.getStyleClass().add("module-row");
+    RowFactory.setupRowDragAndDrop(rowBox, dragHandle, indexFormat, index, this::moveRowViaDrag);
+    return rowBox;
+  }
+
+  private void moveRowViaDrag(int fromIndex, int insertBeforeIndex) {
+    if (RowFactory.reorder(rows, fromIndex, insertBeforeIndex)) {
+      rebuildRows();
+      notifyChanged();
+    }
   }
 
   private void makeClickableToEdit(Label label, OverviewButtonLike button) {
