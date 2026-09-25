@@ -66,6 +66,15 @@
                     </tooltip>
                 </Button>
                 <Separator orientation="VERTICAL" />
+                <Button fx:id="adHocTestButton" accessibleText="%document_model_tree.ad_hoc_testing" mnemonicParsing="false" onAction="#onAdHocTest" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2l-lightbulb-on-outline" iconSize="18" styleClass="toolbar-icon" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%document_model_tree.ad_hoc_testing.tooltip" />
+                    </tooltip>
+                </Button>
+                <Separator orientation="VERTICAL" />
                 <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteButton" styleClass="delete-button">
                     <tooltip>
                         <Tooltip text="%delete_the_selected_element_s" />

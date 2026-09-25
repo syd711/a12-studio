@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TabPane?>
+<?import de.a12.studio.ui.components.StudioTabPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 
@@ -12,9 +12,9 @@
             <Label text="%no_tab_opened" textAlignment="LEFT" styleClass="hint-label" BorderPane.alignment="CENTER" />
          </center>
       </BorderPane>
-      <TabPane fx:id="tabPane" tabClosingPolicy="ALL_TABS">
+      <StudioTabPane fx:id="tabPane" tabClosingPolicy="ALL_TABS">
          <tabs>
          </tabs>
-      </TabPane>
+      </StudioTabPane>
    </children>
 </StackPane>

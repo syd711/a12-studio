@@ -13,7 +13,7 @@
   "relationship-ui":    { "version": "2.0.0",  "enabled": true,  "suffix": "Ru"  },
   "selection":          { "version": "2.0.0",  "enabled": true,  "suffix": "SEM" },
   "application":        { "version": "6.0.0",  "enabled": true,  "suffix": "AM"  },
-  "content":            { "version": "0.8.0",  "enabled": false,  "suffix": "CM"  },
+  "content":            { "version": "0.8.0",  "enabled": true,  "suffix": "CM"  },
   "combination":        { "version": "1.0.0",  "enabled": true,  "suffix": "CDM" },
   "mapping":            { "version": "1.0.0",  "enabled": false, "suffix": "MM"  },
   "query":              { "version": "0.1.0",  "enabled": true,  "suffix": "QM"  },

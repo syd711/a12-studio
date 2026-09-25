@@ -16,6 +16,7 @@ import de.a12.studio.ui.editors.documentmodel.DocumentModelTreeFilter.FieldKind;
 import de.a12.studio.ui.editors.formmodel.FxTestSupport;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ProjectDocumentModels;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
@@ -124,6 +125,44 @@ class DocumentModelTreeFxTest {
     setShown(fixture, ElementKind.INCLUDES, false);
 
     assertEquals(Set.of("Invoice", "BillingAddress", "BillingAddressComp"), Set.copyOf(rowNames(fixture)));
+  }
+
+  // ---- ad hoc testing ---------------------------------------------------------------------------------------
+
+  @Test
+  void adHocTestingTestsTheSelectedElementsAndTheirDescendants() throws Exception {
+    Fixture fixture = open("Invoice_DM");
+    DocumentModelActions actions = FxTestSupport.field(fixture.controller, "documentModelActions");
+    Element billingAddress = element(fixture, "BillingAddress");
+    GroupElement invoice = rootGroup(fixture);
+
+    select(fixture, billingAddress);
+    assertEquals(Set.of(billingAddress.getId()), actions.adHocTestElementIds());
+
+    select(fixture, invoice);
+    Set<String> ids = actions.adHocTestElementIds();
+    assertTrue(ids.contains(invoice.getId()), ids.toString());
+    assertTrue(ids.contains(billingAddress.getId()), "the descendants come along: " + ids);
+
+    FxTestSupport.onFx(() -> fixture.tree.getSelectionModel().clearSelection());
+    assertTrue(actions.adHocTestElementIds().isEmpty(), "nothing selected tests the whole model");
+  }
+
+  @Test
+  void adHocTestingIsOfferedInTheToolbarAndTheContextMenus() throws Exception {
+    Fixture fixture = open("Invoice_DM");
+    DocumentModelActions actions = FxTestSupport.field(fixture.controller, "documentModelActions");
+    Button button = FxTestSupport.field(fixture.controller, "adHocTestButton");
+    String label = StudioBundle.get("document_model_tree.ad_hoc_testing");
+
+    assertFalse(button.isDisable());
+    assertTrue(button.getTooltip().getText().contains("Alt+T"), button.getTooltip().getText());
+    List<String> elementMenu = FxTestSupport.onFx(
+        () -> actions.createContextMenu(element(fixture, "BillingAddress")).getItems().stream().map(item -> item.getText()).toList());
+    assertTrue(elementMenu.contains(label), elementMenu.toString());
+    List<String> rootMenu = FxTestSupport.onFx(
+        () -> actions.createRootContextMenu().getItems().stream().map(item -> item.getText()).toList());
+    assertTrue(rootMenu.contains(label), rootMenu.toString());
   }
 
   @Test

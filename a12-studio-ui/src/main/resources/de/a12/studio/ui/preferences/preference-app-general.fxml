@@ -41,6 +41,13 @@
                         <CheckBox fx:id="colorfulStudioCheckBox" text="%enable_colorful_studio" />
                         <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%enable_colorful_studio_description" />
 
+                        <CheckBox fx:id="multiRowTabsCheckBox" text="%multi_row_tabs">
+                            <VBox.margin>
+                                <Insets top="12.0" />
+                            </VBox.margin>
+                        </CheckBox>
+                        <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%multi_row_tabs_description" />
+
                         <Label styleClass="field-label" text="%font_size">
                             <VBox.margin>
                                 <Insets top="12.0" />

@@ -407,6 +407,20 @@
 }
 
 /*
+ * ID-scoped overrides for the Content Model editor's element TreeView (fx:id="elementsTree"),
+ * mirroring #projectTree above - an id selector always outranks Modena's built-in class/pseudo-class
+ * selectors, so this is used as a guaranteed override for row selection background/text regardless
+ * of focus state.
+ */
+#elementsTree .tree-cell:filled:selected,
+#elementsTree .tree-cell:filled:selected:focused,
+#elementsTree .tree-cell:filled:selected:hover {
+    -fx-background: -fx-selection-bar-soft;
+    -fx-background-color: -fx-selection-bar-soft;
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
+/*
  * ID-scoped overrides for the Form Model editor's Overview tab trees (fx:id="tree" in both
  * DocumentSourceTreeController and FormModelTreeController - FXMLLoader copies fx:id to the
  * node's id, so one selector covers both), mirroring #projectTree above so both trees use the

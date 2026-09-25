@@ -416,8 +416,8 @@ so it stays in its table. `PreventLineBreakRules.classify/toValue/toPattern` por
 **Editor** (`a12-studio-ui/.../editors/typesettingmodel/`), one extracted property editor per SME section:
 `CharacterSequenceRulesPanelController`, `NumberUnitRulesPanelController`, `SpecialPatternRulesPanelController` (a shared
 `AbstractRulesPanelController` holds the row/add/delete/validation behavior) and `OrphanWidowPanelController`. Roles are
-not in the editor: the Model Settings dialog shows only the Roles panel for this model type (every other panel is
-hidden and left unbound so none can disable Save), and the New Model dialog neither asks for nor writes locales.
+not in the editor: the Model Settings dialog shows only the General information (name, description) and Roles panels
+for this model type (every other panel is hidden and left unbound so none can disable Save), and the New Model dialog neither asks for nor writes locales.
 
 **Validation** (`TypesettingModelValidationService`; no locale validators, the header has no locales):
 - Character sequence: required, letters and hyphens only (`^[\p{L}-]+$`), at most 20 characters.

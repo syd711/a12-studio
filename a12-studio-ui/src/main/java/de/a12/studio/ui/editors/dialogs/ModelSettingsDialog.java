@@ -13,6 +13,7 @@ import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.models.projects.ProjectItem;
@@ -176,12 +177,13 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       A12Model<?> model = projectItem.getModel();
       snapshot = new ModelSnapshot(model);
 
-      // A Typesetting Model's only setting is its roles, so every other panel stays unbound (an unbound panel
-      // reports no validation error that could disable Save) and is hidden below.
-      boolean rolesOnly = model instanceof TypesettingModel;
-      if (!rolesOnly) {
-        modelSettingsNameController.setModel(model);
-        modelSettingsNameController.focusNameField();
+      // A Typesetting Model's header only has its general information (name, description) and roles, so the
+      // other panels stay unbound (an unbound panel reports no validation error that could disable Save) and
+      // are hidden below.
+      boolean generalAndRolesOnly = model instanceof TypesettingModel;
+      modelSettingsNameController.setModel(model);
+      modelSettingsNameController.focusNameField();
+      if (!generalAndRolesOnly) {
         supportedCharactersController.setModel(model);
         localesController.setModel(model);
         labelsController.setModel(model);
@@ -254,12 +256,12 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       }
       supportedCharactersController.setVisible(
           !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel)
-              && !(model instanceof RelationshipModel) && !(model instanceof QueryModel) && !(model instanceof AdditiveDocumentModel));
+              && !(model instanceof RelationshipModel) && !(model instanceof QueryModel) && !(model instanceof AdditiveDocumentModel)
+              && !(model instanceof TreeModel));
       modelReferencesController.setVisible(
           !(model instanceof OverviewModel) && !(model instanceof FormModel) && !(model instanceof QueryModel)
-              && !(model instanceof AdditiveDocumentModel));
-      if (rolesOnly) {
-        modelSettingsNameController.setVisible(false);
+              && !(model instanceof AdditiveDocumentModel) && !(model instanceof TreeModel));
+      if (generalAndRolesOnly) {
         supportedCharactersController.setVisible(false);
         localesController.setVisible(false);
         labelsController.setVisible(false);

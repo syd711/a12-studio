@@ -78,6 +78,37 @@
 }
 
 /**
+ * Multi-row tab strip (StudioTabPane with its multi-row header option on, rendered by MultiRowTabPaneSkin
+ * instead of the regular TabPaneSkin). The skin reuses the regular skin's style classes, so everything above
+ * applies as is; what the regular skin gets from Modena's child-combinator rules - the tab's inner layout and
+ * the close button's shape - has to be spelled out here.
+ */
+.tab-pane.multi-row-tabs .tab {
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 6px;
+}
+
+.tab-pane.multi-row-tabs .tab-close-button {
+    -fx-shape: "M 0,0 H1 L 4,3 7,0 H8 V1 L 5,4 8,7 V8 H7 L 4,5 1,8 H0 V7 L 3,4 0,1 Z";
+    -fx-scale-shape: false;
+    -fx-min-width: 16px;
+    -fx-pref-width: 16px;
+    -fx-max-width: 16px;
+    -fx-min-height: 16px;
+    -fx-pref-height: 16px;
+    -fx-max-height: 16px;
+}
+
+.tab-pane.multi-row-tabs .tab-close-button:hover {
+    -fx-background-color: -fx-text-color;
+}
+
+/* The rule under every header row (see MultiRowTabPaneSkin). */
+.tab-pane.multi-row-tabs .tab-header-row-line {
+    -fx-background-color: derive(-fx-border-subtle, -6%);
+}
+
+/**
  * Second-level tabs (sub-tab-panel): segmented/pill tab strip for a TabPane nested inside
  * another panel (e.g. the Overview Model editor's Übersicht/Suche und Filter/... tabs, the
  * Tree and Relationship Model editors' tabs, and the Print Model editor's segment tabs)

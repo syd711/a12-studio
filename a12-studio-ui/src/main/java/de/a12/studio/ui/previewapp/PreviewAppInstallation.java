@@ -47,7 +47,11 @@ public class PreviewAppInstallation {
     return clientStaticDir;
   }
 
-  public static PreviewAppInstallation resolve() throws PreviewAppException {
+  /**
+   * Validates the configured A12 installation folder and returns its {@code bin} subfolder, the parent of every
+   * component ({@code java}, {@code preview-app-server}, {@code simple-model-editor}, ...).
+   */
+  static File resolveBinFolder() throws PreviewAppException {
     String installationPath = A12Settings.load().getInstallationPath();
     if (installationPath == null || installationPath.isEmpty()) {
       throw new PreviewAppException("No A12 installation folder is configured. Set it in Preferences first.");
@@ -57,14 +61,21 @@ public class PreviewAppInstallation {
     if (!A12Settings.isValidInstallationFolder(installationFolder)) {
       throw new PreviewAppException("\"" + installationPath + "\" is not a valid A12 installation folder.");
     }
+    return new File(installationFolder, "bin");
+  }
 
-    File bin = new File(installationFolder, "bin");
-
+  /** The bundled Java runtime ({@code <bin>/java/<version>/bin/java[.exe]}) shipped with the A12 installation. */
+  static File findJavaExecutable(File bin) throws PreviewAppException {
     File javaHome = new File(bin, "java");
-    File javaExecutable = findLatestVersionEntry(javaHome,
+    return findLatestVersionEntry(javaHome,
         versionDir -> new File(versionDir, OSUtil.isWindows() ? "bin/java.exe" : "bin/java"))
         .orElseThrow(() -> new PreviewAppException(
             "Could not find a bundled Java runtime under \"" + javaHome.getAbsolutePath() + "\"."));
+  }
+
+  public static PreviewAppInstallation resolve() throws PreviewAppException {
+    File bin = resolveBinFolder();
+    File javaExecutable = findJavaExecutable(bin);
 
     File serverHome = new File(bin, "preview-app-server");
     File serverVersionDir = findLatestVersionEntry(serverHome, Function.identity())
@@ -86,7 +97,7 @@ public class PreviewAppInstallation {
    * Lists the version subfolders of {@code parent} (e.g. "202606.0.2"), tries the newest first (by
    * name, descending) and returns the first one for which {@code mapper} produces an existing file.
    */
-  private static Optional<File> findLatestVersionEntry(File parent, Function<File, File> mapper) {
+  static Optional<File> findLatestVersionEntry(File parent, Function<File, File> mapper) {
     File[] versionDirs = parent.listFiles(File::isDirectory);
     if (versionDirs == null || versionDirs.length == 0) {
       return Optional.empty();

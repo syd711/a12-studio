@@ -15,6 +15,7 @@ import de.a12.studio.plugin.manager.PluginManager;
 import de.a12.studio.ui.events.*;
 import de.a12.studio.ui.preview.PreviewServer;
 import de.a12.studio.ui.previewapp.PreviewAppProcess;
+import de.a12.studio.ui.previewapp.SmeBackend;
 import de.a12.studio.ui.util.*;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
 import de.a12.studio.ui.versioncontrol.GitService;
@@ -203,6 +204,7 @@ public class Studio extends Application implements StudioEventListener {
   @Override
   public void stop() {
     PreviewServer.stopIfRunning();
+    SmeBackend.getInstance().stop();
     PreviewAppProcess.getInstance().stop();
   }
 

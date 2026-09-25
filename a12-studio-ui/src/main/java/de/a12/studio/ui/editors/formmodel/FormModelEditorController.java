@@ -169,7 +169,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
 
   @FXML
   public void onPreview(ActionEvent e) {
-    PreviewLauncher.openPreviewInBrowser(projectItem);
+    PreviewLauncher.openFormPreview(projectItem);
   }
 
   private void load(@NonNull FormModel formModel) {

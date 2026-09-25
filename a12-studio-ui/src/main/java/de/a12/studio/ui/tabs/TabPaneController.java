@@ -7,6 +7,7 @@ import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.ui.EditorFactory;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ProgressDialog;
+import de.a12.studio.ui.components.StudioTabPane;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.models.A12Model;
@@ -24,7 +25,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -40,7 +40,7 @@ import java.util.ResourceBundle;
 public class TabPaneController implements Initializable, StudioEventListener {
 
   @FXML
-  private TabPane tabPane;
+  private StudioTabPane tabPane;
 
   private Project project;
 
@@ -542,11 +542,15 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
     boolean enabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
     applyColorfulStudioSetting(enabled);
+    tabPane.setMultiRowHeader(LocalUISettings.getBoolean(LocalUISettings.MULTI_ROW_TABS, true));
     LocalUISettings.addListener((key, value) -> {
       Platform.runLater(() -> {
         if (LocalUISettings.COLORFUL_STUDIO_ENABLED.equals(key)) {
           boolean colorsEnabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
           applyColorfulStudioSetting(colorsEnabled);
+        }
+        else if (LocalUISettings.MULTI_ROW_TABS.equals(key)) {
+          tabPane.setMultiRowHeader(LocalUISettings.getBoolean(LocalUISettings.MULTI_ROW_TABS, true));
         }
       });
     });

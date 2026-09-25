@@ -108,6 +108,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   private MenuButton modelTreeAddButton;
 
   @FXML
+  private Button adHocTestButton;
+
+  @FXML
   private Button cutButton;
 
   @FXML
@@ -727,6 +730,11 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
         onPaste();
       }
     }
+    else if (DocumentModelActions.AD_HOC_TEST_SHORTCUT.match(event)) {
+      if (!adHocTestButton.isDisable()) {
+        documentModelActions.startAdHocTest();
+      }
+    }
     else if (DocumentModelActions.INSERT_FROM_MODEL_SHORTCUT.match(event)) {
       if (!modelTreeAddButton.isDisable()) {
         documentModelActions.insertFromModel();
@@ -741,6 +749,11 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   @FXML
   private void onDeleteButton() {
     documentModelActions.confirmAndDeleteSelection();
+  }
+
+  @FXML
+  private void onAdHocTest() {
+    documentModelActions.startAdHocTest();
   }
 
   @FXML
@@ -914,6 +927,8 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     copyButton.setDisable(!hasElementSelected || fixedChildrenAncestor);
     pasteButton.setDisable(!hasElementSelected || withinFixedChildrenGroup || !hasClipboardContent);
     deleteButton.setDisable(!hasElementSelected || fixedChildrenAncestor);
+    // An Additive Document Model is only a fragment; SME tests it through the Combination Model it belongs to.
+    adHocTestButton.setDisable(additive);
   }
 
   private enum DropLocation {ABOVE, BELOW, INTO}
@@ -1202,6 +1217,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     });
     elementsTreeTable.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<ElementViewModel>>) change -> notifySelectionChanged());
     elementsTreeTable.setOnKeyPressed(this::onTreeKeyPressed);
+    addShortcutHint(adHocTestButton, DocumentModelActions.AD_HOC_TEST_SHORTCUT);
     addShortcutHint(cutButton, DocumentModelActions.CUT_SHORTCUT);
     addShortcutHint(copyButton, DocumentModelActions.COPY_SHORTCUT);
     addShortcutHint(pasteButton, DocumentModelActions.PASTE_SHORTCUT);

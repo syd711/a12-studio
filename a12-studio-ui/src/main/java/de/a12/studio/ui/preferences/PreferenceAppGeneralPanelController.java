@@ -42,6 +42,9 @@ public class PreferenceAppGeneralPanelController implements Initializable {
   private CheckBox colorfulStudioCheckBox;
 
   @FXML
+  private CheckBox multiRowTabsCheckBox;
+
+  @FXML
   private Spinner<Integer> fontSizeSpinner;
 
   @FXML
@@ -91,6 +94,11 @@ public class PreferenceAppGeneralPanelController implements Initializable {
     colorfulStudioCheckBox.setSelected(LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true));
     colorfulStudioCheckBox.selectedProperty().addListener((obs, oldVal, newVal) ->
         LocalUISettings.saveProperty(LocalUISettings.COLORFUL_STUDIO_ENABLED, String.valueOf(newVal)));
+
+    // --- Multi-row tabs ---
+    multiRowTabsCheckBox.setSelected(LocalUISettings.getBoolean(LocalUISettings.MULTI_ROW_TABS, true));
+    multiRowTabsCheckBox.selectedProperty().addListener((obs, oldVal, newVal) ->
+        LocalUISettings.saveProperty(LocalUISettings.MULTI_ROW_TABS, String.valueOf(newVal)));
 
     // --- Font size ---
     fontSizeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(

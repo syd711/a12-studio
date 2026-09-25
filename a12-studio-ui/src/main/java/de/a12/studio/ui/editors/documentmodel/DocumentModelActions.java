@@ -33,6 +33,7 @@ import de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController;
 import de.a12.studio.ui.editors.documentmodel.dialogs.MoveGroupDialogController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -104,6 +105,7 @@ public class DocumentModelActions {
   public static final KeyCombination PASTE_SHORTCUT = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
   public static final KeyCombination INSERT_FROM_MODEL_SHORTCUT =
       new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
+  public static final KeyCombination AD_HOC_TEST_SHORTCUT = new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
 
   private final ProjectItem projectItem;
   private final ModelRoot modelRoot;
@@ -227,6 +229,8 @@ public class DocumentModelActions {
     contextMenu.getItems().add(includeItem);
     contextMenu.getItems().add(new SeparatorMenuItem());
     contextMenu.getItems().add(createInsertFromModelMenuItem());
+    contextMenu.getItems().add(new SeparatorMenuItem());
+    contextMenu.getItems().add(createAdHocTestMenuItem());
 
     return contextMenu;
   }
@@ -254,6 +258,9 @@ public class DocumentModelActions {
       items.add(moveItem);
       items.add(new SeparatorMenuItem());
     }
+    items.add(createAdHocTestMenuItem());
+    items.add(new SeparatorMenuItem());
+
     MenuItem cutItem = createMenuItem(StudioBundle.get("document_model_tree.cut"), Icons.CUT);
     cutItem.setOnAction(event -> cutSelection());
     cutItem.setAccelerator(CUT_SHORTCUT);
@@ -280,6 +287,48 @@ public class DocumentModelActions {
     deleteItem.setOnAction(event -> confirmAndDeleteSelection());
     items.add(deleteItem);
     return items;
+  }
+
+  private MenuItem createAdHocTestMenuItem() {
+    MenuItem adHocTestItem = createMenuItem(StudioBundle.get("document_model_tree.ad_hoc_testing"), Icons.AD_HOC_TEST);
+    adHocTestItem.setOnAction(event -> startAdHocTest());
+    adHocTestItem.setAccelerator(AD_HOC_TEST_SHORTCUT);
+    return adHocTestItem;
+  }
+
+  /**
+   * SME's "Ad Hoc Testing": opens the Form Engine preview of a Form Model generated for the selected elements (and
+   * their descendants), or for the whole model if nothing is selected. Like SME, an element that is part of an
+   * Include, Attachment or Multi-Select stands for that whole group.
+   */
+  public void startAdHocTest() {
+    PreviewLauncher.openAdHocTest(projectItem, adHocTestElementIds());
+  }
+
+  /** The ids {@link #startAdHocTest()} tests: the selected elements and their descendants; empty for the whole model. */
+  Set<String> adHocTestElementIds() {
+    Set<String> elementIds = new LinkedHashSet<>();
+    for (TreeItem<ElementViewModel> item : elementsTreeTable.getSelectionModel().getSelectedItems()) {
+      if (item == null || item.getValue() == null || isBaseModelNode(item)) {
+        continue;
+      }
+      TreeItem<ElementViewModel> unit = item;
+      for (TreeItem<ElementViewModel> ancestor = item.getParent(); ancestor != null && ancestor.getValue() != null;
+           ancestor = ancestor.getParent()) {
+        if (new ElementViewModel(ancestor.getValue().getElement()).hasFixedChildren()) {
+          unit = ancestor;
+        }
+      }
+      collectElementIds(unit.getValue().getElement(), elementIds);
+    }
+    return elementIds;
+  }
+
+  private static void collectElementIds(@NonNull Element element, @NonNull Set<String> elementIds) {
+    elementIds.add(element.getId());
+    if (element instanceof GroupElement group && group.getGroup() != null && group.getGroup().getElements() != null) {
+      group.getGroup().getElements().forEach(child -> collectElementIds(child, elementIds));
+    }
   }
 
   public List<MenuItem> createAddMenuItems() {

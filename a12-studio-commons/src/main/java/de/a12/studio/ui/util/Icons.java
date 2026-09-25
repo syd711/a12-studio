@@ -44,6 +44,8 @@ public interface Icons {
   String UNDO = "mdi2u-undo";
   String REDO = "mdi2r-redo";
   String PLAY = "mdi2p-play";
+  /** SME's "Ad Hoc Testing" (tips_and_updates). */
+  String AD_HOC_TEST = "mdi2l-lightbulb-on-outline";
   String STOP = "mdi2s-stop";
   String CONSOLE = "mdi2c-console";
   String GIT_BRANCH = "mdi2s-source-branch";
