@@ -1,0 +1,19 @@
+/**
+ * Global typography scale.
+ *
+ * -fx-app-font-size is the single source of truth for the app's base text size (sensible range
+ * 10px-18px; see PreferenceAppGeneralPanelController's font size slider, which applies it as an
+ * inline "-fx-font-size" style on each window's root - see WidgetFactory#applyFontSize). It is
+ * declared on the universal selector, matching stylesheet-colors.css's pattern, so every node -
+ * including popups/tooltips - resolves it directly rather than relying on inheritance to carry it
+ * down from a single root node.
+ *
+ * Every other -fx-font-size declaration across the theme is expressed as an em multiple of this
+ * value: each ratio is that declaration's original absolute px value divided by 14px, the
+ * previous hardcoded default, so changing this one value rescales all text proportionally while
+ * preserving today's look at the default size.
+ */
+* {
+    -fx-app-font-size: 14px;
+    -fx-font-size: -fx-app-font-size;
+}
