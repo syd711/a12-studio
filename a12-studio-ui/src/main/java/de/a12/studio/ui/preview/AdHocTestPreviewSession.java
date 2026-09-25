@@ -164,6 +164,6 @@ public final class AdHocTestPreviewSession extends FormEnginePreviewSession {
     FormModelContent content = new FormModelContent();
     formModel.setContent(content);
     FormScreenGenerator.generate(content, reduced, reduced.getLocales());
-    return serialize(formModel);
+    return serializeFormModel(formModel);
   }
 }

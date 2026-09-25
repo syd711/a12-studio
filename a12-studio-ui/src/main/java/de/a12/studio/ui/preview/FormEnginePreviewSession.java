@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.previewapp.PreviewAppException;
@@ -12,6 +13,7 @@ import de.a12.studio.ui.util.ProjectDocumentModels;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -98,6 +100,28 @@ public abstract class FormEnginePreviewSession {
         formRevision.equals(knownFormRevision) ? null : rendering.formModel(),
         sendDocument ? rendering.documentModel() : null,
         sendDocument ? rendering.validationCode() : null);
+  }
+
+  /**
+   * The Form Model as the Form Engine expects it. The engine only accepts a model whose content has a {@code
+   * subHeaderBox} and a {@code footerBox}, which the studio leaves out while they are empty (as does a fresh Form
+   * Model); they are added to this copy only.
+   */
+  static String serializeFormModel(FormModel formModel) throws PreviewAppException {
+    try {
+      JsonNode root = JsonSettings.objectMapper.readTree(serialize(formModel));
+      if (root.path("content") instanceof ObjectNode content) {
+        for (String box : List.of("subHeaderBox", "footerBox")) {
+          if (!content.has(box)) {
+            content.putObject(box).put("id", box);
+          }
+        }
+      }
+      return JsonSettings.objectMapper.writeValueAsString(root);
+    }
+    catch (RuntimeException e) {
+      throw new PreviewAppException("The Form Model could not be prepared for the preview: " + e.getMessage(), e);
+    }
   }
 
   static String serialize(Object model) throws PreviewAppException {

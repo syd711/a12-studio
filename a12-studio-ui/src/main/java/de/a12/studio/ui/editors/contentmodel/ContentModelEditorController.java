@@ -6,7 +6,11 @@ import de.a12.studio.models.contentmodel.ContentElement;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.preview.PreviewLauncher;
+import de.a12.studio.ui.previewapp.PreviewAppException;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,6 +21,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.web.WebView;
 import org.jspecify.annotations.NonNull;
 import tools.jackson.databind.JsonNode;
 
@@ -32,6 +37,10 @@ import java.util.UUID;
  * Edits a {@link ContentModel}: the element tree on the left (add/remove/reorder), and per selected
  * element its type/namespace plus the raw {@code props} JSON. The Lexical {@code tree}/{@code html}
  * payloads inside props are deliberately edited as opaque JSON — the studio does not reinterpret them.
+ *
+ * <p>The center shows the Content Model rendered by the real Content Engine, as SME's preview window does: the
+ * installed Simple Model Editor client is loaded into a {@code WebView} and fed the live model by the {@link
+ * de.a12.studio.ui.preview.PreviewServer} (see {@link de.a12.studio.ui.preview.ContentModelPreviewSession}).
  */
 public class ContentModelEditorController extends AbstractEditorController implements Initializable {
 
@@ -60,6 +69,12 @@ public class ContentModelEditorController extends AbstractEditorController imple
 
   @FXML
   private Label propsErrorLabel;
+
+  @FXML
+  private WebView previewWebView;
+
+  @FXML
+  private Label previewUnavailableLabel;
 
   private ContentModel model;
   private boolean updatingFromModel;
@@ -104,6 +119,31 @@ public class ContentModelEditorController extends AbstractEditorController imple
   public void loadModel(@NonNull A12Model<?> model) {
     load((ContentModel) model);
     updateSettingsErrorBadge();
+    startPreview();
+  }
+
+  private void startPreview() {
+    try {
+      previewWebView.getEngine().load(PreviewLauncher.registerContentPreview(projectItem));
+      previewUnavailableLabel.setVisible(false);
+      previewUnavailableLabel.setManaged(false);
+      previewWebView.setVisible(true);
+    }
+    catch (PreviewAppException e) {
+      previewWebView.setVisible(false);
+      previewUnavailableLabel.setText(StudioBundle.get("content_model_editor.preview_unavailable", e.getMessage()));
+      previewUnavailableLabel.setVisible(true);
+      previewUnavailableLabel.setManaged(true);
+    }
+  }
+
+  /** Stops the preview page (it polls the preview server) once the editor's tab is closed. */
+  @Override
+  public void modelClosed(@NonNull ModelClosedEvent event) {
+    if (event.getItem().equals(projectItem)) {
+      previewWebView.getEngine().load("about:blank");
+    }
+    super.modelClosed(event);
   }
 
   private void load(@NonNull ContentModel model) {

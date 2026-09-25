@@ -35,7 +35,7 @@ public final class FormModelPreviewSession extends FormEnginePreviewSession {
   public synchronized Snapshot snapshot(@Nullable String knownFormRevision, @Nullable String knownDocumentRevision)
       throws PreviewAppException {
     FormModel formModel = (FormModel) formItem.getModel();
-    String formJson = serialize(formModel);
+    String formJson = serializeFormModel(formModel);
 
     ExpansionInput input = expansionInput(dataBindingId(formModel), formItem, null);
     String documentRevision = input.revision();

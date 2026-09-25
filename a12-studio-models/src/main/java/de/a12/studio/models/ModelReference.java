@@ -26,6 +26,9 @@ public class ModelReference {
   // A Form Model's reference to the Document Model it binds its Controls' data to, matching SME's
   // FormModelFrame convention (see e.g. Invoice_FM.json's modelReferences entry).
   public static final String PURPOSE_DATA_BINDING = "data binding";
+  // A Content Model's reference to the Document Model whose data its elements are bound to, matching SME's
+  // ExportTransformations.transformModelReferences (alias "DM") and real fixtures (e.g. Product_OfBundle_CM.json).
+  public static final String PURPOSE_DOCUMENT_MODEL_FOR_CONTENT_MODEL = "document-model-for-content-model";
   // A Query Model's reference to the Document Model it projects fields from, matching QueryModel.json's
   // modelReferences entry.
   public static final String PURPOSE_DOCUMENT_MODEL_FOR_QUERY = "document-model-for-query";

@@ -277,6 +277,7 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     this.additive = projectItem.getModel() instanceof AdditiveDocumentModel;
     additiveToolbarBar.setVisible(additive);
     additiveToolbarBar.setManaged(additive);
+    adHocTestButton.setDisable(additive);
     if (!additive) {
       this.referenceBaseModel = null;
       this.baseModelNode = null;

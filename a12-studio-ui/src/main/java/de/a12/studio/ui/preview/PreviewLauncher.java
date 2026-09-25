@@ -61,6 +61,21 @@ public class PreviewLauncher {
         new AdHocTestPreviewSession(documentModelItem, selectedElementIds));
   }
 
+  /**
+   * Used by the Content Model editor's embedded preview: registers a {@link ContentModelPreviewSession} for the
+   * Content Model, which the page at the returned URL renders with the real Content Engine. The page is meant to be
+   * shown in a {@code WebView}, but works in any browser.
+   *
+   * @throws PreviewAppException if the A12 installation has no Simple Model Editor, whose client renders the page
+   */
+  public static String registerContentPreview(@NonNull ProjectItem projectItem) throws PreviewAppException {
+    SmeInstallation.resolve();
+    PreviewServer server = PreviewServer.getOrStart();
+    String sessionId = "content-" + projectItem.getModel().getId();
+    server.registerContentSession(sessionId, new ContentModelPreviewSession(projectItem));
+    return server.getContentPreviewUrl(sessionId);
+  }
+
   private static boolean isFormEnginePreviewAvailable() {
     try {
       SmeInstallation.resolve();

@@ -15,7 +15,9 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.contentmodel.ContentModelEditorController">
@@ -29,7 +31,7 @@
         </ToolBar>
     </right>
     <center>
-        <SplitPane dividerPositions="0.35" BorderPane.alignment="CENTER">
+        <SplitPane dividerPositions="0.2, 0.64" BorderPane.alignment="CENTER">
             <items>
                 <BorderPane>
                     <top>
@@ -75,6 +77,16 @@
                         <TreeView fx:id="elementsTree" BorderPane.alignment="CENTER" />
                     </center>
                 </BorderPane>
+                <StackPane minWidth="200.0">
+                    <children>
+                        <WebView fx:id="previewWebView" />
+                        <Label fx:id="previewUnavailableLabel" managed="false" styleClass="error-label" visible="false" wrapText="true">
+                            <StackPane.margin>
+                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                            </StackPane.margin>
+                        </Label>
+                    </children>
+                </StackPane>
                 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
                     <content>
                         <VBox spacing="16.0" styleClass="field-editor">

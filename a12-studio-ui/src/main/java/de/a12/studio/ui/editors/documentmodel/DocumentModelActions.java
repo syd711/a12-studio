@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.documentmodel;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.NewModelFactory;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -293,6 +294,8 @@ public class DocumentModelActions {
     MenuItem adHocTestItem = createMenuItem(StudioBundle.get("document_model_tree.ad_hoc_testing"), Icons.AD_HOC_TEST);
     adHocTestItem.setOnAction(event -> startAdHocTest());
     adHocTestItem.setAccelerator(AD_HOC_TEST_SHORTCUT);
+    // An Additive Document Model is only a fragment; SME tests it through the Combination Model it belongs to.
+    adHocTestItem.setDisable(projectItem.getModel() instanceof AdditiveDocumentModel);
     return adHocTestItem;
   }
 

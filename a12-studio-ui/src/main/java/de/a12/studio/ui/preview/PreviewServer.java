@@ -14,8 +14,10 @@ import de.a12.studio.models.projects.settings.PreviewAppSettings;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.previewapp.PreviewAppException;
+import de.a12.studio.ui.previewapp.SmeBackend;
 import de.a12.studio.ui.previewapp.SmeInstallation;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
@@ -60,7 +62,13 @@ public class PreviewServer {
 
   private static final Pattern FORM_ENGINE_DATA_PATH = Pattern.compile("^/fe/([^/]+)/data$");
 
+  private static final Pattern CONTENT_DATA_PATH = Pattern.compile("^/cm/([^/]+)/data$");
+
   private static final String SME_CONTEXT = "/sme/";
+
+  // The one backend call the Content Engine preview makes itself (see ContentModelPreviewSession); answered here
+  // instead of being served as a file, since the client bundle sends it to its own origin.
+  private static final String VALIDATION_CODE_API = "api/document-model/generate-validation-code";
 
   private static final String JSON = "application/json; charset=utf-8";
 
@@ -72,7 +80,11 @@ public class PreviewServer {
 
   private final Map<String, FormEnginePreviewSession> formEngineSessions = new ConcurrentHashMap<>();
 
+  private final Map<String, ContentModelPreviewSession> contentSessions = new ConcurrentHashMap<>();
+
   private final String bootstrapTemplate;
+
+  private final String contentBootstrapTemplate;
 
   private final ApplicationModelPreviewService applicationPreviewService = new ApplicationModelPreviewService();
 
@@ -87,6 +99,9 @@ public class PreviewServer {
     bootstrapTemplate = new String(
         PreviewServer.class.getResourceAsStream("form-engine-bootstrap.js").readAllBytes(), StandardCharsets.UTF_8);
 
+    contentBootstrapTemplate = new String(
+        PreviewServer.class.getResourceAsStream("content-model-bootstrap.js").readAllBytes(), StandardCharsets.UTF_8);
+
     httpServer = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
     // Loading the Form Engine page means many parallel asset requests, and a data request can take seconds while the
     // Simple Model Editor backend starts - the default single-threaded executor would serialize all of it.
@@ -97,6 +112,7 @@ public class PreviewServer {
     }));
     httpServer.createContext("/preview/", this::handle);
     httpServer.createContext("/fe/", this::handleFormEngineData);
+    httpServer.createContext("/cm/", this::handleContentData);
     httpServer.createContext(SME_CONTEXT, this::handleSmeClient);
     httpServer.start();
   }
@@ -146,6 +162,19 @@ public class PreviewServer {
 
   public String getFormEnginePreviewUrl(String sessionId) {
     return "http://localhost:" + getPort() + SME_CONTEXT + "index.html?session="
+        + URLEncoder.encode(sessionId, StandardCharsets.UTF_8);
+  }
+
+  /**
+   * Makes {@code session} reachable for the Content Engine page at {@link #getContentPreviewUrl}. Re-registering an
+   * id replaces the session.
+   */
+  public void registerContentSession(String sessionId, ContentModelPreviewSession session) {
+    contentSessions.put(sessionId, session);
+  }
+
+  public String getContentPreviewUrl(String sessionId) {
+    return "http://localhost:" + getPort() + SME_CONTEXT + "index.html?content="
         + URLEncoder.encode(sessionId, StandardCharsets.UTF_8);
   }
 
@@ -272,6 +301,50 @@ public class PreviewServer {
     }
   }
 
+  private void handleContentData(HttpExchange exchange) throws IOException {
+    try {
+      Matcher matcher = CONTENT_DATA_PATH.matcher(exchange.getRequestURI().getPath());
+      ContentModelPreviewSession session = matcher.matches() ? contentSessions.get(matcher.group(1)) : null;
+      if (session == null) {
+        sendResponse(exchange, 404, JSON, errorJson("No preview session is registered for this page."));
+        return;
+      }
+
+      Map<String, String> query = parseQuery(exchange.getRequestURI());
+      ContentModelPreviewSession.Snapshot snapshot = session.snapshot(query.get("cm"), query.get("dm"));
+
+      ObjectNode json = JsonSettings.objectMapper.createObjectNode();
+      json.put("contentModelRevision", snapshot.contentModelRevision());
+      json.put("documentModelRevision", snapshot.documentModelRevision());
+      json.put("hasDocumentModel", snapshot.hasDocumentModel());
+      if (snapshot.contentModel() != null) {
+        json.put("contentModel", snapshot.contentModel());
+      }
+      if (snapshot.documentModel() != null) {
+        json.put("documentModel", snapshot.documentModel());
+        json.put("documentModelWithoutMetaData", snapshot.documentModelWithoutMetaData());
+      }
+      sendResponse(exchange, 200, JSON, JsonSettings.objectMapper.writeValueAsString(json));
+    }
+    catch (PreviewAppException e) {
+      log.warn("Content Model preview data unavailable: {}", e.getMessage());
+      sendResponse(exchange, 500, JSON, errorJson(e.getMessage()));
+    }
+    catch (Exception e) {
+      log.error("Failed to handle Content Model preview request '{}': {}", exchange.getRequestURI(), e.getMessage(), e);
+      sendResponse(exchange, 500, JSON, errorJson("Internal error: " + e.getMessage()));
+    }
+  }
+
+  /** Generates the validation code of the Document Model in the request, the way SME's own backend endpoint does. */
+  private void handleValidationCode(HttpExchange exchange) throws IOException, PreviewAppException {
+    JsonNode request = JsonSettings.objectMapper.readTree(exchange.getRequestBody().readAllBytes());
+    String code = SmeBackend.getInstance().generateValidationCode(request.get("documentModel"));
+    ObjectNode json = JsonSettings.objectMapper.createObjectNode();
+    json.put("validationCode", code);
+    sendResponse(exchange, 200, JSON, JsonSettings.objectMapper.writeValueAsString(json));
+  }
+
   private static String errorJson(String message) {
     ObjectNode json = JsonSettings.objectMapper.createObjectNode();
     json.put("error", message);
@@ -286,6 +359,10 @@ public class PreviewServer {
     try {
       Path staticDir = SmeInstallation.resolve().getStaticDir().toPath().toAbsolutePath().normalize();
       String relative = exchange.getRequestURI().getPath().substring(SME_CONTEXT.length());
+      if (VALIDATION_CODE_API.equals(relative) && "POST".equals(exchange.getRequestMethod())) {
+        handleValidationCode(exchange);
+        return;
+      }
       Path file = staticDir.resolve(relative.isEmpty() ? "index.html" : relative).normalize();
       if (!file.startsWith(staticDir) || !Files.isRegularFile(file)) {
         sendResponse(exchange, 404, "text/plain", "Not found");
@@ -293,7 +370,9 @@ public class PreviewServer {
       }
 
       if (file.equals(staticDir.resolve("index.html"))) {
-        sendResponse(exchange, 200, "text/html; charset=utf-8", injectBootstrap(Files.readString(file, StandardCharsets.UTF_8)));
+        String bootstrap = parseQuery(exchange.getRequestURI()).containsKey("content") ? contentBootstrapTemplate : bootstrapTemplate;
+        sendResponse(exchange, 200, "text/html; charset=utf-8",
+            injectBootstrap(Files.readString(file, StandardCharsets.UTF_8), bootstrap));
         return;
       }
       exchange.getResponseHeaders().add("Content-Type", contentType(file));
@@ -312,12 +391,12 @@ public class PreviewServer {
     }
   }
 
-  private String injectBootstrap(String indexHtml) {
+  private String injectBootstrap(String indexHtml, String bootstrapScript) {
     Project project = Studio.getCurrentProject();
     PreviewAppSettings settings = project != null
         ? project.getSettings().getProjectRootSettings().getPreviewApp()
         : new PreviewAppSettings();
-    String bootstrap = bootstrapTemplate
+    String bootstrap = bootstrapScript
         .replace("__AUTO_REFRESH_ENABLED__", String.valueOf(settings.isAutoRefreshEnabled()))
         .replace("__AUTO_REFRESH_DELAY_MILLIS__", String.valueOf(settings.getAutoRefreshDelayMillis()));
     return indexHtml.replaceFirst("(?i)<head>", Matcher.quoteReplacement("<head><script>" + bootstrap + "</script>"));

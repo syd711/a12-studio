@@ -4,7 +4,7 @@ Rewritten 2026-09-20. Solved items, finished SME-gap-backlog entries (#1-#14) an
 
 ## Open decisions (need the owner)
 
-1. **Kernel dependency: may a12-studio rely on `internal`/`a12internal` kernel classes?** The 2026-09-19 spike found kernel `31.1.1` viable in-process (condition validation, DM expansion, additive join; TDG is enterprise-only and stays blocked), but nearly everything it uses has no stability guarantee. Needs mgm's answer, plus contract tests if yes. Until then only slices that need the reference graph alone are built clean-room (as the loop detection was). Blocks: semantic condition validation, real DM expansion / additive join, ad hoc testing (below), `BindingRepeat`'s deeper heterogeneous-relationship/multiplicity checks (Composed Document Models section below). Details: "Kernel dependency spike" in `docs/sme-reference-comparison.md`.
+1. **Kernel dependency: may a12-studio rely on `internal`/`a12internal` kernel classes?** The 2026-09-19 spike found kernel `31.1.1` viable in-process (condition validation, DM expansion, additive join; TDG is enterprise-only and stays blocked), but nearly everything it uses has no stability guarantee. Needs mgm's answer, plus contract tests if yes. Until then only slices that need the reference graph alone are built clean-room (as the loop detection was). Blocks: semantic condition validation, real DM expansion / additive join, `BindingRepeat`'s deeper heterogeneous-relationship/multiplicity checks (Composed Document Models section below). Details: "Kernel dependency spike" in `docs/sme-reference-comparison.md`.
 2. **Which model types to finish next.** Tree, Print and Content have editors and validators but are `enabled: false` in `model-versions.json` (opening one shows "not supported yet"); Mapping has target + sources only, Structural Mapping is a 24-line stub (both disabled); Transformer, Model Graph Diagram, Link/Document do not exist (Print Typesetting was built 2026-09-25 and is enabled). The comparison doc's ranking is structural mapping → mapping → additive overlay editing → print (typesetting, the last item, is done), but it does not know why the three built editors are still disabled. Decide the order, and what "ready to enable" means for the disabled ones.
 
 ## Open issues (defects and unverified behaviour)
@@ -50,19 +50,24 @@ Features:
 - `QueryFieldReferenceValidator` (the `fields[]` projection) still accepts `indexed = false` fields, and the tree checkbox does not disable them.
 - The Model Tree tab's root DM is picked in the Settings tab, not through an ER-diagram picker like SME.
 
+### Form Engine preview (built 2026-09-25, see "Form Engine preview" in `docs/sme-reference-comparison.md`)
+- Theme and Data menus of the preview are empty: offer the project's `.theme` files (`request-theme` -> `send-theme`) and sample documents (`request-document` -> `send-document`) from `form-engine-bootstrap.js`/`PreviewServer`; decide whether edits made in the preview (`create-document`/`update-document`) may be saved.
+- Ad hoc testing of an Additive Document Model (needs its Combination Model as context, like SME's `contextData`); today the button is disabled.
+- The generated ad hoc Form Model comes from `FormScreenGenerator`, not SME's `form-model-generator` (public npm package `@com.mgmtp.a12.formengine/form-model-generator`): compare on a larger model and align labels/grouping if they differ.
+- The preview needs the Simple Model Editor of the configured A12 installation (`SmeInstallation`); without it the Form Model button falls back to the old wireframe and Ad Hoc Testing shows an error page. Decide whether that fallback should say so in the studio itself.
+
 ### Overview Model
 - No dedicated section in `docs/sme-reference-comparison.md` yet (the survey only says "present"); write one, like Query/Selection/Combined have.
 
 ## Blocked (waiting for an input)
 
-- **Ad hoc testing (Document Model, SME Alt+T)** is deferred, not rejected: it will be built. A reduced test Document + Validation model is rendered in a preview. It needs (1) the kernel's `createReducedDocumentModel` (decision 1), (2) compiled `validationCode` (kernel `generateValidationCode`), (3) a real Form Engine renderer plus a Document-to-Form-Model generator (SME's `fmm-support` is private, licence unconfirmed; see `.claude/memory/project_form_preview_real_rendering.md`). Revisit when 1 and 3 are answered.
 - **Overview filter items:** Boolean/Confirm criteria-based configuration and Enumeration/Multi-select Initial Criteria, Pinned Values and join behaviour are not modeled: no fixture on disk (including the `A12 Tools - 2026.06` sample workspaces) has an example and the BA doc only has screenshots. Re-checked 2026-09-22 (a12-studio fixtures, the upstream `A12 Tools - 2026.06` workspaces, and SME's `overviewModel` TS types, which are simpler than a12-studio's own model and have no `FilterItem`/`FilterGroup`/pinned/initial-criteria concept at all) - still no example anywhere. Implement once a real example JSON turns up.
 - **Overview DateFragment/DateRange periods:** `OverviewElementOptions.defaultPeriods` reuses Date's subset ({date, year, yearMonth, month}) by analogy. Verify against a real example and adjust.
 - **Wire shapes never checked against a real SME file** (no fixture has them; shapes come from SME's meta model and the Data Services docs): `Control.index`, Query `aggregation` (`alias` only from SME's transformer), a `Has(...)` call inside a Query `filterDefinition`, and the Query filter reference validator (no real `filterDefinition` with references to sweep for false positives). Verify when a sample appears.
 
 ## Parked (do not start unless asked)
 
-- Real Form Engine preview (the current in-editor preview is a wireframe; the real "Deploy → Preview App" exists separately).
+- Nothing parked at the moment.
 
 ## Misc
 
