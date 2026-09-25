@@ -41,6 +41,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.apache.commons.io.FilenameUtils;
@@ -90,7 +91,7 @@ public class WidgetFactory {
 
   public static Label createDefaultLabel(String msg) {
     Label label = new Label(msg);
-    label.setStyle("-fx-font-size: 14px;");
+    label.setStyle("-fx-font-size: 1em;");
     return label;
   }
 
@@ -257,7 +258,7 @@ public class WidgetFactory {
             TextField textarea = new TextField(label.getText());
             textarea.setEditable(false);
             textarea.setPrefHeight(label.getHeight());
-            textarea.setStyle("-fx-font-size: 14px;");
+            textarea.setStyle("-fx-font-size: 1em;");
             label.setUserData(textarea);
             int i = ((Pane) label.getParent()).getChildren().indexOf(label);
             ((Pane) label.getParent()).getChildren().add(i, textarea);
@@ -314,6 +315,37 @@ public class WidgetFactory {
   // upper bound for a dialog's initial height when no size was restored from the settings
   private static final double DIALOG_MAX_INITIAL_HEIGHT = 800;
 
+  /**
+   * Applies the user's configured base UI text size (see {@link LocalUISettings#getFontSize()})
+   * to {@code root} as an inline "-fx-font-size" style. Since -fx-font-size is inherited and every
+   * other font-size in the theme is expressed relative to it (see stylesheet-typography.css), this
+   * single inline override rescales the whole subtree - main window, every dialog (via {@link
+   * #createDialogStage}) and the preview app console window all call this on their own root so a
+   * Preferences change takes effect immediately, without needing a full app restart.
+   */
+  public static void applyFontSize(Parent root) {
+    root.setStyle("-fx-font-size: " + LocalUISettings.getFontSize() + "px;");
+  }
+
+  /** Re-applies {@link LocalUISettings#getFontSize()} to every currently open window's root (main
+   *  window, every open dialog, the preview app console), so moving the Preferences slider takes
+   *  effect immediately instead of requiring a restart. */
+  public static void applyFontSizeToAllOpenWindows() {
+    for (Window window : Window.getWindows()) {
+      Scene scene = window.getScene();
+      if (scene == null || scene.getRoot() == null) {
+        continue;
+      }
+      // The dialog/console windows wrap their FXML root in an untargeted shadow-padding StackPane
+      // (see #createDialogStage), so the actual ".root"-styled node - the one applyFontSize was
+      // originally called on - has to be looked up rather than assumed to be the scene's own root.
+      Node styledRoot = scene.getRoot().getStyleClass().contains("root") ? scene.getRoot() : scene.getRoot().lookup(".root");
+      if (styledRoot instanceof Parent parent) {
+        applyFontSize(parent);
+      }
+    }
+  }
+
   public static Stage createStage() {
     Stage stage = new Stage();
     stage.initStyle(StageStyle.TRANSPARENT);
@@ -355,6 +387,7 @@ fxmlLoader.setResources(StudioBundle.getBundle());
       // background/border disappear.
       root.getStyleClass().add("root");
       root.setEffect(new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.35), DIALOG_SHADOW_RADIUS, 0, 0, DIALOG_SHADOW_OFFSET_Y));
+      applyFontSize(root);
     }
 
     DialogController controller = fxmlLoader.getController();

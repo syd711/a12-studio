@@ -2,7 +2,7 @@
  * Radio Button
  */
 .radio-button {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
 }
 
 .radio-button > .radio {

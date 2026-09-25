@@ -20,7 +20,7 @@
     -fx-background-radius: 7px 7px 0 0;
     -fx-border-color: transparent transparent -fx-titled-pane-border transparent;
     -fx-border-width: 0 0 1px 0;
-    -fx-padding: 10px 16px;
+    -fx-padding: 0.714em 1.143em;
 }
 
 .titled-pane:collapsed > .title {
@@ -29,17 +29,17 @@
 }
 
 .titled-pane > .title > .text {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
     -fx-font-weight: bold;
     -fx-fill: -fx-text-section-header;
 }
 
 .titled-pane .titled-pane > .title > .text {
-    -fx-font-size: 12px;
+    -fx-font-size: 0.857em;
 }
 
 .titled-pane.titled-pane-child > .title > .text {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
 }
 
 .titled-pane:collapsed > .title > .text {
@@ -48,7 +48,7 @@
 
 .titled-pane > .title > .arrow-button {
     -fx-background-color: transparent;
-    -fx-padding: 4px 6px 4px 0;
+    -fx-padding: 0.286em 0.429em 0.286em 0;
 }
 
 .titled-pane > .title > .arrow-button > .arrow {
@@ -61,7 +61,7 @@
     -fx-background-radius: 0 0 7px 7px;
     -fx-border-width: 0;
     -fx-border-insets: 0;
-    -fx-padding: 16px;
+    -fx-padding: 1.143em;
 }
 
 /*
@@ -83,7 +83,7 @@
     -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-border-width: 0;
-    -fx-padding: 4px 0 4px 2px;
+    -fx-padding: 0.286em 0 0.286em 0.143em;
 }
 
 .titled-pane-child > .title > .arrow-button {
@@ -96,7 +96,7 @@
 .titled-pane-child > *.content {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
-    -fx-padding: 4px 0 4px 2px;
+    -fx-padding: 0.286em 0 0.286em 0.143em;
 }
 
 /*
@@ -156,17 +156,17 @@
     -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-border-width: 0;
-    -fx-padding: 4px 0 4px 2px;
+    -fx-padding: 0.286em 0 0.286em 0.143em;
 }
 
 .titled-pane.titled-pane-sub-child > .title > .text {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
 }
 
 .titled-pane-sub-child > *.content {
     -fx-background-color: transparent;
     -fx-background-radius: 0;
-    -fx-padding: 4px 0 4px 2px;
+    -fx-padding: 0.286em 0 0.286em 0.143em;
 }
 
 /*
@@ -186,7 +186,7 @@
 }
 
 .sidebar-panel-title {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-section-header;
 }
@@ -225,7 +225,7 @@
 }
 
 .sidebar-panel-strip-title {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-section-header;
 }

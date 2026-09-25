@@ -76,9 +76,51 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     setExpandedRecursive(projectTree.getRoot(), true);
   }
 
+  private static final String MODELS_FOLDER_NAME = "models";
+
   @FXML
   private void onCollapseAll() {
-    setExpandedRecursive(projectTree.getRoot(), false);
+    TreeItem<ProjectItemViewModel> root = projectTree.getRoot();
+    if (root == null) {
+      return;
+    }
+    TreeItem<ProjectItemViewModel> modelsFolder = findModelsFolderTreeItem(root);
+    if (modelsFolder != null) {
+      for (TreeItem<ProjectItemViewModel> child : modelsFolder.getChildren()) {
+        setExpandedRecursive(child, false);
+      }
+      for (TreeItem<ProjectItemViewModel> parent = modelsFolder; parent != null; parent = parent.getParent()) {
+        parent.setExpanded(true);
+      }
+    }
+    else {
+      for (TreeItem<ProjectItemViewModel> child : root.getChildren()) {
+        setExpandedRecursive(child, false);
+      }
+      root.setExpanded(true);
+    }
+  }
+
+  /**
+   * Finds the shallowest, first-encountered folder named "models" (case-insensitive) in {@code
+   * root}'s tree, mirroring {@link de.a12.studio.ui.util.ProjectModelFolders}'s own lookup, but
+   * over the already-built {@link TreeItem} tree rather than {@link ProjectItem}s.
+   */
+  private TreeItem<ProjectItemViewModel> findModelsFolderTreeItem(TreeItem<ProjectItemViewModel> root) {
+    Deque<TreeItem<ProjectItemViewModel>> queue = new ArrayDeque<>();
+    queue.add(root);
+    while (!queue.isEmpty()) {
+      TreeItem<ProjectItemViewModel> item = queue.poll();
+      for (TreeItem<ProjectItemViewModel> child : item.getChildren()) {
+        if (child.getValue().isFolder()) {
+          if (MODELS_FOLDER_NAME.equalsIgnoreCase(child.getValue().getName())) {
+            return child;
+          }
+          queue.add(child);
+        }
+      }
+    }
+    return null;
   }
 
   @FXML

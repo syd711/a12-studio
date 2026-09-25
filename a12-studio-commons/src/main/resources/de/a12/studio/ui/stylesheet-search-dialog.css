@@ -8,7 +8,7 @@
 
 .search-dialog-tab {
     -fx-padding: 6px 10px;
-    -fx-font-size: 12.5px;
+    -fx-font-size: 0.893em;
     -fx-text-fill: -fx-text-muted;
     -fx-border-color: transparent transparent transparent transparent;
     -fx-border-width: 0 0 2px 0;
@@ -35,7 +35,7 @@
 .search-dialog-field:focused {
     -fx-background-color: transparent;
     -fx-border-width: 0;
-    -fx-font-size: 16px;
+    -fx-font-size: 1.143em;
     -fx-pref-height: 30px;
 }
 
@@ -67,12 +67,12 @@
 
 .search-result-name {
     -fx-text-fill: -fx-text-color;
-    -fx-font-size: 13.5px;
+    -fx-font-size: 0.964em;
 }
 
 .search-result-path {
     -fx-text-fill: -fx-text-muted;
-    -fx-font-size: 12px;
+    -fx-font-size: 0.857em;
 }
 
 .search-dialog-results .list-cell:filled:selected .search-result-name,

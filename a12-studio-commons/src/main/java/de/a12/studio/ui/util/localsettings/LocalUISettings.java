@@ -36,6 +36,20 @@ public class LocalUISettings {
   /** Which side panel (Project View / Bookmarks) is shown in the main window: "project", "bookmarks", or "none"; see RootController. */
   public static final String SIDE_PANEL = "sidePanel";
 
+  /** Base UI text size in px, applied as an inline "-fx-font-size" style on every window's root
+   *  via {@link de.a12.studio.ui.util.WidgetFactory#applyFontSize}; see PreferenceAppGeneralPanelController. */
+  public static final String FONT_SIZE = "fontSize";
+
+  public static final int DEFAULT_FONT_SIZE = 14;
+  public static final int MIN_FONT_SIZE = 10;
+  public static final int MAX_FONT_SIZE = 18;
+
+  /** Clamped to [{@link #MIN_FONT_SIZE}, {@link #MAX_FONT_SIZE}] in case the stored value came from a wider-ranged future build. */
+  public static int getFontSize() {
+    int size = getInt(FONT_SIZE, DEFAULT_FONT_SIZE);
+    return Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, size));
+  }
+
   public static File getPropertiesFile() {
     return propertiesFile;
   }

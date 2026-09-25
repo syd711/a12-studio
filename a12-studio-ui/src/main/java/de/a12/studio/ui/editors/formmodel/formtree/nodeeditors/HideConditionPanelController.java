@@ -115,7 +115,7 @@ public class HideConditionPanelController implements Initializable {
     fieldCombo.setConverter(new StringConverter<>() {
       @Override
       public String toString(String elementId) {
-        return elementId == null ? "" : (elementIndex != null ? elementIndex.resolveDisplayPath(elementId) : elementId);
+        return elementId == null || elementId.isEmpty() ? "" : (elementIndex != null ? elementIndex.resolveDisplayPath(elementId) : elementId);
       }
 
       @Override
@@ -168,9 +168,10 @@ public class HideConditionPanelController implements Initializable {
 
     updatingFromModel = true;
     try {
-      // Leading null entry = empty choice, lets the user reset (remove) the hide condition.
+      // Leading "" entry = empty choice, lets the user reset (remove) the hide condition. Deliberately not
+      // null: JavaFX's ComboBox doesn't reliably report a selected null item as a value change.
       fieldCombo.getItems().setAll(masterFieldIds);
-      fieldCombo.getItems().add(0, null);
+      fieldCombo.getItems().add(0, "");
       HideCondition current = getter.get();
       fieldCombo.setValue(current == null ? null : current.getMasterField());
     } finally {

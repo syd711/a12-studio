@@ -2,7 +2,7 @@
  * Table View
  */
 .table-view {
-    -fx-font-size: 13.5px;
+    -fx-font-size: 0.964em;
     -fx-background-color: -fx-input-bg;
     -fx-border-color: -fx-border-color-theme;
     -fx-border-width: 1px;
@@ -24,7 +24,7 @@
 }
 
 .table-view .column-header .label {
-    -fx-font-size: 12.5px;
+    -fx-font-size: 0.893em;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-table-header;
     -fx-border-width: 1px;
@@ -33,7 +33,7 @@
 
 .table-view .cell,
 .table-view .table-cell {
-    -fx-font-size: 13.5px;
+    -fx-font-size: 0.964em;
     -fx-text-fill: -fx-text-color;
 }
 

@@ -793,7 +793,7 @@
             "masterField": "field_69593",
             "case": [
               {
-                "masterValue": null,
+                "masterValue": "false",
                 "notRelevant": true
               }
             ]

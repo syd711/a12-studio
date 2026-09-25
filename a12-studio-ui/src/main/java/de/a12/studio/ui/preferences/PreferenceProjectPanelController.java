@@ -43,7 +43,7 @@ public class PreferenceProjectPanelController implements Initializable {
         if (mode == null) return "";
         return switch (mode) {
           case legacy -> StudioBundle.get("legacy");
-          case standard -> StudioBundle.get("standard");
+          case standard -> StudioBundle.get("relationship_engine_mode_new");
         };
       }
 

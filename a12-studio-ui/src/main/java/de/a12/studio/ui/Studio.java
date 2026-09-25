@@ -104,6 +104,7 @@ public class Studio extends Application implements StudioEventListener {
             return;
           }
           rootController = loader.getController();
+          WidgetFactory.applyFontSize(root);
 
           Rectangle2D screenBounds = Screen.getPrimary().getBounds();
           double width = 1480;

@@ -2,7 +2,7 @@
  * Check Box
  */
 .check-box {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
 }
 
 .check-box .box {

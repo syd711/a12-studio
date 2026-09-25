@@ -10,13 +10,13 @@
 
 .menu-bar,
 .menu-bar .label {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
     -fx-font-weight: normal;
     -fx-text-fill: -fx-text-color-inverse;
 }
 
 .menu-item .label {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
     -fx-font-weight: normal;
     -fx-text-fill: -fx-text-secondary;
 }
@@ -38,14 +38,14 @@
  * generic .menu-item .label rule above (equal specificity, later wins).
  */
 .menu-item .version-menu-header {
-    -fx-font-size: 12px;
+    -fx-font-size: 0.857em;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-secondary;
     -fx-padding: 6px 12px 2px 12px;
 }
 
 .menu-item .version-menu-value {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
     -fx-font-weight: normal;
     -fx-text-fill: -fx-text-color;
     -fx-padding: 2px 12px 2px 24px;

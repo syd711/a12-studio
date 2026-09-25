@@ -108,7 +108,7 @@ public class ColumnLayoutPanelController extends AbstractPropertyEditor implemen
 
     LayoutPreviewCell() {
       box.setPadding(new Insets(1, 0, 1, 0));
-      label.setStyle("-fx-font-size: 11px;");
+      label.setStyle("-fx-font-size: 0.786em;");
       setGraphic(box);
     }
 

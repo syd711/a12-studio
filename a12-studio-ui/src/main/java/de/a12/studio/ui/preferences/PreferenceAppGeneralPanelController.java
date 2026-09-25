@@ -11,6 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
@@ -38,6 +40,9 @@ public class PreferenceAppGeneralPanelController implements Initializable {
 
   @FXML
   private CheckBox colorfulStudioCheckBox;
+
+  @FXML
+  private Spinner<Integer> fontSizeSpinner;
 
   @FXML
   private void onResetDialogs() {
@@ -86,5 +91,14 @@ public class PreferenceAppGeneralPanelController implements Initializable {
     colorfulStudioCheckBox.setSelected(LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true));
     colorfulStudioCheckBox.selectedProperty().addListener((obs, oldVal, newVal) ->
         LocalUISettings.saveProperty(LocalUISettings.COLORFUL_STUDIO_ENABLED, String.valueOf(newVal)));
+
+    // --- Font size ---
+    fontSizeSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(
+        LocalUISettings.MIN_FONT_SIZE, LocalUISettings.MAX_FONT_SIZE, LocalUISettings.getFontSize()));
+    WidgetFactory.restrictToNumericInput(fontSizeSpinner.getEditor());
+    fontSizeSpinner.valueProperty().addListener((obs, oldVal, newVal) -> {
+      LocalUISettings.saveProperty(LocalUISettings.FONT_SIZE, String.valueOf(newVal));
+      WidgetFactory.applyFontSizeToAllOpenWindows();
+    });
   }
 }

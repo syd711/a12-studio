@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -39,6 +40,14 @@
                         <Label styleClass="section-header" text="%appearance" />
                         <CheckBox fx:id="colorfulStudioCheckBox" text="%enable_colorful_studio" />
                         <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%enable_colorful_studio_description" />
+
+                        <Label styleClass="field-label" text="%font_size">
+                            <VBox.margin>
+                                <Insets top="12.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Spinner fx:id="fontSizeSpinner" editable="true" prefWidth="90.0" />
+                        <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%font_size_description" />
                     </children>
                 </VBox>
 

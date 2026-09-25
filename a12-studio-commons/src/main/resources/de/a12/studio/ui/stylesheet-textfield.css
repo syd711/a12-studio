@@ -2,7 +2,7 @@
  * Text Fields
  */
 .text-field {
-    -fx-font-size: 13.5px;
+    -fx-font-size: 0.964em;
     -fx-text-fill: -fx-text-color;
     -fx-background-color: -fx-input-bg;
     -fx-background-radius: 8px;

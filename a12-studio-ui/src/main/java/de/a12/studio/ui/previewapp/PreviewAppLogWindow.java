@@ -55,6 +55,7 @@ public class PreviewAppLogWindow {
 
     root.getStyleClass().add("root");
     root.setEffect(new DropShadow(BlurType.GAUSSIAN, Color.rgb(0, 0, 0, 0.35), 12, 0, 0, 2));
+    WidgetFactory.applyFontSize(root);
 
     stage = WidgetFactory.createStage();
     stage.initOwner(owner);

@@ -3,7 +3,7 @@
  */
 .expression-code-area {
     -fx-font-family: "Consolas", "Monospaced";
-    -fx-font-size: 13.5px;
+    -fx-font-size: 0.964em;
     -fx-font-weight: bold;
     -fx-background-color: -fx-input-bg;
     -fx-border-color: -fx-border-input;
@@ -45,7 +45,7 @@
 }
 
 .completion-list {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
     -fx-font-weight: bold;
     -fx-font-family: "Consolas", "Monospaced";
     -fx-background-color: -fx-input-bg;

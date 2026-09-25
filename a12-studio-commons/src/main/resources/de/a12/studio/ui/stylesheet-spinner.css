@@ -2,7 +2,7 @@
  * Spinner
  */
 .spinner {
-    -fx-font-size: 13.5px;
+    -fx-font-size: 0.964em;
     -fx-background-color: -fx-input-bg;
     -fx-background-radius: 8 6 6 8;
     -fx-border-radius: 8 6 6 8;

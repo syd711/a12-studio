@@ -2,20 +2,20 @@
  * Label
  */
 .label {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
 }
 
 /**
  * Form field labels (right properties panel)
  */
 .field-label {
-    -fx-font-size: 12px;
+    -fx-font-size: 0.857em;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-section-header;
     -fx-padding: 3px 0 3px 1px;
 }
 .section-header {
-    -fx-font-size: 15px;
+    -fx-font-size: 1.071em;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-color;
     -fx-padding: 3px 0 3px 1px;
@@ -33,18 +33,18 @@
  * secondary hint rather than body text.
  */
 .hint-label {
-    -fx-font-size: 16px;
+    -fx-font-size: 1.143em;
     -fx-text-fill: -fx-text-muted;
 }
 
 .editor-type-label {
-    -fx-font-size: 20px;
+    -fx-font-size: 1.429em;
     -fx-font-weight: bold;
 }
 
 .field-description {
     -fx-text-fill: -fx-text-section-header;
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
     -fx-padding: 0 0 0 22px;
 }
 
@@ -64,14 +64,14 @@
  * line under every row, no outer border or background.
  */
 .readonly-table-header-cell {
-    -fx-font-size: 12px;
+    -fx-font-size: 0.857em;
     -fx-font-weight: bold;
     -fx-text-fill: -fx-text-section-header;
     -fx-padding: 0 0 4px 1px;
 }
 
 .readonly-table-cell {
-    -fx-font-size: 13px;
+    -fx-font-size: 0.929em;
     -fx-text-fill: -fx-text-color;
     -fx-padding: 5px 0 5px 1px;
 }

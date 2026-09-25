@@ -2,7 +2,7 @@
  * Buttons
  */
 .button {
-    -fx-font-size: 14px;
+    -fx-font-size: 1em;
 }
 
 .header-button {
