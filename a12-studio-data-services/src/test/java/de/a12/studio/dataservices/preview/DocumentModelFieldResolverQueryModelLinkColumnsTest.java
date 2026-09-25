@@ -2,6 +2,7 @@ package de.a12.studio.dataservices.preview;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.ProjectItem;
 import org.junit.jupiter.api.Test;
@@ -50,11 +51,21 @@ class DocumentModelFieldResolverQueryModelLinkColumnsTest {
     Map<String, Element> primaryElements = DocumentModelFieldResolver.index(primary);
     assertEquals("First Name", DocumentModelFieldResolver.fieldLabel(primaryElements.get("field_99c3b")));
 
-    DocumentModel linkModel = DocumentModelFieldResolver.resolveLinkDocumentModel("PersonSkills_Re", overviewItem);
+    ColumnLinkReference linkReference = new ColumnLinkReference();
+    linkReference.setRelationship("PersonSkills_Re");
+    linkReference.setTargetRole("Skill");
+    linkReference.setType(ColumnLinkReference.TYPE_LINK);
+    DocumentModel linkModel = DocumentModelFieldResolver.resolveLinkedDocumentModel(linkReference, overviewItem);
     assertNotNull(linkModel, "should follow the relationship's linkDocumentModel, through its Combination Model");
     Map<String, Element> linkElements = DocumentModelFieldResolver.index(linkModel);
     // field_42656's label lists "de" first in the fixture, so firstLabelText() (labels.get(0)) is "Level".
     assertEquals("Level", DocumentModelFieldResolver.fieldLabel(linkElements.get("field_42656")));
+
+    // A CHILD reference resolves to the target role's own document model instead of the link document.
+    linkReference.setType(ColumnLinkReference.TYPE_CHILD);
+    DocumentModel skillModel = DocumentModelFieldResolver.resolveLinkedDocumentModel(linkReference, overviewItem);
+    assertNotNull(skillModel, "should follow the target role's documentModel");
+    assertEquals("Skill_Dc", skillModel.getId());
   }
 
   private static void copy(Path source, Path tempDir, String relativePath) throws IOException {

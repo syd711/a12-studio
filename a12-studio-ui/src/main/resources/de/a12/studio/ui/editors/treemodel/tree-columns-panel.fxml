@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%columns" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.treemodel.TreeColumnsPanelController">
+ <BorderPane>
+ <center>
+  <VBox spacing="10.0">
+    <!-- Left/right padding of 13 = the .module-row border (1) + padding (12), so header cells line up with the row cells.
+         Fixed widths must match TreeColumnsPanelController.createRow(); the trailing spacer stands in for the row's actions box. -->
+    <HBox fx:id="columnHeaders" spacing="10.0">
+      <padding><Insets left="13.0" right="13.0" /></padding>
+      <Label styleClass="field-label" text="" minWidth="18.0" prefWidth="18.0" maxWidth="18.0" />
+      <Label styleClass="field-label" text="%name" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+      <Label styleClass="field-label" text="%width" minWidth="70.0" prefWidth="70.0" maxWidth="70.0" />
+      <Label styleClass="field-label" text="%fixed_width" minWidth="100.0" prefWidth="100.0" maxWidth="100.0" />
+      <Label styleClass="field-label" text="%pin_direction" minWidth="200.0" prefWidth="200.0" maxWidth="200.0" />
+      <Region minWidth="120.0" prefWidth="120.0" maxWidth="120.0" />
+    </HBox>
+    <VBox fx:id="columnRows" spacing="8.0" />
+    <Label fx:id="columnsEmptyLabel" styleClass="placeholder-label" text="%no_columns_defined" />
+    <VBox alignment="CENTER_LEFT" spacing="24.0">
+        <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_column" >
+                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                <tooltip><Tooltip text="%add_column" /></tooltip>
+            </Button>
+      <VBox spacing="2.0">
+        <children>
+          <Label styleClass="field-label" text="%hierarchical_column" />
+          <ComboBox fx:id="hierarchicalColumnField" editable="false" prefWidth="240.0" />
+        </children>
+      </VBox>
+    </VBox>
+  </VBox>
+ </center>
+ <top>
+    <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ </BorderPane>
+</TitledPane>

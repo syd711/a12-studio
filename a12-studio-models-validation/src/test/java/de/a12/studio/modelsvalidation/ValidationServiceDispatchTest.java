@@ -28,6 +28,7 @@ class ValidationServiceDispatchTest {
     copyFixture("/printmodel/PrintImageValidator_invalid.json", tempDir);
     copyFixture("/contentmodel/ContentRootElementValidator_invalid.json", tempDir);
     copyFixture("/masterdetailmodel/MasterDetailTypeConsistencyValidator_invalid.json", tempDir);
+    copyFixture("/typesettingmodel/TypesettingRuleValueValidator_invalid.json", tempDir);
 
     Project project = new Project();
     project.load(tempDir.toFile());
@@ -38,6 +39,7 @@ class ValidationServiceDispatchTest {
     assertServiceReached(validationService, project, "PrintImageValidator_invalid.json", "content/elementDefinitions/image");
     assertServiceReached(validationService, project, "ContentRootElementValidator_invalid.json", "content/root");
     assertServiceReached(validationService, project, "MasterDetailTypeConsistencyValidator_invalid.json", "content/type");
+    assertServiceReached(validationService, project, "TypesettingRuleValueValidator_invalid.json", "content/preventLineBreakRules/0");
   }
 
   private void assertServiceReached(ValidationService validationService, Project project, String fileName, String expectedElementId) {

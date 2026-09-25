@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.overviewmodel;
 
 import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.ColumnRef;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
@@ -60,7 +61,7 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
 
   private ElementIndex documentModelIndex;
 
-  private Function<String, ElementIndex> linkDocumentModelIndexResolver = relationshipId -> null;
+  private Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver = linkReference -> null;
 
   // Set while a row's combo box is being repopulated from the model, so that isn't mistaken for a user edit.
   private boolean updatingFromModel;
@@ -71,11 +72,11 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
   }
 
   /** Re-points the column picker's "Field" summary at the currently referenced Document Model. {@code
-   * linkDocumentModelIndexResolver} resolves a relationship id (from a column's {@code linkReferences}) to
+   * linkDocumentModelIndexResolver} resolves a column's {@code linkReferences} entry to
    * the {@link ElementIndex} its field actually lives in - see {@link OverviewColumnOptions#indexFor}. */
-  public void setDocumentModelIndex(ElementIndex documentModelIndex, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  public void setDocumentModelIndex(ElementIndex documentModelIndex, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     this.documentModelIndex = documentModelIndex;
-    this.linkDocumentModelIndexResolver = linkDocumentModelIndexResolver != null ? linkDocumentModelIndexResolver : relationshipId -> null;
+    this.linkDocumentModelIndexResolver = linkDocumentModelIndexResolver != null ? linkDocumentModelIndexResolver : linkReference -> null;
     rebuildRows();
   }
 

@@ -52,6 +52,10 @@ import de.a12.studio.models.treemodel.TreeConfiguration;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeModelContent;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.models.typesettingmodel.TypesettingModel;
+import de.a12.studio.models.typesettingmodel.TypesettingModelContent;
+import de.a12.studio.models.typesettingmodel.TypesettingModelDefaults;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import org.jspecify.annotations.NonNull;
@@ -188,6 +192,7 @@ public class NewModelFactory {
       case QUERY -> buildQueryModel(documentModelId, locales);
       case STRUCTURALMAPPING -> buildStructuralMappingModel(locales);
       case SELECTION -> buildSelectionModel(locales);
+      case TYPESETTING -> buildTypesettingModel();
     };
   }
 
@@ -482,6 +487,20 @@ public class NewModelFactory {
     SelectionCategory category = new SelectionCategory();
     category.setDefaultValue(SelectionDefault.SELECTED);
     return category;
+  }
+
+  // Matches SME's createTypesettingModel (print-typesetting's ui/utils/model.ts): no locales (a Typesetting
+  // Model's header has none - the caller's roles are added afterwards like for every other model type), the
+  // two hyphenation containers present but empty, and orphan/widow at their default limit.
+  private static TypesettingModel buildTypesettingModel() {
+    TypesettingModel model = new TypesettingModel();
+    TypesettingModelContent content = new TypesettingModelContent();
+    content.setCustomHyphenationExclusions(JsonSettings.objectMapper.createArrayNode());
+    content.setInternal(JsonSettings.objectMapper.createObjectNode());
+    content.setOrphan(TypesettingModelDefaults.LINE_LIMIT);
+    content.setWidow(TypesettingModelDefaults.LINE_LIMIT);
+    model.setContent(content);
+    return model;
   }
 
   private static String shortId() {

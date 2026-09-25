@@ -89,6 +89,7 @@ public class NewDocumentModelPanelController {
   public void init(@NonNull ProjectItem targetFolder, @Nullable String defaultName, @NonNull ModelType modelType) {
     this.targetFolder = targetFolder;
     this.modelType = modelType;
+    updateLocalesVisibility();
     ProjectModelFolders.configureLocationCombo(locationCombo, targetFolder);
     localesController.initializeLocales(DocumentModelBuilder.resolveDefaultLocales(targetFolder));
     rolesController.initializeRoles(RolesEditorPanelController.findApplicationModelRoles(targetFolder));
@@ -103,6 +104,12 @@ public class NewDocumentModelPanelController {
    */
   public void setModelType(@NonNull ModelType modelType) {
     this.modelType = modelType;
+    updateLocalesVisibility();
+  }
+
+  // A Typesetting Model's header has no locales, so there is nothing to ask for.
+  private void updateLocalesVisibility() {
+    localesController.setVisible(modelType != ModelType.TYPESETTING);
   }
 
   /** Sets the callback that is invoked whenever any field in this panel changes. */

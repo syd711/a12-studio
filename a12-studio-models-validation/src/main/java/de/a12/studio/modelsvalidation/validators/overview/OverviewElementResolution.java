@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
@@ -74,26 +75,28 @@ public final class OverviewElementResolution {
   /**
    * The {@link ElementIndex} {@code column}'s {@code elementRef} actually resolves against: {@code
    * documentModelIndex} for a plain column, or - for a column carrying {@code linkReferences} (a
-   * Relationship UI Model's Available/Selected Items overview projecting a field that lives on the
-   * relationship's own link document, e.g. {@code PersonSkills_Re.json}'s {@code linkDocumentModel}) - an
-   * index over that relationship's link document model instead, falling back to {@code documentModelIndex} if
-   * the relationship or its link document model doesn't resolve. Mirrors {@code
+   * Relationship UI Model's Available/Selected Items overview projecting a field of the related document) -
+   * an index over the Document Model the link reference points at instead (see {@link
+   * ColumnLinkReference#resolveDocumentModelId}: the relationship's link document for a {@code LINK}
+   * reference, the target role's document for a {@code CHILD} one), falling back to {@code
+   * documentModelIndex} if the relationship or that model doesn't resolve. Mirrors {@code
    * OverviewColumnOptions#indexFor} in {@code a12-studio-ui}.
    */
   public static ElementIndex indexFor(Column column, ElementIndex documentModelIndex, ValidationContext context) {
     if (column == null || column.getLinkReferences() == null || column.getLinkReferences().isEmpty()) {
       return documentModelIndex;
     }
-    String relationshipId = column.getLinkReferences().get(0).getRelationship();
-    DocumentModel linkDocumentModel = relationshipId == null ? null : referencedLinkDocumentModel(relationshipId, context);
-    return linkDocumentModel != null ? new ElementIndex(linkDocumentModel, context.otherDocumentModels()) : documentModelIndex;
+    DocumentModel linkedDocumentModel = referencedLinkedDocumentModel(column.getLinkReferences().get(0), context);
+    return linkedDocumentModel != null ? new ElementIndex(linkedDocumentModel, context.otherDocumentModels()) : documentModelIndex;
   }
 
-  private static DocumentModel referencedLinkDocumentModel(String relationshipId, ValidationContext context) {
-    if (!(context.findOtherModel(relationshipId) instanceof RelationshipModel relationshipModel) || relationshipModel.getContent() == null) {
+  private static DocumentModel referencedLinkedDocumentModel(ColumnLinkReference linkReference, ValidationContext context) {
+    if (linkReference.getRelationship() == null
+        || !(context.findOtherModel(linkReference.getRelationship()) instanceof RelationshipModel relationshipModel)
+        || relationshipModel.getContent() == null) {
       return null;
     }
-    return resolveDocumentModelOrCombination(relationshipModel.getContent().getLinkDocumentModelValue(), context);
+    return resolveDocumentModelOrCombination(linkReference.resolveDocumentModelId(relationshipModel.getContent()), context);
   }
 
   /**

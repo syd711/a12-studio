@@ -45,7 +45,8 @@ public enum ModelType {
   SELECTION("selection"),
   STRUCTURALMAPPING("structuralmapping"),
   TREE("tree"),
-  TYPEDEFINITION("typedefinition");
+  TYPEDEFINITION("typedefinition"),
+  TYPESETTING("typesetting");
 
   private static final String VERSIONS_RESOURCE = "model-versions.json";
   private static final Map<String, JsonNode> MODEL_CONFIG = loadModelConfig();

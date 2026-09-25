@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.overviewmodel;
 
 import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
@@ -88,7 +89,7 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
 
   private String documentModelId;
 
-  private Function<String, ElementIndex> linkDocumentModelIndexResolver = relationshipId -> null;
+  private Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver = linkReference -> null;
 
   // Set while enableColumnsResizeField/showRowCountField are being repopulated from the model, so those
   // programmatic updates aren't mistaken for user edits and don't trigger a save.
@@ -172,12 +173,12 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   }
 
   /** Re-points the "Field" summary of every row at the currently referenced Document Model. {@code
-   * linkDocumentModelIndexResolver} resolves a relationship id (from a column's {@code linkReferences}) to
+   * linkDocumentModelIndexResolver} resolves a column's {@code linkReferences} entry to
    * the {@link ElementIndex} its field actually lives in - see {@link OverviewColumnOptions#indexFor}. */
-  public void setDocumentModelIndex(ElementIndex documentModelIndex, String documentModelId, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  public void setDocumentModelIndex(ElementIndex documentModelIndex, String documentModelId, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     this.documentModelIndex = documentModelIndex;
     this.documentModelId = documentModelId;
-    this.linkDocumentModelIndexResolver = linkDocumentModelIndexResolver != null ? linkDocumentModelIndexResolver : relationshipId -> null;
+    this.linkDocumentModelIndexResolver = linkDocumentModelIndexResolver != null ? linkDocumentModelIndexResolver : linkReference -> null;
     rebuildRows();
   }
 

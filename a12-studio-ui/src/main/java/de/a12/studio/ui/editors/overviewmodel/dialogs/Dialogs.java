@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.overviewmodel.dialogs;
 import de.a12.studio.models.overviewmodel.ActionGroup;
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.Column;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.FilterGroup;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterSection;
@@ -24,7 +25,7 @@ public class Dialogs {
   private Dialogs() {
   }
 
-  public static Optional<Column> showColumnForAdd(Stage owner, ElementIndex documentModelIndex, String documentModelId, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  public static Optional<Column> showColumnForAdd(Stage owner, ElementIndex documentModelIndex, String documentModelId, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     Column column = new Column();
     column.setId("column-" + shortId());
     column.setWidth(1.0);
@@ -32,14 +33,14 @@ public class Dialogs {
         ? Optional.of(column) : Optional.empty();
   }
 
-  public static boolean showColumnForEdit(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  public static boolean showColumnForEdit(Stage owner, ElementIndex documentModelIndex, String documentModelId, Column column, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     return showColumn(owner, StudioBundle.get("edit_column_title"), documentModelIndex, documentModelId, column, linkDocumentModelIndexResolver);
   }
 
   /**
    * Opens the column editor for {@code column}, editing it live so a Cancel can undo the changes.
    */
-  private static boolean showColumn(Stage owner, String title, ElementIndex documentModelIndex, String documentModelId, Column column, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  private static boolean showColumn(Stage owner, String title, ElementIndex documentModelIndex, String documentModelId, Column column, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     FXMLLoader fxmlLoader = new FXMLLoader(OverviewColumnDialogController.class.getResource("overview-column-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("overview-column-dialog", fxmlLoader, owner, title);

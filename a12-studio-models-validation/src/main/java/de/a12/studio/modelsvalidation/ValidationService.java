@@ -17,6 +17,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.treemodel.TreeModel;
+import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.modelsvalidation.services.ApplicationModelValidationService;
 import de.a12.studio.modelsvalidation.services.CombinationModelValidationService;
 import de.a12.studio.modelsvalidation.services.ContentModelValidationService;
@@ -30,6 +31,8 @@ import de.a12.studio.modelsvalidation.services.RelationshipModelValidationServic
 import de.a12.studio.modelsvalidation.services.RelationshipUiModelValidationService;
 import de.a12.studio.modelsvalidation.services.SelectionModelValidationService;
 import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
+import de.a12.studio.modelsvalidation.services.TypesettingModelValidationService;
+import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
@@ -59,6 +62,7 @@ public class ValidationService {
   private final QueryModelValidationService queryModelValidationService = new QueryModelValidationService();
   private final CombinationModelValidationService combinationModelValidationService = new CombinationModelValidationService();
   private final SelectionModelValidationService selectionModelValidationService = new SelectionModelValidationService();
+  private final TypesettingModelValidationService typesettingModelValidationService = new TypesettingModelValidationService();
 
   public ValidationService(Project project) {
     this.project = project;
@@ -108,6 +112,7 @@ public class ValidationService {
       case QueryModel queryModel -> queryModelValidationService.validate(queryModel, context);
       case CombinedDocumentModel combinedDocumentModel -> combinationModelValidationService.validate(combinedDocumentModel, context);
       case SelectionModel selectionModel -> selectionModelValidationService.validate(selectionModel, context);
+      case TypesettingModel typesettingModel -> typesettingModelValidationService.validate(typesettingModel, context);
       default -> List.of();
     };
   }
@@ -128,6 +133,7 @@ public class ValidationService {
       case QUERY -> queryModelValidationService.addValidator(validator);
       case COMBINATION -> combinationModelValidationService.addValidator(validator);
       case SELECTION -> selectionModelValidationService.addValidator(validator);
+      case TYPESETTING -> typesettingModelValidationService.addValidator(validator);
     }
   }
 
@@ -147,6 +153,7 @@ public class ValidationService {
       case QUERY -> queryModelValidationService.removeValidator(validator);
       case COMBINATION -> combinationModelValidationService.removeValidator(validator);
       case SELECTION -> selectionModelValidationService.removeValidator(validator);
+      case TYPESETTING -> typesettingModelValidationService.removeValidator(validator);
     }
   }
 
@@ -162,7 +169,7 @@ public class ValidationService {
   }
 
   /**
-   * Every human-readable settings problem for this model (locales, time zone, etc., as edited via the Model
+   * Every human-readable settings problem for this model (locales, time zone, roles, etc., as edited via the Model
    * Settings dialog), whether single-model (missing locale) or cross-model (e.g. a time zone that disagrees
    * with the rest of the project). Empty if there are none, e.g. for driving both a settings-button badge
    * and its error tooltip.
@@ -172,6 +179,9 @@ public class ValidationService {
     List<String> messages = new ArrayList<>();
     findMessage(errors, TimeZoneValidator.ELEMENT_ID).ifPresent(messages::add);
     findMessage(errors, MissingLocaleValidator.ELEMENT_ID).ifPresent(messages::add);
+    // The roles are a settings concern too (a model such as a Typesetting Model has nothing else in its settings).
+    errors.stream().filter(error -> HeaderRolesValidator.ELEMENT_ID.equals(error.elementId())).map(ModelValidationError::message)
+        .forEach(messages::add);
     return messages;
   }
 

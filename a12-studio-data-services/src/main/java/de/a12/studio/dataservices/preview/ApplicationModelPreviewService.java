@@ -147,18 +147,18 @@ public class ApplicationModelPreviewService {
    * modelRoot.rootGroups}, searched recursively through groups) - the {@code document-model-for-overview}-
    * or {@code query-model-for-overview}-referenced one (see {@link
    * DocumentModelFieldResolver#resolveOverviewDocumentModel}), or, for a column carrying {@code
-   * linkReferences}, the named relationship's own link document model instead (see {@link
-   * DocumentModelFieldResolver#resolveLinkDocumentModel}). The effective label is the column's own label if
+   * linkReferences}, the Document Model the link reference points at instead (see {@link
+   * DocumentModelFieldResolver#resolveLinkedDocumentModel}). The effective label is the column's own label if
    * set, else the resolved Document Model field's label, else its name.
    */
   private List<PreviewFieldDto> resolveOverviewFields(OverviewModel overviewModel, ProjectItem contextItem) {
     DocumentModel documentModel = DocumentModelFieldResolver.resolveOverviewDocumentModel(overviewModel, contextItem);
     Map<String, Element> elementsById = DocumentModelFieldResolver.index(documentModel);
-    Map<String, Map<String, Element>> linkElementsByRelationshipId = new HashMap<>();
+    Map<String, Map<String, Element>> linkElementsByModelId = new HashMap<>();
 
     List<PreviewFieldDto> fields = new ArrayList<>();
     for (Column column : overviewModel.getContent().getColumns()) {
-      Map<String, Element> elements = elementsForColumn(column, elementsById, linkElementsByRelationshipId, contextItem);
+      Map<String, Element> elements = elementsForColumn(column, elementsById, linkElementsByModelId, contextItem);
       Element element = elements.get(column.getElementRef());
       fields.add(new PreviewFieldDto(resolveColumnLabel(column, element), DocumentModelFieldResolver.fieldType(element)));
     }
@@ -166,19 +166,20 @@ public class ApplicationModelPreviewService {
   }
 
   /** {@code elementsById} for a plain column, or - for one carrying {@code linkReferences} - the (lazily
-   * resolved and cached) element index of the named relationship's own link document model instead. */
+   * resolved and cached) element index of the Document Model the link reference points at instead (see
+   * {@link DocumentModelFieldResolver#resolveLinkedDocumentModel}). */
   private Map<String, Element> elementsForColumn(Column column, Map<String, Element> elementsById,
-      Map<String, Map<String, Element>> linkElementsByRelationshipId, ProjectItem contextItem) {
+      Map<String, Map<String, Element>> linkElementsByModelId, ProjectItem contextItem) {
     List<ColumnLinkReference> linkReferences = column.getLinkReferences();
     if (linkReferences == null || linkReferences.isEmpty()) {
       return elementsById;
     }
-    String relationshipId = linkReferences.get(0).getRelationship();
-    if (relationshipId == null) {
+    DocumentModel linkedModel = DocumentModelFieldResolver.resolveLinkedDocumentModel(linkReferences.get(0), contextItem);
+    if (linkedModel == null) {
       return elementsById;
     }
-    Map<String, Element> linkElements = linkElementsByRelationshipId.computeIfAbsent(relationshipId,
-        id -> DocumentModelFieldResolver.index(DocumentModelFieldResolver.resolveLinkDocumentModel(id, contextItem)));
+    Map<String, Element> linkElements = linkElementsByModelId.computeIfAbsent(linkedModel.getId(),
+        id -> DocumentModelFieldResolver.index(linkedModel));
     return linkElements.containsKey(column.getElementRef()) ? linkElements : elementsById;
   }
 

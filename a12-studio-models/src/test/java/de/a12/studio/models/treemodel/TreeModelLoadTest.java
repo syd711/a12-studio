@@ -2,7 +2,10 @@ package de.a12.studio.models.treemodel;
 
 import de.a12.studio.models.ModelRoundTrip;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.util.JsonSettings;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -54,5 +57,38 @@ class TreeModelLoadTest {
   @Test
   void roundTripsTreeModel() throws Exception {
     ModelRoundTrip.assertRoundTrip(getClass(), "/treemodel/TreeModel.json", TreeModel.class);
+  }
+
+  @Test
+  void rootHideLabelAndStylesAreTypedFieldsThatRoundTrip() throws Exception {
+    ObjectNode tree = (ObjectNode) JsonSettings.objectMapper.readTree(
+        ModelRoundTrip.readResource(getClass(), "/treemodel/TreeModel.json"));
+    ObjectNode content = (ObjectNode) tree.get("content");
+    ((ObjectNode) content.get("configuration")).put("rootRef", "crc-1").put("labelHidden", true);
+    content.putArray("styles").add("h_semiBoldFontWeight");
+
+    TreeModel model = JsonSettings.objectMapper.readValue(tree.toString(), TreeModel.class);
+
+    assertEquals("crc-1", model.getContent().getConfiguration().getRootRef());
+    assertEquals(Boolean.TRUE, model.getContent().getConfiguration().getLabelHidden());
+    assertEquals(java.util.List.of("h_semiBoldFontWeight"), model.getContent().getStyles());
+    assertFalse(model.getContent().getExtras().containsKey("styles"));
+    assertFalse(model.getContent().getConfiguration().getExtras().containsKey("rootRef"));
+
+    JsonNode resaved = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(model));
+    assertEquals(content, resaved.get("content"));
+  }
+
+  @Test
+  void absentRootHideLabelAndStylesStayAbsent() throws Exception {
+    TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModel.json", TreeModel.class);
+    assertEquals(null, model.getContent().getConfiguration().getRootRef());
+    assertEquals(null, model.getContent().getConfiguration().getLabelHidden());
+    assertTrue(model.getContent().getStyles().isEmpty());
+
+    JsonNode content = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(model)).get("content");
+    assertFalse(content.has("styles"));
+    assertFalse(content.get("configuration").has("rootRef"));
+    assertFalse(content.get("configuration").has("labelHidden"));
   }
 }

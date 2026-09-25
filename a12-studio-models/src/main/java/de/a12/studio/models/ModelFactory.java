@@ -18,6 +18,7 @@ import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.models.structuralmappingmodel.StructuralMappingModel;
 import de.a12.studio.models.treemodel.TreeModel;
+import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.projects.ProjectItem;
 import lombok.extern.slf4j.Slf4j;
@@ -92,6 +93,7 @@ public class ModelFactory {
         case QUERY -> JsonSettings.objectMapper.treeToValue(root, QueryModel.class);
         case STRUCTURALMAPPING -> JsonSettings.objectMapper.treeToValue(root, StructuralMappingModel.class);
         case SELECTION -> JsonSettings.objectMapper.treeToValue(root, SelectionModel.class);
+        case TYPESETTING -> JsonSettings.objectMapper.treeToValue(root, TypesettingModel.class);
         default -> {
           log.warn("Model type '{}' of '{}' is not supported yet", modelType, projectItem.getPath());
           yield null;

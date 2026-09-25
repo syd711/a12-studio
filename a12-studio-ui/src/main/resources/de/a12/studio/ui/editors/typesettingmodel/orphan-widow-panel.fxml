@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" animated="false" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%typesetting_model.orphan_widow_settings" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.typesettingmodel.OrphanWidowPanelController">
+  <BorderPane>
+    <top>
+      <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER"/>
+    </top>
+    <center>
+      <GridPane hgap="10.0" vgap="8.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="NEVER" minWidth="90.0"/>
+          <ColumnConstraints hgrow="NEVER"/>
+          <ColumnConstraints hgrow="NEVER"/>
+        </columnConstraints>
+        <padding>
+          <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+        </padding>
+
+        <Label styleClass="field-label" text="%typesetting_model.orphans" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+        <Spinner fx:id="orphanSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        <Label GridPane.columnIndex="2" GridPane.rowIndex="0">
+          <graphic>
+            <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18"/>
+          </graphic>
+          <tooltip>
+            <Tooltip prefWidth="300.0" text="%typesetting_model.orphans_hint" wrapText="true"/>
+          </tooltip>
+        </Label>
+
+        <Label styleClass="field-label" text="%typesetting_model.widows" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+        <Spinner fx:id="widowSpinner" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Label GridPane.columnIndex="2" GridPane.rowIndex="1">
+          <graphic>
+            <FontIcon iconLiteral="mdi2h-help-circle-outline" iconSize="18"/>
+          </graphic>
+          <tooltip>
+            <Tooltip prefWidth="300.0" text="%typesetting_model.widows_hint" wrapText="true"/>
+          </tooltip>
+        </Label>
+      </GridPane>
+    </center>
+  </BorderPane>
+</TitledPane>

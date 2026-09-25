@@ -7,7 +7,7 @@
   "overview":           { "version": "39.0.0", "enabled": true,  "suffix": "OM"  },
   "tree":               { "version": "11.0.0", "enabled": true,  "suffix": "TM"  },
   "print":              { "version": "4.0.0",  "enabled": false, "suffix": "PM"  },
-  "printtypesettings":  { "version": "3.2.0",  "enabled": false, "suffix": "TSM" },
+  "typesetting":        { "version": "3.2.0",  "enabled": true,  "suffix": "TSM" },
   "module-masterdetail":{ "version": "1.0.0",  "enabled": true,  "suffix": "MDM" },
   "relationship":       { "version": "4.0.0",  "enabled": true,  "suffix": "RM"  },
   "relationship-ui":    { "version": "2.0.0",  "enabled": true,  "suffix": "Ru"  },

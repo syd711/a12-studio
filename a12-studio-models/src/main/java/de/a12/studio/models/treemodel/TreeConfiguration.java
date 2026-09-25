@@ -15,7 +15,16 @@ public class TreeConfiguration {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Map<String, Object> dnd;
+  // Points at the id of one of the nodes' childRelationshipConfigurations: the relationship that yields the
+  // tree's root nodes (SME "Root").
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String rootRef;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String hierarchicalColumnRef;
+  // SME writes this as `true` or omits it ("Hide Label"), never `false`.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean labelHidden;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private ExpansionStrategy expansionStrategy;
 
   private final Map<String, Object> extras = new LinkedHashMap<>();

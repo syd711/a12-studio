@@ -55,6 +55,14 @@ public class ModelSettingsNamePanelController extends AbstractPropertyEditor imp
     bindTextArea(descriptionArea, (element, value) -> model.setDescription(value));
   }
 
+  /**
+   * Shows/hides this panel entirely, e.g. for {@link de.a12.studio.ui.editors.dialogs.ModelSettingsDialog} of a
+   * model type whose only setting is its roles.
+   */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
   public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
     updatingFromModel = true;

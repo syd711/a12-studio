@@ -2,6 +2,7 @@ package de.a12.studio.models.treemodel;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,9 @@ public class TreeModelContent {
   private SlotBox footerBox;
   private List<TreeNode> nodes = new ArrayList<>();
   private List<TreeColumn> columns = new ArrayList<>();
+  // Logical style names usable by the tree's controls; absent from the JSON when empty.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<String> styles = new ArrayList<>();
 
   private final Map<String, Object> extras = new LinkedHashMap<>();
 

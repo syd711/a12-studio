@@ -1,0 +1,19 @@
+{
+  "header": {
+    "id": "TypesettingRuleValueValidator_invalid",
+    "modelType": "typesetting",
+    "modelVersion": "3.2.0",
+    "annotations": []
+  },
+  "content": {
+    "customHyphenationExclusions": [],
+    "preventLineBreakRules": [
+      {
+        "pattern": "T shirt"
+      }
+    ],
+    "internal": {},
+    "orphan": 2,
+    "widow": 2
+  }
+}

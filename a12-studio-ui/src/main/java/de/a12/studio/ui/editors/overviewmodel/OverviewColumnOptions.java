@@ -28,14 +28,15 @@ public final class OverviewColumnOptions {
   /**
    * The {@link ElementIndex} {@code column}'s {@code elementRef} actually resolves against: {@code
    * documentModelIndex} for a plain column, or - for a column carrying {@code linkReferences} (a
-   * Relationship UI Model's Available/Selected Items overview projecting a field that lives on the
-   * relationship's own link document, e.g. {@code PersonSkills_Re.json}'s {@code linkDocumentModel} - not on
-   * the primary Document/Query Model) - the index {@code linkDocumentModelIndexResolver} returns for that
-   * relationship's id, falling back to {@code documentModelIndex} if the relationship or its link document
-   * model doesn't resolve (yet). See {@code OverviewModelEditorController#refreshLinkDocumentModelIndexes}
-   * for how that resolver is built.
+   * Relationship UI Model's Available/Selected Items overview projecting a field of the related document,
+   * not of the primary Document/Query Model) - the index {@code linkDocumentModelIndexResolver} returns for
+   * that link reference: the relationship's own link document (e.g. {@code PersonSkills_Re.json}'s {@code
+   * linkDocumentModel}) for a {@code LINK} reference, the target role's document for a {@code CHILD} one (see
+   * {@link ColumnLinkReference#resolveDocumentModelId}). Falls back to {@code documentModelIndex} if the
+   * relationship or that model doesn't resolve (yet). See {@code
+   * OverviewModelEditorController#linkedDocumentModelIndex} for how that resolver is built.
    */
-  public static ElementIndex indexFor(Column column, ElementIndex documentModelIndex, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  public static ElementIndex indexFor(Column column, ElementIndex documentModelIndex, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     if (column == null || linkDocumentModelIndexResolver == null) {
       return documentModelIndex;
     }
@@ -43,12 +44,17 @@ public final class OverviewColumnOptions {
     if (linkReferences == null || linkReferences.isEmpty()) {
       return documentModelIndex;
     }
-    String relationshipId = linkReferences.get(0).getRelationship();
-    ElementIndex linkIndex = relationshipId == null ? null : linkDocumentModelIndexResolver.apply(relationshipId);
+    ElementIndex linkIndex = linkDocumentModelIndexResolver.apply(linkReferences.get(0));
     return linkIndex != null ? linkIndex : documentModelIndex;
   }
 
-  public static String describe(Column column, ElementIndex documentModelIndex, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  /**
+   * The column's field path. A column sourced through a relationship hop ({@code linkReferences}) is prefixed
+   * with the id of the Document Model that path lives in (e.g. {@code Team_Dc:/Team/TeamName}), since the
+   * root group name alone ({@code /Team/...}) doesn't say which model it belongs to - and for such a column
+   * it isn't the Overview Model's own Document/Query Model.
+   */
+  public static String describe(Column column, ElementIndex documentModelIndex, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     if (column == null) {
       return null;
     }
@@ -56,7 +62,13 @@ public final class OverviewColumnOptions {
       return "Expression Column";
     }
     if (column.getElementRef() != null && !column.getElementRef().isBlank()) {
-      return OverviewElementOptions.displayPath(indexFor(column, documentModelIndex, linkDocumentModelIndexResolver), column.getElementRef());
+      ElementIndex index = indexFor(column, documentModelIndex, linkDocumentModelIndexResolver);
+      String path = OverviewElementOptions.displayPath(index, column.getElementRef());
+      boolean linked = column.getLinkReferences() != null && !column.getLinkReferences().isEmpty();
+      if (linked && index != null && index != documentModelIndex && OverviewElementOptions.isResolved(index, column.getElementRef())) {
+        return index.getModel().getId() + ":" + path;
+      }
+      return path;
     }
     return "(unset)";
   }
@@ -66,7 +78,7 @@ public final class OverviewColumnOptions {
    * de.a12.studio.ui.editors.overviewmodel.OverviewColumnsPanelController}'s own row rendering (bold red
    * field summary) rather than by a validator, since a column always has *some* row to render even when its
    * reference is broken. */
-  public static boolean isUnresolvedElementRef(Column column, ElementIndex documentModelIndex, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  public static boolean isUnresolvedElementRef(Column column, ElementIndex documentModelIndex, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     return column != null && column.getElementRef() != null && !column.getElementRef().isBlank()
         && !OverviewElementOptions.isResolved(indexFor(column, documentModelIndex, linkDocumentModelIndexResolver), column.getElementRef());
   }
@@ -88,7 +100,7 @@ public final class OverviewColumnOptions {
 
   /** {@code columnId} as-is if it no longer matches any column in {@code columns} (a dangling reference,
    * flagged separately by {@link de.a12.studio.modelsvalidation.validators.overview.OverviewInitialSortingReferenceValidator}). */
-  public static String describeById(List<Column> columns, String columnId, ElementIndex documentModelIndex, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  public static String describeById(List<Column> columns, String columnId, ElementIndex documentModelIndex, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     if (columnId == null) {
       return null;
     }
@@ -102,7 +114,7 @@ public final class OverviewColumnOptions {
   /** Renders column ids as their {@link #describe} summary in a {@code ComboBox<String>} while keeping the id
    * as the stored value, in the same monospace "path" font as every other path picker (see {@link
    * OverviewElementOptions#applyMonospaceCells}). */
-  public static void applyColumnConverter(ComboBox<String> comboBox, List<Column> columns, ElementIndex documentModelIndex, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  public static void applyColumnConverter(ComboBox<String> comboBox, List<Column> columns, ElementIndex documentModelIndex, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     StringConverter<String> converter = new StringConverter<>() {
       @Override
       public String toString(String columnId) {

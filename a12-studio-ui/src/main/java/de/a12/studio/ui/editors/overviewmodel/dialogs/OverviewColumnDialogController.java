@@ -4,6 +4,7 @@ import de.a12.studio.models.Label;
 import de.a12.studio.models.overviewmodel.Alignment;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.ColumnAlignment;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.SummaryConfig;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
@@ -326,7 +327,7 @@ public class OverviewColumnDialogController implements DialogController {
     });
   }
 
-  void init(Stage stage, ElementIndex documentModelIndex, String documentModelId, @NonNull Column column, Function<String, ElementIndex> linkDocumentModelIndexResolver) {
+  void init(Stage stage, ElementIndex documentModelIndex, String documentModelId, @NonNull Column column, Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver) {
     this.stage = stage;
     this.column = column;
     this.documentModelIndex = documentModelIndex;

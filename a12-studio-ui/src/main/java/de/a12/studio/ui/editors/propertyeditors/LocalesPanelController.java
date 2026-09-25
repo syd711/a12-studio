@@ -75,6 +75,14 @@ public class LocalesPanelController extends AbstractPropertyEditor implements In
 
   private A12Model<?> model;
 
+  /**
+   * Shows/hides this panel entirely, for a model type without locales (a Typesetting Model's header has none),
+   * in {@link de.a12.studio.ui.editors.dialogs.ModelSettingsDialog} and the New Model dialog.
+   */
+  public void setVisible(boolean visible) {
+    setEditorVisible(visible);
+  }
+
   public void setModel(@NonNull A12Model<?> model) {
     this.model = model;
     rebuildRows();

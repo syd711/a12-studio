@@ -13,6 +13,7 @@ import de.a12.studio.ui.util.FXResizeHelper;
 import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.StudioVersion;
+import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.versioncontrol.GitChangedFile;
 import de.a12.studio.ui.versioncontrol.GitService;
 import de.a12.studio.ui.versioncontrol.VersionControlActions;
@@ -60,6 +61,8 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       new Shortcut(StudioBundle.get("ctrl_alt_u"), StudioBundle.get("show_update_info"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_alt_h"), StudioBundle.get("resize_window_to_1920x1080"), Category.GENERAL),
       new Shortcut(StudioBundle.get("ctrl_alt_w"), StudioBundle.get("resize_window_to_2560x1440"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_plus"), StudioBundle.get("increase_the_font_size"), Category.GENERAL),
+      new Shortcut(StudioBundle.get("ctrl_minus"), StudioBundle.get("decrease_the_font_size"), Category.GENERAL),
       new Shortcut(StudioBundle.get("win_up"), StudioBundle.get("maximize_the_window"), Category.GENERAL),
       new Shortcut(StudioBundle.get("win_down"), StudioBundle.get("restore_then_minimize_the_window"), Category.GENERAL),
 
@@ -209,6 +212,24 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
       RecentFilesDialogController.show(stage, Studio.getCurrentProject());
       ke.consume();
     }
+    else if (ke.isControlDown() && !ke.isAltDown() && isFontSizeKey(ke, true)) {
+      WidgetFactory.changeFontSize(1);
+      ke.consume();
+    }
+    else if (ke.isControlDown() && !ke.isAltDown() && isFontSizeKey(ke, false)) {
+      WidgetFactory.changeFontSize(-1);
+      ke.consume();
+    }
+  }
+
+  /**
+   * Ctrl+Plus / Ctrl+Minus, on the main keyboard and the numpad. On layouts where '+' is Shift+'='
+   * (e.g. US) the key is reported as EQUALS, so that counts as "plus" too.
+   */
+  private static boolean isFontSizeKey(KeyEvent ke, boolean increase) {
+    return increase
+        ? ke.getCode() == KeyCode.PLUS || ke.getCode() == KeyCode.ADD || ke.getCode() == KeyCode.EQUALS
+        : ke.getCode() == KeyCode.MINUS || ke.getCode() == KeyCode.SUBTRACT;
   }
 
   /**

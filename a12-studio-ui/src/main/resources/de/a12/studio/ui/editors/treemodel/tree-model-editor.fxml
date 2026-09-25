@@ -1,25 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.treemodel.TreeModelEditorController">
     <right>
@@ -36,125 +24,46 @@
             <tabs>
                 <Tab text="%columns">
                     <content>
-                        <BorderPane>
-                            <top>
-                                <ToolBar BorderPane.alignment="CENTER">
-                                    <items>
-                                        <Button mnemonicParsing="false" onAction="#onAddColumn" styleClass="default-button">
-                                            <graphic>
-                                                <FontIcon iconLiteral="mdi2p-plus" iconSize="16" />
-                                            </graphic>
-                                            <tooltip>
-                                                <Tooltip text="%add_column" />
-                                            </tooltip>
-                                        </Button>
-                                        <Button mnemonicParsing="false" onAction="#onRemoveColumn" styleClass="default-button">
-                                            <graphic>
-                                                <FontIcon iconLiteral="mdi2d-delete-outline" iconSize="16" />
-                                            </graphic>
-                                            <tooltip>
-                                                <Tooltip text="%remove_column" />
-                                            </tooltip>
-                                        </Button>
-                                    </items>
-                                </ToolBar>
-                            </top>
-                            <center>
-                                <TableView fx:id="columnsTable" editable="true" BorderPane.alignment="CENTER">
-                                    <columns>
-                                        <TableColumn fx:id="columnNameColumn" prefWidth="200.0" text="%name" />
-                                        <TableColumn fx:id="columnWidthColumn" prefWidth="80.0" text="%width" />
-                                        <TableColumn fx:id="columnFixedWidthColumn" prefWidth="100.0" text="%fixed_width" />
-                                        <TableColumn fx:id="columnPinDirectionColumn" prefWidth="110.0" text="%pin_direction" />
-                                    </columns>
-                                </TableView>
-                            </center>
-                        </BorderPane>
-                    </content>
-                </Tab>
-                <Tab text="%nodes">
-                    <content>
-                        <SplitPane dividerPositions="0.35">
-                            <items>
-                                <BorderPane>
-                                    <top>
-                                        <ToolBar BorderPane.alignment="CENTER">
-                                            <items>
-                                                <Button mnemonicParsing="false" onAction="#onAddNode" styleClass="default-button">
-                                                    <graphic>
-                                                        <FontIcon iconLiteral="mdi2p-plus" iconSize="16" />
-                                                    </graphic>
-                                                    <tooltip>
-                                                        <Tooltip text="%add_node_type" />
-                                                    </tooltip>
-                                                </Button>
-                                                <Button mnemonicParsing="false" onAction="#onRemoveNode" styleClass="default-button">
-                                                    <graphic>
-                                                        <FontIcon iconLiteral="mdi2d-delete-outline" iconSize="16" />
-                                                    </graphic>
-                                                    <tooltip>
-                                                        <Tooltip text="%remove_node_type" />
-                                                    </tooltip>
-                                                </Button>
-                                            </items>
-                                        </ToolBar>
-                                    </top>
-                                    <center>
-                                        <ListView fx:id="nodesList" BorderPane.alignment="CENTER" />
-                                    </center>
-                                </BorderPane>
-                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
-                                    <content>
-                                        <VBox spacing="16.0" styleClass="field-editor">
-                                            <children>
-                                                <VBox spacing="4.0">
-                                                    <children>
-                                                        <Label styleClass="field-label" text="%document_model" />
-                                                        <ComboBox fx:id="nodeDocumentModelField" editable="false" maxWidth="Infinity" />
-                                                    </children>
-                                                </VBox>
-                                                <CheckBox fx:id="nodeDndField" mnemonicParsing="false" text="%drag_drop" />
-                                                <Separator />
-                                                <VBox spacing="8.0">
-                                                    <children>
-                                                        <Label styleClass="field-label" text="%column_mapping" />
-                                                        <GridPane fx:id="nodeColumnMappingGrid" hgap="10.0" vgap="6.0">
-                                                            <columnConstraints>
-                                                                <ColumnConstraints minWidth="120.0" />
-                                                                <ColumnConstraints hgrow="ALWAYS" />
-                                                            </columnConstraints>
-                                                        </GridPane>
-                                                    </children>
-                                                </VBox>
-                                            </children>
-                                            <padding>
-                                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                            </padding>
-                                        </VBox>
-                                    </content>
-                                </ScrollPane>
-                            </items>
-                        </SplitPane>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                            <content>
+                                <VBox spacing="12.0" styleClass="field-editor">
+                                    <children>
+                                        <fx:include fx:id="rootPanel" source="tree-root-panel.fxml" />
+                                        <fx:include fx:id="columnsPanel" source="tree-columns-panel.fxml" />
+                                        <fx:include fx:id="nodeTypesPanel" source="tree-node-types-panel.fxml" />
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
                     </content>
                 </Tab>
                 <Tab text="%configuration">
                     <content>
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
                             <content>
-                                <VBox spacing="16.0" styleClass="field-editor">
+                                <VBox spacing="12.0" styleClass="field-editor">
                                     <children>
-                                        <VBox spacing="4.0">
-                                            <children>
-                                                <Label styleClass="field-label" text="%hierarchical_column" />
-                                                <ComboBox fx:id="hierarchicalColumnField" editable="false" maxWidth="Infinity" />
-                                            </children>
-                                        </VBox>
-                                        <VBox spacing="4.0">
-                                            <children>
-                                                <Label styleClass="field-label" text="%expansion_strategy" />
-                                                <ComboBox fx:id="expansionStrategyField" editable="false" maxWidth="Infinity" />
-                                            </children>
-                                        </VBox>
+                                        <fx:include fx:id="configurationPanel" source="tree-configuration-panel.fxml" />
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab text="%layout">
+                    <content>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                            <content>
+                                <VBox spacing="12.0" styleClass="field-editor">
+                                    <children>
+                                        <fx:include fx:id="accessibilityPanel" source="tree-accessibility-panel.fxml" />
+                                        <fx:include fx:id="stylesPanel" source="/de/a12/studio/ui/editors/overviewmodel/styles-panel.fxml" />
                                     </children>
                                     <padding>
                                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

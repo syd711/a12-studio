@@ -386,6 +386,57 @@ now distinguishes an absent key from an explicit `[]` (null-backed header DTO + 
 
 ---
 
+## Print Typesetting Model
+
+*Built 2026-09-25. `modelType` `typesetting`, suffix `TSM` (SME's own fixtures use `_TSM`).*
+
+**Where SME's behavior actually lives.** SME's `client/src/modules/printTypesettingModel` is a ~450-line shell (module
+registration, data provider, reference provider for roles): the editor UI, the marshaller and the validation are all
+in the external `@com.mgmtp.a12.print/print-typesetting` npm package, and the server-side check in
+`com.mgmtp.a12.print:print-typesetting` (`TypesettingModelValidator` = the kernel run over the
+`DomainTypesettingMetaModel`). Both are downloadable anonymously from the community repo
+(`https://artifacts.geta12.com/artifactory/a12-community-maven/com/mgmtp/a12/print/print-typesetting/<v>/print-typesetting-<v>-sources.jar`
+and `.../api/npm/a12-community-npm/@com.mgmtp.a12.print/print-typesetting/-/print-typesetting-<v>.tgz`; 3.2.3-4.0.1
+in the Maven repo, SME pins 3.2.1 which is not published). The npm package is the source of truth for the editor; the Java jar carries
+`models/DomainTypesettingMetaModel.json`, the kernel meta-model with the field limits and the roles rules.
+
+**Model.** `header` has only `id`, `modelType`, `modelVersion` and `annotations` (the `roles` annotation) — no locales,
+labels or model references. `content` is `customHyphenationExclusions` (`[{word, index[]}]`), `preventLineBreakRules`
+(`[{pattern}]`), `internal` (the generated hyphenation dictionary, `{}` in every model SME creates), `orphan` and `widow`
+(0-10, default 2). Ported to `a12-studio-models/.../typesettingmodel/`: `TypesettingModel`, `TypesettingModelContent`
+(the two hyphenation containers are raw `JsonNode`s so whatever a file carries survives a load/save cycle and an absent
+key stays absent), `PreventLineBreakRule`, and `PreventLineBreakRules`/`PreventLineBreakRuleType`/`SpecialPattern`.
+
+**One list, three tables.** Every rule is a regex in `preventLineBreakRules`; the editor tells them apart by shape
+(`rule-conversion.ts`): one of two curated **special patterns** (`§\d+ Abs\. \d+`, `\d+\(\d+\)\([a-zA-Z]\)`), else a
+**number unit** if it starts with `[+-]?(\d{1,3}(?:[.,]\d{3})+|\d+)(?:[.,]\d+)? `, else a **character sequence**; the
+latter two are stored regex-escaped. A row added but not yet filled in is stored as `{{character}}`/`{{unit}}`/`{{special}}`
+so it stays in its table. `PreventLineBreakRules.classify/toValue/toPattern` port this, pinned by `PreventLineBreakRulesTest`.
+
+**Editor** (`a12-studio-ui/.../editors/typesettingmodel/`), one extracted property editor per SME section:
+`CharacterSequenceRulesPanelController`, `NumberUnitRulesPanelController`, `SpecialPatternRulesPanelController` (a shared
+`AbstractRulesPanelController` holds the row/add/delete/validation behavior) and `OrphanWidowPanelController`. Roles are
+not in the editor: the Model Settings dialog shows only the Roles panel for this model type (every other panel is
+hidden and left unbound so none can disable Save), and the New Model dialog neither asks for nor writes locales.
+
+**Validation** (`TypesettingModelValidationService`; no locale validators, the header has no locales):
+- Character sequence: required, letters and hyphens only (`^[\p{L}-]+$`), at most 20 characters.
+- Number unit: required, no digits, whitespace or special characters, at most 20 characters.
+- Special pattern: must be chosen. Duplicate rules are reported on every occurrence, across all three tables.
+- Orphan/widow: 0-10 (the meta-model's `minValue`/`maxValue`). The spinner clamps typed values, so only a file can carry
+  an out-of-range one; it is shown as is and reported.
+- Roles (`HeaderRolesValidator`, reusable for any model type): valid role names, no duplicates, no blank role (errors);
+  role missing from `auth/roles.yaml`, a roles file present but no roles on the model, roles but no roles file
+  (warnings). Role problems also show on the settings-button badge (`ValidationService#getSettingsIssueMessages`).
+  SME's own role regex has a character range (`,-_`) looser than its message; the validator checks what the message says.
+
+**Not done / known limits.** A Print Model's Text Styles cannot pick a Typesetting Model yet: the Print Model editor is
+disabled and has no typesetting-reference UI (SME's schema tab does). Renaming a Typesetting Model already rewrites the
+header references of the models pointing at it (generic id-based rewriting). No `customHyphenationExclusions` editing,
+matching SME. Not checked against the real print engine: the regexes are only compared with SME's editor's output.
+
+---
+
 ## Form Model
 
 *Analyzed 2026-09-06 (the previous version of this section, "Form Model — not started", was written before this
@@ -1195,12 +1246,12 @@ query, selection, structural mapping and transformer as `isExperimental()` (chec
 | 5 | **relationshipModel** | Foundational — link, masterDetailModel, treeModel, modelGraphDiagram and formModel's `Binding`/`BindingRepeat` all reference it. | **Present, enabled** (the old "no current scaffolding" is obsolete): `RelationshipModelEditorController` (8 files) + `RelationshipModelValidationService` (6 relationship-specific validators). The **Relationship UI Model** (`relationship-ui`, `Ru`) also has an editor (8 files) and 3 validators. A role rename does not propagate to Query/Form/Relationship UI references (TODO decision). |
 | 6 | **selectionModel** | Reusable selection spec. | **Present, enabled** (2026-09-13), see the dedicated section. |
 | 7 | **printModel** | Most editor-complex of the print family — relies on an external print-engine component library for the layout canvas. Backend renders PDF only. | **Large editor, disabled.** 28 content classes, an 811-line `PrintModelEditorController`, 7 print validators; no print-engine dependency and no PDF rendering (the old `PrintService`/`DocumentModelResolver`/`PrintParameters` scaffolding was deleted 2026-07-20). Rename/move refactoring rewrites `FieldRef.path`. |
-| 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. | **Not present.** Only a `printtypesettings` entry in `model-versions.json` (`enabled: false`, suffix `TSM`) and an icon; no `ModelType`, class or editor. Print Setting (deprecated in the platform) has nothing at all. |
+| 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. | **Typesetting: present, enabled** (2026-09-25): `ModelType.TYPESETTING` (the `model-versions.json` key was `printtypesettings`, which never matched the header's `typesetting`), `TypesettingModel`, an editor with four extracted panels, 4 validators plus the reusable roles validator; see the dedicated "Print Typesetting Model" section. **Print Setting: not present** (deprecated in the platform). |
 | 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model. | **Not present.** |
 | 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side, not blocking other model types. | **Both present, enabled.** Query: see the dedicated section. Overview: `OverviewModelEditorController` + 21 editor files (columns, filter items with per-type options, sub-header slots (every element type - button, search, filter, multi-selection - is editable through one dialog since 2026-09-21, the last three without the button-only Event/Confirmation/Priority/Icon block), initial sorting, styles, query-model link) and 16 overview validators; no dedicated section in this doc yet. |
 | — | **appModel** | Standalone. | **Present, enabled** (`ApplicationModelEditorController` + module/scene/region editors, 3 application validators, wireframe preview via `ApplicationModelPreviewService`, real Preview App deploy). |
 | — | **masterDetailModel** | Standalone. | **Present, enabled** (`MainDetailModelEditorController`, 2 validators; `MasterDetailModuleGenerator` is used by the Preview App deploy). |
-| — | **treeModel** | Standalone. | **Editor present, disabled** (474-line `TreeModelEditorController`, 6 validators). |
+| — | **treeModel** | Standalone. | **Editor present, disabled** (`TreeModelEditorController` wiring 3 tabs, 2026-09-25: *Columns* = `TreeRootPanelController` (SME "Root", `configuration.rootRef`: picks one of the nodes' `childRelationshipConfigurations`, shown as "DM → relationship" like SME; a dangling ref is kept and reported), `TreeColumnsPanelController` (row-based columns editor + Hierarchical Column, matching SME's placement) and `TreeNodeTypesPanelController` (one draggable/movable row per node type, click or Edit opens `TreeNodeDialogController` for Document Model / drag & drop / per-column field mapping, Add button below the rows; replaces the old list+detail *Nodes* tab); *Configuration* = `TreeConfigurationPanelController`; *Layout* = `TreeAccessibilityPanelController` (Hide Label, `configuration.labelHidden`) and the Overview editor's `StylesPanelController` bound to `content.styles` - 6 validators). **Still missing vs. SME's Node Types:** editing a node's Child Relationship Configurations (so Root can only offer configurations already in the JSON), actions, context menu, default row action, row title, icon, inherit-from-supertype, styles. |
 | — | **contentModel** | Experimental in SME itself. | **Editor present, disabled** (276-line `ContentModelEditorController`, 2 validators). |
 | — | **typeDefinitionModel** | Reuses the whole DM editor infrastructure. | **Present, enabled** (`TypeDefintionModelEditorController`; the type-definition mode rules are validated, see the Document Model section). |
 | — | **umModule** | User-management config: two YAML file types, "roles" and "users". | **Present** as `RolesEditorController` / `UsersEditorController` over `RolesDocument` / `UsersDocument` (`editors/auth`, `AuthFileFactory`). |

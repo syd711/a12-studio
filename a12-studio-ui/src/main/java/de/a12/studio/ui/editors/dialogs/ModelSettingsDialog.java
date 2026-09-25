@@ -13,6 +13,7 @@ import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
@@ -175,14 +176,19 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       A12Model<?> model = projectItem.getModel();
       snapshot = new ModelSnapshot(model);
 
-      modelSettingsNameController.setModel(model);
-      modelSettingsNameController.focusNameField();
-      supportedCharactersController.setModel(model);
-      localesController.setModel(model);
-      labelsController.setModel(model);
+      // A Typesetting Model's only setting is its roles, so every other panel stays unbound (an unbound panel
+      // reports no validation error that could disable Save) and is hidden below.
+      boolean rolesOnly = model instanceof TypesettingModel;
+      if (!rolesOnly) {
+        modelSettingsNameController.setModel(model);
+        modelSettingsNameController.focusNameField();
+        supportedCharactersController.setModel(model);
+        localesController.setModel(model);
+        labelsController.setModel(model);
+        annotationsController.setModel(model);
+        modelReferencesController.setModel(model);
+      }
       rolesController.setModel(model);
-      annotationsController.setModel(model);
-      modelReferencesController.setModel(model);
       if (model instanceof DocumentModel documentModel) {
         boolean additive = documentModel instanceof AdditiveDocumentModel;
         documentUniquenessCriteriaController.setModel(documentModel);
@@ -252,6 +258,14 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       modelReferencesController.setVisible(
           !(model instanceof OverviewModel) && !(model instanceof FormModel) && !(model instanceof QueryModel)
               && !(model instanceof AdditiveDocumentModel));
+      if (rolesOnly) {
+        modelSettingsNameController.setVisible(false);
+        supportedCharactersController.setVisible(false);
+        localesController.setVisible(false);
+        labelsController.setVisible(false);
+        annotationsController.setVisible(false);
+        modelReferencesController.setVisible(false);
+      }
     }
 
     bindErrorContainer();

@@ -9,6 +9,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.querymodel.QueryModel;
@@ -79,19 +80,24 @@ public final class DocumentModelFieldResolver {
   }
 
   /**
-   * The Document Model a column carrying {@code linkReferences} actually resolves against: the named
-   * relationship's own {@code linkDocumentModel} (the fields attached to the relationship's own link, e.g. a
-   * Relationship UI Model's "Proficiency"/"Acknowledged" columns - see {@code PersonSkills_Re.json}), not the
-   * Overview Model's primary Document/Query Model. {@code null} if {@code relationshipId} is {@code null} or
-   * doesn't resolve to a Relationship Model with a link document model of its own.
+   * The Document Model a column carrying {@code linkReferences} actually resolves against, not the Overview
+   * Model's primary Document/Query Model: for a {@code LINK} reference the named relationship's own {@code
+   * linkDocumentModel} (the fields attached to the relationship's own link, e.g. a Relationship UI Model's
+   * "Proficiency"/"Acknowledged" columns - see {@code PersonSkills_Re.json}), for a {@code CHILD} one the
+   * Document Model of the {@code targetRole} entity (see {@link ColumnLinkReference#resolveDocumentModelId}).
+   * {@code null} if {@code linkReference} is {@code null} or doesn't resolve to a Relationship Model and a
+   * Document Model within it.
    */
-  public static DocumentModel resolveLinkDocumentModel(String relationshipId, ProjectItem contextItem) {
-    ProjectItem relationshipItem = relationshipId == null ? null : contextItem.findByModelId(relationshipId);
+  public static DocumentModel resolveLinkedDocumentModel(ColumnLinkReference linkReference, ProjectItem contextItem) {
+    if (linkReference == null || linkReference.getRelationship() == null) {
+      return null;
+    }
+    ProjectItem relationshipItem = contextItem.findByModelId(linkReference.getRelationship());
     if (relationshipItem == null || !(relationshipItem.getModel() instanceof RelationshipModel relationshipModel)
         || relationshipModel.getContent() == null) {
       return null;
     }
-    return CombinedDocumentModelElements.resolveForFieldReferences(contextItem, relationshipModel.getContent().getLinkDocumentModelValue());
+    return CombinedDocumentModelElements.resolveForFieldReferences(contextItem, linkReference.resolveDocumentModelId(relationshipModel.getContent()));
   }
 
   /**

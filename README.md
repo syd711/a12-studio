@@ -70,7 +70,7 @@ You find an up-to-date overview about all supported model types and their status
 | Master-Detail Model | [x] |
 | Overview Model | [x] |
 | Print Model | Not supported yet |
-| Print Typesetting Model | Not supported yet |
+| Print Typesetting Model | [x] |
 | Query Model | [x] |
 | Relationship Model | [x] |
 | Relationship UI Model | [x] |

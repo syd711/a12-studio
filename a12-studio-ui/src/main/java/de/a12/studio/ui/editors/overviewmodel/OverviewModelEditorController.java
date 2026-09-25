@@ -8,6 +8,7 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.overviewmodel.BoxElement;
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.ButtonElement;
+import de.a12.studio.models.overviewmodel.ColumnLinkReference;
 import de.a12.studio.models.overviewmodel.ElementBox;
 import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
@@ -152,8 +153,8 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   private List<QueryModel> otherQueryModels = List.of();
   private List<RelationshipModel> otherRelationshipModels = List.of();
   private ElementIndex documentModelIndex;
-  private final Map<String, ElementIndex> linkDocumentModelIndexByRelationshipId = new HashMap<>();
-  private final Function<String, ElementIndex> linkDocumentModelIndexResolver = linkDocumentModelIndexByRelationshipId::get;
+  private final Map<String, ElementIndex> linkedDocumentModelIndexByModelId = new HashMap<>();
+  private final Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver = this::linkedDocumentModelIndex;
 
   @Override
   public void initialize(URL url, ResourceBundle resources) {
@@ -347,7 +348,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
         .orElseGet(() -> ProjectDocumentModels.resolveDocumentModelForFieldReferences(documentModelId));
     documentModelIndex = OverviewElementOptions.indexOf(documentModel, otherDocumentModels);
     OverviewElementOptions.restrictFieldIds(documentModelIndex, queryModelFieldRestriction());
-    refreshLinkDocumentModelIndexes();
+    linkedDocumentModelIndexByModelId.clear();
     overviewColumnsController.setDocumentModelIndex(documentModelIndex, documentModelId, linkDocumentModelIndexResolver);
     overviewSortingController.setDocumentModelIndex(documentModelIndex, linkDocumentModelIndexResolver);
     overviewAccessibilityController.setDocumentModelIndex(documentModelIndex, linkDocumentModelIndexResolver);
@@ -357,34 +358,42 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   }
 
   /**
-   * Rebuilds {@link #linkDocumentModelIndexByRelationshipId}: for every Relationship Model in the project
-   * that declares a {@code linkDocumentModel} (the fields attached to the relationship's own link, e.g. a
-   * Relationship UI Model's "Proficiency"/"Acknowledged" columns - see {@code PersonSkills_Re.json}), an
-   * {@link ElementIndex} over that model, keyed by the relationship's id. A Column whose {@code
-   * linkReferences} names that relationship resolves its {@code elementRef} against this index instead of
-   * {@link #documentModelIndex}, since the field lives on the link document, not the primary one (see {@link
-   * OverviewColumnOptions#indexFor}). Rebuilt on every {@link #refreshDocumentModelIndex()} call so it stays
-   * in sync with {@link #otherDocumentModels}/{@link #otherRelationshipModels}.
+   * The {@link ElementIndex} a Column's {@code linkReferences} entry resolves its {@code elementRef}
+   * against instead of {@link #documentModelIndex}, since the field lives on the related document, not the
+   * primary one: the named relationship's link document (e.g. a Relationship UI Model's
+   * "Proficiency"/"Acknowledged" columns - see {@code PersonSkills_Re.json}) for a {@code LINK} reference, the
+   * target role's document (e.g. {@code Team_Dc} for {@code TeamPerson_Re}'s {@code Team} role) for a {@code
+   * CHILD} one - see {@link ColumnLinkReference#resolveDocumentModelId}. Built lazily and cached per
+   * Document Model id; the cache is dropped on every {@link #refreshDocumentModelIndex()} call so it stays in
+   * sync with {@link #otherDocumentModels}/{@link #otherRelationshipModels}. {@code null} if the
+   * relationship or its Document Model doesn't resolve.
    */
-  private void refreshLinkDocumentModelIndexes() {
-    linkDocumentModelIndexByRelationshipId.clear();
-    for (RelationshipModel relationshipModel : otherRelationshipModels) {
-      if (relationshipModel.getContent() == null || relationshipModel.getId() == null) {
-        continue;
-      }
-      String linkDocumentModelId = relationshipModel.getContent().getLinkDocumentModelValue();
-      if (linkDocumentModelId == null || linkDocumentModelId.isBlank()) {
-        continue;
-      }
-      DocumentModel linkDocumentModel = otherDocumentModels.stream()
-          .filter(candidate -> linkDocumentModelId.equals(candidate.getId()))
-          .findFirst()
-          .orElseGet(() -> ProjectDocumentModels.resolveDocumentModelForFieldReferences(linkDocumentModelId));
-      ElementIndex linkIndex = OverviewElementOptions.indexOf(linkDocumentModel, otherDocumentModels);
-      if (linkIndex != null) {
-        linkDocumentModelIndexByRelationshipId.put(relationshipModel.getId(), linkIndex);
-      }
+  private ElementIndex linkedDocumentModelIndex(ColumnLinkReference linkReference) {
+    String relationshipId = linkReference == null ? null : linkReference.getRelationship();
+    if (relationshipId == null) {
+      return null;
     }
+    RelationshipModel relationshipModel = otherRelationshipModels.stream()
+        .filter(candidate -> relationshipId.equals(candidate.getId()) && candidate.getContent() != null)
+        .findFirst()
+        .orElse(null);
+    String linkedDocumentModelId = relationshipModel == null ? null : linkReference.resolveDocumentModelId(relationshipModel.getContent());
+    if (linkedDocumentModelId == null || linkedDocumentModelId.isBlank()) {
+      return null;
+    }
+    ElementIndex cached = linkedDocumentModelIndexByModelId.get(linkedDocumentModelId);
+    if (cached != null) {
+      return cached;
+    }
+    DocumentModel linkedDocumentModel = otherDocumentModels.stream()
+        .filter(candidate -> linkedDocumentModelId.equals(candidate.getId()))
+        .findFirst()
+        .orElseGet(() -> ProjectDocumentModels.resolveDocumentModelForFieldReferences(linkedDocumentModelId));
+    ElementIndex linkedIndex = OverviewElementOptions.indexOf(linkedDocumentModel, otherDocumentModels);
+    if (linkedIndex != null) {
+      linkedDocumentModelIndexByModelId.put(linkedDocumentModelId, linkedIndex);
+    }
+    return linkedIndex;
   }
 
   /**

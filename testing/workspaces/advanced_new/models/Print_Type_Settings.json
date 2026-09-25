@@ -1,0 +1,20 @@
+{
+  "header": {
+    "id": "Print_Type_Settings",
+    "modelType": "typesetting",
+    "modelVersion": "3.2.0",
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "modeler"
+      }
+    ]
+  },
+  "content": {
+    "customHyphenationExclusions": [],
+    "preventLineBreakRules": [],
+    "internal": {},
+    "orphan": 2,
+    "widow": 2
+  }
+}

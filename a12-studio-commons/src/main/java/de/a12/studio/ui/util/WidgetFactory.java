@@ -327,6 +327,21 @@ public class WidgetFactory {
     root.setStyle("-fx-font-size: " + LocalUISettings.getFontSize() + "px;");
   }
 
+  /**
+   * Changes the persisted base UI text size by {@code delta} px (clamped to the range the Preferences
+   * spinner allows) and applies it to every open window, so the Ctrl+Plus/Ctrl+Minus shortcuts behave
+   * exactly like moving the Preferences spinner.
+   */
+  public static void changeFontSize(int delta) {
+    int current = LocalUISettings.getFontSize();
+    int size = Math.min(LocalUISettings.MAX_FONT_SIZE, Math.max(LocalUISettings.MIN_FONT_SIZE, current + delta));
+    if (size == current) {
+      return;
+    }
+    LocalUISettings.saveProperty(LocalUISettings.FONT_SIZE, String.valueOf(size));
+    applyFontSizeToAllOpenWindows();
+  }
+
   /** Re-applies {@link LocalUISettings#getFontSize()} to every currently open window's root (main
    *  window, every open dialog, the preview app console), so moving the Preferences slider takes
    *  effect immediately instead of requiring a restart. */

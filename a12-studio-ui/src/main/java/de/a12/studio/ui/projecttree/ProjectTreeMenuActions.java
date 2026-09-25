@@ -92,7 +92,8 @@ public class ProjectTreeMenuActions {
     try {
       ProjectItem item = NewModelFactory.createModel(selectedFolder, modelType, name, documentModelId, buildScreensFromFields);
       boolean needsSave = false;
-      if (!locales.isEmpty()) {
+      // A Typesetting Model's header has no locales, so the dialog's are not applied to it.
+      if (!locales.isEmpty() && modelType != ModelType.TYPESETTING) {
         item.getModel().setLocales(locales);
         needsSave = true;
       }

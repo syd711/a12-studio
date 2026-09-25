@@ -89,10 +89,51 @@ class OverviewModelEditorControllerQueryModelLinkColumnsTest {
     assertColumnResolvesTo(columnRows, 1, "/Person/Type");
     assertColumnResolvesTo(columnRows, 2, "/Person/FirstName");
     assertColumnResolvesTo(columnRows, 3, "/Person/LastName");
-    assertColumnResolvesTo(columnRows, 4, "/Status/Proficiency");
-    assertColumnResolvesTo(columnRows, 5, "/Status/Expierience");
-    assertColumnResolvesTo(columnRows, 6, "/HR/Acknowledged");
-    assertColumnResolvesTo(columnRows, 7, "/Status/AcquiredAt");
+    // Linked columns are prefixed with the id of the Document Model their path lives in.
+    assertColumnResolvesTo(columnRows, 4, "PersonSkills_LinkFields_Cm:/Status/Proficiency");
+    assertColumnResolvesTo(columnRows, 5, "PersonSkills_LinkFields_Cm:/Status/Expierience");
+    assertColumnResolvesTo(columnRows, 6, "PersonSkills_LinkFields_Cm:/HR/Acknowledged");
+    assertColumnResolvesTo(columnRows, 7, "PersonSkills_LinkFields_Cm:/Status/AcquiredAt");
+  }
+
+  /**
+   * {@code PersonTeamAssignment_Ru_SelectedItems_Ov.json} mixes both link reference types: its first two
+   * columns are {@code CHILD} references into the {@code Team} role's own Document Model ({@code Team_Dc},
+   * via {@code TeamPerson_Re}'s {@code entityCharacteristics}), the last two {@code LINK} references into the
+   * relationship's link document model ({@code TeamPerson_LinkFields_Dc}). Both kinds used to be resolved
+   * against the link document model only, leaving the {@code CHILD} columns unresolved.
+   */
+  @Test
+  void resolvesChildLinkColumnsAgainstTheTargetRolesDocumentModel() throws Exception {
+    assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
+
+    Path source = locateWorkspace();
+    Path models = Files.createDirectories(workspace.resolve("models"));
+    copy(source, models, "10_People/Person_Dc.json");
+    copy(source, models, "20_Teams/Team_Dc.json");
+    copy(source, models, "20_Teams/TeamPerson_LinkFields_Dc.json");
+    copy(source, models, "20_Teams/TeamPerson_Re.json");
+    copy(source, models, "10_People/PersonTeamAssignment/PersonTeamAssignment_Ru_SelectedItems_Ov_Qe.json");
+    copy(source, models, "10_People/PersonTeamAssignment/PersonTeamAssignment_Ru_SelectedItems_Ov.json");
+
+    Project project = new Project();
+    project.load(workspace.toFile());
+    setCurrentProject(project);
+
+    Path ovPath = models.resolve("PersonTeamAssignment_Ru_SelectedItems_Ov.json");
+    ProjectItem item = project.getRoot().findByPath(ovPath.toString());
+
+    FxTestSupport.Loaded<OverviewModelEditorController> loaded =
+        FxTestSupport.load("/de/a12/studio/ui/editors/overviewmodel/overview-model-editor.fxml");
+    FxTestSupport.onFx(() -> loaded.controller().load(item));
+
+    OverviewColumnsPanelController columnsController = FxTestSupport.field(loaded.controller(), "overviewColumnsController");
+    VBox columnRows = FxTestSupport.field(columnsController, "columnRows");
+
+    assertColumnResolvesTo(columnRows, 0, "Team_Dc:/Team/TeamName");
+    assertColumnResolvesTo(columnRows, 1, "Team_Dc:/Team/Location");
+    assertColumnResolvesTo(columnRows, 2, "TeamPerson_LinkFields_Dc:/LinkFields/Position");
+    assertColumnResolvesTo(columnRows, 3, "TeamPerson_LinkFields_Dc:/LinkFields/TimeShare");
   }
 
   /** Asserts the row's "Field" summary shows {@code expectedPath} rather than the column's raw {@code
