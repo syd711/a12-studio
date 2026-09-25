@@ -580,13 +580,35 @@ public class TabPaneController implements Initializable, StudioEventListener {
     tab.setContent(null);
     tabPane.getTabs().remove(tab);
 
-    DetachedTabWindow window = new DetachedTabWindow(item, content, this::onDetachedWindowClosed);
+    DetachedTabWindow window = new DetachedTabWindow(item, content, this::dockDetachedWindow, this::onDetachedWindowClosed);
     detachedWindows.put(item.getPath(), window);
     if (project != null) {
       project.getSettings().getUISettings().removeOpenedFile(item.getPath());
       project.getSettings().getUISettings().save();
     }
     window.show();
+  }
+
+  /**
+   * The reverse of {@link #openInNewWindow}: the window's editor goes back into a new tab (at the end of the tab
+   * pane, selected) and the window is closed. The window is unregistered first, so closing it doesn't count as
+   * the model being closed - it stays open, just as a tab again.
+   */
+  private void dockDetachedWindow(@NonNull DetachedTabWindow window) {
+    ProjectItem item = window.getItem();
+    if (!detachedWindows.remove(item.getPath(), window)) {
+      return;
+    }
+
+    Tab tab = createTabShell(item);
+    tab.setContent(window.takeContent());
+    tabPane.getTabs().add(tab);
+    if (project != null) {
+      project.getSettings().getUISettings().addOpenedFile(item.getPath());
+      project.getSettings().getUISettings().save();
+    }
+    tabPane.getSelectionModel().select(tab);
+    window.close();
   }
 
   private void onDetachedWindowClosed(@NonNull DetachedTabWindow window) {
