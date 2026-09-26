@@ -44,12 +44,21 @@
     window.__previewErrors.push("IndexedDB stand-in: " + error);
   }
 
-  // The preview window's sidebar menu (width / theme / locale / data / validate) is not offered: the editor embeds
-  // the page as a plain rendering of the Content Model, and SME hides the menu there as well.
-  var hideMenu = document.createElement("style");
-  hideMenu.textContent = "[data-role='application-frame-sidebar-wrapper']," +
-      "[data-role='application-frame-toggle-sidebar-button']{display:none !important}";
-  (document.head || document.documentElement).appendChild(hideMenu);
+  // The preview window's chrome is not offered: the editor embeds the page as a plain rendering of the Content Model,
+  // like the preview area of SME's editor. That leaves out the sidebar menu (width / theme / locale / data / validate),
+  // the title bar ("[SME] Content Model Preview" and the version), the "Preview" heading of the box around the
+  // rendering, and the box's border and the margin around it.
+  var hideChrome = document.createElement("style");
+  hideChrome.textContent = "[data-role='application-frame-sidebar-wrapper']," +
+      "[data-role='application-frame-toggle-sidebar-button']," +
+      "[data-role='application-frame-header']," +
+      "[data-role='application-frame-main'] [data-role='split-view-area'] > [data-role='resizable-handler-wrapper']" +
+      " > [data-role='contentbox'] > [data-role='contentbox-header']{display:none !important}" +
+      "[data-role='application-frame-main']{padding:0 !important;margin:0 !important;width:100% !important;" +
+      "max-width:100% !important}" +
+      "[data-role='application-frame-main'] [data-role='split-view-area'] > [data-role='resizable-handler-wrapper']" +
+      " > [data-role='contentbox']{box-shadow:none !important;border:0 !important;border-radius:0 !important}";
+  (document.head || document.documentElement).appendChild(hideChrome);
 
   // ContentPreviewMessage.BaseMessage
   function toPreview(message) {
@@ -134,6 +143,8 @@
     dataWanted = false;
     if (data.contentModel !== undefined) {
       contentModel = JSON.parse(data.contentModel);
+      elementIds = {};
+      collectElementIds(contentModel.content && contentModel.content.root);
       changed = true;
     }
     if (data.hasDocumentModel === false) {
@@ -184,6 +195,93 @@
     }
   };
   Object.defineProperty(window, "opener", { configurable: true, value: host });
+
+  // Element selection. The Content Engine renders an element with its model id as the DOM id (elements that render
+  // nothing of their own, like table rows, have none). When the page is embedded in the editor, the JavaFX side
+  // provides window.studioSelectionBridge: a click in the page reports the model element under it, and the editor
+  // calls window.studioSelect(path) - the ids from the selected element up to the root - to have a frame drawn around
+  // the first of them that is rendered. Without the bridge (a plain browser) the page is left alone.
+  var elementIds = {};
+  var selectedPath = [];
+  var frame = null;
+  var frameUpdateScheduled = false;
+
+  function collectElementIds(element) {
+    if (!element) { return; }
+    if (typeof element.id === "string") { elementIds[element.id] = true; }
+    (element.children || []).forEach(collectElementIds);
+  }
+
+  function bridge() {
+    return window.studioSelectionBridge || null;
+  }
+
+  document.addEventListener("click", function (event) {
+    if (!bridge()) { return; }
+    for (var node = event.target; node && node.nodeType === 1; node = node.parentNode) {
+      if (node.id && elementIds[node.id]) {
+        // The page only shows the model; following its links or submitting its buttons would leave the editor.
+        event.preventDefault();
+        event.stopPropagation();
+        bridge().elementClicked(node.id);
+        return;
+      }
+    }
+  }, true);
+
+  function renderedSelection() {
+    for (var i = 0; i < selectedPath.length; i++) {
+      var node = document.getElementById(selectedPath[i]);
+      if (node) { return node; }
+    }
+    return null;
+  }
+
+  function updateFrame() {
+    frameUpdateScheduled = false;
+    var node = renderedSelection();
+    if (!node) {
+      if (frame) { frame.style.display = "none"; }
+      return;
+    }
+    if (!frame) {
+      frame = document.createElement("div");
+      frame.style.cssText = "position:fixed;z-index:2147483646;pointer-events:none;box-sizing:border-box;" +
+          "border:2px solid #1a73e8;box-shadow:0 0 0 1px rgba(255,255,255,.8),inset 0 0 0 1px rgba(255,255,255,.8);" +
+          "background:rgba(26,115,232,.08)";
+    }
+    if (!frame.parentNode) { document.documentElement.appendChild(frame); }
+    var rect = node.getBoundingClientRect();
+    frame.style.display = "block";
+    frame.style.left = rect.left + "px";
+    frame.style.top = rect.top + "px";
+    frame.style.width = rect.width + "px";
+    frame.style.height = rect.height + "px";
+  }
+
+  function scheduleFrameUpdate() {
+    if (frameUpdateScheduled || !selectedPath.length) { return; }
+    frameUpdateScheduled = true;
+    setTimeout(updateFrame, 30);
+  }
+
+  window.studioSelect = function (path) {
+    var changed = String(path) !== String(selectedPath);
+    selectedPath = path || [];
+    updateFrame();
+    var node = changed ? renderedSelection() : null;
+    if (node && node.scrollIntoView) { node.scrollIntoView({ block: "nearest", inline: "nearest" }); }
+    updateFrame();
+  };
+
+  // The frame follows the page: re-rendering after an edit, resizing and scrolling (also inside scroll containers).
+  window.addEventListener("resize", scheduleFrameUpdate);
+  window.addEventListener("scroll", scheduleFrameUpdate, true);
+  new MutationObserver(function (records) {
+    // Moving the frame itself is a mutation as well.
+    if (records.some(function (record) { return record.target !== frame; })) { scheduleFrameUpdate(); }
+  }).observe(document.documentElement,
+      { childList: true, subtree: true, attributes: true, characterData: true });
 
   if (autoRefreshEnabled) {
     setInterval(refresh, refreshDelayMillis);

@@ -22,6 +22,8 @@ import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.Command;
 import de.a12.studio.ui.util.commandstack.CommandStack;
+import javafx.application.Platform;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -36,11 +38,13 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.skin.VirtualFlow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import lombok.extern.slf4j.Slf4j;
+import netscape.javascript.JSObject;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -55,6 +59,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Edits a {@link ContentModel}: the element tree on the left (add/remove/reorder), the live preview in the middle,
@@ -79,6 +84,8 @@ public class ContentModelEditorController extends AbstractEditorController imple
   private static final double ZOOM_STEP = 0.1;
   private static final double MIN_ZOOM = 0.3;
   private static final double MAX_ZOOM = 3.0;
+  // Used to center a row in the tree if the number of rows it shows is not known.
+  private static final int TREE_ROW_ESTIMATE = 20;
 
   // Static so Copy/Cut in one Content Model tab and Paste in another (or a later reopen of the same tab) work,
   // like a system clipboard. Holds a JSON snapshot, not the live element, so every paste is a fresh clone.
@@ -145,6 +152,8 @@ public class ContentModelEditorController extends AbstractEditorController imple
   private final Debouncer saveDebouncer = new Debouncer();
   private boolean savePending;
   private ContentModel model;
+  // JavaScript only holds a weak reference to what it is handed, so the bridge is kept here for the editor's lifetime.
+  private final PreviewSelectionBridge selectionBridge = new PreviewSelectionBridge();
 
   private final CommandStack commandStack = new CommandStack();
   // Set by the commands while they run: the element the tree should select once the model has changed.
@@ -176,6 +185,13 @@ public class ContentModelEditorController extends AbstractEditorController imple
       if (!refreshing) {
         showElement(newValue != null ? newValue.getValue() : null);
         updateActionState();
+        syncPreviewSelection();
+      }
+    });
+    previewWebView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+      if (newValue == Worker.State.SUCCEEDED) {
+        installSelectionBridge();
+        syncPreviewSelection();
       }
     });
     elementsTree.setContextMenu(createContextMenu());
@@ -282,6 +298,99 @@ public class ContentModelEditorController extends AbstractEditorController imple
 
   private void applyZoom(double zoom) {
     previewWebView.setZoom(Math.clamp(Math.round(zoom * 100) / 100.0, MIN_ZOOM, MAX_ZOOM));
+    syncPreviewSelection();
+  }
+
+  /** Lets the preview page report clicks on its elements (see {@code content-model-bootstrap.js}). */
+  private void installSelectionBridge() {
+    try {
+      JSObject window = (JSObject) previewWebView.getEngine().executeScript("window");
+      window.setMember("studioSelectionBridge", selectionBridge);
+    }
+    catch (RuntimeException e) {
+      log.warn("The preview page cannot report clicks: {}", e.getMessage());
+    }
+  }
+
+  /**
+   * Has the preview page frame the selected element: the ids from the element up to the root are passed, since
+   * elements that render nothing of their own (e.g. table rows) are framed as the closest ancestor that does.
+   */
+  private void syncPreviewSelection() {
+    TreeItem<ContentElement> item = elementsTree.getSelectionModel().getSelectedItem();
+    List<String> path = new ArrayList<>();
+    for (; item != null; item = item.getParent()) {
+      if (item.getValue().getId() != null) {
+        path.add(item.getValue().getId());
+      }
+    }
+    String script = "if (window.studioSelect) { window.studioSelect("
+        + path.stream().map(id -> JsonSettings.objectMapper.valueToTree(id).toString()).collect(Collectors.joining(",", "[", "]"))
+        + "); }";
+    try {
+      previewWebView.getEngine().executeScript(script);
+    }
+    catch (RuntimeException e) {
+      log.debug("Preview selection not synchronized: {}", e.getMessage());
+    }
+  }
+
+  private void selectElementById(String id) {
+    TreeItem<ContentElement> item = findItemById(elementsTree.getRoot(), id);
+    if (item == null) {
+      return;
+    }
+    for (TreeItem<ContentElement> ancestor = item.getParent(); ancestor != null; ancestor = ancestor.getParent()) {
+      ancestor.setExpanded(true);
+    }
+    elementsTree.getSelectionModel().select(item);
+    // The expanded rows are laid out before the scroll position can be worked out.
+    Platform.runLater(() -> scrollToCenter(elementsTree.getRow(item)));
+  }
+
+  /**
+   * Scrolls the tree so that {@code row} is in the middle of it, showing what is above as well as below - {@code
+   * TreeView.scrollTo} would put it at the top. A row that is already visible stays where it is.
+   */
+  private void scrollToCenter(int row) {
+    if (row < 0) {
+      return;
+    }
+    int visibleRows = TREE_ROW_ESTIMATE;
+    if (elementsTree.lookup(".virtual-flow") instanceof VirtualFlow<?> flow
+        && flow.getFirstVisibleCell() != null && flow.getLastVisibleCell() != null) {
+      int first = flow.getFirstVisibleCell().getIndex();
+      int last = flow.getLastVisibleCell().getIndex();
+      // The cells at the edges may be cut off, so they do not count as visible.
+      if (row > first && row < last) {
+        return;
+      }
+      visibleRows = last - first + 1;
+    }
+    elementsTree.scrollTo(Math.max(0, row - visibleRows / 2));
+  }
+
+  private static @Nullable TreeItem<ContentElement> findItemById(@Nullable TreeItem<ContentElement> from, String id) {
+    if (from == null) {
+      return null;
+    }
+    if (id.equals(from.getValue().getId())) {
+      return from;
+    }
+    for (TreeItem<ContentElement> child : from.getChildren()) {
+      TreeItem<ContentElement> found = findItemById(child, id);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
+  }
+
+  /** The object the preview page calls, on the JavaFX thread, when one of the model's elements is clicked. */
+  public class PreviewSelectionBridge {
+    public void elementClicked(String id) {
+      Platform.runLater(() -> selectElementById(id));
+    }
   }
 
   @FXML
@@ -557,6 +666,7 @@ public class ContentModelEditorController extends AbstractEditorController imple
     }
     showElement(target.getValue());
     updateActionState();
+    syncPreviewSelection();
   }
 
   private static void collectCollapsed(@Nullable TreeItem<ContentElement> item, Set<ContentElement> collapsed) {

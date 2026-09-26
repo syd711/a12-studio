@@ -658,6 +658,12 @@
     -fx-font-weight: bold;
 }
 
+.content-setting-hint {
+    -fx-text-fill: -fx-text-base-color;
+    -fx-opacity: 0.7;
+    -fx-font-size: 0.9em;
+}
+
 .content-setting-invalid,
 .content-setting-invalid:focused {
     -fx-border-color: -fx-error-bg;

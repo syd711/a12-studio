@@ -735,7 +735,10 @@ editor, not of the include.
   retyped elements get SME's default props (`ContentElementDefaults`, additive). **Deliberate deviations:** the Grid switch
   SME labels "Gutter" (it stores `noGutter`, so switching it on removes the gutter) is labeled "No gutter"; the type stays
   editable (SME fixes it when the element is created); a "Raw properties (JSON)" panel stays for what has no typed panel,
-  notably the Lexical text of Paragraph/Heading (SME edits it inline on the canvas); "Group Reference", "Field",
+  notably the rich formatting of Paragraph/Heading (SME edits it inline on the canvas; the words themselves have a plain
+  text field in the Content panel, `LexicalText`/`LexicalTextRow`: one line per Lexical block, formatting of the runs
+  around an edit kept, `html` regenerated, read-only with a hint when the tree holds links or field references);
+  "Group Reference", "Field",
   "Field reference" and "Screen Reader Column" are plain text fields (SME offers a picker over the Document Model / the
   table's columns). **Still missing:** the form-content elements (Text Line, Checkbox, ... with elementId, localized
   label/hint/placeholder, annotations), the Conditional element's condition editor, and the pickers above.

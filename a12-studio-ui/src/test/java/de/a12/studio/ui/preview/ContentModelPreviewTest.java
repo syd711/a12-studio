@@ -150,6 +150,7 @@ class ContentModelPreviewTest {
 
     assertTrue(text.contains(expectedText), "rendered text: [" + text + "], page errors: " + errors + ", " + diagnostics);
     assertFalse(text.contains("Preview not updated"), "the page reported an error: [" + text + "]");
+    assertFalse(text.contains("[SME]"), "the title bar of the preview window is not part of the embedded page: [" + text + "]");
   }
 
   private static <T> T onFxPatiently(java.util.concurrent.Callable<T> action) throws Exception {

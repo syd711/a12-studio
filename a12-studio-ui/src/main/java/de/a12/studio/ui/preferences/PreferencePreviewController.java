@@ -28,7 +28,7 @@ public class PreferencePreviewController implements Initializable {
   private CheckBox enabledCheckBox;
 
   @FXML
-  private VBox previewFieldsContainer;
+  private VBox serverFieldsContainer;
 
   @FXML
   private TextField urlField;
@@ -65,11 +65,13 @@ public class PreferencePreviewController implements Initializable {
     settings = rootSettings.getPreviewApp();
 
     enabledCheckBox.setSelected(settings.isEnabled());
-    previewFieldsContainer.setDisable(!settings.isEnabled());
+    // "Enabled" only switches the Preview App server integration (connection fields); the browser and refresh
+    // settings drive the local previews and stay editable.
+    serverFieldsContainer.setDisable(!settings.isEnabled());
     enabledCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
       settings.setEnabled(newValue);
       rootSettings.save();
-      previewFieldsContainer.setDisable(!newValue);
+      serverFieldsContainer.setDisable(!newValue);
       StudioEventManager.getInstance().fireSettingsChangedEvent(rootSettings);
     });
 

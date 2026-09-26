@@ -24,22 +24,54 @@
         </VBox>
     </top>
     <center>
-        <VBox spacing="6.0" BorderPane.alignment="TOP_LEFT">
+        <VBox spacing="12.0" BorderPane.alignment="TOP_LEFT">
             <children>
-                <CheckBox fx:id="enabledCheckBox" text="%preview_app_enabled" />
-
-                <VBox fx:id="previewFieldsContainer" spacing="6.0">
+                <!-- Local previews: independent of the Preview App server, always active. -->
+                <VBox spacing="6.0">
                     <children>
-                        <Label styleClass="field-label" text="%preview_app_url" />
-                        <HBox alignment="CENTER_LEFT" spacing="6.0">
-                            <children>
-                                <TextField fx:id="urlField" prefWidth="280.0" />
-                                <Button fx:id="testConnectionButton" mnemonicParsing="false" onAction="#onTestConnection" text="%test_connection" />
-                            </children>
-                        </HBox>
+                        <Label styleClass="section-header" text="%preview_section_previews" />
+                        <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%preview_section_previews_description" />
 
-                        <VBox spacing="6.0">
+                        <Label styleClass="field-label" text="%browser">
+                            <VBox.margin>
+                                <Insets top="8.0" />
+                            </VBox.margin>
+                        </Label>
+                        <ComboBox fx:id="browserTypeCombo" prefWidth="200.0" />
+
+                        <CheckBox fx:id="autoRefreshCheckBox" text="%automatically_refresh_the_preview">
+                            <VBox.margin>
+                                <Insets top="12.0" />
+                            </VBox.margin>
+                        </CheckBox>
+                        <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%preview_auto_refresh_description" />
+                        <Label styleClass="field-label" text="%refresh_delay_ms" />
+                        <TextField fx:id="autoRefreshDelayField" prefWidth="120.0" />
+                    </children>
+                </VBox>
+
+                <!-- Preview App server integration: only this section is switched off by "Enabled". -->
+                <VBox spacing="6.0">
+                    <children>
+                        <Label styleClass="section-header" text="%preview_app_section" />
+                        <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%preview_app_section_description" />
+
+                        <CheckBox fx:id="enabledCheckBox" text="%preview_app_enabled">
+                            <VBox.margin>
+                                <Insets top="8.0" />
+                            </VBox.margin>
+                        </CheckBox>
+                        <Label styleClass="field-description" style="-fx-padding: 0;" wrapText="true" text="%preview_app_enabled_description" />
+
+                        <VBox fx:id="serverFieldsContainer" spacing="6.0">
                             <children>
+                                <Label styleClass="field-label" text="%preview_app_url" />
+                                <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                    <children>
+                                        <TextField fx:id="urlField" prefWidth="280.0" />
+                                        <Button fx:id="testConnectionButton" mnemonicParsing="false" onAction="#onTestConnection" text="%test_connection" />
+                                    </children>
+                                </HBox>
                                 <Label styleClass="field-label" text="%username" />
                                 <TextField fx:id="usernameField" prefWidth="200.0" />
                                 <Label styleClass="field-label" text="%password" />
@@ -49,28 +81,7 @@
                                 <Insets top="6.0" />
                             </VBox.margin>
                         </VBox>
-
-                        <Label styleClass="field-label" text="%browser">
-                            <VBox.margin>
-                                <Insets top="12.0" />
-                            </VBox.margin>
-                        </Label>
-                        <ComboBox fx:id="browserTypeCombo" prefWidth="200.0" />
-
-                        <VBox spacing="6.0">
-                            <children>
-                                <CheckBox fx:id="autoRefreshCheckBox" text="%automatically_refresh_the_preview" />
-                                <Label styleClass="field-label" text="%refresh_delay_ms" />
-                                <TextField fx:id="autoRefreshDelayField" prefWidth="120.0" />
-                            </children>
-                            <VBox.margin>
-                                <Insets top="12.0" />
-                            </VBox.margin>
-                        </VBox>
                     </children>
-                    <VBox.margin>
-                        <Insets top="12.0" />
-                    </VBox.margin>
                 </VBox>
             </children>
             <padding>

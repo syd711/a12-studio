@@ -47,6 +47,7 @@ public abstract class SettingRow extends VBox {
     labelNode.setMinWidth(LABEL_WIDTH);
     labelNode.setPrefWidth(LABEL_WIDTH);
     labelNode.setWrapText(true);
+    setLabel(null);
     controls.setAlignment(Pos.CENTER_LEFT);
     HBox.setHgrow(controls, Priority.ALWAYS);
     line.setAlignment(Pos.CENTER_LEFT);

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <TitledPane fx:id="root" expanded="false" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.raw_props"
@@ -15,6 +17,9 @@
         <center>
             <VBox spacing="4.0">
                 <children>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Label fx:id="styleInfoIcon" />
+                    </HBox>
                     <TextArea fx:id="propsField" prefRowCount="16" wrapText="false" VBox.vgrow="ALWAYS" />
                 </children>
             </VBox>

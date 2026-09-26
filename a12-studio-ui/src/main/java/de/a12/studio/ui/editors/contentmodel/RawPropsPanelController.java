@@ -3,7 +3,9 @@ package de.a12.studio.ui.editors.contentmodel;
 import de.a12.studio.models.contentmodel.ContentElement;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import org.jspecify.annotations.NonNull;
 import tools.jackson.databind.JsonNode;
@@ -24,11 +26,15 @@ public class RawPropsPanelController extends AbstractContentSettingsPanel {
   @FXML
   private TextArea propsField;
 
+  @FXML
+  private Label styleInfoIcon;
+
   private boolean populating;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
+    WidgetFactory.createHelpIcon(styleInfoIcon, StudioBundle.get("content_settings.raw_props_style_info"));
     propsField.focusedProperty().addListener((observable, hadFocus, hasFocus) -> {
       if (!hasFocus) {
         commit();

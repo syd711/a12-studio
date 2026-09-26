@@ -14,6 +14,9 @@
         </top>
         <center>
             <VBox spacing="2.0">
+            <SettingGroup types="Paragraph,Heading">
+            <LexicalTextRow prompt="%content_settings.enter_text_content"/>
+            </SettingGroup>
             <SettingGroup types="Button">
             <TextRow label="%content_settings.label" path="label" prompt="%content_settings.enter_button_label"/>
             <SwitchRow label="%content_settings.hide_label" path="labelHidden"/>

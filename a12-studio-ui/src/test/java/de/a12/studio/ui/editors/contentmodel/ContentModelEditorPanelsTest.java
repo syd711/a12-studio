@@ -4,11 +4,13 @@ import de.a12.studio.models.contentmodel.ContentElement;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.contentmodel.ContentProps;
 import de.a12.studio.models.contentmodel.ContentTableColumns;
+import de.a12.studio.models.contentmodel.LexicalText;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.contentmodel.fields.LexicalTextRow;
 import de.a12.studio.ui.editors.contentmodel.fields.SettingRow;
 import de.a12.studio.ui.editors.formmodel.FxTestSupport;
 import de.a12.studio.ui.events.ModelClosedEvent;
@@ -18,7 +20,9 @@ import de.a12.studio.ui.util.StudioBundle;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -162,6 +166,69 @@ class ContentModelEditorPanelsTest {
     FxTestSupport.onFx(() -> number.setText("77"));
     String saved = waitForFile("77%");
     assertTrue(saved.contains("77%"), saved);
+  }
+
+  @Test
+  void theTextOfHeadingsAndParagraphsIsEditedInAPlainTextField() throws Exception {
+    select("Heading");
+    ContentElement heading = selected();
+    TextInputControl headingField = FxTestSupport.field(textRow(), "input");
+    assertTrue(headingField instanceof TextField, "a heading is a single line");
+    String before = FxTestSupport.onFx(() -> headingField.getText());
+    assertFalse(before.isBlank());
+    assertTrue(visibleTitles().contains(title("content")));
+
+    FxTestSupport.onFx(() -> headingField.setText("Brand new headline"));
+    assertEquals("Brand new headline", LexicalText.getText(heading));
+    assertTrue(String.valueOf(heading.getProps().get("html")).contains("Brand new headline"));
+    assertFalse(String.valueOf(heading.getProps().get("html")).contains(before));
+    String saved = waitForFile("Brand new headline");
+    assertTrue(saved.contains("Brand new headline"), saved);
+
+    select("Paragraph");
+    ContentElement paragraph = selected();
+    TextInputControl paragraphField = FxTestSupport.field(textRow(), "input");
+    assertTrue(paragraphField instanceof TextArea, "a paragraph can span several lines");
+    assertEquals(LexicalText.getText(paragraph), FxTestSupport.onFx(() -> paragraphField.getText()));
+    FxTestSupport.onFx(() -> paragraphField.setText("First" + (char) 10 + "Second"));
+    assertEquals("First" + (char) 10 + "Second", LexicalText.getText(paragraph));
+  }
+
+  @Test
+  void selectingTextElementsAndTypingNothingLeavesTheirTreeUntouched() throws Exception {
+    select("Paragraph");
+    ContentElement paragraph = selected();
+    String before = JsonSettings.objectMapper.writeValueAsString(paragraph.getProps());
+    select("Heading");
+    select("Paragraph");
+    assertEquals(before, JsonSettings.objectMapper.writeValueAsString(paragraph.getProps()));
+  }
+
+  /** The visible text row of the currently selected element. */
+  private LexicalTextRow textRow() throws Exception {
+    return FxTestSupport.onFx(() -> {
+      List<LexicalTextRow> found = new ArrayList<>();
+      collectTextRows(settingsBox, found);
+      if (found.isEmpty()) {
+        throw new AssertionError("No visible text row");
+      }
+      return found.get(0);
+    });
+  }
+
+  private static void collectTextRows(Node node, List<LexicalTextRow> found) {
+    if (!node.isVisible() || !node.isManaged()) {
+      return;
+    }
+    if (node instanceof LexicalTextRow row) {
+      found.add(row);
+    }
+    else if (node instanceof TitledPane pane && pane.getContent() != null) {
+      collectTextRows(pane.getContent(), found);
+    }
+    else if (node instanceof Parent parent) {
+      parent.getChildrenUnmodifiable().forEach(child -> collectTextRows(child, found));
+    }
   }
 
   @Test
