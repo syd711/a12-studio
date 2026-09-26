@@ -314,7 +314,163 @@ class ContentModelEditorPanelsTest {
     assertFalse(button.getProps().containsKey("onClick"));
   }
 
+  @Test
+  void duplicateCopyPasteAndCutKeepTreeAndModelInSyncWithFreshIds() throws Exception {
+    select("Paragraph");
+    ContentElement original = selected();
+    ContentElement parent = FxTestSupport.onFx(() -> tree.getSelectionModel().getSelectedItem().getParent().getValue());
+    int before = parent.getChildren().size();
+    int index = parent.getChildren().indexOf(original);
+
+    FxTestSupport.onFx(() -> loaded.controller().onDuplicate(null));
+    ContentElement copy = selected();
+    assertEquals(before + 1, parent.getChildren().size());
+    assertEquals(index + 1, parent.getChildren().indexOf(copy), "the duplicate follows the original");
+    assertEquals(original.getType(), copy.getType());
+    assertFalse(original.getId().equals(copy.getId()), "the duplicate gets its own id");
+    assertEquals(before + 1, FxTestSupport.onFx(() -> tree.getSelectionModel().getSelectedItem().getParent().getChildren().size()));
+
+    // Copy the original, paste it into the selected element (as its last child) - the source stays put.
+    select("Paragraph");
+    FxTestSupport.onFx(() -> loaded.controller().onCopy(null));
+    ContentElement target = parent;
+    FxTestSupport.onFx(() -> tree.getSelectionModel().select(find(tree.getRoot(), target)));
+    int targetChildren = target.getChildren().size();
+    FxTestSupport.onFx(() -> loaded.controller().onPaste(null));
+    assertEquals(targetChildren + 1, target.getChildren().size());
+    ContentElement pasted = target.getChildren().get(target.getChildren().size() - 1);
+    assertEquals(original.getType(), pasted.getType());
+    assertFalse(original.getId().equals(pasted.getId()));
+    assertTrue(parent.getChildren().contains(original));
+
+    // Cut removes it from the model and the tree, and a paste brings it back with another id.
+    FxTestSupport.onFx(() -> tree.getSelectionModel().select(find(tree.getRoot(), pasted)));
+    FxTestSupport.onFx(() -> loaded.controller().onCut(null));
+    assertFalse(target.getChildren().contains(pasted));
+    assertNull(FxTestSupport.onFx(() -> find(tree.getRoot(), pasted)));
+    FxTestSupport.onFx(() -> tree.getSelectionModel().select(find(tree.getRoot(), target)));
+    FxTestSupport.onFx(() -> loaded.controller().onPaste(null));
+    assertEquals(targetChildren + 1, target.getChildren().size());
+    assertFalse(pasted.getId().equals(target.getChildren().get(target.getChildren().size() - 1).getId()));
+  }
+
+  @Test
+  void theRootCanBeCopiedButNeitherCutDuplicatedNorDeleted() throws Exception {
+    FxTestSupport.onFx(() -> tree.getSelectionModel().select(tree.getRoot()));
+    ContentElement root = model.getContent().getRoot();
+    int children = root.getChildren().size();
+    FxTestSupport.onFx(() -> {
+      loaded.controller().onCut(null);
+      loaded.controller().onDuplicate(null);
+      loaded.controller().onRemoveElement(null);
+    });
+    assertEquals(children, root.getChildren().size());
+    assertTrue(FxTestSupport.onFx(() -> ((javafx.scene.control.Button) FxTestSupport.field(loaded.controller(), "deleteButton")).isDisabled()));
+  }
+
+  @Test
+  void theTreeContextMenuHasAllToolbarActionsAndMirrorsTheirEnabledState() throws Exception {
+    javafx.scene.control.ContextMenu menu = tree.getContextMenu();
+    assertTrue(menu != null && menu.getItems().stream().filter(i -> !(i instanceof javafx.scene.control.SeparatorMenuItem)).count() == 10,
+        "undo, redo, add, delete, up, down, cut, copy, paste and duplicate must all be offered");
+
+    // The menu is only shown when it has items, so they must exist before it is first shown.
+    FxTestSupport.onFx(() -> tree.getSelectionModel().select(tree.getRoot()));
+    FxTestSupport.onFx(() -> javafx.event.Event.fireEvent(menu, new javafx.stage.WindowEvent(menu, javafx.stage.WindowEvent.WINDOW_SHOWING)));
+    assertTrue(menuItem(menu, "content_model_tree.delete").isDisable(), "the root cannot be deleted");
+    assertTrue(menuItem(menu, "content_model_tree.cut").isDisable());
+    assertFalse(menuItem(menu, "content_model_tree.copy").isDisable());
+    assertTrue(menuItem(menu, "undo").isDisable(), "nothing to undo yet");
+
+    select("Paragraph");
+    FxTestSupport.onFx(() -> javafx.event.Event.fireEvent(menu, new javafx.stage.WindowEvent(menu, javafx.stage.WindowEvent.WINDOW_SHOWING)));
+    assertFalse(menuItem(menu, "content_model_tree.delete").isDisable());
+    assertFalse(menuItem(menu, "content_model_tree.duplicate").isDisable());
+  }
+
+  @Test
+  void structuralChangesUndoAndRedo() throws Exception {
+    ContentElement root = model.getContent().getRoot();
+    select("Paragraph");
+    ContentElement paragraph = selected();
+    ContentElement parent = FxTestSupport.onFx(() -> tree.getSelectionModel().getSelectedItem().getParent().getValue());
+    List<ContentElement> originalOrder = new ArrayList<>(parent.getChildren());
+
+    // Add child: undo removes it and restores the absent "children" key of a leaf, redo brings it back.
+    boolean leafBefore = paragraph.getChildren() == null;
+    FxTestSupport.onFx(() -> loaded.controller().onAddChild(null));
+    assertEquals(1, paragraph.getChildren().size());
+    ContentElement added = paragraph.getChildren().get(0);
+    assertEquals(added, selected());
+    FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
+    assertTrue(paragraph.getChildren() == null || paragraph.getChildren().isEmpty());
+    if (leafBefore) {
+      assertNull(paragraph.getChildren());
+    }
+    assertEquals(paragraph, selected());
+    FxTestSupport.onFx(() -> loaded.controller().onRedo(null));
+    assertEquals(List.of(added), paragraph.getChildren());
+    FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
+
+    // Cut, then undo: the element is back at its old position.
+    select("Paragraph");
+    FxTestSupport.onFx(() -> loaded.controller().onCut(null));
+    assertFalse(parent.getChildren().contains(paragraph));
+    FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
+    assertEquals(originalOrder, parent.getChildren());
+    assertEquals(paragraph, selected());
+
+    // Move down and undo.
+    select("Paragraph");
+    if (parent.getChildren().indexOf(paragraph) < parent.getChildren().size() - 1) {
+      FxTestSupport.onFx(() -> loaded.controller().onMoveDown(null));
+      assertFalse(originalOrder.equals(parent.getChildren()));
+      FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
+      assertEquals(originalOrder, parent.getChildren());
+    }
+
+    // Duplicate, undo, redo.
+    FxTestSupport.onFx(() -> loaded.controller().onDuplicate(null));
+    assertEquals(originalOrder.size() + 1, parent.getChildren().size());
+    FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
+    assertEquals(originalOrder, parent.getChildren());
+    FxTestSupport.onFx(() -> loaded.controller().onRedo(null));
+    assertEquals(originalOrder.size() + 1, parent.getChildren().size());
+    assertEquals(root, model.getContent().getRoot());
+
+    // The tree shows what the model holds after all of that.
+    assertEquals(parent.getChildren(), FxTestSupport.onFx(() ->
+        find(tree.getRoot(), parent).getChildren().stream().map(TreeItem::getValue).toList()));
+  }
+
+  @Test
+  void aPanelEditUndoesAndRedoesAsOneStepPerRunOfEdits() throws Exception {
+    select("Box");
+    SettingRow width = row("style.width");
+    TextField number = FxTestSupport.field(FxTestSupport.field(width, "editor"), "number");
+    ContentElement box = selected();
+    ContentProps props = new ContentProps(box);
+    String before = props.getString("style.width");
+
+    FxTestSupport.onFx(() -> number.setText("31"));
+    FxTestSupport.onFx(() -> number.setText("32"));
+    FxTestSupport.onFx(() -> number.setText("33"));
+    String edited = props.getString("style.width");
+    assertFalse(before.equals(edited), "the edit must have changed the width");
+
+    FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
+    assertEquals(before, new ContentProps(box).getString("style.width"), "one undo reverts the whole run of typing");
+    assertEquals(box, selected());
+    FxTestSupport.onFx(() -> loaded.controller().onRedo(null));
+    assertEquals(edited, new ContentProps(box).getString("style.width"));
+  }
+
   // ------------------------------------------------------------------------------------------ helpers
+  private static javafx.scene.control.MenuItem menuItem(javafx.scene.control.ContextMenu menu, String bundleKey) {
+    return menu.getItems().stream().filter(i -> StudioBundle.get(bundleKey).equals(i.getText())).findFirst()
+        .orElseThrow(() -> new AssertionError("No menu item " + bundleKey));
+  }
+
 
   /** The controller of the given class among the editor's property panels. */
   private <T> T panel(Class<T> type) throws Exception {

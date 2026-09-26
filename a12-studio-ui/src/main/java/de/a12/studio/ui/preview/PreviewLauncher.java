@@ -77,6 +77,16 @@ public class PreviewLauncher {
     return server.getContentPreviewUrl(sessionId);
   }
 
+  /**
+   * Used by the Content Model editor's "open in browser" button: opens the same preview page the embedded {@code
+   * WebView} shows in the browser configured via {@link PreviewAppSettings.BrowserType}.
+   *
+   * @throws PreviewAppException if the A12 installation has no Simple Model Editor, whose client renders the page
+   */
+  public static void openContentPreview(@NonNull ProjectItem projectItem) throws PreviewAppException {
+    SystemUtil.openUrl(registerContentPreview(projectItem), getPreviewAppSettings().getBrowserType());
+  }
+
   private static boolean isFormEnginePreviewAvailable() {
     try {
       SmeInstallation.resolve();

@@ -25,7 +25,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -46,7 +48,21 @@ import java.util.ResourceBundle;
 public class TabPaneController implements Initializable, StudioEventListener {
 
   @FXML
+  private SplitPane splitPane;
+
+  /** The pane the FXML starts with - the one everything is restored into; more come and go with "Split and Move Right". */
+  @FXML
   private StudioTabPane tabPane;
+
+  /** The panes in the order they are shown in {@link #splitPane}, left to right. Never empty. */
+  private final List<StudioTabPane> panes = new ArrayList<>();
+
+  /**
+   * The pane the user works in - the one last clicked, or that a tab was last opened/selected in. New tabs open
+   * there, and the tab-related shortcuts and the studio-wide selected model (see {@link #getSelectedProjectItem})
+   * follow it. Always one of {@link #panes}.
+   */
+  private StudioTabPane activePane;
 
   private Project project;
 
@@ -78,7 +94,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
     Project project = event.getProject();
     this.project = project;
     closeDetachedWindows();
-    tabPane.getTabs().clear();
+    resetToSinglePane();
     restoringSelection = true;
 
     List<String> openedFiles = new ArrayList<>(project.getSettings().getUISettings().getOpenedFiles());
@@ -126,7 +142,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
       // validation-error updates.
       ProjectItem item = file.exists() ? project.getRoot().findByPath(path) : null;
       if (item != null && item.isModelSupported()) {
-        tabPane.getTabs().add(createTabShell(item));
+        activePane.getTabs().add(createTabShell(item));
       }
     }
     catch (Exception e) {
@@ -147,10 +163,10 @@ public class TabPaneController implements Initializable, StudioEventListener {
   private void selectRestoredTab(String selectedFile) {
     Tab target = findTabByPath(selectedFile);
     if (target == null) {
-      target = tabPane.getSelectionModel().getSelectedItem();
+      target = activePane.getSelectionModel().getSelectedItem();
     }
     if (target != null) {
-      tabPane.getSelectionModel().select(target);
+      activePane.getSelectionModel().select(target);
       loadTabContent(target, (ProjectItem) target.getUserData());
     }
   }
@@ -159,13 +175,26 @@ public class TabPaneController implements Initializable, StudioEventListener {
     if (path == null) {
       return null;
     }
-    for (Tab tab : tabPane.getTabs()) {
+    for (Tab tab : allTabs()) {
       ProjectItem item = (ProjectItem) tab.getUserData();
       if (item != null && item.getPath().equals(path)) {
         return tab;
       }
     }
     return null;
+  }
+
+  /** The tabs of all panes, left to right. A copy, so it can be looped over while tabs get closed or moved. */
+  private List<Tab> allTabs() {
+    List<Tab> tabs = new ArrayList<>();
+    for (StudioTabPane pane : panes) {
+      tabs.addAll(pane.getTabs());
+    }
+    return tabs;
+  }
+
+  private StudioTabPane paneOf(@NonNull Tab tab) {
+    return tab.getTabPane() instanceof StudioTabPane pane && panes.contains(pane) ? pane : null;
   }
 
   @Override
@@ -176,12 +205,12 @@ public class TabPaneController implements Initializable, StudioEventListener {
       return;
     }
 
-    for (Tab existingTab : tabPane.getTabs()) {
-      ProjectItem existingItem = (ProjectItem) existingTab.getUserData();
-      if (existingItem != null && existingItem.getPath().equals(event.getItem().getPath())) {
-        tabPane.getSelectionModel().select(existingTab);
-        return;
-      }
+    Tab existingTab = findTabByPath(event.getItem().getPath());
+    if (existingTab != null) {
+      StudioTabPane pane = paneOf(existingTab);
+      setActivePane(pane);
+      pane.getSelectionModel().select(existingTab);
+      return;
     }
 
     open(event.getItem());
@@ -190,7 +219,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
   @Override
   public void modelDeleted(@NonNull ModelDeletedEvent event) {
     String deletedPath = event.getItem().getPath();
-    for (Tab tab : new ArrayList<>(tabPane.getTabs())) {
+    for (Tab tab : allTabs()) {
       ProjectItem tabItem = (ProjectItem) tab.getUserData();
       if (tabItem != null && isSameOrDescendant(tabItem.getPath(), deletedPath)) {
         closeTab(tab);
@@ -212,7 +241,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
    */
   @Override
   public void modelRenamed(@NonNull ModelRenamedEvent event) {
-    for (Tab tab : tabPane.getTabs()) {
+    for (Tab tab : allTabs()) {
       ProjectItem tabItem = (ProjectItem) tab.getUserData();
       if (tabItem != null && tabItem.getPath().equals(event.getOldPath())) {
         reloadTab(tab, event);
@@ -270,7 +299,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
   @Override
   public void modelReverted(@NonNull ModelRevertedEvent event) {
     ProjectItem item = event.getItem();
-    for (Tab tab : tabPane.getTabs()) {
+    for (Tab tab : allTabs()) {
       ProjectItem tabItem = (ProjectItem) tab.getUserData();
       if (tabItem != null && tabItem.getPath().equals(item.getPath())) {
         rebuildTab(tab, item);
@@ -326,7 +355,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
   @Override
   public void modelRefactored(@NonNull ModelRefactoredEvent event) {
     ProjectItem item = event.getItem();
-    for (Tab tab : tabPane.getTabs()) {
+    for (Tab tab : allTabs()) {
       ProjectItem tabItem = (ProjectItem) tab.getUserData();
       if (tabItem != null && tabItem.getPath().equals(item.getPath())) {
         rebuildTab(tab, item);
@@ -359,7 +388,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
   private void open(@NonNull ProjectItem item) {
     Tab tab = createTabShell(item);
-    tabPane.getTabs().add(tab);
+    activePane.getTabs().add(tab);
     loadTabContentWithProgress(tab, item);
   }
 
@@ -412,21 +441,24 @@ public class TabPaneController implements Initializable, StudioEventListener {
    * tab and build its content a second time before this call gets a chance to.
    */
   private void loadTabContent(@NonNull Tab tab, @NonNull ProjectItem item) {
-    if (tab.getContent() != null) {
+    StudioTabPane pane = paneOf(tab);
+    if (tab.getContent() != null || pane == null) {
       return;
     }
 
-    Tab previousSelection = tabPane.getSelectionModel().getSelectedItem();
+    // The editor's panels resolve their model through Studio.getSelectedProjectItem(), which follows the active pane.
+    setActivePane(pane);
+    Tab previousSelection = pane.getSelectionModel().getSelectedItem();
     boolean alreadyLoading = loadingTabContent;
     loadingTabContent = true;
     try {
-      tabPane.getSelectionModel().select(tab);
+      pane.getSelectionModel().select(tab);
 
       Parent content = EditorFactory.create(item);
       if (content == null) {
-        tabPane.getTabs().remove(tab);
-        if (previousSelection != null && previousSelection != tab) {
-          tabPane.getSelectionModel().select(previousSelection);
+        pane.getTabs().remove(tab);
+        if (previousSelection != null && previousSelection != tab && pane.getTabs().contains(previousSelection)) {
+          pane.getSelectionModel().select(previousSelection);
         }
         return;
       }
@@ -489,17 +521,18 @@ public class TabPaneController implements Initializable, StudioEventListener {
    * Double-clicking a tab's header (not its content - see {@link #isTabHeaderClick}) reveals that tab's
    * model in the project tree, same as the project tree toolbar's "select active model" button fires via
    * {@link StudioEventManager#fireModelFocusRequestedEvent}. Wired once on the shared
-   * {@link #tabPane} rather than per-tab: a per-tab {@code setOnMouseClicked} on {@code tab.getTabPane()}
+   * pane rather than per-tab: a per-tab {@code setOnMouseClicked} on {@code tab.getTabPane()}
    * (the previous approach) targets the same underlying TabPane node for every tab, so each newly opened
    * tab silently overwrote the previous tab's handler and only the most-recently-opened tab's double-click
    * ever worked. By the time a double click's second click is dispatched, tab-header selection has already
-   * switched to the clicked tab, so reading {@link #getSelectedProjectItem()} at that point always reflects
-   * the tab actually under the pointer.
+   * switched to the clicked tab, so reading the pane's selection at that point always reflects the tab actually
+   * under the pointer.
    */
-  private void installTabHeaderDoubleClickHandler() {
-    tabPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+  private void installTabHeaderDoubleClickHandler(@NonNull StudioTabPane pane) {
+    pane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
       if (event.getClickCount() == 2 && isTabHeaderClick(event)) {
-        ProjectItem projectItem = getSelectedProjectItem();
+        Tab selectedTab = pane.getSelectionModel().getSelectedItem();
+        ProjectItem projectItem = selectedTab == null ? null : (ProjectItem) selectedTab.getUserData();
         if (projectItem != null) {
           StudioEventManager.getInstance().fireModelFocusRequestedEvent(projectItem);
         }
@@ -537,14 +570,14 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
     MenuItem closeAll = new MenuItem(StudioBundle.get("close_all"));
     closeAll.setOnAction(event -> {
-      for (Tab t : new ArrayList<>(tabPane.getTabs())) {
+      for (Tab t : allTabs()) {
         closeTab(t);
       }
     });
 
     MenuItem closeOthers = new MenuItem(StudioBundle.get("close_others"));
     closeOthers.setOnAction(event -> {
-      for (Tab t : new ArrayList<>(tabPane.getTabs())) {
+      for (Tab t : allTabs()) {
         if (t != tab) {
           closeTab(t);
         }
@@ -555,7 +588,120 @@ public class TabPaneController implements Initializable, StudioEventListener {
     openInNewWindow.setAccelerator(new KeyCodeCombination(KeyCode.F4, KeyCombination.SHIFT_DOWN));
     openInNewWindow.setOnAction(event -> openInNewWindow(tab));
 
-    return new ContextMenu(close, closeAll, closeOthers, new SeparatorMenuItem(), openInNewWindow);
+    MenuItem splitRight = new MenuItem(StudioBundle.get("split_tab_right"));
+    splitRight.setOnAction(event -> splitRight(tab));
+
+    ContextMenu menu = new ContextMenu(close, closeAll, closeOthers, new SeparatorMenuItem(), splitRight, openInNewWindow);
+    // Moving the only tab of a pane out would just leave an empty pane behind, which closes right away.
+    menu.setOnShowing(event -> {
+      StudioTabPane pane = paneOf(tab);
+      splitRight.setDisable(pane == null || pane.getTabs().size() < 2);
+    });
+    return menu;
+  }
+
+  /**
+   * Moves {@code tab} into a new pane of its own, right next to (on the right of) the pane it is in - the pane
+   * that is left of it keeps the other tabs. The new pane goes away again once its last tab is closed or moved.
+   */
+  private void splitRight(@NonNull Tab tab) {
+    StudioTabPane source = paneOf(tab);
+    if (source == null || source.getTabs().size() < 2) {
+      return;
+    }
+
+    StudioTabPane target = createPane();
+    int index = panes.indexOf(source) + 1;
+    panes.add(index, target);
+    splitPane.getItems().add(index, target);
+    distributeDividersEvenly();
+    moveTab(tab, target);
+  }
+
+  /**
+   * Moves {@code tab} from the pane it is in into {@code target}, where it becomes the selected tab, and makes
+   * {@code target} the active pane. Nothing is closed or reopened: the tab keeps its editor and its state, and no
+   * {@link ModelClosedEvent} is fired, since the model stays open. The source pane goes away if it ends up empty.
+   */
+  private void moveTab(@NonNull Tab tab, @NonNull StudioTabPane target) {
+    StudioTabPane source = paneOf(tab);
+    if (source == null || source == target || !panes.contains(target)) {
+      return;
+    }
+    source.getTabs().remove(tab);
+    target.getTabs().add(tab);
+    setActivePane(target);
+    target.getSelectionModel().select(tab);
+  }
+
+  private StudioTabPane createPane() {
+    StudioTabPane pane = new StudioTabPane();
+    pane.setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
+    pane.setMultiRowHeader(LocalUISettings.getBoolean(LocalUISettings.MULTI_ROW_TABS, true));
+    applyColorfulStudioSetting(pane, LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true));
+    installPane(pane);
+    return pane;
+  }
+
+  /** Wires what every pane needs, whether it comes from the FXML or from a split. */
+  private void installPane(@NonNull StudioTabPane pane) {
+    pane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> onSelectionChanged(pane, newTab));
+    pane.getTabs().addListener((ListChangeListener<Tab>) change -> onTabsChanged(pane));
+    pane.setOnTabDropped((tab, target) -> moveTab(tab, target));
+    // A filter, so it also sees the presses that the editor content or a tab header consumes.
+    pane.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> setActivePane(pane));
+    installTabHeaderDoubleClickHandler(pane);
+  }
+
+  /** Drops all panes but the FXML's own and empties that one, e.g. for a newly opened project. */
+  private void resetToSinglePane() {
+    List<StudioTabPane> previousPanes = new ArrayList<>(panes);
+    panes.clear();
+    panes.add(tabPane);
+    // Before the tabs go: the other panes' selections dropping to nothing must not count as the user's selection.
+    activePane = tabPane;
+    for (StudioTabPane pane : previousPanes) {
+      if (pane != tabPane) {
+        pane.getTabs().clear();
+      }
+    }
+    splitPane.getItems().setAll(tabPane);
+    tabPane.getTabs().clear();
+  }
+
+  /** Makes {@code pane} the one the user works in, and hands its selected tab on as the studio's selected model. */
+  private void setActivePane(@NonNull StudioTabPane pane) {
+    if (activePane == pane || !panes.contains(pane)) {
+      return;
+    }
+    activePane = pane;
+    publishSelection(pane.getSelectionModel().getSelectedItem());
+  }
+
+  private void distributeDividersEvenly() {
+    double[] positions = new double[panes.size() - 1];
+    for (int i = 0; i < positions.length; i++) {
+      positions[i] = (i + 1d) / panes.size();
+    }
+    splitPane.setDividerPositions(positions);
+  }
+
+  private void onTabsChanged(@NonNull StudioTabPane pane) {
+    if (pane.getTabs().isEmpty() && panes.size() > 1 && panes.contains(pane)) {
+      removePane(pane);
+    }
+    updateEmptyState();
+  }
+
+  /** Takes an emptied pane out of the split; the active pane moves on to the neighbour that takes its place. */
+  private void removePane(@NonNull StudioTabPane pane) {
+    int index = panes.indexOf(pane);
+    panes.remove(pane);
+    splitPane.getItems().remove(pane);
+    if (activePane == pane) {
+      activePane = null;
+      setActivePane(panes.get(Math.min(index, panes.size() - 1)));
+    }
   }
 
   /**
@@ -578,7 +724,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
 
     tab.setContent(null);
-    tabPane.getTabs().remove(tab);
+    paneOf(tab).getTabs().remove(tab);
 
     DetachedTabWindow window = new DetachedTabWindow(item, content, this::dockDetachedWindow, this::onDetachedWindowClosed);
     detachedWindows.put(item.getPath(), window);
@@ -602,12 +748,12 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
     Tab tab = createTabShell(item);
     tab.setContent(window.takeContent());
-    tabPane.getTabs().add(tab);
+    activePane.getTabs().add(tab);
     if (project != null) {
       project.getSettings().getUISettings().addOpenedFile(item.getPath());
       project.getSettings().getUISettings().save();
     }
-    tabPane.getSelectionModel().select(tab);
+    activePane.getSelectionModel().select(tab);
     window.close();
   }
 
@@ -624,7 +770,7 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   public void openSelectedTabInNewWindow() {
-    Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+    Tab selectedTab = activePane.getSelectionModel().getSelectedItem();
     if (selectedTab != null) {
       openInNewWindow(selectedTab);
     }
@@ -645,53 +791,58 @@ public class TabPaneController implements Initializable, StudioEventListener {
     Tab tab = findTabByPath(item.getPath());
     if (tab == null) {
       tab = createTabShell(item);
-      tabPane.getTabs().add(tab);
+      activePane.getTabs().add(tab);
     }
     openInNewWindow(tab);
   }
 
   private void closeTab(@NonNull Tab tab) {
-    tabPane.getTabs().remove(tab);
+    StudioTabPane pane = paneOf(tab);
+    if (pane != null) {
+      pane.getTabs().remove(tab);
+    }
     onTabClosed(tab);
   }
 
+  /** The model of the selected tab of the active pane. */
   public ProjectItem getSelectedProjectItem() {
-    Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+    Tab selectedTab = activePane.getSelectionModel().getSelectedItem();
     return selectedTab == null ? null : (ProjectItem) selectedTab.getUserData();
   }
 
   public void closeSelectedTab() {
-    Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+    Tab selectedTab = activePane.getSelectionModel().getSelectedItem();
     if (selectedTab != null) {
       closeTab(selectedTab);
     }
   }
 
+  /** Cycles through the tabs of the active pane. */
   public void selectNextTab() {
-    int size = tabPane.getTabs().size();
+    int size = activePane.getTabs().size();
     if (size < 2) {
       return;
     }
-    int current = tabPane.getSelectionModel().getSelectedIndex();
-    tabPane.getSelectionModel().select((current + 1) % size);
+    int current = activePane.getSelectionModel().getSelectedIndex();
+    activePane.getSelectionModel().select((current + 1) % size);
   }
 
   public void selectPreviousTab() {
-    int size = tabPane.getTabs().size();
+    int size = activePane.getTabs().size();
     if (size < 2) {
       return;
     }
-    int current = tabPane.getSelectionModel().getSelectedIndex();
-    tabPane.getSelectionModel().select((current - 1 + size) % size);
+    int current = activePane.getSelectionModel().getSelectedIndex();
+    activePane.getSelectionModel().select((current - 1 + size) % size);
   }
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     StudioEventManager.getInstance().addListener(this);
-    tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> onSelectionChanged(newTab));
-    tabPane.getTabs().addListener((ListChangeListener<Tab>) change -> updateEmptyState());
+    panes.add(tabPane);
+    activePane = tabPane;
+    installPane(tabPane);
     updateEmptyState();
-    installTabHeaderDoubleClickHandler();
 
     boolean enabled = LocalUISettings.getBoolean(LocalUISettings.COLORFUL_STUDIO_ENABLED, true);
     applyColorfulStudioSetting(enabled);
@@ -703,32 +854,37 @@ public class TabPaneController implements Initializable, StudioEventListener {
           applyColorfulStudioSetting(colorsEnabled);
         }
         else if (LocalUISettings.MULTI_ROW_TABS.equals(key)) {
-          tabPane.setMultiRowHeader(LocalUISettings.getBoolean(LocalUISettings.MULTI_ROW_TABS, true));
+          boolean multiRow = LocalUISettings.getBoolean(LocalUISettings.MULTI_ROW_TABS, true);
+          panes.forEach(pane -> pane.setMultiRowHeader(multiRow));
         }
       });
     });
   }
 
   /**
-   * Hides the (empty) TabPane so the "%no_tab_opened" placeholder {@link javafx.scene.control.Label}
+   * Hides the (empty) split of tab panes so the "%no_tab_opened" placeholder {@link javafx.scene.control.Label}
    * behind it in scene-tab-pane.fxml's StackPane shows through - mirrors the mainSplitPane
    * visible/managed toggle in RootController used for the analogous "no project opened" placeholder.
    */
   private void updateEmptyState() {
-    boolean empty = tabPane.getTabs().isEmpty();
-    tabPane.setVisible(!empty);
-    tabPane.setManaged(!empty);
+    boolean empty = allTabs().isEmpty();
+    splitPane.setVisible(!empty);
+    splitPane.setManaged(!empty);
   }
 
   /** Toggles the "colorful-studio" style class that gates stylesheet-model-colors.css's per-tab tinting. */
   private void applyColorfulStudioSetting(boolean colorsEnabled) {
+    panes.forEach(pane -> applyColorfulStudioSetting(pane, colorsEnabled));
+  }
+
+  private void applyColorfulStudioSetting(@NonNull StudioTabPane pane, boolean colorsEnabled) {
     if (colorsEnabled) {
-      if (!tabPane.getStyleClass().contains("colorful-studio")) {
-        tabPane.getStyleClass().add("colorful-studio");
+      if (!pane.getStyleClass().contains("colorful-studio")) {
+        pane.getStyleClass().add("colorful-studio");
       }
     }
     else {
-      tabPane.getStyleClass().remove("colorful-studio");
+      pane.getStyleClass().remove("colorful-studio");
     }
   }
 
@@ -742,14 +898,26 @@ public class TabPaneController implements Initializable, StudioEventListener {
    * assigns as lazy tabs get added one by one - not a real user selection worth loading. Also skipped while
    * {@link #loadingTabContent} is set - see that field's javadoc - since this same selection change is what
    * a {@link #loadTabContent} call already in progress for {@code newTab} is itself triggering.
+   *
+   * <p>Only the active pane's selection counts as the studio's selected model (see {@link #publishSelection}); a
+   * tab selected in another pane - e.g. the neighbour that takes over when the selected one is closed there - is
+   * still loaded, but announced only once that pane becomes the active one (see {@link #setActivePane}).
    */
-  private void onSelectionChanged(Tab newTab) {
+  private void onSelectionChanged(StudioTabPane pane, Tab newTab) {
     ProjectItem item = newTab == null ? null : (ProjectItem) newTab.getUserData();
 
     if (newTab != null && item != null && !restoringSelection && !loadingTabContent) {
       loadTabContentWithProgress(newTab, item);
     }
 
+    if (pane == activePane) {
+      publishSelection(newTab);
+    }
+  }
+
+  /** Announces {@code tab} as the selected one and, unless the tabs are just being restored, remembers it for the next start. */
+  private void publishSelection(Tab tab) {
+    ProjectItem item = tab == null ? null : (ProjectItem) tab.getUserData();
     StudioEventManager.getInstance().fireTabSelectionChangedEvent(item);
 
     if (restoringSelection || project == null) {

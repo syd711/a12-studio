@@ -344,6 +344,7 @@ class MultiRowTabPaneSkin extends SkinBase<TabPane> {
       TabPane tabPane = getSkinnable();
 
       setAlignment(Pos.CENTER_LEFT);
+      getProperties().put(StudioTabPane.TAB_HEADER_KEY, tab);
       Label label = new Label();
       label.getStyleClass().add("tab-label");
       label.textProperty().bind(tab.textProperty());

@@ -111,7 +111,7 @@
                       },
                       "children": [
                         {
-                          "id": "a3ce9cc2",
+                          "id": "82720c88",
                           "type": "Paragraph",
                           "namespace": "com.mgmtp.a12.contentengine",
                           "props": {
@@ -195,7 +195,8 @@
                           "namespace": "com.mgmtp.a12.contentengine",
                           "props": {
                             "style": {
-                              "width": "100%"
+                              "width": "100%",
+                              "padding": "0px"
                             },
                             "tree": {
                               "root": {
@@ -228,7 +229,8 @@
                               }
                             },
                             "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 18px; font-weight: 600; white-space: pre-wrap;\">This is an example workspace</span></p>"
-                          }
+                          },
+                          "children": []
                         },
                         {
                           "id": "5eb2de35",
@@ -236,8 +238,7 @@
                           "namespace": "com.mgmtp.a12.contentengine",
                           "props": {
                             "style": {
-                              "width": "100%",
-                              "padding": "20px 0px 10px 0px"
+                              "width": "100%"
                             },
                             "tree": {
                               "root": {
@@ -271,7 +272,8 @@
                               }
                             },
                             "html": "<p class=\"editor-paragraph\" dir=\"ltr\" style=\"text-align: justify;\"><span style=\"font-size: 14px; white-space: pre-wrap;\">The Advanced Workspace serves as a showcase for advanced A12 modeling features. Modelers can explore examples of many of the features of A12 in this workspace:</span></p>"
-                          }
+                          },
+                          "children": []
                         },
                         {
                           "id": "6833a03d",
@@ -288,6 +290,63 @@
                             }
                           },
                           "children": [
+                            {
+                              "id": "ListItem-8ef9fb8b",
+                              "type": "ListItem",
+                              "namespace": "com.mgmtp.a12.contentengine",
+                              "props": {
+                                "style": {
+                                  "padding": "0px 5px 10px 5px"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "id": "Paragraph-57c1746a",
+                                  "type": "Paragraph",
+                                  "namespace": "com.mgmtp.a12.contentengine",
+                                  "props": {
+                                    "style": {
+                                      "width": "100%",
+                                      "margin": "0px",
+                                      "padding": "0px"
+                                    },
+                                    "tree": {
+                                      "root": {
+                                        "children": [
+                                          {
+                                            "children": [
+                                              {
+                                                "detail": 0,
+                                                "format": 0,
+                                                "mode": "normal",
+                                                "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                                "text": "A Query Model is used to predefine a selection of Persons for the overview \"Fulltime but unassigned\". It takes data across relationships into account. This predefined selection is not visible to the enduser. ",
+                                                "type": "text",
+                                                "version": 1
+                                              }
+                                            ],
+                                            "direction": "ltr",
+                                            "format": "",
+                                            "indent": 0,
+                                            "type": "paragraph",
+                                            "version": 1,
+                                            "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
+                                            "textFormat": 0
+                                          }
+                                        ],
+                                        "direction": "ltr",
+                                        "format": "",
+                                        "indent": 0,
+                                        "type": "root",
+                                        "version": 1,
+                                        "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;"
+                                      }
+                                    },
+                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">A Query Model is used to predefine a selection of Persons for the overview \"Fulltime but unassigned\". It takes data across relationships into account. This predefined selection is not visible to the enduser. </span></p>"
+                                  }
+                                }
+                              ]
+                            },
                             {
                               "id": "ListItem-70b78d1f",
                               "type": "ListItem",
@@ -528,63 +587,6 @@
                                       }
                                     },
                                     "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">Special wizard-like dialogs are shown in the Teams as Tree module, when new elements are created. Moreover, it is possible to create a Team outside a Master/Detail layout.</span></p>"
-                                  }
-                                }
-                              ]
-                            },
-                            {
-                              "id": "ListItem-8ef9fb8b",
-                              "type": "ListItem",
-                              "namespace": "com.mgmtp.a12.contentengine",
-                              "props": {
-                                "style": {
-                                  "padding": "0px 5px 10px 5px"
-                                }
-                              },
-                              "children": [
-                                {
-                                  "id": "Paragraph-57c1746a",
-                                  "type": "Paragraph",
-                                  "namespace": "com.mgmtp.a12.contentengine",
-                                  "props": {
-                                    "style": {
-                                      "width": "100%",
-                                      "margin": "0px",
-                                      "padding": "0px"
-                                    },
-                                    "tree": {
-                                      "root": {
-                                        "children": [
-                                          {
-                                            "children": [
-                                              {
-                                                "detail": 0,
-                                                "format": 0,
-                                                "mode": "normal",
-                                                "style": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
-                                                "text": "A Query Model is used to predefine a selection of Persons for the overview \"Fulltime but unassigned\". It takes data across relationships into account. This predefined selection is not visible to the enduser. ",
-                                                "type": "text",
-                                                "version": 1
-                                              }
-                                            ],
-                                            "direction": "ltr",
-                                            "format": "",
-                                            "indent": 0,
-                                            "type": "paragraph",
-                                            "version": 1,
-                                            "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;",
-                                            "textFormat": 0
-                                          }
-                                        ],
-                                        "direction": "ltr",
-                                        "format": "",
-                                        "indent": 0,
-                                        "type": "root",
-                                        "version": 1,
-                                        "textStyle": "font-size: 14px;font-weight: 400;color: inherit;background-color: transparent;"
-                                      }
-                                    },
-                                    "html": "<p class=\"editor-paragraph\" dir=\"ltr\"><span style=\"font-size: 14px; font-weight: 400; color: inherit; background-color: transparent; white-space: pre-wrap;\">A Query Model is used to predefine a selection of Persons for the overview \"Fulltime but unassigned\". It takes data across relationships into account. This predefined selection is not visible to the enduser. </span></p>"
                                   }
                                 }
                               ]

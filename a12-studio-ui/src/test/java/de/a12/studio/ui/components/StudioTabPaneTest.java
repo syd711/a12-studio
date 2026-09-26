@@ -93,6 +93,62 @@ class StudioTabPaneTest {
     FxTestSupport.onFx(() -> ((Stage) pane.getScene().getWindow()).close());
   }
 
+  // What a drag gesture starts from: the header under the mouse is mapped back to its tab, whichever skin drew it.
+  @Test
+  void aTabHeaderUnderTheMouseIsMappedBackToItsTabInBothLayouts() throws Exception {
+    assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
+    for (boolean multiRow : new boolean[]{true, false}) {
+      StudioTabPane pane = show(3, 800, multiRow);
+      try {
+        FxTestSupport.onFx(() -> {
+          for (Tab tab : pane.getTabs()) {
+            Node label = pane.lookupAll(".tab-label").stream()
+                .filter(node -> node instanceof Label l && tab.getText().equals(l.getText()))
+                .findFirst().orElseThrow();
+            Node header = findHeader(pane, label);
+            assertNotNull(header, "no header found for " + tab.getText() + ", multiRow=" + multiRow);
+            assertSame(tab, tabOf(pane, header));
+            assertTrue(header.getStyleClass().contains("tab"));
+          }
+          Node closeButton = pane.lookup(".tab-close-button");
+          assertNotNull(closeButton);
+          assertEquals(null, findHeader(pane, closeButton), "the close button is no drag handle, multiRow=" + multiRow);
+
+          // a tab pane inside a tab's content has headers of its own, which are not this pane's
+          TabPane nested = new TabPane(new Tab("nested", new Label("x")));
+          pane.getTabs().get(0).setContent(nested);
+          layout(pane);
+          Node nestedHeader = nested.lookup(".tab");
+          assertNotNull(nestedHeader);
+          assertEquals(null, findHeader(pane, nestedHeader), "multiRow=" + multiRow);
+        });
+      }
+      finally {
+        close(pane);
+      }
+    }
+  }
+
+  private static Node findHeader(StudioTabPane pane, Node node) {
+    return call(pane, "findHeader", Node.class, node);
+  }
+
+  private static Tab tabOf(StudioTabPane pane, Node header) {
+    return call(pane, "tabOf", Node.class, header);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T> T call(StudioTabPane pane, String method, Class<?> parameterType, Object argument) {
+    try {
+      var m = StudioTabPane.class.getDeclaredMethod(method, parameterType);
+      m.setAccessible(true);
+      return (T) m.invoke(pane, argument);
+    }
+    catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
   @Test
   void wrapsTheTabHeadersOntoMoreRowsTheNarrowerThePaneIs() throws Exception {
     assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
@@ -322,6 +378,61 @@ class StudioTabPaneTest {
     finally {
       close(pane);
     }
+  }
+
+  @Test
+  void middleClickOnATabHeaderClosesThatTabInBothLayouts() throws Exception {
+    assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
+    for (boolean multiRow : new boolean[]{true, false}) {
+      StudioTabPane pane = show(3, 800, multiRow);
+      try {
+        FxTestSupport.onFx(() -> {
+          Tab first = pane.getTabs().get(0);
+          Tab second = pane.getTabs().get(1);
+          AtomicInteger closed = new AtomicInteger();
+          second.setOnClosed(event -> closed.incrementAndGet());
+
+          // other buttons, and the tab's content, don't close anything
+          middleClick(pane, labelOf(pane, second), MouseButton.PRIMARY);
+          middleClick(pane, labelOf(pane, second), MouseButton.SECONDARY);
+          middleClick(pane, first.getContent(), MouseButton.MIDDLE);
+          assertEquals(3, pane.getTabs().size(), "multiRow=" + multiRow);
+
+          // a vetoed close request keeps the tab
+          second.setOnCloseRequest(Event::consume);
+          middleClick(pane, labelOf(pane, second), MouseButton.MIDDLE);
+          assertEquals(3, pane.getTabs().size(), "multiRow=" + multiRow);
+          second.setOnCloseRequest(null);
+
+          // a tab that isn't closable stays
+          second.setClosable(false);
+          middleClick(pane, labelOf(pane, second), MouseButton.MIDDLE);
+          assertEquals(3, pane.getTabs().size(), "multiRow=" + multiRow);
+          second.setClosable(true);
+
+          middleClick(pane, labelOf(pane, second), MouseButton.MIDDLE);
+          assertEquals(List.of(first, pane.getTabs().get(1)), pane.getTabs(), "multiRow=" + multiRow);
+          assertFalse(pane.getTabs().contains(second), "multiRow=" + multiRow);
+          assertEquals(1, closed.get(), "multiRow=" + multiRow);
+        });
+      }
+      finally {
+        close(pane);
+      }
+    }
+  }
+
+  private static Node labelOf(StudioTabPane pane, Tab tab) {
+    return pane.lookupAll(".tab-label").stream()
+        .filter(node -> node instanceof Label l && tab.getText().equals(l.getText()))
+        .findFirst().orElseThrow();
+  }
+
+  private static void middleClick(StudioTabPane pane, Node target, MouseButton button) {
+    MouseEvent event = new MouseEvent(MouseEvent.MOUSE_CLICKED, 0, 0, 0, 0, button, 1,
+        false, false, false, false, button == MouseButton.PRIMARY, button == MouseButton.MIDDLE,
+        button == MouseButton.SECONDARY, false, false, true, new javafx.scene.input.PickResult(target, 0, 0));
+    Event.fireEvent(pane, event);
   }
 
   private static MouseEvent mouse(javafx.event.EventType<MouseEvent> type) {

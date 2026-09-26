@@ -47,11 +47,10 @@ public class SpacingRow extends SettingRow {
     sidesBox.setManaged(false);
     for (int i = 0; i < 4; i++) {
       Label sideLabel = new Label();
-      // Same column width and gap as the label line above so the four fields line up with the main input; the
-      // label text is indented to read as a sub-row.
+      // Same column width and gap as the label line above so the four fields line up with the main input and the
+      // label text starts at the same left edge as the row's own label.
       sideLabel.setMinWidth(LABEL_WIDTH);
       sideLabel.setPrefWidth(LABEL_WIDTH);
-      sideLabel.setPadding(new Insets(0, 0, 0, 12));
       LengthEditor side = new LengthEditor();
       HBox.setHgrow(side, Priority.ALWAYS);
       side.setOnValue(value -> writeSides());

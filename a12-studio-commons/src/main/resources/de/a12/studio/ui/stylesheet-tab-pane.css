@@ -10,6 +10,21 @@
 }
 
 /*
+ * The SplitPane holding the editor tab panes side by side (see TabPaneController): flush with its surroundings,
+ * like the single tab pane it replaces.
+ */
+.split-pane.tab-split-pane {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
+}
+
+/* A tab dragged over another tab pane (see StudioTabPane): its header strip lights up as the drop target. */
+.tab-pane:tab-drop-target .tab-header-area .tab-header-background {
+    -fx-background-color: derive(-fx-accent-color, 75%);
+}
+
+/*
  * Modena's default *.tab-content-area carries its own -fx-background-insets/-fx-padding
  * (roughly 1-2px on each side), which shows up as a stray gap around content that itself
  * expects to sit flush with the tab strip (e.g. the Form Model editor's overview SplitPane).

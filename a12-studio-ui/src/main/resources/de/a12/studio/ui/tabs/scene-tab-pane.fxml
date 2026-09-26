@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Label?>
 <?import de.a12.studio.ui.components.StudioTabPane?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 
@@ -12,9 +13,13 @@
             <Label text="%no_tab_opened" textAlignment="LEFT" styleClass="hint-label" BorderPane.alignment="CENTER" />
          </center>
       </BorderPane>
-      <StudioTabPane fx:id="tabPane" tabClosingPolicy="ALL_TABS">
-         <tabs>
-         </tabs>
-      </StudioTabPane>
+      <SplitPane fx:id="splitPane" styleClass="tab-split-pane">
+         <items>
+            <StudioTabPane fx:id="tabPane" tabClosingPolicy="ALL_TABS">
+               <tabs>
+               </tabs>
+            </StudioTabPane>
+         </items>
+      </SplitPane>
    </children>
 </StackPane>
