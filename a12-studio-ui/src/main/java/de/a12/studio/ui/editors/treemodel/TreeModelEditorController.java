@@ -96,6 +96,8 @@ public class TreeModelEditorController extends AbstractEditorController implemen
     nodeTypesPanelController.setOnChange(() -> rootPanelController.refresh());
     nodeTypesPanelController.setOnSelectionChange(nodeConfigurationPanelController::setNode);
     nodeConfigurationPanelController.setOnRelationshipsChange(() -> rootPanelController.refresh());
+    nodeConfigurationPanelController.setOnDragDropChange(nodeTypesPanelController::refresh);
+    columnsPanelController.setOnChange(nodeConfigurationPanelController::refresh);
     configurationPanelController.setOnStrategyChange(
         type -> expansionDepthsPanelController.setStrategyVisible(ExpansionStrategy.TREE.equals(type)));
     subheaderMajorController.setOnElementCreated(TreeModelEditorController::assignButtonId);

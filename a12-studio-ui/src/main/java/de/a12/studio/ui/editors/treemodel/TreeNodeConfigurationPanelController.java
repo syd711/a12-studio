@@ -26,9 +26,9 @@ import java.util.ResourceBundle;
 
 /**
  * Shows, below the node types list ({@link TreeNodeTypesPanelController}), the configuration of the node type
- * selected there - what SME shows in a node type's detail screen next to its Document Model, drag &amp; drop flag and
- * column mapping (those stay in the node type dialog): {@link TreeNodeInheritPanelController} (Inherit From
- * Supertype), the Icon ({@link IconPanelController}), {@link TreeChildRelationshipsPanelController}, {@link
+ * selected there - what SME shows in a node type's detail screen next to its Document Model (which the node type
+ * dialog edits): {@link TreeNodeInheritPanelController} (Inherit From Supertype), {@link
+ * TreeNodeDragDropPanelController}, {@link TreeNodeColumnMappingPanelController}, the Icon ({@link IconPanelController}), {@link TreeChildRelationshipsPanelController}, {@link
  * TreeNodeActionsPanelController}, {@link TreeNodeContextMenuPanelController}, {@link
  * TreeNodeRowActivationPanelController}, the Row Title ({@link LocalizedTextPanelController}) and the Styles
  * ({@link StylesPanelController}). A part the node inherits from its super type node is hidden, as in SME. Not a
@@ -49,6 +49,15 @@ public class TreeNodeConfigurationPanelController implements Initializable {
 
   @FXML
   private TreeNodeInheritPanelController inheritPanelController;
+
+  @FXML
+  private TreeNodeDragDropPanelController dragDropPanelController;
+
+  @FXML
+  private TreeNodeColumnMappingPanelController columnMappingPanelController;
+
+  @FXML
+  private Node columnMappingPanel;
 
   @FXML
   private IconPanelController iconPanelController;
@@ -106,6 +115,7 @@ public class TreeNodeConfigurationPanelController implements Initializable {
   public void setModel(@NonNull TreeModel model, @NonNull ProjectItem projectItem) {
     this.model = model;
     this.projectItem = projectItem;
+    columnMappingPanelController.setModel(model, projectItem);
     childRelationshipsPanelController.setModel(model, projectItem);
     contextMenuPanelController.setProjectItem(projectItem);
     // Read on every access, since the selected node changes; a node without selection has no (editable) actions.
@@ -117,6 +127,18 @@ public class TreeNodeConfigurationPanelController implements Initializable {
   /** Called whenever a child relationship configuration was added, changed, moved or removed. */
   public void setOnRelationshipsChange(@NonNull Runnable onRelationshipsChange) {
     childRelationshipsPanelController.setOnChange(onRelationshipsChange);
+  }
+
+  /** Called after the drag &amp; drop flag was toggled, which the node types list shows. */
+  public void setOnDragDropChange(@NonNull Runnable onDragDropChange) {
+    dragDropPanelController.setOnChange(onDragDropChange);
+  }
+
+  /** Re-reads the selected node, e.g. after the tree's columns changed, which the column mapping lists. */
+  public void refresh() {
+    if (node != null && model != null) {
+      refreshNode();
+    }
   }
 
   /** Shows the configuration of {@code node}, or asks for a node type to be selected ({@code null}). */
@@ -140,6 +162,8 @@ public class TreeNodeConfigurationPanelController implements Initializable {
   /** Re-reads everything from the selected node and hides the parts it inherits. */
   private void refreshNode() {
     inheritPanelController.setNode(node, hasSuperTypeNode());
+    dragDropPanelController.setNode(node);
+    columnMappingPanelController.setNode(node);
     iconPanelController.setCustom(node::getIcon, node::setIcon);
     childRelationshipsPanelController.setNode(node);
     actionsPanelController.refresh();
@@ -148,6 +172,7 @@ public class TreeNodeConfigurationPanelController implements Initializable {
     rowTitlePanelController.setCustom(node::getRowTitle);
     stylesPanelController.setCustom(node::getStyles);
 
+    setShown(columnMappingPanel, Part.COLUMNS);
     setShown(iconPanel, Part.ICON);
     setShown(childRelationshipsPanel, Part.CHILD_RELATIONSHIP_CONFIGURATIONS);
     setShown(actionsPanel, Part.ACTIONS);

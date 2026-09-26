@@ -68,6 +68,11 @@ public class TreeColumnsPanelController extends AbstractPropertyEditor implement
   // for a user edit and doesn't trigger a save.
   private boolean updatingFromModel;
 
+  // Notified after every structural change (add/edit/reorder/delete), so the node type configuration, whose column
+  // mapping lists the columns, can follow.
+  private Runnable onChange = () -> {
+  };
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
@@ -79,6 +84,10 @@ public class TreeColumnsPanelController extends AbstractPropertyEditor implement
       ensureConfiguration().setHierarchicalColumnRef(columnIdForName(newValue));
       commitHeaderChange();
     });
+  }
+
+  public void setOnChange(@NonNull Runnable onChange) {
+    this.onChange = onChange;
   }
 
   public void setModel(@NonNull TreeModel model) {
@@ -255,6 +264,7 @@ public class TreeColumnsPanelController extends AbstractPropertyEditor implement
   private void notifyChanged() {
     refreshHierarchicalColumnField();
     commitHeaderChange();
+    onChange.run();
   }
 
   private static String shortId() {

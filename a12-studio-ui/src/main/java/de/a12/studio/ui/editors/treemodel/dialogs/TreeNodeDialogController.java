@@ -9,6 +9,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 /**
@@ -51,6 +52,8 @@ public class TreeNodeDialogController implements DialogController {
   private void onDialogSubmit() {
     TreeNode node = new TreeNode();
     node.setDocumentModelRef(documentModelField.getValue());
+    // SME requires a node to have a configuration; an existing node keeps its own, see the caller.
+    node.setConfiguration(new LinkedHashMap<>());
 
     built = node;
     result = Optional.of(ButtonType.OK);

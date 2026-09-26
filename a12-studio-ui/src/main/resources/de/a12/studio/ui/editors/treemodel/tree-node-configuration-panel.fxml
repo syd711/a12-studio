@@ -14,6 +14,8 @@
         <VBox fx:id="content" spacing="12.0" styleClass="parent-selection-group">
             <children>
                 <fx:include fx:id="inheritPanel" source="tree-node-inherit-panel.fxml" />
+                <fx:include fx:id="dragDropPanel" source="tree-node-drag-drop-panel.fxml" />
+                <fx:include fx:id="columnMappingPanel" source="tree-node-column-mapping-panel.fxml" />
                 <fx:include fx:id="iconPanel" source="../propertyeditors/icon-panel.fxml" />
                 <fx:include fx:id="childRelationshipsPanel" source="tree-child-relationships-panel.fxml" />
                 <fx:include fx:id="actionsPanel" source="tree-node-actions-panel.fxml" />
