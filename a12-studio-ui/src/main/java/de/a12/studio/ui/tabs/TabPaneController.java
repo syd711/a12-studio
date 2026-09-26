@@ -630,6 +630,26 @@ public class TabPaneController implements Initializable, StudioEventListener {
     }
   }
 
+  /**
+   * Opens {@code item} straight in a window of its own, as if it had been opened as a tab and then moved with
+   * "Open Tab in New Window". If it is already shown in a window, that window is focused; if it is open as a
+   * tab, that tab is moved.
+   */
+  public void openModelInNewWindow(@NonNull ProjectItem item) {
+    DetachedTabWindow detached = detachedWindows.get(item.getPath());
+    if (detached != null) {
+      detached.focus();
+      return;
+    }
+
+    Tab tab = findTabByPath(item.getPath());
+    if (tab == null) {
+      tab = createTabShell(item);
+      tabPane.getTabs().add(tab);
+    }
+    openInNewWindow(tab);
+  }
+
   private void closeTab(@NonNull Tab tab) {
     tabPane.getTabs().remove(tab);
     onTabClosed(tab);

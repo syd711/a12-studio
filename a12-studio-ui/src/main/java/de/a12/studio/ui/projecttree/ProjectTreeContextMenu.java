@@ -15,6 +15,9 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import java.util.List;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -83,7 +86,7 @@ class ProjectTreeContextMenu {
     open.setVisible(!viewModel.isFolder());
     open.setOnAction(event -> actions.onOpenItem(viewModel));
 
-    MenuItem openInFileManager = new MenuItem(StudioBundle.get(openInFileManagerKey()));
+    MenuItem openInFileManager =new MenuItem(StudioBundle.get(openInFileManagerKey()));
     openInFileManager.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.FOLDER_OPEN_OUTLINE)));
     openInFileManager.setVisible(viewModel.isFolder());
     openInFileManager.setOnAction(event -> actions.onOpenInFileManager(projectItem));
@@ -105,6 +108,14 @@ class ProjectTreeContextMenu {
     createCopy.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     createCopy.setOnAction(event -> actions.onCreateCopy(projectItem));
 
+
+
+    MenuItem openInNewWindow = new MenuItem(StudioBundle.get("open_model_in_new_window"));
+    openInNewWindow.setAccelerator(new KeyCodeCombination(KeyCode.F4, KeyCombination.SHIFT_DOWN));
+    openInNewWindow.setVisible(!viewModel.isFolder());
+    openInNewWindow.setDisable(viewModel.isSettings());
+    openInNewWindow.setOnAction(event -> actions.onOpenItemInNewWindow(viewModel));
+
     MenuItem zipFolder = new MenuItem(StudioBundle.get("zip_folder"));
     zipFolder.setGraphic(withMenuIconStyle(WidgetFactory.createIcon(Icons.ZIP)));
     zipFolder.setVisible(projectItem.isRoot());
@@ -115,7 +126,8 @@ class ProjectTreeContextMenu {
     delete.setDisable(projectItem.isRoot() || viewModel.isSettings() || viewModel.isAuthFile());
     delete.setOnAction(event -> actions.onDeleteItem(projectItem));
 
-    return new ContextMenu(newMenu, open, openInFileManager, bookmark, rename, createCopy, new SeparatorMenuItem(), zipFolder, delete);
+    return new ContextMenu(newMenu, open, openInFileManager,
+        bookmark, rename, createCopy, new SeparatorMenuItem(), openInNewWindow, new SeparatorMenuItem(), zipFolder, delete);
   }
 
   /**

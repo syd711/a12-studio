@@ -452,6 +452,16 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
   }
 
+  /** The window counterpart of {@link #openItem}: the model isn't added to the tab pane, only shown in its own window. */
+  private boolean openItemInNewWindow(@NonNull ProjectItemViewModel viewModel) {
+    if (viewModel.isFolder() || viewModel.isSettings() || !(viewModel.hasModel() || viewModel.hasAuthFile())
+        || !viewModel.getProjectItem().isModelSupported()) {
+      return false;
+    }
+    Studio.openModelInNewWindow(viewModel.getProjectItem());
+    return true;
+  }
+
   private Stage getStage() {
     return (Stage) projectTree.getScene().getWindow();
   }
@@ -504,7 +514,8 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
-    menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem, this::getProjectRoot);
+    menuFactory = new ProjectTreeMenuActions(this::getStage, this::onReload, this::openItem, this::openItemInNewWindow,
+        this::getProjectRoot);
     ProjectTreeContextMenu contextMenuFactory = new ProjectTreeContextMenu(menuFactory);
     for (ModelType modelType : ModelType.values()) {
       if (modelType == ModelType.DOCUMENT) {
@@ -562,6 +573,12 @@ public class ProjectTreeController implements Initializable, StudioEventListener
       if (event.getCode() == KeyCode.ENTER) {
         if (selected != null) {
           openItem(selected.getValue());
+        }
+      }
+      else if (event.getCode() == KeyCode.F4 && event.isShiftDown()) {
+        // consumed only when it applies, otherwise it falls through to the global "selected tab in new window"
+        if (selected != null && openItemInNewWindow(selected.getValue())) {
+          event.consume();
         }
       }
       else if (event.getCode() == KeyCode.DELETE) {

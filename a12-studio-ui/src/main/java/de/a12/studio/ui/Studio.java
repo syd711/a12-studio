@@ -224,6 +224,10 @@ public class Studio extends Application implements StudioEventListener {
     rootController.openSelectedTabInNewWindow();
   }
 
+  public static void openModelInNewWindow(ProjectItem item) {
+    rootController.openModelInNewWindow(item);
+  }
+
   public static void selectNextTab() {
     rootController.selectNextTab();
   }

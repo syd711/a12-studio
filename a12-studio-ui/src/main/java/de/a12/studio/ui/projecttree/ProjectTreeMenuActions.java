@@ -41,19 +41,26 @@ public class ProjectTreeMenuActions {
   private final Supplier<Stage> stageSupplier;
   private final Runnable onReload;
   private final Consumer<ProjectItemViewModel> onOpen;
+  private final Consumer<ProjectItemViewModel> onOpenInNewWindow;
   private final Supplier<ProjectItem> projectRootSupplier;
 
   public ProjectTreeMenuActions(@NonNull Supplier<Stage> stageSupplier, @NonNull Runnable onReload,
                                 @NonNull Consumer<ProjectItemViewModel> onOpen,
+                                @NonNull Consumer<ProjectItemViewModel> onOpenInNewWindow,
                                 @NonNull Supplier<ProjectItem> projectRootSupplier) {
     this.stageSupplier = stageSupplier;
     this.onReload = onReload;
     this.onOpen = onOpen;
+    this.onOpenInNewWindow = onOpenInNewWindow;
     this.projectRootSupplier = projectRootSupplier;
   }
 
   void onOpenItem(@NonNull ProjectItemViewModel item) {
     onOpen.accept(item);
+  }
+
+  void onOpenItemInNewWindow(@NonNull ProjectItemViewModel item) {
+    onOpenInNewWindow.accept(item);
   }
 
   void onCreateNewFolder(@NonNull ProjectItem parent) {
