@@ -4,6 +4,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.treemodel.TreeColumn;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
@@ -62,6 +63,9 @@ public class TreeNodeColumnMappingPanelController extends AbstractPropertyEditor
   private ProjectItem projectItem;
   private TreeNode node;
 
+  // Resolves the node's mapped field ids to their paths; rebuilt with the rows, null if the node's Document Model is unknown.
+  private ElementIndex elementIndex;
+
   // Notified after the tree's columns were edited, moved or removed here, so the Columns panel can follow.
   private Runnable onColumnsChange = () -> {
   };
@@ -92,6 +96,7 @@ public class TreeNodeColumnMappingPanelController extends AbstractPropertyEditor
 
   private void rebuildRows() {
     columnMappingRows.getChildren().clear();
+    elementIndex = node != null && projectItem != null ? ColumnMappingEditor.elementIndexFor(projectItem, node.getDocumentModelRef()) : null;
 
     List<TreeColumn> columns = node != null ? getColumns() : List.of();
     boolean empty = columns.isEmpty();
@@ -114,7 +119,7 @@ public class TreeNodeColumnMappingPanelController extends AbstractPropertyEditor
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
     String field = ColumnMappingEditor.mappedElementRef(node.getColumns(), column.getId());
-    Label fieldLabel = createRowLabel(field != null ? field : "", "columnMappingField-" + index, column);
+    Label fieldLabel = createRowLabel(field != null ? ColumnMappingEditor.displayPath(elementIndex, field) : "", "columnMappingField-" + index, column);
     fieldLabel.getStyleClass().add("path-text");
     lockWidth(fieldLabel, 220.0);
     Label widthLabel = createRowLabel(column.getWidth() != null ? String.valueOf(column.getWidth()) : "", "columnMappingWidth-" + index, column);
@@ -171,7 +176,7 @@ public class TreeNodeColumnMappingPanelController extends AbstractPropertyEditor
     // Without a project item (an editor not opened from the project tree) there are no fields to offer.
     List<String> fieldOptions = projectItem != null ? ColumnMappingEditor.fieldOptionsFor(projectItem, node.getDocumentModelRef()) : List.of();
     String field = ColumnMappingEditor.mappedElementRef(node.getColumns(), column.getId());
-    Dialogs.showColumnForEdit(Studio.stage, column, fieldOptions, field).ifPresent(edited -> applyEdit(column, edited.column(), edited.field()));
+    Dialogs.showColumnForEdit(Studio.stage, column, fieldOptions, elementIndex, field).ifPresent(edited -> applyEdit(column, edited.column(), edited.field()));
   }
 
   /** Copies the edited attributes onto the tree's {@code column} and stores the chosen field in the node's mapping. */

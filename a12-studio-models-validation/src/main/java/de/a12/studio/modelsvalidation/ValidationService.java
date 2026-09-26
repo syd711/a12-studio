@@ -32,7 +32,9 @@ import de.a12.studio.modelsvalidation.services.RelationshipUiModelValidationServ
 import de.a12.studio.modelsvalidation.services.SelectionModelValidationService;
 import de.a12.studio.modelsvalidation.services.TreeModelValidationService;
 import de.a12.studio.modelsvalidation.services.TypesettingModelValidationService;
+import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
+import de.a12.studio.modelsvalidation.validators.content.ContentBaseGroupValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
@@ -182,6 +184,13 @@ public class ValidationService {
     // The roles are a settings concern too (a model such as a Typesetting Model has nothing else in its settings).
     errors.stream().filter(error -> HeaderRolesValidator.ELEMENT_ID.equals(error.elementId())).map(ModelValidationError::message)
         .forEach(messages::add);
+    if (model instanceof ContentModel) {
+      // A Content Model's settings are its Document Model and the base group inside it: a reference that does not resolve
+      // (or points at another kind of model) and a base group the Document Model does not have.
+      errors.stream().filter(error -> HeaderModelReferenceValidator.ELEMENT_ID.equals(error.elementId())
+              || ContentBaseGroupValidator.ELEMENT_ID.equals(error.elementId()))
+          .map(ModelValidationError::message).forEach(messages::add);
+    }
     return messages;
   }
 

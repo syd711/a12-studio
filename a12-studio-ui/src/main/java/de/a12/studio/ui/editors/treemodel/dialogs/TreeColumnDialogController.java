@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.treemodel.dialogs;
 
 import de.a12.studio.models.treemodel.TreeColumn;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.components.DialogController;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -60,6 +61,9 @@ public class TreeColumnDialogController implements DialogController {
 
   private Stage stage;
 
+  // Resolves the field ids offered by fieldCombo to their paths; null shows the raw ids.
+  private ElementIndex elementIndex;
+
   private TreeColumn built;
 
   /** The edited column together with the node's field for it, as chosen in a column mapping dialog. */
@@ -86,7 +90,7 @@ public class TreeColumnDialogController implements DialogController {
     fieldCombo.setConverter(new StringConverter<>() {
       @Override
       public String toString(String value) {
-        return value == null ? "(None)" : value;
+        return value == null ? "(None)" : ColumnMappingEditor.displayPath(elementIndex, value);
       }
 
       @Override
@@ -129,7 +133,13 @@ public class TreeColumnDialogController implements DialogController {
    * selectable, so opening and confirming the dialog doesn't silently drop it.
    */
   void init(Stage stage, TreeColumn existing, List<String> fieldOptions, String field) {
+    init(stage, existing, fieldOptions, null, field);
+  }
+
+  /** As above, showing the fields by their path in {@code elementIndex} instead of their id. */
+  void init(Stage stage, TreeColumn existing, List<String> fieldOptions, ElementIndex elementIndex, String field) {
     this.stage = stage;
+    this.elementIndex = elementIndex;
     setFieldVisible(fieldOptions != null);
     if (fieldOptions != null) {
       List<String> items = new ArrayList<>();

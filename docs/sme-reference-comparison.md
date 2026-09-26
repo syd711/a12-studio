@@ -1396,6 +1396,40 @@ which the studio has no type for). Not done and still open: 4 and everything fro
 Known unrelated failures seen while running the neighbouring suites: `FixtureWorkspacesFormValidatorsTest` (`City_Fm.json` drift), 5 tests of `ContentModelEditorPanelsTest` (the Element panel include is commented out in
 `content-model-editor.fxml` since `a03beb89`, and one heading-text test), `TypesettingModelEditorTest.theModelSettingsDialogOffersNothingButTheRoles` (expects the name panel hidden, the dialog shows it).
 
+**Status (2026-09-26, later): steps 2 and 3 are done - gaps 5, 7, 8, 10, 11 and 12 are closed; 6 (form elements) and 9 (setting values) only partly (6 is validated but still has no editor); 17 (roles validator for Content Models) was not touched.**
+**Finding that changes the plan's premise: SME does not validate the whole tree against the parent/child rules, it applies them to editing operations only.** SME's own library declares the
+three table row types childless (`childRules: C0`, the same as a Heading) and its editor fills them with cells itself, so every real table has "rows with children". A whole-tree structure check
+therefore has to exempt the children of `TableHeadRow`/`TableBodyRow`/`TableFootRow` (`ContentStructure.ROWS`); the fixture-workspace sweep (`FixtureWorkspacesContentValidatorsTest`, all real Content
+Models must give no error) found this on its first run. **Models (`a12-studio-models`):** `ContentStructure` is the rule engine behind everything (`violations`, `canRemove`, `canMove`, `canDuplicate`, `canPaste`,
+`canRelocate`; an edit is allowed if it adds no violation that was not there before, so a hand-edited tree stays editable elsewhere - a limit of that: an element already in violation cannot be detected getting
+worse), `ContentNodes` (event nodes of `onClick`/`onRowClick`, the `ce-field-reference` nodes inside Lexical text), `ContentUrls` (the URL allow-list, moved out of `TextRow`), `ContentModelContent` keeps unknown
+keys (`extras`). **Validation (`validators/content`, 12 validators registered in `ContentModelValidationService`):** the two existing ones (duplicate ids now reported on the element instead of `content/root`) plus
+`ContentNodeShapeValidator` (type, namespace, props required; Warning for a missing/other engine version), `ContentStructureValidator`, `ContentDocumentModelTypeValidator`, `ContentBaseGroupValidator`,
+`ContentGroupReferenceValidator` (Repeatable Group, Add Row Action - repeatable only -, Image dynamic source), `ContentFieldReferenceValidator` (Field Output, Conditional conditions, references inside texts),
+`ContentFormElementValidator` (elementId, existing, data type per element, data-context compatibility, children Warning), `ContentEventNodeValidator`, `ContentSettingsValidator`, `ContentWarningsValidator`. The
+reference checks run on `DocumentStructure`, the Document Model with Includes expanded (`<include id>_<id>`), and on SME's data-context rules read from the bundle: the context of an element is the base group or the
+closest enclosing Repeatable Group; a group is a candidate below its context; a field is a candidate when it can be reached from the context or a group above it without going through a repeated group; a form
+element may not be more repeated than its context (`granularity`). `ValidationContext.cached` shares the expanded Document Model between the validators of one call. All findings are reported against the element's id
+(events: against the element that holds them) and name the element, the setting or the reference. **Editor:** `updateActionState` asks `ContentStructure` for Delete, Cut, Move, Duplicate and Paste (and the handlers
+check again, since shortcuts do not look at the buttons); the context menu got Add above/below and Paste above/below; drag and drop moves an element as one undoable step (`RelocateElementCommand`), the drop zones
+(middle = last child, top/bottom quarter = above/below) accept only what `canRelocate` allows; the existing `tree-row-drop-*` styles show where it lands.
+**Deviations from the plan above:** one validator per concern but not per plan item (e.g. no separate class for the Add Row Action, it is part of the group reference check); the walker does not stop at the first
+group it cannot resolve like SME (it skips only the subtree below it, so the rest is still checked); reference findings are Errors although SME's own filter would drop them (see "What SME reports"); Delete is
+guarded like Cut (SME's guard for Delete was not verified); `ContentSettingsValidator` covers only what could be derived with certainty - required texts/icons, Image source, unsafe URLs; SME's numeric controllers
+(lengths, spacing, shadow, colors: "Invalid numeric value") are not ported, so an invalid length in a file is still accepted (the rest of gap 9). **Not done:** step 4 (nothing in the editor shows these findings yet:
+no tree markers, issue count or settings badge for the new checks - gap 16), 5 (editors for form elements, Add Row Action group, Conditional) and 6 (migration). **Unverified by a running UI:** the drag handlers
+(`setupDragAndDrop`) - the drop position and the move are tested through the controller's methods, the JavaFX drag events themselves were not exercised.
+
+**Status (2026-09-26, later still): step 4 is done - gap 16 (the editor shows no validation result) and, for Content Models, gap 17 are closed.** `ContentModelEditorController.refreshIssues` asks the validation service for
+everything wrong with the model (on load, after every save of the model - which covers panel edits, structural commands, undo/redo and the Model Settings dialog - and when another Document Model is saved) and shows it in
+four places: the row of each element the findings are about (`validation-error`, or the new `validation-warning` in the warning color; the messages as tooltip), a summary under the tree ("Errors: n, Warnings: m", click goes to
+the next element with a problem and wraps around), a message box above the selected element's settings (the `error-container` component, errors before warnings), and the badge/tooltip of the settings button, which now also
+lists what belongs to a Content Model's own settings (`ValidationService.getSettingsIssueMessages`: a Document Model that is missing or of another kind, a base group the Document Model does not have). Findings about the
+root without an element of its own (`content/root`) are shown on the root. `ContentModelValidationService` now also runs `HeaderRolesValidator` (SME's `ModelHeader` include applies the roles rules to Content Models), so a
+Content Model with a `roles` annotation and no roles file in the workspace gets the same warning ("specifying roles needs a roles file") as a Document Model does; the other model types that lack the roles validator (gap 17 said "together with") were
+not touched. **Limits:** the validation runs on the whole project model on every save (there is no incremental path; it is debounced by the editor's 300 ms save delay for typing); the count only includes findings about elements
+of the tree, not the model-level ones (those are on the settings button); there is no marker on the ancestors of a flagged element, so a problem in a collapsed subtree is only visible through the summary.
+
 Scope: `ContentModelEditorController` + `content-model-editor.fxml` and everything it wires, against SME's `modules/contentModel` (frame, settings tab,
 validator, transformers, reference providers), `resources/models/contentModel/{ContentMetaModel,ContentModelHeaderEditor}.json` and the platform docs
 (`content_engine-contentengine-dev-docs.md`, `sme-sme-content-ba-docs.md`). **Important source note:** SME's *validation* is not in the SME repo. `validateContentModel`

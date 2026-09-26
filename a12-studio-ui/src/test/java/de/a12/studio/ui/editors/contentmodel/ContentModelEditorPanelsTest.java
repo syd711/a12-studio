@@ -546,8 +546,8 @@ class ContentModelEditorPanelsTest {
   @Test
   void theTreeContextMenuHasAllToolbarActionsAndMirrorsTheirEnabledState() throws Exception {
     javafx.scene.control.ContextMenu menu = tree.getContextMenu();
-    assertTrue(menu != null && menu.getItems().stream().filter(i -> !(i instanceof javafx.scene.control.SeparatorMenuItem)).count() == 10,
-        "undo, redo, add, delete, up, down, cut, copy, paste and duplicate must all be offered");
+    assertTrue(menu != null && menu.getItems().stream().filter(i -> !(i instanceof javafx.scene.control.SeparatorMenuItem)).count() == 14,
+        "undo, redo, add child/above/below, delete, up, down, cut, copy, paste, paste above/below and duplicate must all be offered");
 
     // The menu is only shown when it has items, so they must exist before it is first shown.
     FxTestSupport.onFx(() -> tree.getSelectionModel().select(tree.getRoot()));

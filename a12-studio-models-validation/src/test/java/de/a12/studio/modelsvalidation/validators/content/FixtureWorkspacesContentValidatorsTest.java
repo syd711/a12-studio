@@ -4,10 +4,9 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.contentmodel.ContentStructure;
 import de.a12.studio.models.projects.ProjectItem;
-import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
 import de.a12.studio.modelsvalidation.TestModels;
-import de.a12.studio.modelsvalidation.services.ContentModelValidationService;
+import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -58,12 +57,12 @@ class FixtureWorkspacesContentValidatorsTest {
             bound++;
           }
           String name = workspaces.relativize(modelFiles.get(i)).toString();
-          new ContentModelValidationService().validate(model, TestModels.contextWithOtherModels(model, models.toArray(new A12Model<?>[0])))
-              .stream()
-              .filter(error -> !Severity.WARNING.name().equals(error.severity()))
-              // only what the Content Model validators found; the header rules depend on how the fixture files are named
-              .filter(error -> error.elementId() != null && !error.elementId().startsWith("header/"))
-              .forEach(error -> problems.add(name + " [" + error.elementId() + "]: " + error.message()));
+          // Called directly: the runner of the validation service swallows a validator that throws.
+          for (ModelValidator validator : validators()) {
+            validator.validate(model, TestModels.contextWithOtherModels(model, models.toArray(new A12Model<?>[0]))).stream()
+                .filter(error -> !Severity.WARNING.name().equals(error.severity()))
+                .forEach(error -> problems.add(name + " [" + error.elementId() + "]: " + error.message()));
+          }
           ContentStructure.violations(model.getContent().getRoot())
               .forEach(violation -> problems.add(name + " structure: " + violation.kind() + " " + violation.element().getId()));
         }
@@ -83,8 +82,10 @@ class FixtureWorkspacesContentValidatorsTest {
     throw new IllegalStateException("Could not locate testing/workspaces");
   }
 
-  @SuppressWarnings("unused")
-  private static List<ModelValidationError> none() {
-    return List.of();
+  private static List<ModelValidator> validators() {
+    return List.of(new ContentDocumentModelTypeValidator(), new ContentRootElementValidator(), new ContentElementIdUniqueValidator(),
+        new ContentNodeShapeValidator(), new ContentStructureValidator(), new ContentBaseGroupValidator(),
+        new ContentGroupReferenceValidator(), new ContentFieldReferenceValidator(), new ContentFormElementValidator(),
+        new ContentEventNodeValidator(), new ContentSettingsValidator(), new ContentWarningsValidator());
   }
 }

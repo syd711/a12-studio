@@ -9,6 +9,7 @@ import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.models.treemodel.TreeNodeAction;
 import de.a12.studio.models.treemodel.TreeNodeActionGroup;
 import de.a12.studio.models.util.JsonSettings;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -37,7 +38,13 @@ public class Dialogs {
    */
   public static Optional<TreeColumnDialogController.MappingResult> showColumnForEdit(Stage owner, TreeColumn existing,
       List<String> fieldOptions, String field) {
-    TreeColumnDialogController controller = showColumn(owner, StudioBundle.get("edit_column_title"), existing, fieldOptions, field);
+    return showColumnForEdit(owner, existing, fieldOptions, null, field);
+  }
+
+  /** As above, showing the fields by their path in {@code elementIndex} instead of their id. */
+  public static Optional<TreeColumnDialogController.MappingResult> showColumnForEdit(Stage owner, TreeColumn existing,
+      List<String> fieldOptions, ElementIndex elementIndex, String field) {
+    TreeColumnDialogController controller = showColumn(owner, StudioBundle.get("edit_column_title"), existing, fieldOptions, elementIndex, field);
     return controller.getMappingResult();
   }
 
@@ -172,15 +179,15 @@ public class Dialogs {
   }
 
   private static Optional<TreeColumn> showColumn(Stage owner, String title, TreeColumn existing) {
-    return showColumn(owner, title, existing, null, null).getResult();
+    return showColumn(owner, title, existing, null, null, null).getResult();
   }
 
-  private static TreeColumnDialogController showColumn(Stage owner, String title, TreeColumn existing, List<String> fieldOptions, String field) {
+  private static TreeColumnDialogController showColumn(Stage owner, String title, TreeColumn existing, List<String> fieldOptions, ElementIndex elementIndex, String field) {
     FXMLLoader fxmlLoader = new FXMLLoader(TreeColumnDialogController.class.getResource("tree-column-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("tree-column-dialog", fxmlLoader, owner, title);
     TreeColumnDialogController controller = (TreeColumnDialogController) stage.getUserData();
-    controller.init(stage, existing, fieldOptions, field);
+    controller.init(stage, existing, fieldOptions, elementIndex, field);
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();

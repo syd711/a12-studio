@@ -9,6 +9,8 @@ import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.treemodel.TreeColumn;
 import de.a12.studio.models.treemodel.TreeNodeColumn;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.editors.overviewmodel.OverviewElementOptions;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -40,6 +42,12 @@ public final class ColumnMappingEditor {
   /** As above, additionally running {@code onChange} after every user edit of a mapping. */
   public static void populate(@NonNull GridPane grid, @NonNull Label noColumnsLabel, @NonNull List<TreeColumn> columns,
       @NonNull List<String> fieldOptions, @NonNull List<TreeNodeColumn> mappings, @NonNull Runnable onChange) {
+    populate(grid, noColumnsLabel, columns, fieldOptions, null, mappings, onChange);
+  }
+
+  /** As above, showing each field by its path in {@code elementIndex} (see {@link #elementIndexFor}) instead of its id. */
+  public static void populate(@NonNull GridPane grid, @NonNull Label noColumnsLabel, @NonNull List<TreeColumn> columns,
+      @NonNull List<String> fieldOptions, ElementIndex elementIndex, @NonNull List<TreeNodeColumn> mappings, @NonNull Runnable onChange) {
     grid.getChildren().clear();
     noColumnsLabel.setVisible(columns.isEmpty());
     noColumnsLabel.setManaged(columns.isEmpty());
@@ -52,8 +60,15 @@ public final class ColumnMappingEditor {
       ComboBox<String> elementField = new ComboBox<>();
       elementField.setMaxWidth(Double.MAX_VALUE);
       GridPane.setHgrow(elementField, Priority.ALWAYS);
-      elementField.getItems().setAll(fieldOptions);
-      elementField.setValue(mappedElementRef(mappings, column.getId()));
+      String mapped = mappedElementRef(mappings, column.getId());
+      // A mapping whose field is no longer offered stays visible (and is kept), as documented on the class.
+      List<String> items = new ArrayList<>(fieldOptions);
+      if (mapped != null && !items.contains(mapped)) {
+        items.add(mapped);
+      }
+      OverviewElementOptions.applyElementRefConverter(elementField, elementIndex);
+      elementField.getItems().setAll(items);
+      elementField.setValue(mapped);
       elementField.valueProperty().addListener((observable, oldValue, newValue) -> {
         setMappedElementRef(mappings, column.getId(), newValue);
         onChange.run();
@@ -111,6 +126,23 @@ public final class ColumnMappingEditor {
         .findFirst()
         .map(documentModel -> collectFieldIds((DocumentModel) documentModel))
         .orElse(List.of());
+  }
+
+  /**
+   * The element index of {@code documentModelId} (a Document Model, or a Combination Model standing in for one), used to
+   * show a mapped field id as its path; {@code null} if it is unknown, so callers fall back to the raw id.
+   */
+  public static ElementIndex elementIndexFor(@NonNull ProjectItem projectItem, String documentModelId) {
+    if (documentModelId == null) {
+      return null;
+    }
+    DocumentModel documentModel = ProjectDocumentModels.resolveDocumentModelForFieldReferences(documentModelId);
+    return OverviewElementOptions.indexOf(documentModel, ProjectDocumentModels.getOtherDocumentModels(projectItem));
+  }
+
+  /** {@code elementId}'s path in {@code elementIndex}, or the id itself when there is no index or it doesn't resolve. */
+  public static String displayPath(ElementIndex elementIndex, String elementId) {
+    return OverviewElementOptions.displayPath(elementIndex, elementId);
   }
 
   /** The ids of all Document Models in the project, for a combo. */

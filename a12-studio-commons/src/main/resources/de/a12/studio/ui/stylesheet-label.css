@@ -58,6 +58,11 @@
     -fx-font-weight: bold;
 }
 
+/** The warning counterpart of ".validation-error": a hint, not a failure. */
+.validation-warning {
+    -fx-text-fill: -fx-warning-bg;
+}
+
 /**
  * Read-only "table" display (e.g. LocalizedTextReadonlyPanelController's per-locale text list): a plain
  * two-column GridPane styled to resemble a lightweight table - a colored header row plus a thin divider

@@ -299,6 +299,18 @@
     -fx-text-fill: -fx-text-color-inverse;
 }
 
+/* A finding that is only a hint (severity warning): the same rule as .validation-error, in the warning color, without
+   bold - the row stays readable and an error next to it still stands out. */
+.tree-cell.validation-warning {
+    -fx-text-fill: -fx-warning-bg;
+}
+
+.tree-cell.validation-warning:filled:selected,
+.tree-cell.validation-warning:filled:selected:focused,
+.tree-cell.validation-warning:filled:selected:hover {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
 /*
  * The project tree's item name is rendered via a Label set as the cell's graphic (see
  * ProjectTreeCell), not as the cell's own text - so an item's name and its icon can carry

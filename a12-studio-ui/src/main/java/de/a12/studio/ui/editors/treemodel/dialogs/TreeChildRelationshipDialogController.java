@@ -153,7 +153,9 @@ public class TreeChildRelationshipDialogController implements DialogController {
     columnMappingBox.setManaged(mappable);
     if (mappable) {
       ColumnMappingEditor.populate(columnMappingGrid, noColumnsLabel, model.getContent().getColumns(),
-          ColumnMappingEditor.fieldOptionsFor(projectItem, linkDocumentModel), mappings);
+          ColumnMappingEditor.fieldOptionsFor(projectItem, linkDocumentModel),
+          ColumnMappingEditor.elementIndexFor(projectItem, linkDocumentModel), mappings, () -> {
+          });
     }
   }
 
