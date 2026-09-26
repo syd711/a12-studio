@@ -155,6 +155,8 @@ public class Studio extends Application implements StudioEventListener {
           stage.requestFocus();
           stage.setAlwaysOnTop(false);
 
+          StudioTray.install();
+
           Platform.runLater(Studio::checkA12InstallationFolder);
         })
         .onErrorLater(ex -> log.error("Failed to start Studio: {}", ex.getMessage(), ex));
@@ -203,6 +205,7 @@ public class Studio extends Application implements StudioEventListener {
 
   @Override
   public void stop() {
+    StudioTray.uninstall();
     PreviewServer.stopIfRunning();
     SmeBackend.getInstance().stop();
     PreviewAppProcess.getInstance().stop();
