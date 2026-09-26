@@ -15,7 +15,7 @@
   "application":        { "version": "6.0.0",  "enabled": true,  "suffix": "AM"  },
   "content":            { "version": "0.8.0",  "enabled": true,  "suffix": "CM"  },
   "combination":        { "version": "1.0.0",  "enabled": true,  "suffix": "CDM" },
-  "mapping":            { "version": "1.0.0",  "enabled": false, "suffix": "MM"  },
+  "mapping":            { "version": "1.0.0",  "enabled": true, "suffix": "MM"  },
   "query":              { "version": "0.1.0",  "enabled": true,  "suffix": "QM"  },
-  "structuralmapping":  { "version": "1.0.0",  "enabled": false, "suffix": "SMM" }
+  "structuralmapping":  { "version": "1.0.0",  "enabled": true, "suffix": "SMM" }
 }

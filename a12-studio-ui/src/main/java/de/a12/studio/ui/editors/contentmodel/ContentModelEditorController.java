@@ -4,6 +4,10 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.contentmodel.ContentElement;
 import de.a12.studio.models.contentmodel.ContentElementDefaults;
+import de.a12.studio.models.contentmodel.ContentElementFactory;
+import de.a12.studio.models.contentmodel.ContentInsertion;
+import de.a12.studio.models.contentmodel.ContentModule;
+import de.a12.studio.models.contentmodel.ContentTableColumns;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
@@ -12,12 +16,12 @@ import de.a12.studio.ui.editors.contentmodel.commands.ElementStateCommand;
 import de.a12.studio.ui.editors.contentmodel.commands.InsertElementCommand;
 import de.a12.studio.ui.editors.contentmodel.commands.MoveElementCommand;
 import de.a12.studio.ui.editors.contentmodel.commands.RemoveElementCommand;
+import de.a12.studio.ui.editors.contentmodel.dialogs.Dialogs;
 import de.a12.studio.ui.events.ModelClosedEvent;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preview.PreviewLauncher;
 import de.a12.studio.ui.previewapp.PreviewAppException;
 import de.a12.studio.ui.util.Debouncer;
-import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.commandstack.Command;
@@ -25,7 +29,6 @@ import de.a12.studio.ui.util.commandstack.CommandStack;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -33,8 +36,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -53,9 +54,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -176,7 +175,7 @@ public class ContentModelEditorController extends AbstractEditorController imple
           return;
         }
         // "tree-icon" lets the tree stylesheet switch the icon to the inverse color on the selected row.
-        FontIcon icon = WidgetFactory.createIcon(iconFor(element.getType()), TREE_ICON_SIZE, null);
+        FontIcon icon = WidgetFactory.createIcon(ContentElementIcons.iconFor(element.getType()), TREE_ICON_SIZE, null);
         icon.getStyleClass().add("tree-icon");
         setGraphic(icon);
       }
@@ -231,30 +230,6 @@ public class ContentModelEditorController extends AbstractEditorController imple
 
   private static String typeLabel(ContentElement element) {
     return element.getType() != null ? element.getType() : "?";
-  }
-
-  private static String iconFor(String type) {
-    if (type == null) {
-      return "mdi2s-shape-outline";
-    }
-    return switch (type) {
-      case "Box" -> "mdi2s-square-outline";
-      case "Grid" -> "mdi2v-view-grid-outline";
-      case "GridRow", "TableHeadRow", "TableBodyRow" -> "mdi2t-table-row";
-      case "GridColumn", "TableBodyCell" -> "mdi2t-table-column";
-      case "Paragraph" -> "mdi2f-format-paragraph";
-      case "Heading" -> "mdi2f-format-header-1";
-      case "UnorderedList" -> "mdi2f-format-list-bulleted";
-      case "ListItem" -> "mdi2c-circle-small";
-      case "Table" -> "mdi2t-table";
-      case "TableHead" -> "mdi2t-table-arrow-up";
-      case "TableHeadCell" -> "mdi2t-table-headers-eye";
-      case "TableBody" -> "mdi2t-table-large";
-      case "TableFoot" -> "mdi2t-table-arrow-down";
-      case "MessageBox" -> "mdi2m-message-alert-outline";
-      case "Image" -> "mdi2i-image-outline";
-      default -> "mdi2s-shape-outline";
-    };
   }
 
   @Override
@@ -496,18 +471,27 @@ public class ContentModelEditorController extends AbstractEditorController imple
     }, SAVE_DEBOUNCE_MS, true);
   }
 
+  /** Asks which of the element types that fit here to add, then appends it as the last child of the selection. */
   @FXML
   public void onAddChild(ActionEvent e) {
     ContentElement parent = selectedElement();
-    if (parent == null) {
+    ContentElement root = model.getContent().getRoot();
+    if (parent == null || root == null) {
       return;
     }
-    ContentElement child = new ContentElement();
-    child.setId(ContentElementDefaults.newId());
-    child.setType("Box");
-    child.setNamespace(parent.getNamespace() != null ? parent.getNamespace() : ContentElementDefaults.DEFAULT_NAMESPACE);
-    ContentElementDefaults.applyMissing(child);
-    execute(new InsertElementCommand(parent, child, Integer.MAX_VALUE, this::rememberSelection));
+    List<ContentModule> insertable = ContentInsertion.insertableModules(root, parent, ContentInsertion.Position.AS_CHILD);
+    if (insertable.isEmpty()) {
+      return;
+    }
+    Dialogs.showInsertElement(Studio.stage, typeLabel(parent), insertable).ifPresent(chosen -> addChild(parent, chosen));
+  }
+
+  /** Appends a new element of {@code module} as the last child of {@code parent} (undoable, selects the new element). */
+  void addChild(@NonNull ContentElement parent, @NonNull ContentModule module) {
+    ContentElement table = ContentInsertion.closestTable(model.getContent().getRoot(), parent);
+    int tableColumns = table != null ? ContentTableColumns.columns(table).size() : 0;
+    execute(new InsertElementCommand(parent, ContentElementFactory.create(module, tableColumns), Integer.MAX_VALUE,
+        this::rememberSelection));
   }
 
   @FXML
@@ -749,7 +733,9 @@ public class ContentModelEditorController extends AbstractEditorController imple
     }
     undoButton.setDisable(!commandStack.canUndo());
     redoButton.setDisable(!commandStack.canRedo());
-    addButton.setDisable(!hasSelection);
+    ContentElement root = model != null ? model.getContent().getRoot() : null;
+    addButton.setDisable(!hasSelection || root == null
+        || !ContentInsertion.canInsert(root, item.getValue(), ContentInsertion.Position.AS_CHILD));
     deleteButton.setDisable(isRoot);
     moveUpButton.setDisable(isRoot || index <= 0);
     moveDownButton.setDisable(isRoot || index >= siblingCount - 1);
@@ -782,44 +768,18 @@ public class ContentModelEditorController extends AbstractEditorController imple
     event.consume();
   }
 
-  /**
-   * The tree's context menu: every toolbar action, each entry enabled exactly when its toolbar button is. The items
-   * are created once (a context menu without items never opens); only their enabled state is refreshed on showing.
-   */
   private ContextMenu createContextMenu() {
-    Map<MenuItem, Button> mirrored = new LinkedHashMap<>();
-    ContextMenu menu = new ContextMenu();
-    menu.getItems().addAll(
-        menuItem(mirrored, "undo", Icons.UNDO, undoButton, this::onUndo),
-        menuItem(mirrored, "redo", Icons.REDO, redoButton, this::onRedo),
-        new SeparatorMenuItem(),
-        menuItem(mirrored, "content_model_tree.add_child", Icons.PLUS, addButton, this::onAddChild),
-        new SeparatorMenuItem(),
-        menuItem(mirrored, "content_model_tree.delete", Icons.TRASH, deleteButton, this::onRemoveElement),
-        new SeparatorMenuItem(),
-        menuItem(mirrored, "content_model_tree.move_up", Icons.ARROW_UP, moveUpButton, this::onMoveUp),
-        menuItem(mirrored, "content_model_tree.move_down", Icons.ARROW_DOWN, moveDownButton, this::onMoveDown),
-        new SeparatorMenuItem(),
-        menuItem(mirrored, "content_model_tree.cut", Icons.CUT, cutButton, this::onCut),
-        menuItem(mirrored, "content_model_tree.copy", Icons.COPY, copyButton, this::onCopy),
-        menuItem(mirrored, "content_model_tree.paste", Icons.PASTE, pasteButton, this::onPaste),
-        menuItem(mirrored, "content_model_tree.duplicate", Icons.COPY, duplicateButton, this::onDuplicate));
-    menu.setOnShowing(event -> {
-      updateActionState();
-      mirrored.forEach((item, button) -> item.setDisable(button.isDisable()));
-    });
-    return menu;
-  }
-
-  private static MenuItem menuItem(Map<MenuItem, Button> mirrored, String bundleKey, String icon, Button button,
-      EventHandler<ActionEvent> action) {
-    MenuItem item = new MenuItem(StudioBundle.get(bundleKey));
-    FontIcon fontIcon = WidgetFactory.createIcon(icon);
-    fontIcon.getStyleClass().add("menu-icon");
-    item.setGraphic(fontIcon);
-    item.setOnAction(action);
-    mirrored.put(item, button);
-    return item;
+    return ContentModelTreeContextMenu.create(this::updateActionState, new ContentModelTreeContextMenu.Actions(
+        new ContentModelTreeContextMenu.Action(undoButton, this::onUndo),
+        new ContentModelTreeContextMenu.Action(redoButton, this::onRedo),
+        new ContentModelTreeContextMenu.Action(addButton, this::onAddChild),
+        new ContentModelTreeContextMenu.Action(deleteButton, this::onRemoveElement),
+        new ContentModelTreeContextMenu.Action(moveUpButton, this::onMoveUp),
+        new ContentModelTreeContextMenu.Action(moveDownButton, this::onMoveDown),
+        new ContentModelTreeContextMenu.Action(cutButton, this::onCut),
+        new ContentModelTreeContextMenu.Action(copyButton, this::onCopy),
+        new ContentModelTreeContextMenu.Action(pasteButton, this::onPaste),
+        new ContentModelTreeContextMenu.Action(duplicateButton, this::onDuplicate)));
   }
 
   private void commitChange() {

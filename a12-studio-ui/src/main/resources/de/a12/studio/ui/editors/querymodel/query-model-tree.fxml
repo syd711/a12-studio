@@ -58,7 +58,7 @@
                         <Separator orientation="VERTICAL" />
                         <Button fx:id="openModelButton" accessibleText="%open_model" mnemonicParsing="false" onAction="#onOpenModelButton" styleClass="default-button">
                             <graphic>
-                                <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" styleClass="toolbar-icon" />
+                                <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="16" styleClass="toolbar-icon" />
                             </graphic>
                             <tooltip>
                                 <Tooltip text="%open_model" />

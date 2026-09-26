@@ -731,17 +731,36 @@ editor, not of the include.
   `false` flags and unspecified keywords are omitted, `enableColumnsResizing`-style default-true flags get an explicit
   `false`, padding/margin/radius as CSS shorthand with a "Mixed" 4-value mode, colors as `rgb()`/`rgba()`, background
   images as `url('...')`, URLs checked against DOMPurify's scheme allow-list). Table column insert/delete/move/pin go
-  through `ContentTableColumns`, which keeps head/body/foot cells index-aligned like SME's middleware. New children and
+  through `ContentTableColumns`, which keeps head/body/foot cells index-aligned like SME's middleware. The Columns panel (2026-09-26) is a `module-row` list like Modules/Tree columns (`RowFactory`: drag handle, move up/down, edit, delete; "Add column" appends before the right-pinned ones; insert above/below in the row's context menu): one label row per column (head-cell text or `<id>`), moves and drops only among equally pinned columns as in SME (`RowFactory` got a `canDrop` predicate and per-direction move enabling for that). The edit dialog (`TableColumnDialogController`) holds everything SME shows inline or in its expandable row: pin direction (re-sorts like SME), action column, default width, min width (only with "Enable resizing"), fixed width and the horizontal/vertical alignment of general/head/body/foot; widths follow SME's rule (blank clears, otherwise non-negative, rounded down to one decimal) and an invalid one blocks OK with a message naming the field. New children and
   retyped elements get SME's default props (`ContentElementDefaults`, additive). **Deliberate deviations:** the Grid switch
   SME labels "Gutter" (it stores `noGutter`, so switching it on removes the gutter) is labeled "No gutter"; the type stays
   editable (SME fixes it when the element is created); a "Raw properties (JSON)" panel stays for what has no typed panel,
   notably the rich formatting of Paragraph/Heading (SME edits it inline on the canvas; the words themselves have a plain
   text field in the Content panel, `LexicalText`/`LexicalTextRow`: one line per Lexical block, formatting of the runs
   around an edit kept, `html` regenerated, read-only with a hint when the tree holds links or field references);
-  "Group Reference", "Field",
-  "Field reference" and "Screen Reader Column" are plain text fields (SME offers a picker over the Document Model / the
-  table's columns). **Still missing:** the form-content elements (Text Line, Checkbox, ... with elementId, localized
+  "Group Reference", "Field"
+  and "Field reference" are plain text fields (SME offers a picker over the Document Model); "Screen Reader Column" is a
+  combo box over the table's columns (`ColumnRow`) with SME's hint as a tooltip. **Still missing:** the form-content elements (Text Line, Checkbox, ... with elementId, localized
   label/hint/placeholder, annotations), the Conditional element's condition editor, and the pickers above.
+- **Content Model "Add child" (2026-09-26) - which element may go where.** SME's insert panel is not a free choice: it
+  lists only the element types whose parent rule accepts the target and whose result the target's child rule accepts
+  (`ModelStateSelector.insertableNodeTypes` in `contentengine-editor`, rules declared per element in each
+  `*.module.tsx`: `parentRules`/`childRules` as anyOf/noneOf/sequence with min/max instances and a nested rule for a
+  child's own children). The studio ports that as `ContentElementLibrary` (52 element types: 40 default Content
+  Engine elements + the 12 form elements of `formengine-content-elements-editor`, with SME's labels, categories
+  "Layout / Content / General / Form Elements" and `orderingConfigurations`), `ContentRuleEvaluator` (the rule
+  engine, including the sequence pairing and the instance limits) and `ContentInsertion` (simulates the child list
+  after the insert and evaluates it; Repeatable Group and Conditional are looked through, except in the table body,
+  as in SME; supports child/above/below). The "Add child" toolbar button / context-menu entry opens the "Add Element"
+  dialog (`editors/contentmodel/dialogs`, tiles per category, double click or Add confirms) with exactly those types
+  and is disabled when the list is empty (e.g. on a Paragraph or a complete Table). The new element is built by
+  `ContentElementFactory` like SME's `propertiesCreator`s: `Type-<uid>` id, default props, and the parts a type is
+  useless without (Table with head/body/foot + 5 sample columns/rows, Grid with a row, Expandable with both states,
+  lists with three items, Button Group Container with two groups, ...); a table row gets one cell per column of its
+  table. Save/Cancel/Commit/Add Row/Delete Row are never offered (SME excludes them too). **Not ported:** SME's paste
+  rules (cut/copy/paste/drag still accept any target), "Insert above/below" (the rule engine supports both positions,
+  only the menu entries are missing), the experimental-elements switch (SME ships it off), plugin-contributed
+  element libraries (an element of an unknown type takes no children).
 
 ### Validators — gap list
 

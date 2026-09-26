@@ -236,7 +236,7 @@ public class CombinationStepsPanelController extends AbstractPropertyEditor {
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(step));
 
-    Button openModelButton = RowFactory.createActionButton(Icons.OPEN_IN_NEW, "Open Model", () -> openModel(step));
+    Button openModelButton = RowFactory.createActionButton(Icons.PENCIL, "Open Model", () -> openModel(step));
     openModelButton.setDisable(referencedModelId(step) == null);
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {

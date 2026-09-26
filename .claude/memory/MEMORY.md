@@ -23,3 +23,4 @@ This directory holds a12-studio-specific memories, stored in the repo (not under
 
 - [Content Model property panels](project_content_model_property_panels.md) — right column mirrors SME setting panel per element type (2026-09-25); SME source location, row/panel design, traps
 - [Tab split panes](project_tab_split_panes.md) — "Split and Move Right" + tab DnD between StudioTabPanes (2026-09-26); activePane concept, getStyleableNode()==null trap, layout not persisted
+- [Content Model add element](project_content_model_add_element.md) — "Add child" = Add Element dialog filtered by SME parent/child rules (2026-09-26); rule source, port layout, traps

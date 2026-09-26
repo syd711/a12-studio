@@ -39,7 +39,7 @@
             <ComboBox fx:id="documentModelCombo" editable="false" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
             <Button fx:id="openDocumentModelButton" mnemonicParsing="false" onAction="#onOpenDocumentModel" styleClass="default-button">
               <graphic>
-                <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" />
+                <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="16" />
               </graphic>
               <tooltip>
                 <Tooltip text="%open_document_model" />

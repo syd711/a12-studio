@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import de.a12.studio.ui.editors.contentmodel.fields.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.columns"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -16,7 +20,12 @@
             <VBox spacing="6.0">
                 <children>
                     <SwitchRow label="%content_settings.enable_resizing" path="enableColumnsResizing" types="Table" defaultValue="true" />
-                    <VBox fx:id="columnsBox" spacing="6.0" />
+                    <VBox fx:id="columnsBox" spacing="8.0" />
+                    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%content_settings.columns_empty" />
+                    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%content_settings.column_add">
+                        <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                        <tooltip><Tooltip text="%content_settings.column_add" /></tooltip>
+                    </Button>
                 </children>
             </VBox>
         </center>

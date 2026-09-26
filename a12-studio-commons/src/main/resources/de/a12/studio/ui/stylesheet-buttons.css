@@ -48,6 +48,22 @@
     -fx-cursor: hand;
 }
 
+/*
+ * A MenuButton lays out its graphic and its dropdown arrow side by side, so the fixed 34px icon-button width
+ * above is too narrow for it and the arrow ends up on top of the icon. Let it size to its content instead,
+ * keeping the 34px height and a small gap between icon and arrow.
+ */
+.menu-button.default-button {
+    -fx-pref-width: -1;
+    -fx-min-width: -1;
+    -fx-padding: 0 6px 0 8px;
+    -fx-graphic-text-gap: 4px;
+}
+
+.menu-button.default-button > .arrow-button {
+    -fx-padding: 0 0 0 4px;
+}
+
 .default-button:hover, .action-button:hover {
     -fx-background-color: derive(-fx-panel-color, -6%);
 }

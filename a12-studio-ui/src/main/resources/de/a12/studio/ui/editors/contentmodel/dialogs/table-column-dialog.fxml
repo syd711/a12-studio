@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="460.0" minWidth="480.0" prefHeight="740.0" prefWidth="520.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.contentmodel.dialogs.TableColumnDialogController">
+   <top>
+      <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" BorderPane.alignment="CENTER">
+         <content>
+            <VBox spacing="14.0" styleClass="field-editor">
+               <padding>
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+               </padding>
+               <VBox spacing="2.0">
+                  <Label styleClass="field-label" text="%pin_direction" />
+                  <ComboBox fx:id="pinningCombo" editable="false" maxWidth="Infinity" />
+               </VBox>
+               <CheckBox fx:id="actionColumnCheck" mnemonicParsing="false" text="%content_settings.column_action" />
+
+               <Label styleClass="section-header" text="%content_settings.column_section_width" />
+               <HBox spacing="12.0">
+                  <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                     <Label styleClass="field-label" text="%content_settings.column_default_width" />
+                     <TextField fx:id="widthField" />
+                  </VBox>
+                  <VBox fx:id="minWidthBox" spacing="2.0" HBox.hgrow="ALWAYS">
+                     <Label styleClass="field-label" text="%content_settings.column_min_width" />
+                     <TextField fx:id="minWidthField" />
+                  </VBox>
+               </HBox>
+               <CheckBox fx:id="fixedWidthCheck" mnemonicParsing="false" text="%content_settings.column_fixed_width" />
+               <Label fx:id="errorLabel" managed="false" styleClass="validation-error" visible="false" wrapText="true" />
+
+               <Label styleClass="section-header" text="%content_settings.column_horizontal_alignment" />
+               <GridPane fx:id="horizontalGrid" hgap="12.0" vgap="8.0" />
+
+               <Label styleClass="section-header" text="%content_settings.column_vertical_alignment" />
+               <GridPane fx:id="verticalGrid" hgap="12.0" vgap="8.0" />
+            </VBox>
+         </content>
+         <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+         </padding>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <items>
+            <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%ok" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
+         </items>
+         <padding>
+            <Insets bottom="8.0" right="8.0" />
+         </padding>
+      </ToolBar>
+   </bottom>
+</BorderPane>

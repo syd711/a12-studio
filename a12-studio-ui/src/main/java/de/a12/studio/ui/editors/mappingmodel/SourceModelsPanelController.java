@@ -147,7 +147,7 @@ public class SourceModelsPanelController extends AbstractPropertyEditor {
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(sourceModel));
 
-    Button openModelButton = RowFactory.createActionButton(Icons.OPEN_IN_NEW, "Open Model", () -> openModel(sourceModel));
+    Button openModelButton = RowFactory.createActionButton(Icons.PENCIL, "Open Model", () -> openModel(sourceModel));
     openModelButton.setDisable(sourceModel.getDmId() == null || sourceModel.getDmId().isBlank());
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {

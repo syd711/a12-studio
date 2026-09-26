@@ -20,6 +20,9 @@ public final class ContentElementDefaults {
 
   private static final String LEXICAL_ROOT_TAIL = "\"direction\":\"ltr\",\"format\":\"\",\"indent\":0,\"type\":\"root\",\"version\":1}}";
 
+  // What SME's form elements start with: no field bound yet, no annotations
+  private static final String FORM_ELEMENT = "{\"elementId\":\"\",\"annotations\":[]}";
+
   private static final Map<String, String> DEFAULTS = Map.ofEntries(
       Map.entry("Box", "{\"style\":{\"display\":\"flex\",\"width\":\"100%\",\"height\":\"fit-content\","
           + "\"flexDirection\":\"column\",\"flexWrap\":\"nowrap\",\"padding\":\"0px\",\"margin\":\"0px\","
@@ -50,7 +53,22 @@ public final class ContentElementDefaults {
       Map.entry("InteractiveListItem", "{\"text\":\"List Item\"}"),
       Map.entry("InteractiveList", "{\"style\":{\"width\":\"100%\"}}"),
       Map.entry("OrderedList", "{\"style\":{\"width\":\"100%\"}}"),
-      Map.entry("UnorderedList", "{\"style\":{\"width\":\"100%\"}}"));
+      Map.entry("UnorderedList", "{\"style\":{\"width\":\"100%\"}}"),
+      Map.entry("ButtonGroupContainer", "{\"style\":{\"alignItems\":\"center\"}}"),
+      Map.entry("Expandable", "{\"initialCollapsed\":true,\"icons\":{\"collapsedIcon\":{\"name\":\"keyboard_arrow_right\","
+          + "\"theme\":\"filled\"},\"expandedIcon\":{\"name\":\"keyboard_arrow_down\",\"theme\":\"filled\"},"
+          + "\"size\":\"medium\",\"rightAlignment\":true}}"),
+      Map.entry("MessageGroupContainer", "{\"fields\":[],\"groups\":[],\"rules\":[]}"),
+      Map.entry("TextLine", FORM_ELEMENT),
+      Map.entry("TextArea", FORM_ELEMENT),
+      Map.entry("Checkbox", FORM_ELEMENT),
+      Map.entry("Switch", FORM_ELEMENT),
+      Map.entry("DatePicker", FORM_ELEMENT),
+      Map.entry("Select", FORM_ELEMENT),
+      Map.entry("AutoComplete", FORM_ELEMENT),
+      Map.entry("Radio", FORM_ELEMENT),
+      Map.entry("MultiSelect", FORM_ELEMENT),
+      Map.entry("CheckboxGroup", FORM_ELEMENT));
 
   private ContentElementDefaults() {
   }

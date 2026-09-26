@@ -127,11 +127,14 @@ public class NewModelDialogController implements DialogController {
   }
 
   private static boolean requiresDocumentModel(ModelType modelType) {
-    return modelType == ModelType.FORM || modelType == ModelType.OVERVIEW || modelType == ModelType.QUERY;
+    return modelType == ModelType.FORM || modelType == ModelType.OVERVIEW || modelType == ModelType.QUERY
+        || modelType == ModelType.MAPPING;
   }
 
   private void updateDocumentModelVisibility(ModelType modelType) {
     boolean visible = requiresDocumentModel(modelType);
+    // A Mapping Model's document model is specifically its Target (content.Target.dmId).
+    documentModelLabel.setText(StudioBundle.get(modelType == ModelType.MAPPING ? "new_model.target_document_model" : "document_model"));
     documentModelLabel.setVisible(visible);
     documentModelLabel.setManaged(visible);
     documentModelCombo.setVisible(visible);

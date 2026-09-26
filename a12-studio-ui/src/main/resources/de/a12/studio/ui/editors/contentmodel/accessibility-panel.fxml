@@ -14,12 +14,12 @@
         </top>
         <center>
             <VBox spacing="2.0">
-            <SwitchRow label="%content_settings.hide_content" path="contentHidden" types="TableHeadCell"/>
+            <SwitchRow text="%content_settings.hide_content" hint="%content_settings.hide_content_hint" path="contentHidden" types="TableHeadCell"/>
             <ToggleRow label="%content_settings.initial_focus" path="focusOnMessage" types="MessageBox" booleanValued="true" initial="false">
                 <ToggleOption value="true" label="%content_settings.yes"/>
                 <ToggleOption value="false" label="%content_settings.no"/>
             </ToggleRow>
-            <TextRow label="%content_settings.screen_reader_column" path="screenReaderColumnRef" types="Table" prompt="%content_settings.select_a_column"/>
+            <ColumnRow label="%content_settings.screen_reader_column" path="screenReaderColumnRef" types="Table" prompt="%content_settings.select_a_column" hint="%content_settings.screen_reader_column_hint"/>
             <TextRow label="%content_settings.title" path="title" types="Video"/>
             </VBox>
         </center>

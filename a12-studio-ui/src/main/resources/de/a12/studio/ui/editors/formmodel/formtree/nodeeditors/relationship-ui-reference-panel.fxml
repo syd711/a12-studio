@@ -16,7 +16,7 @@
                   <ComboBox fx:id="referenceField" editable="false" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
                   <Button fx:id="openReferenceButton" mnemonicParsing="false" onAction="#onOpenReference" styleClass="default-button">
                     <graphic>
-                      <FontIcon iconLiteral="mdi2o-open-in-new" iconSize="16" />
+                      <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="16" />
                     </graphic>
                     <tooltip>
                       <Tooltip text="%open_relationship_ui_model" />

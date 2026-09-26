@@ -21,6 +21,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 /**
  * Shared row-building blocks for the reorderable-list property editors in this package (e.g.
@@ -54,6 +55,16 @@ public final class RowFactory {
    */
   public static void setupRowDragAndDrop(@NonNull HBox row, @NonNull Node dragHandle, @NonNull DataFormat indexFormat,
       int index, @NonNull BiConsumer<Integer, Integer> onDrop) {
+    setupRowDragAndDrop(row, dragHandle, indexFormat, index, (fromIndex, insertBeforeIndex) -> true, onDrop);
+  }
+
+  /**
+   * Same as {@link #setupRowDragAndDrop(HBox, Node, DataFormat, int, BiConsumer)}, but {@code canDrop} - given the
+   * dragged row's original index and the insertion index the cursor currently points at - can refuse a position (no
+   * drop indicator, drop not accepted), e.g. when the list only allows reordering within a group of rows.
+   */
+  public static void setupRowDragAndDrop(@NonNull HBox row, @NonNull Node dragHandle, @NonNull DataFormat indexFormat,
+      int index, @NonNull BiPredicate<Integer, Integer> canDrop, @NonNull BiConsumer<Integer, Integer> onDrop) {
     dragHandle.setOnDragDetected(event -> {
       Dragboard dragboard = dragHandle.startDragAndDrop(TransferMode.MOVE);
       ClipboardContent content = new ClipboardContent();
@@ -71,9 +82,15 @@ public final class RowFactory {
     dragHandle.setOnDragDone(event -> row.getStyleClass().remove("module-row-dragging"));
 
     row.setOnDragOver(event -> {
-      if (event.getDragboard().hasContent(indexFormat)) {
+      Dragboard dragboard = event.getDragboard();
+      boolean above = isAboveMidpoint(row, event.getY());
+      if (dragboard.hasContent(indexFormat)
+          && canDrop.test(Integer.parseInt((String) dragboard.getContent(indexFormat)), above ? index : index + 1)) {
         event.acceptTransferModes(TransferMode.MOVE);
-        showDropIndicator(row, isAboveMidpoint(row, event.getY()));
+        showDropIndicator(row, above);
+      }
+      else {
+        clearDropIndicator(row);
       }
       event.consume();
     });
@@ -83,7 +100,11 @@ public final class RowFactory {
       boolean success = dragboard.hasContent(indexFormat);
       if (success) {
         int insertBeforeIndex = isAboveMidpoint(row, event.getY()) ? index : index + 1;
-        onDrop.accept(Integer.parseInt((String) dragboard.getContent(indexFormat)), insertBeforeIndex);
+        int fromIndex = Integer.parseInt((String) dragboard.getContent(indexFormat));
+        success = canDrop.test(fromIndex, insertBeforeIndex);
+        if (success) {
+          onDrop.accept(fromIndex, insertBeforeIndex);
+        }
       }
       clearDropIndicator(row);
       event.setDropCompleted(success);
@@ -194,12 +215,18 @@ public final class RowFactory {
    * java.util.Collections#swap} - when either arrow is pressed; disabled at the ends of the list.
    */
   public static VBox createMoveButtonsBox(int index, int rowCount, @NonNull BiConsumer<Integer, Integer> onMove) {
+    return createMoveButtonsBox(index, index > 0, index < rowCount - 1, onMove);
+  }
+
+  /** Same as above, for lists where a row may not be able to swap with a neighbour that is not at the list's end. */
+  public static VBox createMoveButtonsBox(int index, boolean canMoveUp, boolean canMoveDown,
+      @NonNull BiConsumer<Integer, Integer> onMove) {
     Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> onMove.accept(index, index - 1));
-    moveUpButton.setDisable(index == 0);
+    moveUpButton.setDisable(!canMoveUp);
     moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
 
     Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> onMove.accept(index, index + 1));
-    moveDownButton.setDisable(index == rowCount - 1);
+    moveDownButton.setDisable(!canMoveDown);
     moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
 
     VBox box = new VBox(1, moveUpButton, moveDownButton);

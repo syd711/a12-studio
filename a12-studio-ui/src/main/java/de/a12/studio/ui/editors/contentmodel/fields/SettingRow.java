@@ -4,11 +4,14 @@ import de.a12.studio.models.contentmodel.ContentProps;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import de.a12.studio.ui.util.WidgetFactory;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -33,6 +36,7 @@ public abstract class SettingRow extends VBox {
   private final HBox controls = new HBox(6);
 
   private String path;
+  private String hint;
   private Set<String> types = Set.of();
   private String showWhen;
   private String enabledWhen;
@@ -76,6 +80,25 @@ public abstract class SettingRow extends VBox {
     boolean hasLabel = label != null && !label.isBlank();
     labelNode.setVisible(hasLabel);
     labelNode.setManaged(hasLabel);
+  }
+
+  public String getHint() {
+    return hint;
+  }
+
+  /** Extra explanation shown as a tooltip on the row's label, marked by an info icon; empty for none. */
+  public void setHint(String hint) {
+    this.hint = hint;
+    boolean hasHint = hint != null && !hint.isBlank();
+    labelNode.setTooltip(hasHint ? WidgetFactory.createTooltip(hint) : null);
+    labelNode.setGraphic(hasHint ? createInfoIcon() : null);
+    labelNode.setContentDisplay(ContentDisplay.RIGHT);
+  }
+
+  static FontIcon createInfoIcon() {
+    FontIcon icon = WidgetFactory.createIcon("mdi2i-information-outline", 14, null);
+    icon.getStyleClass().add("content-setting-hint-icon");
+    return icon;
   }
 
   public String getPath() {

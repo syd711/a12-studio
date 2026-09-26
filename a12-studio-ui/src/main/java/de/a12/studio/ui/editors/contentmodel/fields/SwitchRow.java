@@ -1,7 +1,9 @@
 package de.a12.studio.ui.editors.contentmodel.fields;
 
 import de.a12.studio.models.contentmodel.ContentProps;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -19,6 +21,31 @@ public class SwitchRow extends SettingRow {
     controls().getChildren().add(checkBox);
     checkBox.selectedProperty().addListener((observable, oldValue, selected) ->
         edited(props -> props.setFlag(getPath(), selected, defaultValue)));
+  }
+
+  public String getText() {
+    return checkBox.getText();
+  }
+
+  /** Puts the label on the checkbox itself instead of in the label column, for long labels that need the full width. */
+  public void setText(String text) {
+    checkBox.setText(text);
+    updateCheckBoxHint();
+  }
+
+  /** With the label on the checkbox (see {@link #setText}), the hint's tooltip and info icon go on the checkbox too. */
+  @Override
+  public void setHint(String hint) {
+    super.setHint(hint);
+    updateCheckBoxHint();
+  }
+
+  private void updateCheckBoxHint() {
+    String hint = getHint();
+    boolean show = hint != null && !hint.isBlank() && checkBox.getText() != null && !checkBox.getText().isBlank();
+    checkBox.setTooltip(show ? WidgetFactory.createTooltip(hint) : null);
+    checkBox.setGraphic(show ? createInfoIcon() : null);
+    checkBox.setContentDisplay(ContentDisplay.RIGHT);
   }
 
   public boolean isDefaultValue() {

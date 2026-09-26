@@ -19,6 +19,7 @@ import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.FormScreenGenerator;
 import de.a12.studio.models.mappingmodel.MappingModel;
 import de.a12.studio.models.mappingmodel.MappingModelContent;
+import de.a12.studio.models.mappingmodel.MappingTarget;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModelContent;
 import de.a12.studio.models.overviewmodel.ElementBox;
@@ -188,7 +189,7 @@ public class NewModelFactory {
       case PRINT -> buildPrintModel(name, locales);
       case TREE -> buildTreeModel(locales);
       case COMBINATION -> buildCombinationModel(locales);
-      case MAPPING -> buildMappingModel(locales);
+      case MAPPING -> buildMappingModel(documentModelId, locales);
       case QUERY -> buildQueryModel(documentModelId, locales);
       case STRUCTURALMAPPING -> buildStructuralMappingModel(locales);
       case SELECTION -> buildSelectionModel(locales);
@@ -436,9 +437,21 @@ public class NewModelFactory {
     return model;
   }
 
-  private static MappingModel buildMappingModel(List<Locale> locales) {
+  // The Target Document Model is mandatory, so the New Model dialog collects it up front; mirrors
+  // MappingModelEditorController#onTargetModelChanged (Target.dmId + an untagged DOCUMENT header reference).
+  private static MappingModel buildMappingModel(String documentModelId, List<Locale> locales) {
     MappingModel model = new MappingModel();
-    model.setContent(new MappingModelContent());
+    MappingModelContent content = new MappingModelContent();
+    if (documentModelId != null && !documentModelId.isBlank()) {
+      MappingTarget target = new MappingTarget();
+      target.setDmId(documentModelId);
+      content.setTarget(target);
+      ModelReference reference = new ModelReference();
+      reference.setModelType(ModelType.DOCUMENT);
+      reference.setReference(documentModelId);
+      model.getModelReferences().add(reference);
+    }
+    model.setContent(content);
     model.setLocales(locales);
     return model;
   }

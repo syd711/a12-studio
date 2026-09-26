@@ -727,3 +727,31 @@
     -fx-background-radius: 6;
     -fx-border-radius: 6;
 }
+
+/* Element tiles of the Content Model "Add Element" dialog: a flat card that takes the accent on hover/selection. */
+.insert-element-tile {
+    -fx-background-color: -fx-surface-color;
+    -fx-background-insets: 0;
+    -fx-background-radius: 6px;
+    -fx-border-color: -fx-border-color-theme;
+    -fx-border-radius: 6px;
+    -fx-text-fill: -fx-text-color;
+    -fx-padding: 6 6 6 6;
+    -fx-cursor: hand;
+}
+
+.insert-element-tile:hover {
+    -fx-background-color: -fx-panel-color;
+    -fx-border-color: -fx-accent-color;
+}
+
+.insert-element-tile:selected,
+.insert-element-tile:selected:hover {
+    -fx-background-color: derive(-fx-accent-color, 80%);
+    -fx-border-color: -fx-accent-color;
+    -fx-border-width: 2;
+}
+
+.insert-element-tile:focused {
+    -fx-border-color: -fx-accent-color;
+}

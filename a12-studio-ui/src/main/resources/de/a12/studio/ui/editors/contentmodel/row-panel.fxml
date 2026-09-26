@@ -14,7 +14,7 @@
         </top>
         <center>
             <VBox spacing="2.0">
-            <SwitchRow label="%content_settings.disable_selected_row_styling" path="disableSelectedRowStyling" types="Table"/>
+            <SwitchRow text="%content_settings.disable_selected_row_styling" path="disableSelectedRowStyling" types="Table"/>
             </VBox>
         </center>
     </BorderPane>

@@ -3,53 +3,52 @@ package de.a12.studio.ui.editors.contentmodel;
 import de.a12.studio.models.contentmodel.ContentElement;
 import de.a12.studio.models.contentmodel.ContentProps;
 import de.a12.studio.models.contentmodel.ContentTableColumns;
+import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.contentmodel.dialogs.Dialogs;
+import de.a12.studio.ui.editors.propertyeditors.RowFactory;
+import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
+import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
- * SME's "Columns" section of a Table: the "Enable resizing" switch and the list of columns with their width, pinning
- * and action-column flag, plus per column the details (fixed width, minimum width while resizing is enabled, and the
- * horizontal/vertical alignment of the general, head, body and foot areas) and the column actions: insert above or
- * below, move up or down (only among columns pinned the same way), and delete. Structure changes go through {@link
- * ContentTableColumns}, which keeps the head/body/foot cells aligned with the columns, and then tell the editor to
- * rebuild the tree below the table.
+ * SME's "Columns" section of a Table: the "Enable resizing" switch and the list of columns, one draggable row per
+ * column named by the text of its head cell (or {@code <id>} when it has none, as in SME). A row can be moved up or
+ * down with its buttons or by dragging its handle - only among columns pinned the same way, like in SME - and
+ * edited or deleted; clicking the row or its edit button opens {@link Dialogs#showTableColumn}, which holds all the
+ * column's settings (pin direction, action column, widths, alignments). "Insert above"/"Insert below" are in the
+ * row's context menu, "Add column" appends one. Structure changes go through {@link ContentTableColumns}, which keeps
+ * the head/body/foot cells aligned with the columns, and then tell the editor to rebuild the tree below the table.
  */
 public class TableColumnsPanelController extends ContentSettingsPanelController {
 
-  private static final List<String> PINNINGS = List.of("none", "left", "right");
-  private static final List<String> HORIZONTAL = List.of("auto", "left", "center", "right");
-  private static final List<String> VERTICAL = List.of("auto", "top", "middle", "bottom");
-  private static final List<String> AREAS = List.of("general", "head", "body", "foot");
+  // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into the columns.
+  private static final DataFormat COLUMN_INDEX = new DataFormat("application/x-a12-content-table-column-index");
 
   @FXML
   private VBox columnsBox;
 
-  private final Set<String> detailsOpen = new HashSet<>();
+  @FXML
+  private Label emptyLabel;
 
   @Override
   protected void populate(@NonNull ContentElement element) {
@@ -68,211 +67,107 @@ public class TableColumnsPanelController extends ContentSettingsPanelController 
       return;
     }
     List<Map<String, Object>> columns = ContentTableColumns.columns(table);
+    boolean empty = columns.isEmpty();
+    emptyLabel.setVisible(empty);
+    emptyLabel.setManaged(empty);
     for (int i = 0; i < columns.size(); i++) {
-      columnsBox.getChildren().add(columnRow(table, columns, i));
+      columnsBox.getChildren().add(createRow(table, columns, i));
     }
   }
 
-  private Node columnRow(ContentElement table, List<Map<String, Object>> columns, int index) {
+  private HBox createRow(ContentElement table, List<Map<String, Object>> columns, int index) {
     Map<String, Object> column = columns.get(index);
-    String id = String.valueOf(column.get("id"));
     String head = ContentTableColumns.headLabel(table, index);
-    Label title = new Label(head != null && !head.isBlank() ? head : "<" + id + ">");
-    title.setMaxWidth(Double.MAX_VALUE);
-    title.getStyleClass().add("content-setting-heading");
-    HBox.setHgrow(title, Priority.ALWAYS);
-
-    TextField width = new TextField(column.get("width") == null ? "" : String.valueOf(column.get("width")));
-    width.setPrefWidth(56);
-    width.setPromptText(StudioBundle.get("content_settings.width"));
-    commitOnLeave(width, text -> commitWidth(column, "width", text));
-
-    ComboBox<String> pinning = new ComboBox<>();
-    pinning.getItems().setAll(PINNINGS);
-    pinning.setConverter(labels("content_settings.pinning_"));
-    pinning.setValue(column.get("pinning") instanceof String p ? p : "none");
-    pinning.setPrefWidth(88);
-    pinning.valueProperty().addListener((observable, oldValue, value) -> {
-      if (value != null && !value.equals(oldValue)) {
-        ContentTableColumns.setPinning(table, index, "none".equals(value) ? null : value);
-        structureEdited();
+    Label nameLabel = new Label(head != null && !head.isBlank() ? head : "<" + column.get("id") + ">");
+    nameLabel.setId("tableColumn-" + index);
+    nameLabel.setMaxWidth(Double.MAX_VALUE);
+    nameLabel.setCursor(Cursor.HAND);
+    HBox.setHgrow(nameLabel, Priority.ALWAYS);
+    nameLabel.setOnMouseClicked(event -> {
+      if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
+        editColumn(index);
       }
     });
 
-    CheckBox action = new CheckBox(StudioBundle.get("content_settings.column_action"));
-    action.setSelected(Boolean.TRUE.equals(column.get("actionColumn")));
-    action.selectedProperty().addListener((observable, oldValue, selected) -> {
-      if (selected) {
-        column.put("actionColumn", true);
-      }
-      else {
-        column.remove("actionColumn");
-      }
-      changed();
+    FontIcon dragHandle = RowFactory.createDragHandle();
+    HBox row = new HBox(10.0, dragHandle, nameLabel, createActionsBox(columns, index));
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("module-row");
+    row.setOnContextMenuRequested(event -> {
+      insertMenu(columns, index).show(row, event.getScreenX(), event.getScreenY());
+      event.consume();
     });
-
-    ToggleButton details = new ToggleButton(StudioBundle.get("content_settings.column_details"));
-    details.setSelected(detailsOpen.contains(id));
-    Button delete = new Button();
-    delete.setGraphic(WidgetFactory.createIcon("mdi2d-delete-outline", 14, null));
-    delete.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("content_settings.column_delete")));
-    delete.setOnAction(event -> confirmDelete(index));
-    MenuButton actions = new MenuButton(StudioBundle.get("content_settings.column_actions"));
-    actions.getItems().addAll(
-        item("content_settings.column_insert_above", false, () -> insert(index, column)),
-        item("content_settings.column_insert_below", false, () -> insert(index + 1, column)),
-        item("content_settings.column_move_up", !canMove(columns, index, -1), () -> moveColumn(index, index - 1)),
-        item("content_settings.column_move_down", !canMove(columns, index, 1), () -> moveColumn(index, index + 1)));
-
-    HBox summary = new HBox(6, title, width, pinning);
-    summary.setAlignment(Pos.CENTER_LEFT);
-    HBox buttons = new HBox(6, action, details, actions, delete);
-    buttons.setAlignment(Pos.CENTER_LEFT);
-
-    VBox card = new VBox(4, summary, buttons);
-    card.getStyleClass().add("content-setting-card");
-    card.setPadding(new Insets(6));
-    VBox detailsBox = detailsBox(column);
-    detailsBox.setVisible(details.isSelected());
-    detailsBox.setManaged(details.isSelected());
-    details.selectedProperty().addListener((observable, oldValue, selected) -> {
-      detailsBox.setVisible(selected);
-      detailsBox.setManaged(selected);
-      if (selected) {
-        detailsOpen.add(id);
-      }
-      else {
-        detailsOpen.remove(id);
-      }
-    });
-    card.getChildren().add(detailsBox);
-    return card;
+    RowFactory.setupRowDragAndDrop(row, dragHandle, COLUMN_INDEX, index,
+        (from, insertBefore) -> canDrop(columns, from, insertBefore), this::dropColumn);
+    return row;
   }
 
-  private VBox detailsBox(Map<String, Object> column) {
-    VBox box = new VBox(4);
-    CheckBox fixed = new CheckBox(StudioBundle.get("content_settings.column_fixed_width"));
-    fixed.setSelected(Boolean.TRUE.equals(column.get("fixedWidth")));
-    fixed.selectedProperty().addListener((observable, oldValue, selected) -> {
-      if (selected) {
-        column.put("fixedWidth", true);
-      }
-      else {
-        column.remove("fixedWidth");
-      }
-      changed();
-    });
-    box.getChildren().add(fixed);
-    if (new ContentProps(table()).getBoolean("enableColumnsResizing", true)) {
-      TextField minWidth = new TextField(column.get("minResizeWidth") == null ? "" : String.valueOf(column.get("minResizeWidth")));
-      minWidth.setPrefWidth(70);
-      commitOnLeave(minWidth, text -> commitWidth(column, "minResizeWidth", text));
-      box.getChildren().add(labeled(StudioBundle.get("content_settings.column_min_width"), minWidth));
+  private HBox createActionsBox(List<Map<String, Object>> columns, int index) {
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, canMove(columns, index, -1), canMove(columns, index, 1),
+        this::moveColumn);
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("content_settings.column_edit"),
+        () -> editColumn(index));
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("content_settings.column_delete"),
+        () -> confirmDelete(index));
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
+    actionsBox.setAlignment(Pos.CENTER_LEFT);
+    return actionsBox;
+  }
+
+  private ContextMenu insertMenu(List<Map<String, Object>> columns, int index) {
+    Map<String, Object> column = columns.get(index);
+    MenuItem above = new MenuItem(StudioBundle.get("content_settings.column_insert_above"));
+    above.setOnAction(event -> insert(index, column));
+    MenuItem below = new MenuItem(StudioBundle.get("content_settings.column_insert_below"));
+    below.setOnAction(event -> insert(index + 1, column));
+    return new ContextMenu(above, below);
+  }
+
+  @FXML
+  private void onAdd() {
+    ContentElement table = table();
+    if (table == null) {
+      return;
     }
-    box.getChildren().add(alignment(column, "horizontalAlignment", "content_settings.column_horizontal_alignment", HORIZONTAL));
-    box.getChildren().add(alignment(column, "verticalAlignment", "content_settings.column_vertical_alignment", VERTICAL));
-    return box;
-  }
-
-  private Node alignment(Map<String, Object> column, String key, String titleKey, List<String> values) {
-    VBox box = new VBox(2);
-    box.getChildren().add(new Label(StudioBundle.get(titleKey)));
-    Object current = column.get(key);
-    for (String area : AREAS) {
-      ComboBox<String> combo = new ComboBox<>();
-      combo.getItems().setAll(values);
-      combo.setConverter(labels("content_settings.alignment_"));
-      combo.setValue(current instanceof Map<?, ?> map && map.get(area) instanceof String value ? value : "auto");
-      combo.valueProperty().addListener((observable, oldValue, value) -> {
-        if (value == null) {
-          return;
-        }
-        Map<String, Object> areas = column.get(key) instanceof Map<?, ?> existing
-            ? castMap(existing) : new LinkedHashMap<>();
-        if ("auto".equals(value)) {
-          areas.remove(area);
-        }
-        else {
-          areas.put(area, value);
-        }
-        if (areas.isEmpty()) {
-          column.remove(key);
-        }
-        else {
-          column.put(key, areas);
-        }
-        changed();
-      });
-      box.getChildren().add(labeled(StudioBundle.get("content_settings.area_" + area), combo));
+    // Before the right-pinned columns, which stay last
+    List<Map<String, Object>> columns = ContentTableColumns.columns(table);
+    int position = columns.size();
+    while (position > 0 && "right".equals(columns.get(position - 1).get("pinning"))) {
+      position--;
     }
-    return box;
+    ContentTableColumns.insert(table, position, null);
+    structureEdited();
   }
 
-  @SuppressWarnings("unchecked")
-  private static Map<String, Object> castMap(Map<?, ?> map) {
-    return (Map<String, Object>) map;
+  private void editColumn(int index) {
+    ContentElement table = table();
+    List<Map<String, Object>> columns = ContentTableColumns.columns(table);
+    if (index < 0 || index >= columns.size()) {
+      return;
+    }
+    Map<String, Object> column = columns.get(index);
+    boolean resizing = new ContentProps(table).getBoolean("enableColumnsResizing", true);
+    Optional<Map<String, Object>> edited = Dialogs.showTableColumn(Studio.stage, column, resizing);
+    if (edited.isEmpty() || edited.get().equals(column)) {
+      return;
+    }
+    applyEdit(table, index, edited.get());
   }
 
-  private static HBox labeled(String text, Node control) {
-    Label label = new Label(text);
-    label.setMinWidth(100);
-    HBox line = new HBox(8, label, control);
-    line.setAlignment(Pos.CENTER_LEFT);
-    return line;
-  }
-
-  private static StringConverter<String> labels(String keyPrefix) {
-    return new StringConverter<>() {
-      @Override
-      public String toString(String value) {
-        return value == null ? "" : StudioBundle.get(keyPrefix + value);
-      }
-
-      @Override
-      public String fromString(String string) {
-        return string;
-      }
-    };
-  }
-
-  private static MenuItem item(String key, boolean disabled, Runnable action) {
-    MenuItem item = new MenuItem(StudioBundle.get(key));
-    item.setDisable(disabled);
-    item.setOnAction(event -> action.run());
-    return item;
-  }
-
-  private static void commitOnLeave(TextField field, java.util.function.Consumer<String> action) {
-    field.setOnAction(event -> action.accept(field.getText()));
-    field.focusedProperty().addListener((observable, hadFocus, hasFocus) -> {
-      if (!hasFocus) {
-        action.accept(field.getText());
-      }
-    });
-  }
-
-  /** SME: blank removes the value, otherwise a non-negative number rounded down to one decimal. */
-  private void commitWidth(Map<String, Object> column, String key, String text) {
-    Object before = column.get(key);
-    if (text == null || text.isBlank()) {
-      column.remove(key);
+  /** Writes the dialog's result onto the live column; a changed pin direction also moves the column, like in SME. */
+  void applyEdit(ContentElement table, int index, Map<String, Object> edited) {
+    Map<String, Object> column = ContentTableColumns.columns(table).get(index);
+    Object oldPinning = column.get("pinning");
+    Object newPinning = edited.get("pinning");
+    column.clear();
+    column.putAll(edited);
+    if (Objects.equals(oldPinning, newPinning)) {
+      changed();
+      rebuild();
     }
     else {
-      double parsed;
-      try {
-        parsed = Double.parseDouble(text.trim());
-      }
-      catch (NumberFormatException e) {
-        return;
-      }
-      if (Double.isNaN(parsed) || parsed < 0) {
-        return;
-      }
-      double rounded = Math.floor(parsed * 10) / 10;
-      column.put(key, rounded == Math.floor(rounded) ? (Object) (int) rounded : (Object) rounded);
-    }
-    if (!java.util.Objects.equals(before, column.get(key))) {
-      changed();
+      ContentTableColumns.setPinning(table, index, (String) newPinning);
+      structureEdited();
     }
   }
 
@@ -281,7 +176,25 @@ public class TableColumnsPanelController extends ContentSettingsPanelController 
     if (target < 0 || target >= columns.size()) {
       return false;
     }
-    return java.util.Objects.equals(columns.get(index).get("pinning"), columns.get(target).get("pinning"));
+    return Objects.equals(columns.get(index).get("pinning"), columns.get(target).get("pinning"));
+  }
+
+  /** SME: a column may only be dropped next to a column pinned the same way. */
+  static boolean canDrop(List<Map<String, Object>> columns, int from, int insertBefore) {
+    if (from < 0 || from >= columns.size()) {
+      return false;
+    }
+    Object pinning = columns.get(from).get("pinning");
+    return (insertBefore > 0 && insertBefore - 1 < columns.size()
+        && Objects.equals(columns.get(insertBefore - 1).get("pinning"), pinning))
+        || (insertBefore < columns.size() && Objects.equals(columns.get(insertBefore).get("pinning"), pinning));
+  }
+
+  private void dropColumn(int from, int insertBefore) {
+    int to = from < insertBefore ? insertBefore - 1 : insertBefore;
+    if (to != from) {
+      moveColumn(from, to);
+    }
   }
 
   private void insert(int index, Map<String, Object> neighbour) {
@@ -295,9 +208,9 @@ public class TableColumnsPanelController extends ContentSettingsPanelController 
   }
 
   private void confirmDelete(int index) {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION, StudioBundle.get("content_settings.column_delete_confirm"),
-        ButtonType.OK, ButtonType.CANCEL);
-    if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+    Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
+        StudioBundle.get("content_settings.column_delete_confirm"), null, null, StudioBundle.get("delete"));
+    if (result.isPresent() && result.get() == ButtonType.OK) {
       deleteColumn(index);
     }
   }

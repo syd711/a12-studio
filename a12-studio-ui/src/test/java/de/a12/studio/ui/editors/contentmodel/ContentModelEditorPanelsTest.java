@@ -1,6 +1,8 @@
 package de.a12.studio.ui.editors.contentmodel;
 
 import de.a12.studio.models.contentmodel.ContentElement;
+import de.a12.studio.models.contentmodel.ContentElementLibrary;
+import de.a12.studio.models.contentmodel.ContentModule;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.contentmodel.ContentProps;
 import de.a12.studio.models.contentmodel.ContentTableColumns;
@@ -10,6 +12,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.editors.contentmodel.fields.ColumnRow;
 import de.a12.studio.ui.editors.contentmodel.fields.LexicalTextRow;
 import de.a12.studio.ui.editors.contentmodel.fields.SettingRow;
 import de.a12.studio.ui.editors.formmodel.FxTestSupport;
@@ -40,6 +43,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -216,6 +220,47 @@ class ContentModelEditorPanelsTest {
     });
   }
 
+  @Test
+  void theScreenReaderColumnIsChosenFromTheColumnsOfTheTable() throws Exception {
+    select("Table");
+    ContentElement table = selected();
+    List<ColumnRow> rows = new ArrayList<>();
+    FxTestSupport.onFx(() -> collectRows(settingsBox, ColumnRow.class, rows));
+    assertEquals(1, rows.size());
+    ColumnRow row = rows.get(0);
+    assertTrue(row.getHint().startsWith("Appends a column") || row.getHint().startsWith("H"), row.getHint());
+    ComboBox<Object> combo = FxTestSupport.field(row, "input");
+    assertFalse(table.getProps().containsKey("screenReaderColumnRef"), "selecting must not change the table");
+
+    List<Map<String, Object>> columns = ContentTableColumns.columns(table);
+    FxTestSupport.onFx(() -> combo.getOnShowing().handle(null));
+    assertEquals(columns.size() + 1, combo.getItems().size(), "None plus one entry per column");
+    Object second = combo.getItems().get(2);
+    String expectedLabel = ContentTableColumns.headLabel(table, 1);
+    assertEquals(expectedLabel != null && !expectedLabel.isBlank() ? expectedLabel : "<" + columns.get(1).get("id") + ">", second.toString());
+
+    FxTestSupport.onFx(() -> combo.setValue(second));
+    assertEquals(columns.get(1).get("id"), table.getProps().get("screenReaderColumnRef"));
+
+    FxTestSupport.onFx(() -> combo.setValue(combo.getItems().get(0)));
+    assertFalse(table.getProps().containsKey("screenReaderColumnRef"), "None removes the reference");
+  }
+
+  private static <T extends Node> void collectRows(Node node, Class<T> type, List<T> found) {
+    if (!node.isVisible() || !node.isManaged()) {
+      return;
+    }
+    if (type.isInstance(node)) {
+      found.add(type.cast(node));
+    }
+    else if (node instanceof TitledPane pane && pane.getContent() != null) {
+      collectRows(pane.getContent(), type, found);
+    }
+    else if (node instanceof Parent parent) {
+      parent.getChildrenUnmodifiable().forEach(child -> collectRows(child, type, found));
+    }
+  }
+
   private static void collectTextRows(Node node, List<LexicalTextRow> found) {
     if (!node.isVisible() || !node.isManaged()) {
       return;
@@ -302,6 +347,69 @@ class ContentModelEditorPanelsTest {
     Object movedId = ContentTableColumns.columns(table).get(0).get("id");
     FxTestSupport.onFx(() -> columns.moveColumn(0, 1));
     assertEquals(movedId, ContentTableColumns.columns(table).get(1).get("id"));
+  }
+
+  @Test
+  void theColumnsPanelListsOneRowPerColumnAndAppliesWhatTheEditDialogReturns() throws Exception {
+    select("Table");
+    ContentElement table = selected();
+    TableColumnsPanelController columns = panel(TableColumnsPanelController.class);
+    VBox rows = FxTestSupport.field(columns, "columnsBox");
+    int before = ContentTableColumns.columns(table).size();
+    assertEquals(before, rowCount(rows), "one row per column");
+
+    // A new, unpinned column at the front; the dialog then pins it to the right
+    Map<String, Object> added = FxTestSupport.onFx(() -> {
+      Map<String, Object> column = ContentTableColumns.insert(table, 0, null);
+      columns.showElement(table);
+      return column;
+    });
+    assertEquals(before + 1, rowCount(rows));
+
+    Map<String, Object> edited = new LinkedHashMap<>(added);
+    edited.put("pinning", "right");
+    edited.put("fixedWidth", true);
+    edited.put("minResizeWidth", 0.5);
+    edited.put("horizontalAlignment", Map.of("body", "right"));
+    FxTestSupport.onFx(() -> columns.applyEdit(table, 0, edited));
+
+    List<Map<String, Object>> after = ContentTableColumns.columns(table);
+    Map<String, Object> last = after.get(after.size() - 1);
+    assertEquals(added.get("id"), last.get("id"), "pinning right moves the column behind the others");
+    assertEquals("right", last.get("pinning"));
+    assertEquals(Boolean.TRUE, last.get("fixedWidth"));
+    assertEquals(0.5, last.get("minResizeWidth"));
+    assertEquals(Map.of("body", "right"), last.get("horizontalAlignment"));
+    for (ContentElement section : table.getChildren()) {
+      for (ContentElement row : section.getChildren()) {
+        assertEquals(before + 1, row.getChildren().size(), "cells follow the column");
+      }
+    }
+    assertEquals(before + 1, rowCount(rows));
+
+    // Editing without changing the pinning keeps the position
+    Map<String, Object> plain = new LinkedHashMap<>(last);
+    plain.remove("fixedWidth");
+    FxTestSupport.onFx(() -> columns.applyEdit(table, after.size() - 1, plain));
+    assertEquals(added.get("id"), ContentTableColumns.columns(table).get(after.size() - 1).get("id"));
+    assertFalse(ContentTableColumns.columns(table).get(after.size() - 1).containsKey("fixedWidth"));
+  }
+
+  private static int rowCount(VBox rows) throws Exception {
+    int count = FxTestSupport.onFx(() -> rows.getChildren().size());
+    return count;
+  }
+
+  @Test
+  void aColumnMayOnlyBeDroppedNextToColumnsPinnedTheSameWay() {
+    List<Map<String, Object>> columns = List.of(
+        Map.of("id", "a", "pinning", "left"), Map.of("id", "b"), Map.of("id", "c"), Map.of("id", "d", "pinning", "right"));
+
+    assertTrue(TableColumnsPanelController.canDrop(columns, 1, 3), "between c and d: c is unpinned like b");
+    assertTrue(TableColumnsPanelController.canDrop(columns, 2, 1), "between a and b: b is unpinned like c");
+    assertFalse(TableColumnsPanelController.canDrop(columns, 1, 0), "in front of the left-pinned column");
+    assertFalse(TableColumnsPanelController.canDrop(columns, 1, 4), "behind the right-pinned column");
+    assertFalse(TableColumnsPanelController.canDrop(columns, 0, 2), "the only left-pinned column has no partner");
   }
 
   @Test
@@ -463,20 +571,17 @@ class ContentModelEditorPanelsTest {
     ContentElement parent = FxTestSupport.onFx(() -> tree.getSelectionModel().getSelectedItem().getParent().getValue());
     List<ContentElement> originalOrder = new ArrayList<>(parent.getChildren());
 
-    // Add child: undo removes it and restores the absent "children" key of a leaf, redo brings it back.
-    boolean leafBefore = paragraph.getChildren() == null;
-    FxTestSupport.onFx(() -> loaded.controller().onAddChild(null));
-    assertEquals(1, paragraph.getChildren().size());
-    ContentElement added = paragraph.getChildren().get(0);
+    // Add child (a Paragraph takes none, so into its parent): undo removes it, redo brings it back.
+    ContentModule paragraphModule = ContentElementLibrary.find(ContentElementLibrary.NAMESPACE, "Paragraph").orElseThrow();
+    FxTestSupport.onFx(() -> loaded.controller().addChild(parent, paragraphModule));
+    assertEquals(originalOrder.size() + 1, parent.getChildren().size());
+    ContentElement added = parent.getChildren().get(originalOrder.size());
     assertEquals(added, selected());
     FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
-    assertTrue(paragraph.getChildren() == null || paragraph.getChildren().isEmpty());
-    if (leafBefore) {
-      assertNull(paragraph.getChildren());
-    }
-    assertEquals(paragraph, selected());
+    assertEquals(originalOrder, parent.getChildren());
+    assertEquals(parent, selected());
     FxTestSupport.onFx(() -> loaded.controller().onRedo(null));
-    assertEquals(List.of(added), paragraph.getChildren());
+    assertEquals(added, parent.getChildren().get(originalOrder.size()));
     FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
 
     // Cut, then undo: the element is back at its old position.
@@ -550,6 +655,36 @@ class ContentModelEditorPanelsTest {
 
   private static String title(String key) {
     return StudioBundle.get("content_settings." + key);
+  }
+
+  @Test
+  void theAddButtonIsOnlyEnabledWhereSomethingCanBeAdded() throws Exception {
+    javafx.scene.control.Button addButton = FxTestSupport.field(loaded.controller(), "addButton");
+
+    select("Box");
+    assertFalse(addButton.isDisabled(), "a Box takes children");
+
+    select("Paragraph");
+    assertTrue(addButton.isDisabled(), "a Paragraph takes no children");
+  }
+
+  @Test
+  void anAddedElementIsOfTheChosenTypeLastInTheParentAndUndoRemovesIt() throws Exception {
+    select("Box");
+    ContentElement box = FxTestSupport.onFx(() -> tree.getSelectionModel().getSelectedItem().getValue());
+    int before = box.getChildren().size();
+    ContentModule table = ContentElementLibrary.find(ContentElementLibrary.NAMESPACE, "Table").orElseThrow();
+
+    FxTestSupport.onFx(() -> loaded.controller().addChild(box, table));
+
+    ContentElement added = box.getChildren().get(before);
+    assertEquals("Table", added.getType());
+    assertEquals(List.of("TableHead", "TableBody", "TableFoot"), added.getChildren().stream().map(ContentElement::getType).toList());
+    assertEquals(added, FxTestSupport.onFx(() -> tree.getSelectionModel().getSelectedItem().getValue()));
+
+    FxTestSupport.onFx(() -> loaded.controller().onUndo(null));
+
+    assertEquals(before, box.getChildren().size());
   }
 
   private List<String> visibleTitles() throws Exception {
