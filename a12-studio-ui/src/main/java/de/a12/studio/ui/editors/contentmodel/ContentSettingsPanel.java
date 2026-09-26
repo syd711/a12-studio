@@ -17,6 +17,14 @@ public interface ContentSettingsPanel {
   /** Shows the settings of {@code element}, or hides the panel when it has none for its type / for {@code null}. */
   void showElement(@Nullable ContentElement element);
 
+  /**
+   * Whether what the panel shows depends on settings of other panels (e.g. the Date Picker Config on the element the
+   * Form Element panel picked), so the editor shows the element again in it after an edit made in another panel.
+   */
+  default boolean followsOtherPanels() {
+    return false;
+  }
+
   /** Called after every user edit that changed the shown element's props. */
   void setOnChange(@NonNull Runnable onChange);
 
@@ -32,6 +40,12 @@ public interface ContentSettingsPanel {
 
     /** The panel added or removed child elements of the selected element: the tree must be rebuilt below it. */
     void structureChanged();
+
+    /** What the elements may reference in the Document Model the Content Model is bound to. */
+    ContentReferences references();
+
+    /** The codes of the locales of the Content Model, for the localized texts of form elements. */
+    java.util.List<String> locales();
   }
 
   /** Releases listeners and pending work once the editor closes. */

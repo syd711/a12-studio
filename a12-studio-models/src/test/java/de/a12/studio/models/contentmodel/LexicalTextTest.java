@@ -180,7 +180,7 @@ class LexicalTextTest {
   }
 
   @Test
-  void aTreeWithLinksOrFieldReferencesCanBeReadButNotEdited() {
+  void aTreeWithLinksCanBeReadButNotEdited() {
     ContentElement element = paragraph(block("paragraph", run(0, "", "See "),
         "{\"children\":[" + run(0, "", "docs") + "],\"type\":\"link\",\"url\":\"https://a\",\"version\":1}",
         "{\"type\":\"ce-field-reference\",\"text\":\"\",\"fieldPath\":\"/Product/Name\",\"version\":1}"));
@@ -198,5 +198,160 @@ class LexicalTextTest {
 
     assertFalse(LexicalText.supports(element));
     assertFalse(LexicalText.isEditable(element));
+  }
+
+  // ---- references ----
+
+  private static String ref(String id, String path, boolean group, int format) {
+    return "{\"detail\":0,\"format\":" + format + ",\"mode\":\"normal\",\"style\":\"\",\"text\":\"\",\"type\":\"ce-field-reference\",\"version\":1,"
+        + "\"fieldId\":\"" + id + "\",\"fieldPath\":\"" + path + "\"" + (group ? ",\"isGroup\":true" : "") + "}";
+  }
+
+  private static ContentElement priceLine() {
+    return paragraph(block("paragraph", run(0, "", "Price: "), ref("price", "/P/Price", false, 0), run(0, "", " EUR")));
+  }
+
+  private static List<String> kinds(ContentElement element, int block) {
+    return runsOf(blocksOf(element).get(block)).stream()
+        .map(run -> "text".equals(run.get("type")) ? "text:" + run.get("text") : "ref:" + run.get("fieldId")).toList();
+  }
+
+  @Test
+  void aReferenceShowsAsItsLabelAndDoesNotMakeTheTextReadOnly() {
+    ContentElement element = paragraph(block("paragraph", run(0, "", "See "), ref("g", "/P/Items", true, 0), ref("f", "/P/Name", false, 0)));
+
+    assertEquals("See IndexOf(/P/Items)[/P/Name]", LexicalText.getText(element));
+    assertTrue(LexicalText.isEditable(element));
+  }
+
+  @Test
+  void editingTheWordsAroundAReferenceKeepsTheReference() {
+    ContentElement element = priceLine();
+    Object node = runsOf(blocksOf(element).get(0)).get(1);
+
+    assertTrue(LexicalText.setText(element, "Cost: [/P/Price] EUR!"));
+
+    assertEquals(List.of("text:Cost: ", "ref:price", "text: EUR!"), kinds(element, 0));
+    assertTrue(node == runsOf(blocksOf(element).get(0)).get(1), "the reference node itself is untouched");
+    assertEquals("Cost: [/P/Price] EUR!", LexicalText.getText(element));
+    assertTrue(((String) element.getProps().get("html")).contains("data-ce-field-ref-id=\"price\""), (String) element.getProps().get("html"));
+  }
+
+  @Test
+  void deletingAllOfAReferencesLabelRemovesIt() {
+    ContentElement element = priceLine();
+
+    assertTrue(LexicalText.setText(element, "Price:  EUR"));
+
+    assertEquals(List.of("text:Price: ", "text: EUR"), kinds(element, 0));
+    assertEquals(List.of(), ContentNodes.lexicalReferences(element));
+  }
+
+  @Test
+  void changingPartOfAReferencesLabelTurnsItIntoPlainText() {
+    ContentElement element = priceLine();
+
+    assertTrue(LexicalText.setText(element, "Price: [/P/Pxrice] EUR"));
+
+    assertEquals(List.of(), ContentNodes.lexicalReferences(element));
+    assertEquals("Price: [/P/Pxrice] EUR", LexicalText.getText(element));
+    kinds(element, 0).forEach(kind -> assertTrue(kind.startsWith("text:"), kind));
+  }
+
+  @Test
+  void typingRightNextToAReferenceGoesIntoTextOfItsOwn() {
+    ContentElement element = paragraph(block("paragraph", ref("f", "/P/Name", false, 0)));
+
+    assertTrue(LexicalText.setText(element, "[/P/Name]!"));
+    assertTrue(LexicalText.setText(element, "?[/P/Name]!"));
+
+    assertEquals(List.of("text:?", "ref:f", "text:!"), kinds(element, 0));
+  }
+
+  @Test
+  void aNewLineAfterAReferenceStartsABlockWithoutIt() {
+    ContentElement element = priceLine();
+
+    assertTrue(LexicalText.setText(element, "Price: [/P/Price] EUR\nsecond"));
+
+    assertEquals(2, blocksOf(element).size());
+    assertEquals(List.of("text:second"), kinds(element, 1));
+    assertEquals(List.of("text:Price: ", "ref:price", "text: EUR"), kinds(element, 0));
+  }
+
+  @Test
+  void aReferenceIsInsertedIntoTheMiddleOfTheWords() {
+    ContentElement element = paragraph(block("paragraph", run(1, "font-weight: 700;", "Hello world")));
+
+    assertTrue(LexicalText.insertReference(element, 6, "f", "/P/Name", false));
+
+    assertEquals(List.of("text:Hello ", "ref:f", "text:world"), kinds(element, 0));
+    Map<String, Object> inserted = runsOf(blocksOf(element).get(0)).get(1);
+    assertEquals("ce-field-reference", inserted.get("type"));
+    assertEquals("/P/Name", inserted.get("fieldPath"));
+    assertEquals(1, inserted.get("format"), "takes the formatting of what precedes it");
+    assertFalse(inserted.containsKey("isGroup"));
+    assertEquals("Hello [/P/Name]world", LexicalText.getText(element));
+    assertEquals(List.of("f"), ContentNodes.lexicalReferences(element).stream().map(ContentNodes.LexicalReference::fieldId).toList());
+    assertTrue(LexicalText.setText(element, LexicalText.getText(element)), "the label in the text does not double it");
+    assertEquals(List.of("text:Hello ", "ref:f", "text:world"), kinds(element, 0));
+  }
+
+  @Test
+  void aReferenceCanBeInsertedAtTheEndsAndIntoLaterBlocksAndAsAGroup() {
+    ContentElement element = paragraph(block("paragraph", run(0, "", "one")), block("paragraph", run(0, "", "two")));
+
+    assertTrue(LexicalText.insertReference(element, 0, "a", "/P/A", false));
+    // "[/P/A]one" is 9 characters, the newline the tenth: 3 more put the caret into "two".
+    assertTrue(LexicalText.insertReference(element, 9 + 1 + 3, "b", "/P/B", true));
+    assertTrue(LexicalText.insertReference(element, 999, "c", "/P/C", false));
+
+    assertEquals(List.of("ref:a", "text:one"), kinds(element, 0));
+    assertEquals(List.of("text:two", "ref:b", "ref:c"), kinds(element, 1));
+    assertEquals("[/P/A]one\ntwoIndexOf(/P/B)[/P/C]", LexicalText.getText(element));
+    assertEquals(List.of(false, true, false), ContentNodes.lexicalReferences(element).stream().map(ContentNodes.LexicalReference::group).toList());
+  }
+
+  @Test
+  void aReferenceIsInsertedIntoAnEmptyElementAndNotIntoOneWithLinks() {
+    ContentElement empty = new ContentElement();
+    empty.setType("Heading");
+    assertTrue(LexicalText.insertReference(empty, 0, "f", "/P/Name", false));
+    assertEquals("[/P/Name]", LexicalText.getText(empty));
+
+    ContentElement withLink = paragraph(block("paragraph",
+        "{\"children\":[" + run(0, "", "docs") + "],\"type\":\"link\",\"url\":\"https://a\",\"version\":1}"));
+    assertFalse(LexicalText.insertReference(withLink, 0, "f", "/P/Name", false));
+    assertEquals("stale", withLink.getProps().get("html"));
+  }
+
+  @Test
+  void theDisplayOfAFieldReferenceCanBeSetAndItsDefaultTextRemoved() {
+    ContentElement element = paragraph(block("paragraph", ref("a", "/P/A", false, 0), ref("g", "/P/G", true, 0), ref("b", "/P/B", false, 0)));
+
+    assertEquals(List.of(new LexicalText.ReferenceOptions("[/P/A]", "value-only", ""), new LexicalText.ReferenceOptions("[/P/B]", "value-only", "")),
+        LexicalText.fieldReferenceOptions(element), "a group reference has no options");
+
+    assertTrue(LexicalText.setReferenceOptions(element, 1, "label-value", "n/a"));
+
+    assertEquals("value-only", LexicalText.fieldReferenceOptions(element).get(0).displayOption());
+    assertEquals(new LexicalText.ReferenceOptions("[/P/B]", "label-value", "n/a"), LexicalText.fieldReferenceOptions(element).get(1));
+    assertEquals("label-value", runsOf(blocksOf(element).get(0)).get(2).get("displayOption"));
+    assertTrue(((String) element.getProps().get("html")).contains("data-ce-field-ref-missing-value-text=\"n/a\""));
+
+    assertTrue(LexicalText.setReferenceOptions(element, 1, "label-value", ""));
+    assertFalse(runsOf(blocksOf(element).get(0)).get(2).containsKey("missingValueText"));
+    assertFalse(LexicalText.setReferenceOptions(element, 2, "label-value", ""), "there are two field references");
+  }
+
+  @Test
+  void aNewFieldReferenceShowsTheValueOnly() {
+    ContentElement element = paragraph(block("paragraph", run(0, "", "x")));
+
+    LexicalText.insertReference(element, 1, "f", "/P/F", false);
+    LexicalText.insertReference(element, 0, "g", "/P/G", true);
+
+    assertEquals("value-only", runsOf(blocksOf(element).get(0)).get(2).get("displayOption"));
+    assertFalse(runsOf(blocksOf(element).get(0)).get(0).containsKey("displayOption"), "a group reference has none");
   }
 }

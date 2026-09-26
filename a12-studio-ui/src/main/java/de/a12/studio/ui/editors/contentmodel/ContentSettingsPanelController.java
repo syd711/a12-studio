@@ -53,6 +53,12 @@ public class ContentSettingsPanelController extends AbstractContentSettingsPanel
   }
 
   @Override
+  public void setContext(@NonNull Context context) {
+    super.setContext(context);
+    entries.forEach(entry -> entry.row().setContext(context));
+  }
+
+  @Override
   protected boolean appliesTo(String type) {
     return entries.stream().anyMatch(entry -> entry.appliesTo(type));
   }

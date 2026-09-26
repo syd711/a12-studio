@@ -3,9 +3,6 @@ package de.a12.studio.ui.editors.treemodel.dialogs;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.documentmodel.Element;
-import de.a12.studio.models.documentmodel.FieldElement;
-import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.treemodel.TreeColumn;
 import de.a12.studio.models.treemodel.TreeNodeColumn;
@@ -116,16 +113,12 @@ public final class ColumnMappingEditor {
     return copy;
   }
 
-  /** All field element ids of the given Document Model, walking its root groups recursively; empty if unknown. */
+  /**
+   * The ids of all elements of the given Document Model that a column can show - fields and also groups (e.g. an
+   * attachment group), included models' elements too - sorted by path; empty if the model is unknown.
+   */
   public static List<String> fieldOptionsFor(@NonNull ProjectItem projectItem, String documentModelId) {
-    if (documentModelId == null) {
-      return List.of();
-    }
-    return ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.DOCUMENT).stream()
-        .filter(documentModel -> documentModelId.equals(documentModel.getId()))
-        .findFirst()
-        .map(documentModel -> collectFieldIds((DocumentModel) documentModel))
-        .orElse(List.of());
+    return OverviewElementOptions.elementIds(elementIndexFor(projectItem, documentModelId));
   }
 
   /**
@@ -151,30 +144,5 @@ public final class ColumnMappingEditor {
         .map(A12Model::getId)
         .sorted()
         .toList();
-  }
-
-  private static List<String> collectFieldIds(DocumentModel documentModel) {
-    List<String> ids = new ArrayList<>();
-    if (documentModel.getContent() != null && documentModel.getContent().getModelRoot() != null
-        && documentModel.getContent().getModelRoot().getRootGroups() != null) {
-      for (GroupElement group : documentModel.getContent().getModelRoot().getRootGroups()) {
-        collectFieldIds(group, ids);
-      }
-    }
-    return ids;
-  }
-
-  private static void collectFieldIds(GroupElement group, List<String> ids) {
-    if (group.getGroup() == null || group.getGroup().getElements() == null) {
-      return;
-    }
-    for (Element child : group.getGroup().getElements()) {
-      if (child instanceof FieldElement field && field.getId() != null) {
-        ids.add(field.getId());
-      }
-      else if (child instanceof GroupElement childGroup) {
-        collectFieldIds(childGroup, ids);
-      }
-    }
   }
 }

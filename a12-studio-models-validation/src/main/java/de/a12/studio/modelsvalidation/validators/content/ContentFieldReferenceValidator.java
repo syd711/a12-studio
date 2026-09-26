@@ -13,6 +13,8 @@ import java.util.Map;
  * the text of any element (Paragraph, Heading, ...). Each needs the Document Model, must name a field of it (a group,
  * for a group reference in a text), and that field must be reachable from the data context of the element: the fields of
  * the base group or the enclosing Repeatable Group and of the groups above it, without descending into repeated groups.
+ * A group reference in a text shows the index of a repetition, so the group must repeat and be the data context or lie
+ * above it.
  */
 public final class ContentFieldReferenceValidator extends AbstractContentNodeValidator {
 
@@ -85,8 +87,8 @@ public final class ContentFieldReferenceValidator extends AbstractContentNodeVal
       else if (!group.isGroup()) {
         findings.error("validation.contentGroupReference.notAGroup", reference.fieldId());
       }
-      else if (!DocumentStructure.isCandidateGroup(info.context(), group)) {
-        findings.error("validation.contentGroupReference.notInContext", reference.fieldId(),
+      else if (!structure.candidateIndexGroups(info.context()).contains(group)) {
+        findings.error("validation.contentGroupReference.notIndexable", reference.fieldId(),
             info.context() != null ? info.context().path() : "/");
       }
     }

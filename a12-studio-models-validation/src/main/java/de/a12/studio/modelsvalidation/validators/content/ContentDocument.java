@@ -35,7 +35,7 @@ record ContentDocument(@Nullable String documentModelId, @Nullable DocumentModel
         documentModel = CombinedDocumentModelElements.resolveForFieldReferences(context.projectItem(), documentModelId);
       }
     }
-    DocumentStructure structure = documentModel != null ? new DocumentStructure(documentModel, context) : null;
+    DocumentStructure structure = documentModel != null ? new DocumentStructure(documentModel, context.otherDocumentModels()) : null;
     String baseGroupId = model.getContent() != null && model.getContent().getConfiguration() != null
         ? model.getContent().getConfiguration().getBaseGroupId()
         : null;

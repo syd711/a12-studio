@@ -19,6 +19,7 @@ import de.a12.studio.modelsvalidation.validators.content.ContentElementIdUniqueV
 import de.a12.studio.modelsvalidation.validators.content.ContentEventNodeValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentFormElementValidator;
+import de.a12.studio.modelsvalidation.validators.content.ContentMessageGroupValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentGroupReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentNodeShapeValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentRootElementValidator;
@@ -53,6 +54,7 @@ public final class ContentModelValidationService {
       new ContentGroupReferenceValidator(),
       new ContentFieldReferenceValidator(),
       new ContentFormElementValidator(),
+      new ContentMessageGroupValidator(),
       new ContentEventNodeValidator(),
       new ContentSettingsValidator(),
       new ContentWarningsValidator()));

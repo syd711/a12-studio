@@ -7,6 +7,7 @@ import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.models.treemodel.TreeNodeAction;
 import de.a12.studio.models.treemodel.TreeNodeActionGroup;
+import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.formmodel.FxTestSupport;
 import javafx.scene.control.Button;
@@ -288,6 +289,36 @@ class TreeConfigurationDialogsTest {
     assertEquals(2, result.column().getWidth());
   }
 
+  @Test
+  void theMappedFieldIsShownByItsPathAndGroupsAreOffered(@TempDir Path dir) throws Exception {
+    Workspace workspace = workspace(dir);
+    ElementIndex index = ColumnMappingEditor.elementIndexFor(workspace.tree(), "Person_DM");
+    assertNotNull(index, "Person_DM resolves in the project");
+    String fieldId = workspace.personFieldIds().get(0);
+    String path = index.resolveDisplayPath(fieldId);
+    assertTrue(path.startsWith("/"), "the field id resolves to a path: " + path);
+
+    String groupId = index.allElements().stream()
+        .filter(element -> element instanceof de.a12.studio.models.documentmodel.GroupElement && element.getId() != null)
+        .map(de.a12.studio.models.documentmodel.Element::getId).findFirst().orElseThrow();
+    List<String> options = ColumnMappingEditor.fieldOptionsFor(workspace.tree(), "Person_DM");
+    assertTrue(options.containsAll(workspace.personFieldIds()));
+    assertTrue(options.contains(groupId), "a group can be mapped too, e.g. an attachment group");
+    assertEquals(List.of(), ColumnMappingEditor.fieldOptionsFor(workspace.tree(), "Gone_DM"));
+    assertNull(ColumnMappingEditor.elementIndexFor(workspace.tree(), "Gone_DM"));
+
+    de.a12.studio.models.treemodel.TreeColumn column = new de.a12.studio.models.treemodel.TreeColumn();
+    column.setName("Name");
+    FxTestSupport.Loaded<TreeColumnDialogController> loaded = FxTestSupport.load("/de/a12/studio/ui/editors/treemodel/dialogs/tree-column-dialog.fxml");
+    FxTestSupport.onFx(() -> loaded.controller().init(new Stage(), column, options, index, fieldId));
+    ComboBox<String> fieldCombo = FxTestSupport.field(loaded.controller(), "fieldCombo");
+    assertEquals(path, fieldCombo.getConverter().toString(fieldId));
+    assertEquals("(None)", fieldCombo.getConverter().toString(null));
+    assertEquals(fieldId, fieldCombo.getValue(), "the stored value stays the id");
+    submit(loaded.controller());
+    assertEquals(fieldId, loaded.controller().getMappingResult().orElseThrow().field());
+  }
+
   // ---- child relationship ----
 
   private static FxTestSupport.Loaded<TreeChildRelationshipDialogController> openRelationship(Workspace workspace,
@@ -333,7 +364,7 @@ class TreeConfigurationDialogsTest {
     @SuppressWarnings("unchecked")
     ComboBox<String> firstColumn = (ComboBox<String>) grid.getChildren().stream()
         .filter(node -> node instanceof ComboBox && GridPane.getRowIndex(node) == 0).findFirst().orElseThrow();
-    assertEquals(workspace.personFieldIds(), firstColumn.getItems(), "the link Document Model's fields");
+    assertTrue(firstColumn.getItems().containsAll(workspace.personFieldIds()), "the link Document Model's fields");
     FxTestSupport.onFx(() -> firstColumn.setValue(workspace.personFieldIds().get(1)));
     submit(loaded.controller());
 

@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.contentmodel.fields;
 
 import de.a12.studio.models.contentmodel.ContentProps;
+import de.a12.studio.ui.editors.contentmodel.ContentSettingsPanel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -41,6 +42,7 @@ public abstract class SettingRow extends VBox {
   private String showWhen;
   private String enabledWhen;
   private ContentProps target;
+  private ContentSettingsPanel.Context context;
   private Runnable onEdit = () -> {
   };
   private boolean loading;
@@ -166,6 +168,16 @@ public abstract class SettingRow extends VBox {
     }
     String value = props.getString(condition.substring(0, equals).trim());
     return value != null && Arrays.asList(condition.substring(equals + 1).split("\\|")).contains(value);
+  }
+
+  /** Gives the row access to the surrounding editor, for the rows that pick from the Document Model. */
+  public void setContext(ContentSettingsPanel.@NonNull Context context) {
+    this.context = context;
+  }
+
+  /** The editor-side context, or {@code null} before the editor has provided it (e.g. in isolated tests). */
+  protected ContentSettingsPanel.Context context() {
+    return context;
   }
 
   public void setOnEdit(@NonNull Runnable onEdit) {

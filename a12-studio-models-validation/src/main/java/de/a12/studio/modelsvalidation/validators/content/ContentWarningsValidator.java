@@ -17,8 +17,9 @@ import java.util.Map;
 /**
  * The hints SME's element modules give while editing (severity warning, so they never make a model invalid): a Box
  * without children can render with a wrong height, a Media Query needs a Box as the root of the model to measure, a
- * Table's screen reader column should not be an action column, a vertical Button needs both a label and an icon, and a
- * Message Group Display shows nothing outside a Message Group Container.
+ * Table's screen reader column should not be an action column, a vertical Button needs both a label and an icon, a
+ * Message Group Display shows nothing outside a Message Group Container and a Message Group Container without one has
+ * nothing to display its messages.
  */
 public final class ContentWarningsValidator implements ModelValidator {
 
@@ -63,12 +64,20 @@ public final class ContentWarningsValidator implements ModelValidator {
           }
         }
       }
+      if (formEngine && "MessageGroupContainer".equals(element.getType()) && !containsMessageGroupDisplay(element)) {
+        errors.add(ContentTree.finding(contentModel, element, Severity.WARNING, "validation.contentWarning.messageGroupContainer"));
+      }
       if (formEngine && "MessageGroupDisplay".equals(element.getType()) && ancestors.stream().noneMatch(
           ancestor -> "MessageGroupContainer".equals(ancestor.getType()))) {
         errors.add(ContentTree.finding(contentModel, element, Severity.WARNING, "validation.contentWarning.messageGroupDisplay"));
       }
     });
     return errors;
+  }
+
+  private static boolean containsMessageGroupDisplay(ContentElement element) {
+    return element.getChildren() != null && element.getChildren().stream()
+        .anyMatch(child -> "MessageGroupDisplay".equals(child.getType()) || containsMessageGroupDisplay(child));
   }
 
   /** The table's screen reader column ({@code screenReaderColumnRef}) is one of its columns that is an action column. */

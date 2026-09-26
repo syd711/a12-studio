@@ -241,13 +241,34 @@ class ContentReferenceValidatorsTest {
         map("type", "ce-field-reference", "fieldId", "nope", "fieldPath", "/Product/Nope"),
         map("type", "ce-field-reference", "fieldId", PRICING, "fieldPath", "/Product/Pricing", "isGroup", true),
         map("type", "ce-field-reference", "fieldId", NAME, "fieldPath", "/Product/Name", "isGroup", true)))))));
-    ContentModel page = page(DM, paragraph);
+    ContentModel page = page(DM, group("pricing", PRICING, paragraph));
 
     List<ModelValidationError> errors = run(new ContentFieldReferenceValidator(), page);
 
     assertEquals(2, errors.size(), errors.toString());
     assertTrue(errors.get(0).message().contains("nope"), errors.get(0).message());
     assertTrue(errors.get(1).message().contains("not a group"), errors.get(1).message());
+  }
+
+  @Test
+  void aGroupReferenceInsideATextNeedsARepeatableGroupAtOrAboveItsDataContext() {
+    ContentElement paragraph = element("p1", "Paragraph");
+    paragraph.getProps().put("tree", map("root", map("children", List.of(map("type", "paragraph", "children", List.of(
+        map("type", "ce-field-reference", "fieldId", ATTRIBUTES, "fieldPath", "/a", "isGroup", true),
+        map("type", "ce-field-reference", "fieldId", VARIANTS, "fieldPath", "/v", "isGroup", true),
+        map("type", "ce-field-reference", "fieldId", PRICING, "fieldPath", "/p", "isGroup", true),
+        map("type", "ce-field-reference", "fieldId", GENERAL, "fieldPath", "/g", "isGroup", true)))))));
+    ContentElement outsideAll = element("p0", "Paragraph");
+    outsideAll.getProps().put("tree", map("root", map("children", List.of(map("type", "paragraph", "children", List.of(
+        map("type", "ce-field-reference", "fieldId", VARIANTS, "fieldPath", "/v", "isGroup", true)))))));
+    ContentModel page = page(DM, outsideAll, group("variants", VARIANTS, group("attributes", ATTRIBUTES, paragraph)));
+
+    List<ModelValidationError> errors = run(new ContentFieldReferenceValidator(), page);
+
+    assertEquals(List.of("p0", "p1", "p1"), errors.stream().map(ModelValidationError::elementId).toList(), errors.toString());
+    assertTrue(errors.get(0).message().contains(VARIANTS) && errors.get(0).message().contains("no index"), errors.get(0).message());
+    assertTrue(errors.get(1).message().contains(PRICING), "Pricing is not above the context: " + errors.get(1).message());
+    assertTrue(errors.get(2).message().contains(GENERAL), "General does not repeat: " + errors.get(2).message());
   }
 
   @Test
@@ -326,6 +347,70 @@ class ContentReferenceValidatorsTest {
     assertEquals(1, errors.size());
     assertEquals(Severity.WARNING.name(), errors.get(0).severity());
     assertEquals("t1", errors.get(0).elementId());
+  }
+
+  // ---- message group container ----
+
+  @Test
+  void aMessageGroupContainerListsExistingFieldsAndGroupsOfTheRightKind() {
+    ContentElement container = form("mgc", "MessageGroupContainer", "");
+    container.getProps().remove("elementId");
+    container.getProps().put("fields", List.of(NAME, VARIANT_NAME, GENERAL, "nope", ""));
+    container.getProps().put("groups", List.of(VARIANTS, NAME, "gone"));
+    container.getProps().put("rules", List.of("any-rule", ""));
+
+    List<ModelValidationError> errors = run(new ContentMessageGroupValidator(), page(DM, container));
+
+    assertEquals(5, errors.size(), errors.toString());
+    errors.forEach(error -> {
+      assertEquals("mgc", error.elementId());
+      assertEquals(Severity.ERROR.name(), error.severity());
+    });
+    assertTrue(errors.get(0).message().contains("is a group, not a field") && errors.get(0).message().contains(GENERAL), errors.get(0).message());
+    assertTrue(errors.get(1).message().contains("nope") && errors.get(1).message().contains(DM), errors.get(1).message());
+    assertTrue(errors.get(2).message().contains("no field selected"), errors.get(2).message());
+    assertTrue(errors.get(3).message().contains("is not a group") && errors.get(3).message().contains(NAME), errors.get(3).message());
+    assertTrue(errors.get(4).message().contains("gone"), errors.get(4).message());
+  }
+
+  @Test
+  void theListsOfAMessageGroupContainerNeedTheDocumentModelButAnEmptyOneDoesNot() {
+    ContentElement listing = form("listing", "MessageGroupContainer", "");
+    listing.getProps().put("fields", List.of(NAME));
+    ContentElement empty = form("empty", "MessageGroupContainer", "");
+    empty.getProps().put("fields", List.of());
+    empty.getProps().put("groups", List.of());
+    empty.getProps().put("rules", List.of());
+
+    List<ModelValidationError> errors = run(new ContentMessageGroupValidator(), page(null, listing, empty));
+
+    assertEquals(List.of("listing"), errors.stream().map(ModelValidationError::elementId).toList(), errors.toString());
+    assertTrue(errors.get(0).message().contains("needs a Document Model"), errors.get(0).message());
+  }
+
+  @Test
+  void aMessageGroupContainerMayListWhatIsNotInItsDataContext() {
+    // A container inside the Variants group may still list a field of another group: it only reports about it.
+    ContentElement container = form("mgc", "MessageGroupContainer", "");
+    container.getProps().put("fields", List.of(NAME, VARIANT_NAME, ATTRIBUTE_NAME));
+    container.getProps().put("groups", List.of(GENERAL, ATTRIBUTES));
+
+    assertEquals(List.of(), run(new ContentMessageGroupValidator(), page(DM, group("variants", VARIANTS, container))));
+  }
+
+  @Test
+  void aMessageGroupContainerWithoutADisplayIsOnlyWarnedAbout() {
+    ContentElement without = form("without", "MessageGroupContainer", "");
+    ContentElement with = form("with", "MessageGroupContainer", "");
+    ContentElement nested = element("box", "Box");
+    nested.getChildren().add(form("display", "MessageGroupDisplay", ""));
+    with.getChildren().add(nested);
+
+    List<ModelValidationError> errors = run(new ContentWarningsValidator(), page(null, without, with));
+
+    assertEquals(1, errors.size(), errors.toString());
+    assertEquals("without", errors.get(0).elementId());
+    assertEquals(Severity.WARNING.name(), errors.get(0).severity());
   }
 
   // ---- events ----

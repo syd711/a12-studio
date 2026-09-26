@@ -218,6 +218,21 @@ class ContentModelEditorIssuesTest {
     assertFalse(tooltip.getText().contains("group_1"), tooltip.getText());
   }
 
+  @Test
+  void withoutAValidationServiceNothingIsShownAndNothingFails() throws Exception {
+    ContentElement group = addToRoot("Group");
+    assertFalse(issues(group).isEmpty());
+    setStatic("validationService", null);
+
+    // Saves and refreshes happen (e.g. from the settings dialog) also where no project is open, e.g. in isolated tests.
+    FxTestSupport.onFx(() -> loaded.controller().refreshIssues());
+    FxTestSupport.onFx(() -> StudioEventManager.getInstance().fireModelSavedEvent(item));
+
+    assertTrue(issues(group).isEmpty());
+    Label summary = FxTestSupport.field(loaded.controller(), "issueSummaryLabel");
+    assertFalse(summary.isVisible());
+  }
+
   // ---- helpers ----
 
   private ContentElement root() {

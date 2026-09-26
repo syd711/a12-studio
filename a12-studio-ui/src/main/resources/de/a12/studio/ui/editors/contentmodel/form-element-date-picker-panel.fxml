@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.a12.studio.ui.editors.contentmodel.fields.*?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.fe_date_picker"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.contentmodel.DatePickerConfigPanelController">
+    <BorderPane>
+        <top>
+            <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+        </top>
+        <center>
+            <VBox spacing="2.0">
+            <NumberRow label="%content_settings.fe_min_year" path="datePickerConfig.minYear" types="DatePicker" hint="%content_settings.fe_year_hint"/>
+            <NumberRow label="%content_settings.fe_max_year" path="datePickerConfig.maxYear" types="DatePicker" hint="%content_settings.fe_year_hint"/>
+            <SwitchRow label="%content_settings.fe_absolute" path="datePickerConfig.absolute" types="DatePicker" hint="%content_settings.fe_absolute_hint"/>
+            <NumberRow label="%content_settings.fe_preselection_year" path="datePickerConfig.preselectionYear" types="DatePicker" hint="%content_settings.fe_preselection_hint"/>
+            </VBox>
+        </center>
+    </BorderPane>
+</TitledPane>

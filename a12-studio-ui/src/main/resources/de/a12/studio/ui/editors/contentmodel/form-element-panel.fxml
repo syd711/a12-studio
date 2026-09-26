@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.configuration"
+<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.fe_form_element"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.contentmodel.ContentSettingsPanelController">
     <BorderPane>
@@ -14,9 +14,8 @@
         </top>
         <center>
             <VBox spacing="2.0">
-            <ReferenceRow label="%content_settings.group_reference" path="groupId" types="Group" kind="GROUP"/>
-            <TextRow label="%content_settings.repeatability_in_preview" path="repeatability" types="Group"/>
-            <ReferenceRow label="%content_settings.field" path="fieldId" types="FieldOutput" kind="FIELD"/>
+            <ReferenceRow label="%content_settings.fe_element" path="elementId" kind="FORM_ELEMENT" types="TextLine,TextArea,Checkbox,Switch,DatePicker,Select,AutoComplete,Radio,MultiSelect,CheckboxGroup"/>
+            <SwitchRow label="%content_settings.fe_prefix_formal_errors" path="prefixFormalErrors" types="MessageGroupDisplay"/>
             </VBox>
         </center>
     </BorderPane>

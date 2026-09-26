@@ -26,6 +26,7 @@ public class ToggleRow extends SettingRow {
 
   private String initial;
   private boolean booleanValued;
+  private boolean omitInitial;
   private boolean updatingButtons;
 
   public ToggleRow() {
@@ -49,7 +50,14 @@ public class ToggleRow extends SettingRow {
         return;
       }
       String value = (String) newToggle.getUserData();
-      edited(props -> props.set(getPath(), booleanValued ? Boolean.valueOf(value) : value));
+      edited(props -> {
+        if (omitInitial && value.equals(initial)) {
+          props.remove(getPath());
+        }
+        else {
+          props.set(getPath(), booleanValued ? Boolean.valueOf(value) : value);
+        }
+      });
     });
   }
 
@@ -72,6 +80,15 @@ public class ToggleRow extends SettingRow {
   /** Options {@code "true"}/{@code "false"} are stored as real booleans (SME's Yes/No and Left/Right toggles). */
   public void setBooleanValued(boolean booleanValued) {
     this.booleanValued = booleanValued;
+  }
+
+  public boolean isOmitInitial() {
+    return omitInitial;
+  }
+
+  /** The initial option is not stored: choosing it removes the key (SME's controllers omit their default value). */
+  public void setOmitInitial(boolean omitInitial) {
+    this.omitInitial = omitInitial;
   }
 
   private void rebuild() {

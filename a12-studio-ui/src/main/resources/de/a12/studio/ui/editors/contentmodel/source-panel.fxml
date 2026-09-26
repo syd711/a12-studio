@@ -15,7 +15,7 @@
         <center>
             <VBox spacing="2.0">
             <TextRow label="%content_settings.static_url" path="src.static" types="Image" secureUrl="true" prompt="%content_settings.enter_url"/>
-            <TextRow label="%content_settings.field_reference" path="src.dynamic" types="Image" prompt="%content_settings.group_id_of_an_attachment_field"/>
+            <ReferenceRow label="%content_settings.field_reference" path="src.dynamic" types="Image" kind="ATTACHMENT_GROUP"/>
             <TextRow label="%content_settings.url" path="src" types="Video" secureUrl="true" prompt="%content_settings.https_example_com"/>
             </VBox>
         </center>

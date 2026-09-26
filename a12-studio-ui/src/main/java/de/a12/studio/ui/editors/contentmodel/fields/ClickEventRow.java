@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.contentmodel.fields;
 
 import de.a12.studio.models.contentmodel.ContentProps;
+import de.a12.studio.ui.editors.contentmodel.ContentReferences;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -51,6 +52,10 @@ public class ClickEventRow extends SettingRow {
   private final VBox confirmationBox = new VBox(4);
   private final Map<String, TextField> confirmationFields = new LinkedHashMap<>();
   private final VBox details = new VBox(4);
+  // An Add Row Action needs the group it adds a row to: only repeated groups, picked from the Document Model.
+  private final ComboBox<String> groupPicker = new ComboBox<>();
+  private final Map<String, String> groupLabels = new java.util.HashMap<>();
+  private final HBox groupBox = new HBox(6);
 
   private boolean confirmation;
   private boolean updating;
@@ -70,13 +75,19 @@ public class ClickEventRow extends SettingRow {
     addNode.setPromptText(StudioBundle.get("content_settings.click_add_event"));
     addNode.valueProperty().addListener((observable, oldValue, type) -> {
       if (!updating && type != null) {
-        edited(props -> props.set(getPath(), newEventNode(type)));
+        edited(props -> {
+          props.set(getPath(), newEventNode(type));
+          refreshGroupPicker(props);
+        });
         showNode(type);
       }
     });
     removeNode.setText(StudioBundle.get("content_settings.click_remove_event"));
     removeNode.setOnAction(event -> {
-      edited(props -> props.remove(getPath()));
+      edited(props -> {
+        props.remove(getPath());
+        refreshGroupPicker(props);
+      });
       showNode(null);
     });
     nodeLabel.setMaxWidth(Double.MAX_VALUE);
@@ -111,8 +122,31 @@ public class ClickEventRow extends SettingRow {
     }
     confirmationBox.setPadding(new Insets(0, 0, 0, 12));
 
+    groupPicker.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(groupPicker, Priority.ALWAYS);
+    groupPicker.setConverter(new javafx.util.StringConverter<>() {
+      @Override
+      public String toString(String id) {
+        return id == null ? "" : groupLabels.getOrDefault(id, id);
+      }
+
+      @Override
+      public String fromString(String string) {
+        return string;
+      }
+    });
+    groupPicker.valueProperty().addListener((observable, oldValue, id) -> {
+      if (!updating) {
+        edited(props -> eventProps(props).put("groupId", id == null ? "" : id));
+      }
+    });
+    Label groupLabel = new Label(StudioBundle.get("content_settings.event_group"));
+    groupBox.setAlignment(Pos.CENTER_LEFT);
+    groupBox.getChildren().addAll(groupLabel, groupPicker);
+    setShown(groupBox, false);
+
     details.setPadding(new Insets(4, 0, 0, 0));
-    details.getChildren().addAll(segments, nameField, nodeBox, confirmationSwitch, confirmationBox);
+    details.getChildren().addAll(segments, nameField, nodeBox, groupBox, confirmationSwitch, confirmationBox);
     addBelow(details);
 
     kinds.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
@@ -199,6 +233,48 @@ public class ClickEventRow extends SettingRow {
     setShown(removeNode, present);
   }
 
+  /** The event node's own props ({@code props.<path>.props}), created if the node has none. */
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> eventProps(ContentProps props) {
+    Map<String, Object> node = (Map<String, Object>) props.get(getPath());
+    return (Map<String, Object>) node.computeIfAbsent("props", key -> new LinkedHashMap<String, Object>());
+  }
+
+  /** Shows the group picker for an Add Row Action node, with the repeated groups the element may add rows to. */
+  private void refreshGroupPicker(ContentProps props) {
+    boolean addRow = props.get(getPath()) instanceof Map<?, ?> node && "AddRowAction".equals(node.get("type"));
+    setShown(groupBox, addRow);
+    if (!addRow) {
+      return;
+    }
+    ContentReferences references = context() != null ? context().references() : null;
+    boolean bound = references != null && references.isBound();
+    String stored = eventProps(props).get("groupId") instanceof String id && !id.isBlank() ? id : null;
+    groupLabels.clear();
+    java.util.List<String> ids = new java.util.ArrayList<>();
+    if (bound) {
+      for (ContentReferences.Choice choice : references.groups(props.getElement(), true)) {
+        groupLabels.put(choice.id(), choice.label());
+        ids.add(choice.id());
+      }
+    }
+    if (stored != null && !groupLabels.containsKey(stored)) {
+      groupLabels.put(stored, StudioBundle.get("content_settings.reference_unavailable", bound ? references.labelOf(stored) : stored));
+      ids.add(stored);
+    }
+    boolean wasUpdating = updating;
+    updating = true;
+    try {
+      groupPicker.getItems().setAll(ids);
+      groupPicker.setValue(stored);
+    }
+    finally {
+      updating = wasUpdating;
+    }
+    groupPicker.setDisable(!bound && stored == null);
+    groupPicker.setPromptText(StudioBundle.get(bound ? "content_settings.reference_select" : "content_settings.reference_needs_document_model"));
+  }
+
   private static void setShown(javafx.scene.Node node, boolean shown) {
     node.setVisible(shown);
     node.setManaged(shown);
@@ -222,6 +298,7 @@ public class ClickEventRow extends SettingRow {
       updating = false;
     }
     showNode(value instanceof Map<?, ?> node && node.get("type") instanceof String type ? type : null);
+    refreshGroupPicker(props);
     showKind(kind);
   }
 }

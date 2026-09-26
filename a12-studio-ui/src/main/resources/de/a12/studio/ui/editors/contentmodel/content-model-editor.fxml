@@ -188,6 +188,13 @@
                                 <fx:include fx:id="elementIssues" source="/de/a12/studio/ui/components/error-container.fxml" />
 <!--                                <fx:include fx:id="elementPanel" source="element-panel.fxml" />-->
                                 <fx:include fx:id="configurationPanel" source="configuration-panel.fxml" />
+                                <fx:include fx:id="conditionsPanel" source="conditions-panel.fxml" />
+                                <fx:include fx:id="formElementPanel" source="form-element-panel.fxml" />
+                                <fx:include fx:id="messageGroupContainerPanel" source="message-group-container-panel.fxml" />
+                                <fx:include fx:id="formElementLocalizationPanel" source="form-element-localization-panel.fxml" />
+                                <fx:include fx:id="formElementAdditionalPanel" source="form-element-additional-panel.fxml" />
+                                <fx:include fx:id="formElementDatePickerPanel" source="form-element-date-picker-panel.fxml" />
+                                <fx:include fx:id="formElementAnnotationsPanel" source="form-element-annotations-panel.fxml" />
                                 <fx:include fx:id="sourcePanel" source="source-panel.fxml" />
                                 <fx:include fx:id="eventsPanel" source="events-panel.fxml" />
                                 <fx:include fx:id="contentPanel" source="content-panel.fxml" />

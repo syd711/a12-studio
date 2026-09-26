@@ -185,6 +185,8 @@ public class ContentModelEditorController extends AbstractEditorController imple
   private ContentElement pendingSelection;
   private boolean refreshing;
   private ContentElement draggedElement;
+  // What the pickers of the property column may offer; rebuilt when the binding or a Document Model may have changed.
+  private ContentDocumentReferences references;
   // What the validators found, by the id of the element it is about; refreshed by refreshIssues.
   private Map<String, List<ModelValidationError>> issuesById = Map.of();
   // The enabled state of the actions the menu has and the toolbar has no button for, set by updateActionState.
@@ -245,6 +247,16 @@ public class ContentModelEditorController extends AbstractEditorController imple
       public ContentElement parentOf(@NonNull ContentElement element) {
         TreeItem<ContentElement> item = findItem(elementsTree.getRoot(), element);
         return item != null && item.getParent() != null ? item.getParent().getValue() : null;
+      }
+
+      @Override
+      public ContentReferences references() {
+        return references;
+      }
+
+      @Override
+      public List<String> locales() {
+        return model.getLocales().stream().map(locale -> locale.getCode()).toList();
       }
 
       @Override
@@ -435,6 +447,7 @@ public class ContentModelEditorController extends AbstractEditorController imple
 
   private void load(@NonNull ContentModel model) {
     this.model = model;
+    this.references = new ContentDocumentReferences(model, projectItem);
     TreeItem<ContentElement> rootItem = buildTreeItem(model.getContent().getRoot());
     rootItem.setExpanded(true);
     elementsTree.setRoot(rootItem);
@@ -494,6 +507,8 @@ public class ContentModelEditorController extends AbstractEditorController imple
     }
     else {
       rawPropsPanelController.refresh();
+      ContentElement element = selectedElement();
+      panels.stream().filter(panel -> panel != source && panel.followsOtherPanels()).forEach(panel -> panel.showElement(element));
     }
     recordStateChange();
     scheduleSave();
@@ -906,11 +921,17 @@ public class ContentModelEditorController extends AbstractEditorController imple
    * on the settings button for what belongs to the model's settings. Run when the model is loaded and after every save.
    */
   void refreshIssues() {
+    if (references != null) {
+      references.invalidate();
+    }
     issuesById = collectIssues();
     elementsTree.refresh();
     updateIssueSummary();
     showElementIssues(selectedElement());
-    updateSettingsErrorBadge();
+    // The badge asks the validation service too; there is none before a project is open (and in isolated tests).
+    if (Studio.getValidationService() != null) {
+      updateSettingsErrorBadge();
+    }
   }
 
   private Map<String, List<ModelValidationError>> collectIssues() {

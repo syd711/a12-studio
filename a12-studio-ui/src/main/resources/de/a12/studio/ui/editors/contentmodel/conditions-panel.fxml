@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.configuration"
+<TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.conditions"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.contentmodel.ContentSettingsPanelController">
     <BorderPane>
@@ -14,9 +14,7 @@
         </top>
         <center>
             <VBox spacing="2.0">
-            <ReferenceRow label="%content_settings.group_reference" path="groupId" types="Group" kind="GROUP"/>
-            <TextRow label="%content_settings.repeatability_in_preview" path="repeatability" types="Group"/>
-            <ReferenceRow label="%content_settings.field" path="fieldId" types="FieldOutput" kind="FIELD"/>
+            <ConditionsRow path="conditions" types="Conditional"/>
             </VBox>
         </center>
     </BorderPane>
