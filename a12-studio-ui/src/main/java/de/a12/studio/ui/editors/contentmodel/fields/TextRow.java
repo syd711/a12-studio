@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.contentmodel.fields;
 
 import de.a12.studio.models.contentmodel.ContentProps;
+import de.a12.studio.models.contentmodel.ContentUrls;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -19,10 +20,6 @@ import java.util.regex.Pattern;
 public class TextRow extends SettingRow {
 
   private static final Pattern CSS_URL = Pattern.compile("^url\\('([^']*)'\\)$");
-  // The scheme allow-list DOMPurify applies to href/src attributes: known safe schemes, or no scheme at all.
-  private static final Pattern SAFE_URL = Pattern.compile(
-      "^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.\\-]+(?:[^a-z+.\\-:]|$))",
-      Pattern.CASE_INSENSITIVE);
   private static final String INVALID_STYLE = "content-setting-invalid";
 
   private final TextArea input = new TextArea();
@@ -91,7 +88,7 @@ public class TextRow extends SettingRow {
 
   /** Whether {@code url} passes SME's URL check: only known safe schemes, or a relative URL. */
   static boolean isSafeUrl(String url) {
-    return SAFE_URL.matcher(url.strip()).find();
+    return ContentUrls.isSafe(url);
   }
 
   @Override

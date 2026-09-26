@@ -7,7 +7,10 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Per-validate call state shared by every validator in {@code de.a12.studio.modelsvalidation.validators}:
@@ -28,6 +31,7 @@ public final class ValidationContext {
   private final List<A12Model<?>> otherModels;
   private final A12Model<?> model;
   private ElementIndex elementIndex;
+  private final Map<Object, Object> cache = new HashMap<>();
 
   public ValidationContext(Project project, ProjectItem projectItem, List<DocumentModel> otherDocumentModels,
       List<A12Model<?>> otherModels, A12Model<?> model) {
@@ -96,5 +100,18 @@ public final class ValidationContext {
       elementIndex = new ElementIndex(documentModel, otherDocumentModels, otherModels);
     }
     return elementIndex;
+  }
+
+  /**
+   * Something derived from the models of this validation call that several validators of one model type need (e.g. the
+   * expanded Document Model a Content Model's reference checks resolve against): computed by {@code compute} on first
+   * use, then shared for the rest of the call. The key must identify what is computed; a {@code null} result is cached too.
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T cached(Object key, Supplier<T> compute) {
+    if (!cache.containsKey(key)) {
+      cache.put(key, compute.get());
+    }
+    return (T) cache.get(key);
   }
 }

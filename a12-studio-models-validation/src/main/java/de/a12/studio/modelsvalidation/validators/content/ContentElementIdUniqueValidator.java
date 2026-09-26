@@ -17,8 +17,6 @@ import java.util.Set;
 /** Content element ids identify elements within the model and must be unique across the whole element tree. */
 public final class ContentElementIdUniqueValidator implements ModelValidator {
 
-  public static final String ELEMENT_ID = "content/root";
-
   @Override
   public List<ModelValidationError> validate(A12Model<?> model, ValidationContext context) {
     if (!(model instanceof ContentModel contentModel) || contentModel.getContent().getRoot() == null) {
@@ -31,7 +29,8 @@ public final class ContentElementIdUniqueValidator implements ModelValidator {
 
   private void collectDuplicates(ContentModel model, ContentElement element, Set<String> seen, List<ModelValidationError> errors) {
     if (element.getId() != null && !seen.add(element.getId())) {
-      errors.add(new ModelValidationError(model, ELEMENT_ID,
+      // Reported against the element that repeats the id, so an editor can mark it.
+      errors.add(new ModelValidationError(model, element.getId(),
           ValidationMessages.get("validation.contentElementIdUnique.duplicate", element.getId()),
           Severity.ERROR.name()));
     }
