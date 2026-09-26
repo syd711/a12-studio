@@ -2,8 +2,6 @@ package de.a12.studio.ui.editors.contentmodel.fields;
 
 import de.a12.studio.models.contentmodel.ContentProps;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.jspecify.annotations.NonNull;
@@ -12,9 +10,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A free text setting (Label, Title, URL, Message, ...). Writing an empty text removes the key. {@code multiline}
- * gives a text area, e.g. for the Message Box message. Edits are reported on every change; the owner debounces the
- * save. Two URL flavors mirror SME: {@code secureUrl} refuses URLs with script-like schemes (the value stays as it
+ * A free text setting (Label, Title, URL, Message, ...), always edited in a text area and shown without a label
+ * column (the label text becomes the prompt unless one is set). Writing an empty text removes the key. Edits are
+ * reported on every change; the owner debounces the save. Two URL flavors mirror SME: {@code secureUrl} refuses URLs with script-like schemes (the value stays as it
  * was and the field is marked invalid), and {@code cssUrl} stores the text as {@code url('...')}, the form of a CSS
  * background image.
  */
@@ -27,25 +25,26 @@ public class TextRow extends SettingRow {
       Pattern.CASE_INSENSITIVE);
   private static final String INVALID_STYLE = "content-setting-invalid";
 
-  private TextInputControl input = new TextField();
-  private boolean multiline;
+  private final TextArea input = new TextArea();
   private boolean secureUrl;
   private boolean cssUrl;
   private String prompt;
+  private String labelText;
 
   public TextRow() {
-    install();
+    input.setPrefRowCount(3);
+    input.setWrapText(true);
+    HBox.setHgrow(input, Priority.ALWAYS);
+    controls().getChildren().add(input);
+    input.textProperty().addListener((observable, oldValue, text) -> onTyped(text == null ? "" : text));
   }
 
-  public boolean isMultiline() {
-    return multiline;
-  }
-
-  public void setMultiline(boolean multiline) {
-    if (this.multiline != multiline) {
-      this.multiline = multiline;
-      install();
-    }
+  /** A text row shows no label column; the label only serves as the prompt when none is set. */
+  @Override
+  public void setLabel(String label) {
+    labelText = label;
+    super.setLabel(null);
+    updatePrompt();
   }
 
   public String getPrompt() {
@@ -54,7 +53,15 @@ public class TextRow extends SettingRow {
 
   public void setPrompt(String prompt) {
     this.prompt = prompt;
-    input.setPromptText(prompt);
+    updatePrompt();
+  }
+
+  private void updatePrompt() {
+    // SettingRow's constructor calls setLabel before this class's fields are initialized.
+    if (input == null) {
+      return;
+    }
+    input.setPromptText(prompt != null && !prompt.isBlank() ? prompt : labelText);
   }
 
   public boolean isSecureUrl() {
@@ -71,19 +78,6 @@ public class TextRow extends SettingRow {
 
   public void setCssUrl(boolean cssUrl) {
     this.cssUrl = cssUrl;
-  }
-
-  private void install() {
-    controls().getChildren().clear();
-    input = multiline ? new TextArea() : new TextField();
-    if (input instanceof TextArea area) {
-      area.setPrefRowCount(3);
-      area.setWrapText(true);
-    }
-    input.setPromptText(prompt);
-    HBox.setHgrow(input, Priority.ALWAYS);
-    controls().getChildren().add(input);
-    input.textProperty().addListener((observable, oldValue, text) -> onTyped(text == null ? "" : text));
   }
 
   private void onTyped(String text) {

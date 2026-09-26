@@ -8,7 +8,10 @@ import de.a12.studio.ui.util.SystemUtil;
 import de.a12.studio.ui.previewapp.PreviewAppException;
 import de.a12.studio.ui.previewapp.SmeInstallation;
 import lombok.extern.slf4j.Slf4j;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -40,7 +43,8 @@ public class PreviewLauncher {
 
   /**
    * Used by the Form Model editor's Preview button: renders the Form Model with the real Form Engine (see {@link
-   * FormModelPreviewSession}) in the browser configured via {@link PreviewAppSettings.BrowserType}. Without the
+   * FormModelPreviewSession}) in a browser window of its own without toolbar, address bar and bookmarks bar, sized to two
+   * thirds of the Studio stage (see {@link SystemUtil#openUrlInAppWindow}). Without the
    * Simple Model Editor in the A12 installation that rendering is not possible; the wireframe preview opens instead.
    */
   public static void openFormPreview(@NonNull ProjectItem projectItem) {
@@ -48,7 +52,7 @@ public class PreviewLauncher {
       openPreview(projectItem);
       return;
     }
-    openFormEnginePreview("form-" + projectItem.getModel().getId(), new FormModelPreviewSession(projectItem), false);
+    openFormEnginePreview("form-" + projectItem.getModel().getId(), new FormModelPreviewSession(projectItem), true);
   }
 
   /**
@@ -104,11 +108,23 @@ public class PreviewLauncher {
     String url = server.getFormEnginePreviewUrl(sessionId);
     PreviewAppSettings.BrowserType browserType = getPreviewAppSettings().getBrowserType();
     if (appWindow) {
-      SystemUtil.openUrlInAppWindow(url, browserType);
+      SystemUtil.openUrlInAppWindow(url, browserType, previewWindowBounds());
     }
     else {
       SystemUtil.openUrl(url, browserType);
     }
+  }
+
+  /** Two thirds of the Studio stage's size, centered on it; {@code null} while there is no stage. */
+  private static @Nullable Rectangle2D previewWindowBounds() {
+    Stage stage = Studio.stage;
+    if (stage == null) {
+      return null;
+    }
+    double width = stage.getWidth() * 2 / 3;
+    double height = stage.getHeight() * 2 / 3;
+    return new Rectangle2D(stage.getX() + (stage.getWidth() - width) / 2, stage.getY() + (stage.getHeight() - height) / 2,
+        width, height);
   }
 
   private static void openPreview(@NonNull ProjectItem projectItem, @NonNull Consumer<String> opener) {

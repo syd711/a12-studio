@@ -3,6 +3,7 @@ package de.a12.studio.ui.util;
 
 import de.a12.studio.models.projects.settings.PreviewAppSettings;
 import de.a12.studio.ui.Studio;
+import javafx.geometry.Rectangle2D;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 
@@ -288,8 +289,19 @@ public class SystemUtil {
    * @param browserType Which browser to launch the URL in.
    */
   public static void openUrlInAppWindow(String url, PreviewAppSettings.BrowserType browserType) {
+    openUrlInAppWindow(url, browserType, null);
+  }
+
+  /**
+   * Same as {@link #openUrlInAppWindow(String, PreviewAppSettings.BrowserType)}, additionally asking the browser to
+   * place its window at {@code bounds} (a browser that is already running with the dedicated profile may ignore it).
+   *
+   * @param bounds Position and size of the window in screen coordinates, or {@code null} to leave it to the browser.
+   */
+  public static void openUrlInAppWindow(String url, PreviewAppSettings.BrowserType browserType,
+                                        @Nullable Rectangle2D bounds) {
     try {
-      List<String> command = appWindowCommand(browserType, url);
+      List<String> command = appWindowCommand(browserType, url, bounds);
       if (command != null) {
         new ProcessBuilder(command).start();
         return;
@@ -302,10 +314,14 @@ public class SystemUtil {
   }
 
   /** The command opening {@code url} in a Chromium app window, or {@code null} if the browser has no such mode. */
-  private static @Nullable List<String> appWindowCommand(PreviewAppSettings.BrowserType browserType, String url)
-      throws IOException {
-    List<String> appArguments = List.of("--app=" + url, "--user-data-dir=" + appWindowProfileFolder().getAbsolutePath(),
-        "--no-first-run", "--no-default-browser-check");
+  private static @Nullable List<String> appWindowCommand(PreviewAppSettings.BrowserType browserType, String url,
+                                                         @Nullable Rectangle2D bounds) throws IOException {
+    List<String> appArguments = new ArrayList<>(List.of("--app=" + url,
+        "--user-data-dir=" + appWindowProfileFolder().getAbsolutePath(), "--no-first-run", "--no-default-browser-check"));
+    if (bounds != null) {
+      appArguments.add("--window-size=%d,%d".formatted((int) bounds.getWidth(), (int) bounds.getHeight()));
+      appArguments.add("--window-position=%d,%d".formatted((int) bounds.getMinX(), (int) bounds.getMinY()));
+    }
     List<String> command = new ArrayList<>();
 
     if (browserType == PreviewAppSettings.BrowserType.SYSTEM_DEFAULT) {

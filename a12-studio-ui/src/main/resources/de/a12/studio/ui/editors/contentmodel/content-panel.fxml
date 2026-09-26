@@ -32,7 +32,7 @@
             <TextRow label="%content_settings.title" path="title" prompt="%content_settings.optional_hover_text"/>
             </SettingGroup>
             <SettingGroup types="MessageBox">
-            <TextRow label="%content_settings.message" path="label" multiline="true" prompt="%content_settings.enter_a_message"/>
+            <TextRow label="%content_settings.message" path="label" prompt="%content_settings.enter_a_message"/>
             <ToggleRow label="%content_settings.variant" path="variant" initial="error">
                 <ToggleOption value="info" label="%content_settings.info"/>
                 <ToggleOption value="success" label="%content_settings.success"/>
@@ -42,7 +42,7 @@
             <IconRow label="%content_settings.icon" path="icon"/>
             </SettingGroup>
             <SettingGroup types="Tooltip">
-            <TextRow label="%content_settings.text" path="text" multiline="true" prompt="%content_settings.enter_tooltip_message"/>
+            <TextRow label="%content_settings.text" path="text" prompt="%content_settings.enter_tooltip_message"/>
             </SettingGroup>
             <SettingGroup types="InteractiveListItem">
             <TextRow label="%content_settings.text" path="text" prompt="%content_settings.enter_text"/>

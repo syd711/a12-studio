@@ -31,7 +31,7 @@
                 <ToggleOption value="bottom" label="%content_settings.bottom"/>
             </ToggleRow>
             <TextRow label="%content_settings.anchor" path="anchor" types="Heading"/>
-            <TextRow label="%content_settings.alternative_text" path="alt" types="Image" multiline="true"/>
+            <TextRow label="%content_settings.alternative_text" path="alt" types="Image"/>
             <SliderRow label="%content_settings.opacity" path="style.opacity" types="Image" min="0" max="1" step="0.1" defaultValue="1"/>
             <TextRow label="%content_settings.aria_label" path="ariaLabel" types="Button"/>
             </VBox>
