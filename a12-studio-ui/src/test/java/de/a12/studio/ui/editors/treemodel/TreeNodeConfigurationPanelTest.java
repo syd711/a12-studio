@@ -474,6 +474,153 @@ class TreeNodeConfigurationPanelTest {
     assertFalse(event.isDisabled());
   }
 
+  // ---- drag & drop and column mapping ----
+
+  @Test
+  void dragAndDropIsOnlyWrittenOnceTheUserChangesIt(@TempDir Path dir) throws Exception {
+    Workspace workspace = workspace(dir);
+    TreeNode withFlag = workspace.model().getContent().getNodes().get(0);
+    TreeNode withoutFlag = workspace.model().getContent().getNodes().get(1);
+    FxTestSupport.Loaded<TreeNodeDragDropPanelController> loaded = load("tree-node-drag-drop-panel.fxml");
+    int[] changes = {0};
+    FxTestSupport.onFx(() -> loaded.controller().setOnChange(() -> changes[0]++));
+    CheckBox dragDrop = field(loaded.controller(), "dragDropField");
+
+    FxTestSupport.onFx(() -> loaded.controller().setNode(withFlag));
+    assertTrue(dragDrop.isSelected());
+
+    FxTestSupport.onFx(() -> loaded.controller().setNode(withoutFlag));
+    assertFalse(dragDrop.isSelected());
+    assertEquals(0, changes[0], "showing a node is not an edit");
+    assertFalse(reloaded(workspace.tree()).getContent().getNodes().get(1).getConfiguration().containsKey("dnd"), "an absent key stays absent");
+
+    FxTestSupport.onFx(() -> dragDrop.setSelected(true));
+    assertEquals(1, changes[0]);
+    assertEquals(true, reloaded(workspace.tree()).getContent().getNodes().get(1).getConfiguration().get("dnd"));
+    assertEquals(java.util.Map.of(), reloaded(workspace.tree()).getContent().getNodes().get(1).getConfiguration().get("inherit"),
+        "the node's other configuration keys are kept");
+  }
+
+  @Test
+  void theColumnMappingShowsARowPerTreeColumnWithItsFieldWidthAndPinDirection(@TempDir Path dir) throws Exception {
+    Workspace workspace = workspace(dir);
+    TreeNode node = workspace.model().getContent().getNodes().get(0);
+    de.a12.studio.models.treemodel.TreeColumn column = workspace.model().getContent().getColumns().get(0);
+    column.setWidth(3);
+    column.setPinDirection("left");
+    node.getColumns().clear();
+    de.a12.studio.models.treemodel.TreeNodeColumn mapping = new de.a12.studio.models.treemodel.TreeNodeColumn();
+    mapping.setColumnRef(column.getId());
+    mapping.setElementRef("someField");
+    node.getColumns().add(mapping);
+    FxTestSupport.Loaded<TreeNodeColumnMappingPanelController> loaded = load("tree-node-column-mapping-panel.fxml");
+    FxTestSupport.onFx(() -> {
+      loaded.controller().setModel(workspace.model(), workspace.tree());
+      loaded.controller().setNode(node);
+    });
+
+    VBox rows = field(loaded.controller(), "columnMappingRows");
+    assertEquals(1, rows.getChildren().size(), "one row per tree column");
+    assertEquals(column.getName(), label(rows, 0, "#columnMappingName-0"));
+    assertEquals("someField", label(rows, 0, "#columnMappingField-0"));
+    assertEquals("3", label(rows, 0, "#columnMappingWidth-0"));
+    assertEquals("left", label(rows, 0, "#columnMappingPinDirection-0"));
+    assertFalse(((Label) field(loaded.controller(), "noColumnsLabel")).isVisible());
+    assertTrue(rows.getChildren().get(0).getStyleClass().contains("module-row"));
+  }
+
+  @Test
+  void editingARowChangesTheColumnAndTheNodesFieldAndClearingTheFieldDropsTheMapping(@TempDir Path dir) throws Exception {
+    Workspace workspace = workspace(dir);
+    TreeNode node = workspace.model().getContent().getNodes().get(0);
+    de.a12.studio.models.treemodel.TreeColumn column = workspace.model().getContent().getColumns().get(0);
+    FxTestSupport.Loaded<TreeNodeColumnMappingPanelController> loaded = load("tree-node-column-mapping-panel.fxml");
+    int[] columnChanges = {0};
+    FxTestSupport.onFx(() -> {
+      loaded.controller().setModel(workspace.model(), workspace.tree());
+      loaded.controller().setOnColumnsChange(() -> columnChanges[0]++);
+      loaded.controller().setNode(node);
+    });
+
+    de.a12.studio.models.treemodel.TreeColumn edited = new de.a12.studio.models.treemodel.TreeColumn();
+    edited.setName("Renamed");
+    edited.setWidth(5);
+    edited.setPinDirection("right");
+    FxTestSupport.onFx(() -> loaded.controller().applyEdit(column, edited, "someField"));
+
+    de.a12.studio.models.treemodel.TreeModel saved = reloaded(workspace.tree());
+    assertEquals("Renamed", saved.getContent().getColumns().get(0).getName());
+    assertEquals(column.getId(), saved.getContent().getColumns().get(0).getId(), "the id is kept");
+    assertEquals(5, saved.getContent().getColumns().get(0).getWidth());
+    assertEquals("right", saved.getContent().getColumns().get(0).getPinDirection());
+    assertEquals("someField", saved.getContent().getNodes().get(0).getColumns().get(0).getElementRef());
+    assertEquals(1, columnChanges[0]);
+    VBox rows = field(loaded.controller(), "columnMappingRows");
+    assertEquals("Renamed", label(rows, 0, "#columnMappingName-0"), "the rows are rebuilt from the model");
+
+    FxTestSupport.onFx(() -> loaded.controller().applyEdit(column, edited, null));
+    assertTrue(reloaded(workspace.tree()).getContent().getNodes().get(0).getColumns().isEmpty(), "no field, no mapping");
+  }
+
+  @Test
+  void deletingARowRemovesTheColumnEverywhere(@TempDir Path dir) throws Exception {
+    Workspace workspace = workspace(dir);
+    TreeNode node = workspace.model().getContent().getNodes().get(0);
+    de.a12.studio.models.treemodel.TreeColumn column = workspace.model().getContent().getColumns().get(0);
+    FxTestSupport.Loaded<TreeNodeColumnMappingPanelController> loaded = load("tree-node-column-mapping-panel.fxml");
+    FxTestSupport.onFx(() -> {
+      loaded.controller().setModel(workspace.model(), workspace.tree());
+      loaded.controller().setNode(node);
+      loaded.controller().applyEdit(column, column, "someField");
+      workspace.model().getContent().getConfiguration().setHierarchicalColumnRef(column.getId());
+      loaded.controller().removeColumn(column);
+    });
+
+    de.a12.studio.models.treemodel.TreeModel saved = reloaded(workspace.tree());
+    assertTrue(saved.getContent().getColumns().isEmpty());
+    saved.getContent().getNodes().forEach(treeNode -> assertTrue(treeNode.getColumns().isEmpty()));
+    assertNull(saved.getContent().getConfiguration().getHierarchicalColumnRef());
+    VBox rows = field(loaded.controller(), "columnMappingRows");
+    assertTrue(rows.getChildren().isEmpty());
+    assertTrue(((Label) field(loaded.controller(), "noColumnsLabel")).isVisible());
+  }
+
+  @Test
+  void movingARowReordersTheTreesColumns(@TempDir Path dir) throws Exception {
+    Workspace workspace = workspace(dir);
+    TreeNode node = workspace.model().getContent().getNodes().get(0);
+    de.a12.studio.models.treemodel.TreeColumn extra = new de.a12.studio.models.treemodel.TreeColumn();
+    extra.setId("column-2");
+    extra.setName("Other");
+    workspace.model().getContent().getColumns().add(extra);
+    FxTestSupport.Loaded<TreeNodeColumnMappingPanelController> loaded = load("tree-node-column-mapping-panel.fxml");
+    FxTestSupport.onFx(() -> {
+      loaded.controller().setModel(workspace.model(), workspace.tree());
+      loaded.controller().setNode(node);
+    });
+
+    VBox rows = field(loaded.controller(), "columnMappingRows");
+    HBox first = (HBox) rows.getChildren().get(0);
+    HBox actions = (HBox) first.getChildren().get(first.getChildren().size() - 1);
+    Button moveDown = (Button) ((VBox) actions.getChildren().get(0)).getChildren().get(1);
+    FxTestSupport.onFx(moveDown::fire);
+
+    assertEquals(List.of("column-2", "column-1"),
+        reloaded(workspace.tree()).getContent().getColumns().stream().map(de.a12.studio.models.treemodel.TreeColumn::getId).toList());
+    assertEquals("Other", label(rows, 0, "#columnMappingName-0"));
+  }
+
+  private static void collectFieldIds(de.a12.studio.models.documentmodel.GroupElement group, List<String> ids) {
+    for (de.a12.studio.models.documentmodel.Element child : group.getGroup().getElements()) {
+      if (child instanceof de.a12.studio.models.documentmodel.FieldElement fieldElement) {
+        ids.add(fieldElement.getId());
+      }
+      else if (child instanceof de.a12.studio.models.documentmodel.GroupElement childGroup) {
+        collectFieldIds(childGroup, ids);
+      }
+    }
+  }
+
   // ---- helpers ----
 
   private static RadioButton radio(VBox rows, int row) {

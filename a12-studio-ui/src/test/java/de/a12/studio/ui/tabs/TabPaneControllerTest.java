@@ -6,15 +6,18 @@ import de.a12.studio.modelsvalidation.ValidationService;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.formmodel.FxTestSupport;
 import de.a12.studio.ui.events.ModelOpenedEvent;
+import de.a12.studio.ui.events.ProjectOpenedEvent;
 import de.a12.studio.ui.components.StudioTabPane;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.StudioBundle;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -40,6 +43,8 @@ class TabPaneControllerTest {
 
   private static boolean toolkitAvailable;
 
+  private static String originalUserHome;
+
   private TabPaneController controller;
 
   @TempDir
@@ -47,11 +52,16 @@ class TabPaneControllerTest {
 
   @BeforeAll
   static void startToolkit() throws Exception {
+    // The tab pane saves the UI settings (opened files, selection) on every change; they live in the user's home
+    // folder, where a test run would overwrite the real ones.
+    originalUserHome = System.getProperty("user.home");
+    System.setProperty("user.home", Files.createTempDirectory("tab-pane-home").toString());
     toolkitAvailable = FxTestSupport.startToolkit();
   }
 
   @AfterAll
   static void restoreEmptyProject() throws Exception {
+    System.setProperty("user.home", originalUserHome);
     if (toolkitAvailable) {
       setCurrentProject(new Project());
       Field validationService = Studio.class.getDeclaredField("validationService");
@@ -96,6 +106,41 @@ class TabPaneControllerTest {
     assertNotNull(tab.getContent());
     assertNotSame(before, tab.getContent(), "its editor was rebuilt from the model");
     assertSame(other, tabPane.getTabs().get(1).getUserData(), "the other tab is left alone");
+  }
+
+  @Test
+  void aTabWhoseEditorCannotBeBuiltIsDroppedButStaysInTheOpenedFiles() throws Exception {
+    assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
+    ProjectItem item = queryItem("Query_A");
+    // The editors ask Studio for the validation service; without one, building the editor throws.
+    Field validationService = Studio.class.getDeclaredField("validationService");
+    validationService.setAccessible(true);
+    validationService.set(null, null);
+    controller = FxTestSupport.<TabPaneController>load("/de/a12/studio/ui/tabs/scene-tab-pane.fxml").controller();
+    TabPane tabPane = FxTestSupport.field(controller, "tabPane");
+    Project project = Studio.getCurrentProject();
+    FxTestSupport.onFx(() -> controller.projectOpened(new ProjectOpenedEvent(project)));
+    project.getSettings().getUISettings().addOpenedFile(item.getPath());
+
+    FxTestSupport.onFx(() -> {
+      dismissAlerts();
+      controller.modelOpened(new ModelOpenedEvent(item));
+    });
+
+    assertEquals(0, tabPane.getTabs().size(), "there is no editor to show");
+    assertTrue(project.getSettings().getUISettings().getOpenedFiles().contains(item.getPath()),
+        "a build that is only broken right now must not make the studio forget the tab");
+  }
+
+  /** The failure alert waits for the user (showAndWait); hides every window that shows up, so the test can go on. */
+  private static void dismissAlerts() {
+    Platform.runLater(() -> {
+      List<Window> showing = Window.getWindows().stream().filter(Window::isShowing).toList();
+      if (showing.isEmpty()) {
+        dismissAlerts();
+      }
+      showing.forEach(Window::hide);
+    });
   }
 
   @Test

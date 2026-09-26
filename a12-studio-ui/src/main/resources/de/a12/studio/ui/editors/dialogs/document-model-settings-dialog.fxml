@@ -28,6 +28,12 @@
                           <!-- Name / Version / Description -->
                           <fx:include fx:id="modelSettingsName" source="../propertyeditors/model-settings-name-panel.fxml" />
 
+                          <!-- Content Model only: Document Model binding -->
+                          <fx:include fx:id="contentDocumentModel" source="../contentmodel/content-document-model-panel.fxml" />
+
+                          <!-- Content Model only: Base Group (while a Document Model is bound) -->
+                          <fx:include fx:id="contentBaseGroup" source="../contentmodel/content-base-group-panel.fxml" />
+
                           <!-- Form Model only: General Settings -->
                           <fx:include fx:id="generalSettings" source="../formmodel/modelsettings/general-settings-panel.fxml" />
 

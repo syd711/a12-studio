@@ -64,7 +64,10 @@
                                 <VBox spacing="12.0" styleClass="field-editor">
                                     <children>
                                         <fx:include fx:id="configurationPanel" source="tree-configuration-panel.fxml" />
+                                        <fx:include fx:id="initialExpansionPanel" source="tree-initial-expansion-panel.fxml" />
                                         <fx:include fx:id="expansionDepthsPanel" source="tree-expansion-depths-panel.fxml" />
+                                        <fx:include fx:id="wholeTreeExpansionPanel" source="tree-whole-tree-expansion-panel.fxml" />
+                                        <fx:include fx:id="paginationPanel" source="tree-pagination-panel.fxml" />
                                         <fx:include fx:id="multiSelectionPanel" source="tree-multi-selection-panel.fxml" />
                                         <fx:include fx:id="dragAndDropPanel" source="tree-drag-and-drop-panel.fxml" />
                                     </children>

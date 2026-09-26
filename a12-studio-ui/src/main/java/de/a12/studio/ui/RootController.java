@@ -20,6 +20,7 @@ import de.a12.studio.ui.previewapp.PreviewAppConsoleDockedController;
 import de.a12.studio.ui.previewapp.PreviewAppLogWindow;
 import de.a12.studio.ui.projecttree.ProjectTreeController;
 import de.a12.studio.ui.tabs.TabPaneController;
+import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import de.a12.studio.ui.util.localsettings.LocalUISettings;
@@ -576,7 +577,8 @@ public class RootController implements Initializable, StudioEventListener {
     if (project == null) return;
     ProjectItem item = findItemByPath(project.getRoot(), bookmark.getPath());
     if (item != null) {
-      StudioEventManager.getInstance().fireModelOpenEvent(item);
+      // Also remembers the tab as opened, so it is restored on the next start.
+      ProjectDocumentModels.openModelInEditor(item);
     }
   }
 

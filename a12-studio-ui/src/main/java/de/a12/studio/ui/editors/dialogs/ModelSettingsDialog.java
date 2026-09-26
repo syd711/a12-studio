@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.dialogs;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.formmodel.FormModel;
@@ -21,6 +22,8 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
+import de.a12.studio.ui.editors.contentmodel.ContentBaseGroupPanelController;
+import de.a12.studio.ui.editors.contentmodel.ContentDocumentModelPanelController;
 import de.a12.studio.ui.editors.documentmodel.CdmQueryRootPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralDetachedRepeatSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralInlineRepeatSettingsPanelController;
@@ -59,6 +62,12 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @FXML
   private ModelSettingsNamePanelController modelSettingsNameController;
+
+  @FXML
+  private ContentDocumentModelPanelController contentDocumentModelController;
+
+  @FXML
+  private ContentBaseGroupPanelController contentBaseGroupController;
 
   @FXML
   private GeneralSettingsPanelController generalSettingsController;
@@ -152,6 +161,8 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     modelStylesController.configureModelStyles();
 
     modelSettingsNameController.setSaveMode(saveMode);
+    contentDocumentModelController.setSaveMode(saveMode);
+    contentBaseGroupController.setSaveMode(saveMode);
     generalSettingsController.setSaveMode(saveMode);
     generalDetachedRepeatSettingsController.setSaveMode(saveMode);
     generalInlineRepeatSettingsController.setSaveMode(saveMode);
@@ -231,6 +242,17 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       } else {
         subtitlesController.setVisible(false);
       }
+      if (model instanceof ContentModel contentModel) {
+        List<DocumentModel> documentModels = ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem);
+        contentBaseGroupController.setModel(contentModel, findDocumentModel(documentModels, contentModel.getDocumentModelId()));
+        contentDocumentModelController.setModel(contentModel, documentModels);
+        contentDocumentModelController.setOnChange(documentModelId ->
+            contentBaseGroupController.setDocumentModel(findDocumentModel(documentModels, documentModelId)));
+        contentDocumentModelController.setVisible(true);
+      } else {
+        contentDocumentModelController.setVisible(false);
+        contentBaseGroupController.setVisible(false);
+      }
       if (model instanceof FormModel formModel) {
         generalSettingsController.setModel(formModel, ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem));
         generalSettingsController.setVisible(true);
@@ -258,9 +280,12 @@ public class ModelSettingsDialog implements Initializable, DialogController {
           !(model instanceof ApplicationModel) && !(model instanceof OverviewModel) && !(model instanceof FormModel)
               && !(model instanceof RelationshipModel) && !(model instanceof QueryModel) && !(model instanceof AdditiveDocumentModel)
               && !(model instanceof TreeModel));
+      // A Content Model's only reference is its Document Model, which has a panel of its own (SME offers no free
+      // references editor there and rewrites them to that one on save).
       modelReferencesController.setVisible(
           !(model instanceof OverviewModel) && !(model instanceof FormModel) && !(model instanceof QueryModel)
-              && !(model instanceof AdditiveDocumentModel) && !(model instanceof TreeModel));
+              && !(model instanceof AdditiveDocumentModel) && !(model instanceof TreeModel)
+              && !(model instanceof ContentModel));
       if (generalAndRolesOnly) {
         supportedCharactersController.setVisible(false);
         localesController.setVisible(false);
@@ -271,6 +296,10 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     }
 
     bindErrorContainer();
+  }
+
+  private static DocumentModel findDocumentModel(List<DocumentModel> documentModels, String id) {
+    return id == null ? null : documentModels.stream().filter(candidate -> id.equals(candidate.getId())).findFirst().orElse(null);
   }
 
   private FormModelContent ensureContent(FormModel formModel) {
@@ -296,6 +325,8 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   private void bindErrorContainer() {
     List<AbstractPropertyEditor> panels = List.of(
         modelSettingsNameController,
+        contentDocumentModelController,
+        contentBaseGroupController,
         generalSettingsController,
         generalDetachedRepeatSettingsController,
         generalInlineRepeatSettingsController,

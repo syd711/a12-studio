@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -39,6 +40,15 @@
                <children>
                   <Label styleClass="field-label" text="%pin_direction" />
                   <ComboBox fx:id="pinDirectionCombo" editable="false" maxWidth="Infinity" />
+               </children>
+            </VBox>
+            <!-- Only shown when the dialog is opened from a node type's column mapping. -->
+            <VBox fx:id="fieldBox">
+               <children>
+                  <Label styleClass="field-label" text="%tree_node_column_mapping_panel.field">
+                     <tooltip><Tooltip prefWidth="300.0" text="%tree_column_dialog.field_hint" wrapText="true" /></tooltip>
+                  </Label>
+                  <ComboBox fx:id="fieldCombo" editable="false" maxWidth="Infinity" />
                </children>
             </VBox>
          </children>

@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.treemodel;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.treemodel.InitialExpansion;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.ui.Studio;
@@ -283,9 +284,24 @@ public class TreeNodeTypesPanelController extends AbstractPropertyEditor impleme
   /** Removes {@code node}; a Root that pointed at one of its child relationship configurations is cleared too, as in SME. */
   private void removeNode(TreeNode node) {
     getNodes().remove(node);
+    removeFromInitialExpansion(node);
     if (model.getContent().getConfiguration() != null
         && TreeRootPanelController.childRelationshipConfigurationIds(node).contains(model.getContent().getConfiguration().getRootRef())) {
       model.getContent().getConfiguration().setRootRef(null);
+    }
+  }
+
+  /** A deleted node type no longer takes part in the initial expansion; no node types left means all, i.e. an absent key. */
+  private void removeFromInitialExpansion(TreeNode node) {
+    if (model.getContent().getConfiguration() == null || model.getContent().getConfiguration().getExpansionStrategy() == null) {
+      return;
+    }
+    InitialExpansion initialExpansion = model.getContent().getConfiguration().getExpansionStrategy().getInitialExpansion();
+    if (initialExpansion != null && initialExpansion.getAffectedNodeRefs() != null && node.getId() != null) {
+      initialExpansion.getAffectedNodeRefs().remove(node.getId());
+      if (initialExpansion.getAffectedNodeRefs().isEmpty()) {
+        initialExpansion.setAffectedNodeRefs(null);
+      }
     }
   }
 

@@ -456,6 +456,10 @@ public class TabPaneController implements Initializable, StudioEventListener {
 
       Parent content = EditorFactory.create(item);
       if (content == null) {
+        // The editor could not be built (the failure has been reported by EditorFactory). The tab goes, but the file
+        // stays in the project's opened files: dropping it there too (what onTabClosed does) would make a build that is
+        // merely broken right now - e.g. while its panels are being worked on - forget the tab for good.
+        tab.setOnClosed(closeEvent -> StudioEventManager.getInstance().fireModelClosedEvent(item));
         pane.getTabs().remove(tab);
         if (previousSelection != null && previousSelection != tab && pane.getTabs().contains(previousSelection)) {
           pane.getSelectionModel().select(previousSelection);

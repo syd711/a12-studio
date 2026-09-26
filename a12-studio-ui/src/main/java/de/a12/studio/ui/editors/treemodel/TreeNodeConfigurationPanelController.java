@@ -129,6 +129,11 @@ public class TreeNodeConfigurationPanelController implements Initializable {
     childRelationshipsPanelController.setOnChange(onRelationshipsChange);
   }
 
+  /** Called after the tree's columns were edited, moved or removed in the column mapping. */
+  public void setOnColumnsChange(@NonNull Runnable onColumnsChange) {
+    columnMappingPanelController.setOnColumnsChange(onColumnsChange);
+  }
+
   /** Called after the drag &amp; drop flag was toggled, which the node types list shows. */
   public void setOnDragDropChange(@NonNull Runnable onDragDropChange) {
     dragDropPanelController.setOnChange(onDragDropChange);

@@ -15,9 +15,11 @@ import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.tree.TreeColumnFieldValidator;
 import de.a12.studio.modelsvalidation.validators.tree.TreeColumnsNotEmptyValidator;
 import de.a12.studio.modelsvalidation.validators.tree.TreeDocumentModelReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.tree.TreeExpansionStrategyValidator;
 import de.a12.studio.modelsvalidation.validators.tree.TreeHierarchicalColumnRefValidator;
 import de.a12.studio.modelsvalidation.validators.tree.TreeNodesNotEmptyValidator;
 import de.a12.studio.modelsvalidation.validators.tree.TreeUniqueNodeValidator;
+import de.a12.studio.modelsvalidation.validators.tree.TreeWholeTreeExpansionValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,9 @@ public final class TreeModelValidationService {
       new TreeUniqueNodeValidator(),
       new TreeDocumentModelReferenceValidator(),
       new TreeColumnFieldValidator(),
-      new TreeHierarchicalColumnRefValidator()));
+      new TreeHierarchicalColumnRefValidator(),
+      new TreeExpansionStrategyValidator(),
+      new TreeWholeTreeExpansionValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

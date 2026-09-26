@@ -31,6 +31,16 @@ public class Dialogs {
     return showColumn(owner, StudioBundle.get("edit_column_title"), existing);
   }
 
+  /**
+   * Edits {@code existing} together with the field of a node type's Document Model shown in it (chosen from {@code
+   * fieldOptions}, currently {@code field}); the caller copies the returned column onto {@code existing} and stores the field.
+   */
+  public static Optional<TreeColumnDialogController.MappingResult> showColumnForEdit(Stage owner, TreeColumn existing,
+      List<String> fieldOptions, String field) {
+    TreeColumnDialogController controller = showColumn(owner, StudioBundle.get("edit_column_title"), existing, fieldOptions, field);
+    return controller.getMappingResult();
+  }
+
   public static Optional<ExpansionDepth> showExpansionDepthForAdd(Stage owner, List<String> relationships) {
     return showExpansionDepth(owner, StudioBundle.get("tree_expansion_depths_panel.add_title"), relationships, null);
   }
@@ -162,14 +172,18 @@ public class Dialogs {
   }
 
   private static Optional<TreeColumn> showColumn(Stage owner, String title, TreeColumn existing) {
+    return showColumn(owner, title, existing, null, null).getResult();
+  }
+
+  private static TreeColumnDialogController showColumn(Stage owner, String title, TreeColumn existing, List<String> fieldOptions, String field) {
     FXMLLoader fxmlLoader = new FXMLLoader(TreeColumnDialogController.class.getResource("tree-column-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("tree-column-dialog", fxmlLoader, owner, title);
     TreeColumnDialogController controller = (TreeColumnDialogController) stage.getUserData();
-    controller.init(stage, existing);
+    controller.init(stage, existing, fieldOptions, field);
     WidgetFactory.installResizable(stage);
 
     stage.showAndWait();
-    return controller.getResult();
+    return controller;
   }
 }

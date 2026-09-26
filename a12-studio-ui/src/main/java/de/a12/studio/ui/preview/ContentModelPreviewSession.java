@@ -1,7 +1,5 @@
 package de.a12.studio.ui.preview;
 
-import de.a12.studio.models.ModelReference;
-import de.a12.studio.models.ModelType;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.previewapp.PreviewAppException;
@@ -53,16 +51,6 @@ public final class ContentModelPreviewSession {
     this.contentItem = contentItem;
   }
 
-  /** The id of the Document Model the Content Model is bound to, or {@code null}. */
-  static @Nullable String documentModelId(@NonNull ContentModel contentModel) {
-    return contentModel.getModelReferences().stream()
-        .filter(reference -> reference.getModelType() == ModelType.DOCUMENT
-            && ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_CONTENT_MODEL.equals(reference.getPurpose()))
-        .map(ModelReference::getReference)
-        .findFirst()
-        .orElse(null);
-  }
-
   /**
    * The current state of the session.
    *
@@ -77,7 +65,7 @@ public final class ContentModelPreviewSession {
     String contentRevision = FormEnginePreviewSession.revision(contentJson);
     @Nullable String contentToSend = contentRevision.equals(knownContentRevision) ? null : contentJson;
 
-    String documentModelId = documentModelId(contentModel);
+    String documentModelId = contentModel.getDocumentModelId();
     if (documentModelId == null) {
       return new Snapshot(contentRevision, NO_DOCUMENT_MODEL, false, contentToSend, null, null);
     }

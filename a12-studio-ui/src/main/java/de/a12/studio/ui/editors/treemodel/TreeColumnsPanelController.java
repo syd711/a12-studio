@@ -96,6 +96,14 @@ public class TreeColumnsPanelController extends AbstractPropertyEditor implement
     refreshHierarchicalColumnField();
   }
 
+  /** Re-renders the rows and the hierarchical column choice, e.g. after the columns were edited in the node column mapping. */
+  public void refresh() {
+    rebuildRows();
+    if (model != null) {
+      refreshHierarchicalColumnField();
+    }
+  }
+
   private List<TreeColumn> getColumns() {
     return model.getContent().getColumns();
   }

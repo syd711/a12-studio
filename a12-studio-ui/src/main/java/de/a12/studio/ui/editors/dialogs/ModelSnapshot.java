@@ -4,6 +4,8 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.Label;
 import de.a12.studio.models.Locale;
+import de.a12.studio.models.ModelReference;
+import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelContent;
 import de.a12.studio.models.documentmodel.DocumentUniquenessCriterion;
@@ -26,7 +28,8 @@ import java.util.List;
  * silently detach those references.
  * <p>
  * Also covers a {@link FormModel}'s model-level {@code content.styles} list, the one Form Model setting that
- * is edited through {@link ModelSettingsDialog}'s deferred property editors and can be restored this cheaply.
+ * is edited through {@link ModelSettingsDialog}'s deferred property editors and can be restored this cheaply, and a
+ * {@link ContentModel}'s Document Model binding (its header references) and base group.
  */
 class ModelSnapshot {
 
@@ -41,6 +44,8 @@ class ModelSnapshot {
   private final List<String> supportedCharacters;
   private final List<DocumentUniquenessCriterion> uniquenessCriteria = new ArrayList<>();
   private final List<Style> formStyles = new ArrayList<>();
+  private final List<ModelReference> contentModelReferences = new ArrayList<>();
+  private final String contentBaseGroupId;
 
   ModelSnapshot(@NonNull A12Model<?> model) {
     this.model = model;
@@ -61,6 +66,13 @@ class ModelSnapshot {
     }
     if (model instanceof FormModel formModel && formModel.getContent() != null) {
       copyStyles(formModel.getContent().getStyles(), formStyles);
+    }
+    if (model instanceof ContentModel contentModel) {
+      copyReferences(contentModel.getModelReferences(), contentModelReferences);
+      this.contentBaseGroupId = baseGroupId(contentModel);
+    }
+    else {
+      this.contentBaseGroupId = null;
     }
   }
 
@@ -84,6 +96,14 @@ class ModelSnapshot {
     }
     if (model instanceof FormModel formModel && formModel.getContent() != null) {
       replaceContents(formModel.getContent().getStyles(), formStyles);
+    }
+    if (model instanceof ContentModel contentModel) {
+      List<ModelReference> references = new ArrayList<>();
+      copyReferences(contentModelReferences, references);
+      replaceContents(contentModel.getModelReferences(), references);
+      if (contentModel.getContent() != null && contentModel.getContent().getConfiguration() != null) {
+        contentModel.getContent().getConfiguration().setBaseGroupId(contentBaseGroupId);
+      }
     }
   }
 
@@ -111,6 +131,24 @@ class ModelSnapshot {
       copy.setValue(annotation.getValue());
       target.add(copy);
     }
+  }
+
+  private static void copyReferences(List<ModelReference> source, List<ModelReference> target) {
+    for (ModelReference reference : source) {
+      ModelReference copy = new ModelReference();
+      copy.setAlias(reference.getAlias());
+      copy.setPurpose(reference.getPurpose());
+      copy.setModelType(reference.getModelType());
+      copy.setUnresolvedModelType(reference.getUnresolvedModelType());
+      copy.setReference(reference.getReference());
+      target.add(copy);
+    }
+  }
+
+  private static String baseGroupId(ContentModel model) {
+    return model.getContent() != null && model.getContent().getConfiguration() != null
+        ? model.getContent().getConfiguration().getBaseGroupId()
+        : null;
   }
 
   private static void copyStyles(List<Style> source, List<Style> target) {

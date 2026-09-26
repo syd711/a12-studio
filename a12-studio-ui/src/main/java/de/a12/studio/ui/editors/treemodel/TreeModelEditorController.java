@@ -25,8 +25,10 @@ import java.util.UUID;
  * Edits a {@link TreeModel}: wires the panels of its four tabs - Columns ({@link TreeRootPanelController},
  * {@link TreeColumnsPanelController} incl. the hierarchical column, {@link TreeNodeTypesPanelController}),
  * Configuration ({@link TreeConfigurationPanelController}, expansion strategy, plus {@link
- * TreeExpansionDepthsPanelController} while that strategy is "Tree", then {@link
- * TreeMultiSelectionPanelController} and {@link TreeDragAndDropPanelController}), Custom Actions (the
+ * TreeInitialExpansionPanelController} while that strategy is "Level by level" or {@link
+ * TreeExpansionDepthsPanelController} while it is "Tree", then {@link TreeWholeTreeExpansionPanelController}, {@link
+ * TreePaginationPanelController} ("Level by level" only), {@link TreeMultiSelectionPanelController} and {@link
+ * TreeDragAndDropPanelController}), Custom Actions (the
  * Overview Model's {@link SubheaderSlotPanelController} for {@code content.subHeaderBox} - Button, Multi-Selection
  * and Expand All PopUp elements - and {@link EventButtonsPanelController} for the Button-only {@code
  * content.footerBox}; Major maps to {@code rightSlot}, Minor to {@code leftSlot}, and unlike the Overview Model
@@ -57,6 +59,15 @@ public class TreeModelEditorController extends AbstractEditorController implemen
 
   @FXML
   private TreeExpansionDepthsPanelController expansionDepthsPanelController;
+
+  @FXML
+  private TreeInitialExpansionPanelController initialExpansionPanelController;
+
+  @FXML
+  private TreeWholeTreeExpansionPanelController wholeTreeExpansionPanelController;
+
+  @FXML
+  private TreePaginationPanelController paginationPanelController;
 
   @FXML
   private TreeMultiSelectionPanelController multiSelectionPanelController;
@@ -93,13 +104,20 @@ public class TreeModelEditorController extends AbstractEditorController implemen
 
   @Override
   public void initialize(URL url, ResourceBundle resources) {
-    nodeTypesPanelController.setOnChange(() -> rootPanelController.refresh());
+    nodeTypesPanelController.setOnChange(() -> {
+      rootPanelController.refresh();
+      initialExpansionPanelController.refresh();
+      expansionDepthsPanelController.refresh();
+    });
     nodeTypesPanelController.setOnSelectionChange(nodeConfigurationPanelController::setNode);
-    nodeConfigurationPanelController.setOnRelationshipsChange(() -> rootPanelController.refresh());
+    nodeConfigurationPanelController.setOnRelationshipsChange(() -> {
+      rootPanelController.refresh();
+      expansionDepthsPanelController.refresh();
+    });
     nodeConfigurationPanelController.setOnDragDropChange(nodeTypesPanelController::refresh);
     columnsPanelController.setOnChange(nodeConfigurationPanelController::refresh);
-    configurationPanelController.setOnStrategyChange(
-        type -> expansionDepthsPanelController.setStrategyVisible(ExpansionStrategy.TREE.equals(type)));
+    nodeConfigurationPanelController.setOnColumnsChange(columnsPanelController::refresh);
+    configurationPanelController.setOnStrategyChange(this::showStrategyPanels);
     subheaderMajorController.setOnElementCreated(TreeModelEditorController::assignButtonId);
     subheaderMinorController.setOnElementCreated(TreeModelEditorController::assignButtonId);
   }
@@ -117,6 +135,9 @@ public class TreeModelEditorController extends AbstractEditorController implemen
     nodeTypesPanelController.setModel(model, projectItem);
     rootPanelController.setModel(model);
     expansionDepthsPanelController.setModel(model);
+    initialExpansionPanelController.setModel(model);
+    paginationPanelController.setModel(model);
+    wholeTreeExpansionPanelController.setModel(model);
     configurationPanelController.setModel(model);
     multiSelectionPanelController.setModel(model);
     dragAndDropPanelController.setModel(model);
@@ -126,6 +147,21 @@ public class TreeModelEditorController extends AbstractEditorController implemen
     accessibilityPanelController.setModel(model);
     stylesPanelController.setCustom(model.getContent()::getStyles);
     loadCustomActions(model);
+  }
+
+  /**
+   * Shows the panels of the given strategy: the expansion depths for "Tree", the initial expansion and pagination for
+   * "Level by level" (SME's default, so also while no strategy is set). Re-reads them, since switching drops the keys of
+   * the other strategy.
+   */
+  private void showStrategyPanels(String type) {
+    boolean tree = ExpansionStrategy.TREE.equals(type);
+    expansionDepthsPanelController.setStrategyVisible(tree);
+    expansionDepthsPanelController.refresh();
+    initialExpansionPanelController.setStrategyVisible(!tree);
+    initialExpansionPanelController.refresh();
+    paginationPanelController.setStrategyVisible(!tree);
+    paginationPanelController.refresh();
   }
 
   private void loadCustomActions(@NonNull TreeModel model) {

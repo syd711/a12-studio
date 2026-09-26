@@ -17,7 +17,11 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 /**
- * Edits a {@link TreeModel}'s {@link TreeConfiguration#getExpansionStrategy()}. The Hierarchical Column picker
+ * Edits the type of a {@link TreeModel}'s {@link TreeConfiguration#getExpansionStrategy()}; what belongs to one
+ * strategy is edited by {@link TreeInitialExpansionPanelController}, {@link TreePaginationPanelController} ("Level by
+ * level") and {@link TreeExpansionDepthsPanelController} ("Tree"), which the owning editor shows through {@link
+ * #setOnStrategyChange}. Switching the strategy drops the keys only the other one has, see {@link
+ * ExpansionStrategy#switchTypeTo}. The Hierarchical Column picker
  * that used to sit alongside this on the Configuration tab now lives on {@link TreeColumnsPanelController}
  * instead, matching SME's own placement (see {@code docs/modules/treeModel/0203_tree_columns.adoc}: Hierarchical
  * Column is the last step of the Columns section, not a separate configuration step). Not bound to a single
@@ -66,10 +70,8 @@ public class TreeConfigurationPanelController extends AbstractPropertyEditor imp
       if (updatingFromModel || model == null || newValue == null) {
         return;
       }
-      if (ensureConfiguration().getExpansionStrategy() == null) {
-        ensureConfiguration().setExpansionStrategy(new ExpansionStrategy());
-      }
-      ensureConfiguration().getExpansionStrategy().setType(newValue);
+      // Also drops what only the other strategy has (SME writes just the active strategy's keys).
+      ensureConfiguration().getOrCreateExpansionStrategy().switchTypeTo(newValue);
       commitHeaderChange();
       onStrategyChange.accept(newValue);
     });
@@ -84,10 +86,12 @@ public class TreeConfigurationPanelController extends AbstractPropertyEditor imp
 
     updatingFromModel = true;
     try {
-      expansionStrategyField.setValue(model.getContent().getConfiguration() != null
+      // A tree without a strategy behaves as "Level by level" (SME's default), which is shown without writing it.
+      String type = model.getContent().getConfiguration() != null
           && model.getContent().getConfiguration().getExpansionStrategy() != null
           ? model.getContent().getConfiguration().getExpansionStrategy().getType()
-          : null);
+          : null;
+      expansionStrategyField.setValue(type != null ? type : ExpansionStrategy.LEVEL_BY_LEVEL);
     }
     finally {
       updatingFromModel = false;

@@ -42,6 +42,9 @@ import java.util.Optional;
 public class TreeExpansionDepthsPanelController extends AbstractPropertyEditor {
 
   @FXML
+  private Button addButton;
+
+  @FXML
   private HBox depthHeaders;
 
   @FXML
@@ -54,6 +57,11 @@ public class TreeExpansionDepthsPanelController extends AbstractPropertyEditor {
 
   public void setModel(@NonNull TreeModel model) {
     this.model = model;
+    rebuildRows();
+  }
+
+  /** Re-reads the depths from the model, e.g. after the strategy was switched (which drops the ones of the other). */
+  public void refresh() {
     rebuildRows();
   }
 
@@ -100,9 +108,21 @@ public class TreeExpansionDepthsPanelController extends AbstractPropertyEditor {
     return relationships;
   }
 
+  /**
+   * The relationships still on offer: every relationship may only have one expansion depth (SME), so the ones the depths
+   * other than {@code editing} use are left out; {@code editing} (null when adding) keeps its own.
+   */
+  List<String> unusedRelationshipChoices(ExpansionDepth editing) {
+    List<String> used = getDepths().stream()
+        .filter(depth -> depth != editing)
+        .map(ExpansionDepth::getRelationshipModel)
+        .toList();
+    return relationshipChoices().stream().filter(relationship -> !used.contains(relationship)).toList();
+  }
+
   @FXML
   private void onAdd() {
-    Dialogs.showExpansionDepthForAdd(Studio.stage, relationshipChoices()).ifPresent(depth -> {
+    Dialogs.showExpansionDepthForAdd(Studio.stage, unusedRelationshipChoices(null)).ifPresent(depth -> {
       ensureDepths().add(depth);
       rebuildRows();
       commitHeaderChange();
@@ -121,6 +141,8 @@ public class TreeExpansionDepthsPanelController extends AbstractPropertyEditor {
     depthHeaders.setManaged(!empty);
     depthsEmptyLabel.setVisible(empty);
     depthsEmptyLabel.setManaged(empty);
+    // Nothing left to add once every relationship of the tree has its depth.
+    addButton.setDisable(unusedRelationshipChoices(null).isEmpty());
 
     for (int index = 0; index < depths.size(); index++) {
       depthRows.getChildren().add(createRow(depths.get(index), index));
@@ -164,7 +186,7 @@ public class TreeExpansionDepthsPanelController extends AbstractPropertyEditor {
   }
 
   private void openEditDialog(ExpansionDepth depth) {
-    Dialogs.showExpansionDepthForEdit(Studio.stage, relationshipChoices(), depth).ifPresent(edited -> {
+    Dialogs.showExpansionDepthForEdit(Studio.stage, unusedRelationshipChoices(depth), depth).ifPresent(edited -> {
       depth.setRelationshipModel(edited.getRelationshipModel());
       depth.setMaxDepth(edited.getMaxDepth());
       rebuildRows();

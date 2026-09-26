@@ -63,7 +63,7 @@ public final class ColumnMappingEditor {
     }
   }
 
-  static String mappedElementRef(List<TreeNodeColumn> mappings, String columnId) {
+  public static String mappedElementRef(List<TreeNodeColumn> mappings, String columnId) {
     return mappings.stream()
         .filter(mapping -> columnId != null && columnId.equals(mapping.getColumnRef()))
         .map(TreeNodeColumn::getElementRef)
@@ -71,7 +71,7 @@ public final class ColumnMappingEditor {
         .orElse(null);
   }
 
-  static void setMappedElementRef(List<TreeNodeColumn> mappings, String columnId, String elementRef) {
+  public static void setMappedElementRef(List<TreeNodeColumn> mappings, String columnId, String elementRef) {
     if (columnId == null) {
       return;
     }

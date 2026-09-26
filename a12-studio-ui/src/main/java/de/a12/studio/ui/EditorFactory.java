@@ -192,9 +192,12 @@ public class EditorFactory {
       }
       return content;
     }
-    catch (IOException e) {
-      log.error("Failed to load editor: {}", e.getMessage(), e);
-      WidgetFactory.showAlert(Studio.stage, e.getMessage());
+    // A RuntimeException (e.g. a panel's controller failing in load()) must not escape either: nothing catches it on the
+    // FX thread but the default handler, which writes to stderr only - the log stays silent and the caller is left with a
+    // half-built tab (or, while restoring the tabs, a restore that never finishes).
+    catch (IOException | RuntimeException e) {
+      log.error("Failed to load editor for '{}': {}", item.getPath(), e.getMessage(), e);
+      WidgetFactory.showAlert(Studio.stage, e.getMessage() != null ? e.getMessage() : e.toString());
     }
     return null;
   }

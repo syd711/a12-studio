@@ -42,11 +42,13 @@ public final class ModelReferenceRewriter {
   // print FieldRef.model & Calculation.model / QueryModelContent.targetDocumentModel & QuerySort.relationshipModel /
   // CombinedDocumentModelContent.baseModelId / Mapping Model's MappingTarget.dmId, MappingSource.dmId,
   // PreComputationFragmentRef.dmId, OverallModelRef.dmId / combineddocumentmodel's DocumentModelIdRef.dmId &
-  // SelectionModelIdRef.smId. "name" is only a reference when its sibling "modelType" marks the object as a
+  // SelectionModelIdRef.smId / TreeChildRelationshipConfiguration.relationshipModelRef (the Tree's
+  // ExpansionDepth.relationshipModel is covered by "relationshipModel"). "name" is only a reference when its sibling "modelType" marks the object as a
   // ModelDescriptor - every other "name" in these models (modules, scenes, buttons, ...) must stay untouched.
   public static final Set<String> REFERENCE_FIELD_NAMES = Set.of(
       "documentModel", "overviewModel", "formModel", "documentModelRef", "linkDocumentModel", "reference", "model",
-      "treeModel", "targetDocumentModel", "relationshipModel", "baseModelId", "dmId", "smId");
+      "treeModel", "targetDocumentModel", "relationshipModel", "baseModelId", "dmId", "smId",
+      "relationshipModelRef");
 
   // See REFERENCE_FIELD_NAMES javadoc above: the one "id"-named reference field, scoped to its wrapper.
   private static final String STRUCTURAL_MAPPING_MODEL_REF_FIELD_NAME = "StructuralMappingModel";

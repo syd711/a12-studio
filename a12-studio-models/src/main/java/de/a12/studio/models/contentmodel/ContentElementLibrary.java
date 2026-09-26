@@ -28,6 +28,13 @@ public final class ContentElementLibrary {
 
   public static final String NAMESPACE = ContentElementDefaults.DEFAULT_NAMESPACE;
 
+  /**
+   * The latest version of {@link #NAMESPACE} the Content Engine's migrator knows (the installed SME 13.0.2 ships
+   * 0.9.0, see {@code DefaultMigrator}); SME writes it to {@code content.configuration.namespaceVersions} of every
+   * new model, and a model with another version is treated as needing migration.
+   */
+  public static final String NAMESPACE_VERSION = "0.9.0";
+
   public static final String FORM_ELEMENTS_NAMESPACE = "com.mgmtp.a12.formengine";
 
   public static final String LAYOUT = "Layout";

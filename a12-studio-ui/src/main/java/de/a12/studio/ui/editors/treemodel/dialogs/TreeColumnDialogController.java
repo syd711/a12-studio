@@ -10,9 +10,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +26,9 @@ import java.util.Optional;
  * a brand new {@link TreeColumn} instance on OK (see {@link #getResult()}) rather than mutating the one passed
  * to {@link #init}, mirroring {@link de.a12.studio.ui.editors.applicationmodel.dialogs.SubregionDialogController};
  * the caller is responsible for copying its fields onto the existing column (edit, preserving its own {@code id})
- * or appending it with a freshly generated id (add).
+ * or appending it with a freshly generated id (add). When opened for a node type's column mapping (see {@link
+ * #init(Stage, TreeColumn, List, String)}) it also offers the node's Document Model field shown in the column,
+ * returned with the column by {@link #getMappingResult()}.
  */
 public class TreeColumnDialogController implements DialogController {
 
@@ -43,6 +47,12 @@ public class TreeColumnDialogController implements DialogController {
   private ComboBox<String> pinDirectionCombo;
 
   @FXML
+  private VBox fieldBox;
+
+  @FXML
+  private ComboBox<String> fieldCombo;
+
+  @FXML
   private Button okButton;
 
   @FXML
@@ -51,6 +61,10 @@ public class TreeColumnDialogController implements DialogController {
   private Stage stage;
 
   private TreeColumn built;
+
+  /** The edited column together with the node's field for it, as chosen in a column mapping dialog. */
+  public record MappingResult(TreeColumn column, String field) {
+  }
 
   private Optional<ButtonType> result = Optional.of(ButtonType.CANCEL);
 
@@ -68,6 +82,19 @@ public class TreeColumnDialogController implements DialogController {
         return string;
       }
     });
+
+    fieldCombo.setConverter(new StringConverter<>() {
+      @Override
+      public String toString(String value) {
+        return value == null ? "(None)" : value;
+      }
+
+      @Override
+      public String fromString(String string) {
+        return string;
+      }
+    });
+    setFieldVisible(false);
 
     okButton.disableProperty().bind(Bindings.createBooleanBinding(
         () -> isBlank(nameField.getText()) || parseWidth(widthField.getText()) == null,
@@ -93,11 +120,40 @@ public class TreeColumnDialogController implements DialogController {
   }
 
   void init(Stage stage, TreeColumn existing) {
+    init(stage, existing, null, null);
+  }
+
+  /**
+   * As {@link #init(Stage, TreeColumn)}, additionally offering the Document Model field {@code field} (may be null)
+   * out of {@code fieldOptions}; a {@code null} list hides the field. A field that is no longer offered stays
+   * selectable, so opening and confirming the dialog doesn't silently drop it.
+   */
+  void init(Stage stage, TreeColumn existing, List<String> fieldOptions, String field) {
     this.stage = stage;
+    setFieldVisible(fieldOptions != null);
+    if (fieldOptions != null) {
+      List<String> items = new ArrayList<>();
+      items.add(null);
+      items.addAll(fieldOptions);
+      if (field != null && !items.contains(field)) {
+        items.add(field);
+      }
+      fieldCombo.setItems(FXCollections.observableArrayList(items));
+      fieldCombo.setValue(field);
+    }
     nameField.setText(existing != null ? existing.getName() : "");
     widthField.setText(existing != null && existing.getWidth() != null ? String.valueOf(existing.getWidth()) : "1");
     fixedWidthField.setSelected(existing != null && Boolean.TRUE.equals(existing.getFixedWidth()));
     pinDirectionCombo.setValue(existing != null ? existing.getPinDirection() : null);
+  }
+
+  Optional<MappingResult> getMappingResult() {
+    return getResult().map(column -> new MappingResult(column, fieldCombo.getValue()));
+  }
+
+  private void setFieldVisible(boolean visible) {
+    fieldBox.setVisible(visible);
+    fieldBox.setManaged(visible);
   }
 
   Optional<TreeColumn> getResult() {

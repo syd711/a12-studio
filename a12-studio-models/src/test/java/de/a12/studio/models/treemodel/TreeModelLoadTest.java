@@ -103,6 +103,51 @@ class TreeModelLoadTest {
   }
 
   @Test
+  void loadsAndRoundTripsTheLevelByLevelInitialExpansionPageSizeAndWholeTreeFlag() throws Exception {
+    TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModelLevelByLevelStrategy.json", TreeModel.class);
+
+    TreeConfiguration configuration = model.getContent().getConfiguration();
+    ExpansionStrategy strategy = configuration.getExpansionStrategy();
+    assertEquals(ExpansionStrategy.LEVEL_BY_LEVEL, strategy.getType());
+    assertEquals(InitialExpansion.LEVEL_LIMIT, strategy.getInitialExpansion().getType());
+    assertEquals(2, strategy.getInitialExpansion().getLevel());
+    assertEquals(java.util.List.of("node-ce5b8"), strategy.getInitialExpansion().getAffectedNodeRefs());
+    assertEquals(5, strategy.getPageSize());
+    assertEquals(Boolean.TRUE, configuration.getWholeTreeExpansion());
+    assertTrue(strategy.getExtras().isEmpty(), "initialExpansion and pageSize are real properties, not extras");
+    assertFalse(configuration.getExtras().containsKey("wholeTreeExpansion"));
+
+    ModelRoundTrip.assertRoundTrip(getClass(), "/treemodel/TreeModelLevelByLevelStrategy.json", TreeModel.class);
+  }
+
+  @Test
+  void switchingTheStrategyDropsTheKeysOfTheOtherOne() throws Exception {
+    TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModelLevelByLevelStrategy.json", TreeModel.class);
+    ExpansionStrategy strategy = model.getContent().getConfiguration().getExpansionStrategy();
+
+    strategy.switchTypeTo(ExpansionStrategy.LEVEL_BY_LEVEL);
+    assertNotNull(strategy.getInitialExpansion(), "the same type changes nothing");
+    assertEquals(5, strategy.getPageSize());
+
+    strategy.switchTypeTo(ExpansionStrategy.TREE);
+    assertNull(strategy.getInitialExpansion());
+    assertNull(strategy.getPageSize());
+    assertEquals(java.util.List.of(), strategy.getExpansionDepths());
+
+    ExpansionDepth depth = new ExpansionDepth();
+    depth.setRelationshipModel("TeamTeam_Re");
+    strategy.getExpansionDepths().add(depth);
+    strategy.switchTypeTo(ExpansionStrategy.LEVEL_BY_LEVEL);
+    assertNull(strategy.getExpansionDepths());
+
+    JsonNode json = JsonSettings.objectMapper.valueToTree(strategy);
+    assertEquals("level_by_level", json.get("type").asString());
+    assertFalse(json.has("expansionDepths"));
+    assertFalse(json.has("initialExpansion"));
+    assertFalse(json.has("pageSize"));
+  }
+
+  @Test
   void aLevelByLevelStrategyWithoutDepthsDoesNotGainTheKey() throws Exception {
     TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModel.json", TreeModel.class);
 

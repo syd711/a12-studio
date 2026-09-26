@@ -5,7 +5,8 @@ import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelContent;
 import de.a12.studio.models.contentmodel.ContentConfiguration;
-import de.a12.studio.models.contentmodel.ContentElement;
+import de.a12.studio.models.contentmodel.ContentElementFactory;
+import de.a12.studio.models.contentmodel.ContentElementLibrary;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.contentmodel.ContentModelContent;
 import de.a12.studio.models.documentmodel.ConditionLanguage;
@@ -64,7 +65,6 @@ import org.jspecify.annotations.NonNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NewModelFactory {
@@ -362,14 +362,14 @@ public class NewModelFactory {
   private static ContentModel buildContentModel(List<Locale> locales) {
     ContentModel model = new ContentModel();
     ContentModelContent content = new ContentModelContent();
-    content.setConfiguration(new ContentConfiguration());
+    // SME seeds every new model with the engine's current version; without it the model counts as needing migration.
+    ContentConfiguration configuration = new ContentConfiguration();
+    configuration.getNamespaceVersions().put(ContentElementLibrary.NAMESPACE, ContentElementLibrary.NAMESPACE_VERSION);
+    content.setConfiguration(configuration);
 
-    ContentElement root = new ContentElement();
-    root.setId(shortId());
-    root.setType("Box");
-    root.setNamespace("com.mgmtp.a12.contentengine");
-    root.setChildren(new ArrayList<>());
-    content.setRoot(root);
+    // The root is a Box built like the one SME's insert creates (id, default style props), since every node
+    // must carry props.
+    content.setRoot(ContentElementFactory.create(ContentElementLibrary.find(ContentElementLibrary.NAMESPACE, "Box").orElseThrow(), 0));
 
     model.setContent(content);
     model.setLocales(locales);
@@ -514,10 +514,6 @@ public class NewModelFactory {
     content.setWidow(TypesettingModelDefaults.LINE_LIMIT);
     model.setContent(content);
     return model;
-  }
-
-  private static String shortId() {
-    return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
   }
 
   // Print model node ids follow the nanoid style of the SME print editor (21 url-safe characters).

@@ -35,6 +35,9 @@ public class TreeConfiguration {
   private Boolean labelHidden;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private ExpansionStrategy expansionStrategy;
+  // SME "Enable Expand/Collapse The Whole Tree": written as `true` or omitted, never `false`.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean wholeTreeExpansion;
   // SME writes these two as `true` or omits them ("Enable Virtual Scrolling", "Enable Columns Resize"), never `false`.
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean enableVirtualScroll;
@@ -51,6 +54,15 @@ public class TreeConfiguration {
   private JsonNode actionColumnWidthNode;
 
   private final Map<String, Object> extras = new LinkedHashMap<>();
+
+  /** The expansion strategy, created (still without a type) if the configuration has none yet. */
+  @JsonIgnore
+  public ExpansionStrategy getOrCreateExpansionStrategy() {
+    if (expansionStrategy == null) {
+      expansionStrategy = new ExpansionStrategy();
+    }
+    return expansionStrategy;
+  }
 
   @JsonIgnore
   public Double getActionColumnWidth() {

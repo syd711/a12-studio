@@ -257,6 +257,37 @@ class TreeConfigurationDialogsTest {
     assertFalse(loaded.controller().isConfirmed());
   }
 
+  // ---- column ----
+
+  @Test
+  void theColumnDialogOffersTheNodesFieldOnlyWhenOpenedFromTheColumnMapping() throws Exception {
+    assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
+    de.a12.studio.models.treemodel.TreeColumn column = new de.a12.studio.models.treemodel.TreeColumn();
+    column.setName("Name");
+    column.setWidth(2);
+
+    FxTestSupport.Loaded<TreeColumnDialogController> plain = FxTestSupport.load("/de/a12/studio/ui/editors/treemodel/dialogs/tree-column-dialog.fxml");
+    FxTestSupport.onFx(() -> plain.controller().init(new Stage(), column));
+    VBox plainBox = FxTestSupport.field(plain.controller(), "fieldBox");
+    assertFalse(plainBox.isVisible());
+    assertFalse(plainBox.isManaged());
+
+    FxTestSupport.Loaded<TreeColumnDialogController> mapped = FxTestSupport.load("/de/a12/studio/ui/editors/treemodel/dialogs/tree-column-dialog.fxml");
+    FxTestSupport.onFx(() -> mapped.controller().init(new Stage(), column, List.of("a", "b"), "gone"));
+    VBox mappedBox = FxTestSupport.field(mapped.controller(), "fieldBox");
+    ComboBox<String> fieldCombo = FxTestSupport.field(mapped.controller(), "fieldCombo");
+    assertTrue(mappedBox.isVisible());
+    assertEquals(java.util.Arrays.asList(null, "a", "b", "gone"), fieldCombo.getItems(), "a field no longer offered stays selectable");
+    assertEquals("gone", fieldCombo.getValue());
+
+    FxTestSupport.onFx(() -> fieldCombo.setValue("b"));
+    submit(mapped.controller());
+    TreeColumnDialogController.MappingResult result = mapped.controller().getMappingResult().orElseThrow();
+    assertEquals("b", result.field());
+    assertEquals("Name", result.column().getName());
+    assertEquals(2, result.column().getWidth());
+  }
+
   // ---- child relationship ----
 
   private static FxTestSupport.Loaded<TreeChildRelationshipDialogController> openRelationship(Workspace workspace,
