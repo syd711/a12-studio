@@ -44,6 +44,11 @@
     -fx-titled-pane-header-bg: #E7E9EE;
     -fx-titled-pane-border: #D8DBE1;
 
+    /* Group of panels that belong to the row selected above them (e.g. the Tree Model's node type
+       configuration): a slightly darker grey than the page, with a grey border, so the panels read as one unit. */
+    -fx-parent-selection-bg: #F5F6F8;
+    -fx-parent-selection-border: #C9CDD4;
+
     /* Text */
     -fx-text-secondary: #111111;
     -fx-text-muted: #7A7F89;

@@ -1,0 +1,65 @@
+{
+  "header": {
+    "id": "TreeModelNodeConfiguration",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [{"code": "en"}],
+    "labels": [{"locale": "en", "text": "Node configuration"}],
+    "modelReferences": [
+      {"purpose": "document-model-for-tree", "modelType": "document", "alias": "DM1", "reference": "Product_DM"},
+      {"purpose": "document-model-for-tree", "modelType": "document", "alias": "DM2", "reference": "Book_DM"},
+      {"purpose": "relationship-model-for-tree", "modelType": "relationship", "alias": "RM1", "reference": "ProductProduct_Re"}
+    ]
+  },
+  "content": {
+    "configuration": {"rootRef": "crc-1"},
+    "subHeaderBox": {"majorElements": [], "minorElements": []},
+    "footerBox": {"majorElements": [], "minorElements": []},
+    "columns": [{"id": "column-1", "name": "Name", "label": [{"locale": "en", "text": "Name"}], "width": 1}],
+    "nodes": [
+      {
+        "id": "node-1",
+        "documentModelRef": "Product_DM",
+        "configuration": {"dnd": true, "inherit": {}},
+        "columns": [{"columnRef": "column-1", "elementRef": "field_name"}],
+        "childRelationshipConfigurations": [
+          {"id": "crc-1", "relationshipModelRef": "ProductProduct_Re", "parentRole": "Parent"},
+          {"id": "crc-2", "relationshipModelRef": "ProductLink_Re", "parentRole": "Product", "columns": []},
+          {"id": "crc-3", "relationshipModelRef": "ProductBook_Re", "parentRole": "Product",
+           "columns": [{"columnRef": "column-1", "elementRef": "field_link"}]}
+        ],
+        "icon": {"name": "category", "theme": "rounded"},
+        "actions": [
+          {"primary": false, "destructive": true, "labelHidden": true, "type": "event", "event": "event_delete_node",
+           "icon": {"name": "delete", "theme": "filled"},
+           "label": [{"locale": "en", "text": "Delete"}],
+           "description": [{"locale": "en", "text": "Delete node"}],
+           "confirmation": {"title": [{"locale": "en", "text": "Delete"}], "message": [{"locale": "en", "text": "Sure?"}]},
+           "styles": ["s1"],
+           "annotations": [{"name": "a", "value": "b"}]},
+          {"primary": false, "destructive": false, "type": "insert", "position": "as_child", "documentModelRef": "Book_DM",
+           "useLabelFromDocumentModel": true, "useTitleFromDocumentModel": true, "useGlobalIcon": true}
+        ],
+        "contextMenu": {
+          "groups": [
+            {"name": "Actions", "title": [{"locale": "en", "text": "Actions"}],
+             "actions": [{"type": "event", "event": "event_copy_node", "icon": {"name": "content_copy"}}]},
+            {"name": "Add_Node", "type": "add", "actions": [{"type": "insert", "position": "below"}]}
+          ]
+        },
+        "defaultRowAction": {"custom": true, "event": "event_open"},
+        "rowTitle": [{"locale": "en", "text": "Open the product"}],
+        "styles": ["h_semiBoldFontWeight"]
+      },
+      {
+        "id": "node-2",
+        "documentModelRef": "Book_DM",
+        "configuration": {"dnd": false, "inherit": {"icon": true, "actions": true, "contextMenu": true}, "showInherit": true},
+        "columns": [],
+        "childRelationshipConfigurations": [],
+        "actions": [],
+        "defaultRowAction": {"custom": true}
+      }
+    ]
+  }
+}

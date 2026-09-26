@@ -35,7 +35,8 @@ import java.util.UUID;
  * TreeColumnsResizePanelController}, {@link TreeAccessibilityPanelController} and the Overview editor's {@link
  * StylesPanelController}, bound to {@code content.styles}) - each of which owns and persists its own slice of {@link
  * de.a12.studio.models.treemodel.TreeModelContent}. {@link TreeNodeTypesPanelController#setOnChange} keeps the
- * Root panel's choices, which come from the node types' child relationship configurations, in sync.
+ * Root panel's choices, which come from the node types' child relationship configurations, in sync. Below the node
+ * types, {@link TreeNodeConfigurationPanelController} shows the configuration of the node type selected there.
  */
 public class TreeModelEditorController extends AbstractEditorController implements Initializable {
 
@@ -47,6 +48,9 @@ public class TreeModelEditorController extends AbstractEditorController implemen
 
   @FXML
   private TreeNodeTypesPanelController nodeTypesPanelController;
+
+  @FXML
+  private TreeNodeConfigurationPanelController nodeConfigurationPanelController;
 
   @FXML
   private TreeConfigurationPanelController configurationPanelController;
@@ -90,6 +94,8 @@ public class TreeModelEditorController extends AbstractEditorController implemen
   @Override
   public void initialize(URL url, ResourceBundle resources) {
     nodeTypesPanelController.setOnChange(() -> rootPanelController.refresh());
+    nodeTypesPanelController.setOnSelectionChange(nodeConfigurationPanelController::setNode);
+    nodeConfigurationPanelController.setOnRelationshipsChange(() -> rootPanelController.refresh());
     configurationPanelController.setOnStrategyChange(
         type -> expansionDepthsPanelController.setStrategyVisible(ExpansionStrategy.TREE.equals(type)));
     subheaderMajorController.setOnElementCreated(TreeModelEditorController::assignButtonId);
@@ -104,6 +110,8 @@ public class TreeModelEditorController extends AbstractEditorController implemen
 
   private void load(@NonNull TreeModel model) {
     columnsPanelController.setModel(model);
+    // Before the node types: setting them selects a node type, which fills the configuration panel.
+    nodeConfigurationPanelController.setModel(model, projectItem);
     nodeTypesPanelController.setModel(model, projectItem);
     rootPanelController.setModel(model);
     expansionDepthsPanelController.setModel(model);

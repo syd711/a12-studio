@@ -20,6 +20,8 @@
          Fixed widths must match TreeNodeTypesPanelController.createRow(); the trailing spacer stands in for the row's actions box. -->
     <HBox fx:id="nodeHeaders" spacing="10.0">
       <padding><Insets left="13.0" right="13.0" /></padding>
+      <!-- Stands in for the row's selection radio button. -->
+      <Region minWidth="20.0" prefWidth="20.0" maxWidth="20.0" />
       <Label styleClass="field-label" text="" minWidth="18.0" prefWidth="18.0" maxWidth="18.0" />
       <Label styleClass="field-label" text="%document_model" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
       <Label styleClass="field-label" text="%drag_drop" minWidth="130.0" prefWidth="130.0" maxWidth="130.0" />

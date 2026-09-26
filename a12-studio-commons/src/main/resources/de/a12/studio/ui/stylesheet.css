@@ -170,6 +170,22 @@
     -fx-effect: dropshadow(gaussian, rgba(17, 17, 17, 0.06), 4, 0, 0, 1);
 }
 
+/* The currently selected row of a row list that has a detail editor below it (e.g. the Tree Model's node types).
+   Declared before the drop-target rules so those still win while a row is being dragged over. */
+.module-row-selected {
+    -fx-border-color: -fx-accent-color;
+}
+
+/* Wraps the panels that belong to the selected row above (see .module-row-selected), so they read as its children. */
+.parent-selection-group {
+    -fx-background-color: -fx-parent-selection-bg;
+    -fx-border-color: -fx-parent-selection-border;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+}
+
 .module-drag-handle {
     -fx-icon-color: -fx-text-faint;
 }

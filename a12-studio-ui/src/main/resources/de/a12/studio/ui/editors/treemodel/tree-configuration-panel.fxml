@@ -13,7 +13,7 @@
   <VBox spacing="4.0">
     <children>
       <Label styleClass="field-label" text="%expansion_strategy" />
-      <ComboBox fx:id="expansionStrategyField" editable="false" maxWidth="Infinity" />
+      <ComboBox fx:id="expansionStrategyField" editable="false" />
     </children>
   </VBox>
  </center>

@@ -19,6 +19,9 @@ public class ModelReference {
   public static final String PURPOSE_QUERY_MODEL_FOR_OVERVIEW = "query-model-for-overview";
   public static final String PURPOSE_DOCUMENT_MODEL = "Document model";
   public static final String PURPOSE_DOCUMENT_MODEL_FOR_TREE = "document-model-for-tree";
+  // A Tree Model's child relationship configurations name their relationship models by id; the header lists each
+  // distinct one under this purpose.
+  public static final String PURPOSE_RELATIONSHIP_MODEL_FOR_TREE = "relationship-model-for-tree";
   // Matches SME's DocumentModelExpansion.importPurpose exactly: a header reference of this purpose means
   // "import every type definition owned by the referenced Type Definition Model", as opposed to an "include"
   // reference (which inlines a whole other document model's element tree via a Group's includeConfig).

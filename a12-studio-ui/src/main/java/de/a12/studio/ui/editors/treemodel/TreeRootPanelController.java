@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.treemodel;
 
+import de.a12.studio.models.treemodel.TreeChildRelationshipConfiguration;
 import de.a12.studio.models.treemodel.TreeConfiguration;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
@@ -79,9 +80,9 @@ public class TreeRootPanelController extends AbstractPropertyEditor implements I
     }
     optionLabels = new LinkedHashMap<>();
     for (TreeNode node : model.getContent().getNodes()) {
-      for (Object configuration : node.getChildRelationshipConfigurations()) {
-        if (configuration instanceof Map<?, ?> map && map.get("id") instanceof String id) {
-          optionLabels.put(id, describe(node, map.get("relationshipModelRef")));
+      for (TreeChildRelationshipConfiguration configuration : node.getChildRelationshipConfigurations()) {
+        if (configuration.getId() != null) {
+          optionLabels.put(configuration.getId(), describe(node, configuration.getRelationshipModelRef()));
         }
       }
     }
@@ -100,15 +101,15 @@ public class TreeRootPanelController extends AbstractPropertyEditor implements I
   /** The ids of the child relationship configurations defined on {@code node}. */
   static List<String> childRelationshipConfigurationIds(@NonNull TreeNode node) {
     List<String> ids = new ArrayList<>();
-    for (Object configuration : node.getChildRelationshipConfigurations()) {
-      if (configuration instanceof Map<?, ?> map && map.get("id") instanceof String id) {
-        ids.add(id);
+    for (TreeChildRelationshipConfiguration configuration : node.getChildRelationshipConfigurations()) {
+      if (configuration.getId() != null) {
+        ids.add(configuration.getId());
       }
     }
     return ids;
   }
 
-  private static String describe(TreeNode node, Object relationshipModelRef) {
+  private static String describe(TreeNode node, String relationshipModelRef) {
     String owner = node.getDocumentModelRef() != null ? node.getDocumentModelRef() : node.getId();
     return owner + " → " + (relationshipModelRef != null ? relationshipModelRef : "?");
   }

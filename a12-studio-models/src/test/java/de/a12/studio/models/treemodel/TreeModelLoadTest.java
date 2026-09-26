@@ -141,4 +141,65 @@ class TreeModelLoadTest {
     assertFalse(content.get("configuration").has("rootRef"));
     assertFalse(content.get("configuration").has("labelHidden"));
   }
+
+  @Test
+  void loadsAndRoundTripsTheNodeConfiguration() throws Exception {
+    TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModelNodeConfiguration.json", TreeModel.class);
+
+    TreeNode product = model.getContent().getNodes().get(0);
+    assertEquals("category", product.getIcon().getName());
+    assertEquals("rounded", product.getIcon().getTheme());
+    assertEquals(3, product.getChildRelationshipConfigurations().size());
+    assertEquals("ProductProduct_Re", product.getChildRelationshipConfigurations().get(0).getRelationshipModelRef());
+    assertEquals("Parent", product.getChildRelationshipConfigurations().get(0).getParentRole());
+    assertNull(product.getChildRelationshipConfigurations().get(0).getColumns(), "an absent columns key stays absent");
+    assertTrue(product.getChildRelationshipConfigurations().get(1).getColumns().isEmpty(), "an explicit [] stays explicit");
+    assertEquals("field_link", product.getChildRelationshipConfigurations().get(2).getColumns().get(0).getElementRef());
+
+    TreeNodeAction event = product.getActions().get(0);
+    assertEquals(java.util.List.of("s1"), event.getStyles());
+    assertEquals("a", event.getAnnotations().get(0).getName());
+    assertNull(event.getPosition());
+    TreeNodeAction insert = product.getActions().get(1);
+    assertTrue(insert.isInsert());
+    assertEquals(TreeNodeAction.POSITION_AS_CHILD, insert.getPosition());
+    assertEquals("Book_DM", insert.getDocumentModelRef());
+    assertTrue(insert.getUseLabelFromDocumentModel());
+    assertTrue(insert.getUseGlobalIcon());
+    assertTrue(insert.getExtras().isEmpty(), "the insert fields are real properties, not extras");
+
+    assertEquals(2, product.getContextMenu().getGroups().size());
+    assertEquals("Actions", product.getContextMenu().getGroups().get(0).getName());
+    assertEquals("en", product.getContextMenu().getGroups().get(0).getTitle().get(0).getLocale());
+    assertNull(product.getContextMenu().getGroups().get(0).getType());
+    assertEquals(TreeNodeActionGroup.TYPE_ADD, product.getContextMenu().getGroups().get(1).getType());
+    assertEquals(Boolean.TRUE, product.getDefaultRowAction().getCustom());
+    assertEquals("event_open", product.getDefaultRowAction().getEvent());
+    assertEquals("Open the product", product.getRowTitle().get(0).getText());
+    assertEquals(java.util.List.of("h_semiBoldFontWeight"), product.getStyles());
+    assertTrue(product.getExtras().isEmpty(), "icon, contextMenu, defaultRowAction, rowTitle and styles are real properties");
+
+    TreeNode book = model.getContent().getNodes().get(1);
+    assertTrue(TreeNodeInheritance.isInherited(book, TreeNodeInheritance.Part.ICON));
+    assertTrue(TreeNodeInheritance.isInherited(book, TreeNodeInheritance.Part.CONTEXT_MENU));
+    assertFalse(TreeNodeInheritance.isInherited(book, TreeNodeInheritance.Part.STYLES));
+    assertNull(book.getIcon());
+    assertNull(book.getContextMenu());
+    assertNull(book.getDefaultRowAction().getEvent(), "a custom row action without an event is not interactive");
+
+    ModelRoundTrip.assertRoundTrip(getClass(), "/treemodel/TreeModelNodeConfiguration.json", TreeModel.class);
+  }
+
+  @Test
+  void aNodeWithoutTheOptionalPartsDoesNotGainThem() throws Exception {
+    TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModel.json", TreeModel.class);
+
+    JsonNode node = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(model)).get("content").get("nodes").get(0);
+    for (String key : java.util.List.of("icon", "contextMenu", "defaultRowAction", "rowTitle", "styles")) {
+      assertFalse(node.has(key), key + " is only written when set");
+    }
+    for (String key : java.util.List.of("position", "documentModelRef", "useGlobalIcon", "styles", "annotations")) {
+      assertFalse(node.get("actions").get(0).has(key), key + " is only written on an action that has it");
+    }
+  }
 }

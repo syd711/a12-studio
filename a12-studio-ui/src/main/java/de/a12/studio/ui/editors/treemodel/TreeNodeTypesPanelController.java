@@ -15,11 +15,14 @@ import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -34,22 +37,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Edits a {@link TreeModel}'s {@code content.nodes}: one draggable, reorderable row per node type,
- * summarizing its Document Model and whether drag &amp; drop is allowed. Clicking a row opens {@link
- * Dialogs#showNodeForEdit} (Document Model, drag &amp; drop, per-column field mapping); the Add button below
- * the rows opens {@link Dialogs#showNodeForAdd}. Not bound to a single {@link
+ * summarizing its Document Model and whether drag &amp; drop is allowed. A leading radio button (or a click
+ * anywhere on the row) selects the row, which {@link #setOnSelectionChange} reports so the owning editor can show
+ * that node type's configuration ({@link TreeNodeConfigurationPanelController}) below the list. The pencil button
+ * (or a double click) opens {@link Dialogs#showNodeForEdit}, the Add button below the rows {@link
+ * Dialogs#showNodeForAdd}; both only ask for the node's Document Model (drag &amp; drop and the per-column field
+ * mapping are edited in {@link TreeNodeConfigurationPanelController}, which calls {@link #refresh()} after a
+ * change that shows in the rows). Not bound to a single {@link
  * de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern used by e.g. {@link
  * TreeColumnsPanelController}. The header's {@code modelReferences} track the node Document Models (purpose
  * "document-model-for-tree"), synced by {@link #syncModelReferences()}. Editing a row only touches what the
- * dialog edits (Document Model, drag &amp; drop, column mapping); everything else on the node - actions,
+ * dialog edits (the Document Model); everything else on the node - drag &amp; drop, columns, actions,
  * child relationship configurations, icon, ... - is left as it was.
  */
 public class TreeNodeTypesPanelController extends AbstractPropertyEditor implements Initializable {
 
   // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into getNodes().
   private static final DataFormat NODE_INDEX = new DataFormat("application/x-a12-tree-node-index");
+
+  private static final String SELECTED_ROW_STYLE = "module-row-selected";
+
+  // Must match the leading spacer in tree-node-types-panel.fxml's header.
+  private static final double RADIO_COLUMN_WIDTH = 20.0;
 
   @FXML
   private HBox nodeHeaders;
@@ -63,19 +76,40 @@ public class TreeNodeTypesPanelController extends AbstractPropertyEditor impleme
   private TreeModel model;
   private ProjectItem projectItem;
 
+  // One radio per row; exactly the selected node's is on. Clicking anywhere on a row selects it.
+  private final ToggleGroup selectionGroup = new ToggleGroup();
+  private TreeNode selectedNode;
+  // Set while rows are being rebuilt, so the radios' programmatic state changes aren't mistaken for clicks.
+  private boolean rebuilding;
+
   // Notified after every structural change (add/edit/reorder/delete), so the owning editor can keep the Root
   // panel's choices - derived from the nodes' child relationship configurations - in sync.
   private Runnable onChange = () -> {
   };
 
+  // Notified whenever the selected node changes and after every rebuild (an edit changes the selected node in
+  // place, so the editor below has to re-read it); null when there are no node types.
+  private Consumer<TreeNode> onSelectionChange = node -> {
+  };
+
   public void setModel(@NonNull TreeModel model, @NonNull ProjectItem projectItem) {
     this.model = model;
     this.projectItem = projectItem;
+    this.selectedNode = null;
     rebuildRows();
   }
 
   public void setOnChange(@NonNull Runnable onChange) {
     this.onChange = onChange;
+  }
+
+  public void setOnSelectionChange(@NonNull Consumer<TreeNode> onSelectionChange) {
+    this.onSelectionChange = onSelectionChange;
+  }
+
+  /** The node type whose configuration is shown below the list, or {@code null} while there are none. */
+  public TreeNode getSelectedNode() {
+    return selectedNode;
   }
 
   private List<TreeNode> getNodes() {
@@ -84,33 +118,85 @@ public class TreeNodeTypesPanelController extends AbstractPropertyEditor impleme
 
   @FXML
   private void onAdd() {
-    Dialogs.showNodeForAdd(Studio.stage, model, projectItem).ifPresent(node -> {
+    Dialogs.showNodeForAdd(Studio.stage, projectItem).ifPresent(node -> {
       node.setId("node-" + shortId());
       getNodes().add(node);
+      selectedNode = node;
       rebuildRows();
       notifyChanged();
     });
   }
 
+  /** Re-renders the rows (e.g. after drag &amp; drop was toggled elsewhere) without reporting a selection change. */
+  public void refresh() {
+    rebuildRows(false);
+  }
+
   private void rebuildRows() {
+    rebuildRows(true);
+  }
+
+  private void rebuildRows(boolean notifySelection) {
     if (model == null) {
       return;
     }
-    nodeRows.getChildren().clear();
+    rebuilding = true;
+    try {
+      nodeRows.getChildren().clear();
+      selectionGroup.getToggles().clear();
 
-    List<TreeNode> nodes = getNodes();
-    boolean empty = nodes.isEmpty();
-    nodeHeaders.setVisible(!empty);
-    nodeHeaders.setManaged(!empty);
-    nodesEmptyLabel.setVisible(empty);
-    nodesEmptyLabel.setManaged(empty);
+      List<TreeNode> nodes = getNodes();
+      boolean empty = nodes.isEmpty();
+      nodeHeaders.setVisible(!empty);
+      nodeHeaders.setManaged(!empty);
+      nodesEmptyLabel.setVisible(empty);
+      nodesEmptyLabel.setManaged(empty);
 
-    for (int index = 0; index < nodes.size(); index++) {
-      nodeRows.getChildren().add(createRow(nodes.get(index), index, nodes.size()));
+      // Keep the selection across a rebuild; fall back to the first node when it is gone (or nothing was selected yet).
+      if (selectedNode == null || !nodes.contains(selectedNode)) {
+        selectedNode = empty ? null : nodes.get(0);
+      }
+
+      for (int index = 0; index < nodes.size(); index++) {
+        nodeRows.getChildren().add(createRow(nodes.get(index), index, nodes.size()));
+      }
+    }
+    finally {
+      rebuilding = false;
+    }
+    if (notifySelection) {
+      onSelectionChange.accept(selectedNode);
     }
   }
 
+  private void select(TreeNode node) {
+    if (rebuilding || node == selectedNode) {
+      return;
+    }
+    selectedNode = node;
+    for (Node row : nodeRows.getChildren()) {
+      boolean selected = row.getUserData() == node;
+      row.getStyleClass().remove(SELECTED_ROW_STYLE);
+      if (selected) {
+        row.getStyleClass().add(SELECTED_ROW_STYLE);
+        ((RadioButton) ((HBox) row).getChildren().get(0)).setSelected(true);
+      }
+    }
+    onSelectionChange.accept(node);
+  }
+
   private HBox createRow(TreeNode node, int index, int rowCount) {
+    RadioButton selectRadio = new RadioButton();
+    selectRadio.setId("treeNodeSelect-" + index);
+    selectRadio.setToggleGroup(selectionGroup);
+    selectRadio.setSelected(node == selectedNode);
+    lockWidth(selectRadio, RADIO_COLUMN_WIDTH);
+    selectRadio.selectedProperty().addListener((observable, oldValue, selected) -> {
+      if (selected) {
+        select(node);
+      }
+    });
+
     FontIcon dragHandle = RowFactory.createDragHandle();
 
     String documentModel = node.getDocumentModelRef() != null ? node.getDocumentModelRef() : StudioBundle.get("no_document_model_selected");
@@ -125,9 +211,15 @@ public class TreeNodeTypesPanelController extends AbstractPropertyEditor impleme
     // Fixed widths here and in tree-node-types-panel.fxml's header must stay in sync so labels sit above their values.
     HBox actionsBox = createActionsBox(node, index, rowCount);
     lockWidth(actionsBox, 120.0);
-    HBox row = new HBox(10.0, dragHandle, documentModelLabel, dragDropLabel, actionsBox);
+    HBox row = new HBox(10.0, selectRadio, dragHandle, documentModelLabel, dragDropLabel, actionsBox);
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
+    row.setUserData(node);
+    if (node == selectedNode) {
+      row.getStyleClass().add(SELECTED_ROW_STYLE);
+    }
+    // A click anywhere on the row (including its buttons) selects it; a drag on the handle never produces a click.
+    row.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> select(node));
     RowFactory.setupRowDragAndDrop(row, dragHandle, NODE_INDEX, index, this::moveNode);
     return row;
   }
@@ -142,12 +234,12 @@ public class TreeNodeTypesPanelController extends AbstractPropertyEditor impleme
     region.setMaxWidth(width);
   }
 
+  // A single click only selects the row (see createRow); a double click opens the edit dialog, like the pencil button.
   private Label createRowLabel(String text, String id, TreeNode node) {
     Label label = new Label(text);
     label.setId(id);
-    label.setCursor(Cursor.HAND);
     label.setOnMouseClicked(event -> {
-      if (event.getClickCount() == 1) {
+      if (event.getClickCount() == 2) {
         openEditDialog(node);
       }
     });
@@ -155,10 +247,8 @@ public class TreeNodeTypesPanelController extends AbstractPropertyEditor impleme
   }
 
   private void openEditDialog(TreeNode node) {
-    Dialogs.showNodeForEdit(Studio.stage, model, projectItem, node).ifPresent(edited -> {
+    Dialogs.showNodeForEdit(Studio.stage, projectItem, node).ifPresent(edited -> {
       node.setDocumentModelRef(edited.getDocumentModelRef());
-      node.setConfiguration(edited.getConfiguration());
-      node.setColumns(edited.getColumns());
       rebuildRows();
       notifyChanged();
     });

@@ -50,8 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * The Tree Model editor's tabs and property editors: Root, Columns and Node Types on the first tab, the
- * Subheader and Footer slots on the Custom Actions tab, the Accessibility and Styles editors on the Layout tab,
+ * The Tree Model editor's tabs and property editors: Root and Columns on the first tab, Node Types on the second,
+ * the Subheader and Footer slots on the Custom Actions tab, the Accessibility and Styles editors on the Layout tab,
  * and the Node Types list's rows.
  */
 class TreeModelEditorPanelsTest {
@@ -115,17 +115,18 @@ class TreeModelEditorPanelsTest {
   // ---- tab layout ----
 
   @Test
-  void firstTabHoldsRootColumnsAndNodeTypesAndLayoutIsANewTab() throws Exception {
+  void theTabsAreTreeNodeTypesConfigurationLayoutAndCustomActions() throws Exception {
     assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
     FxTestSupport.Loaded<TreeModelEditorController> loaded = FxTestSupport.load(EDITOR_FXML);
     TabPane tabs = (TabPane) ((BorderPane) loaded.root()).getCenter();
 
-    assertEquals(List.of(StudioBundle.get("tree_model_editor.tab_tree"), StudioBundle.get("configuration"),
-            StudioBundle.get("custom_actions"), StudioBundle.get("tree_model_editor.tab_layout")),
-        tabs.getTabs().stream().map(Tab::getText).toList(),
-        "the former Nodes tab is gone; Custom Actions is the third tab, followed by Layout");
-    assertEquals(List.of(StudioBundle.get("tree_root"), StudioBundle.get("columns"), StudioBundle.get("node_types")),
-        paneTitles(tabs.getTabs().get(0)));
+    assertEquals(List.of(StudioBundle.get("tree_model_editor.tab_tree"), StudioBundle.get("tree_model_editor.tab_node_types"),
+            StudioBundle.get("configuration"), StudioBundle.get("tree_model_editor.tab_layout"), StudioBundle.get("custom_actions")),
+        tabs.getTabs().stream().map(Tab::getText).toList());
+    assertEquals(List.of(StudioBundle.get("tree_root"), StudioBundle.get("columns")), paneTitles(tabs.getTabs().get(0)));
+    assertEquals(List.of(StudioBundle.get("node_types")), paneTitles(tabs.getTabs().get(1)),
+        "the node types list, followed by the (untitled) configuration of the selected node type");
+    assertEquals(2, ((VBox) ((ScrollPane) tabs.getTabs().get(1).getContent()).getContent()).getChildren().size());
     assertEquals(List.of(StudioBundle.get("tree_virtual_scrolling_panel.title"),
             StudioBundle.get("row_height_and_action_column_width"), StudioBundle.get("tree_columns_resize_panel.title"),
             StudioBundle.get("accessibility"), StudioBundle.get("styles")),
@@ -140,11 +141,14 @@ class TreeModelEditorPanelsTest {
       assertNotNull(controller, panel + " must be injected");
       panels.add(controller);
     }
+    assertNotNull(FxTestSupport.field(loaded.controller(), "nodeConfigurationPanelController"),
+        "nodeConfigurationPanelController must be injected");
   }
 
+  /** The titles of the tab's TitledPanes; anything else (e.g. the node type configuration container) is skipped. */
   private static List<String> paneTitles(Tab tab) {
     VBox box = (VBox) ((ScrollPane) tab.getContent()).getContent();
-    return box.getChildren().stream().map(node -> ((TitledPane) node).getText()).toList();
+    return box.getChildren().stream().filter(TitledPane.class::isInstance).map(node -> ((TitledPane) node).getText()).toList();
   }
 
   // ---- Custom Actions ----
@@ -162,12 +166,12 @@ class TreeModelEditorPanelsTest {
   }
 
   @Test
-  void customActionsIsTheThirdTabWithSubheaderAndFooterSlots(@TempDir Path dir) throws Exception {
+  void customActionsIsTheLastTabWithSubheaderAndFooterSlots(@TempDir Path dir) throws Exception {
     ProjectItem item = selectTree(dir);
     FxTestSupport.Loaded<TreeModelEditorController> loaded = loadEditor(item);
     TabPane tabs = (TabPane) ((BorderPane) loaded.root()).getCenter();
 
-    Tab tab = tabs.getTabs().get(2);
+    Tab tab = tabs.getTabs().get(4);
     assertEquals(StudioBundle.get("custom_actions"), tab.getText());
     VBox box = (VBox) ((ScrollPane) tab.getContent()).getContent();
     assertEquals(List.of(StudioBundle.get("subheader"), StudioBundle.get("major_buttons"), StudioBundle.get("minor_buttons"),

@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.treemodel;
 
 import de.a12.studio.models.treemodel.ExpansionDepth;
 import de.a12.studio.models.treemodel.ExpansionStrategy;
+import de.a12.studio.models.treemodel.TreeChildRelationshipConfiguration;
 import de.a12.studio.models.treemodel.TreeConfiguration;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
@@ -26,7 +27,6 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -90,9 +90,9 @@ public class TreeExpansionDepthsPanelController extends AbstractPropertyEditor {
   private List<String> relationshipChoices() {
     List<String> relationships = new ArrayList<>();
     for (TreeNode node : model.getContent().getNodes()) {
-      for (Object configuration : node.getChildRelationshipConfigurations()) {
-        if (configuration instanceof Map<?, ?> map && map.get("relationshipModelRef") instanceof String ref
-            && !ref.isBlank() && !relationships.contains(ref)) {
+      for (TreeChildRelationshipConfiguration configuration : node.getChildRelationshipConfigurations()) {
+        String ref = configuration.getRelationshipModelRef();
+        if (ref != null && !ref.isBlank() && !relationships.contains(ref)) {
           relationships.add(ref);
         }
       }

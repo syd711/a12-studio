@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- The configuration of the node type selected in the node types panel above. The panels below only offer
+     what is not inherited from a super type node, see TreeNodeConfigurationPanelController. -->
+<VBox fx:id="root" maxWidth="Infinity" spacing="12.0" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="de.a12.studio.ui.editors.treemodel.TreeNodeConfigurationPanelController">
+    <children>
+        <Label fx:id="titleLabel" styleClass="editor-type-label" />
+        <Label fx:id="noSelectionLabel" styleClass="placeholder-label" text="%tree_node_configuration_panel.no_selection" />
+        <VBox fx:id="content" spacing="12.0" styleClass="parent-selection-group">
+            <children>
+                <fx:include fx:id="inheritPanel" source="tree-node-inherit-panel.fxml" />
+                <fx:include fx:id="iconPanel" source="../propertyeditors/icon-panel.fxml" />
+                <fx:include fx:id="childRelationshipsPanel" source="tree-child-relationships-panel.fxml" />
+                <fx:include fx:id="actionsPanel" source="tree-node-actions-panel.fxml" />
+                <fx:include fx:id="contextMenuPanel" source="tree-node-context-menu-panel.fxml" />
+                <fx:include fx:id="rowActivationPanel" source="tree-node-row-activation-panel.fxml" />
+                <fx:include fx:id="rowTitlePanel" source="../propertyeditors/localized-text-panel.fxml" />
+                <fx:include fx:id="stylesPanel" source="/de/a12/studio/ui/editors/overviewmodel/styles-panel.fxml" />
+            </children>
+        </VBox>
+    </children>
+</VBox>

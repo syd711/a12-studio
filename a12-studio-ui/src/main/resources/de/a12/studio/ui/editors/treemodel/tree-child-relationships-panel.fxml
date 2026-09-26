@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%tree_child_relationships_panel.title" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.a12.studio.ui.editors.treemodel.TreeChildRelationshipsPanelController">
+ <BorderPane>
+ <top>
+    <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
+ </top>
+ <center>
+  <VBox spacing="10.0">
+    <!-- Left/right padding of 13 = the .module-row border (1) + padding (12). Fixed widths must match
+         TreeChildRelationshipsPanelController.createRow(); the leading spacer stands in for the drag handle. -->
+    <HBox fx:id="relationshipHeaders" spacing="10.0">
+      <padding><Insets left="13.0" right="13.0" /></padding>
+      <Label styleClass="field-label" text="" minWidth="18.0" prefWidth="18.0" maxWidth="18.0" />
+      <Label styleClass="field-label" text="%tree_child_relationship_dialog.relationship_model" HBox.hgrow="ALWAYS" minWidth="0.0" prefWidth="100.0" maxWidth="Infinity" />
+      <Label styleClass="field-label" text="%tree_child_relationship_dialog.parent_role" HBox.hgrow="ALWAYS" minWidth="0.0" prefWidth="100.0" maxWidth="Infinity" />
+      <Region minWidth="110.0" prefWidth="110.0" maxWidth="110.0" />
+    </HBox>
+    <VBox fx:id="relationshipRows" spacing="8.0" />
+    <Label fx:id="emptyLabel" styleClass="placeholder-label" text="%there_are_no_entries_yet" />
+    <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_child_relationship">
+      <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+      <tooltip><Tooltip text="%add_child_relationship" /></tooltip>
+    </Button>
+  </VBox>
+ </center>
+ </BorderPane>
+</TitledPane>
