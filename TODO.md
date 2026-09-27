@@ -4,6 +4,14 @@ Cleaned up 2026-09-27 (this pass): fixed items from the previous pass (rewritten
 what was done is in `git log` and, per feature, in `docs/sme-reference-comparison.md`. Everything below is open.
 Conventions are in `CLAUDE.md`.
 
+**Sandbox note (2026-09-27):** this pass ran in a cloud sandbox with no access to `C:\workspace\sme`,
+`C:\workspace\a12\2606-06-doc` or `C:\workspace\RichTextFX` (all Windows paths outside the container) - only this
+repo and `docs/sme-reference-comparison.md`'s own already-fact-checked text. Gaps below that would need a fresh
+read of the SME source or BA doc to pin down an exact wire-value/label/candidate-rule (e.g. Form Model gap 8's
+enum wire values, Overview gap 16's "dynamic-suffix fields excluded" rule, the Type Definition Model per-row
+"invalid" indicator's exact trigger) were deliberately left alone rather than guessed at - a session with that
+access should tackle those next.
+
 ## Open decisions (need the owner)
 
 1. **Kernel dependency: may a12-studio rely on `internal`/`a12internal` kernel classes?** The 2026-09-19 spike found kernel `31.1.1` viable in-process (condition validation, DM expansion, additive join; TDG is enterprise-only and stays blocked), but nearly everything it uses has no stability guarantee. Needs mgm's answer, plus contract tests if yes. Until then only slices that need the reference graph alone are built clean-room (as the loop detection was). Blocks: semantic condition validation, real DM expansion / additive join, `BindingRepeat`'s deeper heterogeneous-relationship/multiplicity checks (Composed Document Models section below). Details: "Kernel dependency spike" in `docs/sme-reference-comparison.md`.
@@ -151,7 +159,15 @@ Full review 2026-09-27 against SME's `appModel` module, its docs (`docs/modules/
 Full review 2026-09-27 against SME's `masterDetailModel` module, its self-hosted meta-model DM (`ModuleMasterDetail.json`) and the BA doc (`docs/modules/masterDetailModuleModel/index.adoc`): "Master Detail Model: gap review" in `docs/sme-reference-comparison.md` (5 numbered gaps, a table and the suggested order; the numbers below are its gap numbers). `MainDetailModelEditorController` and its five panels already mirror SME's `formMappingMiddleware`/`syncRelationshipEditors`/`syncLinkDocumentEditors`, both reference validators cover every rule in the meta-model DM, `MasterDetailModuleGenerator` is a faithful tested port of `masterDetailModule.ts`, and cross-model rename propagation needs no masterDetailModel-specific code - what is left:
 - **Gap 3 fixed 2026-09-27 (this pass):** `HeaderRolesValidator` is now registered in `MasterDetailModelValidationService` (see "Open issues" above).
 - **Gap 1, the real feature gap: no heterogeneous (abstract/subtype) or CDM expansion in the Form Mapping / Relationship Editors candidate lists.** SME's `resolveAndFilterAbstractDocuments` replaces a Composed Document Model reference with its query root and expands an abstract Document Model into its concrete subtypes, recursively - a documented, cypress-tested feature (BA doc's "Heterogeneous Overview Module"/"Tree Module" sections). a12-studio has the building blocks already (`ComposedDocumentModelResolver.getQueryRootId`, `TreeHeterogeneity.info`/`allDocuments` over `DocumentModelHeterogeneity`'s super/subtype graph, both used elsewhere) but `MainDetailModelEditorController.referencedDocumentModelIds`/`relationshipEditorDocumentModelIds` don't call them - a heterogeneous or CDM-backed master model currently shows one Form Mapping row for the abstract/CDM-member id itself, which usually can't be edited directly, instead of one row per concrete subtype/query-root.
-- **Gap 2: Binding Overview Models aren't excluded from the Overview Model combo**, unlike SME (BA doc is explicit about this). `OverviewBindingPurpose.resolve` (built for the Overview Model's own gap review) already detects this but needs a `ValidationContext` built from a `ProjectItem` - not something any `a12-studio-ui` code does yet, so this is also the first call site for that constructor helper.
+- **Gap 2 fixed 2026-09-27 (this pass):** Binding Overview Models are now excluded from the Overview Model combo -
+  `MainDetailModelEditorController.overviewModelOptions()` filters out any Overview Model id for which
+  `OverviewBindingPurpose.resolve(id, otherModels)` returns non-null, gathering `otherModels` from
+  `ProjectDocumentModels.getOtherModelsOfType` for `FORM` and `RELATIONSHIPUI` (the two model types
+  `OverviewBindingPurpose` inspects) rather than the `ValidationContext`-only overload. No dedicated UI test was
+  added - the `maindetailmodel` editor package has no FX test scaffolding at all yet (a pre-existing gap, not
+  introduced here), while the filtering logic itself (`OverviewBindingPurpose.resolve`) is already covered by
+  `OverviewBindingPurposeTest`. Build a proper `MainDetailModelEditorControllerTest` (mirroring e.g.
+  `ContentModelSettingsDialogTest`'s FX harness) the next time this editor is touched, and pin this exclusion then.
 - **Gaps 4, 5, last:** low priority (missing-field validator gap only matters for hand-edited JSON; stale-panel-until-reopen only matters while this editor tab is open during an unrelated Overview/Tree Model save elsewhere).
 
 ## Blocked (waiting for an input)

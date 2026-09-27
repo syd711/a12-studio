@@ -9,6 +9,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.models.treemodel.TreeNodeAction;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewBindingPurpose;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -17,6 +18,7 @@ import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -87,9 +89,18 @@ public class MainDetailModelEditorController extends AbstractEditorController im
     load(model);
   }
 
+  /**
+   * Every Overview Model of the project, excluding a Binding Overview Model (the Available/Selected Items
+   * overview of a Form Model {@code Binding}/{@code BindingRepeat} or a Relationship UI Model component) -
+   * SME's own Master Detail Module BA doc is explicit that those can't be picked as a master module's list.
+   */
   private List<String> overviewModelOptions() {
+    List<A12Model<?>> bindingHolders = new ArrayList<>();
+    bindingHolders.addAll(ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.FORM));
+    bindingHolders.addAll(ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.RELATIONSHIPUI));
     return ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.OVERVIEW).stream()
         .map(A12Model::getId)
+        .filter(id -> OverviewBindingPurpose.resolve(id, bindingHolders) == null)
         .sorted(Comparator.naturalOrder())
         .toList();
   }
