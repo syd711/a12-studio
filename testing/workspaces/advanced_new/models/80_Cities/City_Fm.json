@@ -786,22 +786,7 @@
         }
       ]
     },
-    "groupConfiguration": {
-      "group": [
-        {
-          "dependentGroup": {
-            "masterField": "field_69593",
-            "case": [
-              {
-                "masterValue": "false",
-                "notRelevant": true
-              }
-            ]
-          },
-          "groupRef": "group_c28f9"
-        }
-      ]
-    },
+    "groupConfiguration": {},
     "defaults": {}
   }
 }

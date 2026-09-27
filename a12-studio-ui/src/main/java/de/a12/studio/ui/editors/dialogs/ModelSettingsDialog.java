@@ -198,9 +198,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       // other panels stay unbound (an unbound panel reports no validation error that could disable Save) and
       // are hidden below.
       boolean generalAndRolesOnly = model instanceof TypesettingModel;
-      modelSettingsNameController.setModel(model);
-      modelSettingsNameController.focusNameField();
       if (!generalAndRolesOnly) {
+        modelSettingsNameController.setModel(model);
+        modelSettingsNameController.focusNameField();
         supportedCharactersController.setModel(model);
         localesController.setModel(model);
         labelsController.setModel(model);
@@ -300,6 +300,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
               && !(model instanceof AdditiveDocumentModel) && !(model instanceof TreeModel)
               && !(model instanceof ContentModel));
       if (generalAndRolesOnly) {
+        modelSettingsNameController.setVisible(false);
         supportedCharactersController.setVisible(false);
         localesController.setVisible(false);
         labelsController.setVisible(false);
