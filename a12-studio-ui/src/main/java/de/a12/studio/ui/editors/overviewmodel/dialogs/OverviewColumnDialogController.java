@@ -348,7 +348,7 @@ public class OverviewColumnDialogController implements DialogController {
 
     // A link column's field lives on the relationship's own link document model, not the primary one, so
     // its picker offers (and resolves against) that model's fields instead - see effectiveIndex's doc.
-    elementRefCombo.getItems().setAll(OverviewElementOptions.elementIds(effectiveIndex));
+    elementRefCombo.getItems().setAll(OverviewElementOptions.columnElementIds(effectiveIndex));
     OverviewElementOptions.applyElementRefConverter(elementRefCombo, effectiveIndex);
     suffixRefCombo.getItems().setAll(OverviewElementOptions.enumerationElementIds(documentModelIndex));
     OverviewElementOptions.applyElementRefConverter(suffixRefCombo, documentModelIndex);

@@ -189,6 +189,7 @@ public class StylesPanelController extends AbstractPropertyEditor {
     styleField.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, initialValue == null || initialValue.isBlank());
     styleField.textProperty().addListener((observable, oldValue, newValue) -> {
       getStyles().set(index, newValue);
+      renameColumnStyleReferences(oldValue, newValue);
       styleField.pseudoClassStateChanged(ERROR_PSEUDO_CLASS, newValue == null || newValue.isBlank());
       debouncer.debounce(styleField.getId(), () -> {
         refreshStylesError();
@@ -223,7 +224,8 @@ public class StylesPanelController extends AbstractPropertyEditor {
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_style"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
-        getStyles().remove(index);
+        String removedStyle = getStyles().remove(index);
+        removeColumnStyleReferences(removedStyle);
         rebuildRows();
         commitChange();
       }
@@ -238,5 +240,43 @@ public class StylesPanelController extends AbstractPropertyEditor {
     Collections.swap(getStyles(), fromIndex, toIndex);
     rebuildRows();
     commitChange();
+  }
+
+  /**
+   * Gap 17 of "Overview Model: gap review" (structural refactoring): renaming a model-level style (this panel
+   * in {@link #setModel} mode only - a column's own header/content style list, {@link #setColumn} mode, has
+   * nothing further to cascade into) updates every Column header/content style reference that pointed at the
+   * old value, mirroring SME's refactoring dialog. A no-op when {@code oldValue}/{@code newValue} are blank or
+   * equal, or every column's own style list, so an in-progress edit that hasn't settled into a distinct value
+   * yet doesn't cascade prematurely.
+   */
+  private void renameColumnStyleReferences(String oldValue, String newValue) {
+    if (model == null || oldValue == null || oldValue.isBlank() || newValue == null || oldValue.equals(newValue)) {
+      return;
+    }
+    for (Column overviewColumn : model.getContent().getColumns()) {
+      ColumnStyles styles = overviewColumn.getStyles();
+      if (styles == null) {
+        continue;
+      }
+      Collections.replaceAll(styles.getHeader(), oldValue, newValue);
+      Collections.replaceAll(styles.getContent(), oldValue, newValue);
+    }
+  }
+
+  /** Counterpart to {@link #renameColumnStyleReferences} for a deleted style - removes every Column
+   * header/content style reference that pointed at it, rather than leaving a dangling reference behind. */
+  private void removeColumnStyleReferences(String removedValue) {
+    if (model == null || removedValue == null || removedValue.isBlank()) {
+      return;
+    }
+    for (Column overviewColumn : model.getContent().getColumns()) {
+      ColumnStyles styles = overviewColumn.getStyles();
+      if (styles == null) {
+        continue;
+      }
+      styles.getHeader().removeIf(removedValue::equals);
+      styles.getContent().removeIf(removedValue::equals);
+    }
   }
 }

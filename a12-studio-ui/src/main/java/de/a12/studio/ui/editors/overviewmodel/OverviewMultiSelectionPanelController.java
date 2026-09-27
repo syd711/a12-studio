@@ -22,6 +22,12 @@ public class OverviewMultiSelectionPanelController extends AbstractMultiSelectio
 
   private OverviewModel model;
 
+  // Notified after a user toggle of the enabled checkbox (never from setModel()/loadFromModel() itself - see
+  // OverviewSortingPanelController#refresh's own javadoc for why an initial load must not silently prune-and-
+  // save), since disabling Multi-Selection can leave a now-disallowed Subheader element behind (gap 17 of
+  // "Overview Model: gap review" - OverviewSubHeaderPruning removes it instead of merely flagging it).
+  private Runnable onEnabledChange = () -> { };
+
   public void setModel(@NonNull OverviewModel model) {
     this.model = model;
     loadFromModel();
@@ -33,6 +39,13 @@ public class OverviewMultiSelectionPanelController extends AbstractMultiSelectio
    * present there. */
   public void refresh() {
     refreshValidationError();
+  }
+
+  /**
+   * @see #onEnabledChange
+   */
+  public void setOnEnabledChange(@NonNull Runnable onEnabledChange) {
+    this.onEnabledChange = onEnabledChange;
   }
 
   @Override
@@ -60,6 +73,7 @@ public class OverviewMultiSelectionPanelController extends AbstractMultiSelectio
   @Override
   protected void onEnabledChanged() {
     refreshValidationError();
+    onEnabledChange.run();
   }
 
   private void refreshValidationError() {

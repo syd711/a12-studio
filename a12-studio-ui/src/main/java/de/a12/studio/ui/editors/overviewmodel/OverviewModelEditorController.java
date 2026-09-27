@@ -23,6 +23,8 @@ import de.a12.studio.models.querymodel.QueryPaging;
 import de.a12.studio.models.querymodel.QuerySort;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewBindingPurpose;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewSubHeaderPruning;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
 import de.a12.studio.ui.editors.overviewmodel.dialogs.CreateQueryModelDialogController;
@@ -166,6 +168,11 @@ public class OverviewModelEditorController extends AbstractEditorController impl
   private List<DocumentModel> otherDocumentModels = List.of();
   private List<QueryModel> otherQueryModels = List.of();
   private List<RelationshipModel> otherRelationshipModels = List.of();
+  // Form Model Bindings and Relationship UI Model DualPaneSelection/TableList components, the only two sources
+  // OverviewBindingPurpose.resolve scans - cached for pruneSubHeader (gap 17 of "Overview Model: gap review"),
+  // which needs the current purpose to know whether Search/Multi-Selection are prunable at all (never, for
+  // either Binding purpose - see OverviewSubHeaderElementValidator's own javadoc).
+  private List<A12Model<?>> otherModelsForBindingPurpose = List.of();
   private ElementIndex documentModelIndex;
   private final Map<String, ElementIndex> linkedDocumentModelIndexByModelId = new HashMap<>();
   private final Function<ColumnLinkReference, ElementIndex> linkDocumentModelIndexResolver = this::linkedDocumentModelIndex;
@@ -191,6 +198,8 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       overviewAccessibilityController.refresh();
     });
     overviewSearchAndFiltersController.setOnRelevanceChange(this::updateFilterModeDependentVisibility);
+    overviewSearchAndFiltersController.setOnFeatureSwitchChange(this::pruneSubHeader);
+    overviewMultiSelectionController.setOnEnabledChange(this::pruneSubHeader);
     // Switching Pagination <-> Infinite Scrolling changes whether Row Height/Action Column Width are required,
     // and may itself seed a default Row Height (see PagingBehaviourPanelController) - re-read/re-validate them.
     overviewPagingBehaviourController.setOnBehaviourChange(overviewRowHeightActionColumnWidthController::refresh);
@@ -230,6 +239,32 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     filterStringFieldsMultiSelectController.setVisible(!customFilter);
   }
 
+  /**
+   * Gap 17 of "Overview Model: gap review" (structural refactoring): removes a Filter/Search/Multi-Selection
+   * Subheader element that just became disallowed because the user switched its feature off - Enable Filter/Show
+   * Filter Button ({@link OverviewSearchAndFiltersPanelController#setOnFeatureSwitchChange}), Show Full Text
+   * Search (same callback) or Multi-Selection's own enabled checkbox ({@link
+   * OverviewMultiSelectionPanelController#setOnEnabledChange}) - mirroring what SME's own refactoring dialog
+   * does. Never runs from the initial {@code load()} itself (neither callback fires from a panel's {@code
+   * setModel}/{@code loadFromModel}, only from a user toggle - see {@link OverviewSortingPanelController#refresh}
+   * for why an initial load must not silently prune-and-save a pre-existing file). A no-op (via {@link
+   * OverviewSubHeaderPruning#pruneDisallowedElements}) if nothing is actually disallowed.
+   */
+  private void pruneSubHeader() {
+    if (model == null) {
+      return;
+    }
+    String purpose = OverviewBindingPurpose.resolve(model.getId(), otherModelsForBindingPurpose);
+    if (!OverviewSubHeaderPruning.pruneDisallowedElements(model, purpose)) {
+      return;
+    }
+    subheaderMajorController.refresh();
+    subheaderMinorController.refresh();
+    overviewMultiSelectionController.refresh();
+    overviewSearchAndFiltersController.refresh();
+    commitChange();
+  }
+
   @Override
   public void loadModel(@NonNull A12Model<?> model) {
     load((OverviewModel) model);
@@ -250,6 +285,9 @@ public class OverviewModelEditorController extends AbstractEditorController impl
           .filter(RelationshipModel.class::isInstance)
           .map(RelationshipModel.class::cast)
           .toList();
+      otherModelsForBindingPurpose = new ArrayList<>();
+      otherModelsForBindingPurpose.addAll(ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.FORM));
+      otherModelsForBindingPurpose.addAll(ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.RELATIONSHIPUI));
       overviewReferenceController.load(model, otherDocumentModels, otherQueryModels);
       refreshDocumentModelIndex();
       overviewColumnsController.setModel(model);

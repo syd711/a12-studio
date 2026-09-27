@@ -376,6 +376,94 @@ guess at the exact gating.
 
 ---
 
+## Type Definition Model
+
+*Gap review 2026-09-27, against SME's dedicated `client/src/modules/typeDefinitionModel/` module, the type-definition
+editing code it shares with a plain Document Model's own "Type Definitions" tab, and the BA doc's Type Definition
+Model section.*
+
+**What it actually is.** A Type Definition Model (TDM) is not a separate document format on either side — it's a
+plain Document Model whose header carries an annotation marking it TD-only (SME: `{"name": "tdonly", "value":
+"true"}`, read by `hasTypeDefinitionModelRootAnnotation`) and whose `modelRoot`/groups stay empty; only
+`content.typeDefinitions` is used. SME's module is thin: an explorer entry, a module wrapper that reuses the entire
+Document Model editor frame minus the Model Tree tab, and one genuinely TDM-specific behavior described in the next
+paragraph. Server-side, TDM resolution is a thin DTO (`ResolveTypeDefinitionDTO.kt`) around the same kernel-backed
+expansion regular Document Models use — nothing TDM-specific happens on the backend beyond that. a12-studio mirrors
+this closely: `TypeDefinitionTableController` (`a12-studio-ui/.../editors/typedefinitionmodel/`) is a single, shared,
+well-developed component (transitive Include/Import resolution via `TransitiveTypeDefinitions`, "included"/
+"included-imported" row styling, locale-compatible/cycle-safe Import candidates, deferred-save mode) used both by
+`TypeDefintionModelEditorController` (the standalone TDM tab) and `TypeDefinitionSettingsDialog` (a regular Document
+Model's own Type Definitions dialog) — exactly SME's shared-component design.
+
+**Gap 1, the real architectural gap: a TDM can't hold local and imported type definitions at the same time.**
+`TypeDefinitionTableController.updateAddImportAvailability()` disables Add once any Import exists and disables
+Import once any local type definition exists, unconditionally for every `DocumentModel` the table serves — including
+a `TypeDefinitionModel` itself. SME's `selectTypeDefinitionMode()` (`typeDefOverviewWithImport.tsx`) special-cases
+exactly this: it returns `"combined"` whenever the model being edited *is* a TDM
+(`hasTypeDefinitionModelRootAnnotation`), and `AddButton`/`ImportButton` only disable on `"import"`/`"local"`
+respectively, never on `"combined"` — because this component is shared verbatim between the plain-DM editor and the
+TDM editor. So a **plain Document Model** must pick one mode (local-only or imported-only, which a12-studio already
+gets right), but a **TDM itself** may own local type definitions *and* import other TDMs at once, working as a hub
+that re-exports imported ones alongside its own — exactly the BA doc's stated purpose ("maintain all Type
+Definitions that are needed in the different Document Models of a project in a central place... It is also possible
+to import another Type Definition Model"). Fix: a `model instanceof TypeDefinitionModel` escape hatch in
+`updateAddImportAvailability()` that never disables either button for a TDM. No fixture on disk exercises this
+combination today; add one alongside the fix.
+
+**Gap 2: a multi-select group's enumeration value field can be pointed at an imported/included type definition,
+which SME explicitly forbids.** The BA doc: *"For consistency reasons it is not possible to use imported Type
+Definitions or Type Definitions from includes"* for a multi-select's value field. a12-studio's
+`TypeDefinitionPanelController.collectAvailableTypeDefinitionLabels()` offers the model's own type definitions plus
+every transitively included/imported one with no `isMultiSelectParent()` special case, and `MultiSelectGroupValidator`
+only checks that the effective type resolves to Enumeration/String, not that a referenced type definition is local.
+Fix: filter the combo to local-only type definitions when `isMultiSelectParent()`, and add the matching validator
+check.
+
+**Gap 3: `BasicConsistencyValidator`'s type-definition pass never checks blank id/name, only Enumeration duplicate
+values.** Every other element kind gets a blank-id/blank-name check through `allElements()`; type definitions aren't
+reachable through that walk and their dedicated second pass only calls the Enumeration-duplicate check. Reachable
+today only via a hand-edited/imported file (the UI's own Add/rename paths already validate non-blank) — one-line
+addition once touched.
+
+**Gap 4 (re-check once Gap 1 lands, lower confidence):** `MissingReferenceValidator.getDuplicateNamedTypeDefinitions`
+only compares a model's own, non-included, non-imported type definitions against each other — correctly matching
+SME's current, narrower scope. Once Gap 1 makes a TDM's local-plus-imported set real, a same-named local and imported
+type definition would sit unflagged side by side in the same combined table; no SME source found that confirms a rule
+for this specific combined case, so verify rather than assume when implementing Gap 1.
+
+**Low priority.** No per-row "invalid" indicator column in the Type Definitions table (SME's `TypedefOverview` has
+one via `invalidElements`/`invalidTypeDefs`; a12-studio only surfaces an error once a row is opened) — needs a
+`ValidationContext` lookup wired into the table, moderate size, do whenever the table is next touched.
+`testing/workspaces/advanced_new/models/CommonFieldDefinitions_Td.json` uses a non-conforming `_Td` suffix instead
+of the official `_TDM` (the a12 naming-convention doc and `model-versions.json` both say `_TDM`; the e-commerce
+fixture `CommonTypes_TDM.json` is correctly named) — invisible today because that workspace disables suffix
+enforcement, and not worth a standalone rename since three other fixtures (`PersonEmployee_Ad.json`, `Team_Dc.json`,
+`PersonSkills_LinkFields_Base_Dc.json`) reference it by id.
+
+**Checked, not a gap.** Every field-type-config validator (`EnumerationValuesValidator`, `StringTypeConfigValidator`,
+`NumberTypeConfigValidator`, `EnumerationTypeConfigValidator`, `CustomFieldTypeConfigValidator`,
+`DateFormatConfigValidator`, `NumberFieldValueLimitValidator`, `StringPatternErrorMessageValidator`) already walks a
+model's own `content.typeDefinitions` in addition to `allElements()`. Type Definition name uniqueness (own list,
+model-wide) matches SME's `TYPE_DEF_NAME_DUPLICATED` scope exactly. Missing/invalid type-definition references
+(`MissingReferenceValidator`'s `NOT_SPECIFIED`/`DOES_NOT_EXIST`) and broken transitive import chains
+(`TransitiveTypeDefinitions.hasUnresolvedImportChain`) both correctly mirror SME's kernel rules. Import candidate
+filtering (locale-direction, already-imported exclusion, cycle prevention) matches `importTypeDefsView.tsx` exactly.
+**Delete/Remove-Import confirmation dialogs are stricter than SME, not weaker**: SME's own BA doc says explicitly
+that neither action has any check or confirmation dialog at all ("There is no check if a Type Definition is used in
+a field definition before deleting it and thus no confirmation dialogue", and the identical statement for Remove
+Import) — a12-studio shows a confirmation dialog with an explanatory message before either, so it's already ahead
+here, not behind. `IncludeTypeDefinitionModeValidator`/`TypeDefinitionMode` (Include-compatibility between two
+*regular* Document Models) is orthogonal to Gap 1 — a TDM is never Included, only Imported via a header
+`ModelReference`. The "TD" tree badge for a `TypeDefFieldType` field, the round-trip shape of `TypeDefinition`
+(`id`/`name`/`fieldType` only — no additional persisted fields found anywhere), the `_TDM` suffix convention, and the
+Import picker offering only `TypeDefinitionModel` instances (never plain/Additive Document Models) are all already
+correct.
+
+**Suggested order.** 1 (the real gap, add a combined-mode fixture) → 2 (small, BA-doc-backed) → 3 (one line, land
+with 2) → 4 (re-check once 1 lands) → the two low-priority items whenever their files are next touched anyway.
+
+---
+
 ## Combined Document Model
 
 *Built 2026-09-08.*
@@ -428,6 +516,30 @@ a12-studio had no `ModelType.SELECTION` at all. Added a minimal stub (`ModelType
 existing `PrintModel` precedent (loadable/referenceable project-wide, but opens "not supported yet" until a real
 editor exists. **Superseded 2026-09-13** — see the dedicated "Selection Model" section below, `enabled` is now
 `true`).
+
+### Gap review (2026-09-27)
+
+Re-checked against current SME `combinationModel` source (`client/src/modules/combinationModel/`, its meta-model `DomainCombination.json`/editor Form Model, and the BA doc's `04_editor.adoc`) and current a12-studio source.
+
+| # | Gap in Studio | What SME does | Effect today |
+|---|---|---|---|
+| 1 | **The Base Model picker, and the Additive/Decoration model pickers on a Combination Step, only offer plain Document Models — a Combination Model can't be nested inside another one.** `CombinedDocumentModelEditorController.documentModelOptions()` and `CombinationStepsPanelController.documentModelIds()` both call the plain `ProjectDocumentModels.getOtherDocumentModels(projectItem)` | SME's `04_editor.adoc` is explicit: *"Base Document Model:: Select a **(Combined or Transformed)** Document Model from the dropdown list"* - `combModelReferenceProviders.ts`'s `getBaseModelReferenceCalculator` resolves against `resolveStandaloneDocumentModelTypes()`, which includes Combination Model. Same underlying reference calculator backs the Addition/Decoration step pickers | A Combination Model cannot be layered on top of another Combination Model at all - the picker never lists one, even though a12-studio already has the exact helper this needs (`ProjectDocumentModels.getOtherDocumentModelsWithCombinations`, already used by Form Model, Content Model and `ModelSettingsDialog` for this same "treat a Combination Model as document-model-shaped" purpose) sitting unused here |
+| 2 | **The Additive Model picker on an Addition step is not filtered to Additive Document Models.** `CombinationStepsPanelController.documentModelIds()` offers every plain Document Model | SME's `additiveModelReferenceProvider` resolves specifically against `additiveDocumentModelProto.type` - an Addition step's Document Model dropdown only ever offers real Additive Document Models | Any Document Model, additive or not, can be picked as an Addition step's target through the UI; a12-studio already has `AdditiveDocumentModel`/`AdditiveDocumentModelResolver` (used elsewhere for the Document Model editor's own "Additive Elements Only" preview) that could power the same filter here but doesn't |
+| 3 | **A dangling additive/selection/decoration/base-model reference is never shown inline on the offending Combination Step row.** `CombinationStepsPanelController.refreshValidation()` only displays an error whose `elementId` starts with `content/combinationSteps/` (`STEP_ELEMENT_ID_PREFIX`); the only check covering these references is the generic `HeaderModelReferenceValidator`, whose flat `elementId` is always `header/modelReferences` - it never matches that prefix, so it's caught in overall model validation but never surfaces on the step itself | `DomainCombination.json` has 4 dedicated "Invalid Reference" rules not mentioned in this doc before now - `A12_ADDITIVE_MODEL_ID_INVALID_REFERENCE`/`A12_SELECTION_MODEL_ID_INVALID_REFERENCE`/`A12_DECORATION_MODEL_ID_INVALID_REFERENCE` (`errorEntityRelPath: "../dmId"`/`"../smId"`) and `A12_BASE_MODEL_ID_INVALID_REFERENCE` - each shown right on the offending field | A user editing a Combination Step sees no error on the row itself when its Document/Selection Model reference is broken - only a generic, differently-located validation error elsewhere, unlike SME which points at the exact field |
+| 4 | *Precision correction, not a new gap:* **the "7 structural Rules ported" framing undercounts SME's actual rule set.** `DomainCombination.json` declares 11 rules: the 7 already ported (3 `*_MISSING` + 3 `*_NOT_ALLOWED` + `ADDITIVE_MODEL_DUPLICATE`) **plus** the 4 invalid-reference rules in gap 3 (not ported as dedicated validators - misplaced under the generic header validator instead) - `BaseModelMustBeValid`/`AdmShouldNotCauseLoop` remain genuinely unused custom-condition-only rules on SME's own side, so that part of the existing text is still correct | — | Documentation precision only; folded into gap 3's fix rather than tracked separately |
+| 5 | **No user-facing Preview of the expanded/merged Document Model.** SME has a dedicated read-only editor screen for this (`editor/preview/combinationPreviewView.tsx`, a `ConfigurableDmTree` over the real kernel-expanded result) | a12-studio's only expansion logic (`CombinedDocumentModelElements.resolveForFieldReferences`, deliberately conservative - merges Addition steps only, skips Selection/Decoration) is used silently by Overview/Form field-reference pickers; there is no visible tree/preview built on it anywhere | Full parity needs the kernel dependency this doc already tracks as blocked (Open Decision #1), but a partial, Addition-only-merge Preview tab is buildable today on the existing helper without that dependency - worth considering as a scoped, doable slice of an otherwise kernel-gated feature, not an all-or-nothing item |
+| 6 | *Low priority:* **No cap on the number of Combination Steps.** SME's `CombinationSteps` group declares `"repeatability": 99`; a12-studio's `combinationSteps` is an unbounded list with no size check | — | Unlikely to matter in practice; a trivial validator if ever worth adding |
+| 7 | **`HeaderRolesValidator` is not registered in `CombinationModelValidationService`** | Same shared kernel `ModelHeader` roles rules every other model type gets | Same cross-cutting gap already flagged for Application/Master Detail/Relationship/Query Model - fold into the same follow-up |
+
+**Not gaps (checked).** `CombModelReferenceHelper.modelCausesOrHasLoop`'s exact walk semantics (already documented above) were re-read directly against current `combinationHelper.ts` and still match with no drift. SME's real semantic validation (`combModelValidation.ts::validateCombinationModel`) turns out to be broader than "DM expansion + SMT rule-contradiction pass" suggests - it expands via the kernel into a real Document Model and then runs the *entire* Document Model validator suite against it (every field/group/type-definition rule, not just contradiction-solving); doesn't change the kernel-blocked status, just the precision of what's blocked. SME's `SELECTION_MODEL_MISSING` rule (requiring a Selection Model reference for Selection **and both** Decoration step types) is already correctly implemented three-ways by `CombinationSelectionModelMissingValidator`. SME's `invalidCombinationModal.tsx` "Save As Invalid" escape hatch is tied to SME's own save-blocking-on-validation-error UX, which a12-studio's architecture never has anywhere (badges only, no editor blocks saving) - a pre-existing, consistent, project-wide difference, not specific to this model type. Loop-avoidance in the Base Model picker (SME filters loop-causing candidates at picker time; a12-studio reports the loop after selection) was already tracked above and is unchanged.
+
+**Not investigated (flag for follow-up if ever prioritized).** `diff/combiCalculateDiff.ts` (purpose unclear, likely a version-diff viewer, not read); `addModel/addCombinationModelForm.tsx` (an inline "or create a new model" convenience on the pickers - low-priority UX parity); `expansion/combModelExpansion.ts`'s exact algorithm vs. `CombinedDocumentModelElements`'s approximation (known to differ in scope - Selection/Decoration skipped - but not diffed line-by-line).
+
+**Suggested order.**
+1. **Gaps 1, 2** (picker type-filtering): reuse `ProjectDocumentModels.getOtherDocumentModelsWithCombinations` for the Base Model/Additive/Decoration pickers (gap 1), and filter the Additive step picker specifically to `AdditiveDocumentModel`s via the existing resolver (gap 2) - both are call-site swaps to already-existing helpers, no new mechanism.
+2. **Gap 3** (inline invalid-reference errors): add 4 small validators (or one parametrized one) emitting `content/combinationSteps/<i>` / `content/baseModelId`-prefixed errors for a dangling additive/selection/decoration/base-model reference, so `CombinationStepsPanelController.refreshValidation()`'s existing prefix filter picks them up - the generic `HeaderModelReferenceValidator` stays as a backstop, this just gives the step row its own inline error too. Folds in gap 4's precision fix automatically.
+3. **Gap 7** (`HeaderRolesValidator`): batch into the cross-cutting follow-up already tracked for the other model types.
+4. **Gap 5** (Preview tab) and **gap 6** (99-step cap): lower priority, opportunistic.
 
 ---
 
@@ -528,8 +640,25 @@ so it stays in its table. `PreventLineBreakRules.classify/toValue/toPattern` por
 **Editor** (`a12-studio-ui/.../editors/typesettingmodel/`), one extracted property editor per SME section:
 `CharacterSequenceRulesPanelController`, `NumberUnitRulesPanelController`, `SpecialPatternRulesPanelController` (a shared
 `AbstractRulesPanelController` holds the row/add/delete/validation behavior) and `OrphanWidowPanelController`. Roles are
-not in the editor: the Model Settings dialog shows only the General information (name, description) and Roles panels
-for this model type (every other panel is hidden and left unbound so none can disable Save), and the New Model dialog neither asks for nor writes locales.
+not in the editor: the Model Settings dialog should show **just** the Roles panel for this model type (every other
+panel, including General information/name/description, hidden and left unbound so none can disable Save) — SME's real
+dialog (`TypesettingModelContainer.tsx` in the npm package) has exactly three sections (Prevent Line Break Rules,
+Orphan/Widow, Roles) and no name/description UI at all, and its own header deserializer is configured with
+`hasDescription: false` — a TSM's header schema has no description field to edit in the first place. The New Model
+dialog neither asks for nor writes locales.
+
+**Known regression (found 2026-09-27, still open): the Model Settings dialog currently shows Name/Description too.**
+`ModelSettingsDialog.java`'s roles-only guard was introduced correctly (as `rolesOnly`) in commit `24baa9dc`
+(2026-09-25), with `modelSettingsNameController.setModel/.focusNameField()` inside the guard and a
+`setVisible(false)` call hiding the panel. A same-day follow-up, `4bf14fae`, renamed the flag to
+`generalAndRolesOnly`, moved those two `modelSettingsNameController` calls *outside* the guard (now unconditional,
+`ModelSettingsDialog.java:196-197`) and dropped the `setVisible(false)` call — while only updating the inline
+comment and this doc's prose, not the two in-repo javadocs (`TypesettingModel`, `TypesettingModelEditorController`
+both still correctly say "just the Roles panel") or the test. `TypesettingModelEditorTest.theModelSettingsDialogOffersNothingButTheRoles`
+is consequently red (`modelSettingsNameController must be hidden` — confirmed by running it). Fix: move
+`modelSettingsNameController.setModel(model); modelSettingsNameController.focusNameField();` back inside
+`if (!generalAndRolesOnly)`, and add `modelSettingsNameController.setVisible(false);` back into the
+`if (generalAndRolesOnly)` block (~line 294-300); no test or model-class change needed. A ~10-minute revert.
 
 **Validation** (`TypesettingModelValidationService`; no locale validators, the header has no locales):
 - Character sequence: required, letters and hyphens only (`^[\p{L}-]+$`), at most 20 characters.
@@ -545,7 +674,14 @@ for this model type (every other panel is hidden and left unbound so none can di
 **Not done / known limits.** A Print Model's Text Styles cannot pick a Typesetting Model yet: the Print Model editor is
 disabled and has no typesetting-reference UI (SME's schema tab does). Renaming a Typesetting Model already rewrites the
 header references of the models pointing at it (generic id-based rewriting). No `customHyphenationExclusions` editing,
-matching SME. Not checked against the real print engine: the regexes are only compared with SME's editor's output.
+matching SME (re-verified 2026-09-27 against the full npm v3.2.3 and v4.0.1 UI source — no such component exists in
+either version; the two versions are otherwise functionally identical, differing only in an internal
+`internal`→`a12internal` package rename). Not checked against the real print engine: the regexes are only compared
+with SME's editor's output. Re-verified 2026-09-27, nothing else missing: rule classification/escaping, per-rule
+value validators (character set down to the exact punctuation list), duplicate detection, orphan/widow range and
+default, delete-confirmation flow, `HeaderRolesValidator`'s rules, `ModelSuffixValidator`/`model-versions.json`, and
+`NewModelFactory.buildTypesettingModel()`'s defaults all match SME's real package field-for-field — the one open item
+is the Model Settings dialog regression above.
 
 ---
 
@@ -1117,8 +1253,8 @@ needs to copy architecturally.
 | Sort | Multi-field, relationship-hop, direction, null-handling, ignore-case | Present (`QuerySort`/`QuerySortBy`/sorting panel), roughly at parity — `QueryTraversalOption.options()` scopes to *every* relationship in the project rather than only ones connected to the target DM |
 | Paging | pageNumber/pageSize | Present, roughly at parity |
 | Aggregation/grouping | Full group-by + count/sum/max/min/avg mode | **Present** (2026-09-20) — `QueryAggregationPanelController` on the Post Processing tab: the switch, group fields, aggregations (function, field, alias); offers only eligible fields (non-repeatable, not `indexed = false`) and, per aggregation, only fields the chosen function fits; `QueryAggregationValidator` (see the Validation row and "Status (2026-09-20): aggregation done") |
-| Multi-target-type queries (CDM, Transformer Model as target) | Supported | Not supported — DM only (**parked**, 2026-09-20; also blocked: there is no Composed Document Model or Transformer Model here) |
-| Reference/rename tracking | Target-DM, relationship, sort/aggregation field-path references are all first-class in SME's refactoring graph; renaming a DM/field auto-updates or flags the query (`qmModule.ts` `refactorDocument()`) | **Present** (2026-09-20; was partly present 2026-09-19) — renaming/moving an element of a Document Model rewrites every query field path evaluated against it, at any depth: root and hop `fields`, `sort` (also through a relationship), `constraint` (also below `has`), `filterDefinition` text (`[/Path]` refs, also inside `Has(...)` constraints), a hop's `linkDocumentFields` (`ProjectReferenceRefactoring` → `QueryReferenceRefactoring`, one undo step with the DM edit). Renaming a Document Model or Relationship Model *file* (id) rewrites `targetDocumentModel`, `relationshipModel` of hops/sorts/`has` operators (nested included, `ModelReferenceRewriter`) and, new, the relationship named in `Has("<rel>", ...)` inside `filterDefinition` text; SME's own `refactorDocument()` only handles `targetDocumentModel`. An unresolvable target is now an explicit error (validator + banner in the Model Tree tab + message in the Settings tab's target combo), see the Validation row. **Still missing:** a *role* rename in a Relationship Model (the role field commits per keystroke and nothing — Query, Form bindings, Relationship UI — reacts to it; the Query validators flag the dangling `targetRole`), an aggregation's paths are covered since 2026-09-20 (`aggregation.group[].field`, `aggregation.aggregations[].field`, target DM only) |
+| Multi-target-type queries (CDM, Transformer Model as target) | Supported | **Corrected 2026-09-27 - this row was stale/wrong.** A Composed Document Model target already works today: CDM is a marker subclass of `DocumentModel` (`cdm.queryRoot` header annotation), not a separate `ModelType`, so `QuerySettingsPanelController.documentModelOptions()`'s plain `ProjectDocumentModels.getOtherDocumentModels(...)` already lists CDM files. A **Combination Model** target genuinely does not work, but not because the type is missing (it's existed since 2026-09-08) - it's a picker/resolver wiring gap, see the "Gap review" below. Transformer Model as target remains a real blocker (the type doesn't exist in a12-studio at all) |
+| Reference/rename tracking | Target-DM, relationship, sort/aggregation field-path references are all first-class in SME's refactoring graph; renaming a DM/field auto-updates or flags the query (`qmModule.ts` `refactorDocument()`) | **Present** (2026-09-20; was partly present 2026-09-19) — renaming/moving an element of a Document Model rewrites every query field path evaluated against it, at any depth: root and hop `fields`, `sort` (also through a relationship), `constraint` (also below `has`), `filterDefinition` text (`[/Path]` refs, also inside `Has(...)` constraints), a hop's `linkDocumentFields` (`ProjectReferenceRefactoring` → `QueryReferenceRefactoring`, one undo step with the DM edit). Renaming a Document Model or Relationship Model *file* (id) rewrites `targetDocumentModel`, `relationshipModel` of hops/sorts/`has` operators (nested included, `ModelReferenceRewriter`) and, new, the relationship named in `Has("<rel>", ...)` inside `filterDefinition` text; SME's own `refactorDocument()` only handles `targetDocumentModel`. An unresolvable target is now an explicit error (validator + banner in the Model Tree tab + message in the Settings tab's target combo), see the Validation row. **Corrected 2026-09-27**: a role rename in a Relationship Model *is* propagated to Query Model since 2026-09-22 (`RoleRenameRefactoring`: `QuerySort.targetRole`, every `QueryLink.targetRole` recursively, every `HasOperator.targetRole` recursively through And/Or/Not, incl. `linkDocumentConstraint`) - the narrower gap that's actually still open is below. An aggregation's paths are covered since 2026-09-20 (`aggregation.group[].field`, `aggregation.aggregations[].field`, target DM only) |
 | Validation | Root-required, per-node schema validation, constraint semantic validity, target-role validity, field-projection sanity, tab-level validation counts | Present (`QueryModelValidationService`, `a12-studio-models-validation/.../validators/query/`): target-DM required **and must exist in the project** (2026-09-20; before, a dangling target was only caught when the header's DOCUMENT reference still named it, otherwise the tree was just empty), `fields[]`/sort field-path resolution (root and per-link, recursive), relationship+role resolution (sort traversal and graph links, recursive), paging bounds, and `filterDefinition` QL syntax (root and per-link, recursive) — field-projection sanity is reachability-only (the "Add" combo only offers real field paths, so an invalid path isn't reachable through the UI at all); refs *inside* a filter expression's text are resolved too since 2026-09-20 (see "Status (2026-09-20): semantic filter validation done"); `content.aggregation` (`QueryAggregationValidator`, 2026-09-20): every group/aggregation field must resolve to a non-repeatable field that is not `indexed = false`, function/field-type compatibility, no links, `document` projection (see "Status (2026-09-20): aggregation done") |
 
 ### Feasibility spike: the query-grammar dependency (2026-09-05) — **feasible, not kernel-gated**
@@ -1480,7 +1616,25 @@ followed, and a dangling target was an empty tree). Three parts:
 4. ~~**Aggregation**~~ — done 2026-09-20, see "Status (2026-09-20): aggregation done" below (the gate held: Data
    Services executes aggregation-mode queries).
 5. ~~**Reference/rename tracking**~~ — done 2026-09-20, see "Status (2026-09-20): reference/rename tracking done"
-   above (element rename/move, model-id rename, explicit error for an unresolvable target; role rename not covered).
+   above (element rename/move, model-id rename, explicit error for an unresolvable target; role rename covered since
+   2026-09-22, see the gap review below for the one narrower piece that isn't).
+
+### Gap review (2026-09-27)
+
+Re-checked against current SME `queryModel` source (`client/src/modules/queryModel/`) and current a12-studio source, specifically to correct two rows above that had gone stale since they were written (2026-09-05 through 2026-09-20) and to look for anything new.
+
+| # | Gap in Studio | What SME does | Effect today |
+|---|---|---|---|
+| 1 | **A Combination Model cannot be picked as a Query target, and even a hand-authored reference to one wouldn't resolve.** `QuerySettingsPanelController.documentModelOptions()` calls the plain `ProjectDocumentModels.getOtherDocumentModels(projectItem)` instead of `getOtherDocumentModelsWithCombinations(projectItem)` (the helper that adds, per Combination Model, the synthetic Document Model `CombinedDocumentModelElements.resolveForFieldReferences` builds for it — already used the same way by Form Model, Content Model and the generic `ModelSettingsDialog`). Even past the picker, `QueryElementResolution.targetDocumentModel()` resolves via plain `context.findOtherDocumentModel(...)`, so field/sort/filter validation against a Combination Model target would still fail to resolve, unlike `OverviewElementResolution`, which already follows a Combination Model stand-in the same way Overview's own field-reference resolution does | SME allows a Combination Model (and Transformer Model, N/A here) as a query target, per the (now-corrected) "Multi-target-type queries" row above | A Query Model cannot be built against a Combination Model at all today - not because the type doesn't exist (it has since 2026-09-08) but because two call sites default to the Document-Model-only helper instead of the Combination-aware one every other consumer already uses. Cheapest fix in this whole review: swap both call sites |
+| 2 | **`RoleRenameRefactoring` rewrites the structured `constraint`/`QueryLink`/`QuerySort` tree on a role rename, but not a `Has("<relationship>", "<role>", ...)` call written as free-text `filterDefinition`.** Verified directly: `RoleRenameRefactoring.queryEdits` only walks `query.getContent().getConstraint()` (the structured mirror, kept for lossless round-tripping) and `QueryLink`/`QuerySort`, never `filterDefinition` text. Compare `ModelReferenceRewriter`'s own `Has(...)` handling (triggered by renaming the *Relationship Model file*, i.e. its id): it rewrites `has.relationshipModel()` (the call's first argument) via `idMap.get(...)`, but that rewriter maps *ids*, not role names, so it was never going to cover this either - the role argument (the call's second argument) has no rewriter on either rename path | Not a gap relative to SME (SME's own `filterDefinition`-equivalent structured `Operator` AST has no separate free-text form to go stale in the first place, so there's nothing on SME's side to diff this against) - this is a purely internal a12-studio inconsistency between its two parallel representations of the same filter | Renaming a role that is referenced via `Has("PersonCompany", "Company", ...)` **text** in a `filterDefinition` leaves that text silently pointing at the old role name, even though the structured `constraint` mirror of the same filter gets rewritten correctly in the same edit - the two representations of "the same query" disagree after the rename until the model is re-parsed/re-saved from the text side |
+| 3 | **`HeaderRolesValidator` is not registered in `QueryModelValidationService`** (confirmed: 9 query validators + 7 generic header validators, no `HeaderRolesValidator`) | Same shared kernel `ModelHeader` roles rules every other model type gets | Same cross-cutting gap already flagged for Application/Master Detail/Relationship/Combined Document Model - fold into the same follow-up rather than fixing per model type |
+
+**Not gaps / already accurate (re-confirmed).** `QueryFilterReferenceChecker` (the 2026-09-20 semantic filter work) already checks field-path existence, rejects `indexed = false` fields, and validates `Has(...)` relationship/role existence and role-reachability, root and every link recursively - broader than the "Editor features" table's own field-projection row gives it credit for in isolation; the two rows should be read together, not as a contradiction. No type/enum-value checking exists anywhere in the QL toolchain on either side of a `Has(...)`/comparison, confirmed by `QueryLanguageEmitter`'s and `QueryFilterReferenceChecker`'s own doc comments - `TODO.md`'s existing "type and enum-value checking is not done" item is still accurate and still open. `QueryFieldReferenceValidator` (the `fields[]` projection) still doesn't special-case `indexed = false` - still accurate, still open (existing TODO item). `QueryTraversalOption.options()` being unscoped ("every role in the project") is specific to the **Sort** dialog and is a documented, intentional choice there (the separate "Add Relationship" graph picker is correctly scoped to reachable relationships) - worth reading as a deliberate simplification, not an oversight.
+
+**Suggested order.**
+1. **Gap 1** (Combination Model target): swap `QuerySettingsPanelController.documentModelOptions()` to `getOtherDocumentModelsWithCombinations(...)` and give `QueryElementResolution.targetDocumentModel()` the same Combination-aware resolution `OverviewElementResolution` already has - two well-precedented call-site changes, no new mechanism to design.
+2. **Gap 2** (`Has(...)` role text): extend `RoleRenameRefactoring.queryEdits` (and its Form/RelationshipUI/Overview siblings if they have the same text/structured split - Query Model is the only one with a free-text mirror today, so likely Query-only) to also rewrite the role argument of every `Has("<relationship>", "<role>", ...)` occurrence in `filterDefinition`/link `filterDefinition` text, using the same text-rewriting approach `ModelReferenceRewriter` already uses for the relationship-id argument.
+3. **Gap 3** (`HeaderRolesValidator`): batch into the cross-cutting follow-up already tracked for the other model types.
 
 ---
 
@@ -1505,19 +1659,19 @@ query, selection, structural mapping and transformer as `isExperimental()` (chec
 |---|---|---|---|
 | 1 | **structuralMappingModel** | Foundational — referenced by mappingModel and combinationModel. SME's editor: source-tree/target-tree drag&drop field mapper, resolution-strategy editor for conflicts. | **Data model only, disabled.** `ModelType.STRUCTURALMAPPING` + full content classes (`FieldMapping`, `Slice`, `ResolutionStrategy`, `GroupToClearOnFirstFill`); `StructuralMappingModelEditorController` is a 24-line stub; no validation service, no kernel dependency (the old "`kernel-md-structuralmapping-tool` present, `SmmService` scaffolding exists" was wrong). Rename/move refactoring already rewrites its `*FullName` paths. |
 | 2 | **mappingModel** | Depends on structuralMappingModel + additiveDocumentModel. ETL-style: source DM(s) + target DM + optional precomputation, driven by a referenced SMM. | **Started, disabled.** Content classes (`MappingSource`, `MappingTarget`, `SortField`, `PreComputationFragmentRef`, `StructuralMappingModelRef`, ...) and a 141-line editor with the Target Model panel and an editable Sources list (`SourceModelsPanelController` + dialog); no validation service. The precomputation fragment and the Structural Mapping Model link are not editable yet (the controller's own comment says "added later"). |
-| 3 | **combinationModel** | Built on additive + structural mapping. | **Present, enabled.** Structural editor + 7 structural rules (2026-09-08), base/additive loop detection (2026-09-20, reference graph only); DM expansion/SMT validation is not, see the dedicated section. |
+| 3 | **combinationModel** | Built on additive + structural mapping. | **Present, enabled.** Structural editor + 7 structural rules (2026-09-08), base/additive loop detection (2026-09-20, reference graph only); DM expansion/SMT validation is not, see the dedicated section. **Gap review 2026-09-27**: see "Gap review (2026-09-27)" under "Combined Document Model" above - Base/Additive/Decoration pickers don't offer Combination Models, the Additive picker isn't type-filtered, invalid step references don't surface inline, and `HeaderRolesValidator` isn't wired in. |
 | 4 | **additiveDocumentModel** | Hard dependency of both mappingModel and combinationModel. Overlay editing mode: elements are included/overwritten/purely-additive relative to a base DM. | **Partly present, enabled** (a Document Model with an annotation): read-only "Additive Elements Only" preview and base-aware path resolution; no overlay editing mode, no join. See the Document Model gap-list row. |
-| 5 | **relationshipModel** | Foundational — link, masterDetailModel, treeModel, modelGraphDiagram and formModel's `Binding`/`BindingRepeat` all reference it. | **Present, enabled** (the old "no current scaffolding" is obsolete): `RelationshipModelEditorController` (8 files) + `RelationshipModelValidationService` (6 relationship-specific validators). The **Relationship UI Model** (`relationship-ui`, `Ru`) also has an editor (8 files) and 3 validators. A role rename does not propagate to Query/Form/Relationship UI references (TODO decision). |
+| 5 | **relationshipModel** | Foundational — link, masterDetailModel, treeModel, modelGraphDiagram and formModel's `Binding`/`BindingRepeat` all reference it. | **Present, enabled**: `RelationshipModelEditorController` (8 files) + `RelationshipModelValidationService` (9 relationship-specific validators). The **Relationship UI Model** (`relationship-ui`, `Ru` — an a12-studio-original design with no SME equivalent) also has an editor (8 files) and 3 validators. Role rename now propagates to Query/Form/Relationship UI/Overview references (`RoleRenameRefactoring`, fixed 2026-09-22) but not yet to the Tree Model. **Gap review 2026-09-27**: see "Relationship Model: gap review" below - a Combination Model picker gap plus its own validator bug, a missing role-pattern validator, `HeaderRolesValidator` not wired in, the Tree Model rename gap just mentioned, and two low-priority round-trip holes (`storage`/`embeddedGroupPath` etc.). |
 | 6 | **selectionModel** | Reusable selection spec. | **Present, enabled** (2026-09-13), see the dedicated section. |
 | 7 | **printModel** | Most editor-complex of the print family — relies on an external print-engine component library for the layout canvas. Backend renders PDF only. | **Large editor, disabled.** 28 content classes, an 811-line `PrintModelEditorController`, 7 print validators; no print-engine dependency and no PDF rendering (the old `PrintService`/`DocumentModelResolver`/`PrintParameters` scaffolding was deleted 2026-07-20). Rename/move refactoring rewrites `FieldRef.path`. |
 | 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. | **Typesetting: present, enabled** (2026-09-25): `ModelType.TYPESETTING` (the `model-versions.json` key was `printtypesettings`, which never matched the header's `typesetting`), `TypesettingModel`, an editor with four extracted panels, 4 validators plus the reusable roles validator; see the dedicated "Print Typesetting Model" section. **Print Setting: not present** (deprecated in the platform). |
 | 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model. | **Not present.** |
-| 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side, not blocking other model types. | **Both present, enabled.** Query: see the dedicated section. Overview: `OverviewModelEditorController` + 21 editor files (columns, filter items with per-type options, sub-header slots (every element type - button, search, filter, multi-selection - is editable through one dialog since 2026-09-21, the last three without the button-only Event/Confirmation/Priority/Icon block), initial sorting, styles, query-model link) and 23 overview validators (16 as of the 2026-09-26 review, +7 new classes since - see below). **Gap review 2026-09-26, updated 2026-09-27**: see "Overview Model: gap review" below - gaps 1, 2, 3, 6, 7, 8, 9 (partial), 10, 11, 12, 13 are closed; open: 4/14 (Query Model handling), 5 (Subtype), 15-17 (metadata fields, picker candidates, structural refactoring). |
+| 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side, not blocking other model types. | **Both present, enabled.** Query: see the dedicated section (**gap review 2026-09-27**: a Combination Model can't be a query target, `Has(...)` role text isn't rewritten on role rename, `HeaderRolesValidator` not wired in - also corrected two stale claims about CDM-as-target and role-rename coverage). Overview: `OverviewModelEditorController` + 21 editor files (columns, filter items with per-type options, sub-header slots (every element type - button, search, filter, multi-selection - is editable through one dialog since 2026-09-21, the last three without the button-only Event/Confirmation/Priority/Icon block), initial sorting, styles, query-model link) and 23 overview validators (16 as of the 2026-09-26 review, +7 new classes since - see below). **Gap review 2026-09-26, updated 2026-09-27**: see "Overview Model: gap review" below - gaps 1, 2, 3, 4, 5, 6, 7, 8, 9 (partial), 10, 11, 12, 13, 14, 15 are closed; open: 16 (partial, picker candidates), 17 (partial, structural refactoring - filter-field deletion and event/model references still not cascaded). |
 | — | **appModel** | Standalone. | **Present, enabled** (`ApplicationModelEditorController` + module/scene/region editors, 3 application validators, wireframe preview via `ApplicationModelPreviewService`, real Preview App deploy). **Gap review 2026-09-27**: see "Application Model: gap review" below (every SME editor screen has a counterpart; the gaps are round-trip data loss in non-`MasterDetail` `Constraints`, two validator correctness bugs, `HeaderRolesValidator` not wired in, and no within-model rename/delete refactoring for Regions/Scenes/Cases). |
 | — | **masterDetailModel** | Standalone. | **Present, enabled** (`MainDetailModelEditorController`, 2 validators; `MasterDetailModuleGenerator` is used by the Preview App deploy). **Gap review 2026-09-27**: see "Master Detail Model: gap review" below (5 numbered gaps; headline is no heterogeneous/CDM expansion in the Form Mapping candidate lists, which a12-studio already has the building blocks for elsewhere). |
 | — | **treeModel** | Standalone. | **Editor present, enabled** (since 2026-09-25), matching SME 13.0.2/tree model 11.0.0 as of 2026-09-27 - see "Tree Model: full gap review against SME 13.0.2" below for the full write-up. Five tabs (Tree, Node Types, Configuration, Layout, Custom Actions), 17 validators, Row Activation (not the pre-11.0.0 `defaultRowAction`), the Virtual Root, and the column editor's Label/Icon/Alignment/Styles/pin-direction. |
 | — | **contentModel** | Experimental in SME itself. | **Editor present, disabled** (`ContentModelEditorController`, 2 validators; the center renders the model with the real Content Engine in a `WebView`, see "Content Model preview"; the right column mirrors SME's per-type setting panel, see "Content Model property column"). **Gap review 2026-09-26** ("Content Model: gap review"): no Document Model / Base Group setting, new models are seeded without `namespaceVersions`/root props, only 2 structural validators (none of SME's reference, form-element or setting checks), move/duplicate/cut/paste ignore the structure rules, and the editor shows no validation result. |
-| — | **typeDefinitionModel** | Reuses the whole DM editor infrastructure. | **Present, enabled** (`TypeDefintionModelEditorController`; the type-definition mode rules are validated, see the Document Model section). |
+| — | **typeDefinitionModel** | Reuses the whole DM editor infrastructure. | **Present, enabled** (`TypeDefintionModelEditorController`; the type-definition mode rules are validated, see the Document Model section). **Gap review 2026-09-27**: see "Type Definition Model" below — close to parity already; the one real gap is that a TDM can't hold local and imported type definitions at once, unlike SME. |
 | — | **umModule** | User-management config: two YAML file types, "roles" and "users". | **Present** as `RolesEditorController` / `UsersEditorController` over `RolesDocument` / `UsersDocument` (`editors/auth`, `AuthFileFactory`). |
 | — | **transformerModel, modelGraphDiagram** | Lower cross-reference count / experimental in SME. | **Not present** (no `ModelType`, no classes; only a transformer icon). |
 | — | **settingsModule, filesModule, attachment, data** | Workspace-level resources, no structured model editing. | **Not assessed on 2026-09-20.** a12-studio has its own project settings (`ProjectSettings`); whether SME's `settings.yaml` is read is unconfirmed (no reference to it in the code). |
@@ -1527,7 +1681,8 @@ The parked / rejected list for the whole tool lives in `TODO.md` ("Won't do" and
 
 ### Overview Model: gap review (2026-09-26)
 
-**Status (2026-09-27): gaps 1, 2, 3, 4, 5, 6, 7, 8, 9 (partial), 10, 11, 12, 13, 14 closed; 15-17 open.** New/changed: `FilterStringFieldsMultiSelectPanelController` gained the
+**Status (2026-09-27): gaps 1, 2, 3, 4, 5, 6, 7, 8, 9 (partial), 10, 11, 12, 13, 14, 15 closed; 16 (partial), 17
+(partial) open.** New/changed: `FilterStringFieldsMultiSelectPanelController` gained the
 `enumeratedStringFilter.fields` list editor (String fields only, reusing `CustomSelectionOfFieldsPanelController`'s
 row pattern) plus `OverviewEnumeratedStringFilterValidator` (gap 1). `OverviewConfiguration.actionColumnWidth`
 is now a decimal (`JsonNode`-backed, like `Column.width`) with a real UI field; `Column.MIN_WIDTH`/`OverviewConfiguration.MIN_ACTION_COLUMN_WIDTH`
@@ -1590,8 +1745,56 @@ which re-points that row's Field picker at the sub-type's own elements and clear
 changes; `OverviewFilterCustomFieldsValidator` validates `subModel` itself and resolves `fieldId` through it;
 rename-rewrite is via `ModelReferenceRewriter.REFERENCE_FIELD_NAMES` gaining `"subModel"` rather than a header
 reference (no fixture ever showed what a `sub-document-model-for-overview` reference should look like, and it
-isn't needed for rename-safety - the content-field rewrite already covers that). Not started: 15-17 (metadata
-fields, picker candidate rules, structural refactoring).
+isn't needed for rename-safety - the content-field rewrite already covers that). Gap 16's first item is done:
+`OverviewElementOptions.columnElementIds` excludes repeatable fields from the Column dialog's Element Reference
+picker (matching `OverviewFieldReferenceValidator`'s own "repeatable" error); its other candidate rules
+(multi-select "only when enumeration multi-select" - not modelled, Studio has no such distinction between kinds
+of multi-select group; filter fields; Section Data fields; Screen Reader Column) are not.
+
+**Gap 15 (metadata fields), closed:** `OverviewElementResolution.META_FIELDS` (new, 7 entries covering the
+kernel's `__meta` group - docRef/modelReference/modelVersion/creator/createdAt/modifier/modifiedAt) plus
+`metaFieldDisplayName`/`isMetaFieldId`; 4 of the 7 ids were confirmed directly against a real fixture
+(`testing/workspaces/advanced_new/models/10_People/Person_Ov.json`'s "Creator"/"Created At"/"Modifier"/"Modified
+At" labels under its "Meta Data" section), the remaining 3 inferred from the same fixed ordering elsewhere
+(`PersonSkills_LinkFields_Fm.json`). `OverviewElementOptions.columnElementIds`/new `customSelectionFieldIds`
+append the seven meta field ids to their existing candidate lists (Column dialog's Element Reference picker and
+`CustomSelectionOfFieldsPanelController`'s Field picker); `displayPath`/`isResolved` recognize a meta field id so
+it renders as `__meta/<name>` instead of the raw kernel id and is never flagged unresolved. Not done: a
+dedicated "all\_with\_meta shows this, all does not" distinction in the pickers themselves (Studio's pickers
+don't yet key off `filterMode` at all - the meta fields are offered everywhere) - no real fixture uses one, so
+this was left for whenever gap 16's "filter mode-aware candidates" is actually built, rather than guessed at now.
+
+**Gap 17 (structural refactoring), partially closed** - 3 of the 5 SME refactoring-dialog behaviors are done,
+the other 2 are not:
+- *Deleting a column updates Default Sorting* - done. `OverviewColumnsPanelController.openEditDialog` now always
+  calls `notifyChanged()` after a confirmed edit (previously only when `pinDirection` changed, so a "Sortable"
+  toggle-off never reached the Sorting panel); `OverviewSortingPanelController.refresh()` (called from that
+  notification) prunes an Initial Sorting entry whose column was deleted, made non-sortable, or turned into an
+  expression column, before rebuilding its rows.
+- *Disabling Search/Filter/Multi-Selection removes its sub-header element* - done, new `OverviewSubHeaderPruning`
+  (`a12-studio-models-validation`, pure logic, no UI dependency) reuses `OverviewSubHeaderElementValidator`'s own
+  `isFilterAllowed`/`isSearchAllowedForPlainOverview`/`isMultiSelectionAllowedForPlainOverview` predicates
+  (extracted package-visible for this), so pruning and validation can never disagree on what counts as "not
+  allowed" - includes the same purpose-gating (Filter skipped for `selected_item`; Search/Multi-Selection never
+  pruned for either Binding purpose, matching that validator's own gating). Wired into
+  `OverviewModelEditorController.pruneSubHeader` via two new callbacks -
+  `OverviewSearchAndFiltersPanelController.setOnFeatureSwitchChange` (fires on a user toggle of Show Full Text
+  Search/Enable Filter/Show Filter Button, never from `setModel` itself) and
+  `OverviewMultiSelectionPanelController.setOnEnabledChange` (fires from the existing `onEnabledChanged` hook,
+  same "never on load" property) - so opening an already-inconsistent file is left alone (matching how gap 17's
+  column-sorting pruning above also only prunes on a subsequent user edit, not on load) and only an actual
+  feature-off toggle prunes-and-saves. `SubheaderSlotPanelController` gained a public `refresh()` (re-renders
+  from its `rows` list without re-running `initAddMenu()`) so the two Subheader panels reflect the removal
+  immediately. Verified against the whole fixture corpus (zero findings before/after) and by
+  `OverviewSubHeaderPruningTest` (5 cases) plus `OverviewModelEditorControllerSubHeaderPruningTest` (2 cases,
+  full editor wiring).
+- *Style rename/delete cascades to column references* - done. `StylesPanelController`'s style name `TextField`
+  listener now calls `renameColumnStyleReferences(oldValue, newValue)` on every keystroke (each keystroke's
+  rename converges every column's header/content style references to match) and its delete button calls
+  `removeColumnStyleReferences(removedStyle)`; both guarded to only run in `setModel` mode (a model-level Styles
+  list), not the `setColumn`/`setCustom` single-target modes. Verified by
+  `StylesPanelControllerColumnCascadeTest`.
+- *Deleting a filter field* and *event and model references* - **not done**; left open for a future task.
 
 **Re-checked with `OverviewBindingPurpose` in hand, still open (found 2026-09-27, needs its own task):**
 `OverviewFieldReferenceValidator`/`OverviewColumnHeaderLabelOrIconValidator`'s pre-existing false positives on
@@ -2001,6 +2204,36 @@ Full review against SME's `masterDetailModel` module (`document/index.ts`, `midd
 2. **Gap 1, the real feature gap:** give `MainDetailModelEditorController` a helper mirroring `resolveAndFilterAbstractDocuments` - for each raw candidate id, resolve a CDM member via `ComposedDocumentModelResolver.getQueryRootId`, then expand via `TreeHeterogeneity.info(documentModels, id)` + `TreeHeterogeneity.allDocuments(documentModels, info, true)` (already exactly this shape; despite the class name it operates on the plain Document Model super/subtype graph via `DocumentModelHeterogeneity`, not on tree structure) instead of writing new expansion logic. Apply to both `referencedDocumentModelIds` (Form Mapping) and `relationshipEditorDocumentModelIds` (Relationship Editors) - not `linkDocumentEditorDocumentModelIds`, which SME's `syncLinkDocumentEditors` does not expand either. Add a heterogeneous fixture (mirroring the cypress test's `AbstractExample`/`ConcreteExample1`/`ConcreteExample2` shape) since none exists in `testing/workspaces/**` today.
 3. **Gap 2:** add a UI-side way to build a `ValidationContext` from a `ProjectItem` (or a narrower standalone helper that doesn't need the full context) so `OverviewBindingPurpose.resolve` can be called from `overviewModelOptions()` and filtered out; this is the first UI call site for that validator-side utility, so the constructor helper is worth landing in a way other editors can reuse later.
 4. **Gaps 4, 5, last:** low priority, fold in opportunistically next time this editor is touched.
+
+### Relationship Model: gap review (2026-09-27)
+
+**Architecture note.** SME's Relationship Model is unlike every other module reviewed in this doc: it has **no hand-written editor or validator code at all**. It is itself a Document Model (`RelationshipMetaModel.json`, shipped as a real meta-model under `client/resources/models/relationshipModel/`) whose editor is a Form Model (`RelationshipModelEditor.json`) rendered through SME's own generic Form Engine (`RMEditorView.tsx` = `EnhancedFormEngine` + one custom `EventButton` for "Generate Document Models"), and every validation rule is a declarative Rule/Computation embedded in that meta-model rather than a `*Validator.ts`/Kotlin class. There is zero backend/kernel involvement (`grep` across `backend/` for "Relationship" is empty). SME's real, much richer relationship-*authoring* surface is the Model Graph Diagram (ER canvas) calling straight into `updateEntityCharacteristic` - the form editor compared here is SME's secondary, non-diagram path, and porting the diagram itself is already a closed decision (TODO.md, Composed Document Models section: "no plan to port the SME diagram UX"). a12-studio's hand-built `RelationshipModelEditorController` + `RelationshipModelValidationService` (9 validators) is a faithful, already fairly complete port of that form-based path: the Related Entities table (role/document model/computed upper-limit/computed explanation sentence/orderable, row-click opens a detail dialog, add hidden once 2 entities exist), the Link Document Model + Duplicates Allowed panel, the many-to-many gating warning, and the "Generate Document Models" feature (per-role generated DM with a `target` Include and, if set, a `relationship` Include of the link DM - matches SME's `dmGenerator.ts` shape field-for-field) are all present and correct. The gaps below are the real, verified differences.
+
+Also reviewed: a12-studio's separate **Relationship UI Model** (`relationship-ui`, `Ru` - `RelationshipUiModelEditorController` + 3 validators, consumed by binding/overview screens). **SME has no equivalent module** - a case-insensitive search of `client/src`, `docs/` and `backend/` for "relationshipUi"/"RelationshipUI" returns nothing; the nearest SME concept is a Form-Model-canvas palette widget that creates a relationship-bound binding directly on a form, not a persisted model type. Since there is nothing on the SME side to diff feature-by-feature, Relationship UI Model is an a12-studio-original design and is left out of the gap table below rather than listed as "missing" functionality.
+
+| # | Gap in Studio | What SME does | Effect today |
+|---|---|---|---|
+| **Round-trip / data model** | | | |
+| 1 | **`RelationshipModelContent` has no `storage`/`embeddedGroupPath` fields** (the class is `@JsonIgnoreProperties(ignoreUnknown = true)`, so unknown keys are silently dropped on the next save) | `storage` (`EMBEDDED`/`EXTERNAL`, default `EXTERNAL`) + `embeddedGroupPath` (required when `EMBEDDED`) sit on a genuine hidden Form-Engine screen in SME's editor - never user-editable, but every real fixture (e.g. `PersonCompany.json`) carries `storage` with a concrete value regardless. `associationType` (SME: also hidden, default `SHARED`) already got the same defensive treatment in a12-studio's model (`@JsonInclude(NON_EMPTY)`, comment "kept only so old files round-trip"), so the two hidden-but-always-present sibling fields are handled inconsistently | A Relationship Model authored or exported by real SME (or the installed SME backend) and then opened, edited and re-saved in a12-studio silently loses its `storage`/`embeddedGroupPath` keys. No fixture anywhere in this repo (`a12-studio-models{,-validation}/src/test/resources/relationshipmodel/**`, `testing/workspaces/**/*_Re.json`) exercises these keys today, so `BasicProjectModelsRoundTripTest` and friends do not catch it - this is a latent hole, not an observed break |
+| 2 | **`EntityCharacteristic` has no `navigable` field; `Multiplicity` has no `lowerLimit` field; `EntityCharacteristic` has no `candidateConstraints` field** (`population`/`populationParameters`) - same silent-drop risk | All three exist in SME's schema, but (unlike `storage`) **none of the three is reachable from SME's own shipped editor UI either** - `navigable` only ever gets `initialValue: "true"` in `fieldConfiguration` (no screen shows it, so it is silently always `true` in practice in SME too), `lowerLimit` has no screen, and `candidateConstraints` exists purely as kernel-compatibility plumbing (`rmFixCandidateConstraints.ts` null↔`{}`-normalizes it on import/export so the kernel doesn't choke - SME's own comment: "To be non-breaking we set empty values on import... set back to null if empty on export") | Same latent, unobserved round-trip hole as gap 1, but lower priority - since SME's own users can't set `navigable: false`, provide a `lowerLimit`, or configure `candidateConstraints` through the reference UI either, a real-world SME-authored file is very unlikely to carry non-default values for these three, unlike `storage` (gap 1), which every real fixture *does* carry |
+| **Editor** | | | |
+| 3 | **The entity Document Model picker and the Link Document Model picker both only offer Document Models.** `RelationshipModelEditorController.entityDocumentModelOptions()` calls `ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.DOCUMENT)` exclusively, and `load()` passes that same list to `LinkDocumentModelPanelController` | SME's reference provider (`rmReferenceProvider.ts`) resolves both the entity `documentModel` and `linkDocumentModel` fields against `getModelReferenceCalculator(documentModelProto.type, combinationModelProto.type, transformerModelProto.type)` - Document, Combination, **or** Transformer Model. a12-studio has a real, built `ModelType.COMBINATION` (Transformer Model doesn't exist in a12-studio yet, so that third option is moot here) | A Relationship Model cannot be built against a Combination Model entity or link at all - the picker simply never lists one, even though the type exists and other model types (e.g. Query Model, per the priority table) already treat Combination Models as first-class Document-Model-shaped references |
+| **Validators (`RelationshipModelValidationService`, 9 validators)** | | | |
+| 4 | **Bug: `RelationshipDocumentModelReferenceValidator`'s per-entity check and its own link-DM check use two different, inconsistent reference lookups.** The entity loop calls `context.findOtherDocumentModel(entity.getDocumentModel())` (Document Model only); three lines later, the link-DM check on the very same validator correctly calls `context.hasOtherDocumentOrCombinedModel(linkDocumentModel)` (Document **or** Combination) | SME's reference provider (gap 3) treats entity and link references identically - both resolve against the same widened type set | Even after fixing gap 3's picker, an entity hand-pointed (or loaded from a real SME/installed-backend file) at a Combination Model is falsely reported "not found" by this validator, while the exact same reference used as the link Document Model is accepted - the two halves of one validator disagree about what a valid reference looks like |
+| 5 | **No role name pattern/length validation.** The role `TextField` in `EntityCharacteristicDialogController`/`EntityCharacteristicsPanelController` accepts any non-blank text; no validator checks shape | SME's meta-model constrains `role` to the pattern `[_a-zA-Z][-_.a-zA-Z0-9]*`, 1-100 characters | A role starting with a digit, containing a space, or otherwise not a valid identifier is accepted by a12-studio; since roles are referenced from Query/Form/Tree/Overview/RelationshipUI as bare identifiers (`targetRole`, `parentRole`, `Has(...)`), an invalid one is likely to break those consumers or their own expression parsers downstream rather than fail cleanly here |
+| 6 | **`HeaderRolesValidator` is not wired into `RelationshipModelValidationService` or `RelationshipUiModelValidationService`** | The kernel's shared `ModelHeader` roles rules (invalid characters, duplicates, "not in the workspace's roles file") apply to every model's header `roles` annotation | Same cross-cutting gap already flagged for Application Model and Master Detail Model above - a Relationship(-UI) Model's header Roles field is editable but never actually validated. Worth folding into that same follow-up ticket rather than fixing per model type |
+| **Refactoring** | | | |
+| 7 | **`RoleRenameRefactoring` does not cover the Tree Model.** Its `editsFor` dispatches on `QueryModel`, `FormModel`, `RelationshipUiModel` and `OverviewModel` - there is no `TreeModel` branch, even though `TreeChildRelationshipConfiguration` (`relationshipModelRef` + `parentRole`) is exactly the same "relationship id + role name" reference shape the other four consumers already get auto-rewritten | Not applicable to SME (SME has no dedicated rename-rewrite pass at all for this direction - see below) but is a real internal a12-studio inconsistency: renaming a role that a Tree Model's child-relationship configuration points at leaves `parentRole` silently dangling. It isn't invisible forever - `TreeChildRelationshipValidator` (2026-09-27 Tree Model review) checks the parent role against the entity's actual role and reports "Invalid Reference" - but only after the fact, with no auto-fix, unlike the four consumer types `RoleRenameRefactoring` already handles in the same undo step as the rename itself |
+
+**Not gaps (checked).** SME itself has no bespoke rename-rewrite code for the "role renamed inside the Relationship Model → propagate to consumers" direction either (only the reverse - another Document Model renamed → Relationship Model's own `documentModel`/`linkDocumentModel` references updated, `relationshipRefactoring.ts`); SME's consumers instead re-resolve role names live through the same generic reference-provider framework used for every other broken-reference case, so a stale SME role is only ever caught as "invalid reference", never auto-fixed - a12-studio's `RoleRenameRefactoring` (auto-rewriting Query/Form/RelationshipUI/Overview in the same undo step, gap 7 aside) is actually **more capable than SME's own reference implementation** here, not just at parity. Also checked and fine: exactly-two-entities and no cross-relationship-uniqueness check match SME's own behavior (SME hard-enforces exactly 2 via `mustHaveExactlyTwoEntityCharacteristics` and has no rule preventing two Relationship Models between the same Document Model pair either); the Labels section being fully editable per entity in a12-studio's dialog (already tracked in `TODO.md`'s "Relationship Models" section as "hide them") is now confirmed against the actual SME behavior - SME's own row-detail dialog shows Labels read-only (add/remove disabled) - reinforcing that the existing TODO item is correct, not a case where a12-studio should instead build the feature out; `EntityCharacteristicSupport`'s human-readable Upper Limit / Upper Limit Description strings are a faithful port of SME's equivalent computed-expression text.
+
+**Suggested order.**
+1. **Validator bug (4)** is the cheapest, highest-value fix: swap the entity-loop lookup in `RelationshipDocumentModelReferenceValidator` to `context.hasOtherDocumentOrCombinedModel(...)`, matching its own link-DM check three lines below - a one-method fix with no design work.
+2. **Combination Model picker (3)**: widen `RelationshipModelEditorController.entityDocumentModelOptions()` to also list Combination Models (mirroring however Query Model already does this, per the priority table), which then makes gap 4's fix actually reachable through the UI rather than only via hand-edited/imported JSON.
+3. **Role pattern validation (5)**: add a lightweight regex+length check, either as a new small validator or folded into `RelationshipUniqueRolesValidator`'s file, matching SME's `[_a-zA-Z][-_.a-zA-Z0-9]*`/100-char rule.
+4. **Tree Model role-rename coverage (7)**: add a `TreeModel` branch to `RoleRenameRefactoring.editsFor` that walks every node's `childRelationshipConfigurations` and rewrites `parentRole`, the same shape as the existing four branches.
+5. **`HeaderRolesValidator` wiring (6)** - batch this with Application Model's and Master Detail Model's identical gap into one cross-cutting follow-up rather than fixing model-by-model.
+6. **Round-trip fields (1, 2)**: give `storage`/`embeddedGroupPath` the same defensive `@JsonInclude(NON_EMPTY)`-plus-comment treatment `associationType` already has (gap 1, worth doing given real fixtures always carry `storage`); `navigable`/`lowerLimit`/`candidateConstraints` (gap 2) are lowest priority - add only if a real imported/hand-authored file is ever found to carry non-default values, since neither SME's nor a12-studio's UI can produce them today.
 
 ### One-line descriptions of every other module (for orientation)
 

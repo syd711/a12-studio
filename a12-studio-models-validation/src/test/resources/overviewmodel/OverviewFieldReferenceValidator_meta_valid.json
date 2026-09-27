@@ -1,0 +1,33 @@
+{
+  "header": {
+    "id": "OverviewFieldReferenceValidator_meta_valid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Ref_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10
+    },
+    "columns": [
+      {
+        "id": "column_meta",
+        "width": 1,
+        "elementRef": "abc6a6767a60488754aace2accb73824_field_cdaf9",
+        "sortable": false
+      }
+    ]
+  }
+}

@@ -77,6 +77,18 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void fieldReferenceValidatorAcceptsAKernelMetaFieldColumn() {
+    // Gap 15 of the "Overview Model: gap review" - a __meta field is a legitimate reference even though
+    // ElementIndex never contains it (see OverviewElementResolution.isMetaFieldId's own callers).
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFieldReferenceValidator_meta_valid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFieldReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    assertEquals(0, errors.size());
+  }
+
+  @Test
   void sortableMultiSelectValidatorReportsSortableMultiSelectColumn() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewSortableMultiSelectValidator_invalid.json", OverviewModel.class);
     DocumentModel refDm = TestModels.load("/documentmodel/RefMultiSelect_DM.json", DocumentModel.class);

@@ -66,10 +66,13 @@ public final class OverviewSubHeaderElementValidator implements ModelValidator {
     return errors;
   }
 
-  private void validateFilter(A12Model<?> model, OverviewConfiguration configuration, ElementBox subHeaderBox, String purpose,
-      List<ModelValidationError> errors) {
+  /** Whether a {@code filter} Subheader element is currently allowed (SME: not {@code purpose ==
+   * "selected_item"}, and either Custom Filter mode or Enable Filter + Show Filter Button both on) - shared
+   * with {@code OverviewSubHeaderPruning} (gap 17 of "Overview Model: gap review"), which removes the element
+   * instead of merely flagging it. */
+  static boolean isFilterAllowed(OverviewConfiguration configuration, String purpose) {
     if (OverviewBindingPurpose.SELECTED_ITEM.equals(purpose)) {
-      return;
+      return true;
     }
     // SME's meta model has no concept of Custom Filter (newFilterConfiguration) at all - its filter rules key
     // off filterConfiguration.showFilterButton, which a Custom Filter model doesn't set, so a literal port
@@ -79,12 +82,39 @@ public final class OverviewSubHeaderElementValidator implements ModelValidator {
     // check is skipped once newFilterConfiguration actually holds data (see NewFilterConfiguration#hasContent).
     NewFilterConfiguration newFilterConfiguration = configuration.getNewFilterConfiguration();
     if (newFilterConfiguration != null && newFilterConfiguration.hasContent()) {
-      return;
+      return true;
     }
     FilterConfiguration filterConfig = configuration.getFilterConfiguration();
-    boolean showFilter = Boolean.TRUE.equals(configuration.getEnableFilter())
+    return Boolean.TRUE.equals(configuration.getEnableFilter())
         && filterConfig != null && Boolean.TRUE.equals(filterConfig.getShowFilterButton());
+  }
 
+  /** Whether a {@code search} Subheader element is allowed for a non-Binding overview ({@code purpose ==
+   * null}) - the only case SME treats as an outright error; {@code available_item} gets a WARNING instead
+   * (search stays, see {@link #validateSearch}) and {@code selected_item} has no rule for it at all, so this
+   * predicate (shared with {@code OverviewSubHeaderPruning}) is deliberately not purpose-aware itself -
+   * callers only consult it once they already know {@code purpose == null}. */
+  static boolean isSearchAllowedForPlainOverview(OverviewConfiguration configuration) {
+    return Boolean.TRUE.equals(configuration.getShowFullTextSearch());
+  }
+
+  /** Whether a {@code multi_selection} Subheader element is allowed for a non-Binding overview ({@code purpose
+   * == null}) - Multi-Selection has no rule at all for either Binding purpose, matching {@link
+   * OverviewMultiSelectionElementValidator}'s own gating. Shared with {@code OverviewSubHeaderPruning}, same
+   * "caller already knows purpose == null" convention as {@link #isSearchAllowedForPlainOverview}. */
+  static boolean isMultiSelectionAllowedForPlainOverview(OverviewConfiguration configuration) {
+    return configuration.getMultiSelection() != null;
+  }
+
+  private void validateFilter(A12Model<?> model, OverviewConfiguration configuration, ElementBox subHeaderBox, String purpose,
+      List<ModelValidationError> errors) {
+    // selected_item has no filter rule at all - not "not allowed", not "missing"/"duplicate" either -
+    // unlike isFilterAllowed's own "true" for this purpose, which only means "don't remove the element"
+    // (see OverviewSubHeaderPruning) and must not also be read as "then check missing/duplicate".
+    if (OverviewBindingPurpose.SELECTED_ITEM.equals(purpose)) {
+      return;
+    }
+    boolean showFilter = isFilterAllowed(configuration, purpose);
     long minorCount = countType(subHeaderBox.getLeftSlot(), BoxElementType.FILTER);
     long majorCount = countType(subHeaderBox.getRightSlot(), BoxElementType.FILTER);
     if (!showFilter) {
@@ -107,7 +137,7 @@ public final class OverviewSubHeaderElementValidator implements ModelValidator {
 
   private void validateSearch(A12Model<?> model, OverviewConfiguration configuration, ElementBox subHeaderBox, String purpose,
       List<ModelValidationError> errors) {
-    if (Boolean.TRUE.equals(configuration.getShowFullTextSearch())) {
+    if (isSearchAllowedForPlainOverview(configuration)) {
       return;
     }
     long minorCount = countType(subHeaderBox.getLeftSlot(), BoxElementType.SEARCH);
@@ -125,7 +155,7 @@ public final class OverviewSubHeaderElementValidator implements ModelValidator {
 
   private void validateMultiSelection(A12Model<?> model, OverviewConfiguration configuration, ElementBox subHeaderBox, String purpose,
       List<ModelValidationError> errors) {
-    if (purpose != null || configuration.getMultiSelection() != null) {
+    if (purpose != null || isMultiSelectionAllowedForPlainOverview(configuration)) {
       return;
     }
     long minorCount = countType(subHeaderBox.getLeftSlot(), BoxElementType.MULTI_SELECTION);
@@ -135,7 +165,7 @@ public final class OverviewSubHeaderElementValidator implements ModelValidator {
     }
   }
 
-  private static long countType(List<de.a12.studio.models.overviewmodel.BoxElement> elements, BoxElementType type) {
+  static long countType(List<de.a12.studio.models.overviewmodel.BoxElement> elements, BoxElementType type) {
     return elements.stream().filter(element -> element.getType() == type).count();
   }
 

@@ -16,6 +16,8 @@ import de.a12.studio.models.relationshipuimodel.TableListComponent;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingElements;
 
+import java.util.List;
+
 /**
  * Whether an Overview Model is the Available Items or Selected Items overview of a Form Model {@link Binding}/
  * {@link BindingRepeat} component, or of a Relationship UI Model's {@code DualPaneSelection}/{@code TableList}
@@ -41,10 +43,17 @@ public final class OverviewBindingPurpose {
    * Form Model Binding or Relationship UI Model component in {@code context}. The first match wins - real
    * fixtures never reuse one Overview Model as both, so there is no defined tie-break for that case. */
   public static String resolve(String overviewModelId, ValidationContext context) {
+    return resolve(overviewModelId, context.otherModels());
+  }
+
+  /** Same as {@link #resolve(String, ValidationContext)}, for a caller (e.g. UI code doing live structural
+   * refactoring, see {@code OverviewModelEditorController}) that has the project's other models directly
+   * rather than a validator {@link ValidationContext}. */
+  public static String resolve(String overviewModelId, List<A12Model<?>> otherModels) {
     if (overviewModelId == null || overviewModelId.isBlank()) {
       return null;
     }
-    for (A12Model<?> other : context.otherModels()) {
+    for (A12Model<?> other : otherModels) {
       String purpose = switch (other) {
         case FormModel formModel -> resolveFromFormModel(overviewModelId, formModel);
         case RelationshipUiModel relationshipUiModel -> resolveFromRelationshipUiModel(overviewModelId, relationshipUiModel);

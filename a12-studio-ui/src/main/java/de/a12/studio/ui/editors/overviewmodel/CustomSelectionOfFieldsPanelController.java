@@ -244,7 +244,7 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
 
   private void populateFieldCombo(ComboBox<String> fieldField, FieldRef fieldRef) {
     ElementIndex index = effectiveIndexFor(fieldRef);
-    fieldField.getItems().setAll(OverviewElementOptions.elementIds(index));
+    fieldField.getItems().setAll(OverviewElementOptions.customSelectionFieldIds(index));
     OverviewElementOptions.applyElementRefConverter(fieldField, index);
   }
 

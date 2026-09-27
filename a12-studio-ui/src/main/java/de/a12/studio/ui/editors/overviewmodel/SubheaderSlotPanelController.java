@@ -123,6 +123,13 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     this.onChange = onChange;
   }
 
+  /** Re-renders the row list from {@link #rows} without touching the title/Add menu - for a caller that mutated
+   * the list externally (e.g. {@code OverviewSubHeaderPruning} removing a now-disallowed element), unlike {@link
+   * #configure}'s own rebuild, which also re-runs {@link #initAddMenu()} needlessly. */
+  public void refresh() {
+    rebuildRows();
+  }
+
   // Rebuilt (via setAll, so re-running configure() on the same instance doesn't duplicate items) instead of
   // declared in FXML because each item's action needs to close over the specific element type it creates.
   private void initAddMenu() {

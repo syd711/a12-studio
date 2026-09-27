@@ -75,6 +75,13 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
   // the values it should re-read.
   private Runnable onRelevanceChange = () -> { };
 
+  // Notified after a user toggle (never from setModel() itself - see OverviewSortingPanelController#refresh's
+  // own javadoc for why an initial load must not silently prune-and-save) to showFullTextSearch, enableFilter or
+  // showFilterButton, since each governs whether a Search/Filter Subheader element is currently allowed (gap 17
+  // of "Overview Model: gap review" - OverviewSubHeaderPruning removes the element instead of merely flagging
+  // it).
+  private Runnable onFeatureSwitchChange = () -> { };
+
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
@@ -103,6 +110,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       ensureConfiguration().setShowFullTextSearch(newValue);
       commitHeaderChange();
       refreshValidationError();
+      onFeatureSwitchChange.run();
     });
 
     enableFilterField.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -112,6 +120,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       ensureConfiguration().setEnableFilter(newValue);
       commitHeaderChange();
       refreshValidationError();
+      onFeatureSwitchChange.run();
     });
 
     showFilterBarField.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -129,6 +138,7 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
       ensureFilterConfiguration().setShowFilterButton(newValue);
       commitHeaderChange();
       onRelevanceChange.run();
+      onFeatureSwitchChange.run();
     });
 
     filterModeField.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -147,6 +157,13 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
    */
   public void setOnRelevanceChange(@NonNull Runnable onRelevanceChange) {
     this.onRelevanceChange = onRelevanceChange;
+  }
+
+  /**
+   * @see #onFeatureSwitchChange
+   */
+  public void setOnFeatureSwitchChange(@NonNull Runnable onFeatureSwitchChange) {
+    this.onFeatureSwitchChange = onFeatureSwitchChange;
   }
 
   /**

@@ -96,6 +96,10 @@ public final class OverviewElementOptions {
   }
 
   public static String displayPath(ElementIndex index, String elementId) {
+    String metaName = OverviewElementResolution.metaFieldDisplayName(elementId);
+    if (metaName != null) {
+      return "__meta/" + metaName;
+    }
     if (index == null || elementId == null) {
       return elementId;
     }
@@ -105,9 +109,21 @@ public final class OverviewElementOptions {
   /** {@code false} for a dangling {@code elementId} - i.e. one that {@link #displayPath} can only echo back
    * as-is rather than resolve to an actual path. {@code true} when {@code index} is {@code null} (nothing to
    * flag yet, e.g. no Document Model selected), so callers only render the "unresolved" state once there's an
-   * index to have actually failed against. */
+   * index to have actually failed against. Always {@code true} for a kernel {@code __meta} field id (gap 15 of
+   * "Overview Model: gap review") - {@link ElementIndex} never contains those, by construction. */
   public static boolean isResolved(ElementIndex index, String elementId) {
-    return index == null || index.isResolvable(elementId);
+    return index == null || OverviewElementResolution.isMetaFieldId(elementId) || index.isResolvable(elementId);
+  }
+
+  /** The seven kernel-injected {@code __meta} field ids (gap 15 of "Overview Model: gap review") -
+   * legitimately referenceable from any Document Model, so appended (not filtered) by the pickers that offer
+   * them: {@link #columnElementIds}, {@link #customSelectionFieldIds}. Not offered by every {@link
+   * #elementIds}-derived picker (e.g. the type-specific {@link #stringElementIds}/{@link #enumerationElementIds},
+   * or the Suffix/Section Data pickers) - narrower than SME's own "every candidate list includes them"
+   * (`DocumentModelApi.getDmReferenceCandidates`), since there is no real fixture usage anywhere to confirm
+   * that broader scope is actually needed yet. */
+  public static List<String> metaElementIds() {
+    return OverviewElementResolution.META_FIELDS.stream().map(OverviewElementResolution.MetaField::id).toList();
   }
 
   /** Renders ids as their display path in a {@code ComboBox<String>} while keeping the id as the stored value. */
@@ -202,6 +218,33 @@ public final class OverviewElementOptions {
     return elementIds(index).stream()
         .filter(id -> "string".equals(filterItemFieldType(index, id)))
         .toList();
+  }
+
+  /** {@link #elementIds(ElementIndex)} minus repeatable ones, plus the {@link #metaElementIds()} (gap 15) -
+   * used by the Column dialog's Element Reference picker (gap 16 of "Overview Model: gap review": SME's own
+   * picker is non-repeatable only, matching {@link
+   * de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator}'s own "repeatable"
+   * error). Usability only - it doesn't stop a dangling/repeatable value that's already set on the column from
+   * continuing to display, so an existing invalid file's column can still be opened and fixed. */
+  public static List<String> columnElementIds(ElementIndex index) {
+    if (index == null) {
+      return List.of();
+    }
+    List<String> ids = new ArrayList<>(elementIds(index).stream().filter(id -> !index.isInRepeatableGroup(id)).toList());
+    ids.addAll(metaElementIds());
+    return ids;
+  }
+
+  /** {@link #elementIds(ElementIndex)} plus the {@link #metaElementIds()} (gap 15) - used by the Custom
+   * Selection Of Fields panel's row picker ({@code filterConfiguration.fields}, {@code custom_list} filter
+   * mode). */
+  public static List<String> customSelectionFieldIds(ElementIndex index) {
+    if (index == null) {
+      return new ArrayList<>(metaElementIds());
+    }
+    List<String> ids = new ArrayList<>(elementIds(index));
+    ids.addAll(metaElementIds());
+    return ids;
   }
 
   /** {@code viewMode} values for a String Filter Item, both fixture-evidenced ({@code

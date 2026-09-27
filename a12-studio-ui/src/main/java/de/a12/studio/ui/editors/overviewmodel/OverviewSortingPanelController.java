@@ -81,9 +81,30 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
   }
 
   /** Called by the owning editor whenever the Columns panel changes, since this panel's picker choices and
-   * its own dangling-reference validation both derive from the current column list. */
+   * its own dangling-reference validation both derive from the current column list. Also prunes an Initial
+   * Sorting entry that a column delete or a "Sortable" toggle-off (via the Column edit dialog) just made
+   * invalid (gap 17 of "Overview Model: gap review" - SME's own refactoring dialog does the same; {@link
+   * OverviewInitialSortingReferenceValidator} still catches anything this can't, e.g. a column made an
+   * expression column, or a hand-edited file). */
   public void refresh() {
+    pruneStaleSorting();
     rebuildRows();
+  }
+
+  private void pruneStaleSorting() {
+    if (model == null) {
+      return;
+    }
+    List<Column> columns = getColumns();
+    boolean changed = getSorting().removeIf(sortRef -> {
+      Column column = columns.stream().filter(c -> c.getId() != null && c.getId().equals(sortRef.getIdref())).findFirst().orElse(null);
+      // Deleted (column == null), made non-sortable, or turned into an expression column - none is a valid
+      // Initial Sorting entry any more.
+      return column == null || !Boolean.TRUE.equals(column.getSortable()) || OverviewColumnOptions.isExpressionColumn(column);
+    });
+    if (changed) {
+      commitHeaderChange();
+    }
   }
 
   @FXML

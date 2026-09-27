@@ -319,11 +319,18 @@ public class OverviewColumnsPanelController extends AbstractPropertyEditor imple
   private void openEditDialog(Column column) {
     String pinDirectionBefore = column.getPinDirection();
     boolean confirmed = Dialogs.showColumnForEdit(Studio.stage, documentModelIndex, documentModelId, column, linkDocumentModelIndexResolver);
-    if (confirmed && !Objects.equals(pinDirectionBefore, column.getPinDirection())) {
+    if (!confirmed) {
+      rebuildRows();
+      return;
+    }
+    if (!Objects.equals(pinDirectionBefore, column.getPinDirection())) {
       resortByPinDirection();
-      commitHeaderChange();
     }
     rebuildRows();
+    // Notifies the Sorting/Accessibility panels too - e.g. toggling Sortable off must prune a now-invalid
+    // Initial Sorting entry (gap 17 of "Overview Model: gap review"), which only the edit dialog's own OK
+    // (not this panel's own add/delete/reorder actions) can cause.
+    notifyChanged();
   }
 
   /**

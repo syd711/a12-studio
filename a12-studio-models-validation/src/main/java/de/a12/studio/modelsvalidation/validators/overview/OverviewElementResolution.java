@@ -16,6 +16,8 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 
+import java.util.List;
+
 /**
  * Shared field-reference resolution used by every Overview Model validator that checks an
  * {@code elementRef}/{@code fieldId} against the referenced Document Model: columns
@@ -125,12 +127,44 @@ public final class OverviewElementResolution {
    */
   private static final String META_GROUP_ID_PREFIX = "abc6a6767a60488754aace2accb73824_";
 
+  /**
+   * The seven {@code __meta} fields, id to display name - gap 15 of "Overview Model: gap review" (metadata
+   * fields cannot be picked for columns/filters/sorting). Four of the ids/names ({@code creator}/{@code
+   * createdAt}/{@code modifier}/{@code modifiedAt}) are directly confirmed by a real fixture that uses them as
+   * Filter Items with English/German labels ({@code testing/workspaces/advanced_new/models/10_People/Person_Ov.json},
+   * under a "Meta Data" section: "Creator"/"Created At"/"Modifier"/"Modified At", in this exact relative order
+   * alongside the other three); the remaining three ({@code docRef}/{@code modelReference}/{@code
+   * modelVersion}) are inferred from that same order (no fixture uses them, so their display names are a
+   * best-effort spacing of the field name itself, not independently confirmed).
+   */
+  public static final List<MetaField> META_FIELDS = List.of(
+      new MetaField(META_GROUP_ID_PREFIX + "field_1169c", "Doc Ref"),
+      new MetaField(META_GROUP_ID_PREFIX + "field_cfb40", "Model Reference"),
+      new MetaField(META_GROUP_ID_PREFIX + "field_17e3b", "Model Version"),
+      new MetaField(META_GROUP_ID_PREFIX + "field_cdaf9", "Creator"),
+      new MetaField(META_GROUP_ID_PREFIX + "field_65672", "Created At"),
+      new MetaField(META_GROUP_ID_PREFIX + "field_1fa32", "Modifier"),
+      new MetaField(META_GROUP_ID_PREFIX + "field_5cd66", "Modified At"));
+
+  /** One {@link #META_FIELDS} entry: a kernel-injected {@code __meta} field's fixed id and display name. */
+  public record MetaField(String id, String displayName) {
+  }
+
   /** True when {@code elementRef} (an {@code elementId}/{@code fieldId}) refers to the kernel-injected {@code
    * __meta} group or one of its fields - see {@link #META_GROUP_ID_PREFIX}. Callers should skip existence/
    * indexed/repeatable checks for these instead of resolving them against {@link ElementIndex}, which never
    * contains them. */
   public static boolean isMetaFieldId(String elementRef) {
     return elementRef != null && elementRef.startsWith(META_GROUP_ID_PREFIX);
+  }
+
+  /** The display name for {@code elementRef} if it's one of {@link #META_FIELDS}, else {@code null}. */
+  public static String metaFieldDisplayName(String elementRef) {
+    return META_FIELDS.stream()
+        .filter(field -> field.id().equals(elementRef))
+        .map(MetaField::displayName)
+        .findFirst()
+        .orElse(null);
   }
 
   public static boolean isIndexedFalse(Element element) {
