@@ -25,7 +25,10 @@ import java.util.List;
  * "referenceColumnHeaderShouldHaveLabelOrIcon" rule (kernel condition {@code OMElementRefHasNoLabel}), which
  * only warns when the *field itself* also has no label - explicitly hiding the label via {@code labelHidden}
  * is the one case that still warns regardless of the field's own label, since that deliberately suppresses
- * the accessible name.
+ * the accessible name. Also covers the sibling {@code expressionColumnHeaderShouldHaveLabelOrIcon} rule for an
+ * expression column (blank {@code elementRef}, see {@link OverviewExpressionColumnValidator}'s javadoc for why
+ * that's how a column's kind is told apart) - there's no referenced field to inherit a label from, so it's a
+ * plain icon-or-visible-label check.
  */
 public final class OverviewColumnHeaderLabelOrIconValidator implements ModelValidator {
 
@@ -36,25 +39,48 @@ public final class OverviewColumnHeaderLabelOrIconValidator implements ModelVali
     if (!(model instanceof OverviewModel overviewModel)) {
       return List.of();
     }
-    DocumentModel documentModel = OverviewElementResolution.referencedDocumentModel(overviewModel, context);
-    if (documentModel == null || documentModel.getContent() == null || documentModel.getContent().getModelRoot() == null) {
-      return List.of();
-    }
-
-    ElementIndex documentModelIndex = new ElementIndex(documentModel, context.otherDocumentModels());
     List<ModelValidationError> errors = new ArrayList<>();
+
+    DocumentModel documentModel = OverviewElementResolution.referencedDocumentModel(overviewModel, context);
+    ElementIndex documentModelIndex = documentModel != null && documentModel.getContent() != null
+        && documentModel.getContent().getModelRoot() != null ? new ElementIndex(documentModel, context.otherDocumentModels()) : null;
+
     for (Column column : overviewModel.getContent().getColumns()) {
-      ElementIndex index = OverviewElementResolution.indexFor(column, documentModelIndex, context);
-      // A dangling elementRef is already flagged separately (as an ERROR) by
-      // OverviewFieldReferenceValidator - only report this accessibility warning once the field is known to
-      // actually exist, identified by its resolved display path rather than its raw internal id.
-      if (isMissingLabelOrIcon(column, index) && index.isResolvable(column.getElementRef())) {
+      boolean referenceColumn = column.getElementRef() != null && !column.getElementRef().isBlank();
+      if (referenceColumn) {
+        if (documentModelIndex == null) {
+          continue;
+        }
+        ElementIndex index = OverviewElementResolution.indexFor(column, documentModelIndex, context);
+        // A dangling elementRef is already flagged separately (as an ERROR) by
+        // OverviewFieldReferenceValidator - only report this accessibility warning once the field is known to
+        // actually exist, identified by its resolved display path rather than its raw internal id.
+        if (isMissingLabelOrIcon(column, index) && index.isResolvable(column.getElementRef())) {
+          errors.add(new ModelValidationError(model, ELEMENT_ID,
+              ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing", index.resolveDisplayPath(column.getElementRef())),
+              Severity.WARNING.name()));
+        }
+      }
+      else if (isMissingLabelOrIconOnExpressionColumn(column)) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
-            ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missing", index.resolveDisplayPath(column.getElementRef())),
+            ValidationMessages.get("validation.overviewColumnHeaderLabelOrIcon.missingExpression", column.getId()),
             Severity.WARNING.name()));
       }
     }
     return errors;
+  }
+
+  /** The expression-column half of this validator: no referenced field to inherit a label from, so a plain
+   * icon-or-visible-label check (SME's {@code expressionColumnHeaderShouldHaveLabelOrIcon}). */
+  private static boolean isMissingLabelOrIconOnExpressionColumn(Column column) {
+    boolean hasIcon = column.getIcon() != null && column.getIcon().getName() != null && !column.getIcon().getName().isBlank();
+    if (hasIcon) {
+      return false;
+    }
+    if (Boolean.TRUE.equals(column.getLabelHidden())) {
+      return true;
+    }
+    return column.getLabel().stream().noneMatch(OverviewColumnHeaderLabelOrIconValidator::hasText);
   }
 
   /** Whether {@code column} would trigger this validator: a reference column with no icon, whose label is

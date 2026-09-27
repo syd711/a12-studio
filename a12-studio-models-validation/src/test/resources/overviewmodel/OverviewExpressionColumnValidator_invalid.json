@@ -1,0 +1,29 @@
+{
+  "header": {
+    "id": "OverviewExpressionColumnValidator_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10
+    },
+    "columns": [
+      {
+        "id": "column_blank",
+        "width": 1
+      },
+      {
+        "id": "column_bad_syntax",
+        "width": 1,
+        "name": "Bad",
+        "expression": "kontext(City){"
+      }
+    ]
+  }
+}

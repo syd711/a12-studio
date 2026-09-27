@@ -13,8 +13,12 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnHeaderLabelOrIconValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewColumnsNotEmptyValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewContextMenuValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewDocumentModelRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewEnumeratedStringFilterValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewExpressionColumnValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterDefinitionSyntaxValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterCustomFieldsValidator;
@@ -22,12 +26,15 @@ import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterGroupsVa
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeIndexedAnnotationValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterSectionsValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFooterExportExcelValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewInfiniteScrollingValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewInitialSortingReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewMultiSelectionElementValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewPagingSizeValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewSearchElementValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewSortableMultiSelectValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewStylesValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewSubHeaderElementValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +57,7 @@ public final class OverviewModelValidationService {
       new OverviewDocumentModelRequiredValidator(),
       new OverviewFilterModeRequiredValidator(),
       new OverviewFilterCustomFieldsValidator(),
+      new OverviewEnumeratedStringFilterValidator(),
       new OverviewFilterModeIndexedAnnotationValidator(),
       new OverviewFilterSectionsValidator(),
       new OverviewFilterGroupsValidator(),
@@ -57,8 +65,14 @@ public final class OverviewModelValidationService {
       new OverviewMultiSelectionElementValidator(),
       new OverviewSearchElementValidator(),
       new OverviewPagingSizeValidator(),
+      new OverviewInfiniteScrollingValidator(),
       new OverviewInitialSortingReferenceValidator(),
-      new OverviewStylesValidator()));
+      new OverviewStylesValidator(),
+      new OverviewContextMenuValidator(),
+      new OverviewFooterExportExcelValidator(),
+      new OverviewColumnValidator(),
+      new OverviewExpressionColumnValidator(),
+      new OverviewSubHeaderElementValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

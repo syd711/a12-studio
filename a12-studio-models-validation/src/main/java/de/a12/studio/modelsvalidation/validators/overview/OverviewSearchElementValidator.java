@@ -15,7 +15,10 @@ import java.util.stream.Stream;
 
 /**
  * When Show Full Text Search is enabled, the Sub header must contain exactly one Search element (SME rules
- * "noSearchIsAdd" and "onlyOneSearchIsAllowed"), mirroring {@link OverviewMultiSelectionElementValidator}.
+ * "noSearchIsAdd" and "onlyOneSearchIsAllowed"), mirroring {@link OverviewMultiSelectionElementValidator} -
+ * both gated {@code FieldNotFilled(purpose)} in the real meta model, so neither fires at all once {@link
+ * OverviewBindingPurpose#resolve} finds this is a Binding overview (Available or Selected Items); {@link
+ * OverviewSubHeaderElementValidator} covers the Available-Items-specific "not supported" warning instead.
  */
 public final class OverviewSearchElementValidator implements ModelValidator {
 
@@ -27,6 +30,9 @@ public final class OverviewSearchElementValidator implements ModelValidator {
       return List.of();
     }
     if (!Boolean.TRUE.equals(overviewModel.getContent().getConfiguration().getShowFullTextSearch())) {
+      return List.of();
+    }
+    if (OverviewBindingPurpose.resolve(model.getId(), context) != null) {
       return List.of();
     }
 

@@ -17,18 +17,20 @@ import java.util.List;
  * Every {@link Binding} and {@link BindingRepeat} node's {@code binding} content in a Form Model's Screens tree,
  * paired with the owning element's id - shared by the {@code FormBinding*}/{@code FormBindingComponent*}
  * validators, which validate the same {@link BindingContent} shape whether it comes from a plain {@link Binding}
- * or is wrapped inside a to-many {@link BindingRepeat}.
+ * or is wrapped inside a to-many {@link BindingRepeat}. Also reused by {@code
+ * de.a12.studio.modelsvalidation.validators.overview.OverviewBindingPurpose} to find which Form Model
+ * (if any) uses a given Overview Model as a Binding component's Available/Selected Items overview.
  */
-final class FormBindingElements {
+public final class FormBindingElements {
 
   private FormBindingElements() {
   }
 
   /** One {@link Binding}/{@link BindingRepeat} node's id, paired with its (possibly null) {@code binding} content. */
-  record BindingHolder(String elementId, BindingContent content) {
+  public record BindingHolder(String elementId, BindingContent content) {
   }
 
-  static List<BindingHolder> findBindingContents(FormModel model) {
+  public static List<BindingHolder> findBindingContents(FormModel model) {
     List<BindingHolder> holders = new ArrayList<>();
     if (model.getContent() != null && model.getContent().getScreens() != null) {
       for (Screen screen : model.getContent().getScreens()) {

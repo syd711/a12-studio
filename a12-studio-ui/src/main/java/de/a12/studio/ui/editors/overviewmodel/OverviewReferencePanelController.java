@@ -24,9 +24,10 @@ import java.util.ResourceBundle;
 /**
  * Edits an {@link OverviewModel}'s "Overview Reference": the choice between backing the Overview Model
  * directly by a Document Model, or indirectly by a Query Model (whose own {@code targetDocumentModel} is
- * then kept in sync as the header's {@link ModelReference#PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW} reference,
- * since every "element reference" picker elsewhere in {@link de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController}
- * still resolves fields through that Document Model regardless of which mode is active). Isn't wired
+ * then resolved on demand as the Document Model every "element reference" picker elsewhere in {@link
+ * de.a12.studio.ui.editors.overviewmodel.OverviewModelEditorController} works off, regardless of which mode
+ * is active - see {@link #syncModelReferences} for why no separate header reference is written for that
+ * derived value). Isn't wired
  * through {@link de.a12.studio.ui.editors.AbstractPropertyEditor} for the same reason as {@link
  * de.a12.studio.ui.editors.applicationmodel.MatchConditionsPanelController}: it edits header {@link ModelReference}s directly, not a document-model
  * {@link de.a12.studio.models.documentmodel.Element}, and its owning editor already has its own
@@ -40,6 +41,8 @@ public class OverviewReferencePanelController implements Initializable {
   private RadioButton queryModelReferenceField;
   @FXML
   private ComboBox<String> overviewReferenceField;
+  @FXML
+  private Button addQueryModelButton;
   @FXML
   private Button editReferenceButton;
   @FXML
@@ -57,6 +60,9 @@ public class OverviewReferencePanelController implements Initializable {
   private boolean updatingFromModel;
 
   private Runnable onChange = () -> {
+  };
+
+  private Runnable onAddQueryModel = () -> {
   };
 
   @Override
@@ -105,6 +111,34 @@ public class OverviewReferencePanelController implements Initializable {
    */
   public void setOnChange(@NonNull Runnable onChange) {
     this.onChange = onChange;
+  }
+
+  /**
+   * Invoked by {@link #addQueryModelButton} (visible only in Query Model mode, gap 14 of "Overview Model: gap
+   * review") - the owning editor creates the new Query Model (it has the project/document-model context this
+   * panel doesn't) and calls {@link #selectQueryModel} with the result.
+   */
+  public void setOnAddQueryModel(@NonNull Runnable onAddQueryModel) {
+    this.onAddQueryModel = onAddQueryModel;
+  }
+
+  @FXML
+  private void onAddQueryModel() {
+    onAddQueryModel.run();
+  }
+
+  /**
+   * Selects {@code newQueryModel} as the Overview Reference - called once {@link #onAddQueryModel} has
+   * created it, already in Query Model mode (the only way to reach {@link #addQueryModelButton}). Refreshes
+   * the combo box from {@code updatedQueryModels} first, so the new model is actually offered, then picks it
+   * (triggering the same {@link #syncModelReferences}/{@link #onChange} the combo's own value listener always
+   * does).
+   */
+  public void selectQueryModel(@NonNull QueryModel newQueryModel, @NonNull List<QueryModel> updatedQueryModels) {
+    this.queryModels = updatedQueryModels;
+    overviewReferenceField.getItems().setAll(
+        queryModels.stream().map(QueryModel::getId).sorted(Comparator.naturalOrder()).toList());
+    overviewReferenceField.setValue(newQueryModel.getId());
   }
 
   public void load(@NonNull OverviewModel model, @NonNull List<DocumentModel> documentModels, @NonNull List<QueryModel> queryModels) {
@@ -159,6 +193,8 @@ public class OverviewReferencePanelController implements Initializable {
   private void updateInfoLabelVisibility(boolean queryMode) {
     queryModelReferenceInfoLabel.setVisible(queryMode);
     queryModelReferenceInfoLabel.setManaged(queryMode);
+    addQueryModelButton.setVisible(queryMode);
+    addQueryModelButton.setManaged(queryMode);
   }
 
   private String currentReferenceId(String purpose) {
@@ -174,10 +210,14 @@ public class OverviewReferencePanelController implements Initializable {
 
   /**
    * Rebuilds the header's Overview Reference. Document Model mode writes a single {@code
-   * document-model-for-overview} reference; Query Model mode writes a {@code query-model-for-overview}
-   * reference plus a {@code document-model-for-overview} reference auto-resolved from the selected Query
-   * Model's own {@code targetDocumentModel}, so every element-reference picker elsewhere keeps working off
-   * a Document Model without having to know which mode is active.
+   * document-model-for-overview} reference; Query Model mode writes only a {@code query-model-for-overview}
+   * reference (SME, and all 17 real Query-bound overview fixtures, write only that one - see gap 4 of
+   * "Overview Model: gap review" in {@code docs/sme-reference-comparison.md}). No {@code
+   * document-model-for-overview} reference is added alongside it: every element-reference picker elsewhere
+   * already falls back to the selected Query Model's own {@code targetDocumentModel} when there's no explicit
+   * Document Model reference ({@link de.a12.studio.modelsvalidation.validators.overview.OverviewElementResolution#referencedDocumentModel},
+   * {@link OverviewModelEditorController#currentDocumentModelId}), so a redundant explicit reference here would
+   * only go stale the next time the Query Model's own target changes.
    */
   private void syncModelReferences() {
     List<ModelReference> references = model.getModelReferences();
@@ -191,14 +231,6 @@ public class OverviewReferencePanelController implements Initializable {
 
     if (queryModelReferenceField.isSelected()) {
       references.add(newReference(ModelReference.PURPOSE_QUERY_MODEL_FOR_OVERVIEW, ModelType.QUERY, "QM", selectedId));
-      String targetDocumentModelId = queryModels.stream()
-          .filter(queryModel -> selectedId.equals(queryModel.getId()))
-          .findFirst()
-          .map(queryModel -> queryModel.getContent().getTargetDocumentModel())
-          .orElse(null);
-      if (targetDocumentModelId != null && !targetDocumentModelId.isBlank()) {
-        references.add(newReference(ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW, ModelType.DOCUMENT, "DM", targetDocumentModelId));
-      }
     }
     else {
       references.add(newReference(ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW, ModelType.DOCUMENT, "DM", selectedId));

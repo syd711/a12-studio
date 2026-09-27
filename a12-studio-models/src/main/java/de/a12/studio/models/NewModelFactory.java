@@ -24,8 +24,12 @@ import de.a12.studio.models.mappingmodel.MappingTarget;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModelContent;
 import de.a12.studio.models.overviewmodel.ElementBox;
+import de.a12.studio.models.overviewmodel.FilterElement;
+import de.a12.studio.models.overviewmodel.MultiSelectionElement;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.overviewmodel.OverviewModelContent;
+import de.a12.studio.models.overviewmodel.RowActionGroup;
+import de.a12.studio.models.overviewmodel.SearchElement;
 import de.a12.studio.models.printmodel.ComputationStep;
 import de.a12.studio.models.printmodel.PrintGeneral;
 import de.a12.studio.models.printmodel.PrintMetadata;
@@ -294,12 +298,29 @@ public class NewModelFactory {
 
   // alias fixed to "DM", matching the shape of an existing OM's document-model-for-overview reference
   // (see e.g. Company_OM.json / OverviewReferencePanelController#syncModelReferences).
+  // Matches SME's OverviewModelModule.initializeNewOverviewModel (client/src/modules/overviewModel/omModule.ts):
+  // a Multi-Selection element on the left, Search and Filter on the right, and an empty row action group - the
+  // three subheader markers are placed regardless of whether the corresponding feature (Multi-Selection/Search/
+  // Filter) is switched on yet, matching SME's own behavior of leaving that for the user to enable next. SME's
+  // in-memory shape additionally carries a `confirmation: {}`/`priority: "secondary"` on each marker, but no
+  // real file (SME- or Studio-authored, all 61 fixtures checked) ever has either key on a Search/Filter/Multi-
+  // Selection element, so they're evidently stripped again before the file is actually written and are not
+  // reproduced here.
   private static OverviewModel buildOverviewModel(String documentModelId) {
     OverviewModel model = new OverviewModel();
-    model.setContent(new OverviewModelContent());
+    OverviewModelContent content = new OverviewModelContent();
+    model.setContent(content);
     if (documentModelId != null && !documentModelId.isBlank()) {
       model.getModelReferences().add(documentModelReference(ModelReference.PURPOSE_DOCUMENT_MODEL_FOR_OVERVIEW, "DM", documentModelId));
     }
+
+    ElementBox subHeaderBox = ElementBox.createEmpty();
+    subHeaderBox.getLeftSlot().add(new MultiSelectionElement());
+    subHeaderBox.getRightSlot().add(new SearchElement());
+    subHeaderBox.getRightSlot().add(new FilterElement());
+    content.setSubHeaderBox(subHeaderBox);
+    content.setRowActionGroup(new RowActionGroup());
+
     return model;
   }
 

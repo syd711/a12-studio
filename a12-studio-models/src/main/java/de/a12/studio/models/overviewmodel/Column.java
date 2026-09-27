@@ -38,6 +38,10 @@ public class Column {
   public static final String MULTI_SELECT_DISPLAY_MODE_DEFAULT = "default";
   public static final String MULTI_SELECT_DISPLAY_MODE_COMMA_SEPARATED = "comma_separated";
 
+  /** SME: {@code NumberType} with {@code minValue} 0.3, one decimal (same unit as {@link
+   * OverviewConfiguration#MIN_ACTION_COLUMN_WIDTH}, 1.0 = 150px). */
+  public static final double MIN_WIDTH = 0.3;
+
   private String id;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> label = new ArrayList<>();

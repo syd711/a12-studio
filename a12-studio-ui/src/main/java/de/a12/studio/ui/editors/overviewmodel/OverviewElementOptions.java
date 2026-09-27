@@ -192,6 +192,18 @@ public final class OverviewElementOptions {
         .toList();
   }
 
+  /** Every element id in {@code index} whose field type is String - used to restrict the Enumerated String
+   * Filter's field list ({@code enumeratedStringFilter.fields}) to String fields, matching SME's picker for
+   * that panel. */
+  public static List<String> stringElementIds(ElementIndex index) {
+    if (index == null) {
+      return List.of();
+    }
+    return elementIds(index).stream()
+        .filter(id -> "string".equals(filterItemFieldType(index, id)))
+        .toList();
+  }
+
   /** {@code viewMode} values for a String Filter Item, both fixture-evidenced ({@code
    * testing/workspaces/advanced_new/models/10_People/Person_Ov.json}). */
   public static final String STRING_VIEW_MODE_TEXT_FIELD = "textField";

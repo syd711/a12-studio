@@ -74,6 +74,27 @@ class DocumentModelHeterogeneityTest {
     assertEquals(List.of(), DocumentModelHeterogeneity.reachableSuperTypes(models, "Product_DM"));
   }
 
+  @Test
+  void recursiveSubTypesFollowsTransitivelyAndExcludesTheSourceItself() {
+    List<DocumentModel> models = List.of(model("A", null, "B"), model("B", null, "C"), model("C", null, null));
+
+    assertEquals(List.of("B", "C"), DocumentModelHeterogeneity.recursiveSubTypes(models, "A"));
+    assertEquals(List.of("C"), DocumentModelHeterogeneity.recursiveSubTypes(models, "B"));
+    assertEquals(List.of(), DocumentModelHeterogeneity.recursiveSubTypes(models, "C"));
+  }
+
+  @Test
+  void recursiveSubTypesResolvesTheProductHierarchyOfTheECommerceWorkspace() {
+    List<DocumentModel> models = new ArrayList<>();
+    collectDocumentModels(new ProjectItem(TestHelper.resolveTestingCommerceDir().toFile()), models);
+
+    assertEquals(List.of("ProductBook_DM", "ProductBundle_DM", "ProductFood_DM", "ProductMovie_DM", "ProductSingle_DM"),
+        DocumentModelHeterogeneity.recursiveSubTypes(models, "Product_DM").stream().sorted().toList());
+    assertEquals(List.of("ProductBook_DM", "ProductFood_DM", "ProductMovie_DM"),
+        DocumentModelHeterogeneity.recursiveSubTypes(models, "ProductSingle_DM"));
+    assertEquals(List.of(), DocumentModelHeterogeneity.recursiveSubTypes(models, "ProductBook_DM"));
+  }
+
   private static void collectDocumentModels(ProjectItem item, List<DocumentModel> result) {
     if (item.isFolder()) {
       item.getChildren().forEach(child -> collectDocumentModels(child, result));

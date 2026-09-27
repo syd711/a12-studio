@@ -1,0 +1,43 @@
+{
+  "header": {
+    "id": "OverviewSubHeaderElementValidator_filterDuplicate_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10,
+      "enableFilter": true,
+      "filterConfiguration": {
+        "showFilterButton": true,
+        "showFilterBar": true,
+        "filterMode": "all"
+      }
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [
+        {
+          "type": "filter"
+        }
+      ],
+      "rightSlot": [
+        {
+          "type": "filter"
+        }
+      ]
+    }
+  }
+}

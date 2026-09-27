@@ -1,6 +1,7 @@
 package de.a12.studio.modelsvalidation.validators.overview;
 
 import de.a12.studio.models.A12Model;
+import de.a12.studio.models.Label;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.overviewmodel.FieldRef;
@@ -22,7 +23,10 @@ import java.util.Set;
 /**
  * Each Filter "Section Data" entry needs an id and at least one field; a field id must be unique within
  * its own section and must not be reused by another section; every field id must resolve against the
- * referenced Document Model like a column's element reference. Mirrors SME's section-data rules.
+ * referenced Document Model like a column's element reference. While Filter is enabled and its button
+ * shown, a section's label must not have a locale row with an empty text (SME: {@code labelIsRequired},
+ * {@code enableFilter == True and showFilterButton == True and FieldFilled(locale) and FieldNotFilled(text)},
+ * "This field is required."). Mirrors SME's section-data rules.
  */
 public final class OverviewFilterSectionsValidator implements ModelValidator {
 
@@ -41,6 +45,8 @@ public final class OverviewFilterSectionsValidator implements ModelValidator {
     List<ModelValidationError> errors = new ArrayList<>();
     ElementIndex index = elementIndex(overviewModel, context);
     Set<String> fieldIdsSeenAcrossSections = new HashSet<>();
+    boolean labelRequired = Boolean.TRUE.equals(overviewModel.getContent().getConfiguration().getEnableFilter())
+        && Boolean.TRUE.equals(filterConfig.getShowFilterButton());
 
     for (FilterSection section : filterConfig.getSectionData()) {
       if (section.getId() == null || section.getId().isBlank()) {
@@ -50,6 +56,15 @@ public final class OverviewFilterSectionsValidator implements ModelValidator {
       if (section.getFields().isEmpty()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.overviewFilterSections.emptySection", describeSection(section)), Severity.ERROR.name()));
+      }
+      if (labelRequired) {
+        for (Label label : section.getLabel()) {
+          if (label.getLocale() != null && !label.getLocale().isBlank() && (label.getText() == null || label.getText().isBlank())) {
+            errors.add(new ModelValidationError(model, ELEMENT_ID,
+                ValidationMessages.get("validation.overviewFilterSections.labelRequired", describeSection(section), label.getLocale()),
+                Severity.ERROR.name()));
+          }
+        }
       }
 
       // Deduplicated first, so a field repeated within one section is only reported once (as an

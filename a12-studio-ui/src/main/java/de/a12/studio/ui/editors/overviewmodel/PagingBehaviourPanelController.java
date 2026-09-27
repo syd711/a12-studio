@@ -30,12 +30,20 @@ public class PagingBehaviourPanelController extends AbstractPropertyEditor imple
 
   private static final int DEFAULT_PAGING_SIZE = 10;
 
+  // SME pre-fills Row Height with 49 when switching to Infinite Scrolling (see RowHeightActionColumnWidthPanelController,
+  // whose own spinner default of 32 is display-only and never written on its own).
+  private static final int DEFAULT_INFINITE_SCROLL_ROW_HEIGHT = 49;
+
   @FXML
   private ComboBox<String> behaviourField;
   @FXML
   private Spinner<Integer> pagingSizeField;
 
   private OverviewModel model;
+
+  // Notified after every change to the Pagination/Infinite Scrolling behaviour, so the sibling Row Height And
+  // Action Column Width panel can re-read its (possibly just-seeded) Row Height and re-check its validators.
+  private Runnable onBehaviourChange = () -> { };
 
   // Set while fields are being repopulated from the model, so those programmatic updates aren't mistaken
   // for user edits and don't trigger a save.
@@ -58,6 +66,9 @@ public class PagingBehaviourPanelController extends AbstractPropertyEditor imple
       OverviewConfiguration configuration = ensureConfiguration();
       configuration.setEnableInfiniteScroll(infiniteScrolling ? Boolean.TRUE : null);
       configuration.setPagingSize(infiniteScrolling ? null : DEFAULT_PAGING_SIZE);
+      if (infiniteScrolling && configuration.getRowHeight() == null) {
+        configuration.setRowHeight(DEFAULT_INFINITE_SCROLL_ROW_HEIGHT);
+      }
       updatingFromModel = true;
       try {
         pagingSizeField.getValueFactory().setValue(DEFAULT_PAGING_SIZE);
@@ -67,6 +78,7 @@ public class PagingBehaviourPanelController extends AbstractPropertyEditor imple
       }
       pagingSizeField.setDisable(infiniteScrolling);
       commitHeaderChange();
+      onBehaviourChange.run();
     });
     pagingSizeField.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel || model == null) {
@@ -75,6 +87,13 @@ public class PagingBehaviourPanelController extends AbstractPropertyEditor imple
       ensureConfiguration().setPagingSize(newValue);
       commitHeaderChange();
     });
+  }
+
+  /**
+   * @see #onBehaviourChange
+   */
+  public void setOnBehaviourChange(@NonNull Runnable onBehaviourChange) {
+    this.onBehaviourChange = onBehaviourChange;
   }
 
   public void setModel(@NonNull OverviewModel model) {

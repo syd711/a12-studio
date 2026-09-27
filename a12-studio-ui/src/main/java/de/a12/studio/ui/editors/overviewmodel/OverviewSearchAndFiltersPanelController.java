@@ -7,6 +7,7 @@ import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterModeRequiredValidator;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewSearchElementValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewSubHeaderElementValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.StudioBundle;
@@ -216,6 +217,12 @@ public class OverviewSearchAndFiltersPanelController extends AbstractPropertyEdi
         Studio.getValidationService().validateElement(model, OverviewFilterModeRequiredValidator.ELEMENT_ID);
     if (errors.isEmpty()) {
       errors = Studio.getValidationService().validateElement(model, OverviewSearchElementValidator.ELEMENT_ID);
+    }
+    if (errors.isEmpty()) {
+      errors = Studio.getValidationService().validateElement(model, OverviewSubHeaderElementValidator.FILTER_ELEMENT_ID);
+    }
+    if (errors.isEmpty()) {
+      errors = Studio.getValidationService().validateElement(model, OverviewSubHeaderElementValidator.SEARCH_ELEMENT_ID);
     }
     if (errors.isEmpty()) {
       hideError();

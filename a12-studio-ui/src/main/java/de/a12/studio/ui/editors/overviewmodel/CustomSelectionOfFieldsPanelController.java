@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.overviewmodel;
 
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.DocumentModelHeterogeneity;
 import de.a12.studio.models.overviewmodel.FieldRef;
 import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
@@ -23,7 +25,6 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -41,10 +42,10 @@ import java.util.ResourceBundle;
  * group sits right before {@code sectionData} there, so this panel is placed the same way relative to {@link
  * OverviewSectionDataPanelController} in {@code overview-model-editor.fxml}. Each row picks a Document Model
  * field via an inline combo box (see {@link OverviewElementOptions}), mirroring {@link
- * OverviewSortingPanelController}'s column picker. The reference metamodel's row also has a "Subtype" field
- * (for referencing a field of a heterogeneous relationship's sub-model into the Filter Selector) - that column
- * is intentionally left empty for now, matching {@link OverviewSectionDataPanelController}'s dialog being
- * empty for now.
+ * OverviewSortingPanelController}'s column picker. The row's "Subtype" combo (gap 5 of "Overview Model: gap
+ * review") offers the recursive sub-types of the referenced Document Model ({@link
+ * DocumentModelHeterogeneity#recursiveSubTypes}, disabled when there are none); picking one re-points that
+ * row's own field picker at the sub-type's elements instead ({@link FieldRef#getSubModel()}, matching SME).
  */
 public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEditor implements Initializable {
 
@@ -71,6 +72,8 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
 
   private ElementIndex documentModelIndex;
 
+  private List<DocumentModel> otherDocumentModels = List.of();
+
   // Set while a row's combo box is being repopulated from the model, so that isn't mistaken for a user edit.
   private boolean updatingFromModel;
 
@@ -91,9 +94,12 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
     setEditorVisible(visible);
   }
 
-  /** Re-points every row's field picker at the currently referenced Document Model. */
-  public void setDocumentModelIndex(ElementIndex documentModelIndex) {
+  /** Re-points every row's field picker at the currently referenced Document Model, and every row's Subtype
+   * picker at that model's own recursive sub-types (from {@code otherDocumentModels}, the whole project's
+   * Document Models - needed for the heterogeneity graph, unlike {@code documentModelIndex} alone). */
+  public void setDocumentModelIndex(ElementIndex documentModelIndex, List<DocumentModel> otherDocumentModels) {
     this.documentModelIndex = documentModelIndex;
+    this.otherDocumentModels = otherDocumentModels != null ? otherDocumentModels : List.of();
     rebuildRows();
   }
 
@@ -134,27 +140,53 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
   private HBox createRow(FieldRef fieldRef, int index, int rowCount) {
     FontIcon dragHandle = RowFactory.createDragHandle();
 
-    Region subtypeCell = new Region();
-    subtypeCell.setId("customFieldSubtype-" + index);
-    HBox.setHgrow(subtypeCell, Priority.ALWAYS);
-    subtypeCell.setMaxWidth(Double.MAX_VALUE);
+    List<String> subTypes = baseModelId() != null
+        ? DocumentModelHeterogeneity.recursiveSubTypes(otherDocumentModels, baseModelId()) : List.of();
+    ComboBox<String> subtypeField = new ComboBox<>();
+    subtypeField.setId("customFieldSubtype-" + index);
+    subtypeField.setPromptText(StudioBundle.get("select_a_field"));
+    subtypeField.setMaxWidth(Double.MAX_VALUE);
+    subtypeField.setDisable(subTypes.isEmpty());
+    HBox.setHgrow(subtypeField, Priority.ALWAYS);
+    subtypeField.getItems().setAll(subTypes);
 
     ComboBox<String> fieldField = new ComboBox<>();
     fieldField.setId("customFieldField-" + index);
     fieldField.setPromptText(StudioBundle.get("select_a_field"));
     fieldField.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(fieldField, Priority.ALWAYS);
-    fieldField.getItems().setAll(OverviewElementOptions.elementIds(documentModelIndex));
-    OverviewElementOptions.applyElementRefConverter(fieldField, documentModelIndex);
 
     updatingFromModel = true;
     try {
+      subtypeField.setValue(fieldRef.getSubModel());
+      populateFieldCombo(fieldField, fieldRef);
       fieldField.setValue(fieldRef.getFieldId());
     }
     finally {
       updatingFromModel = false;
     }
     updateFieldValidationState(fieldField, fieldRef);
+
+    subtypeField.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (updatingFromModel) {
+        return;
+      }
+      fieldRef.setSubModel(newValue);
+      // The field a row's own elementRef pointed at before switching Subtype almost certainly doesn't exist
+      // on the new one (a different Document Model's element ids), so it's cleared rather than kept dangling.
+      fieldRef.setFieldId(null);
+      updatingFromModel = true;
+      try {
+        populateFieldCombo(fieldField, fieldRef);
+        fieldField.setValue(null);
+      }
+      finally {
+        updatingFromModel = false;
+      }
+      commitHeaderChange();
+      updateFieldValidationState(fieldField, fieldRef);
+    });
+
     fieldField.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel) {
         return;
@@ -172,7 +204,7 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
     ColumnConstraints fieldColumn = new ColumnConstraints();
     fieldColumn.setPercentWidth(66.67);
     contentGrid.getColumnConstraints().addAll(subtypeColumn, fieldColumn);
-    contentGrid.add(subtypeCell, 0, 0);
+    contentGrid.add(subtypeField, 0, 0);
     contentGrid.add(fieldField, 1, 0);
     HBox.setHgrow(contentGrid, Priority.ALWAYS);
 
@@ -190,23 +222,49 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
   }
 
   /** Flags {@code fieldField} with a red border and an explanatory tooltip when {@code fieldRef}'s field id is
-   * set but doesn't resolve against {@link #documentModelIndex} - a dangling reference. Same "unresolved"
+   * set but doesn't resolve against {@link #effectiveIndexFor} - a dangling reference. Same "unresolved"
    * semantics as {@link OverviewColumnOptions#isUnresolvedElementRef}, whose {@link
    * OverviewColumnsPanelController} counterpart flags it on a plain summary {@code Label} instead, since here
    * the field is picked via a combo box rather than rendered as text. */
   private void updateFieldValidationState(ComboBox<String> fieldField, FieldRef fieldRef) {
+    ElementIndex index = effectiveIndexFor(fieldRef);
     String fieldId = fieldRef.getFieldId();
-    boolean unresolved = fieldId != null && !fieldId.isBlank() && !OverviewElementOptions.isResolved(documentModelIndex, fieldId);
+    boolean unresolved = fieldId != null && !fieldId.isBlank() && !OverviewElementOptions.isResolved(index, fieldId);
     if (unresolved) {
       if (!fieldField.getStyleClass().contains("validation-error")) {
         fieldField.getStyleClass().add("validation-error");
       }
-      fieldField.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("path_could_not_be_resolved", OverviewElementOptions.displayPath(documentModelIndex, fieldId))));
+      fieldField.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("path_could_not_be_resolved", OverviewElementOptions.displayPath(index, fieldId))));
     }
     else {
       fieldField.getStyleClass().remove("validation-error");
       fieldField.setTooltip(null);
     }
+  }
+
+  private void populateFieldCombo(ComboBox<String> fieldField, FieldRef fieldRef) {
+    ElementIndex index = effectiveIndexFor(fieldRef);
+    fieldField.getItems().setAll(OverviewElementOptions.elementIds(index));
+    OverviewElementOptions.applyElementRefConverter(fieldField, index);
+  }
+
+  /** {@code documentModelIndex}, or - if {@code fieldRef} has a Subtype set and it resolves to a real project
+   * Document Model - an index over that sub-type instead, so the field picker offers its own elements. */
+  private ElementIndex effectiveIndexFor(FieldRef fieldRef) {
+    String subModelId = fieldRef.getSubModel();
+    if (subModelId == null || subModelId.isBlank()) {
+      return documentModelIndex;
+    }
+    DocumentModel subModel = otherDocumentModels.stream()
+        .filter(candidate -> subModelId.equals(candidate.getId()))
+        .findFirst()
+        .orElse(null);
+    ElementIndex subModelIndex = OverviewElementOptions.indexOf(subModel, otherDocumentModels);
+    return subModelIndex != null ? subModelIndex : documentModelIndex;
+  }
+
+  private String baseModelId() {
+    return documentModelIndex != null && documentModelIndex.getModel() != null ? documentModelIndex.getModel().getId() : null;
   }
 
   private void moveField(int fromIndex, int insertBeforeIndex) {

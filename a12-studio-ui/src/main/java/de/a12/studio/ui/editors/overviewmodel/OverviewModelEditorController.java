@@ -3,32 +3,46 @@ package de.a12.studio.ui.editors.overviewmodel;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.overviewmodel.BoxElement;
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.ButtonElement;
+import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.ColumnLinkReference;
+import de.a12.studio.models.overviewmodel.ColumnRef;
 import de.a12.studio.models.overviewmodel.ElementBox;
 import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.overviewmodel.RowActionGroup;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.querymodel.QueryModel;
+import de.a12.studio.models.querymodel.QueryPaging;
+import de.a12.studio.models.querymodel.QuerySort;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.editors.overviewmodel.dialogs.CreateQueryModelDialogController;
+import de.a12.studio.ui.editors.overviewmodel.dialogs.Dialogs;
 import de.a12.studio.ui.editors.propertyeditors.EventButtonsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -168,6 +182,7 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       refreshDocumentModelIndex();
       commitChange();
     });
+    overviewReferenceController.setOnAddQueryModel(this::onAddQueryModel);
     // The Sorting panel's column picker and its own dangling-reference validation, as well as the
     // Accessibility panel's screen-reader column picker, both derive from the Columns list, so keep them in
     // sync with every structural change made there.
@@ -176,6 +191,9 @@ public class OverviewModelEditorController extends AbstractEditorController impl
       overviewAccessibilityController.refresh();
     });
     overviewSearchAndFiltersController.setOnRelevanceChange(this::updateFilterModeDependentVisibility);
+    // Switching Pagination <-> Infinite Scrolling changes whether Row Height/Action Column Width are required,
+    // and may itself seed a default Row Height (see PagingBehaviourPanelController) - re-read/re-validate them.
+    overviewPagingBehaviourController.setOnBehaviourChange(overviewRowHeightActionColumnWidthController::refresh);
     // The Multi-Selection panel's "exactly one Multi-Selection element in Sub header" validation and the
     // Search and Filters panel's "exactly one Search element in Sub header" validation both depend on the
     // Subheader panels' content, so re-check them whenever either slot changes.
@@ -352,9 +370,119 @@ public class OverviewModelEditorController extends AbstractEditorController impl
     overviewColumnsController.setDocumentModelIndex(documentModelIndex, documentModelId, linkDocumentModelIndexResolver);
     overviewSortingController.setDocumentModelIndex(documentModelIndex, linkDocumentModelIndexResolver);
     overviewAccessibilityController.setDocumentModelIndex(documentModelIndex, linkDocumentModelIndexResolver);
-    customSelectionOfFieldsController.setDocumentModelIndex(documentModelIndex);
+    customSelectionOfFieldsController.setDocumentModelIndex(documentModelIndex, otherDocumentModels);
     overviewSectionDataController.setDocumentModelIndex(documentModelIndex);
     customFilterConfigurationController.setDocumentModelIndex(documentModelIndex);
+    filterStringFieldsMultiSelectController.setDocumentModelIndex(documentModelIndex);
+  }
+
+  /**
+   * Gap 14 of "Overview Model: gap review" - {@link OverviewReferencePanelController}'s "Add" button next to
+   * the Query Model picker. Opens {@link Dialogs#showCreateQueryModel}, targeted at this Overview's own
+   * (resolved) Document Model, creates the new Query Model there, optionally seeds its Fields/Paging/Sorting
+   * from this Overview's own columns/configuration (see {@link #generateQueryFromOverview}), then selects it
+   * as the new Overview Reference.
+   */
+  private void onAddQueryModel() {
+    ProjectItem targetFolder = projectItem.getParent();
+    String preselectedDocumentModelId = currentDocumentModelId();
+    Optional<CreateQueryModelDialogController.Result> input = Dialogs.showCreateQueryModel(Studio.stage, targetFolder,
+        otherDocumentModels, preselectedDocumentModelId, model.getLocales(), defaultQueryModelName(model.getId()));
+    if (input.isEmpty()) {
+      return;
+    }
+
+    try {
+      ProjectItem selectedFolder = input.get().folder();
+      ProjectItem newItem = NewModelFactory.createModel(selectedFolder, ModelType.QUERY, input.get().name(),
+          input.get().targetDocumentModelId());
+      QueryModel queryModel = (QueryModel) newItem.getModel();
+      if (input.get().generateFromOverview()) {
+        generateQueryFromOverview(queryModel, input.get().targetDocumentModelId());
+      }
+      if (!input.get().locales().isEmpty()) {
+        queryModel.setLocales(input.get().locales());
+      }
+      if (!input.get().roles().isEmpty()) {
+        RolesEditorPanelController.applyRoles(queryModel, input.get().roles());
+      }
+      newItem.save();
+      StudioEventManager.getInstance().fireModelSavedEvent(newItem);
+
+      otherQueryModels = ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.QUERY).stream()
+          .filter(QueryModel.class::isInstance)
+          .map(QueryModel.class::cast)
+          .toList();
+      overviewReferenceController.selectQueryModel(queryModel, otherQueryModels);
+    }
+    catch (IOException e) {
+      WidgetFactory.showAlert(Studio.stage, StudioBundle.get("could_not_create_item", input.get().name()), e.getMessage());
+    }
+  }
+
+  /**
+   * Seeds {@code queryModel}'s Fields, Paging and Sorting from this Overview Model's own columns/
+   * configuration: one field per reference column's resolved absolute path (expression columns have no field
+   * to project, so they're skipped), the Paging Size, and one Sort entry per Initial Sorting column (direction
+   * from the column's own Preferred Sorting, defaulting to Ascending). Resolves paths against {@code
+   * targetDocumentModelId} fresh (not {@link #documentModelIndex}, which may still be pointed at a different
+   * Document Model if the user picked one other than this Overview's currently resolved one).
+   */
+  // Package-private (not private) so OverviewModelEditorControllerAddQueryModelTest can exercise it directly
+  // without going through the blocking Dialogs#showCreateQueryModel it's normally reached from.
+  void generateQueryFromOverview(@NonNull QueryModel queryModel, @NonNull String targetDocumentModelId) {
+    DocumentModel targetDocumentModel = otherDocumentModels.stream()
+        .filter(candidate -> targetDocumentModelId.equals(candidate.getId()))
+        .findFirst()
+        .orElseGet(() -> ProjectDocumentModels.resolveDocumentModelForFieldReferences(targetDocumentModelId));
+    ElementIndex index = OverviewElementOptions.indexOf(targetDocumentModel, otherDocumentModels);
+    if (index == null) {
+      return;
+    }
+
+    List<Column> columns = model.getContent().getColumns();
+    Set<String> fieldPaths = new LinkedHashSet<>();
+    for (Column column : columns) {
+      String elementRef = column.getElementRef();
+      if (elementRef != null && !elementRef.isBlank() && index.isResolvable(elementRef)) {
+        fieldPaths.add(index.resolveDisplayPath(elementRef));
+      }
+    }
+    queryModel.getContent().setFields(new ArrayList<>(fieldPaths));
+
+    Integer pagingSize = model.getContent().getConfiguration().getPagingSize();
+    if (pagingSize != null) {
+      QueryPaging paging = new QueryPaging();
+      paging.setPageSize(pagingSize);
+      queryModel.getContent().setPaging(paging);
+    }
+
+    List<QuerySort> sortEntries = new ArrayList<>();
+    for (ColumnRef sortRef : model.getContent().getConfiguration().getInitialSorting()) {
+      Column sortedColumn = columns.stream().filter(column -> column.getId() != null && column.getId().equals(sortRef.getIdref())).findFirst().orElse(null);
+      if (sortedColumn == null || sortedColumn.getElementRef() == null || sortedColumn.getElementRef().isBlank()
+          || !index.isResolvable(sortedColumn.getElementRef())) {
+        continue;
+      }
+      QuerySort sort = new QuerySort();
+      sort.getSortBy().setField(index.resolveDisplayPath(sortedColumn.getElementRef()));
+      sort.getSortBy().setDirection(Column.PREFERRED_SORTING_DESC.equals(sortedColumn.getPreferredSorting())
+          ? de.a12.studio.models.querymodel.QuerySortBy.DIRECTION_DESC : de.a12.studio.models.querymodel.QuerySortBy.DIRECTION_ASC);
+      sortEntries.add(sort);
+    }
+    queryModel.getContent().setSort(sortEntries);
+  }
+
+  // Mirrors DocumentModelActions#defaultOverviewModelName's "<Base>_OM" convention, but for the Query Model
+  // this Overview is about to be re-bound to ("_Qe", matching real fixtures like
+  // PersonSkills_Person_Ru_SelectedItems_Qe.json for PersonSkills_Person_Ru_SelectedItems_Ov.json).
+  private static String defaultQueryModelName(@NonNull String overviewModelId) {
+    for (String suffix : List.of("_OM", "_Ov")) {
+      if (overviewModelId.endsWith(suffix)) {
+        return overviewModelId.substring(0, overviewModelId.length() - suffix.length()) + "_Qe";
+      }
+    }
+    return overviewModelId + "_Qe";
   }
 
   /**

@@ -1,5 +1,7 @@
 package de.a12.studio.ui.editors.overviewmodel.dialogs;
 
+import de.a12.studio.models.Locale;
+import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.overviewmodel.ActionGroup;
 import de.a12.studio.models.overviewmodel.Button;
 import de.a12.studio.models.overviewmodel.Column;
@@ -8,8 +10,10 @@ import de.a12.studio.models.overviewmodel.FilterGroup;
 import de.a12.studio.models.overviewmodel.FilterItem;
 import de.a12.studio.models.overviewmodel.FilterSection;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.ui.editors.overviewmodel.dialogs.CreateQueryModelDialogController.Result;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXMLLoader;
@@ -209,6 +213,25 @@ public class Dialogs {
       return Optional.empty();
     }
     return Optional.of(action);
+  }
+
+  /**
+   * Opens {@link CreateQueryModelDialogController} for {@link
+   * de.a12.studio.ui.editors.overviewmodel.OverviewReferencePanelController}'s "Add" button (gap 14 of
+   * "Overview Model: gap review").
+   */
+  public static Optional<Result> showCreateQueryModel(Stage owner, @NonNull ProjectItem targetFolder,
+      @NonNull List<DocumentModel> documentModels, String preselectedDocumentModelId, @NonNull List<Locale> defaultLocales,
+      @NonNull String defaultName) {
+    FXMLLoader fxmlLoader = new FXMLLoader(CreateQueryModelDialogController.class.getResource("create-query-model-dialog.fxml"));
+    fxmlLoader.setResources(StudioBundle.getBundle());
+    Stage stage = WidgetFactory.createDialogStage("create-query-model-dialog", fxmlLoader, owner, StudioBundle.get("create_query_model_from_overview"));
+    CreateQueryModelDialogController controller = (CreateQueryModelDialogController) stage.getUserData();
+    controller.init(stage, targetFolder, documentModels, preselectedDocumentModelId, defaultLocales, defaultName);
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.getResult();
   }
 
   private static Button cloneAction(Button action) {

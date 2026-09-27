@@ -1,0 +1,34 @@
+{
+  "header": {
+    "id": "OverviewSubHeaderElementValidator_filterNotAllowed_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10,
+      "enableFilter": false
+    },
+    "columns": [
+      {
+        "id": "column_1",
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ],
+    "subHeaderBox": {
+      "leftSlot": [],
+      "rightSlot": [
+        {
+          "type": "filter"
+        }
+      ]
+    }
+  }
+}

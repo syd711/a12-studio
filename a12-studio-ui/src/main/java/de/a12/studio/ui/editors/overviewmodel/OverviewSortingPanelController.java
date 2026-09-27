@@ -95,11 +95,13 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     commitHeaderChange();
   }
 
-  /** The first {@link Column#getId()} not yet referenced by any existing {@link ColumnRef} in {@link
-   * #getSorting()}, or {@code null} if every column already has a sorting entry (or there are no columns). */
+  /** The first sortable reference column's {@link Column#getId()} not yet referenced by any existing {@link
+   * ColumnRef} in {@link #getSorting()}, or {@code null} if every eligible column already has a sorting entry
+   * (or there are none). */
   private String firstUnselectedColumnId() {
     List<String> selectedIds = getSorting().stream().map(ColumnRef::getIdref).toList();
     return getColumns().stream()
+        .filter(column -> !OverviewColumnOptions.isExpressionColumn(column) && Boolean.TRUE.equals(column.getSortable()))
         .map(Column::getId)
         .filter(id -> id != null && !selectedIds.contains(id))
         .findFirst()
@@ -170,7 +172,13 @@ public class OverviewSortingPanelController extends AbstractPropertyEditor {
     columnField.setPromptText(StudioBundle.get("select_a_column"));
     columnField.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(columnField, Priority.ALWAYS);
-    columnField.getItems().setAll(OverviewColumnOptions.columnIds(columns));
+    // SME's picker only offers sortable reference columns - an expression column or one with Sortable
+    // unchecked isn't a valid Initial Sorting entry (see OverviewInitialSortingReferenceValidator's sibling
+    // "not sortable" check, which flags a hand-edited/stale entry this exclusion prevents authoring afresh).
+    columnField.getItems().setAll(columns.stream()
+        .filter(column -> !OverviewColumnOptions.isExpressionColumn(column) && Boolean.TRUE.equals(column.getSortable()))
+        .map(Column::getId)
+        .toList());
     OverviewColumnOptions.applyColumnConverter(columnField, columns, documentModelIndex, linkDocumentModelIndexResolver);
 
     updatingFromModel = true;

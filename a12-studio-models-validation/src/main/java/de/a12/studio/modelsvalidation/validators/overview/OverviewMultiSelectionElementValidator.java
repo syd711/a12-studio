@@ -15,7 +15,9 @@ import java.util.stream.Stream;
 
 /**
  * When Multi-Selection is enabled, the Sub header must contain exactly one Multi-Selection element
- * (SME rules "noMultiSelectionIsAdded" and "onlyOneMultiSelectionIsAllowed").
+ * (SME rules "noMultiSelectionIsAdded" and "onlyOneMultiSelectionIsAllowed") - both gated {@code
+ * FieldNotFilled(purpose)} in the real meta model, so neither fires at all once {@link
+ * OverviewBindingPurpose#resolve} finds this is a Binding overview (Available or Selected Items).
  */
 public final class OverviewMultiSelectionElementValidator implements ModelValidator {
 
@@ -27,6 +29,9 @@ public final class OverviewMultiSelectionElementValidator implements ModelValida
       return List.of();
     }
     if (overviewModel.getContent().getConfiguration().getMultiSelection() == null) {
+      return List.of();
+    }
+    if (OverviewBindingPurpose.resolve(model.getId(), context) != null) {
       return List.of();
     }
 

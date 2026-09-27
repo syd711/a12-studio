@@ -31,6 +31,14 @@
                     <HBox alignment="CENTER_LEFT" spacing="6.0">
                         <children>
                             <ComboBox fx:id="overviewReferenceField" editable="false" HBox.hgrow="ALWAYS" />
+                            <Button fx:id="addQueryModelButton" managed="false" mnemonicParsing="false" onAction="#onAddQueryModel" styleClass="default-button" visible="false">
+                                <graphic>
+                                    <FontIcon iconLiteral="mdi2p-plus" iconSize="16" />
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="%create_query_model_from_overview" />
+                                </tooltip>
+                            </Button>
                             <Button fx:id="editReferenceButton" mnemonicParsing="false" onAction="#onEditReference" styleClass="default-button">
                                 <graphic>
                                     <FontIcon iconLiteral="mdi2p-pencil-outline" iconSize="16" />

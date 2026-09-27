@@ -124,6 +124,37 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void columnHeaderLabelOrIconValidatorReportsMissingHeaderOnExpressionColumn() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewColumnHeaderLabelOrIconValidator_expression_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewColumnHeaderLabelOrIconValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("expression column"));
+    assertTrue(errors.get(0).message().contains("column_expr"));
+  }
+
+  @Test
+  void expressionColumnValidatorReportsMissingFieldsAndBadSyntax() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewExpressionColumnValidator_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewExpressionColumnValidator().validate(model, TestModels.context(model));
+
+    assertEquals(3, errors.size());
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("needs a Name")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("needs an Expression")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("invalid Expression")));
+  }
+
+  @Test
+  void expressionColumnValidatorAcceptsAWellFormedColumn() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewExpressionColumnValidator_invalid.json", OverviewModel.class);
+    model.getContent().getColumns().removeIf(column -> !"column_bad_syntax".equals(column.getId()));
+    model.getContent().getColumns().get(0).setExpression("[FirstName] \" \" [LastName]");
+    List<ModelValidationError> errors = new OverviewExpressionColumnValidator().validate(model, TestModels.context(model));
+
+    assertEquals(0, errors.size());
+  }
+
+  @Test
   void filterModeIndexedAnnotationValidatorReportsUnindexedFieldForAllMode() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterModeIndexedAnnotationValidator_invalid.json", OverviewModel.class);
     DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
@@ -173,6 +204,51 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void enumeratedStringFilterValidatorReportsEmptySelectionAndMissingPagingSize() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewEnumeratedStringFilterValidator_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewEnumeratedStringFilterValidator().validate(model, TestModels.context(model));
+
+    assertEquals(2, errors.size());
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("At least one field")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Paging Size is required")));
+  }
+
+  @Test
+  void enumeratedStringFilterValidatorReportsDuplicateAndUnresolvedField() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewEnumeratedStringFilterValidator_duplicate_invalid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewEnumeratedStringFilterValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    // field_1 selected twice, plus field_missing not resolving.
+    assertEquals(2, errors.size());
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("is selected more than once")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("field_missing")));
+  }
+
+  @Test
+  void filterCustomFieldsValidatorReportsAnInvalidSubModelReference() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterCustomFieldsValidator_subModel_invalid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFilterCustomFieldsValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("Does_Not_Exist_DM"));
+  }
+
+  @Test
+  void filterCustomFieldsValidatorResolvesAFieldThroughASubModel() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterCustomFieldsValidator_subModel_valid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    DocumentModel refSubDm = TestModels.load("/documentmodel/RefSub_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFilterCustomFieldsValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm, refSubDm));
+
+    assertEquals(0, errors.size());
+  }
+
+  @Test
   void filterSectionsValidatorReportsMissingIdAndDuplicateField() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterSectionsValidator_invalid.json", OverviewModel.class);
     DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
@@ -181,6 +257,17 @@ class OverviewValidatorsTest {
 
     // Missing section id, plus the same field selected twice within the section.
     assertEquals(2, errors.size());
+  }
+
+  @Test
+  void filterSectionsValidatorReportsMissingLabelWhileFilterButtonShown() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFilterSectionsValidator_label_invalid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFilterSectionsValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("needs a label text"));
   }
 
   @Test
@@ -266,6 +353,34 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void infiniteScrollingValidatorReportsMissingPagingSizeForPagination() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewInfiniteScrollingValidator_pagination_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewInfiniteScrollingValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("Paging Size is required"));
+  }
+
+  @Test
+  void infiniteScrollingValidatorReportsMissingRowHeightAndActionColumnWidth() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewInfiniteScrollingValidator_infiniteScroll_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewInfiniteScrollingValidator().validate(model, TestModels.context(model));
+
+    assertEquals(2, errors.size());
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Row Height is required")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Action Column Width is required")));
+  }
+
+  @Test
+  void infiniteScrollingValidatorAcceptsPaginationWithPagingSize() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewInfiniteScrollingValidator_pagination_invalid.json", OverviewModel.class);
+    model.getContent().getConfiguration().setPagingSize(10);
+    List<ModelValidationError> errors = new OverviewInfiniteScrollingValidator().validate(model, TestModels.context(model));
+
+    assertEquals(0, errors.size());
+  }
+
+  @Test
   void initialSortingReferenceValidatorReportsDeletedColumn() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewInitialSortingReferenceValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewInitialSortingReferenceValidator().validate(model, TestModels.context(model));
@@ -275,11 +390,83 @@ class OverviewValidatorsTest {
   }
 
   @Test
+  void initialSortingReferenceValidatorReportsDuplicateColumn() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewInitialSortingReferenceValidator_duplicate_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewInitialSortingReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("used more than once"));
+  }
+
+  @Test
   void stylesValidatorReportsBlankEntry() {
     OverviewModel model = TestModels.load("/overviewmodel/OverviewStylesValidator_invalid.json", OverviewModel.class);
     List<ModelValidationError> errors = new OverviewStylesValidator().validate(model, TestModels.context(model));
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("required"));
+  }
+
+  @Test
+  void contextMenuValidatorReportsGroupWithoutAction() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewContextMenuValidator_invalid.json", OverviewModel.class);
+    List<ModelValidationError> errors = new OverviewContextMenuValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("Empty Group"));
+    assertTrue(errors.get(0).message().contains("at least one action"));
+  }
+
+  @Test
+  void footerExportExcelValidatorWarnsWhenNotBoundToAComposedDocumentModel() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFooterExportExcelValidator_invalid.json", OverviewModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFooterExportExcelValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    assertEquals(1, errors.size());
+    assertEquals("WARNING", errors.get(0).severity());
+    assertTrue(errors.get(0).message().contains("Composed Document Models only"));
+  }
+
+  @Test
+  void columnValidatorReportsWidthSortingSuffixAndStyleProblems() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewColumnValidator_invalid.json", OverviewModel.class);
+    DocumentModel aggregationDm = TestModels.load("/documentmodel/Aggregation_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewColumnValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, aggregationDm));
+
+    assertEquals(6, errors.size());
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("width must be at least")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Preferred Sorting is required")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("field_does_not_exist")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("indexed")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("not defined in Styles")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("used more than once")));
+  }
+
+  @Test
+  void columnValidatorAcceptsAStaticSuffixOnAnUnindexedField() {
+    // useDynamicSuffix is false/absent - SME's indexedAnnotationShouldBeNotFalseForDynamicSuffix rule needs
+    // FieldFilled(useDynamicSuffix) too, so a static suffix must not trip the indexed check.
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewColumnValidator_invalid.json", OverviewModel.class);
+    model.getContent().getColumns().removeIf(column -> !"column_suffix_indexed".equals(column.getId()));
+    model.getContent().getColumns().get(0).setUseDynamicSuffix(null);
+    DocumentModel aggregationDm = TestModels.load("/documentmodel/Aggregation_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new OverviewColumnValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, aggregationDm));
+
+    assertEquals(0, errors.size());
+  }
+
+  @Test
+  void footerExportExcelValidatorAcceptsAComposedDocumentModel() {
+    OverviewModel model = TestModels.load("/overviewmodel/OverviewFooterExportExcelValidator_cdm_valid.json", OverviewModel.class);
+    de.a12.studio.models.composeddocumentmodel.ComposedDocumentModel cdm =
+        TestModels.load("/documentmodel/CdmRef_CdM.json", de.a12.studio.models.composeddocumentmodel.ComposedDocumentModel.class);
+    List<ModelValidationError> errors = new OverviewFooterExportExcelValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, cdm));
+
+    assertEquals(0, errors.size());
   }
 }

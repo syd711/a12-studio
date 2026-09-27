@@ -1,0 +1,65 @@
+{
+  "header": {
+    "id": "OverviewColumnValidator_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-overview",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Aggregation_DM"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {
+      "pagingSize": 10
+    },
+    "styles": ["defined-style"],
+    "columns": [
+      {
+        "id": "column_width",
+        "width": 0.1,
+        "elementRef": "field_type",
+        "sortable": false
+      },
+      {
+        "id": "column_sortable",
+        "width": 1,
+        "elementRef": "field_type",
+        "sortable": true
+      },
+      {
+        "id": "column_suffix_missing",
+        "width": 1,
+        "elementRef": "field_liability",
+        "sortable": false,
+        "suffixRef": "field_does_not_exist"
+      },
+      {
+        "id": "column_suffix_indexed",
+        "width": 1,
+        "elementRef": "field_liability",
+        "sortable": false,
+        "suffixRef": "field_secret",
+        "useDynamicSuffix": true
+      },
+      {
+        "id": "column_styles",
+        "width": 1,
+        "elementRef": "field_type",
+        "sortable": false,
+        "styles": {
+          "header": ["undefined-style"],
+          "content": ["defined-style", "defined-style"]
+        }
+      }
+    ]
+  }
+}

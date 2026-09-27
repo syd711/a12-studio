@@ -20,8 +20,11 @@ import java.util.Set;
 
 /**
  * When the Filter Mode is "custom_list", the field selection must be non-empty, its field ids unique,
- * and each one must resolve against the referenced Document Model - not annotated {@code indexed} =
- * false. Mirrors SME's {@code custom_list} filter field rules.
+ * and each one must resolve against the referenced Document Model (or, if set, its {@link
+ * FieldRef#getSubModel()} - a recursive sub-type of that Document Model, gap 5 of "Overview Model: gap
+ * review") - not annotated {@code indexed} = false. A set {@code subModel} must itself resolve to a real
+ * Document Model in the project (SME: {@code mustHaveValidSubModelReference}). Mirrors SME's {@code
+ * custom_list} filter field rules.
  */
 public final class OverviewFilterCustomFieldsValidator implements ModelValidator {
 
@@ -63,10 +66,21 @@ public final class OverviewFilterCustomFieldsValidator implements ModelValidator
     ElementIndex index = new ElementIndex(documentModel, context.otherDocumentModels());
     for (FieldRef field : fields) {
       String fieldId = field.getFieldId();
+      String subModelId = field.getSubModel();
+      ElementIndex fieldIndex = index;
+      if (subModelId != null && !subModelId.isBlank()) {
+        DocumentModel subModel = context.findOtherDocumentModel(subModelId);
+        if (subModel == null || subModel.getContent() == null || subModel.getContent().getModelRoot() == null) {
+          errors.add(new ModelValidationError(model, ELEMENT_ID,
+              ValidationMessages.get("validation.common.fieldReferenceMissing", subModelId), Severity.ERROR.name()));
+          continue;
+        }
+        fieldIndex = new ElementIndex(subModel, context.otherDocumentModels());
+      }
       if (fieldId == null || fieldId.isBlank()) {
         continue;
       }
-      Element element = OverviewElementResolution.resolve(index, fieldId);
+      Element element = OverviewElementResolution.resolve(fieldIndex, fieldId);
       if (element == null) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.common.fieldReferenceMissing", fieldId), Severity.ERROR.name()));

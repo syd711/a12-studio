@@ -5,6 +5,7 @@ import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewMultiSelectionElementValidator;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewSubHeaderElementValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.propertyeditors.AbstractMultiSelectionPanelController;
 import org.jspecify.annotations.NonNull;
@@ -67,6 +68,9 @@ public class OverviewMultiSelectionPanelController extends AbstractMultiSelectio
     }
     List<ModelValidationError> errors =
         Studio.getValidationService().validateElement(model, OverviewMultiSelectionElementValidator.ELEMENT_ID);
+    if (errors.isEmpty()) {
+      errors = Studio.getValidationService().validateElement(model, OverviewSubHeaderElementValidator.MULTI_SELECTION_ELEMENT_ID);
+    }
     if (errors.isEmpty()) {
       hideError();
     }

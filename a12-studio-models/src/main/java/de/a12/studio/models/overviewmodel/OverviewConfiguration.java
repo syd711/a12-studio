@@ -8,7 +8,7 @@ import de.a12.studio.models.Label;
 import lombok.Getter;
 import lombok.Setter;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.IntNode;
+import tools.jackson.databind.node.DoubleNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,9 @@ import java.util.List;
 @Setter
 public class OverviewConfiguration {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean enableFilter;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean showFullTextSearch;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer pagingSize;
@@ -42,12 +44,15 @@ public class OverviewConfiguration {
   private ColumnRef screenReaderColumn;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Integer rowHeight;
-  // Normally a plain integer, but at least one fixture uses a fractional value (e.g. "0.5"); a JsonNode
-  // preserves that original value across a load/save cycle instead of truncating it through an Integer,
-  // the same trick as overviewmodel.Column#width.
+  // A relative width (SME: NumberType, minValue 0.3, one decimal, same unit as Column#width - 1.0 = 150px), but
+  // some files use a whole number (e.g. "1") while real files with a fractional value (0.3/0.4/0.5) also exist;
+  // a JsonNode preserves the original token across a load/save cycle instead of coercing it through a single
+  // numeric representation, the same trick as overviewmodel.Column#width.
   @JsonProperty("actionColumnWidth")
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private JsonNode actionColumnWidthNode;
+
+  public static final double MIN_ACTION_COLUMN_WIDTH = 0.3;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean enableInfiniteScroll;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -56,12 +61,12 @@ public class OverviewConfiguration {
   private List<Label> subtitle = new ArrayList<>();
 
   @JsonIgnore
-  public Integer getActionColumnWidth() {
-    return actionColumnWidthNode == null || actionColumnWidthNode.isNull() ? null : (int) actionColumnWidthNode.asDouble();
+  public Double getActionColumnWidth() {
+    return actionColumnWidthNode == null || actionColumnWidthNode.isNull() ? null : actionColumnWidthNode.asDouble();
   }
 
   @JsonIgnore
-  public void setActionColumnWidth(Integer actionColumnWidth) {
-    actionColumnWidthNode = actionColumnWidth == null ? null : IntNode.valueOf(actionColumnWidth);
+  public void setActionColumnWidth(Double actionColumnWidth) {
+    actionColumnWidthNode = actionColumnWidth == null ? null : DoubleNode.valueOf(actionColumnWidth);
   }
 }

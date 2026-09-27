@@ -76,6 +76,37 @@ public final class DocumentModelHeterogeneity {
     return result;
   }
 
+  /**
+   * The ids of the direct and transitive sub types of {@code superId}, in breadth-first order and without
+   * {@code superId} itself (SME's {@code resolveSubTypesRecursively}, used by the Overview Model's Custom
+   * Selection Of Fields "Subtype" picker - see {@code de.a12.studio.ui.editors.overviewmodel.CustomSelectionOfFieldsPanelController}).
+   * Empty if {@code superId} is not one of {@code documentModels}, or has no sub types at all.
+   */
+  public static List<String> recursiveSubTypes(Collection<? extends A12Model<?>> documentModels, String superId) {
+    Map<String, List<String>> subTypeGraph = new LinkedHashMap<>();
+    for (A12Model<?> model : documentModels) {
+      if (model.getId() != null) {
+        subTypeGraph.put(model.getId(), directSubTypes(documentModels, model.getId()));
+      }
+    }
+    if (superId == null || !subTypeGraph.containsKey(superId)) {
+      return List.of();
+    }
+
+    List<String> result = new ArrayList<>();
+    Set<String> visited = new HashSet<>(List.of(superId));
+    Deque<String> queue = new ArrayDeque<>(List.of(superId));
+    while (!queue.isEmpty()) {
+      for (String next : subTypeGraph.getOrDefault(queue.poll(), List.of())) {
+        if (visited.add(next)) {
+          result.add(next);
+          queue.add(next);
+        }
+      }
+    }
+    return result;
+  }
+
   /** Whether {@code model} is marked {@code abstract} (header annotation {@code abstract = true}). */
   public static boolean isAbstract(A12Model<?> model) {
     if (model == null || model.getAnnotations() == null) {

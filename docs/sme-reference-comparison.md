@@ -85,6 +85,18 @@ DM version 28.6.0→29.0.0, with automatic migration; `modelAlias` is now ignore
 `includeConfig` — which a12-studio already correctly implements — is the actual, current mechanism; the dead
 `GroupConfig.modelAlias` field has been removed.
 
+**Correction (2026-09-27):** "which a12-studio already correctly implements" above overstated it — `includeLevel`
+specifically was never added to `IncludeConfig.java` (confirmed by reading the class: only `reference`,
+`excludeRules`, `excludeComputations`, plus `@JsonIgnoreProperties(ignoreUnknown = true)`, so a real file carrying
+an `includeLevel` key would silently lose it on the next save). Checked against SME's own source
+(`commonDocumentModel/api/elements/{include,group}.ts`): the field is `"SINGLE_RG" | "MODEL_ROOT"`, and it is
+**not** in SME's own Include-authoring form either (`DomainInclude.json` has no such field) — `MODEL_ROOT` is an
+internal marker SME's Additive Document Model uses to mount its base model as a synthetic root-level Include with
+the single-root-group constraint (see the next paragraph) waived; a12-studio's Additive Document Model doesn't
+represent its base model as an Include at all (`AdditiveDocumentModelResolver`), so it has no use for the value.
+Net effect: not an editor-feature gap, but a real lossless-round-trip gap — add the field to `IncludeConfig` (no
+UI, no new validator) the next time round-trip fixtures are touched.
+
 - **Group**: `elements?`, `repeatability`, `indexFieldName?`, `includeConfig?` (Include: reference,
   `excludeRules?`/`excludeComputations?`, `includeLevel`). Special `usageType` variants: `attachment` (fixed field set:
   `original_filename`, `internal_filename`, `content`, `attachment_id`, `size`, `mime_type`, `category`,
@@ -98,6 +110,14 @@ DM version 28.6.0→29.0.0, with automatic migration; `modelAlias` is now ignore
 - **Computation**: `computedFieldRelPath`, `commonPrecondition?`, `computationAlternatives[]` (each with
   `precondition?`/`operation?`, evaluated in order), `roundingMode?`.
 - **TypeDefinition**: a named, reusable `fieldType`, importable from a separate Type Definition Model.
+
+**Correction (2026-09-27):** `roundingMode?` above describes SME's own shape only — `ComputationConfig`/
+`ComputationAlternative` (`a12-studio-models`) has no such field at all, confirmed by reading both classes. This
+is lower-priority than the `includeLevel` gap above: SME's own `DomainComputation.json` carries an explicit
+comment on this exact field ("the field is not shown in the SME, but needs to be in the model, so that it will
+not be overwritten") — it is a round-trip-only value (an `Exact`/`RoundUp`/… enum) with **no editor UI on the SME
+side either**, same bucket as the already-noted `toleranceRangeOp`. No fixture in either repo carries it today, so
+add it as a lossless pass-through field (no UI, no validator) only once a real file turns up needing it.
 
 ### Editor features — gap list
 
@@ -206,6 +226,17 @@ weren't independently confirmable from the documentation available in this repo 
 single unrelated `interpretationOfYear` mention in the QM filtering docs), so no enable/disable or cross-field
 validation logic was guessed at — the controls are always-editable with no gating.
 
+**Resolved (2026-09-27):** the exact conditions are now known, read directly from SME's `DomainField.json`
+meta-model rules: `younger1900`/`youngerThan1900Check` is only valid when `format` contains a year component
+(`OPTIONAL_DATE_TYPE_INVALID`'s sibling rule `YOUNGER1900_CHECK_INVALID`); `interpretationOfYear` is only
+relevant for `DateRange` and is specifically *required* (not just "valid") when `formatDateRange ==
+"DD.MM-DD.MM"` **and** the model is year-based (`INTERPRETATION_OF_YEAR_INVALID`/`_MISSING`); plain
+Date/DateTime/Time's `optionalDateType` is only valid for the three formats `DD.MM.YYYY`/`YYYYMMDD`/`YYYY-MM-DD`,
+while DateRange's own `optionalDateType` is restricted to `FULL` only (stricter — a different rule,
+`OPTIONAL_DATE_RANGE_INVALID`). Still not implemented as gating logic in a12-studio's
+`DataTypeDateFragmentConfigurationPanelController`/`DataTypeDateRangeConfigurationPanelController` (both remain
+always-editable) — see "Document Model: gap review (2026-09-27)" below, gap 10.
+
 **4. DONE (2026-09-06).** `RequirednessConfig.errorMessage` (custom "this field is required" message) could be
 toggled off the default but never authored — `TypeDefinitionPanelController`'s "use default error messages"
 checkbox only *cleared* the list when checked, with no text field to type a replacement into. Fixed via a new
@@ -246,7 +277,87 @@ structural checks (`DMValidationService.kt`'s `checkMissingErrors` family: dangl
 field, duplicate names, missing computed-field target, too-few multi-select enum values, missing TypeDef ref) —
 the gap is not "missing validators," it's "validators correctly demand data that the UI provides no way to enter"
 (see point 1 above). No rule-contradiction/TDG solver exists on either side of this doc's prior analysis, confirmed
-still true.
+still true. **Update (2026-09-27):** the count is now 25 (`RuleConditionSyntaxValidator` added 2026-09-21,
+`CdmQueryRootReferenceValidator`/`CdmRelationshipStepValidator` added 2026-09-23) — see the full numbered list in
+"Document Model: gap review (2026-09-27)" below, which also found several validator **correctness** gaps this
+paragraph's "roughly matches" didn't catch (an over-strict Enumeration rule, and under-strict String/Include/name
+rules).
+
+### Document Model: gap review (2026-09-27)
+
+Full field-by-field and validator-by-validator review, prompted by the same treatment already done for Tree/
+Overview/Application Model. Method: read every rule in SME's Document-Model-editor meta-model
+(`client/resources/models/documentModel/Domain{Field,Group,Rule,Computation,Typedef,ModelConfig,ModelSettings,
+Multiselect,MultiselectField,Attachment,Include,HiddenRoot,AddDocumentModel,CopyDocumentModel,
+EditSupportedCharacters}.json` — these files are themselves Document Models and are SME's actual ground truth for
+every field/validation rule its self-hosting Form-Engine editor generates, not just `.tsx` source) plus the
+backend's hand-coded structural layer (`backend/.../documentModel/features/validation/DMValidationService.kt`),
+against a field/panel/validator inventory of a12-studio's current `documentmodel` package, model classes and
+`DocumentModelValidationService`. SME checkout: `C:\workspace\sme` HEAD `ba2e34687`/2026-03-09 (unchanged since
+the March analysis), kernel schema `modelVersion` 28.4.0 as pinned in the Domain files — a slightly older schema
+than the 29.x+ shape a12-studio's own data model targets (see the `includeConfig`/`modelAlias` correction above),
+so a few of SME's own fields here (`Boolean.trueValue`/`falseValue`, see "Checked, not a gap" below) may themselves
+already be dead weight SME carries only for backward migration, not real gaps to close.
+
+Several strong candidate gaps surfaced by the meta-model read turned out, on checking a12-studio's actual Java
+model and panels directly, to already be built or not applicable — listed first so the numbered list below isn't
+cluttered with false leads:
+
+- **Element `Descriptions` (Internal/External, per-language) already exist and are already wired up.** SME's
+  meta-model gives every element type a `Descriptions` group alongside `Labels`/`HelperText`/`Annotations`; a
+  first pass over SME's side alone suggested this was unmodeled in a12-studio. It isn't: `Element.java` has had
+  `internalDescription`/`externalDescription` (`List<Label>`) from the start, `LocalizedTextPanelController`
+  already has generic `configureInternal()`/`configureExternal()` methods, and every Document Model element editor
+  (`DocumentModel{Field,Group,Include,Attachment,ComputationRule,ValidationRule}EditorController`) already calls
+  them. No action needed.
+- **`BooleanFieldType` correctly has zero options.** SME's `DomainField.json` (this checkout's older schema) shows
+  a `trueValue`/`falseValue` pair with real validation rules (`TRUE_FALSE_EQUALS`/`TRUE_FALSE_INVALID`), which
+  looked like a gap against a12-studio's genuinely empty `BooleanFieldType`. But every occurrence of `type:
+  "ConfirmType"` found in that file is meta-model-internal (a checkbox-shaped meta-field reused on *other*
+  options, e.g. `zeroAllowed`), not the real Boolean field type's own config group — there is no real
+  `BooleanType` options block in this file at all. Confirms the existing correction in "Field-level & validator
+  gap analysis" point 2 above; not a gap.
+- **Type Definition name uniqueness (model-wide) is already checked.** `MissingReferenceValidator`'s
+  `duplicateTypeDefinitionName` check already covers SME's `TYPE_DEF_NAME_DUPLICATED` rule.
+- **Number field's `trait` (Amount/Percent/Permille) is already exposed** on `DataTypeNumberConfigurationPanelController`.
+
+| # | Gap in Studio | What SME does | Effect today |
+|---|---|---|---|
+| **Validator correctness (highest priority — these are wrong answers, not missing ones)** | | | |
+| 1 | **Enumeration per-locale label check is *stricter* than SME (false positives).** `EnumerationTypeConfigValidator.checkLabels` unconditionally requires every enum value to have a label in every model locale | SME's rule is conditional/all-or-nothing (`A12_COUNT_OF_LABELS_INVALID`/`A12_LABEL_FOR_LANGUAGE_MISSING`): labels are optional, but once *any* value has a label in *any* language, *every* value needs one in *every* language | A perfectly valid, unlabeled Enumeration field (legal in SME — labels are opt-in) is flagged as an error in a12-studio purely for existing. Fix: only run the per-locale-coverage check once at least one value already has at least one non-blank label |
+| 2 | **String `noValueValidation` has no cross-validation at all.** `StringTypeConfigValidator` only checks min>max length and the two line-break conflicts | SME additionally requires `linebreaksPermitted` to be explicitly set whenever `noValueValidation` is on, and forbids `pattern`/`minLength`/`hintList` from being set at the same time as `noValueValidation` (only `maxLength` may remain) | A String field can have `noValueValidation=true` together with a `pattern` or `minLength` that then does nothing (silently ignored by the kernel), with no warning the combination is meaningless |
+| **Missing validators** | | | |
+| 3 | **Include validation is missing two of SME's checks.** Only reference-resolves (`MissingReferenceValidator`) and TD-mode (`IncludeTypeDefinitionModeValidator`) exist | SME also requires: (a) the included model declares every locale the including model has ("invalid locales"), (b) the included model has exactly one non-repeatable root group | An Include of a model missing a locale, or of a model with 2+ root groups (or a repeatable one), is accepted with no warning — the third SME Include check, "creates an include loop", is a pre-existing TODO item ("only reported after selection") |
+| 4 | **`ModelConfig.supportedCharacters` has a raw-text panel but no real validator.** `SupportedCharactersPanelController` only reports a JSON-parse error | SME additionally validates each array entry is a single quoted character with no stray whitespace | `["ab", " ", ""]` parses as valid JSON and passes silently, even though none of those entries is a usable single supported character |
+| 5 | **Duplicate element *name* within a group is not checked** (only duplicate *id*, via `DuplicateIdValidator`) | SME's `A12_DUPLICATE_NAME_WITHIN_GROUP` family flags two siblings sharing a display `name` even when their ids differ | Two fields/groups/rules in the same group can have identical names; since relative-path rule/computation expressions resolve by name, this is a real ambiguity risk, not just cosmetic |
+| 6 | **No name-pattern validation on Group/Field/Rule/Computation names** (only blank-check, via `BasicConsistencyValidator`) | SME rejects a leading digit, a leading "xml" (case-insensitive), and dot/colon/mixed sequences (`..`, `::`, `.:`, `:.`) in names | A name like `1Field` or `xmlNote` is accepted; likely low-severity in practice since such names are unusual, but cheap to close alongside gap 5 in the same validator pass |
+| **Round-trip data loss (no UI needed — SME doesn't have UI for these either)** | | | |
+| 7 | `IncludeConfig.includeLevel` is entirely unmodeled and `@JsonIgnoreProperties(ignoreUnknown = true)` silently drops it on load | Real field in SME's persisted shape (`"SINGLE_RG" \| "MODEL_ROOT"`), part of the same kernel A12K-4102 migration that produced `includeConfig` itself — but not present in SME's own Include-authoring form (`DomainInclude.json`) either; `MODEL_ROOT` is an internal marker SME's Additive Document Model uses to mount its base model as a synthetic root-level Include, a mechanism a12-studio's `AdditiveDocumentModelResolver` doesn't need | A file with an explicit `includeLevel` on a regular Include loses it on next save. Add the field for lossless round-trip only — no UI, no validator (see the correction in "Data model" above) |
+| 8 | `ComputationConfig`/`ComputationAlternative.roundingMode` is entirely unmodeled | Real field in SME's shape, but SME's own meta-model comment says it "is not shown in the SME" either — round-trip-only, same bucket as the already-known `toleranceRangeOp` | No fixture in either repo carries it today; lowest priority of the round-trip items, add only if one turns up |
+| **Existing, known gap — now cross-referenced here** | | | |
+| 9 | `DocumentModelContent.documentUniquenessCriteria` (`ContentUniquenessCriterion`, addresses fields by full path string) has zero editor UI and zero validator — distinct from the fully-built `ModelConfig.uniquenessCriteria` (addresses fields by element id). Already flagged in the class's own doc comment as "mapped purely for lossless round-tripping" but not previously listed in this doc | Not independently re-verified against SME's own form for this on this pass | No fixture currently needs it edited; low priority unless a workflow surfaces requiring it |
+| **Lower confidence — re-verify against `DomainField.json` before implementing** | | | |
+| 10 | `DataTypeDateFragmentConfigurationPanelController`/`DataTypeDateRangeConfigurationPanelController`'s "expert" fields have no cross-field gating, even though the exact conditions are now known (see the "Resolved (2026-09-27)" note under point 3 in "Field-level & validator gap analysis" above) | SME gates `younger1900`/`interpretationOfYear`/`optionalDateType` validity on `format`/`formatDateRange` as described there | A DateFragment/DateRange field can have a nonsensical combination (e.g. `younger1900Check` on a format with no year) with no warning |
+| 11 | `NumberTypeConfigValidator` may be missing a `trait=Amount ⇒ maxFractionalDigits==2` rule, a `positivesOnly`-vs-negative-`minValue` conflict, and a `maxIntegerDigits`-vs-`maxValue`-digit-count check; `CustomFieldTypeConfigValidator` has no `minLength>maxLength` check (String's equivalent exists) | `DomainField.json`'s Number rules include `A12_AMOUNT_AND_INVALID_FRACT_DIGITS` and related fractional-digit rules whose exact trigger conditions weren't fully re-derived this pass | Re-verify the precise conditions in `DomainField.json` before adding — don't guess at the exact gating |
+
+**Also checked and found to be a non-issue:** `SchemaVersionValidator`'s errors are model-sourced (`elementId ==
+null`) and `ValidatorRunner` drops model-sourced errors entirely per its own doc comment — this makes the
+validator dead in practice (it can never surface an error to the UI), which may be intentional parity with SME
+(whose own UI only ever surfaces element-level problems) or an accidental dead validator; worth a one-line
+confirmation the next time `ValidatorRunner` is touched, not urgent on its own. Cross-cutting annotation
+duplicate-name checking (SME's `ANNOTATION_DUPLICATE`) has no equivalent for any model type, not just Document
+Model, and is structurally similar to the already-tracked cross-cutting `HeaderRolesValidator` gap
+(`TODO.md`, Application Model section) — worth folding into that same follow-up rather than a
+Document-Model-only fix. Labels/HelperText/Descriptions cannot have SME's "duplicate language row" problem at all
+— `LocalizedTextPanelController` renders one control per declared model locale (`Map<String, TextInputControl>`
+keyed by locale), so the shape that would produce a duplicate simply doesn't exist in this editor's UI.
+
+**Suggested order.** 1 and 2 first (validator *correctness* bugs — one over-strict causing false positives on
+every unlabeled Enumeration field, one silently accepting a meaningless String configuration); 3–6 next (missing
+validators, all cheap, no design work — 5 and 6 are natural to land together as one pass over
+`BasicConsistencyValidator`/name checks); 7–9 whenever round-trip fixtures are next touched (no UI, no urgency); 10
+only if the Date/DateRange "expert" panels are touched anyway; 11 needs a `DomainField.json` re-read first, do not
+guess at the exact gating.
 
 ### Load/save/validate flow (SME reference)
 
@@ -441,7 +552,9 @@ matching SME. Not checked against the real print engine: the regexes are only co
 ## Form Model
 
 *Analyzed 2026-09-06 (the previous version of this section, "Form Model — not started", was written before this
-module existed in a12-studio and is factually wrong — do not trust anything from before this date about Form Model).*
+module existed in a12-studio and is factually wrong — do not trust anything from before this date about Form Model).
+Re-reviewed 2026-09-27 against SME's meta-model `Rule`s directly (not just fixtures/`.tsx`) — see "Form Model: gap
+review (2026-09-27)" near the end of this section for the 9 gaps that surfaced.*
 
 a12-studio's Form Model editor is **substantial, not empty**: 76 data-model classes
 (`a12-studio-models/.../formmodel/`), 92 UI classes (`a12-studio-ui/.../editors/formmodel/`, tree +
@@ -898,6 +1011,68 @@ covered by round-trip tests.**
   UI-component configuration) and `BindingRepeat` (created instead of a plain `Binding` when the dragged
   relationship's target role is to-many). See TODO.md's "Fixed 2026-09-23" entry for the full file list.
 
+### Form Model: gap review (2026-09-27)
+
+Full field-by-field and validator-by-validator re-review, prompted by the same treatment already done for
+Document/Overview/Application/Tree Model. Method: read SME's Form-Model-editor meta-model ground truth
+(`client/resources/models/formModel/FormModelFrame.json` — the graph-level `Rule`s it declares — plus the shared
+mixins it composes, `I_ScreenElementBase.json`, `I_Label.json`, `I_FieldBasedInput.json`,
+`I_RepeatOverviewColumnBase.json`, `I_ButtonStyling.json`, `FieldConfigurationEntry.json`), the 21 hand-written
+`FMCustomConditions` (`client/src/modules/formModel/validation/customConditions/index.ts`), and the BA
+documentation (`docs/modules/formModel/asciidoc/chapter02/02.02_form-model-view.adoc`,
+`chapter03/03.03_common_editor_features.adoc`, `chapter03/03.09_conditionally_hidden.adoc`,
+`chapter04/04_refactoring.adoc`) — against a12-studio's `FormModelValidationService` (30 form validators),
+`FormModelContent`/`FieldConfigEntry`/`LocalizedText` and the `modelsettings`/`formtree` editor packages. Unlike
+the 2026-09-06 build (which worked mostly from fixtures and `.tsx` reads), this pass starts from the meta-model's
+own declared `Rule`s, which is how gaps 1-6 below surfaced — none of them have a real fixture on disk exercising
+them yet, matching the pattern of SME's own rule set (most of these conditions never fire on the sample
+workspaces either).
+
+**Checked, not a gap** (candidates that turned out to already be built): the "General Detached/Inline Repeat
+Settings" and "Rule Confirmation Settings" model-settings panels the BA doc describes all exist
+(`GeneralDetachedRepeatSettingsPanelController`, `GeneralInlineRepeatSettingsPanelController`,
+`RuleConfirmationSettingsPanelController`); `FormModelContent.detachedRepeatCommitButtonEnablement`/
+`inlineRepeatReadonlyPresentation`/`disableRuleConfirmation`/`hideConfirmationSummary` are all wired to a panel.
+`FormButtonScreenReferenceValidator` already checks all four button boxes (`subHeaderBox`/`footerBox` ×
+major/minor, model-level and per-screen) — actually broader than SME's three separate `Rule`s (SME has no
+`subHeaderBox/minorButtons` target check at all; a12-studio's does). Repeat Default Button Labels
+(`Defaults.buttonLabels`, SME's `I_SectionDefaultRepeatButtonLabels-form.json` list) are modeled and wired
+(`FormModelEditorController.loadRepeatDefaultButtonLabels`). `AmountSuffix` itself (static/dynamic, `fieldRef`) is
+fully modeled with a settings panel — only its reference validator is missing (gap 2 below).
+
+| # | Gap in Studio | What SME does | Effect today |
+|---|---|---|---|
+| **Cross-cutting (cheapest, land first)** | | | |
+| 1 | **`HeaderRolesValidator` is not registered in `FormModelValidationService`** (same cross-cutting gap already flagged for Application Model in TODO.md) | SME's `roles` header annotation gets `mustHaveValidRoleValues`/`rolesNotUnique`/`shouldNotHaveEmptyRoles`/`roleIsNotPartOfRolesModel`/etc. on every meta-model including `FormModelFrame.json` (`UniqueRoleCustomCondition` is the Form-specific wiring of the shared rule) | A Form Model's `roles` annotation (duplicate roles, invalid characters, roles absent from the workspace's `access-rights.yaml`) is completely unchecked - one line to close (`FormModelValidationService` already imports the sibling validators; add `new HeaderRolesValidator()` like `TreeModelValidationService`/`ContentModelValidationService` do) |
+| **Missing validators (cheap, same shape as existing ones, land together)** | | | |
+| 2 | **`AmountSuffix.fieldRef` has no reference validator** | `amountSuffixFieldRefMustBeValidReference`: the dynamic Amount Suffix's field reference must resolve to a real, non-repeatable Enumeration field | A dynamic Amount Suffix pointing at a deleted/renamed/wrong-type field is silently accepted |
+| 3 | **`FieldConfigEntry.placeholder` + `exposition` conflict is unchecked** | `graph_mustNotHavePlaceholderWhenFullOrInlineExposition`: a placeholder is meaningless (and rejected) when `exposition` is `FULL` or `INLINE` | A Control can have both set at once with no warning, even though the Form Engine won't show the placeholder |
+| 4 | **`externalEnumeration` + `exposition` conflict is unchecked** | `graph_externalEnumerationExpositionMustBeValid`: once `externalEnumeration.src` is set, `exposition` must be one of `FULL`/`INLINE`/`COMPACT`/`AUTOCOMPLETE` | An External Enumeration field can be left on an incompatible exposition (e.g. the default) with no warning |
+| 5 | **Model-level `styles` list allows duplicate names** | `styleNamesNotUnique` (`RepetitionNotUnique(content/styles/name)`) | `FormStyleReferenceValidator` already checks "no name"/"undefined reference" but not "two style entries with the same name" - the second silently shadows the first wherever it's picked from the combo |
+| 6 | **The header annotation name `bindingConfiguration` is not reserved** | `editor_annotationNameMustNotBeReserved`: SME refuses to let you hand-author an annotation with that name because the Overview Model's binding-purpose resolution reads it as structured JSON (see the `OverviewBindingPurpose`/`bindingConfiguration` note in TODO.md's Overview Model section) | A user typing a `bindingConfiguration` annotation by hand in the raw Annotations panel would silently corrupt the binding-overview resolution for any Overview Model reading it, with no warning at authoring time |
+| **Missing feature (broad blast radius, but a single well-contained validator)** | | | |
+| 7 | **Label-as-Expression has zero validation.** `LocalizedText`/`ExpressionText` (`type: "Multilingual" \| "Expression"`) is already modeled and already editable in the UI for every labeled element - `ControlLabelPanelController`, `RepeatLabelPanelController`, `FormNodeEditorScreenPanelController`/`...SectionPanelController`/`...RowPanelController`, button styling, `FieldConfigEntry`, `RepeatOverviewColumnBase` all reference `LocalizedTextType`/`ExpressionText` - but no validator ever checks the `expressionText` it carries | SME's `I_Label.json` mixin (composed into `I_ScreenElementBase`, `I_FieldBasedInput`, `I_RepeatOverviewColumnBase`, `I_ButtonStyling`, `FieldConfigurationEntry`, `ExpressionCell`, `Row`, `Screen` - i.e. nearly every named element) has two rules: `expressionMustNotBeEmpty` and `expressionMustBeValid` (`ExpressionValidationCustomCondition`, the *same* text-templating "Expression" language a12-studio already built `ExpressionLang.g4` for to check Overview expression columns - see the Overview Model gap review, gap 8) | An element whose Label Type is switched to "Expression" can be left with a blank or syntactically broken expression and shows no error anywhere; a new `FormLabelExpressionValidator` walking every `LocalizedText` field on the tree and reusing the existing `ExpressionLang` syntax checker closes this in one pass across every element type at once |
+| **Missing UI (fields exist for round-trip, no way to author them yet)** | | | |
+| 8 | **"Preprocessing Settings" has no editor panel at all.** `FormModelContent.openNewDocumentPreProcessing`/`openExistingDocumentPreProcessing` exist on the Java model (presumably added for round-trip) but nothing in `a12-studio-ui` ever reads or writes them - no panel, no FXML, no `ModelSettingsDialog` wiring | The BA doc's "Preprocessing Settings" (`chapter02/02.02_form-model-view.adoc`) is a real Model-Settings sub-panel: two 3-way enums (`no preprocessing` / `evaluate computations` / `evaluate computations and dependencies`) controlling whether computations/dependencies run when the Form Engine opens a new vs. an existing document, plus a CDM-specific default note | The setting can never be authored in the studio at all; a value already present in an imported file round-trips silently but is invisible and unreachable in the UI. No real fixture on either side currently sets a non-default value, so this is lower priority than 1-7 - add the panel (mirroring `GeneralDetachedRepeatSettingsPanelController`'s pattern) whenever a fixture needs it, or proactively since the shape is already fully known from the meta-model |
+| **Missing editor convenience (small, purely UX)** | | | |
+| 9 | **No "Copy Hide Condition" / "Paste Hide Condition" context actions.** SME has dedicated context-menu entries and keyboard shortcuts (`Ctrl+H`/`Ctrl+B`) to copy a Hide Condition (master field + selected cases) from one element and paste it onto another, with a replace-confirmation and no compatibility check on paste (`docs/modules/formModel/asciidoc/chapter03/03.09_conditionally_hidden.adoc`, "Copying the Hide Condition") | a12-studio has no equivalent - a Hide Condition must be re-entered by hand on every element, even when copying the exact same condition to several siblings | Pure productivity feature, not a correctness gap; lowest priority of this list |
+
+**Also confirmed still open, not re-litigated here:** the interactive "Commit / Edit / Delete" refactoring dialog
+SME shows when deleting a Screen/Control that's referenced elsewhere (`chapter04/04_refactoring.adoc`, "Example:
+Deleting a Screen") is the same cross-cutting missing feature already tracked as Application Model gap 6 in
+TODO.md ("no within-model refactoring... dialog... for any model type") - Form Model's `FormButtonScreenReferenceValidator`/
+`FormDependentControlContextValidator`/etc. only catch the resulting dangling reference after the fact, as a
+validation error, not interactively at delete time. Not re-listed as a separate numbered gap since the fix belongs
+with that cross-model-type follow-up, not a Form-Model-only patch.
+
+**Suggested order.** 1 first (one line, closes a whole rule family). 2-6 next - all cheap, single-purpose
+validators following the exact shape of existing ones (`FormDatePickerConfigValidator`,
+`FormBindingComponentReferenceValidator`) - land together as one pass. 7 is the highest-value item despite not
+being first: broad blast radius (every labeled element in the model) but genuinely a single new validator class
+reusing the already-built `ExpressionLang` checker, no new grammar or UI work needed. 8 only when a fixture or a
+real workflow needs to author it (the shape is fully known from the meta-model, so there's no discovery risk left,
+only build cost). 9 last - pure editor convenience, no correctness impact.
+
 ---
 
 ## Query Model
@@ -1337,9 +1512,9 @@ query, selection, structural mapping and transformer as `isExperimental()` (chec
 | 7 | **printModel** | Most editor-complex of the print family — relies on an external print-engine component library for the layout canvas. Backend renders PDF only. | **Large editor, disabled.** 28 content classes, an 811-line `PrintModelEditorController`, 7 print validators; no print-engine dependency and no PDF rendering (the old `PrintService`/`DocumentModelResolver`/`PrintParameters` scaffolding was deleted 2026-07-20). Rename/move refactoring rewrites `FieldRef.path`. |
 | 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. | **Typesetting: present, enabled** (2026-09-25): `ModelType.TYPESETTING` (the `model-versions.json` key was `printtypesettings`, which never matched the header's `typesetting`), `TypesettingModel`, an editor with four extracted panels, 4 validators plus the reusable roles validator; see the dedicated "Print Typesetting Model" section. **Print Setting: not present** (deprecated in the platform). |
 | 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model. | **Not present.** |
-| 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side, not blocking other model types. | **Both present, enabled.** Query: see the dedicated section. Overview: `OverviewModelEditorController` + 21 editor files (columns, filter items with per-type options, sub-header slots (every element type - button, search, filter, multi-selection - is editable through one dialog since 2026-09-21, the last three without the button-only Event/Confirmation/Priority/Icon block), initial sorting, styles, query-model link) and 16 overview validators. **Gap review 2026-09-26**: see "Overview Model: gap review" below (the editor covers nearly every SME setting; the gaps are the enumerated-string-filter field list, Subtype, the Action Column Width unit, defaults, and about half of SME's overview rules). |
-| — | **appModel** | Standalone. | **Present, enabled** (`ApplicationModelEditorController` + module/scene/region editors, 3 application validators, wireframe preview via `ApplicationModelPreviewService`, real Preview App deploy). |
-| — | **masterDetailModel** | Standalone. | **Present, enabled** (`MainDetailModelEditorController`, 2 validators; `MasterDetailModuleGenerator` is used by the Preview App deploy). |
+| 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side, not blocking other model types. | **Both present, enabled.** Query: see the dedicated section. Overview: `OverviewModelEditorController` + 21 editor files (columns, filter items with per-type options, sub-header slots (every element type - button, search, filter, multi-selection - is editable through one dialog since 2026-09-21, the last three without the button-only Event/Confirmation/Priority/Icon block), initial sorting, styles, query-model link) and 23 overview validators (16 as of the 2026-09-26 review, +7 new classes since - see below). **Gap review 2026-09-26, updated 2026-09-27**: see "Overview Model: gap review" below - gaps 1, 2, 3, 6, 7, 8, 9 (partial), 10, 11, 12, 13 are closed; open: 4/14 (Query Model handling), 5 (Subtype), 15-17 (metadata fields, picker candidates, structural refactoring). |
+| — | **appModel** | Standalone. | **Present, enabled** (`ApplicationModelEditorController` + module/scene/region editors, 3 application validators, wireframe preview via `ApplicationModelPreviewService`, real Preview App deploy). **Gap review 2026-09-27**: see "Application Model: gap review" below (every SME editor screen has a counterpart; the gaps are round-trip data loss in non-`MasterDetail` `Constraints`, two validator correctness bugs, `HeaderRolesValidator` not wired in, and no within-model rename/delete refactoring for Regions/Scenes/Cases). |
+| — | **masterDetailModel** | Standalone. | **Present, enabled** (`MainDetailModelEditorController`, 2 validators; `MasterDetailModuleGenerator` is used by the Preview App deploy). **Gap review 2026-09-27**: see "Master Detail Model: gap review" below (5 numbered gaps; headline is no heterogeneous/CDM expansion in the Form Mapping candidate lists, which a12-studio already has the building blocks for elsewhere). |
 | — | **treeModel** | Standalone. | **Editor present, enabled** (since 2026-09-25), matching SME 13.0.2/tree model 11.0.0 as of 2026-09-27 - see "Tree Model: full gap review against SME 13.0.2" below for the full write-up. Five tabs (Tree, Node Types, Configuration, Layout, Custom Actions), 17 validators, Row Activation (not the pre-11.0.0 `defaultRowAction`), the Virtual Root, and the column editor's Label/Icon/Alignment/Styles/pin-direction. |
 | — | **contentModel** | Experimental in SME itself. | **Editor present, disabled** (`ContentModelEditorController`, 2 validators; the center renders the model with the real Content Engine in a `WebView`, see "Content Model preview"; the right column mirrors SME's per-type setting panel, see "Content Model property column"). **Gap review 2026-09-26** ("Content Model: gap review"): no Document Model / Base Group setting, new models are seeded without `namespaceVersions`/root props, only 2 structural validators (none of SME's reference, form-element or setting checks), move/duplicate/cut/paste ignore the structure rules, and the editor shows no validation result. |
 | — | **typeDefinitionModel** | Reuses the whole DM editor infrastructure. | **Present, enabled** (`TypeDefintionModelEditorController`; the type-definition mode rules are validated, see the Document Model section). |
@@ -1351,6 +1526,88 @@ query, selection, structural mapping and transformer as `isExperimental()` (chec
 The parked / rejected list for the whole tool lives in `TODO.md` ("Won't do" and "Parked").
 
 ### Overview Model: gap review (2026-09-26)
+
+**Status (2026-09-27): gaps 1, 2, 3, 4, 5, 6, 7, 8, 9 (partial), 10, 11, 12, 13, 14 closed; 15-17 open.** New/changed: `FilterStringFieldsMultiSelectPanelController` gained the
+`enumeratedStringFilter.fields` list editor (String fields only, reusing `CustomSelectionOfFieldsPanelController`'s
+row pattern) plus `OverviewEnumeratedStringFilterValidator` (gap 1). `OverviewConfiguration.actionColumnWidth`
+is now a decimal (`JsonNode`-backed, like `Column.width`) with a real UI field; `Column.MIN_WIDTH`/`OverviewConfiguration.MIN_ACTION_COLUMN_WIDTH`
+(both 0.3) are enforced by `OverviewColumnValidator`/`OverviewInfiniteScrollingValidator` (gap 2). `NewModelFactory.buildOverviewModel`
+now seeds the Subheader (Multi-Selection left, Search+Filter right - bare markers, no `confirmation`/`priority`,
+see the class javadoc for why) and an empty `rowActionGroup` exactly like SME's real `OverviewModelModule.initializeNewOverviewModel`
+(checked directly against `C:\workspace\sme`); `rowActionGroup`/`subHeaderBox`/`footerBox`/`enableFilter`/`showFullTextSearch`
+no longer serialize as literal `null` (gap 3). `OverviewInfiniteScrollingValidator` covers Paging Size/Row
+Height/Action Column Width required-and-minimum; `PagingBehaviourPanelController` seeds Row Height to 49 on
+switching to Infinite Scrolling (gap 10). Initial Sorting duplicates (`OverviewInitialSortingReferenceValidator`)
+and a sortable-reference-columns-only picker (gap 11); Filter Section label-required-while-filter-button-shown
+(`OverviewFilterSectionsValidator`, gap 12); Context Menu group-without-action and Footer `export_excel`
+"Composed Document Models only" warning - not the deeper non-repeatable-CDM half (`OverviewContextMenuValidator`/
+`OverviewFooterExportExcelValidator`, gap 13). `OverviewColumnValidator` covers Width minimum, Preferred-Sorting-
+required, Dynamic-Suffix reference/indexed (gated on `useDynamicSuffix`, not just presence) and column header/
+content Style reference validity+uniqueness; `attachmentDisplayModeIsRequiredForAttachment`/
+`multiSelectDisplayModeIsRequiredForMultiSelect` are explicitly **not** ported - checked directly against the
+SME source, `elementType` (the field these two rules key off) is stripped from every exported file and
+reconstructed on import *from whichever display-mode field is already present*, not by resolving the reference
+against the Document Model, so the semantically live-resolved check Studio would otherwise use is stricter than
+SME's own, real, session-history-dependent rule (proven by 5 real fixtures, e.g. `Company_OM.json`'s "Logo"
+column, that a first cut of this rule flagged and SME itself does not) (gap 9, partial). Gap 8 (expression
+columns): the Column dialog's OK button now requires Name + a syntactically valid Expression for an expression
+column (blank `elementRef`), and `OverviewExpressionColumnValidator` + the header-label-or-icon check
+(`OverviewColumnHeaderLabelOrIconValidator`, extended) enforce the same server-side. The syntax checker is
+**not** `RuleLanguageSyntaxChecker` as this section originally assumed - checked directly against the SME
+source and against all 13 real expression columns in `testing/workspaces` (`RuleLanguageSyntaxChecker` rejects
+every one of them): Overview expression columns use the platform's separate text-templating "Expression"
+language (`kontext`/`case`/multilingual-value constructs, `documentation/2606-06-doc/expression-expression-docs.md`),
+now ported as its own ANTLR grammar (`a12-studio-models/src/main/antlr/de/a12/studio/models/expressionlang/ExpressionLang.g4`,
+`ExpressionLanguageSyntaxChecker`), transcribed directly from that doc's own grammar declaration and verified
+against all 13 real columns. `OverviewBindingPurpose` (gap 7) mirrors SME's `omParser.isBindingOverviewModel`,
+scanning both Form Model Bindings (`modelsSME.availableItemsOverview`/`selectedItemsOverview`) and - a12-studio's
+own addition, since it models this as a distinct Relationship UI Model type rather than folding it into
+`formModel` - `DualPaneSelectionComponent`/`TableListComponent`/`EditConfiguration`. It now backs `OverviewSubHeaderElementValidator`
+(gap 6): the six "element not allowed while the feature is off" rules (Filter/Search/Multi-Selection x major/
+minor slot) plus Filter's own "no element added"/"only one allowed" pair (new - Search's and Multi-Selection's
+existing `OverviewSearchElementValidator`/`OverviewMultiSelectionElementValidator` gained the same `purpose`
+gate instead of a new pair), transcribed rule-by-rule from `OverviewMetaModel.json` rather than the simplified
+"just skip while off" a first reading suggests - Search's off-rule and its own missing/duplicate pair are
+skipped entirely for *either* Binding purpose (replaced, for `available_item` only, by a WARNING with SME's own
+different message, "not supported in Available Items Binding Overview"); Multi-Selection's off-rule and its
+missing/duplicate pair are likewise skipped for either purpose; Filter's off-rule and its missing/duplicate pair
+apply to every purpose *except* `selected_item`. A Custom Filter exemption the literal meta model has no
+equivalent for (SME's own TS types have no `newFilterConfiguration` concept at all, see "wire-shape differences"
+above) was necessary too: a literal port flagged 5 real fixtures (`Person_Ov`, `PersonEmployee_Ov`,
+`PersonFreelancer_Ov`, `All_Skills_Ov`, `Available_Skills_Ov`) whose Filter element the BA doc says a Custom
+Filter overview doesn't need at all. Verified against the whole fixture corpus (every overview file under
+`testing/workspaces`, with real sibling Form/Relationship UI Models in context) before and after: zero findings
+either way. Gaps 4/14 (Query Model handling): `OverviewReferencePanelController.syncModelReferences` now writes
+only `query-model-for-overview` in Query Model mode (every field-reference picker already fell back to the Query
+Model's own `targetDocumentModel` when there was no explicit reference, so nothing else needed to change to stop
+writing the redundant, staleness-prone `document-model-for-overview` one); a new "Add" button next to the Query
+Model picker opens `CreateQueryModelDialogController` (name/location/locales/roles/Target Document Model/a
+"Generate Fields, Paging and Sorting from this Overview Model" checkbox) and `OverviewModelEditorController`
+creates the model and seeds it from the Overview's own reference columns/Paging Size/Initial Sorting -
+`OM_NotValid` is still not ported, per the existing decision. Gap 5 (Subtype): `FieldRef.subModel` is typed now;
+`DocumentModelHeterogeneity.recursiveSubTypes` (new) backs the Custom Selection Of Fields row's Subtype combo,
+which re-points that row's Field picker at the sub-type's own elements and clears a stale `fieldId` when it
+changes; `OverviewFilterCustomFieldsValidator` validates `subModel` itself and resolves `fieldId` through it;
+rename-rewrite is via `ModelReferenceRewriter.REFERENCE_FIELD_NAMES` gaining `"subModel"` rather than a header
+reference (no fixture ever showed what a `sub-document-model-for-overview` reference should look like, and it
+isn't needed for rename-safety - the content-field rewrite already covers that). Not started: 15-17 (metadata
+fields, picker candidate rules, structural refactoring).
+
+**Re-checked with `OverviewBindingPurpose` in hand, still open (found 2026-09-27, needs its own task):**
+`OverviewFieldReferenceValidator`/`OverviewColumnHeaderLabelOrIconValidator`'s pre-existing false positives on
+binding overviews are not one root cause. Four of sixteen (`ProductMovie_OM`, three
+`e-commerce/99_BindingOverviewModels/*` expression columns) have `purpose == null` - those Form Models
+(`ProductBook_FM` and siblings) use a *third* wire shape for their bindings that neither `OverviewBindingPurpose`
+nor the rest of this review accounted for: a header `bindingConfiguration` annotation (a JSON-encoded string,
+`{"type":"relationship","details":{"components":[{"name":"DropDownSelection","models":[{"name":"...",
+"use":"candidate"|"link"}]}]}}` - `candidate`/`link` presumably map to available/selected) plus a plain
+`modelReferences` entry per referenced overview (`purpose: "bindingReference"`, indistinguishable from each
+other without the annotation). Four more (`PersonSkills_Person_Ru_SelectedItems_Ov` and 3 siblings,
+`OverviewFieldReferenceValidator` only) resolve `purpose == selected_item` correctly but still report their
+field missing even though each column already has a `linkReferences` entry (`type: LINK`) that should route
+resolution through the relationship's own link document instead of the primary one - a separate, pre-existing
+bug in `OverviewElementResolution`/`ColumnLinkReference.resolveDocumentModelId`'s link-column resolution, not a
+purpose gap.
 
 Reviewed against SME's `overviewModel` module (`document/omDocument.ts`, `transformations/import|exportTransformations.ts`, `converter/omParser.ts`,
 `omModule.ts`, `references/omReferenceProvider.ts` + `omPaths.ts`, `customConditions/*`, `transformations/overviewRefactoring.ts`), its resource models
@@ -1377,7 +1634,7 @@ Interactive Rows, Subtitle, Subheader and Footer. "Create Overview Model from Se
   Studio keeps what is on disk; that is only listed below where it causes a visible problem.
 - Older-version migration (`OverviewMigrationTool`) is not planned, see "Won't do" in `TODO.md`.
 
-**SME rule coverage** (all rules of `OverviewMetaModel.json`; the "Ported" ones are the 16 overview validators of `OverviewModelValidationService`).
+**SME rule coverage, as reviewed 2026-09-26** (all rules of `OverviewMetaModel.json`; the "Ported" ones were the 16 overview validators of `OverviewModelValidationService` at the time - 23 as of 2026-09-27, see the Status line above for what closed since). The table below is the original review; not updated row-by-row.
 
 | SME rule(s) | Studio |
 |---|---|
@@ -1665,6 +1922,85 @@ types, the model header (id equals filename, suffix, locales, name convention), 
 
 **Open questions.** (i) Severity of the reference checks - see above; the studio should still treat them as errors. (ii) Whether SME guards *Delete* like Cut (only `isCuttable`/`isMovable`/`isDuplicable`/`isPastable` were read). (iii) The exact candidate rule for "fields available from a data
 context" lives in `contentengine-editor` (`candidateFields`/`candidateGroups`); port it from the bundle's behavior against a Document Model with nested repeatable groups rather than guessing (a fixture with base group + Repeatable Group + Conditional is needed - none exists today).
+
+### Application Model: gap review (2026-09-27)
+
+Reviewed against SME's `appModel` module (`document/amDocument.ts`, `amModule.ts`, `transformation/{appModelTransformer,appModelRefactoring,import|exportTransformations}.ts`,
+`references/{amReferenceProviders,amPaths,regionReferenceProvider,sceneProvider,caseProvider}.ts`, `middlewares/onConstraintTypeChangeMiddleware.ts`,
+`customConditions/validJsonCheck.ts`), its docs (`docs/modules/appModel/{01_introduction,02_editor,03_subeditors,04_glossary,05_refactoring}_app_model.adoc`), and every
+`*AppModel*.json`/`*AM.json`/`*AppModelModule.json` fixture under `client/resources` (used to check what actually occurs in practice, not just what the schema
+allows - see the Prior Scene point below). SME's Application Model validation is not a hand-written TypeScript validator set (unlike most other modules) - the
+editor relies on JSON-schema shape plus the reference providers listed above to catch broken references, so there is no `*.ts` validator file to diff against; the
+comparison below is against the kernel meta-model constraints as documented and as observed in fixtures.
+
+**The editor already has a counterpart for every screen in SME's structure diagram** (`02_editor_app_model.adoc`): Region/Subregion/Layout/Default Region
+(`RegionPanelController`/`SubregionsPanelController`/`LayoutPanelController`/`DefaultRegionPanelController`), Initial Activity + descriptor + Skip Data Loading at
+both the model and the per-Menu level (`ActivityPanelController`, used from both `ApplicationModelEditorController` and `ModuleEditorController`), Modules with
+Menu/Child Menu (name, Activity Descriptor, Skip Data Loading, per-locale Label via the shared `LocalizedTextPanelController`, Roles via
+`ModuleRolesPanelController`/`AbstractRolesPanelController`), Flows, Scenes (name, description, Prior Scene, Default Case), Match Conditions, Scene Change
+onEnter/onExit with both directive types (Region Clear: layout name + free-form JSON settings; View Add: component name, Constraints, ordered Models list,
+free-form JSON configuration, Load Data), and Cases (name, per-locale Label, On Enter only - matching SME's "no On Exit for Cases" note). The Model Settings
+screen (Name/Version/Description/Locales/Labels/Roles/Annotations) is the generic `ModelSettingsDialog` shared by every model type, and **SME's "Model
+References" feature (`AppModelSettingsModelReferences`: referencing a Master-Detail Module Model adds a Module with a Master-Detail layout) is already built** -
+`ModelReferencesPanelController` locks the Model Type to `module-masterdetail` for an Application Model, and `MasterDetailModuleGenerator` (used only by
+`PreviewAppDeployer`, mirroring SME's `toFileContentForUpload` doing the expansion only at upload time, not at save time) generates the Module/Flow/Overview-or-Tree-scene/Detail-scenes/menu exactly as `document/masterDetailModule.ts` does. **Cross-model rename propagation is also already built, and more robustly than
+SME's own**: `ModelReferenceRewriter` (generic JSON-tree walk keyed on field name, used by every model type) treats any object with a sibling `modelType` field as
+a `ModelDescriptor` shape and rewrites its `name`/`documentModel`, so renaming a referenced Form/Overview/Document/Tree Model already updates every
+`ViewAddDirective.models[]` entry project-wide - SME's own `refactorAppModel` (`transformation/appModelRefactoring.ts`) does the same but by hand-walking only
+`onEnter`/`onExit` directives, so it is actually narrower. The gaps that remain are round-trip fidelity, two validator correctness bugs, one missing validator, a
+small typo, and within-model refactoring (renaming/deleting a Region/Scene/Case) - listed below.
+
+| # | Gap in Studio | What SME does | Effect today |
+|---|---|---|---|
+| **Round-trip / data model** | | | |
+| 1 | **`Constraints` cannot hold anything but `type`/`preferredWidth`.** `Constraints` (`a12-studio-models/.../applicationmodel/Constraints.java`) is `@JsonIgnoreProperties(ignoreUnknown = true)` with no catch-all map, and `DirectiveDialogController`'s Constraints section only offers a "MasterDetail" combo + Preferred Width field | `constraints` is genuinely free-form JSON on a `ViewAddDirective` - real fixtures carry arbitrary keys (`client/resources/test/modules/appModel/transformation/keepKnownConstraintsProperties/testAppModel.json`: `{"propertyA": "A", "propertyB": "B"}`, and one integration fixture nests a `label` array inside it) alongside the documented `MasterDetail`/`preferredWidth` shape; `onConstraintTypeChangeMiddleware.ts` only strips `type` when switching *away* from MasterDetail, it never assumes the object has no other keys | A View Add directive with non-`MasterDetail` constraints (e.g. Dashboard tile sizing/label config) silently loses those keys the moment the model is loaded and re-saved in the studio, and there is no way to author them through the dialog at all - only by hand-editing the JSON outside the studio. No existing fixture in `testing/workspaces/**` exercises this, so `BasicProjectModelsRoundTripTest` and friends do not catch it |
+| **Validators (`ApplicationModelValidationService`, 3 validators)** | | | |
+| 2 | **Region/Subregion name uniqueness is checked model-wide, not per-parent.** `ApplicationUniqueNamesValidator.collectRegionNames` recurses the whole region tree with one shared `seen` set | The docs are explicit: a Subregion's "name... acts as an identifier and must be unique **among siblings**" (`03_subeditors_app_model.adoc`) - two subregions in different branches of the tree may share a name | A model with, say, two unrelated `"HIDDEN"` subregions under different parents gets a false "not unique" error the user cannot fix by renaming anything meaningfully different |
+| 3 | **`ApplicationViewAddValidator` does not check that a referenced model is the right *type*.** It only calls `context.findOtherModel(descriptor.getName())`/`getDocumentModel()` and checks non-null - `findOtherModel` ignores `ModelType` entirely | SME's reference provider (`getUIModel` in `amReferenceProviders.ts`) filters candidates by the `modelType` sibling (`form`→also `scdmForm`, `overview`→every overview variant, `document`→also combination/transformer) before offering them, and the Document Model reference calculator is filtered to document/combination/transformer types only | A `ModelDescriptor` naming e.g. an Overview Model while declaring `modelType: form` (or a Print Model as a `documentModel`) passes validation silently; the studio only catches "does not exist", never "wrong kind of model" |
+| 4 | **`HeaderRolesValidator` is not registered for Application Models** (`ApplicationModelValidationService`'s validator list has no `HeaderRolesValidator`, unlike Tree/Content/Typesetting's services) | The kernel's shared `ModelHeader` roles rules (invalid characters, duplicates, empty entries, "not in the workspace's roles file") apply to every model's header `roles` annotation, Application Model included (`02_editor_app_model.adoc`'s "Roles" section) | An Application Model's header Roles field (edited via the generic `RolesEditorPanelController` in `ModelSettingsDialog`, so the field itself works) is never actually validated - a typo'd or duplicate role, or one absent from the workspace's roles file, is accepted silently. The same rules also have no equivalent for a Menu/Child Menu's own `permission` roles (`ModuleRolesPanelController` documents this as a deliberate simplification: "minus the roles-file warning") |
+| 5 | *Minor:* **No range check on `Constraints.preferredWidth`** (docs: "a number from 1 to 11"; `preferredWidthField` only restricts input to digits, not the range) | Schema-level restriction to 1-11 | An out-of-range width is accepted and just clips/overflows at render time in the real app; low priority since it is cosmetic in the editor |
+| **Editor: refactoring** | | | |
+| 6 | **No within-model refactoring for Region/Scene/Case rename or delete.** Renaming a subregion (`SubregionsPanelController.editSubregion`), a scene (`SceneDialogController.nameField`) or a case (analogous) writes straight to the model with no scan for other references; deleting one is a plain list removal | SME ships this as a named, documented feature (`05_refactoring_app_model.adoc`, "Within the Model" table): renaming/deleting a Region updates Default Region and every Scene Change directive Region; renaming/deleting a Scene updates other scenes' Prior Scene; renaming/deleting a Case updates the owning Scene's Default Case - each shown in a dialog with a per-reference Commit/Edit/Ignore choice | Renaming or deleting a Region/Scene/Case leaves every `defaultRegion`/directive `region`/`priorScene`/`defaultCase` string that pointed at the old name dangling; the three validators (gap group above) will eventually flag it as "unknown", but only after the fact and with no assisted fix - the user has to hunt down and retype every reference by hand. (a12-studio has no interactive Commit/Edit/Ignore refactoring dialog anywhere yet, for any model type - its existing cross-model rename machinery, `ProjectReferenceRefactoring`/`ModelReferenceRewriter`, always auto-rewrites silently, so a lighter-weight "auto-rewrite + summary" is more consistent with the rest of the codebase than building a new interactive-dialog framework just for this.) |
+| 7 | **Region-valued fields are free-typed, comma-separated text, not a picker.** `DefaultRegionPanelController.defaultRegionField` and `DirectiveDialogController.regionField` are plain `TextField`s (split/joined on `,`) | SME offers a proper dropdown sourced from the actual region tree, shown breadcrumb-style (`› CONTENT › HIDDEN`), built by `regionReferenceProvider` for every region-valued path (`content/defaultRegion`, `.onEnter/region`, `.onExit/region`) | A region name must be retyped exactly by hand every time; a typo is only caught later by `ApplicationSceneGraphValidator`, not prevented while typing, and there's no "pick from the tree" convenience at all |
+| 8 | *Trivial bug:* **`ActivityPanelController.DESCRIPTOR_KEYS` misspells a suggestion**: `"menuEnty"` instead of `"menuEntry"` (SME docs: "instance, model, module, engine and menuEntry") | — | Picking that suggestion from the dropdown produces a descriptor key the runtime engine will not recognize; a one-line fix |
+| 9 | *Low priority:* **Only one level of the Region tree is editable.** `SubregionsPanelController`/`SubregionDialogController` manage only the top-level Region's direct `subRegions`; a subregion's own nested `subRegions` (schema-legal, arbitrary depth) can be neither seen nor added through the UI, though an existing one loaded from disk round-trips unharmed (`editSubregion` only overwrites name/layout, never the subregion's own children) | The region tree is recursive in principle | No real fixture anywhere in the SME resources tree nests past depth 2 (root + one level) - checked programmatically across every `*.json` under `client/resources` - so this is a theoretical schema capability nobody currently uses, not an observed real-world need |
+
+**Not gaps (checked).** Prior Scene is scoped to the owning Flow in both the combo box (`SceneDialogController.priorSceneOptions`) and the validator
+(`ApplicationSceneGraphValidator.checkPriorScene`'s own javadoc states this restriction). SME's `sceneProvider.ts` reference provider is structurally
+model-wide (it excludes only the current scene, not other flows/modules), but a full sweep of every `priorScene` value in every SME fixture found **zero**
+cross-flow references - every real Prior Scene names a scene in the same Flow - so the stricter same-flow scoping matches actual usage and is not a functional
+gap, just a documented, intentional divergence from what the schema would technically allow. Also checked and fine: Match Condition and View-Add-Name suggestion
+lists are editable combo boxes seeded with sensible (if not identical to SME's) defaults, matching the docs' "any value may be entered" framing for both; Layout
+name suggestions (ApplicationFrame/MasterDetail/Dashboard/Stack/Null) are present everywhere SME lists them (`DirectiveDialogController`, `SubregionDialogController`);
+Region/Layout `settings` and View Add `configuration` are already free-form JSON maps that round-trip unknown keys correctly (only `Constraints`, gap 1, doesn't).
+
+**Suggested order.**
+1. **Quick fixes first**: the `"menuEnty"` typo (8) and the `preferredWidth` 1-11 range check (5) - both one-line changes with no design work.
+2. **Round-trip (1)**: give `Constraints` a catch-all `extras`/`Map<String,Object>` (the same trick `ContentConfiguration` and `GenericDirective` already use elsewhere in this codebase) so unknown keys survive load-then-save; extend `DirectiveDialogController`'s Constraints section with a raw-JSON fallback area for non-`MasterDetail` shapes, mirroring how `configurationArea`/`layoutSettingsArea` already work. Add a `testing/workspaces/**` fixture (or a dedicated unit fixture) with non-`MasterDetail` constraints to pin it, since none exists today.
+3. **Validator fixes (2, 3, 4)**: make `ApplicationUniqueNamesValidator.collectRegionNames` scope its `seen` set per parent (a fresh set per recursive call, only compared against that region's own `subRegions`); make `ApplicationViewAddValidator` compare `context.findOtherModel(...).getModelType()`/`findOtherDocumentModel(...)` against `descriptor.getModelType()` before accepting a reference; add `HeaderRolesValidator` to `ApplicationModelValidationService`'s validator list. (The last one is really a cross-cutting gap - most model-type services besides Tree/Content/Typesetting lack it - worth a small follow-up ticket to wire it in everywhere, not just here.)
+4. **Region picker (7)**: extract a small helper that walks `content.region`/`subRegions` into breadcrumb-labelled options (mirroring `regionReferenceProvider`'s shape), and use it to turn `DefaultRegionPanelController`'s and `DirectiveDialogController`'s region fields into editable combo boxes (editable, since "any value may be entered" per the docs) instead of plain text fields.
+5. **Within-model refactoring (6)**, the biggest remaining item: on a Region/Scene/Case rename or delete (`SubregionsPanelController`, `FlowsPanelController`, `CasesPanelController`), scan the model for `content/defaultRegion`, every `Directive.region`, every other Scene's `priorScene`, and the owning Scene's `defaultCase`, and auto-rewrite (rename) or clear (delete) them, then surface what changed in a short summary (toast/dialog) rather than building a full interactive Commit/Edit/Ignore review flow from scratch - consistent with how `ProjectTreeMenuActions.rewriteProjectReferences` already handles cross-model renames silently. A full per-reference review dialog, if ever wanted for closer SME parity, is a separate, larger follow-up that would also benefit every other model type's rename operations, not just this one.
+6. **(6) nested subregion editing (9)** only if a real project ever needs more than one level - no evidence today that it does.
+
+### Master Detail Model: gap review (2026-09-27)
+
+Full review against SME's `masterDetailModel` module (`document/index.ts`, `middlewares.ts`, `references/mdReferenceProviders.ts`, `transformer/masterDetailRefactoring.ts`), its self-hosted meta-model DM (`client/resources/models/masterDetailModel/ModuleMasterDetail.json` - the Document Model that defines the Master Detail Module Model's own JSON schema and every validation rule on it, edited through `ModuleMasterDetailEditor.json`), and the BA doc (`docs/modules/masterDetailModuleModel/index.adoc`, including its dedicated "Heterogeneous Overview Module"/"Tree Module" sections and the `testHeterogeneousModels.ts` cypress test).
+
+**Already solid.** `MainDetailModelEditorController` + its five extracted panels (`MainModelReferencePanelController`, `FormWidthPanelController`, and the `AbstractDocumentFormMappingPanelController` subclasses for Form Mapping/Relationship Editors/Link Document Editors) mirror SME's `formMappingMiddleware`/`syncRelationshipEditors`/`syncLinkDocumentEditors` closely, down to reading the master model's `document-model-for-{overview,tree}` header references the same way `syncFormMappings` does. `MasterDetailReferenceValidator`/`MasterDetailTypeConsistencyValidator` cover every rule in `ModuleMasterDetail.json`'s content group (`overviewModelMustBeSet`/`treeModelMustBeSet`/the four `*MustBeValidReference` rules across all three mapping groups) with correctly field-naming messages. `MasterDetailModuleGenerator` is a faithful, tested port of `document/masterDetailModule.ts` (`MasterDetailModuleGeneratorTest`, 4 tests). Cross-model rename propagation already works and needs no masterDetailModel-specific code: `ModelReferenceRewriter`'s generic field-name-keyed JSON walk already includes `overviewModel`/`treeModel`/`documentModel`/`formModel` in `REFERENCE_FIELD_NAMES`, covering everything SME's own per-model-type `refactorMasterDetail` (`transformer/masterDetailRefactoring.ts`) does by hand. Form Width's 1-11 range is enforced by the Spinner's value factory.
+
+| # | Gap in Studio | What SME does | Effect today |
+|---|---|---|---|
+| 1 | **No heterogeneous (abstract/subtype) or CDM expansion in the Form Mapping / Relationship Editors candidate lists.** `MainDetailModelEditorController.referencedDocumentModelIds`/`relationshipEditorDocumentModelIds` return the master model's `document-model-for-*` header references (respectively a tree node's `documentModelRef`) as-is | `middlewares.ts`'s `resolveAndFilterAbstractDocuments` post-processes that same raw list: a Composed Document Model member is replaced by its query root (`ComposedDocumentModelApi.getSCDMQueryRoot`), and an abstract Document Model (`dmInfo.abstract`) is dropped in favour of its direct sub types, recursively - this is a documented, cypress-tested feature (`testHeterogeneousModels.ts`; BA doc's "Heterogeneous Overview Module"/"Tree Module" sections: "If the super-type Document Model is abstract, it will not appear in the Form Mapping list... Select the correct Form Model for each subtype Document Model") | A Master Detail Module built over a heterogeneous Overview/Tree (any Document Model using the existing `superTypes`/`subTypes` header annotations - see `DocumentModelHeterogeneity`, already used by the Tree Model and Overview Model editors) or a CDM-backed Overview shows one Form Mapping/Relationship Editors row for the abstract or CDM-member id itself, which typically cannot be instantiated or edited directly, instead of one row per concrete subtype/query-root - the module can't be completed as the BA doc describes |
+| 2 | **Binding Overview Models are not excluded from the Overview Model combo.** `MainDetailModelEditorController.overviewModelOptions()` lists every project Overview Model unfiltered | The BA doc is explicit: "Please note that Binding Overview Models are excluded from the list of available references." SME determines this dynamically (`omParser.isBindingOverviewModel`, scanning Form Models for a Binding/BindingRepeat component's Available/Selected Items overview) | The combo offers Overview Models that exist only to back an in-form multi-select widget (typically missing the columns/actions a standalone master list needs) as if they were normal top-level references. a12-studio already ported the detection logic as `OverviewBindingPurpose.resolve(id, ValidationContext)` (`modelsvalidation/validators/overview/`, built for the Overview Model's own gap review) but it is not yet called from any UI code - wiring it into this combo needs a `ValidationContext` built from the `ProjectItem`, which no `a12-studio-ui` code does today either |
+| 3 | **`HeaderRolesValidator` is not registered in `MasterDetailModelValidationService`** | SME's own meta-model DM for this exact model type (`ModuleMasterDetail.json`) carries the identical roles rule set (invalid characters, duplicates, blank entries, "not in the workspace's roles file", "workspace has a roles file so roles are required") that every model header gets | A Master Detail Module's header Roles annotation (edited via the shared `ModelSettingsDialog`, so the field itself works) is accepted with a typo, a duplicate, or a role absent from the workspace's roles file, with no warning. This is the same cross-cutting gap already flagged for the Application Model (gap 4 there) - only `ContentModelValidationService`/`TreeModelValidationService`/`TypesettingModelValidationService` currently register it |
+| 4 | *Minor, defense-in-depth:* **No validator requires a Form Mapping/Relationship Editors/Link Document Editors row's `documentModel`/`formModel` to be non-blank**, only that a non-blank value resolves (`MasterDetailReferenceValidator`) | `ModuleMasterDetail.json` marks both fields `requirednessConfig: absoluteOrRelativeToNextRepAncestor` (required) on all three groups | In practice moot for editor-driven changes (the UI always fills `documentModel` itself and blocks saving via its own inline error when `formModel` is blank), but a hand-edited or imported file with a blank `documentModel`/`formModel` in one of these lists passes model validation silently |
+| 5 | *Minor, cosmetic:* **Form Mapping/Relationship Editors/Link Document Editors panels can go stale without a visible refresh.** `AbstractEditorController.modelSaved` only calls `onDocumentModelChangedElsewhere()` when the model saved elsewhere is a `DocumentModel` | Saving the Overview or Tree Model currently selected as this module's master list elsewhere (e.g. adding a new Document Model reference to it) doesn't retrigger `refreshFormMapping()`, since an Overview/Tree Model save doesn't match `instanceof DocumentModel` | The three mapping panels show a stale candidate list until the tab is closed and reopened; the data on disk is never wrong, and reopening the tab fixes the display, so this is UX polish, not a correctness bug |
+
+**Suggested order.**
+1. **Gap 3 first: one-line fix.** Add `HeaderRolesValidator` to `MasterDetailModelValidationService`'s validator list, same as the Application Model follow-up - worth doing both in the same small change since it's the identical missing line in two services.
+2. **Gap 1, the real feature gap:** give `MainDetailModelEditorController` a helper mirroring `resolveAndFilterAbstractDocuments` - for each raw candidate id, resolve a CDM member via `ComposedDocumentModelResolver.getQueryRootId`, then expand via `TreeHeterogeneity.info(documentModels, id)` + `TreeHeterogeneity.allDocuments(documentModels, info, true)` (already exactly this shape; despite the class name it operates on the plain Document Model super/subtype graph via `DocumentModelHeterogeneity`, not on tree structure) instead of writing new expansion logic. Apply to both `referencedDocumentModelIds` (Form Mapping) and `relationshipEditorDocumentModelIds` (Relationship Editors) - not `linkDocumentEditorDocumentModelIds`, which SME's `syncLinkDocumentEditors` does not expand either. Add a heterogeneous fixture (mirroring the cypress test's `AbstractExample`/`ConcreteExample1`/`ConcreteExample2` shape) since none exists in `testing/workspaces/**` today.
+3. **Gap 2:** add a UI-side way to build a `ValidationContext` from a `ProjectItem` (or a narrower standalone helper that doesn't need the full context) so `OverviewBindingPurpose.resolve` can be called from `overviewModelOptions()` and filtered out; this is the first UI call site for that validator-side utility, so the constructor helper is worth landing in a way other editors can reuse later.
+4. **Gaps 4, 5, last:** low priority, fold in opportunistically next time this editor is touched.
 
 ### One-line descriptions of every other module (for orientation)
 

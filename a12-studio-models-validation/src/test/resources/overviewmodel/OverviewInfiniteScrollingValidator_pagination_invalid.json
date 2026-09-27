@@ -1,0 +1,23 @@
+{
+  "header": {
+    "id": "OverviewInfiniteScrollingValidator_pagination_invalid",
+    "modelType": "overview",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "configuration": {},
+    "columns": [
+      {
+        "id": "column_1",
+        "width": 1,
+        "elementRef": "field_1",
+        "sortable": false
+      }
+    ]
+  }
+}

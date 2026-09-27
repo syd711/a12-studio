@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="root" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="500.0" prefHeight="520.0" styleClass="navigation-panel" stylesheets="@/de/a12/studio/ui/stylesheet.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.a12.studio.ui.editors.overviewmodel.dialogs.CreateQueryModelDialogController">
+   <top>
+      <fx:include fx:id="header" source="/de/a12/studio/ui/components/scene-dialog-header.fxml" />
+   </top>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="dialog-scroll-pane" BorderPane.alignment="CENTER">
+         <content>
+            <VBox maxHeight="1.7976931348623157E308">
+               <children>
+                  <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" />
+                  <Label styleClass="field-label" text="%name">
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="nameField" promptText="%enter_the_query_model_name_here">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+                  <Label styleClass="field-label" text="%location">
+                     <VBox.margin>
+                        <Insets top="12.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ComboBox fx:id="locationCombo" maxWidth="1.7976931348623157E308" promptText="%select_a_location" />
+
+                  <Label styleClass="field-label" text="%target_document_model">
+                     <VBox.margin>
+                        <Insets top="12.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ComboBox fx:id="targetDocumentModelCombo" maxWidth="1.7976931348623157E308" />
+
+                  <CheckBox fx:id="generateFromOverviewField" mnemonicParsing="false" text="%generate_fields_paging_and_sorting_from_this_overview_model">
+                     <VBox.margin>
+                        <Insets top="16.0" />
+                     </VBox.margin>
+                  </CheckBox>
+
+                  <VBox spacing="24.0">
+                     <children>
+                        <fx:include fx:id="locales" source="../../propertyeditors/locales-panel.fxml" />
+                        <fx:include fx:id="roles" source="../../propertyeditors/roles-panel.fxml" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="24.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <bottom>
+      <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" prefWidth="200.0" styleClass="footer-toolbar" BorderPane.alignment="CENTER">
+         <items>
+          <Button fx:id="okButton" defaultButton="true" mnemonicParsing="false" onAction="#onDialogSubmit" styleClass="primary-button" text="%create_model" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#onDialogCancel" styleClass="secondary-button" text="%cancel" />
+         </items>
+      </ToolBar>
+   </bottom>
+</BorderPane>

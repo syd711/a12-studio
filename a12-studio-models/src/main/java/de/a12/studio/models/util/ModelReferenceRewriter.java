@@ -43,12 +43,14 @@ public final class ModelReferenceRewriter {
   // CombinedDocumentModelContent.baseModelId / Mapping Model's MappingTarget.dmId, MappingSource.dmId,
   // PreComputationFragmentRef.dmId, OverallModelRef.dmId / combineddocumentmodel's DocumentModelIdRef.dmId &
   // SelectionModelIdRef.smId / TreeChildRelationshipConfiguration.relationshipModelRef (the Tree's
-  // ExpansionDepth.relationshipModel is covered by "relationshipModel"). "name" is only a reference when its sibling "modelType" marks the object as a
-  // ModelDescriptor - every other "name" in these models (modules, scenes, buttons, ...) must stay untouched.
+  // ExpansionDepth.relationshipModel is covered by "relationshipModel") / overviewmodel's FieldRef.subModel (the
+  // Custom Selection Of Fields "Subtype" column, gap 5 of "Overview Model: gap review"). "name" is only a
+  // reference when its sibling "modelType" marks the object as a ModelDescriptor - every other "name" in these
+  // models (modules, scenes, buttons, ...) must stay untouched.
   public static final Set<String> REFERENCE_FIELD_NAMES = Set.of(
       "documentModel", "overviewModel", "formModel", "documentModelRef", "linkDocumentModel", "reference", "model",
       "treeModel", "targetDocumentModel", "relationshipModel", "baseModelId", "dmId", "smId",
-      "relationshipModelRef");
+      "relationshipModelRef", "subModel");
 
   // See REFERENCE_FIELD_NAMES javadoc above: the one "id"-named reference field, scoped to its wrapper.
   private static final String STRUCTURAL_MAPPING_MODEL_REF_FIELD_NAME = "StructuralMappingModel";

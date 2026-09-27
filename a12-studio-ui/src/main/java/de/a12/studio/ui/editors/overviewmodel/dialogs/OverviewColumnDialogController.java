@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.overviewmodel.dialogs;
 
 import de.a12.studio.models.Label;
+import de.a12.studio.models.expressionlang.ExpressionLanguageSyntaxChecker;
 import de.a12.studio.models.overviewmodel.Alignment;
 import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.ColumnAlignment;
@@ -185,6 +186,16 @@ public class OverviewColumnDialogController implements DialogController {
       validate();
     });
 
+    // expressionMustBeValid's syntax half (SME's own, kernel-backed reference/type half is Open Decision #1).
+    // Overview expression columns use the platform's text-templating "Expression" language (kontext/case/
+    // multilingual-value constructs - documentation/2606-06-doc/expression-expression-docs.md), NOT the
+    // boolean Rule/Computation condition language RuleLanguageSyntaxChecker checks - confirmed by running an
+    // earlier version of this validator against every real fixture expression column, which
+    // RuleLanguageSyntaxChecker rejected outright. Its error blocks OK the same way FilterItemDialogController
+    // gates on its own RuleEditorController's errorProperty().
+    expressionPanelController.setValidator(ExpressionLanguageSyntaxChecker::validate);
+    expressionPanelController.errorProperty().addListener((observable, oldValue, newValue) -> validate());
+
     preferredSortingCombo.setItems(FXCollections.observableArrayList(Column.PREFERRED_SORTING_ASC, Column.PREFERRED_SORTING_DESC));
     preferredSortingCombo.setConverter(displayConverter(value -> Column.PREFERRED_SORTING_ASC.equals(value) ? "Ascending" : "Descending"));
     preferredSortingCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -308,6 +319,7 @@ public class OverviewColumnDialogController implements DialogController {
       if (!updatingFromModel) {
         column.setName(blankToNull(newValue));
       }
+      validate();
     });
     widthField.textProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
@@ -393,7 +405,10 @@ public class OverviewColumnDialogController implements DialogController {
     stylesHeaderController.setColumn(column);
     stylesContentController.setColumn(column);
     iconPanelController.setColumn(column);
-    expressionPanelController.setCustom(column::getExpression, column::setExpression);
+    expressionPanelController.setCustom(column::getExpression, value -> {
+      column.setExpression(value);
+      validate();
+    });
 
     validate();
   }
@@ -479,8 +494,14 @@ public class OverviewColumnDialogController implements DialogController {
   private void validate() {
     boolean expression = TYPE_EXPRESSION.equals(columnTypeCombo.getValue());
     boolean elementRefOk = expression || elementRefCombo.getValue() != null;
+    // expressionNameIsRequired/expressionIsRequired (SME): an expression column needs both a Name and an
+    // Expression; expressionMustBeValid's syntax half is expressionPanelController's own setValidator error
+    // (see initialize()), checked here via its errorProperty().
+    boolean nameOk = !expression || (nameField.getText() != null && !nameField.getText().isBlank());
+    boolean expressionTextOk = !expression || (column.getExpression() != null && !column.getExpression().isBlank());
+    boolean expressionSyntaxOk = !expression || !expressionPanelController.errorProperty().get();
     boolean widthOk = parseWidth(widthField.getText()) != null;
-    okButton.setDisable(!elementRefOk || !widthOk);
+    okButton.setDisable(!elementRefOk || !nameOk || !expressionTextOk || !expressionSyntaxOk || !widthOk);
   }
 
   private ColumnAlignment ensureAlignment() {

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <?import javafx.geometry.Insets?>
 <TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%filter_string_fields_with_multi_select" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -22,6 +25,17 @@
                         <children>
                             <Label styleClass="field-label" text="%paging_size" />
                             <Spinner fx:id="pagingSizeField" editable="true" maxWidth="Infinity" />
+                        </children>
+                    </VBox>
+                    <VBox fx:id="fieldsBox" spacing="8.0">
+                        <children>
+                            <Label styleClass="field-label" text="%field" />
+                            <VBox fx:id="fieldRows" spacing="8.0" />
+                            <Label fx:id="fieldsEmptyLabel" styleClass="placeholder-label" text="%no_custom_fields_defined" />
+                            <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAdd" styleClass="primary-button" text="%add_custom_field" >
+                                <graphic><FontIcon styleClass="button-icon" iconLiteral="mdi2p-plus" iconSize="16" /></graphic>
+                                <tooltip><Tooltip text="%add_custom_field" /></tooltip>
+                            </Button>
                         </children>
                     </VBox>
                 </children>

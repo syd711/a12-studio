@@ -16,8 +16,11 @@ public class OverviewModelContent {
   private OverviewConfiguration configuration = new OverviewConfiguration();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Column> columns = new ArrayList<>();
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private RowActionGroup rowActionGroup;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private ElementBox subHeaderBox;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private ElementBox footerBox;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private RowAction defaultRowAction;
