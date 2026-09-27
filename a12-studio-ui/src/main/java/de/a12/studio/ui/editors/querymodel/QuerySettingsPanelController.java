@@ -54,7 +54,7 @@ public class QuerySettingsPanelController {
   }
 
   private List<DocumentModel> documentModelOptions() {
-    return ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    return ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem);
   }
 
   private void handleTargetModelSelectionChanged() {

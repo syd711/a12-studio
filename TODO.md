@@ -122,8 +122,15 @@ Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap revie
 - Filter expressions are only existence-checked; type and enum-value checking is not done, and there are no "did you mean" candidates.
 - `QueryFieldReferenceValidator` (the `fields[]` projection) still accepts `indexed = false` fields, and the tree checkbox does not disable them.
 - The Model Tree tab's root DM is picked in the Settings tab, not through an ER-diagram picker like SME.
-- **Gap review 2026-09-27** (see "Gap review (2026-09-27)" under "Query Model" in `docs/sme-reference-comparison.md`): a Combination Model can't be picked as a Query target at all — `QuerySettingsPanelController.documentModelOptions()` and `QueryElementResolution.targetDocumentModel()` both need the same Combination-aware helper/resolution Overview Model already has; a role rename propagates to the structured `constraint`/`QueryLink`/`QuerySort` tree (`RoleRenameRefactoring`, since 2026-09-22) but not to a `Has("<relationship>", "<role>", ...)` call written as free-text `filterDefinition` — the two representations of the same filter disagree after a role rename until re-saved from the text side.
+- A role rename propagates to the structured `constraint`/`QueryLink`/`QuerySort` tree (`RoleRenameRefactoring`, since 2026-09-22) but not to a `Has("<relationship>", "<role>", ...)` call written as free-text `filterDefinition` — the two representations of the same filter disagree after a role rename until re-saved from the text side.
 - `HeaderRolesValidator` gap fixed 2026-09-27 (this pass) — see "Open issues" above.
+- **Fixed 2026-09-27 (this pass):** a Combination Model can now be picked and resolved as a Query target -
+  `QuerySettingsPanelController.documentModelOptions()` now offers combinations too
+  (`ProjectDocumentModels.getOtherDocumentModelsWithCombinations`), `QueryModelTreeController.resolveTargetDocumentModel()`
+  resolves through the same combination-aware helper for the Model Tree tab, and
+  `QueryElementResolution.targetDocumentModel()` (shared by the field/sort/filter/aggregation validators) now falls
+  back to `CombinedDocumentModelElements.resolveForFieldReferences` the same way Overview/Content Model already do.
+  New `QueryModelCombinationTargetTest` pins it against the real `advanced_new/PersonEmployee_Cm` fixture.
 
 ### Form Engine preview (built 2026-09-25, see "Form Engine preview" in `docs/sme-reference-comparison.md`)
 - Theme and Data menus of the preview are empty: offer the project's `.theme` files (`request-theme` -> `send-theme`) and sample documents (`request-document` -> `send-document`) from `form-engine-bootstrap.js`/`PreviewServer`; decide whether edits made in the preview (`create-document`/`update-document`) may be saved.

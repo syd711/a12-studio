@@ -139,11 +139,7 @@ public class QueryModelTreeController implements Initializable {
   }
 
   private void resolveTargetDocumentModel() {
-    String targetId = content().getTargetDocumentModel();
-    targetDocumentModel = ProjectDocumentModels.getOtherDocumentModels(projectItem).stream()
-        .filter(dm -> dm.getId().equals(targetId))
-        .findFirst()
-        .orElse(null);
+    targetDocumentModel = ProjectDocumentModels.resolveDocumentModelForFieldReferences(content().getTargetDocumentModel());
   }
 
   /**

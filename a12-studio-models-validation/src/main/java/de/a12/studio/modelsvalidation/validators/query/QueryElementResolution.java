@@ -1,5 +1,6 @@
 package de.a12.studio.modelsvalidation.validators.query;
 
+import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.querymodel.QueryModel;
@@ -19,12 +20,19 @@ public final class QueryElementResolution {
   private QueryElementResolution() {
   }
 
-  /** The Document Model {@code content.targetDocumentModel} refers to, or null if unset/unresolved. */
+  /** The Document Model {@code content.targetDocumentModel} refers to - a Combination Model's synthetic merge
+   * ({@link CombinedDocumentModelElements#resolveForFieldReferences}) if it names one instead of a plain Document
+   * Model - or null if unset/unresolved. */
   public static DocumentModel targetDocumentModel(QueryModel model, ValidationContext context) {
     if (model.getContent() == null) {
       return null;
     }
-    return context.findOtherDocumentModel(model.getContent().getTargetDocumentModel());
+    String targetDocumentModel = model.getContent().getTargetDocumentModel();
+    DocumentModel direct = context.findOtherDocumentModel(targetDocumentModel);
+    if (direct != null || targetDocumentModel == null || context.projectItem() == null) {
+      return direct;
+    }
+    return CombinedDocumentModelElements.resolveForFieldReferences(context.projectItem(), targetDocumentModel);
   }
 
   /** Resolves an absolute "/"-separated field path (as stored in {@code fields[]}/{@code sortBy.field}) against
