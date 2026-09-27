@@ -1,0 +1,64 @@
+{
+  "header": {
+    "id": "ContentUniquenessCriteriaValidator_valid",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "ContentUniquenessCriteriaValidator_valid",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_root",
+          "name": "Root",
+          "Group": {
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_1",
+                "name": "Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Name"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "documentUniquenessCriteria": [
+      {
+        "name": "NameMustBeUnique",
+        "fields": [
+          {
+            "fullName": "/Root/Name"
+          }
+        ]
+      }
+    ]
+  }
+}

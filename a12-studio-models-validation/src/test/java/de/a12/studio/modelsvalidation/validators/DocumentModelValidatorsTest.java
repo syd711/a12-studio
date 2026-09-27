@@ -643,4 +643,25 @@ class DocumentModelValidatorsTest {
     assertEquals(1, errors.size());
     assertEquals("typedef_timestamp", errors.get(0).elementId());
   }
+
+  @Test
+  void contentUniquenessCriteriaValidatorReportsBlankNameDuplicateNameMissingFieldsAndUnresolvableField() {
+    DocumentModel model = load("ContentUniquenessCriteriaValidator_invalid");
+    List<ModelValidationError> errors = new ContentUniquenessCriteriaValidator().validate(model, TestModels.context(model));
+
+    assertEquals(4, errors.size(), () -> "Unexpected errors: " + errors);
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("name")), "Blank name must be reported");
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Duplicate")
+        && error.message().toLowerCase().contains("more than once")), "Duplicate name must be reported once");
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("at least one field")), "Empty fields list must be reported");
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("/Root/DoesNotExist")), "Unresolvable field path must be reported");
+  }
+
+  @Test
+  void contentUniquenessCriteriaValidatorAcceptsAResolvableCriterion() {
+    DocumentModel model = load("ContentUniquenessCriteriaValidator_valid");
+    List<ModelValidationError> errors = new ContentUniquenessCriteriaValidator().validate(model, TestModels.context(model));
+
+    assertTrue(errors.isEmpty(), () -> "Unexpected errors: " + errors);
+  }
 }

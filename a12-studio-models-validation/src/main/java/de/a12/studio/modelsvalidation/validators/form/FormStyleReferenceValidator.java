@@ -11,13 +11,16 @@ import de.a12.studio.modelsvalidation.ValidationMessages;
 import de.a12.studio.modelsvalidation.validators.ModelValidator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Every style an element uses ({@code style}/{@code headerStyle}) must be defined in the model-level styles
  * of the Model Settings, and every entry needs a name - SME picks style names from that list, so a dangling
- * one is a broken reference. Reports one error per use, on the element that holds it, naming the style.
+ * one is a broken reference. Reports one error per use, on the element that holds it, naming the style. Also
+ * flags two model-level style entries sharing the same name (SME's {@code styleNamesNotUnique}) - the second
+ * would otherwise silently shadow the first wherever it's picked from the combo.
  */
 public final class FormStyleReferenceValidator implements ModelValidator {
 
@@ -30,10 +33,16 @@ public final class FormStyleReferenceValidator implements ModelValidator {
       return List.of();
     }
     List<ModelValidationError> errors = new ArrayList<>();
+    Set<String> seenNames = new HashSet<>();
+    Set<String> reportedDuplicates = new HashSet<>();
     for (Style style : formModel.getContent().getStyles()) {
       if (style.getName() == null || style.getName().isBlank()) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.formStyle.definitionWithoutName"), Severity.ERROR.name()));
+      }
+      else if (!seenNames.add(style.getName()) && reportedDuplicates.add(style.getName())) {
+        errors.add(new ModelValidationError(model, ELEMENT_ID,
+            ValidationMessages.get("validation.formStyle.duplicateName", style.getName()), Severity.ERROR.name()));
       }
     }
 

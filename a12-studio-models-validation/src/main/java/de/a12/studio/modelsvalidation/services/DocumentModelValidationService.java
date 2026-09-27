@@ -6,6 +6,7 @@ import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
 import de.a12.studio.modelsvalidation.validators.AttachmentGroupValidator;
 import de.a12.studio.modelsvalidation.validators.BasicConsistencyValidator;
+import de.a12.studio.modelsvalidation.validators.ContentUniquenessCriteriaValidator;
 import de.a12.studio.modelsvalidation.validators.CustomFieldTypeConfigValidator;
 import de.a12.studio.modelsvalidation.validators.DateFormatConfigValidator;
 import de.a12.studio.modelsvalidation.validators.DuplicateIdValidator;
@@ -67,7 +68,8 @@ public final class DocumentModelValidationService {
       new SupportedCharactersValidator(),
       new RuleConditionSyntaxValidator(),
       new CdmQueryRootReferenceValidator(),
-      new CdmRelationshipStepValidator()));
+      new CdmRelationshipStepValidator(),
+      new ContentUniquenessCriteriaValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

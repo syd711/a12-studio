@@ -1,0 +1,27 @@
+{
+  "header": {
+    "id": "FormReservedAnnotationNameValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "bindingConfiguration",
+        "value": "{}"
+      }
+    ]
+  },
+  "content": {
+    "screens": [],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

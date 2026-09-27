@@ -1,0 +1,33 @@
+{
+  "header": {
+    "id": "FormAmountSuffixFieldRefValidator_valid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "DependencyDrift_DM"
+      }
+    ]
+  },
+  "content": {
+    "amountSuffix": {
+      "type": "dynamic",
+      "fieldRef": "field_enum"
+    },
+    "screens": [],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

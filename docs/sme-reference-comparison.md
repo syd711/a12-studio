@@ -285,8 +285,8 @@ rules).
 
 ### Document Model: gap review (2026-09-27)
 
-**Status (2026-09-27): gaps 1-6 closed, plus the separately-tracked Include-loop picker item ("Features" in
-TODO.md); 7-11 still open (7-9 no UI needed/low priority, 10-11 need a `DomainField.json` re-read first).**
+**Status (2026-09-27): gaps 1-6 and 9 closed, plus the separately-tracked Include-loop picker item ("Features" in
+TODO.md); 7, 8, 10, 11 still open (7-8 no UI needed/low priority, 10-11 need a `DomainField.json` re-read first).**
 `EnumerationTypeConfigValidator.checkLabels` now only runs once at least one enum value already has at least
 one non-blank label (gap 1); `StringTypeConfigValidator` now requires `linebreaksPermitted` to be explicitly
 set whenever `noValueValidation` is on and rejects `pattern`/`minLength`/`hintList` alongside it (gap 2); new
@@ -356,8 +356,8 @@ cluttered with false leads:
 | **Round-trip data loss (no UI needed — SME doesn't have UI for these either)** | | | |
 | 7 | `IncludeConfig.includeLevel` is entirely unmodeled and `@JsonIgnoreProperties(ignoreUnknown = true)` silently drops it on load | Real field in SME's persisted shape (`"SINGLE_RG" \| "MODEL_ROOT"`), part of the same kernel A12K-4102 migration that produced `includeConfig` itself — but not present in SME's own Include-authoring form (`DomainInclude.json`) either; `MODEL_ROOT` is an internal marker SME's Additive Document Model uses to mount its base model as a synthetic root-level Include, a mechanism a12-studio's `AdditiveDocumentModelResolver` doesn't need | A file with an explicit `includeLevel` on a regular Include loses it on next save. Add the field for lossless round-trip only — no UI, no validator (see the correction in "Data model" above) |
 | 8 | `ComputationConfig`/`ComputationAlternative.roundingMode` is entirely unmodeled | Real field in SME's shape, but SME's own meta-model comment says it "is not shown in the SME" either — round-trip-only, same bucket as the already-known `toleranceRangeOp` | No fixture in either repo carries it today; lowest priority of the round-trip items, add only if one turns up |
-| **Existing, known gap — now cross-referenced here** | | | |
-| 9 | `DocumentModelContent.documentUniquenessCriteria` (`ContentUniquenessCriterion`, addresses fields by full path string) has zero editor UI and zero validator — distinct from the fully-built `ModelConfig.uniquenessCriteria` (addresses fields by element id). Already flagged in the class's own doc comment as "mapped purely for lossless round-tripping" but not previously listed in this doc | Not independently re-verified against SME's own form for this on this pass | No fixture currently needs it edited; low priority unless a workflow surfaces requiring it |
+| **Fixed 2026-09-27** | | | |
+| 9 | ~~`DocumentModelContent.documentUniquenessCriteria` (`ContentUniquenessCriterion`, addresses fields by full path string) has zero editor UI and zero validator~~ — distinct from the fully-built `ModelConfig.uniquenessCriteria` (addresses fields by element id) | Not independently re-verified against SME's own form for this; `ContentUniquenessCriteriaPanelController`/`ContentUniquenessCriterionDialogController` follow `DocumentUniquenessCriteriaPanelController`'s shape exactly, just keying Fields by full path (`ElementIndex.getPath`/`resolveAbsolutePath`) instead of element id, and `ContentUniquenessCriteriaValidator` checks name required/unique, ≥1 field, and every field path resolves — no SME source confirms the Required/non-repeatable *eligibility* restriction the other dialog has, so that restriction was deliberately not copied over | The real `advanced_new/models/10_People/Person_Dc.json` fixture (`PersonIDMustBeUnique`, fields `/Person/Type`/`/Person/PersonID`) is now editable and validated, not just silently round-tripped |
 | **Lower confidence — re-verify against `DomainField.json` before implementing** | | | |
 | 10 | `DataTypeDateFragmentConfigurationPanelController`/`DataTypeDateRangeConfigurationPanelController`'s "expert" fields have no cross-field gating, even though the exact conditions are now known (see the "Resolved (2026-09-27)" note under point 3 in "Field-level & validator gap analysis" above) | SME gates `younger1900`/`interpretationOfYear`/`optionalDateType` validity on `format`/`formatDateRange` as described there | A DateFragment/DateRange field can have a nonsensical combination (e.g. `younger1900Check` on a format with no year) with no warning |
 | 11 | `NumberTypeConfigValidator` may be missing a `trait=Amount ⇒ maxFractionalDigits==2` rule, a `positivesOnly`-vs-negative-`minValue` conflict, and a `maxIntegerDigits`-vs-`maxValue`-digit-count check; `CustomFieldTypeConfigValidator` has no `minLength>maxLength` check (String's equivalent exists) | `DomainField.json`'s Number rules include `A12_AMOUNT_AND_INVALID_FRACT_DIGITS` and related fractional-digit rules whose exact trigger conditions weren't fully re-derived this pass | Re-verify the precise conditions in `DomainField.json` before adding — don't guess at the exact gating |
@@ -377,9 +377,9 @@ keyed by locale), so the shape that would produce a duplicate simply doesn't exi
 **Suggested order.** 1 and 2 first (validator *correctness* bugs — one over-strict causing false positives on
 every unlabeled Enumeration field, one silently accepting a meaningless String configuration); 3–6 next (missing
 validators, all cheap, no design work — 5 and 6 are natural to land together as one pass over
-`BasicConsistencyValidator`/name checks); 7–9 whenever round-trip fixtures are next touched (no UI, no urgency); 10
-only if the Date/DateRange "expert" panels are touched anyway; 11 needs a `DomainField.json` re-read first, do not
-guess at the exact gating.
+`BasicConsistencyValidator`/name checks); 9 done (real fixture surfaced needing it); 7, 8 whenever round-trip
+fixtures are next touched (no UI, no urgency); 10 only if the Date/DateRange "expert" panels are touched anyway;
+11 needs a `DomainField.json` re-read first, do not guess at the exact gating.
 
 ### Load/save/validate flow (SME reference)
 
@@ -1200,6 +1200,16 @@ the 2026-09-06 build (which worked mostly from fixtures and `.tsx` reads), this 
 own declared `Rule`s, which is how gaps 1-6 below surfaced — none of them have a real fixture on disk exercising
 them yet, matching the pattern of SME's own rule set (most of these conditions never fire on the sample
 workspaces either).
+
+**Status (2026-09-27): gaps 1-7 closed; 8 (only when needed) and 9 (pure UX) still open.** `HeaderRolesValidator`
+is now registered in `FormModelValidationService` (gap 1); `FormAmountSuffixFieldRefValidator`,
+`FormPlaceholderExpositionConflictValidator`, `FormExternalEnumerationExpositionValidator`, a duplicate-name
+check added to `FormStyleReferenceValidator`, and new `FormReservedAnnotationNameValidator` close gaps 2-6;
+new `FormLabelExpressionValidator` (backed by a new `FormLabelExpressions` reflective-walk helper in
+`a12-studio-models`, mirroring `FormStyleReferences`'s own reflective walk over `List<Style>` fields but for
+`LocalizedText`-typed fields instead) closes gap 7, reusing the `ExpressionLang` syntax checker built for
+Overview expression columns - no new grammar work needed, confirming the "single well-contained validator"
+framing below. Pinned by 9 new tests in `FormValidatorsTest`.
 
 **Checked, not a gap** (candidates that turned out to already be built): the "General Detached/Inline Repeat
 Settings" and "Rule Confirmation Settings" model-settings panels the BA doc describes all exist

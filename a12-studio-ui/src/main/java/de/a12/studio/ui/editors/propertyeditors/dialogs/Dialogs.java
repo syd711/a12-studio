@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.propertyeditors.dialogs;
 import de.a12.studio.ui.util.StudioBundle;
 
 import de.a12.studio.models.overviewmodel.OverviewButtonLike;
+import de.a12.studio.models.documentmodel.ContentUniquenessCriterion;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentUniquenessCriterion;
 import de.a12.studio.models.util.JsonSettings;
@@ -69,6 +70,25 @@ fxmlLoader.setResources(StudioBundle.getBundle());
     String title = criterion == null ? StudioBundle.get("new_uniqueness_criterion") : StudioBundle.get("edit_uniqueness_criterion");
     Stage stage = WidgetFactory.createDialogStage("uniqueness-criterion-dialog", fxmlLoader, owner, title);
     DocumentUniquenessCriterionDialogController controller = (DocumentUniquenessCriterionDialogController) stage.getUserData();
+    controller.initDialog(stage, model, criterion, usedNames);
+    WidgetFactory.installResizable(stage);
+
+    stage.showAndWait();
+    return controller.getResult();
+  }
+
+  /**
+   * @param criterion the criterion to edit, or {@code null} to create a new one (an empty dialog).
+   * @param usedNames every other criterion's name already in use on {@code model}, so the dialog can reject a
+   *                   duplicate {@link ContentUniquenessCriterion#getName()}.
+   */
+  public static Optional<ContentUniquenessCriterion> showContentUniquenessCriterion(Stage owner, DocumentModel model,
+                                                                                       ContentUniquenessCriterion criterion, Set<String> usedNames) {
+    FXMLLoader fxmlLoader = new FXMLLoader(ContentUniquenessCriterionDialogController.class.getResource("content-uniqueness-criterion-dialog.fxml"));
+fxmlLoader.setResources(StudioBundle.getBundle());
+    String title = criterion == null ? StudioBundle.get("new_content_uniqueness_criterion") : StudioBundle.get("edit_content_uniqueness_criterion");
+    Stage stage = WidgetFactory.createDialogStage("content-uniqueness-criterion-dialog", fxmlLoader, owner, title);
+    ContentUniquenessCriterionDialogController controller = (ContentUniquenessCriterionDialogController) stage.getUserData();
     controller.initDialog(stage, model, criterion, usedNames);
     WidgetFactory.installResizable(stage);
 

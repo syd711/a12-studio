@@ -45,19 +45,17 @@ below are its gap numbers). This is a follow-up to the already-mature 2026-09-06
 Screen/Section/Control/Repeat/Binding coverage) — several strong-looking candidates checked out as already built
 (General Detached/Inline Repeat Settings, Rule Confirmation Settings, Repeat Default Button Labels, `AmountSuffix`
 itself) — see the doc's "Checked, not a gap" list before assuming something is missing.
-- **Gap 1 first: one line.** `HeaderRolesValidator` is not registered in `FormModelValidationService` - the same
-  cross-cutting gap already tracked for Application Model above; wire both from the same follow-up.
-- **Gaps 2-6: missing validators, cheap, land together.** `AmountSuffix.fieldRef` has no reference check; a
-  `FieldConfigEntry`'s `placeholder` + `exposition=FULL/INLINE` conflict and `externalEnumeration` +
-  incompatible `exposition` are both unchecked; the model-level `styles` list allows duplicate names
-  (`FormStyleReferenceValidator` only catches "no name"/"undefined", not "two entries, same name"); the header
-  annotation name `bindingConfiguration` (reserved - the Overview Model's binding-purpose resolution reads it) can
-  be hand-typed with no warning.
-- **Gap 7, highest value despite not being first: Label-as-Expression has zero validation.** `LocalizedText`/
-  `ExpressionText` is already modeled and already editable across nearly every labeled element (Screen, Section,
-  Row, Control, RepeatOverviewColumn, ButtonStyling, FieldConfigEntry, ...), but nothing checks the expression text
-  it carries for blank/invalid syntax - a single new validator reusing the already-built `ExpressionLang` grammar
-  (built for Overview expression columns) closes it across every element type at once.
+**Fixed 2026-09-27 (gaps 1-7):** `HeaderRolesValidator` is now registered in `FormModelValidationService` (gap 1);
+five new validators land together (gaps 2-6) - `FormAmountSuffixFieldRefValidator` (the dynamic `AmountSuffix.fieldRef`
+must resolve to a real, non-repeatable Enumeration field), `FormPlaceholderExpositionConflictValidator`
+(`FieldConfigEntry.placeholder` is rejected once `exposition` is `FULL`/`INLINE`), `FormExternalEnumerationExpositionValidator`
+(`externalEnumeration` requires `exposition` to be `FULL`/`INLINE`/`COMPACT`/`AUTOCOMPLETE`), `FormStyleReferenceValidator`
+gained a duplicate-style-name check, and new `FormReservedAnnotationNameValidator` flags a hand-typed header
+`bindingConfiguration` annotation (already hidden from `AnnotationsPanelController`'s own rows, but nothing stopped
+it from being typed until now). Gap 7 (highest value): new `FormLabelExpressionValidator` + `FormLabelExpressions`
+(a `FormStyleReferences`-style reflective walk of every `LocalizedText`-typed field on the model) close Label-as-
+Expression validation across every labeled element at once, reusing the `ExpressionLang` syntax checker already
+built for Overview expression columns. Pinned by new tests in `FormValidatorsTest`.
 - **Gap 8, only when needed:** "Preprocessing Settings" (`FormModelContent.openNewDocumentPreProcessing`/
   `openExistingDocumentPreProcessing`) has fields on the Java model but zero editor panel - the shape is fully known
   from the meta-model, no fixture currently needs a non-default value.
@@ -80,7 +78,7 @@ Full review 2026-09-27 against SME's Document-Model meta-model (`Domain{Field,Gr
 
 **Fixed 2026-09-27 (gaps 1-6, and the Include-loop picker item below):** see "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md` for the full write-up. Headlines: `EnumerationTypeConfigValidator`'s per-locale label check is now conditional (only once *any* value already has *any* label, matching SME instead of flagging every valid unlabeled Enumeration field); `StringTypeConfigValidator` now requires `linebreaksPermitted` to be explicitly set whenever `noValueValidation` is on, and rejects `pattern`/`minLength`/`hintList` set alongside it; new `IncludeStructureValidator` ports SME's other two Include checks (included model must declare every locale this model has, must have exactly one non-repeatable root group); new `SupportedCharactersValidator` requires every `ModelConfig.supportedCharacters` entry to be exactly one non-whitespace character; `BasicConsistencyValidator` gained the Group/Field/Rule/Computation name-pattern check (no leading digit, no leading "xml", no `..`/`::`/`.:`/`:.`) - gap 5 (duplicate element name within a group) turned out to already be implemented (`MissingReferenceValidator.getElementsWithDuplicatedNames`, wired since before this review), just untested; pinned with a new regression test. The Include-loop picker item (SME's `createsIncludeLoop`) is also fixed: `TransitiveTypeDefinitions.includedModelIds` (the Include-only twin of the existing `importedModelIds`, used the same way) now backs a loop-prevention filter in both `IncludeDialogController.includableModels` and `IncludePropertiesPanelController.includableModelIds` - a candidate that already includes, directly or transitively, the model being edited no longer appears in either picker.
 - **Gaps 7, 8: round-trip-only fields, no UI needed (SME has none either).** `IncludeConfig.includeLevel` and `ComputationConfig`/`ComputationAlternative.roundingMode` are both unmodeled in the Java classes and silently dropped on load; add only for lossless round-trip when a real fixture needs it.
-- **Gap 9:** `DocumentModelContent.documentUniquenessCriteria` (`ContentUniquenessCriterion`) has no editor UI or validator at all (distinct from the fully-built `ModelConfig.uniquenessCriteria`); low priority.
+- **Fixed 2026-09-27 (gap 9):** `DocumentModelContent.documentUniquenessCriteria` (`ContentUniquenessCriterion`) now has an editor panel - `ContentUniquenessCriteriaPanelController`/`content-uniqueness-criteria-panel.fxml` (shared `propertyeditors` package, per the "panels embedded in the generic `ModelSettingsDialog`" exception in CLAUDE.md's property-editor rule) plus `ContentUniquenessCriterionDialogController`/`Dialogs.showContentUniquenessCriterion`, following `DocumentUniquenessCriteriaPanelController`'s existing shape exactly but addressing Fields by full path string (`ElementIndex.getPath`/`resolveAbsolutePath`, confirmed against the real `Person_Dc.json` fixture) instead of by `Element` id, since that's what `ContentUniquenessCriterion.Field.fullName` actually stores. New `ContentUniquenessCriteriaValidator` checks name required/unique, at least one field, and every field's full path resolves - no SME source confirms these exact rules for this specific (distinct-from-`ModelConfig`) criterion type, so eligibility restrictions from the other dialog (Required, non-repeatable) were deliberately *not* copied over without evidence. Pinned by new tests in `DocumentModelValidatorsTest`.
 - **Gaps 10, 11, lower confidence:** Date/DateRange "expert" field cross-gating (conditions are now known, see the doc) and a few narrower Number/Custom validator checks that need a `DomainField.json` re-read before implementing, not a guess.
 - Cross-cutting, not Document-Model-specific: no model type validates duplicate annotation names (SME's `ANNOTATION_DUPLICATE`) - fold into the same follow-up as the already-tracked cross-cutting `HeaderRolesValidator` gap (Application Model section below) rather than fixing here alone.
 

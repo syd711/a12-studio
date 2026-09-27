@@ -1,0 +1,49 @@
+{
+  "header": {
+    "id": "FormLabelExpressionValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "id": "screen_blank",
+        "name": "Blank",
+        "title": {
+          "type": "Expression",
+          "expressionText": ""
+        },
+        "screenElements": []
+      },
+      {
+        "id": "screen_bad_syntax",
+        "name": "BadSyntax",
+        "title": {
+          "type": "Expression",
+          "expressionText": "[Name){"
+        },
+        "screenElements": []
+      },
+      {
+        "id": "screen_valid",
+        "name": "Valid",
+        "title": {
+          "type": "Expression",
+          "expressionText": "\"Hello\""
+        },
+        "screenElements": []
+      }
+    ],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

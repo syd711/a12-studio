@@ -33,6 +33,7 @@ import de.a12.studio.ui.editors.formmodel.modelsettings.RuleConfirmationSettings
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.SubtitlePanelController;
 import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
+import de.a12.studio.ui.editors.propertyeditors.ContentUniquenessCriteriaPanelController;
 import de.a12.studio.ui.editors.propertyeditors.DocumentUniquenessCriteriaPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalesPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
@@ -113,6 +114,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
   private DocumentUniquenessCriteriaPanelController documentUniquenessCriteriaController;
 
   @FXML
+  private ContentUniquenessCriteriaPanelController contentUniquenessCriteriaController;
+
+  @FXML
   private ModelReferencesPanelController modelReferencesController;
 
   @FXML
@@ -178,6 +182,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     annotationsController.setSaveMode(saveMode);
     referenceModelAnnotationsController.setSaveMode(saveMode);
     documentUniquenessCriteriaController.setSaveMode(saveMode);
+    contentUniquenessCriteriaController.setSaveMode(saveMode);
     modelReferencesController.setSaveMode(saveMode);
     timezoneController.setSaveMode(saveMode);
     modelConfigController.setSaveMode(saveMode);
@@ -207,6 +212,8 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         boolean additive = documentModel instanceof AdditiveDocumentModel;
         documentUniquenessCriteriaController.setModel(documentModel);
         documentUniquenessCriteriaController.setVisible(true);
+        contentUniquenessCriteriaController.setModel(documentModel);
+        contentUniquenessCriteriaController.setVisible(true);
         timezoneController.setModel(documentModel);
         timezoneController.setVisible(!additive);
         modelConfigController.setModel(documentModel);
@@ -225,6 +232,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         }
       } else {
         documentUniquenessCriteriaController.setVisible(false);
+        contentUniquenessCriteriaController.setVisible(false);
         timezoneController.setVisible(false);
         modelConfigController.setVisible(false);
         modelInfoController.setVisible(false);
@@ -353,6 +361,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         annotationsController,
         referenceModelAnnotationsController,
         documentUniquenessCriteriaController,
+        contentUniquenessCriteriaController,
         modelReferencesController,
         timezoneController,
         modelConfigController,

@@ -1,0 +1,29 @@
+{
+  "header": {
+    "id": "FormStyleReferenceValidator_duplicateName",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "styles": [
+      {
+        "name": "Bold"
+      },
+      {
+        "name": "Bold"
+      }
+    ],
+    "screens": [],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

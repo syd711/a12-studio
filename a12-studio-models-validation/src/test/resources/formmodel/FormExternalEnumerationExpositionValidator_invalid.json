@@ -1,0 +1,37 @@
+{
+  "header": {
+    "id": "FormExternalEnumerationExpositionValidator_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Ref_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [],
+    "fieldConfiguration": {
+      "field": [
+        {
+          "elementRef": "field_1",
+          "exposition": "CHECKBOX",
+          "externalEnumeration": {
+            "src": "https://example.com/options"
+          }
+        }
+      ]
+    },
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

@@ -378,4 +378,86 @@ class FormValidatorsTest {
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("field_external_enum"));
   }
+
+  private DocumentModel dependencyDriftDmForAmountSuffix() {
+    return TestModels.load("/documentmodel/DependencyDrift_DM.json", DocumentModel.class);
+  }
+
+  @Test
+  void amountSuffixFieldRefValidatorReportsAFieldOfTheWrongType() {
+    FormModel model = load("FormAmountSuffixFieldRefValidator_wrongType");
+    List<ModelValidationError> errors = new FormAmountSuffixFieldRefValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, dependencyDriftDmForAmountSuffix()));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("non-repeatable Enumeration"));
+  }
+
+  @Test
+  void amountSuffixFieldRefValidatorReportsAMissingField() {
+    FormModel model = load("FormAmountSuffixFieldRefValidator_missing");
+    List<ModelValidationError> errors = new FormAmountSuffixFieldRefValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, dependencyDriftDmForAmountSuffix()));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("does not exist"));
+  }
+
+  @Test
+  void amountSuffixFieldRefValidatorAcceptsANonRepeatableEnumerationField() {
+    FormModel model = load("FormAmountSuffixFieldRefValidator_valid");
+    List<ModelValidationError> errors = new FormAmountSuffixFieldRefValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, dependencyDriftDmForAmountSuffix()));
+
+    assertEquals(0, errors.size());
+  }
+
+  @Test
+  void placeholderExpositionConflictValidatorReportsAPlaceholderOnAFullExposition() {
+    FormModel model = load("FormPlaceholderExpositionConflictValidator_invalid");
+    List<ModelValidationError> errors = new FormPlaceholderExpositionConflictValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("field_1"));
+    assertTrue(errors.get(0).message().contains("FULL"));
+  }
+
+  @Test
+  void externalEnumerationExpositionValidatorReportsAnIncompatibleExposition() {
+    FormModel model = load("FormExternalEnumerationExpositionValidator_invalid");
+    List<ModelValidationError> errors = new FormExternalEnumerationExpositionValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("field_1"));
+    assertTrue(errors.get(0).message().contains("CHECKBOX"));
+  }
+
+  @Test
+  void styleReferenceValidatorReportsADuplicateStyleName() {
+    FormModel model = load("FormStyleReferenceValidator_duplicateName");
+    List<ModelValidationError> errors = new FormStyleReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("Bold"));
+  }
+
+  @Test
+  void reservedAnnotationNameValidatorReportsBindingConfiguration() {
+    FormModel model = load("FormReservedAnnotationNameValidator_invalid");
+    List<ModelValidationError> errors = new FormReservedAnnotationNameValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("bindingConfiguration"));
+  }
+
+  @Test
+  void labelExpressionValidatorReportsBlankAndInvalidExpressionsButNotAValidOne() {
+    FormModel model = load("FormLabelExpressionValidator_invalid");
+    List<ModelValidationError> errors = new FormLabelExpressionValidator().validate(model, TestModels.context(model));
+
+    assertEquals(2, errors.size(), errors.toString());
+    assertTrue(errors.stream().anyMatch(error -> error.elementId().equals("screen_blank") && error.message().contains("blank")));
+    assertTrue(errors.stream().anyMatch(error -> error.elementId().equals("screen_bad_syntax") && error.message().contains("not valid")));
+    assertTrue(errors.stream().noneMatch(error -> error.elementId().equals("screen_valid")));
+  }
 }

@@ -76,6 +76,9 @@
                           <!-- Document Uniqueness Criteria -->
                           <fx:include fx:id="documentUniquenessCriteria" source="../propertyeditors/document-uniqueness-criteria-panel.fxml" />
 
+                          <!-- Content Uniqueness Criteria (fields by full path, distinct from Document Uniqueness Criteria above) -->
+                          <fx:include fx:id="contentUniquenessCriteria" source="../propertyeditors/content-uniqueness-criteria-panel.fxml" />
+
                           <!-- Model References -->
                           <fx:include fx:id="modelReferences" source="../propertyeditors/model-references-panel.fxml" />
 
