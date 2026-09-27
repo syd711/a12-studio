@@ -17,6 +17,10 @@ import de.a12.studio.models.querymodel.QuerySort;
 import de.a12.studio.models.querymodel.operator.HasOperator;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModelContent;
+import de.a12.studio.models.treemodel.TreeChildRelationshipConfiguration;
+import de.a12.studio.models.treemodel.TreeModel;
+import de.a12.studio.models.treemodel.TreeModelContent;
+import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.modelsvalidation.refactoring.ProjectReferenceRefactoring.ModelEdits;
 import org.junit.jupiter.api.Test;
 
@@ -28,8 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Pins that renaming a role ("Owner" -&gt; "Buyer") in relationship model {@code Owns} is followed into every
  * other project model that names that role: {@link QuerySort}/{@link QueryLink}/{@link HasOperator}, Form Model
- * {@code Binding}s, Relationship UI Models and Overview {@link ColumnLinkReference}s. Mirrors the style of
- * {@link ProjectReferenceRefactoringTest}.
+ * {@code Binding}s, Relationship UI Models, Overview {@link ColumnLinkReference}s and Tree Model
+ * {@link TreeChildRelationshipConfiguration}s. Mirrors the style of {@link ProjectReferenceRefactoringTest}.
  */
 class RoleRenameRefactoringTest {
 
@@ -169,6 +173,28 @@ class RoleRenameRefactoringTest {
   }
 
   @Test
+  void aTreeChildRelationshipConfigurationFollowsTheRenameOnlyWhenItsRelationshipAndRoleMatch() {
+    TreeChildRelationshipConfiguration matching = childRelationshipConfiguration(RELATIONSHIP, OLD_ROLE);
+    TreeChildRelationshipConfiguration otherRole = childRelationshipConfiguration(RELATIONSHIP, "Order");
+    TreeChildRelationshipConfiguration otherRelationship = childRelationshipConfiguration("Gone", OLD_ROLE);
+
+    TreeNode node = new TreeNode();
+    node.getChildRelationshipConfigurations().addAll(List.of(matching, otherRole, otherRelationship));
+    TreeModelContent content = new TreeModelContent();
+    content.getNodes().add(node);
+    TreeModel tree = new TreeModel();
+    tree.setId("T");
+    tree.setContent(content);
+
+    List<ModelEdits> edits = renameAndApply(tree);
+
+    assertEquals(1, edits.size());
+    assertEquals(NEW_ROLE, matching.getParentRole());
+    assertEquals("Order", otherRole.getParentRole());
+    assertEquals(OLD_ROLE, otherRelationship.getParentRole());
+  }
+
+  @Test
   void revertingTheEditsRestoresTheOldRole() {
     QuerySort sort = sort(RELATIONSHIP, OLD_ROLE);
     QueryModel query = query("Q", sort);
@@ -235,6 +261,13 @@ class RoleRenameRefactoringTest {
     content.setDetails(details);
     repeat.setBinding(content);
     return repeat;
+  }
+
+  private static TreeChildRelationshipConfiguration childRelationshipConfiguration(String relationshipModelRef, String parentRole) {
+    TreeChildRelationshipConfiguration configuration = new TreeChildRelationshipConfiguration();
+    configuration.setRelationshipModelRef(relationshipModelRef);
+    configuration.setParentRole(parentRole);
+    return configuration;
   }
 
   private static ColumnLinkReference linkReference(String relationship, String targetRole) {

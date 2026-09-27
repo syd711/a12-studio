@@ -1,0 +1,42 @@
+{
+  "header": {
+    "id": "RelationshipRoleFormatValidator_invalid",
+    "modelType": "relationship",
+    "modelVersion": "4.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "duplicatesAllowed": false,
+    "labels": [],
+    "entityCharacteristics": [
+      {
+        "role": "1invalid role",
+        "documentModel": "First_DM",
+        "ordered": false,
+        "labels": [],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
+      },
+      {
+        "role": "ValidRole",
+        "documentModel": "Second_DM",
+        "ordered": false,
+        "labels": [],
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        }
+      }
+    ]
+  }
+}

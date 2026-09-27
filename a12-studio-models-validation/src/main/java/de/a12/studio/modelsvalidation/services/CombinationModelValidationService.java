@@ -5,6 +5,7 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
@@ -19,6 +20,7 @@ import de.a12.studio.modelsvalidation.validators.combination.CombinationAdditive
 import de.a12.studio.modelsvalidation.validators.combination.CombinationBaseModelLoopValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationDecorationModelMissingValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationDecorationModelNotAllowedValidator;
+import de.a12.studio.modelsvalidation.validators.combination.CombinationInvalidReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationSelectionModelMissingValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationSelectionModelNotAllowedValidator;
 
@@ -41,6 +43,7 @@ public final class CombinationModelValidationService {
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
+      new HeaderRolesValidator(),
       new CombinationAdditiveModelMissingValidator(),
       new CombinationSelectionModelMissingValidator(),
       new CombinationDecorationModelMissingValidator(),
@@ -48,6 +51,7 @@ public final class CombinationModelValidationService {
       new CombinationSelectionModelNotAllowedValidator(),
       new CombinationDecorationModelNotAllowedValidator(),
       new CombinationAdditiveModelDuplicateValidator(),
+      new CombinationInvalidReferenceValidator(),
       new CombinationBaseModelLoopValidator(),
       new CombinationAdditiveModelLoopValidator()));
 

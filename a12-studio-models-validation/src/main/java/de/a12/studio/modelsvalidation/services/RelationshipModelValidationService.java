@@ -5,6 +5,7 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
@@ -16,6 +17,7 @@ import de.a12.studio.modelsvalidation.validators.relationship.RelationshipDocume
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipEntityCountValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipGeneratedDmNameLengthValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipLinkDocumentModelValidator;
+import de.a12.studio.modelsvalidation.validators.relationship.RelationshipRoleFormatValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipUniqueRolesValidator;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipUpperLimitValidator;
 
@@ -33,8 +35,10 @@ public final class RelationshipModelValidationService {
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
+      new HeaderRolesValidator(),
       new RelationshipEntityCountValidator(),
       new RelationshipUniqueRolesValidator(),
+      new RelationshipRoleFormatValidator(),
       new RelationshipUpperLimitValidator(),
       new RelationshipDocumentModelReferenceValidator(),
       new RelationshipLinkDocumentModelValidator(),

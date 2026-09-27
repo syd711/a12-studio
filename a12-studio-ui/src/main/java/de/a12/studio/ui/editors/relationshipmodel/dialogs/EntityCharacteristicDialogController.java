@@ -23,8 +23,10 @@ import java.util.Optional;
  * de.a12.studio.ui.editors.relationshipmodel.RelatedEntitiesPanelController} by clicking an entity row or its
  * Edit button, or by the Add Entity button. Unlike a standalone top-level dialog (e.g. {@code
  * OverviewColumnDialogController}), {@link #onDialogSubmit} doesn't itself persist anything: the {@link
- * EntityCharacteristic} is mutated live by the three embedded panels (Entity Characteristics, Link Constraints,
- * Labels) and the owning panel's own commit does the actual save, in one go, once this dialog is confirmed.
+ * EntityCharacteristic} is mutated live by the two visible embedded panels (Entity Characteristics, Link
+ * Constraints) and the owning panel's own commit does the actual save, in one go, once this dialog is
+ * confirmed. The Labels panel stays wired (the field round-trips and SME's own row-detail dialog shows them
+ * read-only) but is hidden - SME's default UI never offers editing them here either.
  * Mirrors {@code de.a12.studio.ui.editors.overviewmodel.dialogs.FilterItemDialogController}.
  */
 public class EntityCharacteristicDialogController implements DialogController {
@@ -59,6 +61,7 @@ public class EntityCharacteristicDialogController implements DialogController {
     linkConstraintsController.setSaveMode(saveMode);
     labelsController.configureCustom("labels", StudioBundle.get("labels"));
     labelsController.setSaveMode(saveMode);
+    labelsController.setVisible(false);
 
     entityCharacteristicsController.setOnChange(this::validate);
     linkConstraintsController.setOnChange(this::validate);

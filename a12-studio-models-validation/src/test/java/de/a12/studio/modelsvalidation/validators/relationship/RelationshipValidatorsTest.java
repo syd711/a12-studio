@@ -38,6 +38,15 @@ class RelationshipValidatorsTest {
   }
 
   @Test
+  void roleFormatValidatorReportsInvalidRole() {
+    RelationshipModel model = load("RelationshipRoleFormatValidator_invalid");
+    List<ModelValidationError> errors = new RelationshipRoleFormatValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("1invalid role"));
+  }
+
+  @Test
   void upperLimitValidatorReportsMissingLimit() {
     RelationshipModel model = load("RelationshipUpperLimitValidator_invalid");
     List<ModelValidationError> errors = new RelationshipUpperLimitValidator().validate(model, TestModels.context(model));

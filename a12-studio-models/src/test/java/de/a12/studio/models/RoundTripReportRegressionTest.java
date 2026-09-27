@@ -70,6 +70,15 @@ class RoundTripReportRegressionTest {
   }
 
   @Test
+  void relationshipStorageAndEmbeddedGroupPath() throws Exception {
+    assertRoundTrip("{\"duplicatesAllowed\":false,\"storage\":\"EMBEDDED\",\"embeddedGroupPath\":\"/G\","
+            + "\"labels\":[],\"entityCharacteristics\":[]}",
+        RelationshipModelContent.class);
+    assertRoundTrip("{\"duplicatesAllowed\":false,\"storage\":\"EXTERNAL\",\"labels\":[],\"entityCharacteristics\":[]}",
+        RelationshipModelContent.class);
+  }
+
+  @Test
   void formModelPreProcessingAndEmptyFieldConfiguration() throws Exception {
     FormModelContent content = JsonSettings.objectMapper.readValue(
         "{\"openNewDocumentPreProcessing\":\"COMPUTATIONS_AND_DEPENDENCIES\","

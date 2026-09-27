@@ -86,15 +86,15 @@ public class CombinationStepDialogController implements DialogController {
     };
   }
 
-  public void initDialog(Stage stage, @NonNull CombinationStep combinationStep, @NonNull List<String> documentModelIds,
-      @NonNull List<String> selectionModelIds) {
+  public void initDialog(Stage stage, @NonNull CombinationStep combinationStep, @NonNull List<String> additiveModelIds,
+      @NonNull List<String> decorationModelIds, @NonNull List<String> selectionModelIds) {
     this.stage = stage;
     this.combinationStep = combinationStep;
 
     typeField.getItems().setAll(CombinationStepType.values());
-    additiveModelField.getItems().setAll(documentModelIds);
+    additiveModelField.getItems().setAll(additiveModelIds);
     selectionModelField.getItems().setAll(selectionModelIds);
-    decorationModelField.getItems().setAll(documentModelIds);
+    decorationModelField.getItems().setAll(decorationModelIds);
 
     CombinationStepType type = combinationStep.getType() != null ? combinationStep.getType() : CombinationStepType.ADDITION;
     typeField.setValue(type);

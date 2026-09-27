@@ -70,6 +70,14 @@ public final class BasicConsistencyValidator implements ModelValidator {
     // Type Definition Model's field editor - see TypeDefinitionPanelController.setCustomTypeDisabled()).
     if (documentModel.getContent().getTypeDefinitions() != null) {
       for (TypeDefinition typeDefinition : documentModel.getContent().getTypeDefinitions()) {
+        if (isBlank(typeDefinition.getId())) {
+          errors.add(error(model, typeDefinition.getId(), ElementProperty.GENERAL,
+              ValidationMessages.get("validation.basicConsistency.emptyId", typeDefinition.getName())));
+        }
+        if (isBlank(typeDefinition.getName())) {
+          errors.add(error(model, typeDefinition.getId(), ElementProperty.GENERAL,
+              ValidationMessages.get("validation.basicConsistency.emptyName", typeDefinition.getId())));
+        }
         if (typeDefinition.getFieldType() instanceof EnumerationFieldType enumType && enumType.getEnumerationType() != null) {
           checkEnumerationDuplicates(model, typeDefinition.getId(), enumType, errors);
         }

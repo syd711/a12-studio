@@ -19,6 +19,9 @@ import de.a12.studio.models.querymodel.operator.NotOperator;
 import de.a12.studio.models.querymodel.operator.Operator;
 import de.a12.studio.models.querymodel.operator.OrOperator;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
+import de.a12.studio.models.treemodel.TreeChildRelationshipConfiguration;
+import de.a12.studio.models.treemodel.TreeModel;
+import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.modelsvalidation.refactoring.DocumentModelRefactoring.Edit;
 import de.a12.studio.modelsvalidation.refactoring.ProjectReferenceRefactoring.ModelEdits;
 import org.slf4j.Logger;
@@ -43,6 +46,8 @@ import java.util.Objects;
  *       {@code relationshipName} matches {@code relationshipModelId}.</li>
  *   <li><b>Overview Models</b>: {@code ColumnLinkReference.targetRole} whose
  *       {@code relationship} matches {@code relationshipModelId}.</li>
+ *   <li><b>Tree Models</b>: {@code TreeChildRelationshipConfiguration.parentRole} whose
+ *       {@code relationshipModelRef} matches {@code relationshipModelId}.</li>
  * </ul>
  *
  * <p>Only references that unambiguously point to {@code relationshipModelId}/{@code oldRole} are updated;
@@ -97,6 +102,9 @@ public final class RoleRenameRefactoring {
     }
     else if (model instanceof OverviewModel overview) {
       overviewEdits(overview, relationshipModelId, oldRole, newRole, edits);
+    }
+    else if (model instanceof TreeModel tree) {
+      treeEdits(tree, relationshipModelId, oldRole, newRole, edits);
     }
     return edits;
   }
@@ -207,6 +215,23 @@ public final class RoleRenameRefactoring {
       for (ColumnLinkReference ref : column.getLinkReferences()) {
         if (relationshipModelId.equals(ref.getRelationship()) && oldRole.equals(ref.getTargetRole())) {
           edits.add(new Edit(ref::setTargetRole, oldRole, newRole));
+        }
+      }
+    }
+  }
+
+  // ---- Tree Model --------------------------------------------------------------------------------------------
+
+  private static void treeEdits(TreeModel tree, String relationshipModelId,
+      String oldRole, String newRole, List<Edit> edits) {
+    if (tree.getContent() == null || tree.getContent().getNodes() == null) {
+      return;
+    }
+    for (TreeNode node : tree.getContent().getNodes()) {
+      for (TreeChildRelationshipConfiguration configuration : node.getChildRelationshipConfigurations()) {
+        if (relationshipModelId.equals(configuration.getRelationshipModelRef())
+            && oldRole.equals(configuration.getParentRole())) {
+          edits.add(new Edit(configuration::setParentRole, oldRole, newRole));
         }
       }
     }

@@ -67,8 +67,14 @@ public class CombinedDocumentModelEditorController extends AbstractEditorControl
     load(model);
   }
 
+  /**
+   * SME's {@code 04_editor.adoc}: "Base Document Model: Select a <b>(Combined or Transformed)</b> Document
+   * Model" - a Combination Model can itself be nested onto another one, so this includes the synthetic
+   * stand-in {@link ProjectDocumentModels#getOtherDocumentModelsWithCombinations} builds for every project
+   * Combination Model, not just plain Document Models.
+   */
   private List<DocumentModel> documentModelOptions() {
-    return ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    return ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem);
   }
 
   private void onBaseModelChanged() {

@@ -39,6 +39,16 @@ public class RelationshipModelContent {
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private String associationType;
 
+  // Never user-editable (SME keeps both on a hidden Form Engine screen), but every real fixture carries
+  // "storage" with a concrete value ("EMBEDDED"/"EXTERNAL", default EXTERNAL) regardless - kept so a
+  // load/save cycle round-trips it instead of silently dropping it. embeddedGroupPath is required only
+  // when storage is EMBEDDED.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String storage;
+
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private String embeddedGroupPath;
+
   @JsonIgnore
   public String getLinkDocumentModelValue() {
     if (linkDocumentModel == null || linkDocumentModel.isNull()) {

@@ -93,50 +93,59 @@ shares with a plain Document Model's own Type Definitions tab — see "Type Defi
 `docs/sme-reference-comparison.md` for the full write-up (a12-studio's port is already close to parity: every
 field-type-config validator already walks `content.typeDefinitions`, name-uniqueness/missing-reference/broken-import
 checks all match SME's real rules, and a12-studio's Delete/Remove-Import confirmation dialogs are stricter than
-SME's, which has none at all). In suggested order:
-- **The real architectural gap: a Type Definition Model can't hold local and imported type definitions at the same
-  time.** `TypeDefinitionTableController.updateAddImportAvailability()` disables Add once any Import exists and
-  Import once any local type definition exists, for every Document Model this table serves — but SME's shared
-  component special-cases a TDM itself (`selectTypeDefinitionMode()` returns `"combined"` when editing a TDM), so
-  only a *plain* Document Model has to pick one mode; a TDM is meant to work as a hub that owns some type
-  definitions and re-exports others imported from a different TDM (per the BA doc). Needs a
-  `model instanceof TypeDefinitionModel` escape hatch, plus a fixture exercising the combination (none exists
-  today).
-- A multi-select group's enumeration value field can be pointed at an imported/included type definition with no
-  warning; the BA doc explicitly forbids this ("consistency reasons"). `TypeDefinitionPanelController
-  .collectAvailableTypeDefinitionLabels()` needs to offer local-only type definitions when
-  `isMultiSelectParent()`, and `MultiSelectGroupValidator` needs the matching check.
-- `BasicConsistencyValidator`'s type-definition pass only checks Enumeration duplicate values, not blank id/name
-  like every other element kind gets — one-line addition, land with the item above.
-- Once the combined-mode gap is fixed, re-check whether `MissingReferenceValidator`'s duplicate-name check needs to
-  see a TDM's combined (local + imported) set, not just its own local list.
-- Low priority: no per-row "invalid" indicator column in the Type Definitions table (SME has one);
+SME's, which has none at all).
+
+**Fixed 2026-09-27:** the real architectural gap — a TDM can now hold local and imported type definitions at the
+same time (`TypeDefinitionTableController.updateAddImportAvailability()` has a `model instanceof TypeDefinitionModel`
+escape hatch, pinned by new `TypeDefinitionTableControllerTest`); a multi-select group's enumeration value field can
+no longer be pointed at an imported/included type definition (`TypeDefinitionPanelController
+.collectAvailableTypeDefinitionLabels()` goes local-only for a multi-select parent, `MultiSelectGroupValidator`
+gained the matching check); `BasicConsistencyValidator`'s type-definition pass now also checks blank id/name.
+Re-checked the duplicate-name follow-up: `MissingReferenceValidator`'s duplicate-name check still only compares a
+model's own local type definitions (left as is — no SME source confirms a rule for the same-named local-vs-imported
+case in a TDM's now-real combined set).
+- Low priority, still open: no per-row "invalid" indicator column in the Type Definitions table (SME has one);
   `testing/workspaces/advanced_new/models/CommonFieldDefinitions_Td.json` uses a non-conforming `_Td` suffix instead
   of `_TDM` (invisible today because that workspace disables suffix enforcement, and not worth a standalone rename
   since three other fixtures reference it by id).
 
 ### Relationship Models
-Full gap review 2026-09-27 against SME's `relationshipModel` module — see "Relationship Model: gap review" in `docs/sme-reference-comparison.md` for the full write-up (SME's own implementation turns out to be a declarative Document+Form Model with no bespoke code at all, so most of a12-studio's hand-built editor is already at or above parity). Open items, in suggested order:
-- **Bug**: `RelationshipDocumentModelReferenceValidator`'s per-entity Document Model check uses `context.findOtherDocumentModel(...)` (Document Model only) while its own link-DM check three lines below correctly uses `context.hasOtherDocumentOrCombinedModel(...)` (Document or Combination) — the two halves of one validator disagree.
-- The entity Document Model picker and Link Document Model picker (`RelationshipModelEditorController.entityDocumentModelOptions()`) only offer Document Models; SME's reference provider also allows Combination Model (and Transformer Model, which doesn't exist here yet).
-- No role name pattern/length validator (SME: `[_a-zA-Z][-_.a-zA-Z0-9]*`, 1-100 chars) — a12-studio's role field accepts anything non-blank.
-- `RoleRenameRefactoring.editsFor` has no `TreeModel` branch, so renaming a role leaves a Tree Model's `TreeChildRelationshipConfiguration.parentRole` dangling (only caught after the fact by `TreeChildRelationshipValidator`), unlike Query/Form/RelationshipUI/Overview which are auto-rewritten in the same undo step.
-- `HeaderRolesValidator` is not wired into `RelationshipModelValidationService`/`RelationshipUiModelValidationService` (same cross-cutting gap as Application Model/Master Detail Model — batch into one follow-up).
-- Round-trip: `RelationshipModelContent` has no `storage`/`embeddedGroupPath` fields (`@JsonIgnoreProperties(ignoreUnknown = true)` silently drops them); real SME fixtures always carry `storage`, unlike its sibling hidden field `associationType` which already got defensive `@JsonInclude` handling. Lower priority: `EntityCharacteristic.navigable`, `Multiplicity.lowerLimit`, `EntityCharacteristic.candidateConstraints` are also missing but unreachable from SME's own editor UI too, so unlikely to appear in real files.
-- The Labels (entity add/edit dialog, `entity-characteristic-dialog.fxml`) are not used by the default UI for relationships: hide them. (Reconfirmed 2026-09-27: SME's own row-detail dialog shows Labels read-only, so hiding rather than building this out further is the right call.)
+Full gap review 2026-09-27 against SME's `relationshipModel` module — see "Relationship Model: gap review" in `docs/sme-reference-comparison.md` for the full write-up (SME's own implementation turns out to be a declarative Document+Form Model with no bespoke code at all, so most of a12-studio's hand-built editor is already at or above parity).
+
+**Fixed 2026-09-27:** the `RelationshipDocumentModelReferenceValidator` bug (entity check now uses
+`context.hasOtherDocumentOrCombinedModel(...)`, matching its own link-DM check); the entity/Link Document Model
+pickers now also offer Combination Models (`entityDocumentModelOptions()` uses
+`getOtherDocumentModelsWithCombinations`); a new `RelationshipRoleFormatValidator` enforces SME's role pattern/length
+(`[_a-zA-Z][-_.a-zA-Z0-9]*`, 1-100 chars); `RoleRenameRefactoring` gained a `TreeModel` branch that rewrites
+`TreeChildRelationshipConfiguration.parentRole` the same way the other four consumers are; `HeaderRolesValidator` is
+now wired into both `RelationshipModelValidationService` and `RelationshipUiModelValidationService`; `storage`/
+`embeddedGroupPath` now round-trip on `RelationshipModelContent` (same `@JsonInclude(NON_EMPTY)` treatment as
+`associationType`); the Labels panel in the entity add/edit dialog (`entity-characteristic-dialog.fxml`) is now
+hidden (`EntityCharacteristicDialogController` calls `labelsController.setVisible(false)`).
+- Lower priority, still open: `EntityCharacteristic.navigable`, `Multiplicity.lowerLimit`,
+  `EntityCharacteristic.candidateConstraints` round-trip fields — unreachable from SME's own editor UI too, so
+  unlikely to appear in real files.
 
 ### Composed Document Models
 - Full diagram-driven authoring (SME's "Relationship Element"/"Link Relationship Element" diagram nodes) is intentionally **not** going to be re-implemented - a12-studio represents the relationship chain as a structured list editor instead (see the "Fixed 2026-09-23" entry above). Decided 2026-09-26: no plan to port the SME diagram UX.
 - `BindingRepeat`'s deeper heterogeneous-relationship/repetition-vs-multiplicity checks (SME's `DescendantOfHeterogeneous(ToMany)Relationship`/`InvalidBindingRepeatRepetitionAndMultiplicity`) need kernel-backed DM expansion - blocked on Open Decision #1, not on CDM itself any more.
 
 ### Combined Document Model
-Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap review (2026-09-27)" under "Combined Document Model" in `docs/sme-reference-comparison.md`. In suggested order:
-- The Base Model picker and the Additive/Decoration model pickers on a Combination Step only offer plain Document Models (`getOtherDocumentModels`) — a Combination Model can't be nested on top of another one, and SME allows exactly that; a12-studio already has `getOtherDocumentModelsWithCombinations` (used elsewhere) sitting unused here.
-- The Additive Model picker on an Addition step isn't filtered to Additive Document Models — any plain Document Model can be picked, unlike SME's `additiveModelReferenceProvider`.
-- A dangling additive/selection/decoration/base-model reference is never shown inline on the offending Combination Step row (`CombinationStepsPanelController.refreshValidation()` only matches `elementId`s starting `content/combinationSteps/`; the only check today, `HeaderModelReferenceValidator`, always reports a flat `header/modelReferences` id) — SME has 4 dedicated per-field "Invalid Reference" rules for this.
-- `HeaderRolesValidator` is not wired into `CombinationModelValidationService` (same cross-cutting gap as Application/Master Detail/Relationship/Query Model).
-- No user-facing Preview of the expanded/merged Document Model (SME has one, kernel-backed); a partial Addition-only-merge preview is buildable today on the existing `CombinedDocumentModelElements` helper without the kernel dependency — worth considering as a scoped slice of the otherwise kernel-gated feature.
-- Low priority: no cap on the number of Combination Steps (SME caps at 99).
+Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap review (2026-09-27)" under "Combined Document Model" in `docs/sme-reference-comparison.md`.
+
+**Fixed 2026-09-27:** the Base Model picker and the Additive/Decoration model pickers on a Combination Step now use
+`getOtherDocumentModelsWithCombinations` (a Combination Model can be nested on top of another one); the Additive
+Model picker on an Addition step is now filtered to real `AdditiveDocumentModel`s only
+(`CombinationStepsPanelController.additiveModelIds()`); a dangling additive/selection/decoration/base-model
+reference is now shown inline on the offending Combination Step row (new `CombinationInvalidReferenceValidator`,
+reporting under `content/combinationSteps/<i>` / `content/baseModelId` so
+`CombinationStepsPanelController.refreshValidation()`'s existing prefix filter picks it up; the generic
+`HeaderModelReferenceValidator` stays as the overall-model backstop); `HeaderRolesValidator` is now wired into
+`CombinationModelValidationService`.
+- Still open: no user-facing Preview of the expanded/merged Document Model (SME has one, kernel-backed); a partial
+  Addition-only-merge preview is buildable today on the existing `CombinedDocumentModelElements` helper without the
+  kernel dependency — worth considering as a scoped slice of the otherwise kernel-gated feature.
+- Low priority, still open: no cap on the number of Combination Steps (SME caps at 99).
 
 ### Query Model
 - Filter expressions are only existence-checked; type and enum-value checking is not done, and there are no "did you mean" candidates.

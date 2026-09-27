@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.combineddocumentmodel;
 
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.combineddocumentmodel.CombinationStep;
 import de.a12.studio.models.combineddocumentmodel.CombinationStepType;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
@@ -117,7 +118,7 @@ public class CombinationStepsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    Dialogs.showCombinationStepForAdd(Studio.stage, documentModelIds(), selectionModelIds()).ifPresent(step -> {
+    Dialogs.showCombinationStepForAdd(Studio.stage, additiveModelIds(), decorationModelIds(), selectionModelIds()).ifPresent(step -> {
       getSteps().add(step);
       changed();
     });
@@ -127,12 +128,35 @@ public class CombinationStepsPanelController extends AbstractPropertyEditor {
     return model.getContent().getCombinationSteps();
   }
 
-  private static List<String> documentModelIds() {
+  /**
+   * Candidates for an Addition step's Document Model field - matches SME's {@code additiveModelReferenceProvider},
+   * which resolves specifically against {@code additiveDocumentModelProto.type}: only real {@link
+   * AdditiveDocumentModel}s, never a plain Document Model or a Combination Model.
+   */
+  private static List<String> additiveModelIds() {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem == null) {
       return List.of();
     }
     return ProjectDocumentModels.getOtherDocumentModels(projectItem).stream()
+        .filter(AdditiveDocumentModel.class::isInstance)
+        .map(DocumentModel::getId)
+        .sorted(Comparator.naturalOrder())
+        .toList();
+  }
+
+  /**
+   * Candidates for the Base Model / Decoration step's Document Model field - matches SME's {@code
+   * getBaseModelReferenceCalculator} ("(Combined or Transformed) Document Model"): every plain Document Model
+   * plus the synthetic stand-in for every project Combination Model, so a Combination Model can be decorated
+   * or nested onto another one.
+   */
+  private static List<String> decorationModelIds() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    if (projectItem == null) {
+      return List.of();
+    }
+    return ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem).stream()
         .map(DocumentModel::getId)
         .sorted(Comparator.naturalOrder())
         .toList();
@@ -220,7 +244,7 @@ public class CombinationStepsPanelController extends AbstractPropertyEditor {
   }
 
   private void openEditDialog(CombinationStep step) {
-    if (Dialogs.showCombinationStepForEdit(Studio.stage, step, documentModelIds(), selectionModelIds())) {
+    if (Dialogs.showCombinationStepForEdit(Studio.stage, step, additiveModelIds(), decorationModelIds(), selectionModelIds())) {
       changed();
     }
   }

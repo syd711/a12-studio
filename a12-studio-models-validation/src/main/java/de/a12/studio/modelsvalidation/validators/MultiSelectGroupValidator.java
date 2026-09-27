@@ -10,6 +10,8 @@ import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.RuleElement;
 import de.a12.studio.models.documentmodel.StringFieldType;
+import de.a12.studio.models.documentmodel.TypeDefFieldType;
+import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.Severity;
@@ -18,6 +20,8 @@ import de.a12.studio.modelsvalidation.ValidationMessages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Port of the kernel's MultiSelectGroupRule (decompiled from kernel-md-model, EUPL-1.2 dual-licensed): a
@@ -53,6 +57,7 @@ public final class MultiSelectGroupValidator implements ModelValidator {
             ValidationMessages.get("validation.multiSelectGroup.mustHaveExactlyOneField", groupElement.getName())));
       } else {
         checkMultiSelectField(model, groupElement, group, fieldsInGroup.get(0), index, errors);
+        checkTypeDefinitionIsLocal(model, groupElement, fieldsInGroup.get(0), documentModel, errors);
       }
       boolean otherElementsPresent = group.getElements() != null
           && group.getElements().stream().anyMatch(e -> !(e instanceof FieldElement) && !(e instanceof RuleElement));
@@ -78,6 +83,30 @@ public final class MultiSelectGroupValidator implements ModelValidator {
     if (!(effectiveType instanceof EnumerationFieldType) && !(effectiveType instanceof StringFieldType)) {
       errors.add(error(model, field.getId(), ElementProperty.TYPE,
           ValidationMessages.get("validation.multiSelectGroup.fieldMustBeEnumOrString", field.getName(), groupElement.getName())));
+    }
+  }
+
+  /**
+   * A multi-select group's enumeration value field may only point at a <b>local</b> type definition - the BA
+   * doc: "For consistency reasons it is not possible to use imported Type Definitions or Type Definitions
+   * from includes". An included/imported {@code TypeDefType} reference is caught here, not by {@link
+   * MissingReferenceValidator} (which only checks that the reference resolves at all, local or not).
+   */
+  private static void checkTypeDefinitionIsLocal(A12Model<?> model, GroupElement groupElement, FieldElement field,
+      DocumentModel documentModel, List<ModelValidationError> errors) {
+    if (field.getField() == null || !(field.getField().getFieldType() instanceof TypeDefFieldType typeDefFieldType)) {
+      return;
+    }
+    String typeDefinitionId = typeDefFieldType.getTypeDefType() == null ? null : typeDefFieldType.getTypeDefType().getTypeDefinitionId();
+    if (typeDefinitionId == null) {
+      return;
+    }
+    Set<String> localTypeDefinitionIds = documentModel.getContent().getTypeDefinitions().stream()
+        .map(TypeDefinition::getId)
+        .collect(Collectors.toSet());
+    if (!localTypeDefinitionIds.contains(typeDefinitionId)) {
+      errors.add(error(model, field.getId(), ElementProperty.TYPE,
+          ValidationMessages.get("validation.multiSelectGroup.typeDefinitionMustBeLocal", field.getName(), groupElement.getName())));
     }
   }
 

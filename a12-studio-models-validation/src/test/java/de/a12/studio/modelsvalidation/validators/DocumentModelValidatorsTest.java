@@ -469,6 +469,15 @@ class DocumentModelValidatorsTest {
   }
 
   @Test
+  void multiSelectGroupValidatorReportsNonLocalTypeDefinition() {
+    DocumentModel model = load("MultiSelectGroupValidator_importedTypeDefinition");
+    List<ModelValidationError> errors = new MultiSelectGroupValidator().validate(model, TestModels.context(model));
+
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("local Type Definition")),
+        "A multi-select value field pointing at a non-local type definition must be reported");
+  }
+
+  @Test
   void attachmentGroupValidatorReportsEmptyAttachmentGroup() {
     DocumentModel model = load("AttachmentGroupValidator_invalid");
     List<ModelValidationError> errors = new AttachmentGroupValidator().validate(model, TestModels.context(model));
@@ -569,6 +578,15 @@ class DocumentModelValidatorsTest {
 
     assertEquals(1, errors.size());
     assertEquals("typedef_country", errors.get(0).elementId());
+  }
+
+  @Test
+  void basicConsistencyValidatorReportsBlankNameOnATypeDefinition() {
+    DocumentModel model = load("BasicConsistencyValidator_typeDefinitionBlankName");
+    List<ModelValidationError> errors = new BasicConsistencyValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("typedef_blank_name", errors.get(0).elementId());
   }
 
   @Test

@@ -28,7 +28,7 @@ public final class RelationshipDocumentModelReferenceValidator implements ModelV
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.relationshipDocumentModelReference.missing", entity.getRole()), Severity.ERROR.name()));
       }
-      else if (context.findOtherDocumentModel(entity.getDocumentModel()) == null) {
+      else if (!context.hasOtherDocumentOrCombinedModel(entity.getDocumentModel())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.relationshipDocumentModelReference.notFound",
                 entity.getDocumentModel(), entity.getRole()), Severity.ERROR.name()));

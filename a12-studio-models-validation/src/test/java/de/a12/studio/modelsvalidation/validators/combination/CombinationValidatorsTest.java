@@ -6,6 +6,8 @@ import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelContent;
 import de.a12.studio.models.combineddocumentmodel.DocumentModelIdRef;
 import de.a12.studio.models.combineddocumentmodel.SelectionModelIdRef;
+import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.selectionmodel.SelectionModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.TestModels;
 import org.junit.jupiter.api.Test;
@@ -97,6 +99,65 @@ class CombinationValidatorsTest {
     List<ModelValidationError> errors = new CombinationAdditiveModelDuplicateValidator().validate(model, TestModels.context(model));
 
     assertTrue(errors.isEmpty());
+  }
+
+  @Test
+  void invalidReferenceValidatorReportsDanglingBaseModel() {
+    CombinedDocumentModel model = modelWithSteps();
+    model.getContent().setBaseModelId("Missing_DM");
+    List<ModelValidationError> errors = new CombinationInvalidReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("content/baseModelId", errors.get(0).elementId());
+  }
+
+  @Test
+  void invalidReferenceValidatorAllowsAResolvableBaseModel() {
+    CombinedDocumentModel model = modelWithSteps();
+    model.getContent().setBaseModelId("Other_DM");
+    DocumentModel other = new DocumentModel();
+    other.setId("Other_DM");
+    List<ModelValidationError> errors = new CombinationInvalidReferenceValidator()
+        .validate(model, TestModels.contextWithDocumentModels(model, other));
+
+    assertTrue(errors.isEmpty());
+  }
+
+  @Test
+  void invalidReferenceValidatorReportsDanglingAdditiveModel() {
+    CombinedDocumentModel model = modelWithSteps(step(CombinationStepType.ADDITION, "Missing_DM", null, null));
+    List<ModelValidationError> errors = new CombinationInvalidReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("content/combinationSteps/0", errors.get(0).elementId());
+  }
+
+  @Test
+  void invalidReferenceValidatorReportsDanglingSelectionModel() {
+    CombinedDocumentModel model = modelWithSteps(step(CombinationStepType.SELECTION, null, "Missing_SeM", null));
+    List<ModelValidationError> errors = new CombinationInvalidReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("content/combinationSteps/0", errors.get(0).elementId());
+  }
+
+  @Test
+  void invalidReferenceValidatorAllowsAResolvableSelectionModel() {
+    CombinedDocumentModel model = modelWithSteps(step(CombinationStepType.SELECTION, null, "Other_SeM", null));
+    SelectionModel selectionModel = new SelectionModel();
+    selectionModel.setId("Other_SeM");
+    List<ModelValidationError> errors = new CombinationInvalidReferenceValidator()
+        .validate(model, TestModels.contextWithOtherModels(model, selectionModel));
+
+    assertTrue(errors.isEmpty());
+  }
+
+  @Test
+  void invalidReferenceValidatorReportsDanglingDecorationModel() {
+    CombinedDocumentModel model = modelWithSteps(step(CombinationStepType.DECORATION_FOR_GROUPS, null, "Some_SeM", "Missing_DM"));
+    List<ModelValidationError> errors = new CombinationInvalidReferenceValidator().validate(model, TestModels.context(model));
+
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Missing_DM")));
   }
 
   private static CombinedDocumentModel modelWithSteps(CombinationStep... steps) {

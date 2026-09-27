@@ -82,9 +82,14 @@ public class RelationshipModelEditorController extends AbstractEditorController 
     load(model);
   }
 
+  /**
+   * Document Model and Combination Model ids, matching SME's {@code rmReferenceProvider.ts} (Document,
+   * Combination, or Transformer Model - a12-studio has no Transformer Model yet), used for both the entity
+   * Document Model picker and the Link Document Model picker.
+   */
   private List<String> entityDocumentModelOptions() {
     List<String> options = new ArrayList<>();
-    ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.DOCUMENT).stream()
+    ProjectDocumentModels.getOtherDocumentModelsWithCombinations(projectItem).stream()
         .map(A12Model::getId)
         .sorted(Comparator.naturalOrder())
         .forEach(options::add);

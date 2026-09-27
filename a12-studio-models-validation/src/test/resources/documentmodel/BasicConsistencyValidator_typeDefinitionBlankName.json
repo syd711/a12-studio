@@ -1,0 +1,37 @@
+{
+  "header": {
+    "id": "BasicConsistencyValidator_typeDefinitionBlankName",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "BasicConsistencyValidator_typeDefinitionBlankName",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_blank_name",
+        "name": "",
+        "fieldType": {
+          "type": "StringType"
+        }
+      }
+    ]
+  }
+}

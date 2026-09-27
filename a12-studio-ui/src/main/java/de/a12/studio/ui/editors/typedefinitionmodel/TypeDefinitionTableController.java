@@ -169,9 +169,20 @@ public class TypeDefinitionTableController implements Initializable {
   /**
    * Mirrors SME's own mutual exclusivity ("It is not possible to mix local/included and imported Type
    * Definitions in one model" - see {@code typeDefOverviewWithImport.tsx}'s {@code selectTypeDefinitionMode}):
-   * Add is disabled once an Import exists, Import is disabled once any local type definition exists.
+   * Add is disabled once an Import exists, Import is disabled once any local type definition exists - <b>except</b>
+   * on a {@link TypeDefinitionModel} itself, which SME's {@code selectTypeDefinitionMode} special-cases as
+   * {@code "combined"}: a TDM works as a hub that owns some type definitions and re-exports others imported
+   * from a different TDM, so neither button is ever disabled there.
    */
   private void updateAddImportAvailability() {
+    if (model instanceof TypeDefinitionModel) {
+      addButton.setDisable(false);
+      addButtonTooltip.setText(StudioBundle.get("add_type_definition"));
+      importButton.setDisable(false);
+      importButtonTooltip.setText(StudioBundle.get("import_all_type_definitions_from_a_type_definition_model"));
+      return;
+    }
+
     boolean hasImports = !importReferences().isEmpty();
     boolean hasLocalTypeDefinitions = !typeDefinitions.isEmpty();
 

@@ -267,7 +267,7 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
   public void setElement(@NonNull Element element) {
     super.setElement(element);
 
-    typeDefinitionLabelsById = collectAvailableTypeDefinitionLabels(element.getId());
+    typeDefinitionLabelsById = collectAvailableTypeDefinitionLabels(element.getId(), isMultiSelectParent());
     setComboBoxItems(dataTypeCombo, List.copyOf(typeDefinitionLabelsById.keySet()));
 
     List<String> dataTypeItems = new ArrayList<>();
@@ -411,8 +411,12 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
    * matters, and editing a {@link TypeDefinition}'s own field type, where the whole "Use Custom Type" grid -
    * this combo included - is hidden outright, matching SME's own editor (which never lets a type definition
    * reference another one at all: {@code TypedefEditor.json} has no equivalent control).
+   * <p>
+   * {@code multiSelectParent} excludes every included/imported type definition: a multi-select group's
+   * enumeration value field may only point at a <b>local</b> type definition (the BA doc, "for consistency
+   * reasons it is not possible to use imported Type Definitions or Type Definitions from includes").
    */
-  private static Map<String, String> collectAvailableTypeDefinitionLabels(@NonNull String excludedId) {
+  private static Map<String, String> collectAvailableTypeDefinitionLabels(@NonNull String excludedId, boolean multiSelectParent) {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
     if (projectItem == null || !(projectItem.getModel() instanceof DocumentModel documentModel)) {
       return Map.of();
@@ -423,6 +427,9 @@ public class TypeDefinitionPanelController extends AbstractPropertyEditor implem
       if (!excludedId.equals(typeDefinition.getId())) {
         labels.put(typeDefinition.getId(), typeDefinition.getName());
       }
+    }
+    if (multiSelectParent) {
+      return labels;
     }
 
     List<DocumentModel> otherModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
