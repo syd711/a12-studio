@@ -15,7 +15,10 @@
       "name": "APP",
       "subRegions": [
         {
-          "name": "APP"
+          "name": "HIDDEN"
+        },
+        {
+          "name": "HIDDEN"
         }
       ]
     }

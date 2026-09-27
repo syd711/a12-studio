@@ -4,6 +4,7 @@ import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.Layout;
 import de.a12.studio.models.applicationmodel.Region;
+import de.a12.studio.modelsvalidation.refactoring.ApplicationModelStructuralRefactoring;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.applicationmodel.dialogs.Dialogs;
@@ -139,9 +140,11 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
   }
 
   private void editSubregion(Region subregion) {
+    String oldName = subregion.getName();
     Dialogs.showSubregionForEdit(Studio.stage, subregion).ifPresent(edited -> {
       subregion.setName(edited.getName());
       subregion.setLayout(edited.getLayout());
+      ApplicationModelStructuralRefactoring.renameRegion(model, oldName, edited.getName());
       rebuildRows();
       commitChange();
     });
@@ -167,6 +170,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_subregion"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getOrCreateSubRegions().remove(subregion);
+        ApplicationModelStructuralRefactoring.deleteRegion(model, subregion.getName());
         rebuildRows();
         commitChange();
       }

@@ -1,17 +1,22 @@
 package de.a12.studio.ui.editors.applicationmodel.dialogs;
 
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.Constraints;
 import de.a12.studio.models.applicationmodel.Directive;
 import de.a12.studio.models.applicationmodel.DirectiveType;
 import de.a12.studio.models.applicationmodel.GenericDirective;
 import de.a12.studio.models.applicationmodel.Layout;
 import de.a12.studio.models.applicationmodel.ModelDescriptor;
+import de.a12.studio.models.applicationmodel.Region;
 import de.a12.studio.models.applicationmodel.RegionClearDirective;
 import de.a12.studio.models.applicationmodel.ViewAddDirective;
+import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.editors.applicationmodel.RegionReferenceOptions;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -57,11 +62,13 @@ public class DirectiveDialogController implements DialogController {
 
   private static final String INVALID_JSON_MESSAGE = "Please enter a valid JSON object, e.g. {\"key\": \"value\"}.";
 
+  private static final String INVALID_PREFERRED_WIDTH_MESSAGE = "Preferred Width must be a number from 1 to 11.";
+
   @FXML
   private ComboBox<String> typeCombo;
 
   @FXML
-  private TextField regionField;
+  private ComboBox<String> regionField;
 
   @FXML
   private Label genericNoticeLabel;
@@ -86,6 +93,9 @@ public class DirectiveDialogController implements DialogController {
 
   @FXML
   private TextField preferredWidthField;
+
+  @FXML
+  private TextArea constraintsExtrasArea;
 
   @FXML
   private GridPane modelsGrid;
@@ -133,7 +143,8 @@ public class DirectiveDialogController implements DialogController {
       typeCombo.setValue(existing instanceof ViewAddDirective ? DirectiveType.VIEW_ADD.getValue() : DirectiveType.REGION_CLEAR.getValue());
     }
 
-    regionField.setText(existing != null ? String.join(", ", existing.getRegion()) : "");
+    RegionReferenceOptions.applyRegionOptions(regionField, resolveApplicationModelRegion());
+    regionField.getEditor().setText(existing != null ? String.join(", ", existing.getRegion()) : "");
 
     if (existing instanceof RegionClearDirective regionClear && regionClear.getLayout() != null) {
       layoutNameCombo.setValue(regionClear.getLayout().getName());
@@ -147,12 +158,16 @@ public class DirectiveDialogController implements DialogController {
       if (viewAdd.getConstraints() != null) {
         constraintsTypeCombo.setValue(viewAdd.getConstraints().getType());
         preferredWidthField.setText(viewAdd.getConstraints().getPreferredWidth() != null ? viewAdd.getConstraints().getPreferredWidth().toString() : "");
+        constraintsExtrasArea.setText(toText(viewAdd.getConstraints().getExtras()));
+      } else {
+        constraintsExtrasArea.setText("{}");
       }
       workingModels.addAll(viewAdd.getModels());
       configurationArea.setText(toText(viewAdd.getConfiguration()));
       loadDataField.setSelected(Boolean.TRUE.equals(viewAdd.getLoadData()));
     } else {
       configurationArea.setText("{}");
+      constraintsExtrasArea.setText("{}");
     }
 
     rebuildModelsRows();
@@ -283,7 +298,7 @@ public class DirectiveDialogController implements DialogController {
     if (directive == null) {
       return;
     }
-    directive.setRegion(splitRegion(regionField.getText()));
+    directive.setRegion(splitRegion(regionField.getEditor().getText()));
     result = Optional.of(directive);
     stage.close();
   }
@@ -299,9 +314,18 @@ public class DirectiveDialogController implements DialogController {
         WidgetFactory.showAlert(Studio.stage, INVALID_JSON_MESSAGE);
         return null;
       }
+      if (!isPreferredWidthValid()) {
+        WidgetFactory.showAlert(Studio.stage, INVALID_PREFERRED_WIDTH_MESSAGE);
+        return null;
+      }
+      Map<String, Object> constraintsExtras = parseJsonObject(constraintsExtrasArea.getText());
+      if (constraintsExtras == null) {
+        WidgetFactory.showAlert(Studio.stage, INVALID_JSON_MESSAGE);
+        return null;
+      }
       ViewAddDirective viewAdd = new ViewAddDirective();
       viewAdd.setName(viewAddNameField.getText());
-      viewAdd.setConstraints(buildConstraints());
+      viewAdd.setConstraints(buildConstraints(constraintsExtras));
       viewAdd.getModels().addAll(workingModels);
       viewAdd.getConfiguration().putAll(configuration);
       viewAdd.setLoadData(loadDataField.isSelected() ? Boolean.TRUE : null);
@@ -323,10 +347,23 @@ public class DirectiveDialogController implements DialogController {
     return regionClear;
   }
 
-  private Constraints buildConstraints() {
+  private boolean isPreferredWidthValid() {
+    String widthText = preferredWidthField.getText();
+    if (widthText == null || widthText.isBlank()) {
+      return true;
+    }
+    try {
+      int width = Integer.parseInt(widthText.trim());
+      return width >= 1 && width <= 11;
+    } catch (NumberFormatException e) {
+      return false;
+    }
+  }
+
+  private Constraints buildConstraints(Map<String, Object> extras) {
     String type = constraintsTypeCombo.getValue();
     String widthText = preferredWidthField.getText();
-    if ((type == null || type.isEmpty()) && (widthText == null || widthText.isEmpty())) {
+    if ((type == null || type.isEmpty()) && (widthText == null || widthText.isEmpty()) && extras.isEmpty()) {
       return null;
     }
     Constraints constraints = new Constraints();
@@ -334,6 +371,7 @@ public class DirectiveDialogController implements DialogController {
     if (widthText != null && !widthText.isEmpty()) {
       constraints.setPreferredWidth(Integer.valueOf(widthText));
     }
+    extras.forEach(constraints::setExtra);
     return constraints;
   }
 
@@ -365,6 +403,21 @@ public class DirectiveDialogController implements DialogController {
     } catch (RuntimeException e) {
       return null;
     }
+  }
+
+  // Resolves the region tree of the Application Model this directive belongs to, so the region field's
+  // dropdown can offer breadcrumb-labelled suggestions (RegionReferenceOptions). This dialog isn't handed
+  // the owning ApplicationModel directly (it's opened several layers deep, from SceneChangePanelController
+  // via Scene/Case dialogs), so it falls back to whichever project item is currently selected/open in the
+  // tree - the same "current model" lookup already used deep in this editor's validation calls (e.g.
+  // FlowsPanelController.checkUniqueNames).
+  private static Region resolveApplicationModelRegion() {
+    ProjectItem projectItem = Studio.getSelectedProjectItem();
+    A12Model<?> model = projectItem == null ? null : projectItem.getModel();
+    if (model instanceof ApplicationModel applicationModel && applicationModel.getContent() != null) {
+      return applicationModel.getContent().getRegion();
+    }
+    return null;
   }
 
   private static List<String> splitRegion(String text) {

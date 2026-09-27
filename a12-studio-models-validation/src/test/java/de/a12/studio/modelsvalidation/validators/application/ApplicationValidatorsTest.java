@@ -60,11 +60,24 @@ class ApplicationValidatorsTest {
 
   @Test
   void uniqueNamesValidatorReportsDuplicateRegionName() {
+    // Two sibling subregions sharing a name ("HIDDEN") - a real collision, unlike a subregion sharing its
+    // own ancestor's name, which SME allows (region names must only be unique among siblings, see gap 2 of
+    // "Application Model: gap review" in docs/sme-reference-comparison.md).
     ApplicationModel model = load("ApplicationUniqueNamesValidator_region_invalid");
     List<ModelValidationError> errors = new ApplicationUniqueNamesValidator().validate(model, TestModels.context(model));
 
     assertEquals(1, errors.size());
-    assertTrue(errors.get(0).message().contains("APP"));
+    assertTrue(errors.get(0).message().contains("HIDDEN"));
+  }
+
+  @Test
+  void uniqueNamesValidatorAllowsSameNameAcrossDifferentBranches() {
+    // A subregion may reuse a name already used elsewhere in the tree as long as it isn't a sibling of that
+    // other region - e.g. two unrelated "HIDDEN" subregions under different parents.
+    ApplicationModel model = load("ApplicationUniqueNamesValidator_region_validDifferentBranches");
+    List<ModelValidationError> errors = new ApplicationUniqueNamesValidator().validate(model, TestModels.context(model));
+
+    assertEquals(0, errors.size());
   }
 
   @Test
@@ -164,5 +177,27 @@ class ApplicationValidatorsTest {
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("Missing_DM"));
+  }
+
+  @Test
+  void viewAddValidatorReportsWrongModelType() {
+    // The descriptor declares modelType "form" but "Ref_DM" actually resolves to a plain Document Model.
+    ApplicationModel model = load("ApplicationViewAddValidator_wrongModelType_invalid");
+    List<ModelValidationError> errors = new ApplicationViewAddValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm()));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("Ref_DM"));
+    assertTrue(errors.get(0).message().contains("form"));
+    assertTrue(errors.get(0).message().contains("document"));
+  }
+
+  @Test
+  void viewAddValidatorReportsPreferredWidthOutOfRange() {
+    ApplicationModel model = load("ApplicationViewAddValidator_preferredWidthRange_invalid");
+    List<ModelValidationError> errors = new ApplicationViewAddValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("12"));
   }
 }

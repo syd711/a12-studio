@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
@@ -13,7 +13,7 @@
   <VBox>
     <children>
       <Label styleClass="field-label" text="%region" />
-      <TextField fx:id="defaultRegionField" promptText="%comma_separated_region_path_e_g_app_content" prefWidth="250.0" />
+      <ComboBox fx:id="defaultRegionField" editable="true" promptText="%comma_separated_region_path_e_g_app_content" prefWidth="250.0" maxWidth="Infinity" />
     </children>
   </VBox>
  </center>

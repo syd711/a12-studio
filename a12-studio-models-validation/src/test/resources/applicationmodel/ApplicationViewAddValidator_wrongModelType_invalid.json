@@ -1,6 +1,6 @@
 {
   "header": {
-    "id": "ApplicationViewAddValidator_missingDocumentModel_invalid",
+    "id": "ApplicationViewAddValidator_wrongModelType_invalid",
     "modelType": "application",
     "modelVersion": "6.0.0",
     "locales": [
@@ -26,9 +26,8 @@
                       "name": "SomeView",
                       "models": [
                         {
-                          "modelType": "document",
-                          "name": "Ref_DM",
-                          "documentModel": "Missing_DM"
+                          "modelType": "form",
+                          "name": "Ref_DM"
                         }
                       ]
                     }

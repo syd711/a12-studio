@@ -6,6 +6,7 @@ import de.a12.studio.models.applicationmodel.Scene;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.refactoring.ApplicationModelStructuralRefactoring;
 import de.a12.studio.modelsvalidation.validators.application.ApplicationUniqueNamesValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
@@ -153,7 +154,9 @@ public class CasesPanelController {
   }
 
   private void onEditCase(Case caseObj) {
+    String oldName = caseObj.getName();
     if (Dialogs.showCaseForEdit(Studio.stage, caseObj)) {
+      ApplicationModelStructuralRefactoring.renameDefaultCaseReference(scene, oldName, caseObj.getName());
       rebuildRows();
       onChange.run();
     }
@@ -165,6 +168,7 @@ public class CasesPanelController {
       return;
     }
     scene.getCases().remove(caseObj);
+    ApplicationModelStructuralRefactoring.clearDefaultCaseReference(scene, caseObj.getName());
     rebuildRows();
     onChange.run();
   }

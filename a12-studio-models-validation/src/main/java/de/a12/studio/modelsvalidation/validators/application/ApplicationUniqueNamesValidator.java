@@ -23,9 +23,12 @@ import java.util.Set;
  * Identifier uniqueness within an application model: module names, flow names per module, scene names
  * per flow, case names per scene, and (sub)region names (SME: "This ... name is not unique.").
  *
- * <p>Each category gets its own element id (region/module names are checked model-wide, so those two are
- * fixed constants; flow and scene names are only checked within one module, and case names only within one
- * scene, so those are built from the owning module's/scene's current name) so the panel that owns that
+ * <p>Each category gets its own element id (module names are checked model-wide, so that one is a fixed
+ * constant; region names share one fixed element id too, but the uniqueness scope itself is per-parent -
+ * siblings only, see {@link #collectRegionNames} - since a subregion's name only has to be unique among its
+ * own siblings, not across the whole tree; flow and scene names are only checked within one module, and case
+ * names only within one scene, so those are built from the owning module's/scene's current name) so the panel
+ * that owns that
  * category — {@code RegionPanelController}, {@code ModulesPanelController}, {@code FlowsPanelController}
  * (both flows and scenes, since it shows a whole module's flow/scene tree at once) and {@code
  * CasesPanelController} — can look up just its own errors via {@link
@@ -90,8 +93,7 @@ public final class ApplicationUniqueNamesValidator implements ModelValidator {
     }
 
     if (applicationModel.getContent().getRegion() != null) {
-      Set<String> regionNames = new HashSet<>();
-      collectRegionNames(model, applicationModel.getContent().getRegion(), regionNames, errors);
+      collectRegionNames(model, applicationModel.getContent().getRegion(), errors);
     }
 
     for (Module module : applicationModel.getContent().getModules()) {
@@ -115,12 +117,18 @@ public final class ApplicationUniqueNamesValidator implements ModelValidator {
     }
   }
 
-  private void collectRegionNames(A12Model<?> model, Region region, Set<String> seen, List<ModelValidationError> errors) {
-    if (region.getName() != null && !seen.add(region.getName())) {
-      errors.add(error(model, REGION_ELEMENT_ID, ValidationMessages.get("validation.applicationUniqueNames.region", region.getName())));
+  // A subregion's name is only required to be unique among its own siblings (SME: "...acts as an identifier and
+  // must be unique among siblings"), not across the whole region tree - so each recursive call gets its own
+  // `seen` set, scoped to one parent's direct children, rather than one set shared across the entire tree.
+  private void collectRegionNames(A12Model<?> model, Region region, List<ModelValidationError> errors) {
+    Set<String> seen = new HashSet<>();
+    for (Region subRegion : region.getSubRegions()) {
+      if (subRegion.getName() != null && !seen.add(subRegion.getName())) {
+        errors.add(error(model, REGION_ELEMENT_ID, ValidationMessages.get("validation.applicationUniqueNames.region", subRegion.getName())));
+      }
     }
     for (Region subRegion : region.getSubRegions()) {
-      collectRegionNames(model, subRegion, seen, errors);
+      collectRegionNames(model, subRegion, errors);
     }
   }
 

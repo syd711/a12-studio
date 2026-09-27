@@ -1,0 +1,36 @@
+{
+  "header": {
+    "id": "ApplicationUniqueNamesValidator_region_validDifferentBranches",
+    "modelType": "application",
+    "modelVersion": "6.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modules": [],
+    "region": {
+      "name": "APP",
+      "subRegions": [
+        {
+          "name": "CONTENT",
+          "subRegions": [
+            {
+              "name": "HIDDEN"
+            }
+          ]
+        },
+        {
+          "name": "SIDEBAR",
+          "subRegions": [
+            {
+              "name": "HIDDEN"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

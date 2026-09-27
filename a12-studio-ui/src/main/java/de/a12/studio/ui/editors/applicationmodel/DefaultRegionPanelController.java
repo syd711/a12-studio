@@ -2,6 +2,7 @@ package de.a12.studio.ui.editors.applicationmodel;
 
 import de.a12.studio.models.applicationmodel.ApplicationModel;
 import de.a12.studio.models.applicationmodel.ApplicationModelContent;
+import de.a12.studio.models.applicationmodel.Region;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.application.ApplicationSceneGraphValidator;
@@ -10,7 +11,7 @@ import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.Debouncer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -35,7 +36,7 @@ public class DefaultRegionPanelController extends AbstractPropertyEditor impleme
   private final Debouncer debouncer = new Debouncer();
 
   @FXML
-  private TextField defaultRegionField;
+  private ComboBox<String> defaultRegionField;
 
   private ApplicationModel model;
 
@@ -46,7 +47,7 @@ public class DefaultRegionPanelController extends AbstractPropertyEditor impleme
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    defaultRegionField.textProperty().addListener((observable, oldValue, newValue) -> {
+    defaultRegionField.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel) {
         return;
       }
@@ -58,9 +59,11 @@ public class DefaultRegionPanelController extends AbstractPropertyEditor impleme
 
   public void setModel(@NonNull ApplicationModel model) {
     this.model = model;
+    Region region = model.getContent() != null ? model.getContent().getRegion() : null;
+    RegionReferenceOptions.applyRegionOptions(defaultRegionField, region);
     updatingFromModel = true;
     try {
-      defaultRegionField.setText(joinRegion(getContent().getDefaultRegion()));
+      defaultRegionField.getEditor().setText(joinRegion(getContent().getDefaultRegion()));
     } finally {
       updatingFromModel = false;
     }

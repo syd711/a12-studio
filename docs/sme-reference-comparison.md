@@ -1667,7 +1667,7 @@ query, selection, structural mapping and transformer as `isExperimental()` (chec
 | 8 | **printSettingModel / printTypesettingModel** | Small, no cross-model references — cheap wins once printModel work begins. | **Typesetting: present, enabled** (2026-09-25): `ModelType.TYPESETTING` (the `model-versions.json` key was `printtypesettings`, which never matched the header's `typesetting`), `TypesettingModel`, an editor with four extracted panels, 4 validators plus the reusable roles validator; see the dedicated "Print Typesetting Model" section. **Print Setting: not present** (deprecated in the platform). |
 | 9 | **link / document** | Record-editing modules depending on relationshipModel/documentModel. `document` = data *instances* of a Document Model. | **Not present.** |
 | 10 | **queryModel / overviewModel** | Search/filter/list-screen configuration; consumer-side, not blocking other model types. | **Both present, enabled.** Query: see the dedicated section (**gap review 2026-09-27**: a Combination Model can't be a query target, `Has(...)` role text isn't rewritten on role rename, `HeaderRolesValidator` not wired in - also corrected two stale claims about CDM-as-target and role-rename coverage). Overview: `OverviewModelEditorController` + 21 editor files (columns, filter items with per-type options, sub-header slots (every element type - button, search, filter, multi-selection - is editable through one dialog since 2026-09-21, the last three without the button-only Event/Confirmation/Priority/Icon block), initial sorting, styles, query-model link) and 23 overview validators (16 as of the 2026-09-26 review, +7 new classes since - see below). **Gap review 2026-09-26, updated 2026-09-27**: see "Overview Model: gap review" below - gaps 1, 2, 3, 4, 5, 6, 7, 8, 9 (partial), 10, 11, 12, 13, 14, 15 are closed; open: 16 (partial, picker candidates), 17 (partial, structural refactoring - filter-field deletion and event/model references still not cascaded). |
-| — | **appModel** | Standalone. | **Present, enabled** (`ApplicationModelEditorController` + module/scene/region editors, 3 application validators, wireframe preview via `ApplicationModelPreviewService`, real Preview App deploy). **Gap review 2026-09-27**: see "Application Model: gap review" below (every SME editor screen has a counterpart; the gaps are round-trip data loss in non-`MasterDetail` `Constraints`, two validator correctness bugs, `HeaderRolesValidator` not wired in, and no within-model rename/delete refactoring for Regions/Scenes/Cases). |
+| — | **appModel** | Standalone. | **Present, enabled** (`ApplicationModelEditorController` + module/scene/region editors, 4 application validators, wireframe preview via `ApplicationModelPreviewService`, real Preview App deploy). **Gap review 2026-09-27, fixed same day (gaps 1-8):** see "Application Model: gap review" below - `Constraints` round-trips arbitrary keys, the region-uniqueness/view-add-model-type validator bugs are fixed, `HeaderRolesValidator` is wired in, region fields are breadcrumb-picker `ComboBox`es, and Region/Scene/Case rename/delete now auto-rewrites within-model references (`ApplicationModelStructuralRefactoring`). Gap 9 (nested subregion editing) is intentionally left - no real fixture needs it. |
 | — | **masterDetailModel** | Standalone. | **Present, enabled** (`MainDetailModelEditorController`, 2 validators; `MasterDetailModuleGenerator` is used by the Preview App deploy). **Gap review 2026-09-27**: see "Master Detail Model: gap review" below (5 numbered gaps; headline is no heterogeneous/CDM expansion in the Form Mapping candidate lists, which a12-studio already has the building blocks for elsewhere). |
 | — | **treeModel** | Standalone. | **Editor present, enabled** (since 2026-09-25), matching SME 13.0.2/tree model 11.0.0 as of 2026-09-27 - see "Tree Model: full gap review against SME 13.0.2" below for the full write-up. Five tabs (Tree, Node Types, Configuration, Layout, Custom Actions), 17 validators, Row Activation (not the pre-11.0.0 `defaultRowAction`), the Virtual Root, and the column editor's Label/Icon/Alignment/Styles/pin-direction. |
 | — | **contentModel** | Experimental in SME itself. | **Editor present, disabled** (`ContentModelEditorController`, 2 validators; the center renders the model with the real Content Engine in a `WebView`, see "Content Model preview"; the right column mirrors SME's per-type setting panel, see "Content Model property column"). **Gap review 2026-09-26** ("Content Model: gap review"): no Document Model / Base Group setting, new models are seeded without `namespaceVersions`/root props, only 2 structural validators (none of SME's reference, form-element or setting checks), move/duplicate/cut/paste ignore the structure rules, and the editor shows no validation result. |
@@ -2152,6 +2152,32 @@ a `ModelDescriptor` shape and rewrites its `name`/`documentModel`, so renaming a
 `ViewAddDirective.models[]` entry project-wide - SME's own `refactorAppModel` (`transformation/appModelRefactoring.ts`) does the same but by hand-walking only
 `onEnter`/`onExit` directives, so it is actually narrower. The gaps that remain are round-trip fidelity, two validator correctness bugs, one missing validator, a
 small typo, and within-model refactoring (renaming/deleting a Region/Scene/Case) - listed below.
+
+**Fixed 2026-09-27 (gaps 1-8):** all gaps except 9 (nested subregion editing, still not needed - no real fixture
+nests past depth 2). Headlines: `Constraints` gained a catch-all `extras` map (`@JsonAnySetter`/`@JsonAnyGetter`,
+the same trick `ContentConfiguration` uses) so a non-`MasterDetail` View Add directive's arbitrary keys survive a
+load-then-save, plus a raw-JSON "Additional Constraints" area in `DirectiveDialogController` to author them (gap
+1); `ApplicationUniqueNamesValidator.collectRegionNames` now scopes its `seen` set per parent (a fresh set per
+recursive call, compared only against that region's own `subRegions`) instead of the whole tree (gap 2);
+`ApplicationViewAddValidator` now checks a referenced model's actual `ModelType` against the `ModelDescriptor`'s
+declared one (widening `document` to also accept a Combination Model, mirroring `context.hasOtherDocumentOrCombinedModel`)
+before accepting it, and range-checks `Constraints.preferredWidth` (1-11), both as new validator errors and as
+`DirectiveDialogController` submit-time gating (gaps 3, 5); `HeaderRolesValidator` is now registered in
+`ApplicationModelValidationService` (gap 4); `DefaultRegionPanelController`'s and `DirectiveDialogController`'s
+region fields are now editable `ComboBox`es whose dropdown shows every (sub)region as a breadcrumb (`RegionReferenceOptions`,
+new, in `a12-studio-ui/.../editors/applicationmodel/`) sourced from the model's own region tree, while the
+committed value stays the plain region name (gap 7); `"menuEnty"` is now `"menuEntry"` (gap 8); and a new
+`ApplicationModelStructuralRefactoring` (`a12-studio-models-validation/.../refactoring/`) auto-rewrites (rename) or
+clears (delete) `content.defaultRegion`/every `Directive.region` on a Region rename/delete (whole-model scope,
+wired from `RegionPanelController`/`SubregionsPanelController`), a Flow's other Scenes' `priorScene` on a Scene
+rename/delete (scoped to the owning Flow, wired from `FlowsPanelController`), and a Scene's own `defaultCase` on a
+Case rename/delete (wired from `CasesPanelController`) - applied silently, consistent with the rest of this
+codebase's cross-model rename machinery (`ProjectReferenceRefactoring`/`ModelReferenceRewriter`/`RoleRenameRefactoring`'s
+own caller), not SME's own interactive per-reference Commit/Edit/Ignore dialog (still not built for any model type).
+`ApplicationUniqueNamesValidator_region_invalid` (existing fixture) was reshaped to a true sibling collision (two
+`HIDDEN` subregions under one parent) since its old shape (a subregion sharing its own ancestor's name) is valid
+under the corrected per-parent rule; a new `..._region_validDifferentBranches` fixture pins that a name may recur
+across unrelated branches.
 
 | # | Gap in Studio | What SME does | Effect today |
 |---|---|---|---|

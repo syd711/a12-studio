@@ -5,6 +5,7 @@ import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
@@ -32,7 +33,8 @@ public final class ApplicationModelValidationService {
       new HeaderModelReferenceValidator(),
       new ApplicationUniqueNamesValidator(),
       new ApplicationSceneGraphValidator(),
-      new ApplicationViewAddValidator()));
+      new ApplicationViewAddValidator(),
+      new HeaderRolesValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

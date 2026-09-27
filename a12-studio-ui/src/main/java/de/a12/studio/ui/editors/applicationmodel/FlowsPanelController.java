@@ -6,6 +6,7 @@ import de.a12.studio.models.applicationmodel.Module;
 import de.a12.studio.models.applicationmodel.Scene;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.refactoring.ApplicationModelStructuralRefactoring;
 import de.a12.studio.modelsvalidation.validators.application.ApplicationUniqueNamesValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -235,7 +236,9 @@ public class FlowsPanelController extends AbstractPropertyEditor {
     if (parentFlow == null) {
       return;
     }
+    String oldName = scene.getName();
     if (Dialogs.showSceneForEdit(Studio.stage, parentFlow, scene)) {
+      ApplicationModelStructuralRefactoring.renamePriorSceneReferences(parentFlow, oldName, scene.getName());
       rebuildTree();
       commitChange();
     }
@@ -257,6 +260,7 @@ public class FlowsPanelController extends AbstractPropertyEditor {
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_scene"), null, null, "Delete");
     if (result.isPresent() && result.get() == ButtonType.OK) {
       parentFlow.getScenes().remove(scene);
+      ApplicationModelStructuralRefactoring.clearPriorSceneReferences(parentFlow, scene.getName());
       rebuildTree();
       commitChange();
     }

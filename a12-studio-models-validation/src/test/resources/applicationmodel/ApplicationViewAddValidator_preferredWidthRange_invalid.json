@@ -1,6 +1,6 @@
 {
   "header": {
-    "id": "ApplicationViewAddValidator_missingDocumentModel_invalid",
+    "id": "ApplicationViewAddValidator_preferredWidthRange_invalid",
     "modelType": "application",
     "modelVersion": "6.0.0",
     "locales": [
@@ -24,13 +24,11 @@
                     {
                       "type": "VIEW_ADD",
                       "name": "SomeView",
-                      "models": [
-                        {
-                          "modelType": "document",
-                          "name": "Ref_DM",
-                          "documentModel": "Missing_DM"
-                        }
-                      ]
+                      "constraints": {
+                        "type": "MasterDetail",
+                        "preferredWidth": 12
+                      },
+                      "models": []
                     }
                   ]
                 }

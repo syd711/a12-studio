@@ -5,6 +5,7 @@ import de.a12.studio.models.applicationmodel.ApplicationModelContent;
 import de.a12.studio.models.applicationmodel.Region;
 import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.refactoring.ApplicationModelStructuralRefactoring;
 import de.a12.studio.modelsvalidation.validators.application.ApplicationUniqueNamesValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -52,7 +53,9 @@ public class RegionPanelController extends AbstractPropertyEditor implements Ini
       if (updatingFromModel) {
         return;
       }
+      String previousName = getOrCreateRegion().getName();
       getOrCreateRegion().setName(newValue);
+      ApplicationModelStructuralRefactoring.renameRegion(model, previousName, newValue);
       refreshNameUniquenessError();
       debouncer.debounce(regionCombo.getId(), this::commitHeaderChange, COMMIT_DEBOUNCE_MS, true);
     });
@@ -73,9 +76,10 @@ public class RegionPanelController extends AbstractPropertyEditor implements Ini
   /**
    * Not bound to an {@link Element}, so the base class's element-keyed validation plumbing (which needs
    * {@code this.element} to be set) never runs for this panel; queries {@link
-   * ApplicationUniqueNamesValidator}'s dedicated region-name element id directly instead. That check runs
-   * against the whole region tree (root and every subregion share one uniqueness scope), so this can also
-   * surface a clash between two subregions unrelated to the root region's own name.
+   * ApplicationUniqueNamesValidator}'s dedicated region-name element id directly instead. That check is scoped
+   * per parent (siblings only, see the validator's own javadoc), so this can surface a sibling-subregion name
+   * clash it's otherwise unrelated to, but never a clash between the root region's own name and one of its
+   * descendants (not siblings of each other).
    */
   private void refreshNameUniquenessError() {
     List<ModelValidationError> errors =

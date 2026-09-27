@@ -42,7 +42,7 @@
                <VBox>
                   <children>
                      <Label styleClass="field-label" text="%region" />
-                     <TextField fx:id="regionField" promptText="%comma_separated_region_path_e_g_app_content" />
+                     <ComboBox fx:id="regionField" editable="true" maxWidth="Infinity" promptText="%comma_separated_region_path_e_g_app_content" />
                   </children>
                </VBox>
 
@@ -104,6 +104,12 @@
                         <ComboBox fx:id="constraintsTypeCombo" editable="true" maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                         <TextField fx:id="preferredWidthField" promptText="1-11" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                      </GridPane>
+                     <VBox>
+                        <children>
+                           <Label styleClass="field-label" text="%additional_constraints_json" />
+                           <TextArea fx:id="constraintsExtrasArea" prefRowCount="3" wrapText="true" />
+                        </children>
+                     </VBox>
 
                      <Label styleClass="section-header" text="%models" />
                      <GridPane fx:id="modelsGrid" hgap="10.0" vgap="6.0">

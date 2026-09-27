@@ -37,7 +37,7 @@ import de.a12.studio.ui.util.StudioBundle;
  */
 public class ActivityPanelController extends AbstractPropertyEditor {
 
-  private static final List<String> DESCRIPTOR_KEYS = List.of("instance", "model", "module", "engine", "menuEnty");
+  private static final List<String> DESCRIPTOR_KEYS = List.of("instance", "model", "module", "engine", "menuEntry");
 
   @FXML
   private GridPane descriptorGrid;
