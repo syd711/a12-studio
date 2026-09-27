@@ -44,6 +44,54 @@
     -fx-font-weight: bold;
 }
 
+/**
+ * JSON Editor (RichTextFX CodeArea)
+ */
+.json-code-area {
+    -fx-font-family: "Consolas", "Monospaced";
+    -fx-font-size: 0.964em;
+    -fx-font-weight: bold;
+    -fx-background-color: -fx-input-bg;
+    -fx-border-color: -fx-border-input;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.json-code-area:focused {
+    -fx-border-color: -fx-accent-color;
+}
+
+.json-code-area .paragraph-box {
+    -fx-padding: 8px;
+}
+
+.json-code-area .text {
+    -fx-fill: -fx-text-color;
+}
+
+.json-code-area .selection {
+    -fx-fill: -fx-selection-bg;
+}
+
+.json-code-area .key {
+    -fx-fill: -fx-accent-color;
+    -fx-font-weight: bold;
+}
+
+.json-code-area .string {
+    -fx-fill: #2a7d2a;
+}
+
+.json-code-area .number {
+    -fx-fill: #1c6fbf;
+}
+
+.json-code-area .literal {
+    -fx-fill: #b5620a;
+    -fx-font-weight: bold;
+}
+
 .completion-list {
     -fx-font-size: 1em;
     -fx-font-weight: bold;
