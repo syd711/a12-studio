@@ -56,7 +56,7 @@ class TreeModelLoadTest {
     TreeColumn column = content.getColumns().get(0);
     assertEquals("column-025fb", column.getId());
     assertEquals("Name", column.getName());
-    assertEquals(1, column.getWidth());
+    assertEquals(1.0, column.getWidth());
     assertEquals("left", column.getPinDirection());
     assertFalse(column.getFixedWidth());
   }
@@ -218,11 +218,11 @@ class TreeModelLoadTest {
     assertEquals("en", product.getContextMenu().getGroups().get(0).getTitle().get(0).getLocale());
     assertNull(product.getContextMenu().getGroups().get(0).getType());
     assertEquals(TreeNodeActionGroup.TYPE_ADD, product.getContextMenu().getGroups().get(1).getType());
-    assertEquals(Boolean.TRUE, product.getDefaultRowAction().getCustom());
-    assertEquals("event_open", product.getDefaultRowAction().getEvent());
+    assertEquals(RowActivation.TYPE_EVENT, product.getRowActivation().getType());
+    assertEquals("event_open_node", product.getRowActivation().getEvent());
     assertEquals("Open the product", product.getRowTitle().get(0).getText());
     assertEquals(java.util.List.of("h_semiBoldFontWeight"), product.getStyles());
-    assertTrue(product.getExtras().isEmpty(), "icon, contextMenu, defaultRowAction, rowTitle and styles are real properties");
+    assertTrue(product.getExtras().isEmpty(), "icon, contextMenu, rowActivation, rowTitle and styles are real properties");
 
     TreeNode book = model.getContent().getNodes().get(1);
     assertTrue(TreeNodeInheritance.isInherited(book, TreeNodeInheritance.Part.ICON));
@@ -230,7 +230,8 @@ class TreeModelLoadTest {
     assertFalse(TreeNodeInheritance.isInherited(book, TreeNodeInheritance.Part.STYLES));
     assertNull(book.getIcon());
     assertNull(book.getContextMenu());
-    assertNull(book.getDefaultRowAction().getEvent(), "a custom row action without an event is not interactive");
+    assertEquals(RowActivation.TYPE_NON_INTERACTIVE, book.getRowActivation().getType());
+    assertNull(book.getRowActivation().getEvent());
 
     ModelRoundTrip.assertRoundTrip(getClass(), "/treemodel/TreeModelNodeConfiguration.json", TreeModel.class);
   }
@@ -240,7 +241,7 @@ class TreeModelLoadTest {
     TreeModel model = ModelRoundTrip.load(getClass(), "/treemodel/TreeModel.json", TreeModel.class);
 
     JsonNode node = JsonSettings.objectMapper.readTree(JsonSettings.objectMapper.writeValueAsString(model)).get("content").get("nodes").get(0);
-    for (String key : java.util.List.of("icon", "contextMenu", "defaultRowAction", "rowTitle", "styles")) {
+    for (String key : java.util.List.of("icon", "contextMenu", "rowActivation", "rowTitle", "styles")) {
       assertFalse(node.has(key), key + " is only written when set");
     }
     for (String key : java.util.List.of("position", "documentModelRef", "useGlobalIcon", "styles", "annotations")) {

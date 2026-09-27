@@ -4,7 +4,6 @@ import de.a12.studio.models.Annotation;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.DocumentModelHeterogeneity;
 import de.a12.studio.models.overviewmodel.Icon;
-import de.a12.studio.models.overviewmodel.RowAction;
 import de.a12.studio.models.treemodel.TreeNodeInheritance.Part;
 import org.junit.jupiter.api.Test;
 
@@ -89,29 +88,19 @@ class TreeNodeInheritanceTest {
     icon.setName("book");
     node.setIcon(icon);
     node.getStyles().add("s1");
-    RowAction rowAction = new RowAction();
-    rowAction.setCustom(true);
-    node.setDefaultRowAction(rowAction);
+    RowActivation rowActivation = new RowActivation();
+    rowActivation.setType(RowActivation.TYPE_NON_INTERACTIVE);
+    node.setRowActivation(rowActivation);
     node.setContextMenu(new TreeNodeContextMenu());
     node.getContextMenu().getGroups().add(new TreeNodeActionGroup());
 
-    for (Part part : List.of(Part.ICON, Part.STYLES, Part.DEFAULT_ROW_ACTION, Part.CONTEXT_MENU)) {
+    for (Part part : List.of(Part.ICON, Part.STYLES, Part.ROW_ACTIVATION, Part.CONTEXT_MENU)) {
       assertTrue(TreeNodeInheritance.hasContent(node, part), part.name());
       TreeNodeInheritance.clearContent(node, part);
       assertFalse(TreeNodeInheritance.hasContent(node, part), part.name());
     }
     assertNull(node.getIcon());
     assertNull(node.getContextMenu());
-    assertNull(node.getDefaultRowAction());
-  }
-
-  @Test
-  void aDefaultRowActionThatIsNotCustomCountsAsNoContent() {
-    TreeNode node = node("Book");
-    RowAction rowAction = new RowAction();
-    rowAction.setCustom(false);
-    node.setDefaultRowAction(rowAction);
-
-    assertFalse(TreeNodeInheritance.hasContent(node, Part.DEFAULT_ROW_ACTION));
+    assertNull(node.getRowActivation());
   }
 }

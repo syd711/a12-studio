@@ -10,8 +10,10 @@ import javafx.scene.control.CheckBox;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Edits a {@link TreeModel}'s {@code content.configuration.multiSelection} (SME "Multi-Selection" under
@@ -25,6 +27,8 @@ public class TreeMultiSelectionPanelController extends AbstractMultiSelectionPan
   private CheckBox selectParentField;
 
   private TreeModel model;
+
+  private Supplier<List<String>> eventSuggestions;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -42,6 +46,16 @@ public class TreeMultiSelectionPanelController extends AbstractMultiSelectionPan
   public void setModel(@NonNull TreeModel model) {
     this.model = model;
     loadFromModel();
+  }
+
+  /** The events the button dialog offers, read whenever it opens (they depend on the tree's relationships). */
+  public void setEventSuggestions(Supplier<List<String>> eventSuggestions) {
+    this.eventSuggestions = eventSuggestions;
+  }
+
+  @Override
+  protected List<String> eventSuggestions() {
+    return eventSuggestions != null ? eventSuggestions.get() : null;
   }
 
   @Override

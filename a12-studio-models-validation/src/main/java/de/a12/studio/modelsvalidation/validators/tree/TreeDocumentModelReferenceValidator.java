@@ -12,7 +12,10 @@ import de.a12.studio.modelsvalidation.validators.ModelValidator;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Every node type needs a Document Model, and it must exist in the workspace. */
+/**
+ * Every node type needs a Document Model, and it must exist in the workspace - a Document Model, or a Combination Model
+ * (SME offers both, and Transformer Models, which Studio has no type for).
+ */
 public final class TreeDocumentModelReferenceValidator implements ModelValidator {
 
   public static final String ELEMENT_ID = "content/nodes/documentModelRef";
@@ -28,7 +31,7 @@ public final class TreeDocumentModelReferenceValidator implements ModelValidator
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.treeDocumentModelReference.missing", node.getId()), Severity.ERROR.name()));
       }
-      else if (context.findOtherDocumentModel(node.getDocumentModelRef()) == null) {
+      else if (!context.hasOtherDocumentOrCombinedModel(node.getDocumentModelRef())) {
         errors.add(new ModelValidationError(model, ELEMENT_ID,
             ValidationMessages.get("validation.treeDocumentModelReference.notFound",
                 node.getDocumentModelRef(), node.getId()), Severity.ERROR.name()));

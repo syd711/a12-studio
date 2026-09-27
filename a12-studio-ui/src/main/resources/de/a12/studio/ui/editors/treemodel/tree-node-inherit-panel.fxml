@@ -31,7 +31,7 @@
                             <CheckBox wrapText="true" fx:id="iconField" mnemonicParsing="false" text="%tree_node_inherit_panel.icon" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                             <CheckBox wrapText="true" fx:id="actionsField" mnemonicParsing="false" text="%tree_node_inherit_panel.actions" GridPane.columnIndex="3" GridPane.rowIndex="0" />
                             <CheckBox wrapText="true" fx:id="contextMenuField" mnemonicParsing="false" text="%tree_node_inherit_panel.context_menu" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                            <CheckBox wrapText="true" fx:id="defaultRowActionField" mnemonicParsing="false" text="%tree_node_inherit_panel.default_row_action" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            <CheckBox wrapText="true" fx:id="rowActivationField" mnemonicParsing="false" text="%tree_node_inherit_panel.row_activation" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                             <CheckBox wrapText="true" fx:id="rowTitleField" mnemonicParsing="false" text="%tree_node_inherit_panel.row_title" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                             <CheckBox wrapText="true" fx:id="stylesField" mnemonicParsing="false" text="%tree_node_inherit_panel.styles" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                         </children>

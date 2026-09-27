@@ -1,9 +1,14 @@
 package de.a12.studio.ui.editors.treemodel;
 
 import de.a12.studio.models.treemodel.TreeColumn;
+import de.a12.studio.models.treemodel.TreeColumns;
 import de.a12.studio.models.treemodel.TreeConfiguration;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.Severity;
+import de.a12.studio.modelsvalidation.ValidationMessages;
+import de.a12.studio.modelsvalidation.validators.tree.TreeColumnValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
@@ -28,7 +33,9 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -120,15 +127,39 @@ public class TreeColumnsPanelController extends AbstractPropertyEditor implement
     Dialogs.showColumnForAdd(Studio.stage).ifPresent(column -> {
       column.setId("column-" + shortId());
       getColumns().add(column);
+      // A pinned column goes to its side, as SME keeps them.
+      TreeColumns.sortByPinDirection(getColumns());
       rebuildRows();
       notifyChanged();
     });
+  }
+
+  /** SME keeps the left-pinned columns first and the right-pinned ones last, and refuses to mix them by moving. */
+  private void warnAboutPinDirection() {
+    WidgetFactory.showInformation(Studio.stage, StudioBundle.get("tree_columns_panel.pin_direction_move"), null);
+  }
+
+  /**
+   * Shows the problems of the columns - a missing name or width, an empty header - in this panel's error container, which
+   * also drives the tab's error badge; the row of a column with an empty header is flagged in {@link #createRow} as well.
+   */
+  private void refreshValidationError() {
+    Optional<ModelValidationError> worst = Studio.getValidationService().validate(model).stream()
+        .filter(error -> error.elementId() != null && error.elementId().startsWith(TreeColumnValidator.ELEMENT_ID))
+        .min(Comparator.comparing(error -> !Severity.ERROR.name().equals(error.severity())));
+    if (worst.isEmpty()) {
+      hideError();
+    }
+    else {
+      showError(worst.get().severity(), worst.get().message());
+    }
   }
 
   private void rebuildRows() {
     if (model == null) {
       return;
     }
+    refreshValidationError();
     columnRows.getChildren().clear();
 
     List<TreeColumn> columns = getColumns();
@@ -148,10 +179,14 @@ public class TreeColumnsPanelController extends AbstractPropertyEditor implement
 
     Label nameLabel = createRowLabel(column.getName(), "treeColumnName-" + index, column);
     nameLabel.getStyleClass().add("path-text");
+    if (TreeColumnValidator.isHeaderEmpty(column)) {
+      nameLabel.getStyleClass().add("validation-error");
+      nameLabel.setTooltip(WidgetFactory.createTooltip(ValidationMessages.get("validation.treeColumn.emptyHeader", column.getName())));
+    }
     nameLabel.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
 
-    Label widthLabel = createRowLabel(column.getWidth() != null ? String.valueOf(column.getWidth()) : "", "treeColumnWidth-" + index, column);
+    Label widthLabel = createRowLabel(column.getWidthText(), "treeColumnWidth-" + index, column);
     lockWidth(widthLabel, 70.0);
     Label fixedWidthLabel = createRowLabel(StudioBundle.get(Boolean.TRUE.equals(column.getFixedWidth()) ? "yes" : "no"), "treeColumnFixedWidth-" + index, column);
     lockWidth(fixedWidthLabel, 100.0);
@@ -188,17 +223,23 @@ public class TreeColumnsPanelController extends AbstractPropertyEditor implement
 
   private void openEditDialog(TreeColumn column) {
     Dialogs.showColumnForEdit(Studio.stage, column).ifPresent(edited -> {
-      column.setName(edited.getName());
-      column.setWidth(edited.getWidth());
-      column.setFixedWidth(edited.getFixedWidth());
-      column.setPinDirection(edited.getPinDirection());
+      column.applyFrom(edited);
+      TreeColumns.sortByPinDirection(getColumns());
       rebuildRows();
       notifyChanged();
     });
   }
 
   private void moveColumn(int fromIndex, int insertBeforeIndex) {
+    List<TreeColumn> before = new ArrayList<>(getColumns());
     if (RowFactory.reorder(getColumns(), fromIndex, insertBeforeIndex)) {
+      if (!TreeColumns.isSortedByPinDirection(getColumns())) {
+        getColumns().clear();
+        getColumns().addAll(before);
+        rebuildRows();
+        warnAboutPinDirection();
+        return;
+      }
       rebuildRows();
       notifyChanged();
     }
@@ -227,6 +268,10 @@ public class TreeColumnsPanelController extends AbstractPropertyEditor implement
   }
 
   private void moveRow(int fromIndex, int toIndex) {
+    if (TreeColumns.isIllegalMove(getColumns(), fromIndex, toIndex - fromIndex)) {
+      warnAboutPinDirection();
+      return;
+    }
     Collections.swap(getColumns(), fromIndex, toIndex);
     rebuildRows();
     notifyChanged();

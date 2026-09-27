@@ -86,6 +86,15 @@ public class StylesPanelController extends AbstractPropertyEditor {
     rebuildRows();
   }
 
+  /**
+   * Titles a panel that is bound with {@link #setCustom} - which has no configure method of its own - and keys where
+   * its expanded state is remembered ({@code settingsKeySuffix}, e.g. {@code ".treeColumnHeaderStyles"}).
+   */
+  public void configureCustom(@NonNull String title, @NonNull String settingsKeySuffix) {
+    setTitle(title);
+    setSettingsKeySuffix(settingsKeySuffix);
+  }
+
   public void configureColumnHeaderStyles() {
     this.columnStylesAccessor = column -> ensureColumnStyles(column).getHeader();
     setTitle(StudioBundle.get("style_for_header_cells"));

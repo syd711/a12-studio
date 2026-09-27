@@ -40,7 +40,7 @@
                   <!-- Insert action -->
                   <VBox fx:id="insertBox" spacing="10.0">
                      <children>
-                        <VBox spacing="6.0">
+                        <VBox fx:id="positionBox" spacing="6.0">
                            <children>
                               <Label styleClass="field-label" text="%tree_node_action.position" />
                               <ComboBox fx:id="positionField" maxWidth="Infinity" />

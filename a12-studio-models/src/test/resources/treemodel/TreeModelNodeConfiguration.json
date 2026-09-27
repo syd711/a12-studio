@@ -47,7 +47,7 @@
             {"name": "Add_Node", "type": "add", "actions": [{"type": "insert", "position": "below"}]}
           ]
         },
-        "defaultRowAction": {"custom": true, "event": "event_open"},
+        "rowActivation": {"type": "event", "event": "event_open_node"},
         "rowTitle": [{"locale": "en", "text": "Open the product"}],
         "styles": ["h_semiBoldFontWeight"]
       },
@@ -58,7 +58,7 @@
         "columns": [],
         "childRelationshipConfigurations": [],
         "actions": [],
-        "defaultRowAction": {"custom": true}
+        "rowActivation": {"type": "non_interactive"}
       }
     ]
   }

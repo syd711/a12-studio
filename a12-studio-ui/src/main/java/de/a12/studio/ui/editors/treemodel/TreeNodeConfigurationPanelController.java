@@ -118,9 +118,12 @@ public class TreeNodeConfigurationPanelController implements Initializable {
     columnMappingPanelController.setModel(model, projectItem);
     childRelationshipsPanelController.setModel(model, projectItem);
     contextMenuPanelController.setProjectItem(projectItem);
+    contextMenuPanelController.setModel(model);
+    rowActivationPanelController.setModel(model, projectItem);
     // Read on every access, since the selected node changes; a node without selection has no (editable) actions.
     actionsPanelController.configure(StudioBundle.get("actions"), ".nodeActions", projectItem,
-        () -> node != null ? node.getActions() : List.of(), () -> false, TreeNodeConfigurationPanelController::newRowAction);
+        () -> node != null ? node.getActions() : List.of(), () -> false, TreeNodeConfigurationPanelController::newRowAction,
+        () -> TreeActionContext.forNode(model, node));
     setNode(null);
   }
 
@@ -182,7 +185,7 @@ public class TreeNodeConfigurationPanelController implements Initializable {
     setShown(childRelationshipsPanel, Part.CHILD_RELATIONSHIP_CONFIGURATIONS);
     setShown(actionsPanel, Part.ACTIONS);
     setShown(contextMenuPanel, Part.CONTEXT_MENU);
-    setShown(rowActivationPanel, Part.DEFAULT_ROW_ACTION);
+    setShown(rowActivationPanel, Part.ROW_ACTIVATION);
     setShown(rowTitlePanel, Part.ROW_TITLE);
     setShown(stylesPanel, Part.STYLES);
   }

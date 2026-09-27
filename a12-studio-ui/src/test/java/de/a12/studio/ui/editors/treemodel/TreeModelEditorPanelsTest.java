@@ -30,6 +30,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -79,6 +80,20 @@ class TreeModelEditorPanelsTest {
   @BeforeAll
   static void startToolkit() throws Exception {
     toolkitAvailable = FxTestSupport.startToolkit();
+    if (toolkitAvailable) {
+      // TreeColumnsPanelController.refreshValidationError() calls Studio.getValidationService(); its
+      // ProjectModels walk needs a real (even empty) folder - an unloaded Project's root has no File and NPEs.
+      de.a12.studio.models.projects.Project validationProject = new de.a12.studio.models.projects.Project();
+      validationProject.load(java.nio.file.Files.createTempDirectory("tree-validation").toFile());
+      FxTestSupport.setValidationServiceForProject(validationProject);
+    }
+  }
+
+  @AfterAll
+  static void stopValidationService() throws Exception {
+    if (toolkitAvailable) {
+      FxTestSupport.clearValidationService();
+    }
   }
 
   @AfterEach

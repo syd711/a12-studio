@@ -10,6 +10,7 @@ import de.a12.studio.models.treemodel.TreeNodeActionGroup;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.formmodel.FxTestSupport;
+import de.a12.studio.ui.editors.treemodel.TreeActionContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -48,7 +49,9 @@ class TreeConfigurationDialogsTest {
       {"header": {"id": "Team_TM", "modelType": "tree", "modelVersion": "11.0.0"},
        "content": {
          "columns": [{"id": "column-1", "name": "Name", "width": 1}, {"id": "column-2", "name": "Size", "width": 1}],
-         "nodes": [{"id": "node-1", "documentModelRef": "Base_DM", "configuration": {}}]}}
+         "nodes": [{"id": "node-1", "documentModelRef": "Base_DM", "configuration": {},
+                    "childRelationshipConfigurations": [
+                      {"id": "crc-1", "relationshipModelRef": "BasePerson_Re", "parentRole": "Base"}]}]}}
       """;
 
   private static final String RELATIONSHIP = """
@@ -143,7 +146,8 @@ class TreeConfigurationDialogsTest {
   private static FxTestSupport.Loaded<TreeNodeActionDialogController> openAction(Workspace workspace, TreeNodeAction action, boolean insertOnly) throws Exception {
     FxTestSupport.Loaded<TreeNodeActionDialogController> loaded =
         FxTestSupport.load("/de/a12/studio/ui/editors/treemodel/dialogs/tree-node-action-dialog.fxml");
-    FxTestSupport.onFx(() -> loaded.controller().init(new Stage(), workspace.tree(), action, insertOnly));
+    FxTestSupport.onFx(() -> loaded.controller().init(new Stage(), workspace.tree(), action, insertOnly,
+        TreeActionContext.forNode(workspace.model(), workspace.node())));
     return loaded;
   }
 
@@ -197,19 +201,19 @@ class TreeConfigurationDialogsTest {
     assertEquals(List.of("as_child", "above", "below"), position.getItems());
     assertTrue(insertBox.isVisible());
     assertFalse(ok.isDisable(), "an insert action needs no event");
-    assertTrue(documentModel.getItems().contains(null), "the default Document Model is choosable");
-    assertTrue(documentModel.getItems().containsAll(List.of("Base_DM", "Person_DM", "Other_DM")));
+    assertEquals(java.util.Arrays.asList(null, "Person_DM"), documentModel.getItems(),
+        "as child: node-1's own child relationship (BasePerson_Re's Person role)");
     assertFalse(useLabel.isVisible(), "nothing to take the label from before a Document Model is picked");
 
-    FxTestSupport.onFx(() -> {
-      position.setValue("below");
-      documentModel.setValue("Person_DM");
-    });
+    FxTestSupport.onFx(() -> position.setValue("below"));
+    assertEquals(java.util.Arrays.asList(null, "Base_DM"), documentModel.getItems(),
+        "below/above: node-1's own Document Model (no sub types, no sibling relationship reaches it here)");
+    FxTestSupport.onFx(() -> documentModel.setValue("Base_DM"));
     assertTrue(useLabel.isVisible());
     FxTestSupport.onFx(() -> useGlobalIcon.setSelected(true));
 
     assertEquals("below", action.getPosition());
-    assertEquals("Person_DM", action.getDocumentModelRef());
+    assertEquals("Base_DM", action.getDocumentModelRef());
     assertEquals(Boolean.TRUE, action.getUseGlobalIcon());
     FxTestSupport.onFx(() -> useGlobalIcon.setSelected(false));
     assertNull(action.getUseGlobalIcon(), "written as true or omitted");
@@ -260,12 +264,18 @@ class TreeConfigurationDialogsTest {
 
   // ---- column ----
 
+  private static de.a12.studio.models.treemodel.TreeNodeColumn mapping(String elementRef) {
+    de.a12.studio.models.treemodel.TreeNodeColumn mapping = new de.a12.studio.models.treemodel.TreeNodeColumn();
+    mapping.setElementRef(elementRef);
+    return mapping;
+  }
+
   @Test
   void theColumnDialogOffersTheNodesFieldOnlyWhenOpenedFromTheColumnMapping() throws Exception {
     assumeTrue(toolkitAvailable, "No JavaFX toolkit available");
     de.a12.studio.models.treemodel.TreeColumn column = new de.a12.studio.models.treemodel.TreeColumn();
     column.setName("Name");
-    column.setWidth(2);
+    column.setWidth(2.0);
 
     FxTestSupport.Loaded<TreeColumnDialogController> plain = FxTestSupport.load("/de/a12/studio/ui/editors/treemodel/dialogs/tree-column-dialog.fxml");
     FxTestSupport.onFx(() -> plain.controller().init(new Stage(), column));
@@ -274,7 +284,7 @@ class TreeConfigurationDialogsTest {
     assertFalse(plainBox.isManaged());
 
     FxTestSupport.Loaded<TreeColumnDialogController> mapped = FxTestSupport.load("/de/a12/studio/ui/editors/treemodel/dialogs/tree-column-dialog.fxml");
-    FxTestSupport.onFx(() -> mapped.controller().init(new Stage(), column, List.of("a", "b"), "gone"));
+    FxTestSupport.onFx(() -> mapped.controller().init(new Stage(), column, List.of("a", "b"), null, mapping("gone")));
     VBox mappedBox = FxTestSupport.field(mapped.controller(), "fieldBox");
     ComboBox<String> fieldCombo = FxTestSupport.field(mapped.controller(), "fieldCombo");
     assertTrue(mappedBox.isVisible());
@@ -286,7 +296,7 @@ class TreeConfigurationDialogsTest {
     TreeColumnDialogController.MappingResult result = mapped.controller().getMappingResult().orElseThrow();
     assertEquals("b", result.field());
     assertEquals("Name", result.column().getName());
-    assertEquals(2, result.column().getWidth());
+    assertEquals(2.0, result.column().getWidth());
   }
 
   @Test
@@ -309,8 +319,9 @@ class TreeConfigurationDialogsTest {
 
     de.a12.studio.models.treemodel.TreeColumn column = new de.a12.studio.models.treemodel.TreeColumn();
     column.setName("Name");
+    column.setWidth(de.a12.studio.models.treemodel.TreeColumn.DEFAULT_WIDTH);
     FxTestSupport.Loaded<TreeColumnDialogController> loaded = FxTestSupport.load("/de/a12/studio/ui/editors/treemodel/dialogs/tree-column-dialog.fxml");
-    FxTestSupport.onFx(() -> loaded.controller().init(new Stage(), column, options, index, fieldId));
+    FxTestSupport.onFx(() -> loaded.controller().init(new Stage(), column, options, index, mapping(fieldId)));
     ComboBox<String> fieldCombo = FxTestSupport.field(loaded.controller(), "fieldCombo");
     assertEquals(path, fieldCombo.getConverter().toString(fieldId));
     assertEquals("(None)", fieldCombo.getConverter().toString(null));
@@ -411,7 +422,8 @@ class TreeConfigurationDialogsTest {
   private static FxTestSupport.Loaded<TreeNodeContextMenuGroupDialogController> openGroup(Workspace workspace, TreeNodeActionGroup group) throws Exception {
     FxTestSupport.Loaded<TreeNodeContextMenuGroupDialogController> loaded =
         FxTestSupport.load("/de/a12/studio/ui/editors/treemodel/dialogs/tree-node-context-menu-group-dialog.fxml");
-    FxTestSupport.onFx(() -> loaded.controller().init(new Stage(), workspace.tree(), group));
+    FxTestSupport.onFx(() -> loaded.controller().init(new Stage(), workspace.tree(), group,
+        TreeActionContext.forNode(workspace.model(), workspace.node())));
     return loaded;
   }
 
@@ -445,6 +457,13 @@ class TreeConfigurationDialogsTest {
     Field currentProject = Studio.class.getDeclaredField("currentProject");
     currentProject.setAccessible(true);
     currentProject.set(null, project);
+    // TreeColumnsPanelController.refreshValidationError() calls Studio.getValidationService().
+    if (project == null) {
+      FxTestSupport.clearValidationService();
+    }
+    else {
+      FxTestSupport.setValidationServiceForProject(project);
+    }
   }
 
   private static Path locateBasicModels() throws IOException {

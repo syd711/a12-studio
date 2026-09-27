@@ -6,6 +6,7 @@ import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.treemodel.InitialExpansion;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
+import de.a12.studio.models.treemodel.TreeNodeActions;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
@@ -35,6 +36,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -119,8 +121,10 @@ public class TreeNodeTypesPanelController extends AbstractPropertyEditor impleme
 
   @FXML
   private void onAdd() {
-    Dialogs.showNodeForAdd(Studio.stage, projectItem).ifPresent(node -> {
+    Dialogs.showNodeForAdd(Studio.stage, projectItem, takenDocumentModels()).ifPresent(node -> {
       node.setId("node-" + shortId());
+      // Every new node type starts with SME's delete action, so nodes can be deleted at runtime.
+      node.getActions().add(TreeNodeActions.newDeleteAction(model.getLocales().stream().map(locale -> locale.getCode()).toList()));
       getNodes().add(node);
       selectedNode = node;
       rebuildRows();
@@ -247,8 +251,13 @@ public class TreeNodeTypesPanelController extends AbstractPropertyEditor impleme
     return label;
   }
 
+  /** The Document Models the node types use; one Document Model backs only one node type. */
+  private List<String> takenDocumentModels() {
+    return getNodes().stream().map(TreeNode::getDocumentModelRef).filter(Objects::nonNull).toList();
+  }
+
   private void openEditDialog(TreeNode node) {
-    Dialogs.showNodeForEdit(Studio.stage, projectItem, node).ifPresent(edited -> {
+    Dialogs.showNodeForEdit(Studio.stage, projectItem, node, takenDocumentModels()).ifPresent(edited -> {
       node.setDocumentModelRef(edited.getDocumentModelRef());
       rebuildRows();
       notifyChanged();

@@ -14,6 +14,7 @@ import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.treemodel.TreeConfiguration;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.ui.components.DialogController;
@@ -239,6 +240,10 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       if (model instanceof OverviewModel overviewModel) {
         subtitlesController.setCustom(() -> ensureConfiguration(overviewModel).getSubtitle());
         subtitlesController.setVisible(true);
+      } else if (model instanceof TreeModel treeModel) {
+        // SME's Tree Model has Subtitles next to its Labels and Hide Label, in configuration.subtitle.
+        subtitlesController.setCustom(() -> ensureConfiguration(treeModel).getSubtitle());
+        subtitlesController.setVisible(true);
       } else {
         subtitlesController.setVisible(false);
       }
@@ -307,6 +312,13 @@ public class ModelSettingsDialog implements Initializable, DialogController {
       formModel.setContent(new FormModelContent());
     }
     return formModel.getContent();
+  }
+
+  private TreeConfiguration ensureConfiguration(TreeModel treeModel) {
+    if (treeModel.getContent().getConfiguration() == null) {
+      treeModel.getContent().setConfiguration(new TreeConfiguration());
+    }
+    return treeModel.getContent().getConfiguration();
   }
 
   private OverviewConfiguration ensureConfiguration(OverviewModel overviewModel) {

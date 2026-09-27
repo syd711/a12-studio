@@ -1,0 +1,73 @@
+{
+  "header": {
+    "id": "TreeModelVersion11",
+    "modelType": "tree",
+    "modelVersion": "11.0.0",
+    "locales": [{"code": "en"}, {"code": "de"}],
+    "labels": [{"locale": "en", "text": "Tree 11"}],
+    "modelReferences": [
+      {"purpose": "document-model-for-tree", "modelType": "document", "alias": "DM1", "reference": "Product_DM"},
+      {"purpose": "relationship-model-for-tree", "modelType": "relationship", "alias": "RM1", "reference": "ProductProduct_Re"}
+    ]
+  },
+  "content": {
+    "configuration": {
+      "rootRef": "crc-1",
+      "hierarchicalColumnRef": "column-1",
+      "screenReaderColumnRef": "column-1",
+      "subtitle": [{"locale": "en", "text": "All products"}, {"locale": "de", "text": "Alle Produkte"}],
+      "virtualRoot": {
+        "label": [{"locale": "en", "text": "Catalog"}],
+        "actions": [
+          {"type": "insert", "position": "as_child", "primary": false, "destructive": false, "icon": {"name": "add"}},
+          {"type": "event", "event": "event_expand_whole_tree", "primary": false, "destructive": false}
+        ],
+        "contextMenu": {
+          "groups": [
+            {"name": "Add", "type": "add", "title": [{"locale": "en", "text": "Add"}], "actions": [{"type": "insert", "position": "as_child", "documentModelRef": "Product_DM"}]}
+          ]
+        }
+      },
+      "expansionStrategy": {"type": "level_by_level"}
+    },
+    "subHeaderBox": {"leftSlot": [], "rightSlot": []},
+    "footerBox": {"leftSlot": [], "rightSlot": []},
+    "columns": [
+      {
+        "id": "column-1",
+        "name": "Name",
+        "label": [{"locale": "en", "text": "Name"}, {"locale": "de", "text": "Name"}],
+        "labelHidden": true,
+        "icon": {"name": "label", "theme": "outlined"},
+        "width": 2.5,
+        "alignment": {"header": {"horizontal": "center", "vertical": "middle"}, "content": {"horizontal": "left", "vertical": "top"}},
+        "pinDirection": "left",
+        "fixedWidth": false,
+        "styles": {"header": ["s1"], "content": ["s1", "s2"]}
+      },
+      {"id": "column-2", "name": "Price", "label": [{"locale": "en", "text": "Price"}], "width": 0.3},
+      {"id": "column-3", "name": "Stock", "label": [{"locale": "en", "text": "Stock"}], "width": 1},
+      {"id": "column-4", "name": "Rating", "label": [{"locale": "en", "text": "Rating"}], "width": 1.0}
+    ],
+    "nodes": [
+      {
+        "id": "node-1",
+        "documentModelRef": "Product_DM",
+        "columns": [{"columnRef": "column-1", "elementRef": "field_1"}],
+        "childRelationshipConfigurations": [{"id": "crc-1", "relationshipModelRef": "ProductProduct_Re", "parentRole": "Parent"}],
+        "actions": [],
+        "rowActivation": {"type": "insert", "position": "below", "documentModelRef": "Product_DM"},
+        "configuration": {"dnd": false, "inherit": {"rowActivation": true}}
+      },
+      {
+        "id": "node-2",
+        "documentModelRef": "Book_DM",
+        "columns": [],
+        "childRelationshipConfigurations": [],
+        "actions": [],
+        "rowActivation": {"type": "event", "event": "event_toggle_expansion"}
+      }
+    ],
+    "styles": ["s1", "s2"]
+  }
+}

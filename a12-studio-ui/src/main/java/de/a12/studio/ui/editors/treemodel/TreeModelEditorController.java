@@ -6,6 +6,7 @@ import de.a12.studio.models.overviewmodel.BoxElement;
 import de.a12.studio.models.overviewmodel.ButtonElement;
 import de.a12.studio.models.overviewmodel.ElementBox;
 import de.a12.studio.models.treemodel.ExpansionStrategy;
+import de.a12.studio.models.treemodel.TreeEvents;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeModelContent;
 import de.a12.studio.ui.editors.AbstractEditorController;
@@ -18,8 +19,10 @@ import javafx.fxml.Initializable;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Edits a {@link TreeModel}: wires the panels of its four tabs - Columns ({@link TreeRootPanelController},
@@ -28,7 +31,7 @@ import java.util.UUID;
  * TreeInitialExpansionPanelController} while that strategy is "Level by level" or {@link
  * TreeExpansionDepthsPanelController} while it is "Tree", then {@link TreeWholeTreeExpansionPanelController}, {@link
  * TreePaginationPanelController} ("Level by level" only), {@link TreeMultiSelectionPanelController} and {@link
- * TreeDragAndDropPanelController}), Custom Actions (the
+ * TreeDragAndDropPanelController} and {@link TreeVirtualRootPanelController}), Custom Actions (the
  * Overview Model's {@link SubheaderSlotPanelController} for {@code content.subHeaderBox} - Button, Multi-Selection
  * and Expand All PopUp elements - and {@link EventButtonsPanelController} for the Button-only {@code
  * content.footerBox}; Major maps to {@code rightSlot}, Minor to {@code leftSlot}, and unlike the Overview Model
@@ -41,6 +44,9 @@ import java.util.UUID;
  * types, {@link TreeNodeConfigurationPanelController} shows the configuration of the node type selected there.
  */
 public class TreeModelEditorController extends AbstractEditorController implements Initializable {
+
+  // The model being edited, for what depends on it while a dialog opens.
+  private TreeModel currentModel;
 
   @FXML
   private TreeRootPanelController rootPanelController;
@@ -74,6 +80,9 @@ public class TreeModelEditorController extends AbstractEditorController implemen
 
   @FXML
   private TreeDragAndDropPanelController dragAndDropPanelController;
+
+  @FXML
+  private TreeVirtualRootPanelController virtualRootPanelController;
 
   @FXML
   private SubheaderSlotPanelController subheaderMajorController;
@@ -115,9 +124,23 @@ public class TreeModelEditorController extends AbstractEditorController implemen
       expansionDepthsPanelController.refresh();
     });
     nodeConfigurationPanelController.setOnDragDropChange(nodeTypesPanelController::refresh);
-    columnsPanelController.setOnChange(nodeConfigurationPanelController::refresh);
-    nodeConfigurationPanelController.setOnColumnsChange(columnsPanelController::refresh);
+    columnsPanelController.setOnChange(() -> {
+      nodeConfigurationPanelController.refresh();
+      accessibilityPanelController.refresh();
+    });
+    nodeConfigurationPanelController.setOnColumnsChange(() -> {
+      columnsPanelController.refresh();
+      accessibilityPanelController.refresh();
+    });
     configurationPanelController.setOnStrategyChange(this::showStrategyPanels);
+    // The events offered depend on the tree's relationships: no copy/paste events while one has a link Document Model.
+    Supplier<List<String>> headerEvents = () -> TreeEvents.candidates(TreeEvents.Context.HEADER, hasLinkDocumentModel());
+    subheaderMajorController.setEventSuggestions(headerEvents);
+    subheaderMinorController.setEventSuggestions(headerEvents);
+    footerMajorButtonsController.setEventSuggestions(headerEvents);
+    footerMinorButtonsController.setEventSuggestions(headerEvents);
+    multiSelectionPanelController.setEventSuggestions(
+        () -> TreeEvents.candidates(TreeEvents.Context.MULTI_SELECTION, hasLinkDocumentModel()));
     subheaderMajorController.setOnElementCreated(TreeModelEditorController::assignButtonId);
     subheaderMinorController.setOnElementCreated(TreeModelEditorController::assignButtonId);
   }
@@ -128,7 +151,12 @@ public class TreeModelEditorController extends AbstractEditorController implemen
     updateSettingsErrorBadge();
   }
 
+  private boolean hasLinkDocumentModel() {
+    return currentModel != null && projectItem != null && TreeProjectModels.hasLinkDocumentModel(currentModel, projectItem);
+  }
+
   private void load(@NonNull TreeModel model) {
+    this.currentModel = model;
     columnsPanelController.setModel(model);
     // Before the node types: setting them selects a node type, which fills the configuration panel.
     nodeConfigurationPanelController.setModel(model, projectItem);
@@ -141,6 +169,7 @@ public class TreeModelEditorController extends AbstractEditorController implemen
     configurationPanelController.setModel(model);
     multiSelectionPanelController.setModel(model);
     dragAndDropPanelController.setModel(model);
+    virtualRootPanelController.setModel(model, projectItem);
     virtualScrollingPanelController.setModel(model);
     rowHeightActionColumnWidthPanelController.setModel(model);
     columnsResizePanelController.setModel(model);

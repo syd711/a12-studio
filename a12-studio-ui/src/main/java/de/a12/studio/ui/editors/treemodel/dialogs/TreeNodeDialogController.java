@@ -3,13 +3,16 @@ package de.a12.studio.ui.editors.treemodel.dialogs;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.ui.components.DialogController;
+import de.a12.studio.ui.editors.treemodel.TreeProjectModels;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -61,10 +64,25 @@ public class TreeNodeDialogController implements DialogController {
   }
 
   void init(Stage stage, ProjectItem projectItem, TreeNode existing) {
+    init(stage, projectItem, existing, List.of());
+  }
+
+  /**
+   * As above, offering the project's Document Models and Combination Models (SME offers both) except those in {@code taken}
+   * - the Document Models of the other node types, since one Document Model backs only one node type. The one {@code
+   * existing} has stays available.
+   */
+  void init(Stage stage, ProjectItem projectItem, TreeNode existing, List<String> taken) {
     this.stage = stage;
 
-    documentModelField.getItems().setAll(ColumnMappingEditor.documentModelIds(projectItem));
-    documentModelField.setValue(existing != null ? existing.getDocumentModelRef() : null);
+    String current = existing != null ? existing.getDocumentModelRef() : null;
+    List<String> choices = new ArrayList<>(TreeProjectModels.nodeDocumentModelIds(projectItem));
+    choices.removeIf(id -> taken.contains(id) && !id.equals(current));
+    if (current != null && !choices.contains(current)) {
+      choices.add(current);
+    }
+    documentModelField.getItems().setAll(choices);
+    documentModelField.setValue(current);
   }
 
   Optional<TreeNode> getResult() {

@@ -11,6 +11,7 @@ import de.a12.studio.ui.editors.propertyeditors.AnnotationsPanelController;
 import de.a12.studio.ui.editors.propertyeditors.IconPanelController;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
 import de.a12.studio.ui.editors.propertyeditors.PriorityPanelController;
+import de.a12.studio.ui.editors.treemodel.TreeActionContext;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -34,7 +35,8 @@ import java.util.function.BiConsumer;
  * inserts a node at a Position, optionally of a given Document Model, and can take its label, title and icon from
  * that model), Confirmation Text, "Visual Settings" (Priority, Destructive, Icon, Hide Label, Label, Description,
  * Styles) and Annotations. Which Events make sense is open-ended, so the field is an editable combo with the
- * events SME's Tree Engine knows as suggestions.
+ * events of the action's {@link TreeActionContext} as suggestions (a custom name is kept, the Tree Engine hands it to the
+ * application).
  * <p>
  * The action starts out unattached (Add) or as a JSON clone of the real one (Edit, see {@link
  * Dialogs#showActionForEdit}) - the caller only splices it into its list once {@link #isConfirmed()} is true.
@@ -42,11 +44,6 @@ import java.util.function.BiConsumer;
  * shares a deferred save mode so nothing is persisted while the dialog is open.
  */
 public class TreeNodeActionDialogController implements DialogController {
-
-  // The row events (incl. copy/paste) SME's Tree Engine handles itself, see its tmEvents.ts.
-  private static final List<String> EVENT_SUGGESTIONS = List.of("event_add_link", "event_delete_link", "event_delete_node",
-      "event_expand_sub_tree", "event_collapse_sub_tree", "event_copy_node", "event_copy_node_and_children", "event_cut_node",
-      "event_paste", "event_paste_above", "event_paste_below");
 
   private static final List<String> TYPES = List.of(TreeNodeAction.TYPE_EVENT, TreeNodeAction.TYPE_INSERT);
   private static final List<String> POSITIONS = List.of(TreeNodeAction.POSITION_AS_CHILD, TreeNodeAction.POSITION_ABOVE, TreeNodeAction.POSITION_BELOW);
@@ -62,6 +59,9 @@ public class TreeNodeActionDialogController implements DialogController {
 
   @FXML
   private VBox insertBox;
+
+  @FXML
+  private VBox positionBox;
 
   @FXML
   private ComboBox<String> positionField;
@@ -112,6 +112,10 @@ public class TreeNodeActionDialogController implements DialogController {
 
   private Stage stage;
 
+  private ProjectItem projectItem;
+
+  private TreeActionContext context;
+
   private TreeNodeAction action;
 
   private Optional<ButtonType> result = Optional.of(ButtonType.CANCEL);
@@ -145,7 +149,6 @@ public class TreeNodeActionDialogController implements DialogController {
     });
 
     eventField.setEditable(true);
-    eventField.getItems().setAll(EVENT_SUGGESTIONS);
     eventField.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
         action.setEvent(blankToNull(newValue));
@@ -159,6 +162,7 @@ public class TreeNodeActionDialogController implements DialogController {
     positionField.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel && newValue != null) {
         action.setPosition(newValue);
+        refreshDocumentModelChoices();
       }
     });
 
@@ -187,8 +191,11 @@ public class TreeNodeActionDialogController implements DialogController {
    * @param insertOnly whether the action can only be an insert action, as in a context menu's "add" group; the Type is
    *                   then fixed.
    */
-  void init(@NonNull Stage stage, @NonNull ProjectItem projectItem, @NonNull TreeNodeAction action, boolean insertOnly) {
+  void init(@NonNull Stage stage, @NonNull ProjectItem projectItem, @NonNull TreeNodeAction action, boolean insertOnly,
+      @NonNull TreeActionContext context) {
     this.stage = stage;
+    this.projectItem = projectItem;
+    this.context = context;
     this.action = action;
 
     if (insertOnly && !action.isInsert()) {
@@ -198,9 +205,12 @@ public class TreeNodeActionDialogController implements DialogController {
     if (action.getType() == null) {
       action.setType(TreeNodeAction.TYPE_EVENT);
     }
-    if (action.isInsert() && action.getPosition() == null) {
+    if (action.isInsert() && (action.getPosition() == null || context.virtualRoot())) {
+      // The Virtual Root always inserts as child (SME sets that on import and offers no Position there).
       action.setPosition(TreeNodeAction.POSITION_AS_CHILD);
     }
+    positionBox.setVisible(!context.virtualRoot());
+    positionBox.setManaged(!context.virtualRoot());
 
     updatingFromModel = true;
     try {
@@ -208,15 +218,12 @@ public class TreeNodeActionDialogController implements DialogController {
       typeField.setDisable(insertOnly);
       eventField.getEditor().setText(action.getEvent());
       positionField.setValue(action.getPosition());
-
-      List<String> documentModels = new ArrayList<>();
-      documentModels.add(null);
-      documentModels.addAll(ColumnMappingEditor.documentModelIds(projectItem));
-      if (action.getDocumentModelRef() != null && !documentModels.contains(action.getDocumentModelRef())) {
-        documentModels.add(action.getDocumentModelRef());
+      List<String> events = new ArrayList<>(context.eventCandidates(projectItem));
+      if (action.getEvent() != null && !events.contains(action.getEvent())) {
+        events.add(action.getEvent());
       }
-      documentModelField.getItems().setAll(documentModels);
-      documentModelField.setValue(action.getDocumentModelRef());
+      eventField.getItems().setAll(events);
+      refreshDocumentModelChoices();
       documentModelField.setPromptText(StudioBundle.get("tree_node_action.default_document_model"));
 
       useLabelFromDocumentModelField.setSelected(Boolean.TRUE.equals(action.getUseLabelFromDocumentModel()));
@@ -255,6 +262,7 @@ public class TreeNodeActionDialogController implements DialogController {
         updatingFromModel = false;
       }
       action.setPosition(positionField.getValue());
+      refreshDocumentModelChoices();
     }
     else {
       action.setPosition(null);
@@ -276,6 +284,30 @@ public class TreeNodeActionDialogController implements DialogController {
       }
     }
     refreshTypeDependents();
+  }
+
+  /**
+   * Offers the Document Models an insert can create at the current Position (SME's candidates: by position, the child
+   * relationships' Document Models or the node's and its siblings'), plus an empty choice for "the default one" and - so a
+   * stored value stays visible, and is reported by the validator - a value that is no longer a candidate.
+   */
+  private void refreshDocumentModelChoices() {
+    List<String> documentModels = new ArrayList<>();
+    documentModels.add(null);
+    documentModels.addAll(context.documentModelCandidates(projectItem, action.getPosition()));
+    String current = action.getDocumentModelRef();
+    if (current != null && !documentModels.contains(current)) {
+      documentModels.add(current);
+    }
+    boolean wasUpdating = updatingFromModel;
+    updatingFromModel = true;
+    try {
+      documentModelField.getItems().setAll(documentModels);
+      documentModelField.setValue(current);
+    }
+    finally {
+      updatingFromModel = wasUpdating;
+    }
   }
 
   private void refreshTypeDependents() {

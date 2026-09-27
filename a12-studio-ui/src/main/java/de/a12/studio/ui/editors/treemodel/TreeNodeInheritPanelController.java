@@ -39,7 +39,7 @@ public class TreeNodeInheritPanelController extends AbstractPropertyEditor imple
   @FXML
   private CheckBox contextMenuField;
   @FXML
-  private CheckBox defaultRowActionField;
+  private CheckBox rowActivationField;
   @FXML
   private CheckBox rowTitleField;
   @FXML
@@ -65,7 +65,7 @@ public class TreeNodeInheritPanelController extends AbstractPropertyEditor imple
     fields.put(Part.ICON, iconField);
     fields.put(Part.ACTIONS, actionsField);
     fields.put(Part.CONTEXT_MENU, contextMenuField);
-    fields.put(Part.DEFAULT_ROW_ACTION, defaultRowActionField);
+    fields.put(Part.ROW_ACTIVATION, rowActivationField);
     fields.put(Part.ROW_TITLE, rowTitleField);
     fields.put(Part.STYLES, stylesField);
     fields.forEach((part, field) -> field.selectedProperty().addListener((observable, oldValue, inherited) -> {

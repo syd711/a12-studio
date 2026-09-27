@@ -10,6 +10,8 @@ import lombok.Setter;
 @Setter
 public class Alignment {
 
+  // Tree Model columns may set only the vertical part, so an absent key must stay absent.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String horizontal;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String vertical;

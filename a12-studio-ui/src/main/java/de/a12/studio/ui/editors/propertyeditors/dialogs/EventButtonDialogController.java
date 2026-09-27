@@ -138,8 +138,19 @@ public class EventButtonDialogController implements DialogController {
   }
 
   void init(@NonNull Stage stage, @NonNull OverviewButtonLike button) {
+    init(stage, button, null);
+  }
+
+  /**
+   * As above, offering {@code eventSuggestions} as the events to choose from ({@code null}: the Overview / Form defaults);
+   * the field stays freely editable, and an event the button already has is kept.
+   */
+  void init(@NonNull Stage stage, @NonNull OverviewButtonLike button, List<String> eventSuggestions) {
     this.stage = stage;
     this.button = button;
+    if (eventSuggestions != null) {
+      eventField.getItems().setAll(eventSuggestions);
+    }
 
     boolean isButton = isButton(button);
     buttonOnlyBox.setVisible(isButton);

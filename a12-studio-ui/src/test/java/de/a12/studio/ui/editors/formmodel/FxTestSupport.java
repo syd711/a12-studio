@@ -48,6 +48,26 @@ public final class FxTestSupport {
     selectedProjectItem = item;
   }
 
+  /**
+   * Sets {@code Studio.validationService} to a fresh {@link de.a12.studio.modelsvalidation.ValidationService} over {@code
+   * project} (may be {@code null}), via reflection - several panels (e.g. {@code TreeColumnsPanelController}) call {@code
+   * Studio.getValidationService()} while initializing, which is otherwise only populated by the real app's
+   * {@code ProjectOpenedEvent} handler. Call {@link #clearValidationService()} in the test's cleanup, since it is static
+   * state shared with every other test.
+   */
+  public static void setValidationServiceForProject(Project project) throws Exception {
+    Field field = Studio.class.getDeclaredField("validationService");
+    field.setAccessible(true);
+    field.set(null, new de.a12.studio.modelsvalidation.ValidationService(project));
+  }
+
+  /** Undoes {@link #setValidationServiceForProject}. */
+  public static void clearValidationService() throws Exception {
+    Field field = Studio.class.getDeclaredField("validationService");
+    field.setAccessible(true);
+    field.set(null, null);
+  }
+
   public static synchronized boolean startToolkit() throws Exception {
     if (toolkitAvailable != null) {
       return toolkitAvailable;

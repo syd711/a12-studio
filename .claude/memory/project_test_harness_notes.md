@@ -1,9 +1,11 @@
 ---
 name: test-harness-notes
-description: How to run the full suite on Windows (locked build/ workaround, short-path mirror), the FxTestSupport JavaFX harness, and the debounced-save vs @TempDir trap; the suite has no known red tests since 2026-09-21
+description: How to run the full suite on Windows (locked build/ workaround, short-path mirror), the FxTestSupport JavaFX harness, and the debounced-save vs @TempDir trap; 2 known pre-existing red tests as of 2026-09-27 (see update below), not 0
 metadata:
   type: project
 ---
+
+**Update (2026-09-27): the "0 failures" baseline below is stale.** Running per-module/per-package **in place** (no mirror needed this time - the locked-`build/` issue did not occur) found 2 reproducible, pre-existing failures unrelated to whatever feature is in progress: `FixtureWorkspacesFormValidatorsTest.realFormModelsHaveNoDriftAgainstTheirDocumentModels` (the documented `City_Fm.json` drift) and `TypesettingModelEditorTest.theModelSettingsDialogOffersNothingButTheRoles`. [[tree-node-configuration]] independently logged 7 on 2026-09-26 (adding `ContentModelEditorPanelsTest`, 5, not re-checked this session). Treat "green" claims in this file as needing a fresh check, not as still true; a full-suite `:a12-studio-ui:test` run in one process also hit a Java heap `OutOfMemoryError` in this environment on 2026-09-27 - run per-package/per-class instead of a whole-module run when memory is tight, e.g. `--tests 'de.a12.studio.ui.editors.<package>.*'` or a list of `--tests '<FQCN>'`.
 
 **Baseline (2026-09-21, end of day): the whole suite is green** - 1457 tests, 9 skipped, 0 failures (`./gradlew test --continue --offline` in a mirror, see below). The two tests that used to be red (`QueryValidatorsTest.sortFieldReferenceValidatorReportsMissingField`, `ApplicationGroupFeatureTest.prefixesEveryModelAndRewritesReferences`) were stale fixtures, fixed 2026-09-21: a Query sort fixture in the old `sortBy`-wrapper shape (on the wire `field`/`direction` sit directly on the sort entry, `QuerySort` uses `@JsonUnwrapped`), and `testing/workspaces/basic/models/QueryModel.json`, which was removed in 43a6a3f0 while the application-groups test still read it (the test now writes its own Query Model). **Any red test is therefore a regression**, no exemption list exists. When a fixture-reading test fails, check first whether the fixture still exists / still has the wire shape - `git log -- <fixture>` - before suspecting the code.
 

@@ -119,8 +119,16 @@ public class MultiSelectionActionDialogController implements DialogController {
   }
 
   public void initDialog(Stage stage, @NonNull Button button) {
+    initDialog(stage, button, null);
+  }
+
+  /** As above, offering {@code eventSuggestions} as the events to choose from ({@code null}: the Overview's). */
+  public void initDialog(Stage stage, @NonNull Button button, List<String> eventSuggestions) {
     this.stage = stage;
     this.button = button;
+    if (eventSuggestions != null) {
+      eventField.getItems().setAll(eventSuggestions);
+    }
 
     updatingFromModel = true;
     try {

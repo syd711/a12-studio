@@ -83,6 +83,7 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
   // Identifies a row-reorder drag; unique per panel instance so drags from a sibling slot's row list are
   // rejected rather than accepted into this one. Created once in configure().
   private DataFormat indexFormat;
+  private Supplier<List<String>> eventSuggestions;
 
   // Notified after every structural change (add/reorder/delete/type change), so the owning editor can keep
   // sibling panels whose validation derives from this list (e.g. the Multi-Selection panel's "exactly one
@@ -225,8 +226,16 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
     });
   }
 
+  /**
+   * Offers the events {@code eventSuggestions} supplies in the button dialog instead of the Overview defaults (read whenever
+   * a dialog opens); {@code null} keeps the defaults.
+   */
+  public void setEventSuggestions(Supplier<List<String>> eventSuggestions) {
+    this.eventSuggestions = eventSuggestions;
+  }
+
   private void openEditDialog(OverviewButtonLike button) {
-    Dialogs.showEventButtonForEdit(Studio.stage, button).ifPresent(edited -> {
+    Dialogs.showEventButtonForEdit(Studio.stage, button, eventSuggestions != null ? eventSuggestions.get() : null).ifPresent(edited -> {
       int index = rows.indexOf(button);
       if (index >= 0) {
         rows.set(index, (BoxElement) edited);

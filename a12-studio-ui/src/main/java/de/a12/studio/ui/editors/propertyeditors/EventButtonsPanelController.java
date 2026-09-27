@@ -67,6 +67,7 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   // same window, e.g. subheader/footer major/minor buttons), so drags from a sibling instance's row list are
   // rejected rather than accepted into this one. Created once in configure(), keyed off settingsKeySuffix.
   private DataFormat indexFormat;
+  private Supplier<List<String>> eventSuggestions;
 
   /**
    * Binds this panel to {@code rows}. {@code rows} doesn't need to be declared as {@code List<EventButtonLike>}
@@ -87,9 +88,21 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
     rebuildRows();
   }
 
+  /**
+   * Offers the events {@code eventSuggestions} supplies in the button dialog instead of the Overview / Form defaults (read
+   * whenever a dialog opens, so it may depend on the model's current state); {@code null} keeps the defaults.
+   */
+  public void setEventSuggestions(Supplier<List<String>> eventSuggestions) {
+    this.eventSuggestions = eventSuggestions;
+  }
+
+  private List<String> suggestions() {
+    return eventSuggestions != null ? eventSuggestions.get() : null;
+  }
+
   @FXML
   private void onAdd() {
-    Dialogs.showEventButtonForAdd(Studio.stage, () -> (OverviewButtonLike) newRowFactory.get()).ifPresent(row -> {
+    Dialogs.showEventButtonForAdd(Studio.stage, () -> (OverviewButtonLike) newRowFactory.get(), suggestions()).ifPresent(row -> {
       rows.add(row);
       rebuildRows();
       commitHeaderChange();
@@ -97,7 +110,7 @@ public class EventButtonsPanelController extends AbstractPropertyEditor {
   }
 
   private void openEditDialog(EventButtonLike row) {
-    Dialogs.showEventButtonForEdit(Studio.stage, (OverviewButtonLike) row).ifPresent(edited -> {
+    Dialogs.showEventButtonForEdit(Studio.stage, (OverviewButtonLike) row, suggestions()).ifPresent(edited -> {
       rows.set(rows.indexOf(row), edited);
       rebuildRows();
       commitHeaderChange();

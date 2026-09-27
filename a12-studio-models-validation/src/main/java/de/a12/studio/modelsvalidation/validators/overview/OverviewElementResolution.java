@@ -64,7 +64,7 @@ public final class OverviewElementResolution {
 
   /** {@code documentModelId} resolved as a plain Document Model, or - if it names a Combination Model instead
    * - the synthetic merge {@link CombinedDocumentModelElements#resolveForFieldReferences} makes of it. */
-  private static DocumentModel resolveDocumentModelOrCombination(String documentModelId, ValidationContext context) {
+  public static DocumentModel resolveDocumentModelOrCombination(String documentModelId, ValidationContext context) {
     if (documentModelId == null) {
       return null;
     }

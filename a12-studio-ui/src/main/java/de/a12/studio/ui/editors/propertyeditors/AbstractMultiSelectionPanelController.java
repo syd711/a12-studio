@@ -107,6 +107,11 @@ public abstract class AbstractMultiSelectionPanelController extends AbstractProp
   protected void onEnabledChanged() {
   }
 
+  /** The events the action dialog offers; {@code null} keeps the Overview's. */
+  protected List<String> eventSuggestions() {
+    return null;
+  }
+
   /** Called for a freshly added action before it is stored, e.g. to give it an id. */
   protected void onActionCreated(@NonNull Button button) {
   }
@@ -269,7 +274,7 @@ public abstract class AbstractMultiSelectionPanelController extends AbstractProp
 
   @FXML
   private void onAddAction() {
-    Dialogs.showMultiSelectionActionForAdd(Studio.stage).ifPresent(button -> {
+    Dialogs.showMultiSelectionActionForAdd(Studio.stage, eventSuggestions()).ifPresent(button -> {
       onActionCreated(button);
       getActions().add(button);
       rebuildActionRows();
@@ -323,7 +328,7 @@ public abstract class AbstractMultiSelectionPanelController extends AbstractProp
   }
 
   private void openEditDialog(Button button) {
-    if (Dialogs.showMultiSelectionActionForEdit(Studio.stage, button)) {
+    if (Dialogs.showMultiSelectionActionForEdit(Studio.stage, button, eventSuggestions())) {
       rebuildActionRows();
       commitHeaderChange();
     }

@@ -62,6 +62,7 @@ public class TreeNodeActionsPanelController extends AbstractPropertyEditor {
   private Supplier<List<TreeNodeAction>> actionsSupplier;
   private BooleanSupplier insertOnly = () -> false;
   private Supplier<TreeNodeAction> newAction = TreeNodeAction::new;
+  private Supplier<TreeActionContext> context;
   private DataFormat indexFormat;
 
   // Notified after every change, so the owner can e.g. drop an owning object that became empty.
@@ -74,16 +75,19 @@ public class TreeNodeActionsPanelController extends AbstractPropertyEditor {
    *                        group); queried whenever a dialog opens, since the owner's type can change meanwhile.
    * @param newAction       creates the draft an Add starts from, so a list can seed the fields SME requires of its
    *                        actions (a row action needs a priority, a context-menu action has none).
+   * @param context         where the actions are (the node type or the Virtual Root), which decides what the dialog's
+   *                        pickers offer; called whenever a dialog opens, since the selected node type changes.
    */
   public void configure(@NonNull String title, @NonNull String settingsKeySuffix, @NonNull ProjectItem projectItem,
       @NonNull Supplier<List<TreeNodeAction>> actionsSupplier, @NonNull BooleanSupplier insertOnly,
-      @NonNull Supplier<TreeNodeAction> newAction) {
+      @NonNull Supplier<TreeNodeAction> newAction, @NonNull Supplier<TreeActionContext> context) {
     setTitle(title);
     setSettingsKeySuffix(settingsKeySuffix);
     this.projectItem = projectItem;
     this.actionsSupplier = actionsSupplier;
     this.insertOnly = insertOnly;
     this.newAction = newAction;
+    this.context = context;
     if (indexFormat == null) {
       indexFormat = new DataFormat("application/x-a12-tree-node-action-index" + settingsKeySuffix + "-" + INSTANCE_COUNTER.incrementAndGet());
     }
@@ -105,14 +109,14 @@ public class TreeNodeActionsPanelController extends AbstractPropertyEditor {
 
   @FXML
   private void onAdd() {
-    Dialogs.showActionForAdd(Studio.stage, projectItem, newAction.get(), insertOnly.getAsBoolean()).ifPresent(action -> {
+    Dialogs.showActionForAdd(Studio.stage, projectItem, newAction.get(), insertOnly.getAsBoolean(), context.get()).ifPresent(action -> {
       getActions().add(action);
       changed();
     });
   }
 
   private void openEditDialog(TreeNodeAction action) {
-    Dialogs.showActionForEdit(Studio.stage, projectItem, action, insertOnly.getAsBoolean()).ifPresent(edited -> {
+    Dialogs.showActionForEdit(Studio.stage, projectItem, action, insertOnly.getAsBoolean(), context.get()).ifPresent(edited -> {
       getActions().set(getActions().indexOf(action), edited);
       changed();
     });

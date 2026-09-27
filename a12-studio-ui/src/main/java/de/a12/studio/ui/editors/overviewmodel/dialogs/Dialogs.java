@@ -16,6 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import org.jspecify.annotations.NonNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -54,20 +55,30 @@ public class Dialogs {
   }
 
   public static Optional<Button> showMultiSelectionActionForAdd(Stage owner) {
+    return showMultiSelectionActionForAdd(owner, null);
+  }
+
+  /** As above, offering {@code eventSuggestions} instead of the Overview's. */
+  public static Optional<Button> showMultiSelectionActionForAdd(Stage owner, List<String> eventSuggestions) {
     Button button = new Button();
-    return showMultiSelectionAction(owner, StudioBundle.get("add_action_title"), button) ? Optional.of(button) : Optional.empty();
+    return showMultiSelectionAction(owner, StudioBundle.get("add_action_title"), button, eventSuggestions) ? Optional.of(button) : Optional.empty();
   }
 
   public static boolean showMultiSelectionActionForEdit(Stage owner, Button button) {
-    return showMultiSelectionAction(owner, StudioBundle.get("edit_action_title"), button);
+    return showMultiSelectionActionForEdit(owner, button, null);
   }
 
-  private static boolean showMultiSelectionAction(Stage owner, String title, Button button) {
+  /** As above, offering {@code eventSuggestions} instead of the Overview's. */
+  public static boolean showMultiSelectionActionForEdit(Stage owner, Button button, List<String> eventSuggestions) {
+    return showMultiSelectionAction(owner, StudioBundle.get("edit_action_title"), button, eventSuggestions);
+  }
+
+  private static boolean showMultiSelectionAction(Stage owner, String title, Button button, List<String> eventSuggestions) {
     FXMLLoader fxmlLoader = new FXMLLoader(MultiSelectionActionDialogController.class.getResource("overview-multi-selection-action-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("overview-multi-selection-action-dialog", fxmlLoader, owner, title);
     MultiSelectionActionDialogController controller = (MultiSelectionActionDialogController) stage.getUserData();
-    controller.initDialog(stage, button);
+    controller.initDialog(stage, button, eventSuggestions);
     stage.setOnHidden(event -> controller.destroy());
     WidgetFactory.installResizable(stage);
 

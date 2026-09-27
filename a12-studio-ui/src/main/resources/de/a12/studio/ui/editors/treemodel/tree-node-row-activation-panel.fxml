@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
 <TitledPane fx:id="root" expanded="true" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%tree_node_row_activation_panel.title" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="de.a12.studio.ui.editors.treemodel.TreeNodeRowActivationPanelController">
@@ -16,21 +14,39 @@
             <fx:include fx:id="errorContainer" source="/de/a12/studio/ui/components/error-container.fxml" BorderPane.alignment="CENTER" />
         </top>
         <center>
-            <GridPane hgap="10.0" vgap="8.0">
-                <columnConstraints>
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                    <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                </columnConstraints>
+            <VBox spacing="10.0">
                 <children>
-                    <HBox alignment="CENTER_LEFT" spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <VBox spacing="2.0">
                         <children>
-                            <CheckBox fx:id="customField" mnemonicParsing="false" text="%tree_node_row_activation_panel.custom" />
-                            <Label fx:id="customInfoIcon" />
+                            <HBox alignment="CENTER_LEFT" spacing="6.0">
+                                <children>
+                                    <Label styleClass="field-label" text="%tree_node_row_activation_panel.type" />
+                                    <Label fx:id="typeInfoIcon" />
+                                </children>
+                            </HBox>
+                            <ComboBox fx:id="typeField" maxWidth="Infinity" />
                         </children>
-                    </HBox>
-                    <TextField fx:id="eventField" promptText="%event" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                    </VBox>
+                    <VBox fx:id="eventBox" spacing="2.0">
+                        <children>
+                            <Label styleClass="field-label" text="%event" />
+                            <ComboBox fx:id="eventField" maxWidth="Infinity" promptText="%event" />
+                        </children>
+                    </VBox>
+                    <VBox fx:id="positionBox" spacing="2.0">
+                        <children>
+                            <Label styleClass="field-label" text="%tree_node_action.position" />
+                            <ComboBox fx:id="positionField" maxWidth="Infinity" />
+                        </children>
+                    </VBox>
+                    <VBox fx:id="documentModelBox" spacing="2.0">
+                        <children>
+                            <Label styleClass="field-label" text="%document_model" />
+                            <ComboBox fx:id="documentModelField" maxWidth="Infinity" promptText="%tree_node_action.default_document_model" />
+                        </children>
+                    </VBox>
                 </children>
-            </GridPane>
+            </VBox>
         </center>
     </BorderPane>
 </TitledPane>

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.a12.studio.models.Label;
 import de.a12.studio.models.overviewmodel.Icon;
-import de.a12.studio.models.overviewmodel.RowAction;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,13 +16,14 @@ import java.util.Map;
 /**
  * One node type of a Tree Model. {@code configuration} keeps SME's free-form flags ({@code dnd}, {@code inherit},
  * {@code showInherit}); a node whose Document Model is a sub type of another node's may inherit the columns,
- * child relationship configurations, icon, actions, context menu, default row action, row title and styles of
+ * child relationship configurations, icon, actions, context menu, row activation, row title and styles of
  * that node instead of defining its own, see {@code configuration.inherit}.
  */
 @Getter
 @Setter
 public class TreeNode {
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Map<String, Object> configuration;
   private String id;
   private List<TreeNodeAction> actions = new ArrayList<>();
@@ -34,10 +34,10 @@ public class TreeNode {
   private Icon icon;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private TreeNodeContextMenu contextMenu;
-  // Absent = the Tree Engine's default behavior (view/edit); otherwise custom is true and the event is either set
-  // (row click fires it) or omitted (rows are not interactive), same as the Overview Model's row activation.
+  // Absent = the Tree Engine's default behavior (view/edit), see RowActivation. (Tree model 11.0.0 replaced the
+  // former "defaultRowAction"; a file still carrying that key keeps it in extras, migrating is not done.)
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  private RowAction defaultRowAction;
+  private RowActivation rowActivation;
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Label> rowTitle = new ArrayList<>();
   @JsonInclude(JsonInclude.Include.NON_EMPTY)

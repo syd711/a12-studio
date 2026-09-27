@@ -3,8 +3,10 @@ package de.a12.studio.ui.editors.treemodel;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.treemodel.RowActivation;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
+import de.a12.studio.models.treemodel.TreeNodeAction;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.formmodel.FxTestSupport;
@@ -12,6 +14,7 @@ import de.a12.studio.ui.util.StudioBundle;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -430,48 +433,77 @@ class TreeNodeConfigurationPanelTest {
         "SME's own files keep an empty inherit object");
   }
 
-  // ---- default row action ----
+  // ---- row activation ----
 
   @Test
-  void aCustomRowActionIsAnObjectWithTheEventAndDefaultsToAbsent(@TempDir Path dir) throws Exception {
+  void theRowActivationTypesWriteTheirShapeAndDefaultToAbsent(@TempDir Path dir) throws Exception {
     Workspace workspace = workspace(dir);
     TreeNode node = workspace.model().getContent().getNodes().get(0);
     FxTestSupport.Loaded<TreeNodeRowActivationPanelController> loaded = load("tree-node-row-activation-panel.fxml");
-    FxTestSupport.onFx(() -> loaded.controller().setNode(node));
-    CheckBox custom = field(loaded.controller(), "customField");
-    TextField event = field(loaded.controller(), "eventField");
-    assertFalse(custom.isSelected());
-    assertTrue(event.isDisabled(), "no event without a custom row action");
-    assertNull(node.getDefaultRowAction());
+    FxTestSupport.onFx(() -> {
+      loaded.controller().setModel(workspace.model(), workspace.tree());
+      loaded.controller().setNode(node);
+    });
+    ComboBox<String> type = field(loaded.controller(), "typeField");
+    ComboBox<String> event = field(loaded.controller(), "eventField");
+    ComboBox<String> position = field(loaded.controller(), "positionField");
+    VBox eventBox = field(loaded.controller(), "eventBox");
+    VBox positionBox = field(loaded.controller(), "positionBox");
+    VBox documentModelBox = field(loaded.controller(), "documentModelBox");
+    assertEquals("", type.getValue(), "the default is the absent rowActivation");
+    assertNull(node.getRowActivation());
+    assertFalse(eventBox.isVisible());
+    assertFalse(positionBox.isVisible());
+    assertFalse(documentModelBox.isVisible());
+    assertTrue(event.getItems().contains("event_open_node"));
+    assertTrue(event.getItems().contains("event_toggle_expansion"));
 
-    FxTestSupport.onFx(() -> custom.setSelected(true));
-    assertFalse(event.isDisabled());
-    FxTestSupport.onFx(() -> event.setText("event_open"));
+    FxTestSupport.onFx(() -> type.setValue(RowActivation.TYPE_EVENT));
+    assertTrue(eventBox.isVisible());
+    assertFalse(positionBox.isVisible());
+    FxTestSupport.onFx(() -> event.getEditor().setText("selectPerson"));
+    assertEquals(RowActivation.TYPE_EVENT, reloaded(workspace.tree()).getContent().getNodes().get(0).getRowActivation().getType());
+    assertEquals("selectPerson", reloaded(workspace.tree()).getContent().getNodes().get(0).getRowActivation().getEvent(),
+        "a custom event name is kept");
 
-    assertEquals(Boolean.TRUE, reloaded(workspace.tree()).getContent().getNodes().get(0).getDefaultRowAction().getCustom());
-    assertEquals("event_open", reloaded(workspace.tree()).getContent().getNodes().get(0).getDefaultRowAction().getEvent());
+    FxTestSupport.onFx(() -> type.setValue(RowActivation.TYPE_INSERT));
+    assertFalse(eventBox.isVisible());
+    assertTrue(positionBox.isVisible());
+    assertTrue(documentModelBox.isVisible());
+    assertEquals(TreeNodeAction.POSITION_AS_CHILD, position.getValue(), "as child is the default position");
+    RowActivation insert = reloaded(workspace.tree()).getContent().getNodes().get(0).getRowActivation();
+    assertEquals(RowActivation.TYPE_INSERT, insert.getType());
+    assertEquals(TreeNodeAction.POSITION_AS_CHILD, insert.getPosition());
+    assertNull(insert.getEvent(), "switching the type drops the other type's settings");
 
-    FxTestSupport.onFx(() -> custom.setSelected(false));
-    assertNull(reloaded(workspace.tree()).getContent().getNodes().get(0).getDefaultRowAction());
-    assertFalse(Files.readString(workspace.tree().getFile().toPath()).contains("defaultRowAction"), "back to absent");
+    FxTestSupport.onFx(() -> type.setValue(RowActivation.TYPE_NON_INTERACTIVE));
+    assertEquals(RowActivation.TYPE_NON_INTERACTIVE, reloaded(workspace.tree()).getContent().getNodes().get(0).getRowActivation().getType());
+    assertFalse(eventBox.isVisible() || positionBox.isVisible());
+
+    FxTestSupport.onFx(() -> type.setValue(""));
+    assertNull(reloaded(workspace.tree()).getContent().getNodes().get(0).getRowActivation());
+    assertFalse(Files.readString(workspace.tree().getFile().toPath()).contains("rowActivation"), "back to absent");
   }
 
   @Test
-  void aLoadedCustomRowActionIsShown(@TempDir Path dir) throws Exception {
+  void aLoadedRowActivationIsShown(@TempDir Path dir) throws Exception {
     Workspace workspace = workspace(dir);
     TreeNode node = workspace.model().getContent().getNodes().get(0);
-    de.a12.studio.models.overviewmodel.RowAction rowAction = new de.a12.studio.models.overviewmodel.RowAction();
-    rowAction.setCustom(true);
-    rowAction.setEvent("event_open");
-    node.setDefaultRowAction(rowAction);
+    RowActivation activation = new RowActivation();
+    activation.setType(RowActivation.TYPE_EVENT);
+    activation.setEvent("event_open_node");
+    node.setRowActivation(activation);
     FxTestSupport.Loaded<TreeNodeRowActivationPanelController> loaded = load("tree-node-row-activation-panel.fxml");
-    FxTestSupport.onFx(() -> loaded.controller().setNode(node));
+    FxTestSupport.onFx(() -> {
+      loaded.controller().setModel(workspace.model(), workspace.tree());
+      loaded.controller().setNode(node);
+    });
 
-    CheckBox custom = field(loaded.controller(), "customField");
-    TextField event = field(loaded.controller(), "eventField");
-    assertTrue(custom.isSelected());
-    assertEquals("event_open", event.getText());
-    assertFalse(event.isDisabled());
+    ComboBox<String> type = field(loaded.controller(), "typeField");
+    ComboBox<String> event = field(loaded.controller(), "eventField");
+    assertEquals(RowActivation.TYPE_EVENT, type.getValue());
+    assertEquals("event_open_node", event.getEditor().getText());
+    assertTrue(((VBox) field(loaded.controller(), "eventBox")).isVisible());
   }
 
   // ---- drag & drop and column mapping ----
@@ -506,7 +538,7 @@ class TreeNodeConfigurationPanelTest {
     Workspace workspace = workspace(dir);
     TreeNode node = workspace.model().getContent().getNodes().get(0);
     de.a12.studio.models.treemodel.TreeColumn column = workspace.model().getContent().getColumns().get(0);
-    column.setWidth(3);
+    column.setWidth(3.0);
     column.setPinDirection("left");
     node.getColumns().clear();
     de.a12.studio.models.treemodel.TreeNodeColumn mapping = new de.a12.studio.models.treemodel.TreeNodeColumn();
@@ -544,21 +576,21 @@ class TreeNodeConfigurationPanelTest {
 
     de.a12.studio.models.treemodel.TreeColumn edited = new de.a12.studio.models.treemodel.TreeColumn();
     edited.setName("Renamed");
-    edited.setWidth(5);
+    edited.setWidth(5.0);
     edited.setPinDirection("right");
-    FxTestSupport.onFx(() -> loaded.controller().applyEdit(column, edited, "someField"));
+    FxTestSupport.onFx(() -> loaded.controller().applyEdit(column, edited, "someField", null));
 
     de.a12.studio.models.treemodel.TreeModel saved = reloaded(workspace.tree());
     assertEquals("Renamed", saved.getContent().getColumns().get(0).getName());
     assertEquals(column.getId(), saved.getContent().getColumns().get(0).getId(), "the id is kept");
-    assertEquals(5, saved.getContent().getColumns().get(0).getWidth());
+    assertEquals(5.0, saved.getContent().getColumns().get(0).getWidth());
     assertEquals("right", saved.getContent().getColumns().get(0).getPinDirection());
     assertEquals("someField", saved.getContent().getNodes().get(0).getColumns().get(0).getElementRef());
     assertEquals(1, columnChanges[0]);
     VBox rows = field(loaded.controller(), "columnMappingRows");
     assertEquals("Renamed", label(rows, 0, "#columnMappingName-0"), "the rows are rebuilt from the model");
 
-    FxTestSupport.onFx(() -> loaded.controller().applyEdit(column, edited, null));
+    FxTestSupport.onFx(() -> loaded.controller().applyEdit(column, edited, null, null));
     assertTrue(reloaded(workspace.tree()).getContent().getNodes().get(0).getColumns().isEmpty(), "no field, no mapping");
   }
 
@@ -571,7 +603,7 @@ class TreeNodeConfigurationPanelTest {
     FxTestSupport.onFx(() -> {
       loaded.controller().setModel(workspace.model(), workspace.tree());
       loaded.controller().setNode(node);
-      loaded.controller().applyEdit(column, column, "someField");
+      loaded.controller().applyEdit(column, column, "someField", null);
       workspace.model().getContent().getConfiguration().setHierarchicalColumnRef(column.getId());
       loaded.controller().removeColumn(column);
     });
@@ -648,6 +680,13 @@ class TreeNodeConfigurationPanelTest {
     Field currentProject = Studio.class.getDeclaredField("currentProject");
     currentProject.setAccessible(true);
     currentProject.set(null, project);
+    // TreeColumnsPanelController.refreshValidationError() calls Studio.getValidationService().
+    if (project == null) {
+      FxTestSupport.clearValidationService();
+    }
+    else {
+      FxTestSupport.setValidationServiceForProject(project);
+    }
   }
 
   private static Path locateBasicModels() throws IOException {

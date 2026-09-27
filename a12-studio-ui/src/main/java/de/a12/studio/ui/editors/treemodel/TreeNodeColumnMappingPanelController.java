@@ -3,7 +3,9 @@ package de.a12.studio.ui.editors.treemodel;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.treemodel.TreeColumn;
 import de.a12.studio.models.treemodel.TreeModel;
+import de.a12.studio.models.treemodel.TreeColumns;
 import de.a12.studio.models.treemodel.TreeNode;
+import de.a12.studio.models.treemodel.TreeNodeColumn;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -122,7 +124,7 @@ public class TreeNodeColumnMappingPanelController extends AbstractPropertyEditor
     Label fieldLabel = createRowLabel(field != null ? ColumnMappingEditor.displayPath(elementIndex, field) : "", "columnMappingField-" + index, column);
     fieldLabel.getStyleClass().add("path-text");
     lockWidth(fieldLabel, 220.0);
-    Label widthLabel = createRowLabel(column.getWidth() != null ? String.valueOf(column.getWidth()) : "", "columnMappingWidth-" + index, column);
+    Label widthLabel = createRowLabel(column.getWidthText(), "columnMappingWidth-" + index, column);
     lockWidth(widthLabel, 70.0);
     Label pinDirectionLabel = createRowLabel(column.getPinDirection() != null ? column.getPinDirection() : "", "columnMappingPinDirection-" + index, column);
     lockWidth(pinDirectionLabel, 120.0);
@@ -175,17 +177,20 @@ public class TreeNodeColumnMappingPanelController extends AbstractPropertyEditor
   private void openEditDialog(TreeColumn column) {
     // Without a project item (an editor not opened from the project tree) there are no fields to offer.
     List<String> fieldOptions = projectItem != null ? ColumnMappingEditor.fieldOptionsFor(projectItem, node.getDocumentModelRef()) : List.of();
-    String field = ColumnMappingEditor.mappedElementRef(node.getColumns(), column.getId());
-    Dialogs.showColumnForEdit(Studio.stage, column, fieldOptions, elementIndex, field).ifPresent(edited -> applyEdit(column, edited.column(), edited.field()));
+    TreeNodeColumn mapping = node.getColumns().stream().filter(candidate -> column.getId() != null && column.getId().equals(candidate.getColumnRef()))
+        .findFirst().orElse(null);
+    Dialogs.showColumnForEdit(Studio.stage, column, fieldOptions, elementIndex, mapping)
+        .ifPresent(edited -> applyEdit(column, edited.column(), edited.field(), edited.configuration()));
   }
 
-  /** Copies the edited attributes onto the tree's {@code column} and stores the chosen field in the node's mapping. */
-  void applyEdit(TreeColumn column, TreeColumn edited, String field) {
-    column.setName(edited.getName());
-    column.setWidth(edited.getWidth());
-    column.setFixedWidth(edited.getFixedWidth());
-    column.setPinDirection(edited.getPinDirection());
-    setMapping(column.getId(), field);
+  /**
+   * Copies the edited attributes onto the tree's {@code column} and stores the chosen field - with its display mode, for an
+   * attachment or multi-select field - in the node's mapping.
+   */
+  void applyEdit(TreeColumn column, TreeColumn edited, String field, TreeNodeColumn.Configuration configuration) {
+    column.applyFrom(edited);
+    TreeColumns.sortByPinDirection(getColumns());
+    setMapping(column.getId(), field, configuration);
     columnsChanged();
   }
 
@@ -219,17 +224,17 @@ public class TreeNodeColumnMappingPanelController extends AbstractPropertyEditor
     onColumnsChange.run();
   }
 
-  /** Sets the node's field for {@code columnId}; clearing it drops the mapping unless it carries a display-mode override. */
-  private void setMapping(String columnId, String elementRef) {
+  /** Sets the node's field and display mode for {@code columnId}; clearing the field drops the mapping altogether. */
+  private void setMapping(String columnId, String elementRef, TreeNodeColumn.Configuration configuration) {
     if (columnId == null) {
       return;
     }
     if (elementRef == null) {
-      node.getColumns().removeIf(mapping -> columnId.equals(mapping.getColumnRef()) && mapping.getConfiguration() == null);
-      if (node.getColumns().stream().noneMatch(mapping -> columnId.equals(mapping.getColumnRef()))) {
-        return;
-      }
+      node.getColumns().removeIf(mapping -> columnId.equals(mapping.getColumnRef()));
+      return;
     }
     ColumnMappingEditor.setMappedElementRef(node.getColumns(), columnId, elementRef);
+    node.getColumns().stream().filter(mapping -> columnId.equals(mapping.getColumnRef())).findFirst()
+        .ifPresent(mapping -> mapping.setConfiguration(configuration));
   }
 }

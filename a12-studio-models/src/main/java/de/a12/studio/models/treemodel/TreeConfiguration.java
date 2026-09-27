@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.a12.studio.models.Label;
 import de.a12.studio.models.overviewmodel.MultiSelectionConfig;
 import lombok.Getter;
 import lombok.Setter;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.DoubleNode;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -30,6 +33,15 @@ public class TreeConfiguration {
   private String rootRef;
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String hierarchicalColumnRef;
+  // One of the columns (a column id): the one whose text a screen reader announces to identify a row.
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String screenReaderColumnRef;
+  // The multilingual line below the model's label; absent from the JSON when empty.
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  private List<Label> subtitle = new ArrayList<>();
+  // Absent = no Virtual Root (SME's "Enable Virtual Root" is not stored, the key's presence is the flag).
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private TreeVirtualRoot virtualRoot;
   // SME writes this as `true` or omits it ("Hide Label"), never `false`.
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean labelHidden;

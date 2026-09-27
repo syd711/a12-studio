@@ -83,7 +83,13 @@ fxmlLoader.setResources(StudioBundle.getBundle());
    * attached to the model tree by this method itself.
    */
   public static Optional<OverviewButtonLike> showEventButtonForAdd(Stage owner, Supplier<OverviewButtonLike> newInstanceFactory) {
-    return showEventButton(owner, StudioBundle.get("add_event_button_title"), newInstanceFactory.get());
+    return showEventButtonForAdd(owner, newInstanceFactory, null);
+  }
+
+  /** As above, offering {@code eventSuggestions} (the events of the tree's Subheader / Footer, say) instead of the defaults. */
+  public static Optional<OverviewButtonLike> showEventButtonForAdd(Stage owner, Supplier<OverviewButtonLike> newInstanceFactory,
+      List<String> eventSuggestions) {
+    return showEventButton(owner, StudioBundle.get("add_event_button_title"), newInstanceFactory.get(), eventSuggestions);
   }
 
   /**
@@ -92,16 +98,21 @@ fxmlLoader.setResources(StudioBundle.getBundle());
    * caller only replaces the original row with the returned one once present.
    */
   public static Optional<OverviewButtonLike> showEventButtonForEdit(Stage owner, OverviewButtonLike row) {
-    String title = StudioBundle.get(EventButtonDialogController.isButton(row) ? "edit_event_button_title" : "edit_subheader_element_title");
-    return showEventButton(owner, title, cloneRow(row));
+    return showEventButtonForEdit(owner, row, null);
   }
 
-  private static Optional<OverviewButtonLike> showEventButton(Stage owner, String title, OverviewButtonLike row) {
+  /** As above, offering {@code eventSuggestions} instead of the defaults. */
+  public static Optional<OverviewButtonLike> showEventButtonForEdit(Stage owner, OverviewButtonLike row, List<String> eventSuggestions) {
+    String title = StudioBundle.get(EventButtonDialogController.isButton(row) ? "edit_event_button_title" : "edit_subheader_element_title");
+    return showEventButton(owner, title, cloneRow(row), eventSuggestions);
+  }
+
+  private static Optional<OverviewButtonLike> showEventButton(Stage owner, String title, OverviewButtonLike row, List<String> eventSuggestions) {
     FXMLLoader fxmlLoader = new FXMLLoader(EventButtonDialogController.class.getResource("event-button-dialog.fxml"));
     fxmlLoader.setResources(StudioBundle.getBundle());
     Stage stage = WidgetFactory.createDialogStage("event-button-dialog", fxmlLoader, owner, title);
     EventButtonDialogController controller = (EventButtonDialogController) stage.getUserData();
-    controller.init(stage, row);
+    controller.init(stage, row, eventSuggestions);
     stage.setOnHidden(event -> controller.destroy());
     WidgetFactory.installResizable(stage);
 

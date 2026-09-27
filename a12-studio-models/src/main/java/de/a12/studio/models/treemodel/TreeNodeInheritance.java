@@ -1,6 +1,6 @@
 package de.a12.studio.models.treemodel;
 
-import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.A12Model;
 import de.a12.studio.models.documentmodel.DocumentModelHeterogeneity;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public final class TreeNodeInheritance {
     ICON("icon"),
     ACTIONS("actions"),
     CONTEXT_MENU("contextMenu"),
-    DEFAULT_ROW_ACTION("defaultRowAction"),
+    ROW_ACTIVATION("rowActivation"),
     ROW_TITLE("rowTitle"),
     STYLES("styles");
 
@@ -49,7 +49,7 @@ public final class TreeNodeInheritance {
    * Whether {@code node}'s Document Model is a (direct or indirect) sub type of the Document Model of another node
    * in {@code nodes}, so it has something to inherit from.
    */
-  public static boolean isSubTypeNode(TreeNode node, List<TreeNode> nodes, Collection<DocumentModel> documentModels) {
+  public static boolean isSubTypeNode(TreeNode node, List<TreeNode> nodes, Collection<? extends A12Model<?>> documentModels) {
     if (node.getDocumentModelRef() == null) {
       return false;
     }
@@ -102,7 +102,7 @@ public final class TreeNodeInheritance {
       case ICON -> node.getIcon() != null && node.getIcon().getName() != null;
       case ACTIONS -> !node.getActions().isEmpty();
       case CONTEXT_MENU -> node.getContextMenu() != null && !node.getContextMenu().getGroups().isEmpty();
-      case DEFAULT_ROW_ACTION -> node.getDefaultRowAction() != null && Boolean.TRUE.equals(node.getDefaultRowAction().getCustom());
+      case ROW_ACTIVATION -> node.getRowActivation() != null;
       case ROW_TITLE -> !node.getRowTitle().isEmpty();
       case STYLES -> !node.getStyles().isEmpty();
     };
@@ -116,7 +116,7 @@ public final class TreeNodeInheritance {
       case ICON -> node.setIcon(null);
       case ACTIONS -> node.setActions(new ArrayList<>());
       case CONTEXT_MENU -> node.setContextMenu(null);
-      case DEFAULT_ROW_ACTION -> node.setDefaultRowAction(null);
+      case ROW_ACTIVATION -> node.setRowActivation(null);
       case ROW_TITLE -> node.setRowTitle(new ArrayList<>());
       case STYLES -> node.setStyles(new ArrayList<>());
     }

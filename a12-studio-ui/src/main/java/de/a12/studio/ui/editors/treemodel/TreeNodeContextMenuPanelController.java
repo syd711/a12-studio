@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.treemodel;
 
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.models.treemodel.TreeNodeActionGroup;
 import de.a12.studio.models.treemodel.TreeNodeContextMenu;
@@ -26,19 +27,24 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Edits the selected node type's {@code contextMenu} (SME "Context Menu"): one draggable, reorderable row per named
+ * Edits a {@code contextMenu} (SME "Context Menu") - the selected node type's, or the Virtual Root's: one draggable, reorderable row per named
  * group, summarizing its Group Name and Actions; a click on a row or its pencil opens {@link
  * Dialogs#showContextMenuGroupForEdit}, the Add button {@link Dialogs#showContextMenuGroupForAdd}. Not bound to a
- * single {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern. The node's
- * {@code contextMenu} is only created with its first group and dropped again with its last, since SME treats a
- * node without groups as having no context menu.
+ * single {@link de.a12.studio.models.documentmodel.Element}, so it follows the model-header pattern. The {@code
+ * contextMenu} is only created with its first group and dropped again with its last, since SME treats an owner without
+ * groups as having no context menu.
  */
 public class TreeNodeContextMenuPanelController extends AbstractPropertyEditor {
 
-  private static final DataFormat GROUP_INDEX = new DataFormat("application/x-a12-tree-context-menu-group-index");
+  // javafx.scene.input.DataFormat registers its mime type in a process-wide static registry and throws if the same
+  // string is registered twice, so every instance gets a counter of its own (see TreeNodeActionsPanelController).
+  private static final AtomicLong INSTANCE_COUNTER = new AtomicLong();
 
   // The move up/down + edit + delete buttons at the end of each row (3 * 34px buttons + 2 * 4px spacing).
   private static final double ACTIONS_BOX_WIDTH = 110.0;
@@ -52,45 +58,78 @@ public class TreeNodeContextMenuPanelController extends AbstractPropertyEditor {
   @FXML
   private Label emptyLabel;
 
+  private final DataFormat groupIndex = new DataFormat("application/x-a12-tree-context-menu-group-index-" + INSTANCE_COUNTER.incrementAndGet());
+
   private ProjectItem projectItem;
-  private TreeNode node;
+  private TreeModel model;
+  private Supplier<TreeNodeContextMenu> menuGetter;
+  private Consumer<TreeNodeContextMenu> menuSetter;
+  private Supplier<TreeActionContext> context;
 
   public void setProjectItem(@NonNull ProjectItem projectItem) {
     this.projectItem = projectItem;
   }
 
-  /** Binds the panel to {@code node}, or to nothing ({@code null}). */
+  public void setModel(@NonNull TreeModel model) {
+    this.model = model;
+  }
+
+  /** Binds the panel to {@code node}'s context menu, or to nothing ({@code null}); {@link #setModel} comes first. */
   public void setNode(TreeNode node) {
-    this.node = node;
+    if (node == null) {
+      configure(null, null, null);
+    }
+    else {
+      configure(node::getContextMenu, node::setContextMenu, () -> TreeActionContext.forNode(model, node));
+    }
+  }
+
+  /**
+   * Binds the panel to any owner of a context menu.
+   *
+   * @param menuGetter reads the menu ({@code null} while it has no groups); {@code null} unbinds the panel
+   * @param menuSetter stores or - {@code null} - drops the menu
+   * @param context    where the menu is, which decides what the pickers of the group dialog offer
+   */
+  public void configure(Supplier<TreeNodeContextMenu> menuGetter, Consumer<TreeNodeContextMenu> menuSetter,
+      Supplier<TreeActionContext> context) {
+    this.menuGetter = menuGetter;
+    this.menuSetter = menuSetter;
+    this.context = context;
+    rebuildRows();
+  }
+
+  /** Re-reads the menu, e.g. after it changed from outside this panel. */
+  public void refresh() {
     rebuildRows();
   }
 
   private List<TreeNodeActionGroup> getGroups() {
-    TreeNodeContextMenu contextMenu = node.getContextMenu();
+    TreeNodeContextMenu contextMenu = menuGetter.get();
     return contextMenu != null ? contextMenu.getGroups() : List.of();
   }
 
   @FXML
   private void onAdd() {
-    Dialogs.showContextMenuGroupForAdd(Studio.stage, projectItem).ifPresent(group -> {
-      if (node.getContextMenu() == null) {
-        node.setContextMenu(new TreeNodeContextMenu());
+    Dialogs.showContextMenuGroupForAdd(Studio.stage, projectItem, context.get()).ifPresent(group -> {
+      if (menuGetter.get() == null) {
+        menuSetter.accept(new TreeNodeContextMenu());
       }
-      node.getContextMenu().getGroups().add(group);
+      menuGetter.get().getGroups().add(group);
       changed();
     });
   }
 
   private void openEditDialog(TreeNodeActionGroup group) {
-    Dialogs.showContextMenuGroupForEdit(Studio.stage, projectItem, group).ifPresent(edited -> {
+    Dialogs.showContextMenuGroupForEdit(Studio.stage, projectItem, group, context.get()).ifPresent(edited -> {
       getGroups().set(getGroups().indexOf(group), edited);
       changed();
     });
   }
 
   private void changed() {
-    if (node.getContextMenu() != null && node.getContextMenu().getGroups().isEmpty()) {
-      node.setContextMenu(null);
+    if (menuGetter.get() != null && menuGetter.get().getGroups().isEmpty()) {
+      menuSetter.accept(null);
     }
     rebuildRows();
     commitHeaderChange();
@@ -98,7 +137,7 @@ public class TreeNodeContextMenuPanelController extends AbstractPropertyEditor {
 
   private void rebuildRows() {
     groupRows.getChildren().clear();
-    if (node == null) {
+    if (menuGetter == null) {
       return;
     }
 
@@ -139,7 +178,7 @@ public class TreeNodeContextMenuPanelController extends AbstractPropertyEditor {
     HBox row = new HBox(10.0, dragHandle, nameLabel, actionsLabel, actionsBox);
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
-    RowFactory.setupRowDragAndDrop(row, dragHandle, GROUP_INDEX, index, this::moveViaDrag);
+    RowFactory.setupRowDragAndDrop(row, dragHandle, groupIndex, index, this::moveViaDrag);
     return row;
   }
 

@@ -6,6 +6,7 @@ import de.a12.studio.models.treemodel.TreeNodeActionGroup;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.PropertyEditorSaveMode;
 import de.a12.studio.ui.editors.propertyeditors.LocalizedTextPanelController;
+import de.a12.studio.ui.editors.treemodel.TreeActionContext;
 import de.a12.studio.ui.editors.treemodel.TreeNodeActionsPanelController;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
@@ -103,7 +104,7 @@ public class TreeNodeContextMenuGroupDialogController implements DialogControlle
     });
   }
 
-  void init(@NonNull Stage stage, @NonNull ProjectItem projectItem, @NonNull TreeNodeActionGroup group) {
+  void init(@NonNull Stage stage, @NonNull ProjectItem projectItem, @NonNull TreeNodeActionGroup group, @NonNull TreeActionContext context) {
     this.stage = stage;
     this.group = group;
 
@@ -118,7 +119,7 @@ public class TreeNodeContextMenuGroupDialogController implements DialogControlle
 
     titleController.setCustom(group::getTitle);
     actionsController.configure(StudioBundle.get("actions"), ".contextMenuGroupActions", projectItem, group::getActions,
-        () -> TreeNodeActionGroup.TYPE_ADD.equals(group.getType()), TreeNodeAction::new);
+        () -> TreeNodeActionGroup.TYPE_ADD.equals(group.getType()), TreeNodeAction::new, () -> context);
   }
 
   /** Unregisters the embedded panels once this dialog is closed - see {@link Dialogs}. */
