@@ -76,6 +76,18 @@ public final class StringTypeConfigValidator implements ModelValidator {
       errors.add(error(model, elementId, ElementProperty.DATA_TYPE,
           ValidationMessages.get("validation.stringTypeConfig.lineBreakAndAlphabeticalSorting", elementId)));
     }
+    if (Boolean.TRUE.equals(stringType.getNoValueValidation())) {
+      if (stringType.getLineBreaksPermitted() == null) {
+        errors.add(error(model, elementId, ElementProperty.DATA_TYPE,
+            ValidationMessages.get("validation.stringTypeConfig.noValueValidationRequiresLineBreaksSetting", elementId)));
+      }
+      if ((stringType.getPattern() != null && !stringType.getPattern().isEmpty())
+          || stringType.getMinLength() != null
+          || (stringType.getHintList() != null && !stringType.getHintList().isEmpty())) {
+        errors.add(error(model, elementId, ElementProperty.DATA_TYPE,
+            ValidationMessages.get("validation.stringTypeConfig.noValueValidationConflict", elementId)));
+      }
+    }
   }
 
   private static boolean isValidRegex(String pattern) {

@@ -418,6 +418,22 @@ class DocumentModelValidatorsTest {
     assertEquals("field_same", errors.get(0).elementId());
   }
 
+  /**
+   * Gap 5 in "Document Model: gap review (2026-09-27)": two sibling elements in the same group sharing a
+   * display name (but not an id, already covered by {@link DuplicateIdValidator}) must be reported, mirroring
+   * SME's {@code A12_DUPLICATE_NAME_WITHIN_GROUP} family. Confirms {@code getElementsWithDuplicatedNames} is
+   * already wired up, since relative-path rule/computation expressions resolve by name.
+   */
+  @Test
+  void missingReferenceValidatorReportsDuplicateElementName() {
+    DocumentModel model = load("MissingReferenceValidator_duplicateName");
+    List<ModelValidationError> errors = new MissingReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(2, errors.size(), "Both siblings sharing the duplicated name must be reported");
+    assertTrue(errors.stream().map(ModelValidationError::elementId)
+        .allMatch(id -> "field_one".equals(id) || "field_two".equals(id)));
+  }
+
   @Test
   void numberFieldValueLimitValidatorReportsExcessiveMaxValue() {
     DocumentModel model = load("NumberFieldValueLimitValidator_invalid");
@@ -467,6 +483,18 @@ class DocumentModelValidatorsTest {
 
     assertFalse(errors.isEmpty(), "A rule with an empty error code/condition must be reported");
     assertTrue(errors.stream().allMatch(error -> "rule_broken".equals(error.elementId())));
+  }
+
+  /** Gap 6 in "Document Model: gap review (2026-09-27)": a leading digit, a leading "xml" (case-insensitive)
+   * and a dot/colon sequence are each invalid element names, mirroring SME's name-pattern rules. */
+  @Test
+  void basicConsistencyValidatorReportsInvalidNamePattern() {
+    DocumentModel model = load("BasicConsistencyValidator_invalidNamePattern");
+    List<ModelValidationError> errors = new BasicConsistencyValidator().validate(model, TestModels.context(model));
+
+    assertEquals(3, errors.size());
+    assertTrue(errors.stream().map(ModelValidationError::elementId)
+        .allMatch(id -> List.of("field_leading_digit", "field_xml_prefix", "field_dot_sequence").contains(id)));
   }
 
   @Test

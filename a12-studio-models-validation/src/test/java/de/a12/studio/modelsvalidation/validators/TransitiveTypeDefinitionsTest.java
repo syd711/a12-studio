@@ -138,6 +138,28 @@ class TransitiveTypeDefinitionsTest {
     assertFalse(TransitiveTypeDefinitions.importedModelIds(tdmA, List.of(tdmB)).contains("B_TDM"));
   }
 
+  /**
+   * The Include-only twin of {@link #importedModelIds}: backs the Include picker's loop-prevention filter
+   * (mirrors SME's {@code createsIncludeLoop}), by finding every model {@code Invoice_DM} already includes,
+   * directly or transitively, so a picker for a new Include on {@code Order_DM} can reject any candidate whose
+   * own Include chain already reaches back to {@code Order_DM}.
+   */
+  @Test
+  void includedModelIdsFindsTransitiveIncludesForCycleDetectionInThePicker() {
+    DocumentModel order = modelWithIncludes("Order_DM", "Product_DM");
+    DocumentModel product = new DocumentModel();
+    product.setId("Product_DM");
+    product.setContent(new DocumentModelContent());
+    product.getContent().setModelRoot(new ModelRoot());
+    DocumentModel invoice = modelWithIncludes("Invoice_DM", "Order_DM");
+
+    Set<String> includedByInvoice = TransitiveTypeDefinitions.includedModelIds(invoice, List.of(order, product));
+
+    assertEquals(Set.of("Order_DM", "Product_DM"), includedByInvoice);
+    assertTrue(includedByInvoice.contains("Order_DM"), "Picking Invoice_DM as Order_DM's Include would close a cycle");
+    assertFalse(TransitiveTypeDefinitions.includedModelIds(product, List.of(order, invoice)).contains("Order_DM"));
+  }
+
   private static DocumentModel modelWithImports(String id, String... references) {
     DocumentModel model = new DocumentModel();
     model.setId(id);

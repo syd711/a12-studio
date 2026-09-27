@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.util.NameConventionValidation;
 import javafx.beans.binding.Bindings;
@@ -99,25 +100,36 @@ public class IncludeDialogController implements DialogController {
 
   /**
    * Every {@link DocumentModel} in {@code project} that can be the target of an Include: excludes {@code
-   * excludedModel} itself (a model can't include itself) and Type Definition models (which aren't
-   * includable business objects), sorted by id for a stable, predictable dropdown order.
+   * excludedModel} itself (a model can't include itself), Type Definition models (which aren't includable
+   * business objects), and - mirroring SME's {@code createsIncludeLoop} check - any candidate that already
+   * includes (directly or transitively) {@code excludedModel}, since picking it would close an Include cycle;
+   * sorted by id for a stable, predictable dropdown order.
    */
   private static List<DocumentModel> includableModels(@NonNull Project project, DocumentModel excludedModel) {
+    List<DocumentModel> allModels = new ArrayList<>();
+    collectAllDocumentModels(project.getRoot(), allModels);
+
     List<DocumentModel> result = new ArrayList<>();
-    collectIncludableModels(project.getRoot(), excludedModel, result);
+    for (DocumentModel candidate : allModels) {
+      if (candidate instanceof TypeDefinitionModel || candidate == excludedModel) {
+        continue;
+      }
+      if (excludedModel != null && TransitiveTypeDefinitions.includedModelIds(candidate, allModels).contains(excludedModel.getId())) {
+        continue;
+      }
+      result.add(candidate);
+    }
     result.sort(Comparator.comparing(DocumentModel::getId));
     return result;
   }
 
-  private static void collectIncludableModels(@NonNull ProjectItem item, DocumentModel excludedModel, @NonNull List<DocumentModel> result) {
+  private static void collectAllDocumentModels(@NonNull ProjectItem item, @NonNull List<DocumentModel> result) {
     if (item.isFolder()) {
       for (ProjectItem child : item.getChildren()) {
-        collectIncludableModels(child, excludedModel, result);
+        collectAllDocumentModels(child, result);
       }
     }
-    else if (item.getModel() instanceof DocumentModel documentModel
-        && !(documentModel instanceof TypeDefinitionModel)
-        && documentModel != excludedModel) {
+    else if (item.getModel() instanceof DocumentModel documentModel) {
       result.add(documentModel);
     }
   }

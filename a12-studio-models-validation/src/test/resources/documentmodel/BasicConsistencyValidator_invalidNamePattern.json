@@ -1,0 +1,87 @@
+{
+  "header": {
+    "id": "BasicConsistencyValidator_invalidNamePattern",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "BasicConsistencyValidator_invalidNamePattern",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": [
+        {
+          "type": "Group",
+          "id": "group_root",
+          "name": "Root",
+          "Group": {
+            "repeatability": 1,
+            "elements": [
+              {
+                "type": "Field",
+                "id": "field_leading_digit",
+                "name": "1Field",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "First"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_xml_prefix",
+                "name": "xmlNote",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Second"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "Field",
+                "id": "field_dot_sequence",
+                "name": "Weird..Name",
+                "Field": {
+                  "fieldType": {
+                    "type": "StringType"
+                  },
+                  "label": [
+                    {
+                      "locale": "en",
+                      "text": "Third"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

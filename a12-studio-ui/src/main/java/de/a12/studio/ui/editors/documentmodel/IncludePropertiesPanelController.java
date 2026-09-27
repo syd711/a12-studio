@@ -8,6 +8,7 @@ import de.a12.studio.models.documentmodel.IncludeConfig;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.modelsvalidation.ElementProperty;
+import de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -20,6 +21,7 @@ import javafx.scene.control.ComboBox;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -102,15 +104,21 @@ public class IncludePropertiesPanelController extends AbstractPropertyEditor imp
   /**
    * Every other Document Model in the project this Include could reference, mirroring {@link
    * de.a12.studio.ui.editors.documentmodel.dialogs.IncludeDialogController}'s selection: Type Definition
-   * models aren't includable business objects, and a model can't include itself.
+   * models aren't includable business objects, a model can't include itself, and - mirroring SME's {@code
+   * createsIncludeLoop} check - a candidate that already includes (directly or transitively) this model is
+   * excluded too, since picking it would close an Include cycle.
    */
   private static List<String> includableModelIds() {
     ProjectItem projectItem = Studio.getSelectedProjectItem();
-    if (projectItem == null) {
+    if (projectItem == null || !(projectItem.getModel() instanceof DocumentModel currentModel)) {
       return List.of();
     }
-    return ProjectDocumentModels.getOtherDocumentModels(projectItem).stream()
+    List<DocumentModel> otherModels = ProjectDocumentModels.getOtherDocumentModels(projectItem);
+    List<DocumentModel> allModels = new ArrayList<>(otherModels);
+    allModels.add(currentModel);
+    return otherModels.stream()
         .filter(model -> !(model instanceof TypeDefinitionModel))
+        .filter(candidate -> !TransitiveTypeDefinitions.includedModelIds(candidate, allModels).contains(currentModel.getId()))
         .map(DocumentModel::getId)
         .sorted(Comparator.naturalOrder())
         .toList();

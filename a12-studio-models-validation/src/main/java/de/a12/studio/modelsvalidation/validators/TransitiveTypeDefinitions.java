@@ -101,6 +101,35 @@ public final class TransitiveTypeDefinitions {
   }
 
   /**
+   * Every {@link DocumentModel} id reachable from {@code model} through Include groups alone, transitively -
+   * the Include-only twin of {@link #importedModelIds}, used the same way: to reject a candidate Include in
+   * the picker that would close a cycle (including a model that already includes, directly or transitively,
+   * the model doing the including). Mirrors SME's {@code createsIncludeLoop} check.
+   */
+  public static Set<String> includedModelIds(@NonNull DocumentModel model, @NonNull List<DocumentModel> otherModels) {
+    Set<String> visited = new LinkedHashSet<>();
+    collectIncludedModelIds(model, otherModels, visited);
+    return visited;
+  }
+
+  private static void collectIncludedModelIds(DocumentModel model, List<DocumentModel> otherModels, Set<String> visited) {
+    for (Element element : new ElementIndex(model).allElements()) {
+      if (!(element instanceof GroupElement groupElement) || groupElement.getGroup() == null) {
+        continue;
+      }
+      IncludeConfig includeConfig = groupElement.getGroup().getIncludeConfig();
+      if (includeConfig == null) {
+        continue;
+      }
+      DocumentModel included = resolveReference(includeConfig.getReference(), otherModels);
+      if (included == null || !visited.add(included.getId())) {
+        continue;
+      }
+      collectIncludedModelIds(included, otherModels, visited);
+    }
+  }
+
+  /**
    * True if {@code model}'s own Import graph - not {@code model}'s direct Import references themselves (those
    * are already checked by {@link de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator}),
    * but every Import reference reachable transitively from {@code model} - has a broken edge somewhere.

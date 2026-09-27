@@ -47,6 +47,9 @@ public final class BasicConsistencyValidator implements ModelValidator {
       if (isBlank(element.getName())) {
         errors.add(error(model, element.getId(), ElementProperty.GENERAL,
             ValidationMessages.get("validation.basicConsistency.emptyName", element.getId())));
+      } else if (!isValidNamePattern(element.getName())) {
+        errors.add(error(model, element.getId(), ElementProperty.GENERAL,
+            ValidationMessages.get("validation.basicConsistency.invalidNamePattern", element.getId(), element.getName())));
       }
       if (element instanceof FieldElement field && field.getField() != null) {
         checkEnumerationOrTypeDef(model, index, field, errors);
@@ -148,6 +151,22 @@ public final class BasicConsistencyValidator implements ModelValidator {
 
   private static boolean isBlank(String value) {
     return value == null || value.isBlank();
+  }
+
+  /**
+   * Mirrors SME/kernel's Group/Field/Rule/Computation name-pattern rules (SME's {@code DomainGroup.json}/
+   * {@code DomainField.json} etc.): a name must not start with a digit, must not start with "xml"
+   * (case-insensitive), and must not contain a dot/colon sequence ({@code ..}, {@code ::}, {@code .:} or
+   * {@code :.}).
+   */
+  private static boolean isValidNamePattern(String name) {
+    if (Character.isDigit(name.charAt(0))) {
+      return false;
+    }
+    if (name.regionMatches(true, 0, "xml", 0, 3)) {
+      return false;
+    }
+    return !(name.contains("..") || name.contains("::") || name.contains(".:") || name.contains(":."));
   }
 
   private static ModelValidationError error(A12Model<?> model, String elementId, String property, String message) {

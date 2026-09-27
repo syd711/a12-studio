@@ -285,6 +285,28 @@ rules).
 
 ### Document Model: gap review (2026-09-27)
 
+**Status (2026-09-27): gaps 1-6 closed, plus the separately-tracked Include-loop picker item ("Features" in
+TODO.md); 7-11 still open (7-9 no UI needed/low priority, 10-11 need a `DomainField.json` re-read first).**
+`EnumerationTypeConfigValidator.checkLabels` now only runs once at least one enum value already has at least
+one non-blank label (gap 1); `StringTypeConfigValidator` now requires `linebreaksPermitted` to be explicitly
+set whenever `noValueValidation` is on and rejects `pattern`/`minLength`/`hintList` alongside it (gap 2); new
+`IncludeStructureValidator` ports SME's remaining two Include checks - included model must declare every
+locale this model has, included model must have exactly one non-repeatable root group (gap 3); new
+`SupportedCharactersValidator` requires every `ModelConfig.supportedCharacters` entry to be exactly one
+character with no stray whitespace (gap 4); gap 5 (duplicate element *name* within a group) turned out to
+already be implemented - `MissingReferenceValidator.getElementsWithDuplicatedNames` was already wired into
+`validate()`'s group branch, just without a pinning test (added: `missingReferenceValidatorReportsDuplicateElementName`
+in `DocumentModelValidatorsTest`) - this review's initial read of the validator list missed that the existing
+`validation.missingReference.duplicatePath` check *is* SME's `A12_DUPLICATE_NAME_WITHIN_GROUP` rule, not
+something separate; `BasicConsistencyValidator` gained the name-pattern check (leading digit, leading "xml"
+case-insensitive, `..`/`::`/`.:`/`:.`) for every Group/Field/Rule/Computation name (gap 6). Separately, the
+"Base Model / Include pickers should not offer loop-creating candidates" item (SME's `createsIncludeLoop`) is
+now fixed too: `TransitiveTypeDefinitions.includedModelIds` (new, the Include-only twin of the pre-existing
+`importedModelIds` used the same way for the Type Definition Import picker) walks a candidate's own Include
+chain, and both `IncludeDialogController.includableModels` (new-Include dialog) and
+`IncludePropertiesPanelController.includableModelIds` (existing-Include's reference combo) now exclude any
+candidate whose Include chain already reaches back to the model being edited.
+
 Full field-by-field and validator-by-validator review, prompted by the same treatment already done for Tree/
 Overview/Application Model. Method: read every rule in SME's Document-Model-editor meta-model
 (`client/resources/models/documentModel/Domain{Field,Group,Rule,Computation,Typedef,ModelConfig,ModelSettings,

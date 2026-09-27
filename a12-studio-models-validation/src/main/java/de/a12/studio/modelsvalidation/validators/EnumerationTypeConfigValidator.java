@@ -70,13 +70,16 @@ public final class EnumerationTypeConfigValidator implements ModelValidator {
   private static void checkEnumerationType(A12Model<?> model, String elementId, EnumerationTypeOptions enumerationType,
       Set<String> locales, List<ModelValidationError> errors) {
     if (enumerationType.getValues() != null) {
+      boolean anyValueHasAnyLabel = enumerationType.getValues().stream().anyMatch(EnumerationTypeConfigValidator::hasAnyLabel);
       for (EnumerationValue value : enumerationType.getValues()) {
         if (value.getValue() == null || value.getValue().isBlank()) {
           errors.add(error(model, elementId, ElementProperty.DATA_TYPE,
               ValidationMessages.get("validation.enumerationTypeConfig.valueMissing", elementId)));
           continue;
         }
-        checkLabels(model, elementId, value, locales, errors);
+        if (anyValueHasAnyLabel) {
+          checkLabels(model, elementId, value, locales, errors);
+        }
       }
     }
     if (enumerationType.getCategories() != null) {
@@ -131,6 +134,11 @@ public final class EnumerationTypeConfigValidator implements ModelValidator {
             ValidationMessages.get("validation.enumerationTypeConfig.labelMissing", elementId, value.getValue(), locale)));
       }
     }
+  }
+
+  private static boolean hasAnyLabel(EnumerationValue value) {
+    return value.getLabel() != null
+        && value.getLabel().stream().anyMatch(label -> label.getText() != null && !label.getText().isBlank());
   }
 
   private static ModelValidationError error(A12Model<?> model, String elementId, String property, String message) {

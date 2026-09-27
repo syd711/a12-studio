@@ -11,6 +11,7 @@ import de.a12.studio.modelsvalidation.validators.DateFormatConfigValidator;
 import de.a12.studio.modelsvalidation.validators.DuplicateIdValidator;
 import de.a12.studio.modelsvalidation.validators.EnumerationTypeConfigValidator;
 import de.a12.studio.modelsvalidation.validators.EnumerationValuesValidator;
+import de.a12.studio.modelsvalidation.validators.IncludeStructureValidator;
 import de.a12.studio.modelsvalidation.validators.IncludeTypeDefinitionModeValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
@@ -26,6 +27,7 @@ import de.a12.studio.modelsvalidation.validators.RuleConditionSyntaxValidator;
 import de.a12.studio.modelsvalidation.validators.SchemaVersionValidator;
 import de.a12.studio.modelsvalidation.validators.StringPatternErrorMessageValidator;
 import de.a12.studio.modelsvalidation.validators.StringTypeConfigValidator;
+import de.a12.studio.modelsvalidation.validators.SupportedCharactersValidator;
 import de.a12.studio.modelsvalidation.validators.TimeZoneValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.composeddocument.CdmQueryRootReferenceValidator;
@@ -61,6 +63,8 @@ public final class DocumentModelValidationService {
       new CustomFieldTypeConfigValidator(),
       new DateFormatConfigValidator(),
       new IncludeTypeDefinitionModeValidator(),
+      new IncludeStructureValidator(),
+      new SupportedCharactersValidator(),
       new RuleConditionSyntaxValidator(),
       new CdmQueryRootReferenceValidator(),
       new CdmRelationshipStepValidator()));
