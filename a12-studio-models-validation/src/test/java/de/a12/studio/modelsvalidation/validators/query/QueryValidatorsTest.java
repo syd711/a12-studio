@@ -81,6 +81,19 @@ class QueryValidatorsTest {
   }
 
   @Test
+  void fieldReferenceValidatorRejectsANotIndexedField() {
+    QueryModel model = TestModels.load("/querymodel/QueryFieldReferenceValidator_notIndexed.json", QueryModel.class);
+    DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
+    List<ModelValidationError> errors = new QueryFieldReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm));
+
+    // "/Root/Name" is indexed and resolves cleanly, "/Root/Hidden" resolves but is annotated indexed = false.
+    assertEquals(1, errors.size());
+    assertEquals(QueryFieldReferenceValidator.ELEMENT_ID, errors.get(0).elementId());
+    assertTrue(errors.get(0).message().contains("Hidden"), errors.get(0).message());
+  }
+
+  @Test
   void sortFieldReferenceValidatorReportsMissingField() {
     QueryModel model = TestModels.load("/querymodel/QuerySortFieldReferenceValidator_invalid.json", QueryModel.class);
     DocumentModel refDm = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);

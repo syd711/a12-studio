@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.querymodel.QueryLink;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewElementResolution;
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
 import de.a12.studio.ui.util.Icons;
 import org.jspecify.annotations.NonNull;
@@ -121,6 +122,15 @@ class QueryTreeRow {
    * an unresolved relationship link (nothing to project until its reference is fixed). */
   boolean hasInResultCheckbox() {
     return kind != Kind.ROOT_LABEL && !isUnresolvedRelationshipLink();
+  }
+
+  /** Whether this row's own field is annotated {@code indexed = false} - a field like this may never be added to
+   * {@code content.fields[]}/a {@link QueryLink}'s {@code fields[]} (see {@code QueryFieldReferenceValidator}), so
+   * its "In Result" checkbox must be disabled rather than merely left uncheckable-in-practice. Only a field row
+   * can be indexed=false itself; a Group/document-node/relationship-link row aggregates its descendants instead
+   * and is never disabled here even if every descendant field is non-indexed. */
+  boolean isIndexedFalseField() {
+    return isField() && OverviewElementResolution.isIndexedFalse(elementViewModel.getElement());
   }
 
   /** Whether this row is a "document node" - the target Document Model itself, or a relationship link that

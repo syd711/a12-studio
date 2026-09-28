@@ -552,6 +552,10 @@ public class QueryModelTreeController implements Initializable {
       }
       checkBox.setIndeterminate(state == QueryTreeRow.InResultState.MIXED);
       checkBox.setSelected(state == QueryTreeRow.InResultState.ALL);
+      // A field annotated indexed = false may never be added to the fields[] projection (QueryFieldReferenceValidator)
+      // - disable the checkbox so it can't be checked from here. A field already invalidly present in fields[] (e.g.
+      // the Document Model was edited afterwards) still shows checked-but-disabled; fix it from the fields list itself.
+      checkBox.setDisable(row.isIndexedFalseField());
       setGraphic(checkBox);
     }
   }

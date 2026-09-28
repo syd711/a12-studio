@@ -128,7 +128,15 @@ Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap revie
 
 ### Query Model
 - Filter expressions are only existence-checked; type and enum-value checking is not done, and there are no "did you mean" candidates.
-- `QueryFieldReferenceValidator` (the `fields[]` projection) still accepts `indexed = false` fields, and the tree checkbox does not disable them.
+- **Fixed 2026-09-28 (this pass):** `QueryFieldReferenceValidator` now rejects an `indexed = false` field in `content.fields[]`
+  (reusing `OverviewElementResolution.isIndexedFalse`/`validation.common.indexedAnnotationFalse`, matching the existing
+  filter/aggregation validators' rule for the same annotation), and the tree's "In Result" checkbox
+  (`QueryModelTreeController.InResultCell`) is now disabled for such a field (`QueryTreeRow.isIndexedFalseField()`).
+  Group/document-node/relationship-link rows are unaffected (they aggregate descendants and still get flagged per-field
+  by the validator). Pinned by `QueryValidatorsTest.fieldReferenceValidatorRejectsANotIndexedField`. Not run against a
+  local Gradle build in this pass - the sandbox's egress policy blocks `plugins.gradle.org`/`services.gradle.org`
+  needed to resolve the root build's license-report plugin (confirmed via `curl .../__agentproxy/status`, both classed
+  as policy denials, not transient) - verify with CI/a full build once merged.
 - The Model Tree tab's root DM is picked in the Settings tab, not through an ER-diagram picker like SME.
 - A role rename propagates to the structured `constraint`/`QueryLink`/`QuerySort` tree (`RoleRenameRefactoring`, since 2026-09-22) but not to a `Has("<relationship>", "<role>", ...)` call written as free-text `filterDefinition` — the two representations of the same filter disagree after a role rename until re-saved from the text side.
 - `HeaderRolesValidator` gap fixed 2026-09-27 (this pass) — see "Open issues" above.
