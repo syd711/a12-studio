@@ -19,7 +19,7 @@
                     <HBox alignment="CENTER_RIGHT">
                         <Label fx:id="styleInfoIcon" />
                     </HBox>
-                    <fx:include fx:id="propsField" source="../propertyeditors/json-editor.fxml" VBox.vgrow="ALWAYS" />
+                    <fx:include fx:id="propsField" source="../propertyeditors/json-code-editor.fxml" VBox.vgrow="ALWAYS" />
                 </children>
             </VBox>
         </center>
