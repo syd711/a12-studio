@@ -66,6 +66,15 @@
                               <Tooltip text="%select_active_model_project_tree_tooltip" />
                           </tooltip>
                       </Button>
+                      <Separator orientation="VERTICAL" />
+                      <MenuButton fx:id="filterButton" accessibleText="%filter_model_types_project_tree" mnemonicParsing="false" styleClass="default-button">
+                          <graphic>
+                              <FontIcon fx:id="filterIcon" iconLiteral="mdi2f-filter-outline" iconSize="18" styleClass="toolbar-icon" />
+                          </graphic>
+                          <tooltip>
+                              <Tooltip text="%filter_model_types_project_tree_tooltip" />
+                          </tooltip>
+                      </MenuButton>
                       <Region HBox.hgrow="ALWAYS" />
                       <Button fx:id="collapseProjectViewButton" accessibleText="%collapse_project_view" mnemonicParsing="false" onAction="#onCollapseProjectView" styleClass="default-button">
                           <graphic>

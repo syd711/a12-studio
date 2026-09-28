@@ -89,6 +89,7 @@ Source: "..\..\..\Output\A12-Studio\a12-studio-server.jar"; DestDir: "{app}"; Fl
 Source: "..\..\..\Output\A12-Studio\wcf-cli\*"; DestDir: "{app}\wcf-cli"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "..\..\..\Output\A12-Studio\java-runtime\*"; DestDir: "{app}\java-runtime"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 Source: "..\..\..\documentation\third-party-licenses\*"; DestDir: "{app}\third-party-licenses"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
+Source: "..\..\..\resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs; Permissions: everyone-full
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

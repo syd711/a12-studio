@@ -23,6 +23,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -50,11 +51,20 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private MenuButton newButton;
 
   @FXML
+  private MenuButton filterButton;
+
+  @FXML
+  private FontIcon filterIcon;
+
+  @FXML
   private ToolBar projectToolbar;
 
   private Project project;
   private ProjectItemViewModel rootViewModel;
   private ProjectTreeMenuActions menuFactory;
+
+  /** Model types currently shown in the tree; all types are shown until the user narrows the filter. */
+  private final Set<ModelType> selectedModelTypes = EnumSet.allOf(ModelType.class);
   private Map<String, List<ModelValidationError>> validationErrorsByPath = new HashMap<>();
   private final Map<Button, IProjectToolbarButtonContribution> pluginToolbarButtons = new LinkedHashMap<>();
   private Separator pluginToolbarSeparator;
@@ -429,12 +439,81 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   private static final Set<String> INITIALLY_COLLAPSED_NODE_NAMES = Set.of("auth", "data");
 
   private TreeItem<ProjectItemViewModel> toTreeItem(@NonNull ProjectItemViewModel viewModel) {
+    return toTreeItem(viewModel, true);
+  }
+
+  /**
+   * Builds a {@link TreeItem} subtree for {@code viewModel}, applying {@link #selectedModelTypes}: a
+   * non-folder item whose model type isn't selected is dropped, and a folder that had children but ends up
+   * with none after filtering is dropped too (returns {@code null}). {@code isRoot} is never dropped, so the
+   * project root itself always stays even if every model in the project is filtered out.
+   */
+  private TreeItem<ProjectItemViewModel> toTreeItem(@NonNull ProjectItemViewModel viewModel, boolean isRoot) {
+    if (!isRoot && !viewModel.isFolder() && !passesModelTypeFilter(viewModel)) {
+      return null;
+    }
     TreeItem<ProjectItemViewModel> treeItem = new TreeItem<>(viewModel);
     treeItem.setExpanded(!INITIALLY_COLLAPSED_NODE_NAMES.contains(viewModel.getName()));
-    for (ProjectItemViewModel child : viewModel.getChildren()) {
-      treeItem.getChildren().add(toTreeItem(child));
+    List<ProjectItemViewModel> children = viewModel.getChildren();
+    for (ProjectItemViewModel child : children) {
+      TreeItem<ProjectItemViewModel> childTreeItem = toTreeItem(child, false);
+      if (childTreeItem != null) {
+        treeItem.getChildren().add(childTreeItem);
+      }
+    }
+    if (!isRoot && viewModel.isFolder() && !children.isEmpty() && treeItem.getChildren().isEmpty()) {
+      return null;
     }
     return treeItem;
+  }
+
+  private boolean passesModelTypeFilter(@NonNull ProjectItemViewModel viewModel) {
+    if (!viewModel.hasModel()) {
+      return true;
+    }
+    ModelType modelType = viewModel.getModelType();
+    return modelType == null || selectedModelTypes.contains(modelType);
+  }
+
+  private void populateFilterMenu() {
+    MenuItem reset = new MenuItem(StudioBundle.get("reset_model_type_filter_project_tree"));
+    reset.setOnAction(event -> {
+      selectedModelTypes.addAll(EnumSet.allOf(ModelType.class));
+      for (MenuItem item : filterButton.getItems()) {
+        if (item instanceof CheckMenuItem checkMenuItem) {
+          checkMenuItem.setSelected(true);
+        }
+      }
+      applyModelTypeFilter();
+    });
+    filterButton.getItems().add(reset);
+    filterButton.getItems().add(new SeparatorMenuItem());
+
+    for (ModelType modelType : ModelType.values()) {
+      CheckMenuItem item = new CheckMenuItem(ModelTypeLabels.getDisplayName(modelType));
+      item.setSelected(true);
+      item.selectedProperty().addListener((obs, oldValue, newValue) -> {
+        if (newValue) {
+          selectedModelTypes.add(modelType);
+        }
+        else {
+          selectedModelTypes.remove(modelType);
+        }
+        applyModelTypeFilter();
+      });
+      filterButton.getItems().add(item);
+    }
+  }
+
+  /** Rebuilds the tree from {@link #rootViewModel} with the current {@link #selectedModelTypes}, and updates the filter button's icon to reflect whether a filter is active. */
+  private void applyModelTypeFilter() {
+    filterIcon.setIconLiteral(selectedModelTypes.size() < ModelType.values().length ? Icons.FILTER_ACTIVE : Icons.FILTER);
+    if (rootViewModel == null) {
+      return;
+    }
+    TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
+    rootTreeItem.setExpanded(true);
+    projectTree.setRoot(rootTreeItem);
   }
 
   private void openItem(@NonNull ProjectItemViewModel viewModel) {
@@ -566,6 +645,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     folderItem.setGraphic(folderIcon);
     folderItem.setOnAction(event -> onNewFolder());
     newButton.getItems().add(folderItem);
+    populateFilterMenu();
     addPluginToolbarButtons();
     StudioEventManager.getInstance().addListener(this);
     projectTree.setOnKeyPressed(event -> {

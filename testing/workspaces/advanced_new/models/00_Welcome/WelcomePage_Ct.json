@@ -44,7 +44,8 @@
           "padding": "8px",
           "margin": "0px",
           "gap": "8px",
-          "backgroundRepeat": "no-repeat"
+          "backgroundRepeat": "no-repeat",
+          "borderStyle": "none"
         }
       },
       "children": [

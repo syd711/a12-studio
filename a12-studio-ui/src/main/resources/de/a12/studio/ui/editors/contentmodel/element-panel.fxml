@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <TitledPane fx:id="root" maxWidth="Infinity" stylesheets="@/de/a12/studio/ui/stylesheet.css" text="%content_settings.element"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -18,11 +21,19 @@
             <VBox spacing="4.0">
                 <children>
                     <Label styleClass="field-label" text="%id" />
-                    <TextField fx:id="elementIdField" editable="false" />
-                    <Label styleClass="field-label" text="%type" />
-                    <ComboBox fx:id="elementTypeField" maxWidth="Infinity" />
-                    <Label styleClass="field-label" text="%namespace" />
-                    <TextField fx:id="elementNamespaceField" editable="false" />
+                    <HBox alignment="CENTER_LEFT" spacing="6.0">
+                      <children>
+                        <TextField fx:id="elementIdField" editable="false" styleClass="readonly-field" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="copyIdButton" mnemonicParsing="false" onAction="#onCopyId" styleClass="default-button">
+                          <graphic>
+                            <FontIcon iconLiteral="mdi2c-content-copy" iconSize="16" />
+                          </graphic>
+                          <tooltip>
+                            <Tooltip text="%copy_id" />
+                          </tooltip>
+                        </Button>
+                      </children>
+                    </HBox>
                 </children>
             </VBox>
         </center>

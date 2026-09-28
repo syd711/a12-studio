@@ -103,7 +103,7 @@ class FormModelActions {
 
     List<MenuItem> addItems = createAddMenuItems(selected);
     if (!addItems.isEmpty()) {
-      Menu addMenu = new Menu("_Add");
+      Menu addMenu = new Menu(StudioBundle.get("form_model_tree.add"));
       addMenu.getItems().addAll(addItems);
       contextMenu.getItems().add(addMenu);
       contextMenu.getItems().add(new SeparatorMenuItem());
@@ -174,7 +174,7 @@ class FormModelActions {
   List<MenuItem> createAddMenuItems(@Nullable FormElementViewModel selected) {
     List<MenuItem> items = new ArrayList<>();
     if (selected == null) {
-      MenuItem addScreenItem = createMenuItem("_Add Screen", Icons.FORM_SCREEN);
+      MenuItem addScreenItem = createMenuItem(StudioBundle.get("form_model_tree.add_screen"), Icons.FORM_SCREEN);
       addScreenItem.setOnAction(event -> addRootScreen());
       items.add(addScreenItem);
       return items;
@@ -349,7 +349,7 @@ class FormModelActions {
 
   void confirmAndDelete(@NonNull FormElementViewModel item) {
     boolean hasChildren = !item.getChildren().isEmpty();
-    String help = hasChildren ? "Child elements will be deleted as well." : null;
+    String help = hasChildren ? StudioBundle.get("form_model_tree.delete_confirm_help") : null;
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
         StudioBundle.get("delete_the_selected_element_s_confirm"), help, null, StudioBundle.get("delete"));
     if (result.isEmpty() || result.get() != ButtonType.OK) {

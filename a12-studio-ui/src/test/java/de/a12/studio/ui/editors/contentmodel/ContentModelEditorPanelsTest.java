@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.contentmodel;
 
 import de.a12.studio.models.contentmodel.ContentElement;
+import de.a12.studio.models.contentmodel.ContentElementDefaults;
 import de.a12.studio.models.contentmodel.ContentElementLibrary;
 import de.a12.studio.models.contentmodel.ContentModule;
 import de.a12.studio.models.contentmodel.ContentModel;
@@ -312,20 +313,6 @@ class ContentModelEditorPanelsTest {
   }
 
   @Test
-  void retypingAnElementAddsTheDefaultsOfTheNewTypeAndKeepsWhatIsThere() throws Exception {
-    select("Box");
-    ContentElement box = selected();
-    ElementPanelController element = FxTestSupport.field(loaded.controller(), "elementPanelController");
-    ComboBox<String> type = FxTestSupport.field(element, "elementTypeField");
-
-    FxTestSupport.onFx(() -> type.setValue("Image"));
-
-    assertEquals("Image", box.getType());
-    assertEquals(Map.of("static", ""), box.getProps().get("src"));
-    assertEquals("1000px", new ContentProps(box).getString("style.width"), "an existing value must survive retyping");
-  }
-
-  @Test
   void tableColumnOperationsKeepCellsAlignedAndRebuildTheTree() throws Exception {
     select("Table");
     ContentElement table = selected();
@@ -455,9 +442,7 @@ class ContentModelEditorPanelsTest {
   void mediaQueriesCanBeAddedAndDeleted() throws Exception {
     select("Box");
     ContentElement element = selected();
-    ElementPanelController elementPanel = FxTestSupport.field(loaded.controller(), "elementPanelController");
-    ComboBox<String> type = FxTestSupport.field(elementPanel, "elementTypeField");
-    FxTestSupport.onFx(() -> type.setValue("MediaQuery"));
+    retype(element, "MediaQuery");
     MediaQueryPanelController mediaQuery = panel(MediaQueryPanelController.class);
 
     assertEquals(1, ((List<?>) element.getProps().get("queries")).size());
@@ -471,10 +456,8 @@ class ContentModelEditorPanelsTest {
   @Test
   void aClickEventNameIsStoredAndRemovedWithNone() throws Exception {
     select("Box");
-    ElementPanelController elementPanel = FxTestSupport.field(loaded.controller(), "elementPanelController");
-    ComboBox<String> type = FxTestSupport.field(elementPanel, "elementTypeField");
-    FxTestSupport.onFx(() -> type.setValue("Button"));
     ContentElement button = selected();
+    retype(button, "Button");
     SettingRow click = row("onClick");
     ToggleGroup kinds = FxTestSupport.field(click, "kinds");
     ToggleButton eventName = FxTestSupport.field(click, "eventName");
@@ -696,6 +679,20 @@ class ContentModelEditorPanelsTest {
 
   private ContentElement selected() throws Exception {
     return FxTestSupport.onFx(() -> tree.getSelectionModel().getSelectedItem().getValue());
+  }
+
+  /**
+   * Changes {@code element}'s type directly (there is no more UI for this - it was the Element panel's type
+   * combobox, removed along with the field it was backed by) and reselects it so the settings panels repopulate for
+   * the new type, mirroring what the removed UI listener used to do.
+   */
+  private void retype(ContentElement element, String type) throws Exception {
+    FxTestSupport.onFx(() -> {
+      element.setType(type);
+      ContentElementDefaults.applyMissing(element);
+      tree.getSelectionModel().clearSelection();
+      tree.getSelectionModel().select(find(tree.getRoot(), element));
+    });
   }
 
   private void select(String type) throws Exception {

@@ -187,7 +187,7 @@ public class BookmarksPanelController implements Initializable, StudioEventListe
     }
 
     private ContextMenu createContextMenu(Bookmark bookmark) {
-      FontIcon openIcon = WidgetFactory.createIcon(Icons.PENCIL);
+      FontIcon openIcon = WidgetFactory.createIcon(Icons.OPEN_MODEL_EDITOR);
       openIcon.getStyleClass().add("menu-icon");
       MenuItem openItem = new MenuItem(StudioBundle.get("open"), openIcon);
       openItem.setOnAction(event -> onOpen.accept(bookmark));

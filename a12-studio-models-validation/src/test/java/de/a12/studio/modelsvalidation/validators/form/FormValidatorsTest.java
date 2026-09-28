@@ -69,6 +69,17 @@ class FormValidatorsTest {
   }
 
   @Test
+  void fieldReferenceValidatorReportsUnknownFieldReferencedOnlyByControl() {
+    FormModel model = load("FormFieldReferenceValidator_tree_invalid");
+    List<ModelValidationError> errors = new FormFieldReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm()));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("field_missing_in_tree"));
+    assertEquals("control_missing", errors.get(0).elementId());
+  }
+
+  @Test
   void fieldReferenceValidatorResolvesFieldThroughInclude() {
     FormModel model = load("FormFieldReferenceValidator_include_valid");
     List<ModelValidationError> errors = new FormFieldReferenceValidator().validate(model,
@@ -85,6 +96,17 @@ class FormValidatorsTest {
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("group_missing"));
+  }
+
+  @Test
+  void groupReferenceValidatorReportsUnknownGroupReferencedOnlyByRepeat() {
+    FormModel model = load("FormGroupReferenceValidator_tree_invalid");
+    List<ModelValidationError> errors = new FormGroupReferenceValidator().validate(model,
+        TestModels.contextWithDocumentModels(model, refDm()));
+
+    assertEquals(1, errors.size());
+    assertTrue(errors.get(0).message().contains("group_missing_in_tree"));
+    assertEquals("repeat_missing", errors.get(0).elementId());
   }
 
   @Test
@@ -439,15 +461,6 @@ class FormValidatorsTest {
 
     assertEquals(1, errors.size());
     assertTrue(errors.get(0).message().contains("Bold"));
-  }
-
-  @Test
-  void reservedAnnotationNameValidatorReportsBindingConfiguration() {
-    FormModel model = load("FormReservedAnnotationNameValidator_invalid");
-    List<ModelValidationError> errors = new FormReservedAnnotationNameValidator().validate(model, TestModels.context(model));
-
-    assertEquals(1, errors.size());
-    assertTrue(errors.get(0).message().contains("bindingConfiguration"));
   }
 
   @Test

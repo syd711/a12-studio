@@ -5,7 +5,9 @@ import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.FilterSection;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterSectionsValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.overviewmodel.dialogs.Dialogs;
@@ -29,7 +31,6 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.configuration.filterConfiguration.sectionData}: one
@@ -88,10 +89,26 @@ public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
     return ensureFilterConfiguration().getSectionData();
   }
 
+  /**
+   * Reflects any {@link OverviewFilterSectionsValidator} problem still present among {@link #getSections()} in
+   * this panel's own error container - the per-row inline styling in {@link #createFieldsCell} flags an
+   * unresolved field reference on its own path chip, but only this also drives {@link
+   * de.a12.studio.ui.util.TabErrorBadge}, so switching to another tab doesn't hide the fact that a section
+   * still has an unresolved (or missing/duplicate) field.
+   */
+  private void refreshValidationError() {
+    List<ModelValidationError> errors = Studio.getValidationService().validate(model);
+    errors.stream()
+        .filter(error -> OverviewFilterSectionsValidator.ELEMENT_ID.equals(error.elementId()))
+        .findFirst()
+        .ifPresentOrElse(error -> showError(error.severity(), error.message()), this::hideError);
+  }
+
   private void rebuildRows() {
     if (model == null) {
       return;
     }
+    refreshValidationError();
     sectionRows.getChildren().clear();
 
     List<FilterSection> sections = currentSections();
@@ -144,18 +161,30 @@ public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
     return row;
   }
 
-  /** One left-aligned path per field, stacked vertically, mirroring {@code labelCell}'s click-to-edit. */
+  /** One left-aligned path per field, stacked vertically, mirroring {@code labelCell}'s click-to-edit. A field
+   * id that doesn't resolve against {@code documentModelIndex} - the same "unresolved" semantics as {@link
+   * OverviewElementOptions#isResolved} - is flagged the same way {@link OverviewColumnsPanelController} and
+   * {@link CustomSelectionOfFieldsPanelController} flag their own dangling references. */
   private VBox createFieldsCell(FilterSection section, int index) {
     VBox fieldsCell = new VBox(4.0);
     fieldsCell.setId("sectionFields-" + index);
     fieldsCell.setAlignment(Pos.CENTER_LEFT);
     fieldsCell.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(fieldsCell, Priority.ALWAYS);
-    for (String path : fieldPaths(section)) {
+    for (FieldRef field : section.getFields()) {
+      String fieldId = field.getFieldId();
+      if (fieldId == null) {
+        continue;
+      }
+      String path = OverviewElementOptions.displayPath(documentModelIndex, fieldId);
       Label pathLabel = new Label(path);
       pathLabel.getStyleClass().add("path-chip");
       pathLabel.setWrapText(true);
       pathLabel.setMaxWidth(Double.MAX_VALUE);
+      if (!OverviewElementOptions.isResolved(documentModelIndex, fieldId)) {
+        pathLabel.getStyleClass().add("validation-error");
+        pathLabel.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("path_could_not_be_resolved", path)));
+      }
       fieldsCell.getChildren().add(pathLabel);
     }
     makeClickableToEdit(fieldsCell, section);
@@ -179,15 +208,6 @@ public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
         .filter(text -> text != null && !text.isBlank())
         .findFirst()
         .orElse("");
-  }
-
-  /** Every field's path (see {@link ElementIndex#getPath}), one per row. */
-  private List<String> fieldPaths(FilterSection section) {
-    return section.getFields().stream()
-        .map(FieldRef::getFieldId)
-        .filter(fieldId -> fieldId != null)
-        .map(fieldId -> OverviewElementOptions.displayPath(documentModelIndex, fieldId))
-        .collect(Collectors.toList());
   }
 
   private void openEditDialog(FilterSection section) {

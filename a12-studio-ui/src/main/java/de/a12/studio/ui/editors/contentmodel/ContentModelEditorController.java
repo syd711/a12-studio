@@ -44,6 +44,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -55,6 +56,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import lombok.extern.slf4j.Slf4j;
@@ -153,6 +156,15 @@ public class ContentModelEditorController extends AbstractEditorController imple
   private RawPropsPanelController rawPropsPanelController;
 
   @FXML
+  private SplitPane editorSplitPane;
+
+  @FXML
+  private BorderPane previewPane;
+
+  @FXML
+  private StackPane previewContainer;
+
+  @FXML
   private WebView previewWebView;
 
   @FXML
@@ -163,6 +175,9 @@ public class ContentModelEditorController extends AbstractEditorController imple
 
   @FXML
   private Button openInBrowserButton;
+
+  @FXML
+  private Button openInWindowButton;
 
   @FXML
   private Label previewUnavailableLabel;
@@ -179,6 +194,8 @@ public class ContentModelEditorController extends AbstractEditorController imple
   private ContentModel model;
   // JavaScript only holds a weak reference to what it is handed, so the bridge is kept here for the editor's lifetime.
   private final PreviewSelectionBridge selectionBridge = new PreviewSelectionBridge();
+  // Non-null while the preview WebView has been moved into its own floating window (see onOpenInWindow).
+  private ContentPreviewWindow previewWindow;
 
   private final CommandStack commandStack = new CommandStack();
   // Set by the commands while they run: the element the tree should select once the model has changed.
@@ -268,13 +285,6 @@ public class ContentModelEditorController extends AbstractEditorController imple
       }
     };
     panels.forEach(panel -> panel.setContext(context));
-    // The element panel include is optional in the FXML; without it there is no type editor to wire up.
-    if (elementPanelController != null) {
-      elementPanelController.setOnTypeChange(element -> {
-        elementsTree.refresh();
-        panels.stream().filter(panel -> panel != elementPanelController).forEach(panel -> panel.showElement(element));
-      });
-    }
   }
 
   private static String typeLabel(ContentElement element) {
@@ -308,6 +318,7 @@ public class ContentModelEditorController extends AbstractEditorController imple
     zoomOutButton.setDisable(true);
     zoomInButton.setDisable(true);
     openInBrowserButton.setDisable(true);
+    openInWindowButton.setDisable(true);
   }
 
   @FXML
@@ -428,12 +439,43 @@ public class ContentModelEditorController extends AbstractEditorController imple
   }
 
   /**
+   * Moves the preview {@code WebView} out of the editor into its own floating window, so the preview can be seen
+   * alongside the editor on a second monitor; closing that window (see {@link ContentPreviewWindow}) automatically
+   * moves the WebView back here. The whole preview column (not just the {@code WebView}) is taken out of {@link
+   * #editorSplitPane} while it is decoupled, so the tree and settings columns get its space instead of leaving it
+   * behind as an empty gap; the divider positions the two remaining columns had are restored once it comes back.
+   */
+  @FXML
+  public void onOpenInWindow(ActionEvent e) {
+    if (previewWindow != null) {
+      return;
+    }
+    int previewIndex = editorSplitPane.getItems().indexOf(previewPane);
+    double[] dividerPositions = editorSplitPane.getDividerPositions();
+    previewContainer.getChildren().remove(previewWebView);
+    editorSplitPane.getItems().remove(previewPane);
+    openInWindowButton.setDisable(true);
+    previewWindow = new ContentPreviewWindow(Studio.stage, projectItem.getDisplayName(), previewWebView, window -> {
+      previewWindow = null;
+      previewContainer.getChildren().add(0, previewWebView);
+      editorSplitPane.getItems().add(previewIndex, previewPane);
+      editorSplitPane.setDividerPositions(dividerPositions);
+      openInWindowButton.setDisable(false);
+    });
+    previewWindow.show();
+  }
+
+  /**
    * Stops the preview page (it polls the preview server) once the editor's tab is closed, writes an edit that is
    * still waiting for its debounced save, and releases the panels.
    */
   @Override
   public void modelClosed(@NonNull ModelClosedEvent event) {
     if (event.getItem().equals(projectItem)) {
+      if (previewWindow != null) {
+        // Synchronously restores previewWebView into previewContainer via the onClosed callback below.
+        previewWindow.close();
+      }
       previewWebView.getEngine().load("about:blank");
       saveDebouncer.shutdown();
       if (savePending) {

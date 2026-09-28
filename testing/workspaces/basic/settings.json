@@ -10,7 +10,18 @@
       {
         "code": "en"
       }
-    ]
+    ],
+    "enforceModelSuffixes": true
   },
-  "previewApp": {}
+  "previewApp": {
+    "enabled": true,
+    "browserType": "SYSTEM_DEFAULT",
+    "autoRefreshEnabled": true,
+    "autoRefreshDelayMillis": 500,
+    "url": "http://localhost:8082/api",
+    "username": "admin",
+    "password": "a12"
+  },
+  "settingsType": "PROJECT_ROOT",
+  "settingsName": "settings.json"
 }

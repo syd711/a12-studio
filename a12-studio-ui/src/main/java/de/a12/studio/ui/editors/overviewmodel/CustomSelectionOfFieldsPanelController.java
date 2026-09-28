@@ -6,7 +6,9 @@ import de.a12.studio.models.overviewmodel.FieldRef;
 import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
+import de.a12.studio.modelsvalidation.validators.overview.OverviewFilterCustomFieldsValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
@@ -114,10 +116,26 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
     return ensureFilterConfiguration().getFields();
   }
 
+  /**
+   * Reflects any {@link OverviewFilterCustomFieldsValidator} problem still present among {@link #getFields()}
+   * in this panel's own error container - the per-row inline styling in {@link #updateFieldValidationState}
+   * flags an unresolved reference on its own combo box, but only this also drives {@link
+   * de.a12.studio.ui.util.TabErrorBadge}, so switching to another tab doesn't hide the fact that a custom
+   * field is still unresolved (or the selection is empty/has a duplicate).
+   */
+  private void refreshValidationError() {
+    List<ModelValidationError> errors = Studio.getValidationService().validate(model);
+    errors.stream()
+        .filter(error -> OverviewFilterCustomFieldsValidator.ELEMENT_ID.equals(error.elementId()))
+        .findFirst()
+        .ifPresentOrElse(error -> showError(error.severity(), error.message()), this::hideError);
+  }
+
   private void rebuildRows() {
     if (model == null) {
       return;
     }
+    refreshValidationError();
     fieldRows.getChildren().clear();
 
     List<FieldRef> fields = currentFields();
@@ -185,6 +203,7 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
       }
       commitHeaderChange();
       updateFieldValidationState(fieldField, fieldRef);
+      refreshValidationError();
     });
 
     fieldField.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -194,6 +213,7 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
       fieldRef.setFieldId(newValue);
       commitHeaderChange();
       updateFieldValidationState(fieldField, fieldRef);
+      refreshValidationError();
     });
 
     GridPane contentGrid = new GridPane();

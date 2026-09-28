@@ -46,7 +46,6 @@ import de.a12.studio.modelsvalidation.validators.form.FormLayoutColumnSumValidat
 import de.a12.studio.modelsvalidation.validators.form.FormMultiColumnSectionLayoutValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormPlaceholderExpositionConflictValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormReferenceTypeDriftValidator;
-import de.a12.studio.modelsvalidation.validators.form.FormReservedAnnotationNameValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormSiblingNameUniquenessValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormStyleReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormUnusedConfigEntryValidator;
@@ -105,7 +104,6 @@ public final class FormModelValidationService {
       new FormAmountSuffixFieldRefValidator(),
       new FormPlaceholderExpositionConflictValidator(),
       new FormExternalEnumerationExpositionValidator(),
-      new FormReservedAnnotationNameValidator(),
       new FormLabelExpressionValidator()));
 
   public void addValidator(ModelValidator validator) {

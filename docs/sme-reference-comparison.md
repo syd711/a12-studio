@@ -1204,12 +1204,24 @@ workspaces either).
 **Status (2026-09-27): gaps 1-7 closed; 8 (only when needed) and 9 (pure UX) still open.** `HeaderRolesValidator`
 is now registered in `FormModelValidationService` (gap 1); `FormAmountSuffixFieldRefValidator`,
 `FormPlaceholderExpositionConflictValidator`, `FormExternalEnumerationExpositionValidator`, a duplicate-name
-check added to `FormStyleReferenceValidator`, and new `FormReservedAnnotationNameValidator` close gaps 2-6;
+check added to `FormStyleReferenceValidator`, and (briefly) `FormReservedAnnotationNameValidator` close gaps 2-6;
 new `FormLabelExpressionValidator` (backed by a new `FormLabelExpressions` reflective-walk helper in
 `a12-studio-models`, mirroring `FormStyleReferences`'s own reflective walk over `List<Style>` fields but for
 `LocalizedText`-typed fields instead) closes gap 7, reusing the `ExpressionLang` syntax checker built for
 Overview expression columns - no new grammar work needed, confirming the "single well-contained validator"
 framing below. Pinned by 9 new tests in `FormValidatorsTest`.
+
+**`FormReservedAnnotationNameValidator` removed (2026-09-28):** it unconditionally flagged the header
+annotation `bindingConfiguration` as an error whenever present, on the assumption (per SME's own
+`editor_annotationNameMustNotBeReserved` rule) that nothing legitimate would ever produce it. That's false in
+practice: `bindingConfiguration` is the real payload the relationship-binding feature writes for a Form
+Model's bound sections (see the `OverviewBindingPurpose` note above) and is present as valid, correct data in
+`testing/workspaces/basic/models/{Company_FM,Person_FM}.json` and multiple `e-commerce` fixtures - the
+validator was reporting every one of them as broken. `AnnotationsPanelController` already does the actual
+protection SME's rule is for (hides `bindingConfiguration` from the Annotations panel so a user can't type or
+rename an annotation to it), so the model-level validator was redundant on top of being wrong; deleted rather
+than rescoped, since a model-level check can't distinguish "system-written" from "hand-typed" once the
+annotation is just sitting in `header.annotations`.
 
 **Checked, not a gap** (candidates that turned out to already be built): the "General Detached/Inline Repeat
 Settings" and "Rule Confirmation Settings" model-settings panels the BA doc describes all exist

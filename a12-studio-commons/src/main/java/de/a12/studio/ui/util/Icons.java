@@ -37,6 +37,8 @@ public interface Icons {
   String ACCOUNT_KEY_OUTLINE = "mdi2a-account-key-outline";
   String ACCOUNT_MULTIPLE_OUTLINE = "mdi2a-account-multiple-outline";
   String PENCIL = "mdi2p-pencil-outline";
+  // For buttons that open a model editor (not a generic edit/rename action).
+  String OPEN_MODEL_EDITOR = "mdi2f-file-document-edit-outline";
   String OPEN_IN_NEW = "mdi2o-open-in-new";
   String ZIP = "mdi2f-folder-zip-outline";
   String CUT = "mdi2c-content-cut";

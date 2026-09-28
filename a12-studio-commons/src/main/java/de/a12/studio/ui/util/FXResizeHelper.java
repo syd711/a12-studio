@@ -38,6 +38,10 @@ public class FXResizeHelper {
   // the resize/drag mode chosen at MOUSE_PRESSED; stays fixed until the button is released
   private Cursor activeCursor = Cursor.DEFAULT;
 
+  // true only once a drag-to-move gesture is actually underway (mouse moved while pressed in the
+  // drag zone), so the hand cursor reflects an active drag rather than just hovering the header
+  private boolean dragging = false;
+
   private Object userData;
 
   // tracks how the stage's geometry was last set, so keyboard/mouse maximize, snap, and
@@ -306,6 +310,10 @@ public class FXResizeHelper {
     LISTENER.put(Cursor.OPEN_HAND, event -> {
       STAGE.setX(event.getScreenX() - mPresSceneX);
       STAGE.setY(event.getScreenY() - mPresSceneY);
+      if (!dragging) {
+        dragging = true;
+        fireAction(Cursor.OPEN_HAND);
+      }
     });
   }
 
@@ -340,9 +348,13 @@ public class FXResizeHelper {
       }
     });
 
-    SCENE.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> activeCursor = Cursor.DEFAULT);
+    SCENE.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+      activeCursor = Cursor.DEFAULT;
+      dragging = false;
+      fireAction(hoverCursorAt(event.getSceneX(), event.getSceneY()));
+    });
 
-    SCENE.setOnMouseMoved(event -> fireAction(cursorAt(event.getSceneX(), event.getSceneY())));
+    SCENE.setOnMouseMoved(event -> fireAction(hoverCursorAt(event.getSceneX(), event.getSceneY())));
 
     // Once the pointer leaves the window, no further MOUSE_MOVED events arrive on this scene,
     // so a cursor set while hovering the drag/resize zones (e.g. OPEN_HAND) would otherwise stay
@@ -352,6 +364,19 @@ public class FXResizeHelper {
         fireAction(Cursor.DEFAULT);
       }
     });
+  }
+
+  /**
+   * Same as {@link #cursorAt(double, double)}, but downgrades {@link Cursor#OPEN_HAND} to
+   * {@link Cursor#DEFAULT} unless a drag-to-move gesture is actually in progress, so merely
+   * hovering the header doesn't show the hand cursor.
+   */
+  private Cursor hoverCursorAt(double sx, double sy) {
+    Cursor c = cursorAt(sx, sy);
+    if (c == Cursor.OPEN_HAND && !dragging) {
+      return Cursor.DEFAULT;
+    }
+    return c;
   }
 
   /**

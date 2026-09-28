@@ -1,0 +1,58 @@
+{
+  "header": {
+    "id": "FormFieldReferenceValidator_tree_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Ref_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "ControlGrid",
+            "id": "grid1",
+            "name": "grid1",
+            "row": [
+              {
+                "type": "Row",
+                "id": "row_grid1",
+                "cell": [
+                  {
+                    "type": "Control",
+                    "id": "control_missing",
+                    "elementRef": "field_missing_in_tree"
+                  },
+                  {
+                    "type": "Control",
+                    "id": "control_ok",
+                    "elementRef": "field_1"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {},
+    "groupConfiguration": {
+      "group": []
+    }
+  }
+}

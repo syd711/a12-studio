@@ -1,0 +1,47 @@
+{
+  "header": {
+    "id": "FormGroupReferenceValidator_tree_invalid",
+    "modelType": "form",
+    "modelVersion": "39.0.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ],
+    "modelReferences": [
+      {
+        "purpose": "document-model-for-form",
+        "modelType": "document",
+        "alias": "Ref",
+        "reference": "Ref_DM"
+      }
+    ]
+  },
+  "content": {
+    "screens": [
+      {
+        "type": "Screen",
+        "id": "screen1",
+        "name": "Screen1",
+        "screenElements": [
+          {
+            "type": "EmbeddedRepeat",
+            "id": "repeat_missing",
+            "name": "repeat_missing",
+            "groupRef": "group_missing_in_tree",
+            "controlGrid": {
+              "type": "ControlGrid",
+              "id": "grid_repeat",
+              "name": "grid_repeat",
+              "row": []
+            }
+          }
+        ]
+      }
+    ],
+    "fieldConfiguration": {
+      "field": []
+    },
+    "groupConfiguration": {}
+  }
+}
