@@ -97,6 +97,7 @@ public class MediaQueryPanelController extends ContentSettingsPanelController {
     kind.valueProperty().addListener((observable, oldValue, value) -> update(query, "kind", value));
     Button remove = new Button();
     remove.setGraphic(WidgetFactory.createIcon("mdi2d-delete-outline", 14, null));
+    remove.getStyleClass().add("default-button");
     remove.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("content_settings.query_delete")));
     remove.setOnAction(event -> deleteQuery(index));
 

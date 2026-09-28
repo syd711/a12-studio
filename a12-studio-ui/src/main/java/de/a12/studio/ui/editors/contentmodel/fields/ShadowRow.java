@@ -87,6 +87,7 @@ public class ShadowRow extends SettingRow {
       body.getChildren().add(line("content_settings.shadow_" + field, number));
     }
     Button reset = new Button(StudioBundle.get("content_settings.shadow_reset"));
+    reset.getStyleClass().add("primary-button");
     reset.setOnAction(event -> {
       edited(props -> props.remove(getPath()));
       showShadow(null);

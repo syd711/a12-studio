@@ -21,7 +21,7 @@
                         <ToggleOption value="and" label="%content_settings.operator_and" />
                     </ToggleRow>
                     <VBox fx:id="queriesBox" spacing="6.0" />
-                    <Button fx:id="addQueryButton" text="%content_settings.query_add" />
+                    <Button fx:id="addQueryButton" styleClass="primary-button" text="%content_settings.query_add" />
                 </children>
             </VBox>
         </center>

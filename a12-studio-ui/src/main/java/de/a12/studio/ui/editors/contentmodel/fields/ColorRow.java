@@ -28,6 +28,7 @@ public class ColorRow extends SettingRow {
   public ColorRow() {
     picker.setMaxWidth(Double.MAX_VALUE);
     clear.setGraphic(WidgetFactory.createIcon("mdi2c-close", 12, null));
+    clear.getStyleClass().add("default-button");
     clear.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("content_settings.clear_color")));
     clear.setVisible(false);
     clear.setManaged(false);

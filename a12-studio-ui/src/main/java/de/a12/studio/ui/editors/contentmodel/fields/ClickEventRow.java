@@ -83,6 +83,7 @@ public class ClickEventRow extends SettingRow {
       }
     });
     removeNode.setText(StudioBundle.get("content_settings.click_remove_event"));
+    removeNode.getStyleClass().add("primary-button");
     removeNode.setOnAction(event -> {
       edited(props -> {
         props.remove(getPath());
