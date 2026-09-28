@@ -163,7 +163,7 @@ public class ContextMenuGroupDialogController implements DialogController {
   }
 
   private HBox createActionsBox(Button action) {
-    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openActionEditDialog(action));
+    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openActionEditDialog(action));
 
     javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("remove_action"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_action"), null, null, StudioBundle.get("delete"));

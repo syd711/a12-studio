@@ -183,7 +183,7 @@ public class ModelReferencesPanelController extends AbstractPropertyEditor {
       commitChange();
     });
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_model_reference"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getModelReferences().remove(reference);

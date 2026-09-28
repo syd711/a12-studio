@@ -163,7 +163,7 @@ public class FilterItemsPanelController {
   private HBox createActionsBox(FilterItem item, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(item));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openEditDialog(item));
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
       Optional<ButtonType> confirmResult = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_filter_item"), null, null, StudioBundle.get("delete"));

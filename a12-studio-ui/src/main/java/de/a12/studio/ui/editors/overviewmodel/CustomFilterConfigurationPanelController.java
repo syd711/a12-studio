@@ -640,7 +640,7 @@ public class CustomFilterConfigurationPanelController extends AbstractPropertyEd
   private HBox createFilterGroupActionsBox(FilterGroup group, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveFilterGroup);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openFilterGroupEditDialog(group));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openFilterGroupEditDialog(group));
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_filter_group"), null, null, StudioBundle.get("delete"));

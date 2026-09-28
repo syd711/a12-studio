@@ -39,6 +39,8 @@
 .combo-box-base:editable > .text-field {
     -fx-background-radius: 8 0 0 8;
     -fx-border-radius: 8 0 0 8;
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
 }
 
 /* Same "value failed to resolve" semantics as the Label/tree-cell ".validation-error" rules elsewhere,

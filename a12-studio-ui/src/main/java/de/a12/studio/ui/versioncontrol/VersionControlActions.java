@@ -4,14 +4,14 @@ import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.settings.VersionControlSettings;
 import de.a12.studio.ui.RootController;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ProgressDialog;
+import de.a12.studio.ui.components.ProgressResultModel;
 import de.a12.studio.ui.events.StudioEventManager;
-import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -44,41 +44,33 @@ public class VersionControlActions {
     settings.getLastCommitMessages().put(project.getFolder().getAbsolutePath(), trimmedMessage);
     settings.save();
 
-    JFXFuture.runAsync(() -> {
-          try {
-            gitService.stageAndCommit(List.of(file), trimmedMessage);
-          }
-          catch (GitAPIException ex) {
-            throw new RuntimeException(ex);
-          }
-        })
-        .thenLater(() -> StudioEventManager.getInstance().fireGitStatusChangedEvent())
-        .onErrorLater(ex -> {
-          log.error("Failed to commit '{}'", file.file(), ex);
-          WidgetFactory.showAlert(stage, StudioBundle.get("versioncontrol_commit_failed"), ex.getMessage());
-        });
+    GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_committing"),
+        () -> gitService.stageAndCommit(List.of(file), trimmedMessage));
+    ProgressResultModel result = ProgressDialog.createProgressDialog(stage, progressModel);
+    if (result.isSuccess()) {
+      StudioEventManager.getInstance().fireGitStatusChangedEvent();
+    }
+    else if (!result.isCancelled()) {
+      log.error("Failed to commit '{}'", file.file());
+    }
   }
 
   public static void revert(@NonNull Stage stage, @NonNull GitService gitService, @NonNull GitChangedFile file) {
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(stage,
+    Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(stage,
         StudioBundle.get("confirm_revert_file", file.relativePath()), null, null, StudioBundle.get("versioncontrol_revert"));
-    if (result.isEmpty() || result.get() != ButtonType.OK) {
+    if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
       return;
     }
 
-    JFXFuture.runAsync(() -> {
-          try {
-            gitService.revert(List.of(file));
-          }
-          catch (GitAPIException ex) {
-            throw new RuntimeException(ex);
-          }
-        })
-        .thenLater(VersionControlActions::onRevertCompleted)
-        .onErrorLater(ex -> {
-          log.error("Failed to revert '{}'", file.file(), ex);
-          WidgetFactory.showAlert(stage, StudioBundle.get("versioncontrol_revert_failed"), ex.getMessage());
-        });
+    GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_reverting"),
+        () -> gitService.revert(List.of(file)));
+    ProgressResultModel result = ProgressDialog.createProgressDialog(stage, progressModel);
+    if (result.isSuccess()) {
+      onRevertCompleted();
+    }
+    else if (!result.isCancelled()) {
+      log.error("Failed to revert '{}'", file.file());
+    }
   }
 
   /**

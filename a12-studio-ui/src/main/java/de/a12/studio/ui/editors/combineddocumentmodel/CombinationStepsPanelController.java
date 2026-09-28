@@ -258,12 +258,12 @@ public class CombinationStepsPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(CombinationStep step, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(step));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openEditDialog(step));
 
-    Button openModelButton = RowFactory.createActionButton(Icons.OPEN_MODEL_EDITOR, "Open Model", () -> openModel(step));
+    Button openModelButton = RowFactory.createActionButton(Icons.OPEN_MODEL_EDITOR, StudioBundle.get("open_model"), () -> openModel(step));
     openModelButton.setDisable(referencedModelId(step) == null);
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_combination_step"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getSteps().remove(step);

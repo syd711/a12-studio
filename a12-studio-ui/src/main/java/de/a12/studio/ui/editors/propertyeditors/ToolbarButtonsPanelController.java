@@ -228,7 +228,7 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(Button row, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(row));
+    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openEditDialog(row));
 
     javafx.scene.control.Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       Button copy = cloneButton(row);
@@ -239,7 +239,7 @@ public class ToolbarButtonsPanelController extends AbstractPropertyEditor {
       commitHeaderChange();
     });
 
-    javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_button"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         rows.remove(row);

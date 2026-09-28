@@ -1091,7 +1091,7 @@ public class DocumentModelActions {
     }
 
     boolean hasChildren = topLevelSelection(selection).stream().anyMatch(treeItem -> !treeItem.getChildren().isEmpty());
-    String help = hasChildren ? "Child elements will be deleted as well." : null;
+    String help = hasChildren ? StudioBundle.get("document_model_tree.delete_confirm_help") : null;
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
         StudioBundle.get("delete_the_selected_element_s_confirm"), help, null, StudioBundle.get("delete"));
     if (result.isEmpty() || result.get() != ButtonType.OK) {

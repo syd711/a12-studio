@@ -161,7 +161,7 @@ public class ContextMenuPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(ActionGroup group, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(group));
+    javafx.scene.control.Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openEditDialog(group));
 
     javafx.scene.control.Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_context_menu_group"), null, null, StudioBundle.get("delete"));

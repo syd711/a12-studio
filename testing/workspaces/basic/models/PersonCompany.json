@@ -25,16 +25,16 @@
     ],
     "modelReferences": [
       {
-        "purpose": "Document model",
-        "modelType": "document",
         "alias": "Person",
-        "reference": "Person_DM"
+        "purpose": "Document model",
+        "reference": "Person_DM",
+        "modelType": "document"
       },
       {
-        "purpose": "Document model",
-        "modelType": "document",
         "alias": "Company",
-        "reference": "Company_DM"
+        "purpose": "Document model",
+        "reference": "Company_DM",
+        "modelType": "document"
       }
     ]
   },
@@ -52,9 +52,13 @@
     ],
     "entityCharacteristics": [
       {
-        "role": "Person",
-        "documentModel": "Person_DM",
         "ordered": false,
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": true,
+            "upperLimit": null
+          }
+        },
         "labels": [
           {
             "locale": "de",
@@ -65,17 +69,17 @@
             "text": "Employees"
           }
         ],
-        "linkConstraints": {
-          "multiplicity": {
-            "unbounded": true,
-            "upperLimit": null
-          }
-        }
+        "role": "Person",
+        "documentModel": "Person_DM"
       },
       {
-        "role": "Company",
-        "documentModel": "Company_DM",
         "ordered": false,
+        "linkConstraints": {
+          "multiplicity": {
+            "unbounded": false,
+            "upperLimit": 1
+          }
+        },
         "labels": [
           {
             "locale": "de",
@@ -86,12 +90,8 @@
             "text": "Employed by"
           }
         ],
-        "linkConstraints": {
-          "multiplicity": {
-            "unbounded": false,
-            "upperLimit": 1
-          }
-        }
+        "role": "Company",
+        "documentModel": "Company_DM"
       }
     ]
   }

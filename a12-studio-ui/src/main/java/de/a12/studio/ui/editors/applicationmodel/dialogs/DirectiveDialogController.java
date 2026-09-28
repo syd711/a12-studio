@@ -18,6 +18,7 @@ import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.applicationmodel.RegionReferenceOptions;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.ModelTypeLabels;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
@@ -237,17 +238,17 @@ public class DirectiveDialogController implements DialogController {
   }
 
   private HBox createModelActionsBox(ModelDescriptor descriptor, int index, int rowCount) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> moveModel(index, index - 1));
+    Button moveUpButton = createActionButton(Icons.ARROW_UP, StudioBundle.get("move_up"), () -> moveModel(index, index - 1));
     moveUpButton.setDisable(index == 0);
     moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
 
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> moveModel(index, index + 1));
+    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, StudioBundle.get("move_down"), () -> moveModel(index, index + 1));
     moveDownButton.setDisable(index == rowCount - 1);
     moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
 
     VBox moveButtonsBox = new VBox(1, moveUpButton, moveDownButton);
 
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       workingModels.remove(descriptor);
       rebuildModelsRows();
     });

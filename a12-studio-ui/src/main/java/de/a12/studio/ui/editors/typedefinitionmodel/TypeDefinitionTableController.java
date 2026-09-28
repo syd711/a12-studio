@@ -10,6 +10,7 @@ import de.a12.studio.models.documentmodel.TypeDefFieldType;
 import de.a12.studio.models.documentmodel.TypeDefinition;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
+import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.TransitiveTypeDefinitions;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.SearchFieldController;
@@ -31,6 +32,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -40,8 +42,10 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -114,6 +118,11 @@ public class TypeDefinitionTableController implements Initializable {
   // mutated by this table: they belong to whichever included/imported model actually owns them.
   private List<TypeDefinitionRow> includedTypeDefinitions = List.of();
 
+  // A type definition id (own or included/imported) -> its current validation error messages, recomputed by
+  // refreshValidationState() alongside every rebuild of the rows above; drives the per-row "invalid" indicator
+  // (see the nameColumn cell factory in initialize()), mirroring SME's TypedefOverview "invalidTypeDefs" column.
+  private Map<String, List<String>> errorMessagesByTypeDefinitionId = Map.of();
+
   private Consumer<TypeDefinitionRow> selectionListener;
 
   private Runnable onItemAddedListener;
@@ -161,9 +170,43 @@ public class TypeDefinitionTableController implements Initializable {
     this.includedTypeDefinitions = TransitiveTypeDefinitions.resolve(model, otherModels).stream()
         .map(TypeDefinitionRow::included)
         .toList();
+    refreshValidationState();
     applyFilter(searchController.getText());
     deleteImportButton.setDisable(importReferences().isEmpty());
     updateAddImportAvailability();
+  }
+
+  /**
+   * Recomputes {@link #errorMessagesByTypeDefinitionId}: this model's own validation errors, plus - for every
+   * distinct owning model among {@link #includedTypeDefinitions} - that model's own validation errors too, so
+   * a problem on an included/imported type definition (e.g. a duplicate name inside the model that actually
+   * owns it) still marks the row here. Must run before {@link #applyFilter}, which is what actually re-renders
+   * the rows against this map.
+   */
+  private void refreshValidationState() {
+    Map<String, List<String>> messages = new HashMap<>();
+    if (model != null) {
+      collectErrorMessages(model, messages);
+    }
+    includedTypeDefinitions.stream()
+        .map(TypeDefinitionRow::ownerModelId)
+        .distinct()
+        .forEach(ownerModelId -> otherModels.stream()
+            .filter(other -> ownerModelId.equals(other.getId()))
+            .findFirst()
+            .ifPresent(owner -> collectErrorMessages(owner, messages)));
+    this.errorMessagesByTypeDefinitionId = messages;
+  }
+
+  private static void collectErrorMessages(@NonNull DocumentModel documentModel, @NonNull Map<String, List<String>> target) {
+    if (Studio.getValidationService() == null) {
+      return;
+    }
+    for (ModelValidationError error : Studio.getValidationService().validate(documentModel)) {
+      if (error.elementId() != null) {
+        target.computeIfAbsent(error.elementId(), id -> new ArrayList<>()).add(error.message());
+      }
+    }
   }
 
   /**
@@ -222,6 +265,7 @@ public class TypeDefinitionTableController implements Initializable {
     });
 
     nameColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().typeDefinition().getName()));
+    nameColumn.setCellFactory(column -> createNameCell());
     baseTypeColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(getBaseTypeName(param.getValue().typeDefinition())));
     sourceColumn.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().source()));
 
@@ -269,6 +313,7 @@ public class TypeDefinitionTableController implements Initializable {
 
     typeDefinitions.add(typeDefinition);
     searchController.clear();
+    refreshValidationState();
     applyFilter(searchController.getText());
     selectRow(TypeDefinitionRow.own(typeDefinition));
     updateAddImportAvailability();
@@ -443,6 +488,7 @@ public class TypeDefinitionTableController implements Initializable {
     }
 
     typeDefinitions.removeAll(itemsToDelete);
+    refreshValidationState();
     applyFilter(searchController.getText());
     updateAddImportAvailability();
     save();
@@ -498,6 +544,41 @@ public class TypeDefinitionTableController implements Initializable {
             .filter(row -> row.typeDefinition().getName() != null && row.typeDefinition().getName().toLowerCase().contains(term))
             .toList();
     typeDefinitionsTable.setItems(FXCollections.observableArrayList(filtered));
+  }
+
+  /**
+   * Marks a row invalid the same way {@link de.a12.studio.ui.editors.documentmodel.ElementNameTreeCell}/{@link
+   * de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeCell} already do for the document/form tree - a
+   * red name plus a tooltip listing every current error message - rather than a separate icon column, matching
+   * this codebase's existing per-row validation convention (SME's {@code TypedefOverview} uses a dedicated
+   * icon column for the same purpose).
+   */
+  private TableCell<TypeDefinitionRow, String> createNameCell() {
+    return new TableCell<>() {
+      @Override
+      protected void updateItem(String name, boolean empty) {
+        super.updateItem(name, empty);
+        TypeDefinitionRow row = empty || getTableRow() == null ? null : getTableRow().getItem();
+        if (row == null) {
+          setText(null);
+          setTooltip(null);
+          getStyleClass().remove("validation-error");
+          return;
+        }
+        setText(name);
+        List<String> errors = errorMessagesByTypeDefinitionId.getOrDefault(row.typeDefinition().getId(), List.of());
+        if (errors.isEmpty()) {
+          getStyleClass().remove("validation-error");
+          setTooltip(null);
+        }
+        else {
+          if (!getStyleClass().contains("validation-error")) {
+            getStyleClass().add("validation-error");
+          }
+          setTooltip(WidgetFactory.createTooltip(errors.stream().map(m -> "• " + m).collect(Collectors.joining("\n"))));
+        }
+      }
+    };
   }
 
   private static String getBaseTypeName(@NonNull TypeDefinition typeDefinition) {

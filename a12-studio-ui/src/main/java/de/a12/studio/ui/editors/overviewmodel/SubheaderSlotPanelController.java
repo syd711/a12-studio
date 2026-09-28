@@ -278,7 +278,7 @@ public class SubheaderSlotPanelController extends AbstractPropertyEditor {
       }
     });
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(editable));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openEditDialog(editable));
     editButton.setDisable(editable == null);
 
     HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);

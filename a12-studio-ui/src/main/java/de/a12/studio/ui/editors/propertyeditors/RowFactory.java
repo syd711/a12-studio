@@ -1,6 +1,7 @@
 package de.a12.studio.ui.editors.propertyeditors;
 
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -221,11 +222,11 @@ public final class RowFactory {
   /** Same as above, for lists where a row may not be able to swap with a neighbour that is not at the list's end. */
   public static VBox createMoveButtonsBox(int index, boolean canMoveUp, boolean canMoveDown,
       @NonNull BiConsumer<Integer, Integer> onMove) {
-    Button moveUpButton = createActionButton(Icons.ARROW_UP, "Move Up", () -> onMove.accept(index, index - 1));
+    Button moveUpButton = createActionButton(Icons.ARROW_UP, StudioBundle.get("move_up"), () -> onMove.accept(index, index - 1));
     moveUpButton.setDisable(!canMoveUp);
     moveUpButton.getStyleClass().addAll("move-button", "move-button-top");
 
-    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, "Move Down", () -> onMove.accept(index, index + 1));
+    Button moveDownButton = createActionButton(Icons.ARROW_DOWN, StudioBundle.get("move_down"), () -> onMove.accept(index, index + 1));
     moveDownButton.setDisable(!canMoveDown);
     moveDownButton.getStyleClass().addAll("move-button", "move-button-bottom");
 

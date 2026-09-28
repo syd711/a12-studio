@@ -130,7 +130,7 @@ public class MatchConditionsPanelController {
       onChange.run();
     });
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_match_condition"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         matchConditions.remove(matchCondition);

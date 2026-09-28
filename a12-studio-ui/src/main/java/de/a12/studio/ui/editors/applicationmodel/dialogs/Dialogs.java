@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class Dialogs {
 
-  private static final String FLOW_NAME_TOOLTIP = "The name of the flow which acts as an identifier and must be unique among siblings.";
+  private static final String FLOW_NAME_TOOLTIP = StudioBundle.get("application_dialogs.flow_name_tooltip");
 
   public static Optional<Menu> showChildMenuForAdd(Stage owner) {
     Menu menu = new Menu();

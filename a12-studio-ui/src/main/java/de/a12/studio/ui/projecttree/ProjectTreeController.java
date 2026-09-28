@@ -482,6 +482,9 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   private void populateFilterMenu() {
     MenuItem selectAll = new MenuItem(StudioBundle.get("select_all_model_types"));
+    FontIcon selectAllIcon = WidgetFactory.createIcon(Icons.ELEMENT_MULTI_SELECT);
+    selectAllIcon.getStyleClass().add("menu-icon");
+    selectAll.setGraphic(selectAllIcon);
     selectAll.setOnAction(event -> {
       selectedModelTypes.addAll(EnumSet.allOf(ModelType.class));
       for (CheckMenuItem checkMenuItem : filterMenuItemsByType.values()) {
@@ -493,6 +496,9 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     filterButton.getItems().add(selectAll);
 
     MenuItem deselectAll = new MenuItem(StudioBundle.get("deselect_all_model_types"));
+    FontIcon deselectAllIcon = WidgetFactory.createIcon(Icons.DESELECT_ALL);
+    deselectAllIcon.getStyleClass().add("menu-icon");
+    deselectAll.setGraphic(deselectAllIcon);
     deselectAll.setOnAction(event -> {
       selectedModelTypes.clear();
       for (CheckMenuItem checkMenuItem : filterMenuItemsByType.values()) {

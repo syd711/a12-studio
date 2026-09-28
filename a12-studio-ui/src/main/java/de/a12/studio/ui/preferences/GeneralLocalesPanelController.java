@@ -6,6 +6,7 @@ import de.a12.studio.models.projects.settings.ProjectRootSettings;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.util.Debouncer;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.WidgetFactory;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -134,7 +135,7 @@ public class GeneralLocalesPanelController implements Initializable {
   }
 
   private HBox createActionsBox(int index) {
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       generalSettings.getLocales().remove(index);
       rebuildRows();
       commitLocalesChange();

@@ -111,7 +111,7 @@ public class ChildMenuPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(Menu menu, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> editMenu(menu));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> editMenu(menu));
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_child_menu"), null, null, "Delete");

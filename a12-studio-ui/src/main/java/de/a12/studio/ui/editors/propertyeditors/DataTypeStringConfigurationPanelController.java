@@ -229,7 +229,7 @@ public class DataTypeStringConfigurationPanelController extends AbstractProperty
     valuesLabel.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(valuesLabel, Priority.ALWAYS);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openSuggestionsDialog(locale));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openSuggestionsDialog(locale));
 
     HBox row = new HBox(10.0, localeLabel, valuesLabel, editButton);
     row.setAlignment(Pos.CENTER_LEFT);

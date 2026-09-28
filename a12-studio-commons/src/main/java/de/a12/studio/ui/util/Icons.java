@@ -81,6 +81,7 @@ public interface Icons {
   String PNG_MODEL_TYPESETTING = "/de/a12/studio/ui/icons/Typesetting.png";
 
   String ELEMENT_MULTI_SELECT = "mdi2c-checkbox-multiple-marked-outline";
+  String DESELECT_ALL = "mdi2c-checkbox-multiple-blank-outline";
   String ELEMENT_INCLUDE = "mdi2l-link";
   String ELEMENT_GENERIC = "mdi2s-shape-outline";
   String ELEMENT_FIELD = "mdi2a-alpha-f-box";

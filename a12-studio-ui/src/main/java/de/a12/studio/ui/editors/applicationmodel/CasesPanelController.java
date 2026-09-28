@@ -140,13 +140,13 @@ public class CasesPanelController {
   private HBox createActionsBox(Case caseObj, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveCase);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> onEditCase(caseObj));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> onEditCase(caseObj));
     Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("duplicate"), () -> {
       scene.getCases().add(index + 1, cloneCase(caseObj));
       rebuildRows();
       onChange.run();
     });
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> onDeleteCase(caseObj));
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> onDeleteCase(caseObj));
 
     HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, copyButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);

@@ -119,7 +119,7 @@ public abstract class AbstractRulesPanelController extends AbstractPropertyEdito
       valueControl.setId(getClass().getSimpleName() + "-row-" + row);
       valueControls.put(rule, valueControl);
 
-      Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+      Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
         Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
             StudioBundle.get("typesetting_model.delete_this_rule"), null, null, "Delete");
         if (result.isPresent() && result.get() == ButtonType.OK) {

@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.overviewmodel;
 
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.overviewmodel.RowAction;
 import de.a12.studio.ui.editors.AbstractPropertyEditor;
@@ -43,8 +44,7 @@ public class RowActivationPanelController extends AbstractPropertyEditor impleme
     super.initialize(location, resources);
 
     WidgetFactory.createHelpIcon(rowActivationInfoIcon,
-        "Default Engine Behavior: the Overview Engine's built-in row-click behavior applies. Event: clicking a row "
-            + "triggers the given event. Non Interactive: rows are explicitly not clickable.");
+        StudioBundle.get("row_activation_panel.info"));
 
     rowActivationTypeField.getItems().setAll(ROW_ACTIVATION_DEFAULT, ROW_ACTIVATION_EVENT, ROW_ACTIVATION_NON_INTERACTIVE);
     rowActivationTypeField.valueProperty().addListener((observable, oldValue, newValue) -> {

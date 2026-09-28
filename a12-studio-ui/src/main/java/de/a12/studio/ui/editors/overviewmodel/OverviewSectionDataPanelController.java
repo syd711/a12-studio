@@ -218,7 +218,7 @@ public class OverviewSectionDataPanelController extends AbstractPropertyEditor {
   }
 
   private HBox createActionsBox(FilterSection section) {
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(section));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openEditDialog(section));
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_section"), null, null, StudioBundle.get("delete"));

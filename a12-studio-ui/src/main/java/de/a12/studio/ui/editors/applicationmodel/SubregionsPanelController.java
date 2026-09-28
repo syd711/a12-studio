@@ -153,7 +153,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(Region subregion, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> editSubregion(subregion));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> editSubregion(subregion));
 
     Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       Region copy = new Region();
@@ -166,7 +166,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
       commitChange();
     });
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_subregion"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getOrCreateSubRegions().remove(subregion);

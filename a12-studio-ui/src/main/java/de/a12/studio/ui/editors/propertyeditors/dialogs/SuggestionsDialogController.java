@@ -3,6 +3,7 @@ package de.a12.studio.ui.editors.propertyeditors.dialogs;
 import de.a12.studio.ui.components.DialogController;
 import de.a12.studio.ui.editors.propertyeditors.RowFactory;
 import de.a12.studio.ui.util.Icons;
+import de.a12.studio.ui.util.StudioBundle;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -98,7 +99,7 @@ public class SuggestionsDialogController implements DialogController {
     HBox.setHgrow(textField, Priority.ALWAYS);
     textField.textProperty().addListener((observable, oldValue, newValue) -> values.set(index, newValue));
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       values.remove(index);
       rebuildRows();
     });

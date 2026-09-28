@@ -146,7 +146,7 @@ public abstract class AbstractRolesPanelController extends AbstractPropertyEdito
   protected abstract Node createRoleField(int index);
 
   protected HBox createActionsBox(int index) {
-    Button deleteButton = createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_role"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         roles.remove(index);

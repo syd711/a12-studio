@@ -3,6 +3,8 @@ package de.a12.studio.ui.versioncontrol;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.settings.VersionControlSettings;
 import de.a12.studio.ui.Studio;
+import de.a12.studio.ui.components.ProgressDialog;
+import de.a12.studio.ui.components.ProgressResultModel;
 import de.a12.studio.ui.events.GitStatusChangedEvent;
 import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.ProjectClosedEvent;
@@ -367,22 +369,19 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     if (files.isEmpty()) {
       return;
     }
-    Optional<ButtonType> result = WidgetFactory.showConfirmation(getStage(),
+    Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(getStage(),
         StudioBundle.get("confirm_revert_changes", files.size()), null, null, StudioBundle.get("versioncontrol_revert"));
-    if (result.isPresent() && result.get() == ButtonType.OK) {
-      JFXFuture.runAsync(() -> {
-            try {
-              gitService.revert(files);
-            }
-            catch (GitAPIException e) {
-              throw new RuntimeException(e);
-            }
-          })
-          .thenLater(this::onRevertCompleted)
-          .onErrorLater(ex -> {
-            log.error("Failed to revert changes", ex);
-            WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_revert_failed"), ex.getMessage());
-          });
+    if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
+      return;
+    }
+    GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_reverting"),
+        () -> gitService.revert(files));
+    ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(), progressModel);
+    if (result.isSuccess()) {
+      onRevertCompleted();
+    }
+    else if (!result.isCancelled()) {
+      log.error("Failed to revert changes");
     }
   }
 
@@ -415,19 +414,15 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       return;
     }
     String trimmedMessage = message.trim();
-    JFXFuture.runAsync(() -> {
-          try {
-            gitService.stageAndCommit(files, trimmedMessage);
-          }
-          catch (GitAPIException e) {
-            throw new RuntimeException(e);
-          }
-        })
-        .thenLater(() -> StudioEventManager.getInstance().fireGitStatusChangedEvent())
-        .onErrorLater(ex -> {
-          log.error("Failed to commit", ex);
-          WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_commit_failed"), ex.getMessage());
-        });
+    GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_committing"),
+        () -> gitService.stageAndCommit(files, trimmedMessage));
+    ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(), progressModel);
+    if (result.isSuccess()) {
+      StudioEventManager.getInstance().fireGitStatusChangedEvent();
+    }
+    else if (!result.isCancelled()) {
+      log.error("Failed to commit");
+    }
   }
 
   private Stage getStage() {

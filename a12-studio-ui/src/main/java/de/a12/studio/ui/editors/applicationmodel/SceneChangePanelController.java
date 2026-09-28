@@ -198,14 +198,14 @@ public class SceneChangePanelController {
   private HBox createActionsBox(List<Directive> directives, Directive directive, int index) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, directives.size(), (fromIndex, toIndex) -> moveRow(directives, fromIndex, toIndex));
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> editDirective(directives, directive));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> editDirective(directives, directive));
 
     Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("duplicate"), () -> {
       directives.add(index + 1, cloneDirective(directive));
       rebuildAll();
     });
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_directive"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         directives.remove(directive);

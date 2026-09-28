@@ -148,9 +148,9 @@ public class ComputationAlternativesPanelController extends AbstractPropertyEdit
   private HBox createActionsBox(ComputationAlternative alternative, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(alternative));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openEditDialog(alternative));
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_alternative"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getAlternatives().remove(alternative);

@@ -169,7 +169,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
   private HBox createActionsBox(Module module, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> onEditModule.accept(module));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> onEditModule.accept(module));
 
     Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
       Module copy = new Module();
@@ -182,7 +182,7 @@ public class ModulesPanelController extends AbstractPropertyEditor {
       onModuleAdded.accept(copy);
     });
 
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_module"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
         getModules().remove(module);

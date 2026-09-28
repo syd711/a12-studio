@@ -189,8 +189,8 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
   private HBox createCategoryActionsBox(Category category, int index, int rowCount) {
     VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveCategory);
 
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> onEditCategory(category));
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> onDeleteCategory(category));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> onEditCategory(category));
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> onDeleteCategory(category));
 
     HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
@@ -369,7 +369,7 @@ public class DataTypeEnumerationConfigurationPanelController extends AbstractPro
         currentColumn++;
       }
 
-      Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> onDeleteValue(value));
+      Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> onDeleteValue(value));
       GridPane.setHalignment(deleteButton, HPos.CENTER);
       enumerationValuesGrid.add(deleteButton, currentColumn, gridRow);
     }

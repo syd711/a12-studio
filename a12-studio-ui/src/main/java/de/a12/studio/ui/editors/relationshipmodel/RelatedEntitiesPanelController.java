@@ -181,9 +181,9 @@ public class RelatedEntitiesPanelController extends AbstractPropertyEditor {
   }
 
   private HBox createActionsBox(EntityCharacteristic entity) {
-    Button editButton = RowFactory.createActionButton(Icons.PENCIL, "Edit", () -> openEditDialog(entity));
+    Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> openEditDialog(entity));
 
-    Button openModelButton = RowFactory.createActionButton(Icons.OPEN_MODEL_EDITOR, "Open Model", () -> openModel(entity));
+    Button openModelButton = RowFactory.createActionButton(Icons.OPEN_MODEL_EDITOR, StudioBundle.get("open_model"), () -> openModel(entity));
     openModelButton.setDisable(entity.getDocumentModel() == null || entity.getDocumentModel().isBlank());
 
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("delete"), () -> {

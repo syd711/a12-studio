@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.relationshipmodel;
 
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.relationship.RelationshipLinkDocumentModelValidator;
@@ -47,7 +48,7 @@ public class LinkDocumentModelPanelController extends AbstractPropertyEditor imp
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
-    WidgetFactory.createHelpIcon(duplicatesAllowedInfoIcon, "Multiple links between the same two documents are allowed.");
+    WidgetFactory.createHelpIcon(duplicatesAllowedInfoIcon, StudioBundle.get("link_document_model_panel.duplicates_allowed_info"));
 
     linkDocumentModelField.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (updatingFromModel || model == null) {

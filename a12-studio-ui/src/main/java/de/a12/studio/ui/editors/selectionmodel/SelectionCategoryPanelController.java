@@ -195,7 +195,7 @@ public class SelectionCategoryPanelController extends AbstractPropertyEditor imp
       rebuildRows();
       commitAndRefresh();
     });
-    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, "Delete", () -> {
+    Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
           StudioBundle.get("selection_model.delete_this_path"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
