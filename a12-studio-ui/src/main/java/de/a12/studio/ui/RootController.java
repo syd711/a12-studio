@@ -252,7 +252,7 @@ public class RootController implements Initializable, StudioEventListener {
             "Please open a project before dropping files.");
         return false;
       }
-      handler.handle(Studio.stage, target, file);
+      handler.handle(Studio.stage, target, file).ifPresent(projectTreeController::reloadAndOpen);
       return true;
     }
 

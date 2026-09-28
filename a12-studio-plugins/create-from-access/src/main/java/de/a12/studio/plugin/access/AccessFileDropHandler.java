@@ -44,11 +44,12 @@ public class AccessFileDropHandler implements IFileDropHandler {
   }
 
   @Override
-  public void handle(@NonNull Stage owner, @NonNull ProjectItem targetFolder, @NonNull File file) {
+  @NonNull
+  public Optional<ProjectItem> handle(@NonNull Stage owner, @NonNull ProjectItem targetFolder, @NonNull File file) {
     Optional<ImportFromAccessDialogController.AccessImportInput> input =
         ImportFromAccessDialogController.showWithFile(owner, targetFolder, file);
     if (input.isEmpty()) {
-      return;
+      return Optional.empty();
     }
 
     ImportFromAccessDialogController.AccessImportInput data = input.get();
@@ -71,11 +72,13 @@ public class AccessFileDropHandler implements IFileDropHandler {
       if (needsSave) {
         item.save();
       }
+      return Optional.of(item);
     }
     catch (IOException e) {
       log.error("Failed to create document model from dropped Access file '{}': {}",
           file.getName(), e.getMessage(), e);
       WidgetFactory.showAlert(owner, "Error", e.getMessage());
+      return Optional.empty();
     }
   }
 

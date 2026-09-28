@@ -466,9 +466,18 @@ SME's current, narrower scope. Once Gap 1 makes a TDM's local-plus-imported set 
 type definition would sit unflagged side by side in the same combined table; no SME source found that confirms a rule
 for this specific combined case, so verify rather than assume when implementing Gap 1.
 
-**Low priority.** No per-row "invalid" indicator column in the Type Definitions table (SME's `TypedefOverview` has
-one via `invalidElements`/`invalidTypeDefs`; a12-studio only surfaces an error once a row is opened) — needs a
-`ValidationContext` lookup wired into the table, moderate size, do whenever the table is next touched.
+**Fixed 2026-09-28: per-row "invalid" indicator.** SME's `TypedefOverview` marks an invalid row via a dedicated
+`invalidTypeDefs`-driven icon column (`CustomTableBodyCell`, `DMValidation.select("invalidTypeDefs", ...)`);
+a12-studio previously only surfaced an error once a row was opened. `TypeDefinitionTableController` now computes
+`errorMessagesByTypeDefinitionId` (this model's own `Studio.getValidationService().validate(model)`, plus - for
+every distinct owning model among the included/imported rows - that model's own `validate(...)` too, so a problem
+on an inherited type definition, e.g. a duplicate name inside the model that actually owns it, still marks the
+row here) and renders it via a `nameColumn` cell factory: a red name plus a tooltip listing the actual message(s),
+matching this codebase's existing per-row validation convention (`ElementNameTreeCell`/`FormModelTreeCell`) rather
+than introducing a separate icon column. Recomputed wherever the table already refreshes itself (`load()`/Add/
+Delete/Import/Delete Import), so no new refresh trigger was needed. Pinned by two new cases in
+`TypeDefinitionTableControllerTest` (an own type definition with an invalid `StringType` config, and an
+imported type definition invalid in its owning model).
 `testing/workspaces/advanced_new/models/CommonFieldDefinitions_Td.json` uses a non-conforming `_Td` suffix instead
 of the official `_TDM` (the a12 naming-convention doc and `model-versions.json` both say `_TDM`; the e-commerce
 fixture `CommonTypes_TDM.json` is correctly named) — invisible today because that workspace disables suffix
@@ -495,7 +504,8 @@ Import picker offering only `TypeDefinitionModel` instances (never plain/Additiv
 correct.
 
 **Suggested order.** 1 (the real gap, add a combined-mode fixture) → 2 (small, BA-doc-backed) → 3 (one line, land
-with 2) → 4 (re-check once 1 lands) → the two low-priority items whenever their files are next touched anyway.
+with 2) → 4 (re-check once 1 lands) → the invalid-indicator column (done 2026-09-28) → the `_Td` suffix rename
+whenever that fixture is next touched anyway.
 
 ---
 

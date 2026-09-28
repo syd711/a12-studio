@@ -6,6 +6,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Extension point interface for plugins that want to intercept files dropped onto the
@@ -66,6 +67,10 @@ public interface IFileDropHandler {
    * @param targetFolder the project-tree folder that was active when the file was dropped,
    *                     or the project root if no folder was selected
    * @param file         the dropped file
+   * @return the created project item, or {@link Optional#empty()} if the user cancelled the
+   *         import dialog or an error prevented the model from being created. The caller adds
+   *         the returned item to the project tree and opens it.
    */
-  void handle(@NonNull Stage owner, @NonNull ProjectItem targetFolder, @NonNull File file);
+  @NonNull
+  Optional<ProjectItem> handle(@NonNull Stage owner, @NonNull ProjectItem targetFolder, @NonNull File file);
 }

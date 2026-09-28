@@ -104,10 +104,16 @@ field-type-config validator already walks `content.typeDefinitions`, name-unique
 checks all match SME's real rules, and a12-studio's Delete/Remove-Import confirmation dialogs are stricter than
 SME's, which has none at all). The real architectural gap (mixed local+imported type definitions in one TDM) is
 already fixed (see git log).
-- Low priority, still open: no per-row "invalid" indicator column in the Type Definitions table (SME has one);
-  `testing/workspaces/advanced_new/models/CommonFieldDefinitions_Td.json` uses a non-conforming `_Td` suffix instead
-  of `_TDM` (invisible today because that workspace disables suffix enforcement, and not worth a standalone rename
-  since three other fixtures reference it by id).
+- **Fixed 2026-09-28 (this pass):** the per-row "invalid" indicator (SME's `TypedefOverview` `invalidTypeDefs`
+  column) is now shown in `TypeDefinitionTableController` - a red name + tooltip listing the actual validation
+  messages, matching this codebase's existing per-row convention (`ElementNameTreeCell`/`FormModelTreeCell`) rather
+  than a separate icon column. `refreshValidationState()` validates this model plus, for every distinct owning model
+  among the included/imported rows, that model too, so a problem on an inherited type definition (e.g. a duplicate
+  name inside the model that actually owns it) still marks the row here. Pinned by two new
+  `TypeDefinitionTableControllerTest` cases (own-model and owning-model invalidity).
+- Still open, cosmetic: `testing/workspaces/advanced_new/models/CommonFieldDefinitions_Td.json` uses a non-conforming
+  `_Td` suffix instead of `_TDM` (invisible today because that workspace disables suffix enforcement, and not worth
+  a standalone rename since three other fixtures reference it by id).
 
 ### Relationship Models
 Full gap review 2026-09-27 against SME's `relationshipModel` module — see "Relationship Model: gap review" in `docs/sme-reference-comparison.md` for the full write-up (SME's own implementation turns out to be a declarative Document+Form Model with no bespoke code at all, so most of a12-studio's hand-built editor is already at or above parity). The bulk of the gap list is already fixed (see git log).

@@ -170,6 +170,17 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     }
   }
 
+  /**
+   * Reloads the project tree and opens {@code item} in an editor tab, mirroring what {@link
+   * ProjectTreeMenuActions#executePluginEntry} does for a plugin's "New" menu entry. Public so
+   * {@link de.a12.studio.ui.RootController} can apply the same after a plugin {@code
+   * IFileDropHandler} creates a model from a dropped file.
+   */
+  public void reloadAndOpen(@NonNull ProjectItem item) {
+    reloadProject();
+    openItem(new ProjectItemViewModel(item, Map.of()));
+  }
+
   public void load(@NonNull Project project) {
     this.project = project;
     refreshPluginToolbarButtonVisibility();
