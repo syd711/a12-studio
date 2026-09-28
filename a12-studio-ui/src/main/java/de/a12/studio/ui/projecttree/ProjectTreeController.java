@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.Project;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.projects.settings.UISettings;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.*;
@@ -65,6 +66,9 @@ public class ProjectTreeController implements Initializable, StudioEventListener
 
   /** Model types currently shown in the tree; all types are shown until the user narrows the filter. */
   private final Set<ModelType> selectedModelTypes = EnumSet.allOf(ModelType.class);
+  private final Map<ModelType, CheckMenuItem> filterMenuItemsByType = new EnumMap<>(ModelType.class);
+  /** Suppresses the filter checkbox listeners' save-and-rebuild while {@link #restoreModelTypeFilter()} programmatically updates them. */
+  private boolean restoringModelTypeFilter;
   private Map<String, List<ModelValidationError>> validationErrorsByPath = new HashMap<>();
   private final Map<Button, IProjectToolbarButtonContribution> pluginToolbarButtons = new LinkedHashMap<>();
   private Separator pluginToolbarSeparator;
@@ -169,6 +173,7 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   public void load(@NonNull Project project) {
     this.project = project;
     refreshPluginToolbarButtonVisibility();
+    restoreModelTypeFilter();
     this.validationErrorsByPath = new HashMap<>();
     this.rootViewModel = new ProjectItemViewModel(project.getRoot(), validationErrorsByPath);
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
@@ -476,21 +481,32 @@ public class ProjectTreeController implements Initializable, StudioEventListener
   }
 
   private void populateFilterMenu() {
-    MenuItem reset = new MenuItem(StudioBundle.get("reset_model_type_filter_project_tree"));
-    reset.setOnAction(event -> {
+    MenuItem selectAll = new MenuItem(StudioBundle.get("select_all_model_types"));
+    selectAll.setOnAction(event -> {
       selectedModelTypes.addAll(EnumSet.allOf(ModelType.class));
-      for (MenuItem item : filterButton.getItems()) {
-        if (item instanceof CheckMenuItem checkMenuItem) {
-          checkMenuItem.setSelected(true);
-        }
+      for (CheckMenuItem checkMenuItem : filterMenuItemsByType.values()) {
+        checkMenuItem.setSelected(true);
       }
       applyModelTypeFilter();
+      saveModelTypeFilter();
     });
-    filterButton.getItems().add(reset);
+    filterButton.getItems().add(selectAll);
+
+    MenuItem deselectAll = new MenuItem(StudioBundle.get("deselect_all_model_types"));
+    deselectAll.setOnAction(event -> {
+      selectedModelTypes.clear();
+      for (CheckMenuItem checkMenuItem : filterMenuItemsByType.values()) {
+        checkMenuItem.setSelected(false);
+      }
+      applyModelTypeFilter();
+      saveModelTypeFilter();
+    });
+    filterButton.getItems().add(deselectAll);
     filterButton.getItems().add(new SeparatorMenuItem());
 
     for (ModelType modelType : ModelType.values()) {
       CheckMenuItem item = new CheckMenuItem(ModelTypeLabels.getDisplayName(modelType));
+      item.setGraphic(WidgetFactory.createModelIcon(Icons.forModelType(modelType)));
       item.setSelected(true);
       item.selectedProperty().addListener((obs, oldValue, newValue) -> {
         if (newValue) {
@@ -500,8 +516,12 @@ public class ProjectTreeController implements Initializable, StudioEventListener
           selectedModelTypes.remove(modelType);
         }
         applyModelTypeFilter();
+        if (!restoringModelTypeFilter) {
+          saveModelTypeFilter();
+        }
       });
       filterButton.getItems().add(item);
+      filterMenuItemsByType.put(modelType, item);
     }
   }
 
@@ -514,6 +534,51 @@ public class ProjectTreeController implements Initializable, StudioEventListener
     TreeItem<ProjectItemViewModel> rootTreeItem = toTreeItem(rootViewModel);
     rootTreeItem.setExpanded(true);
     projectTree.setRoot(rootTreeItem);
+  }
+
+  /**
+   * Restores {@link #selectedModelTypes} (and the filter menu's checkboxes) from the previously
+   * saved {@link UISettings#getProjectTreeModelTypeFilter()}, if any. Called from {@link #load} before
+   * the tree is first built for a project, so the initial build already reflects the saved filter.
+   */
+  private void restoreModelTypeFilter() {
+    List<String> saved = project.getSettings().getUISettings().getProjectTreeModelTypeFilter();
+    if (saved == null) {
+      // No filter has ever been saved; keep the all-types-selected default.
+      return;
+    }
+    Set<ModelType> restored = EnumSet.noneOf(ModelType.class);
+    for (String name : saved) {
+      try {
+        restored.add(ModelType.valueOf(name));
+      }
+      catch (IllegalArgumentException e) {
+        // Unknown/removed model type name from an older settings file; ignore it.
+      }
+    }
+    selectedModelTypes.clear();
+    selectedModelTypes.addAll(restored);
+
+    restoringModelTypeFilter = true;
+    try {
+      for (Map.Entry<ModelType, CheckMenuItem> entry : filterMenuItemsByType.entrySet()) {
+        entry.getValue().setSelected(selectedModelTypes.contains(entry.getKey()));
+      }
+    }
+    finally {
+      restoringModelTypeFilter = false;
+    }
+    filterIcon.setIconLiteral(selectedModelTypes.size() < ModelType.values().length ? Icons.FILTER_ACTIVE : Icons.FILTER);
+  }
+
+  /** Persists {@link #selectedModelTypes} so the filter survives restarting the Studio; see {@link #restoreModelTypeFilter()}. */
+  private void saveModelTypeFilter() {
+    if (project == null) {
+      return;
+    }
+    UISettings uiSettings = project.getSettings().getUISettings();
+    uiSettings.setProjectTreeModelTypeFilter(selectedModelTypes.stream().map(Enum::name).toList());
+    uiSettings.save();
   }
 
   private void openItem(@NonNull ProjectItemViewModel viewModel) {

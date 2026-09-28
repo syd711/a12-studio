@@ -291,22 +291,42 @@ public class TabPaneController implements Initializable, StudioEventListener {
   }
 
   /**
-   * Refreshes the tab of a reverted item in place, so an editor left open against a file a
-   * version-control revert just changed out from under it shows the reverted content instead of
-   * stale edits. {@code event.getItem()} has already been {@link ProjectItem#reload() reloaded} by
-   * the caller, so rebuilding from it picks up the reverted content.
+   * Rebuilds every open tab's and detached window's editor content from the current project tree
+   * - called by {@link de.a12.studio.ui.RootController#reloadProject()} after {@link
+   * de.a12.studio.models.projects.Project#reload()} has replaced the whole {@link ProjectItem}
+   * tree, e.g. after a version-control revert. Every open tab/window is holding a {@link
+   * ProjectItem} from before that reload, so each one is re-resolved by path against {@link
+   * de.a12.studio.models.projects.Project#getRoot()} rather than reused; one whose file no longer
+   * exists (reverted away) is closed instead of rebuilt, same as {@link #modelDeleted}. A revert
+   * isn't limited to the file(s) that triggered it, so every open editor is treated as potentially
+   * stale rather than just the ones for files a specific revert actually touched.
    */
-  @Override
-  public void modelReverted(@NonNull ModelRevertedEvent event) {
-    ProjectItem item = event.getItem();
+  public void invalidateAllTabs() {
+    if (project == null) {
+      return;
+    }
     for (Tab tab : allTabs()) {
       ProjectItem tabItem = (ProjectItem) tab.getUserData();
-      if (tabItem != null && tabItem.getPath().equals(item.getPath())) {
-        rebuildTab(tab, item);
-        return;
+      if (tabItem == null) {
+        continue;
+      }
+      ProjectItem freshItem = project.getRoot().findByPath(tabItem.getPath());
+      if (freshItem == null) {
+        closeTab(tab);
+      }
+      else {
+        rebuildTab(tab, freshItem);
       }
     }
-    rebuildDetachedWindow(item);
+    for (DetachedTabWindow window : new ArrayList<>(detachedWindows.values())) {
+      ProjectItem freshItem = project.getRoot().findByPath(window.getItem().getPath());
+      if (freshItem == null) {
+        window.close();
+      }
+      else {
+        rebuildDetachedWindow(freshItem);
+      }
+    }
   }
 
   /**

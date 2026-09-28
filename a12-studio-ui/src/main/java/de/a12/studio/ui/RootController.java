@@ -591,7 +591,7 @@ public class RootController implements Initializable, StudioEventListener {
         versioncontrolPanelRoot = loader.load();
         versioncontrolPanelController = loader.getController();
         versioncontrolPanelController.setCollapseProjectViewCallback(this::collapseProjectView);
-        versioncontrolPanelController.setProjectRefreshCallback(projectTreeController::reloadProject);
+        versioncontrolPanelController.setProjectRefreshCallback(this::reloadProject);
         // Lazily loaded, so it may have missed the ProjectOpenedEvent for an already-open project.
         versioncontrolPanelController.setProject(project);
       } catch (Exception e) {
@@ -708,6 +708,28 @@ public class RootController implements Initializable, StudioEventListener {
 
   public void selectNextTab() {
     tabPaneController.selectNextTab();
+  }
+
+  /**
+   * Reloads the whole project from disk (fresh {@link de.a12.studio.models.projects.ProjectItem}
+   * tree, see {@link ProjectTreeController#reloadProject()}) and rebuilds every open tab/detached
+   * window's editor content from it (see {@link TabPaneController#invalidateAllTabs()}), since
+   * every one of them is holding a {@link de.a12.studio.models.projects.ProjectItem} from before
+   * the reload otherwise. The project tree must be reloaded first: {@link
+   * TabPaneController#invalidateAllTabs()} re-resolves each open tab's item against {@link
+   * de.a12.studio.models.projects.Project#getRoot()}, which only reflects on-disk changes after
+   * {@link ProjectTreeController#reloadProject()} has run.
+   *
+   * <p>Exposed here (and via {@link Studio#getRootController()}) so {@link
+   * de.a12.studio.ui.versioncontrol.VersionControlActions} and {@link
+   * de.a12.studio.ui.versioncontrol.VersioncontrolPanelController} can trigger this same full
+   * reload after any version-control revert (single- or multi-file) - a revert isn't limited to
+   * changing the one file that triggered it, so every open editor needs to be treated as
+   * potentially stale, not just the tab(s) for the reverted file(s).
+   */
+  public void reloadProject() {
+    projectTreeController.reloadProject();
+    tabPaneController.invalidateAllTabs();
   }
 
   public void selectPreviousTab() {

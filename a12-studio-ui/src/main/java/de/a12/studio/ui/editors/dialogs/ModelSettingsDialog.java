@@ -3,9 +3,9 @@ package de.a12.studio.ui.editors.dialogs;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
 import de.a12.studio.models.applicationmodel.ApplicationModel;
+import de.a12.studio.models.composeddocumentmodel.ComposedDocumentModel;
 import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.models.documentmodel.DocumentModel;
-import de.a12.studio.models.typedefinitionmodel.TypeDefinitionModel;
 import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.FormModelContent;
 import de.a12.studio.models.formmodel.FormStyleReferences;
@@ -213,7 +213,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         documentUniquenessCriteriaController.setModel(documentModel);
         documentUniquenessCriteriaController.setVisible(true);
         contentUniquenessCriteriaController.setModel(documentModel);
-        contentUniquenessCriteriaController.setVisible(true);
+        contentUniquenessCriteriaController.setVisible(documentModel instanceof ComposedDocumentModel);
         timezoneController.setModel(documentModel);
         timezoneController.setVisible(!additive);
         modelConfigController.setModel(documentModel);
@@ -239,7 +239,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         annotationsController.setTitle(StudioBundle.get("annotations"));
         referenceModelAnnotationsController.setVisible(false);
       }
-      if (model instanceof DocumentModel && !(model instanceof AdditiveDocumentModel) && !(model instanceof TypeDefinitionModel)) {
+      if (model instanceof ComposedDocumentModel) {
         cdmQueryRootController.setModel(model, projectItem);
         cdmQueryRootController.setVisible(true);
       } else {

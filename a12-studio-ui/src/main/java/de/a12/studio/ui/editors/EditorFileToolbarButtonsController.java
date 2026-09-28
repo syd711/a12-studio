@@ -305,11 +305,10 @@ public class EditorFileToolbarButtonsController implements Initializable, Studio
   private void onRevert(ActionEvent e) {
     GitChangedFile file = currentChangedFile;
     GitService gitService = Studio.getGitService();
-    ProjectItem item = projectItemSupplier != null ? projectItemSupplier.get() : null;
-    if (file == null || gitService == null || item == null) {
+    if (file == null || gitService == null) {
       return;
     }
-    VersionControlActions.revert(getStage(), gitService, item, file);
+    VersionControlActions.revert(getStage(), gitService, file);
   }
 
   private Stage getStage() {

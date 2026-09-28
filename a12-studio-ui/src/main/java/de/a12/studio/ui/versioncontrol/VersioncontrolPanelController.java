@@ -1,7 +1,6 @@
 package de.a12.studio.ui.versioncontrol;
 
 import de.a12.studio.models.projects.Project;
-import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.VersionControlSettings;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.GitStatusChangedEvent;
@@ -82,10 +81,11 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   }
 
   /**
-   * Wired by {@link de.a12.studio.ui.RootController} to {@link
-   * de.a12.studio.ui.projecttree.ProjectTreeController#reloadProject()} - called after a successful
-   * {@link #onRevert()} so the project tree picks up whatever files the revert added, removed, or
-   * changed on disk, the same way it already does after a delete/rename/move.
+   * Wired by {@link de.a12.studio.ui.RootController} to its own {@link
+   * de.a12.studio.ui.RootController#reloadProject()} - called after a successful {@link
+   * #onRevert()} so the project tree and every open editor pick up whatever files the revert
+   * added, removed, or changed on disk, the same way the project tree already does after a
+   * delete/rename/move.
    */
   public void setProjectRefreshCallback(Runnable callback) {
     this.projectRefreshCallback = callback;
@@ -378,7 +378,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
               throw new RuntimeException(e);
             }
           })
-          .thenLater(() -> onRevertCompleted(files))
+          .thenLater(this::onRevertCompleted)
           .onErrorLater(ex -> {
             log.error("Failed to revert changes", ex);
             WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_revert_failed"), ex.getMessage());
@@ -387,38 +387,18 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   }
 
   /**
-   * Makes sure the reverted files' {@link ProjectItem}s (and any editor open on one of them)
-   * reflect what {@link GitService#revert} just did on disk, before refreshing this panel's own
-   * changes list. A {@link ChangeStatus#NEW} file was deleted by the revert, so its item is
-   * treated like any other deletion (closes a matching open tab, see {@link
-   * de.a12.studio.ui.tabs.TabPaneController#modelDeleted}); every other file was checked out from
-   * HEAD, so it still exists but its content changed - {@link ProjectItem#reload()} picks that up,
-   * and {@link StudioEventManager#fireModelRevertedEvent} lets a matching open tab rebuild its
-   * editor from the reloaded model (or close and reopen it, if the editor can't be rebuilt in
-   * place - see {@link de.a12.studio.ui.tabs.TabPaneController#modelReverted}). Finally, {@link
-   * #projectRefreshCallback} reloads the project tree itself, the same way it already does after a
-   * delete/rename/move, so structural changes (files added or removed by the revert) show up too.
-   * The tail {@link StudioEventManager#fireGitStatusChangedEvent} refreshes this panel itself (via
-   * {@link #gitStatusChanged}) as well as any open editor's Commit/Revert toolbar buttons.
+   * A revert isn't limited to the file(s) actually checked - the on-disk state it restores can
+   * differ from what any single file's status suggested - so rather than patching up just the
+   * reverted files' project items, {@link #projectRefreshCallback} (wired to {@link
+   * de.a12.studio.ui.RootController#reloadProject()}) reloads the whole project from disk and
+   * rebuilds every open tab/detached window's editor content from it, closing any tab whose file
+   * the revert deleted. The tail {@link StudioEventManager#fireGitStatusChangedEvent} refreshes
+   * this panel itself (via {@link #gitStatusChanged}) as well as any open editor's Commit/Revert
+   * toolbar buttons.
    */
-  private void onRevertCompleted(@NonNull List<GitChangedFile> files) {
-    if (project != null) {
-      for (GitChangedFile file : files) {
-        ProjectItem item = project.getRoot().findByPath(file.file().getAbsolutePath());
-        if (item == null) {
-          continue;
-        }
-        if (file.status() == ChangeStatus.NEW) {
-          StudioEventManager.getInstance().fireModelDeletedEvent(item);
-        }
-        else {
-          item.reload();
-          StudioEventManager.getInstance().fireModelRevertedEvent(item);
-        }
-      }
-      if (projectRefreshCallback != null) {
-        projectRefreshCallback.run();
-      }
+  private void onRevertCompleted() {
+    if (projectRefreshCallback != null) {
+      projectRefreshCallback.run();
     }
     StudioEventManager.getInstance().fireGitStatusChangedEvent();
   }

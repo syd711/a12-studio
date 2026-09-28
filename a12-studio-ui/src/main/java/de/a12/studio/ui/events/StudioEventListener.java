@@ -31,10 +31,6 @@ public interface StudioEventListener {
 
   }
 
-  default void modelReverted(@NonNull ModelRevertedEvent event) {
-
-  }
-
   default void modelRefactored(@NonNull ModelRefactoredEvent event) {
 
   }

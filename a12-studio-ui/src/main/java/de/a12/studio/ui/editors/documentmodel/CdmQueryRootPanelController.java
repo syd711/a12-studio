@@ -42,11 +42,11 @@ import java.util.stream.Collectors;
  * and editing it with real widgets instead. Not bound to a single {@link de.a12.studio.models.documentmodel.Element}
  * (these annotations live on the model header), so only {@link #setModel} is used.
  * <p>
- * Setting a query root here turns a plain {@link DocumentModel} into a {@link
- * de.a12.studio.models.composeddocumentmodel.ComposedDocumentModel} - but, like the {@code additive-document}
- * annotation, only on the model's *next* load (see {@link ComposedDocumentModelResolver}'s javadoc): this
- * panel edits the raw annotation list of whatever {@link A12Model} it was given, whatever its current runtime
- * type.
+ * Only shown for models that are already a {@link de.a12.studio.models.composeddocumentmodel.ComposedDocumentModel}
+ * at runtime (see {@link de.a12.studio.ui.editors.dialogs.ModelSettingsDialog}) - there is currently no way to
+ * turn a plain {@link DocumentModel} into a CDM through this dialog. The underlying mechanism (see {@link
+ * ComposedDocumentModelResolver}'s javadoc) still edits the raw annotation list of whatever {@link A12Model} it
+ * was given and only takes effect as a {@code cdm.queryRoot}-driven type change on the model's *next* load.
  */
 public class CdmQueryRootPanelController extends AbstractPropertyEditor implements Initializable {
 

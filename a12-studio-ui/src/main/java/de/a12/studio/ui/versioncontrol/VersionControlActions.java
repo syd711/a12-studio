@@ -1,8 +1,9 @@
 package de.a12.studio.ui.versioncontrol;
 
 import de.a12.studio.models.projects.Project;
-import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.models.projects.settings.VersionControlSettings;
+import de.a12.studio.ui.RootController;
+import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.JFXFuture;
 import de.a12.studio.ui.util.StudioBundle;
@@ -58,8 +59,7 @@ public class VersionControlActions {
         });
   }
 
-  public static void revert(@NonNull Stage stage, @NonNull GitService gitService, @NonNull ProjectItem item,
-      @NonNull GitChangedFile file) {
+  public static void revert(@NonNull Stage stage, @NonNull GitService gitService, @NonNull GitChangedFile file) {
     Optional<ButtonType> result = WidgetFactory.showConfirmation(stage,
         StudioBundle.get("confirm_revert_file", file.relativePath()), null, null, StudioBundle.get("versioncontrol_revert"));
     if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -74,7 +74,7 @@ public class VersionControlActions {
             throw new RuntimeException(ex);
           }
         })
-        .thenLater(() -> onRevertCompleted(item, file))
+        .thenLater(VersionControlActions::onRevertCompleted)
         .onErrorLater(ex -> {
           log.error("Failed to revert '{}'", file.file(), ex);
           WidgetFactory.showAlert(stage, StudioBundle.get("versioncontrol_revert_failed"), ex.getMessage());
@@ -83,18 +83,16 @@ public class VersionControlActions {
 
   /**
    * Mirrors {@link de.a12.studio.ui.versioncontrol.VersioncontrolPanelController}'s own post-revert
-   * handling: a {@link ChangeStatus#NEW} file was deleted by the revert, so it's treated like any
-   * other deletion (closes the tab, if open); every other file was checked out from HEAD, so {@link
-   * ProjectItem#reload()} picks up its new content and {@link StudioEventManager#fireModelRevertedEvent}
-   * lets an open tab's editor rebuild from it.
+   * handling: a revert isn't limited to the one file that triggered it (a checkout can touch
+   * whatever HEAD says that file's tree looked like), so rather than patching up just {@code file},
+   * {@link de.a12.studio.ui.RootController#reloadProject()} reloads the whole project from disk and
+   * rebuilds every open tab/detached window's editor content from it - closing any tab whose file
+   * the revert deleted.
    */
-  private static void onRevertCompleted(@NonNull ProjectItem item, @NonNull GitChangedFile file) {
-    if (file.status() == ChangeStatus.NEW) {
-      StudioEventManager.getInstance().fireModelDeletedEvent(item);
-    }
-    else {
-      item.reload();
-      StudioEventManager.getInstance().fireModelRevertedEvent(item);
+  private static void onRevertCompleted() {
+    RootController rootController = Studio.getRootController();
+    if (rootController != null) {
+      rootController.reloadProject();
     }
     StudioEventManager.getInstance().fireGitStatusChangedEvent();
   }

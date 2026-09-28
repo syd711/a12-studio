@@ -76,7 +76,7 @@
                           <!-- Document Uniqueness Criteria -->
                           <fx:include fx:id="documentUniquenessCriteria" source="../propertyeditors/document-uniqueness-criteria-panel.fxml" />
 
-                          <!-- Content Uniqueness Criteria (fields by full path, distinct from Document Uniqueness Criteria above) -->
+                          <!-- Composed Document Model only: Content Uniqueness Criteria (fields by full path, distinct from Document Uniqueness Criteria above) -->
                           <fx:include fx:id="contentUniquenessCriteria" source="../propertyeditors/content-uniqueness-criteria-panel.fxml" />
 
                           <!-- Model References -->
@@ -91,7 +91,7 @@
                           <!-- Immutable / Comment (Document Model only) -->
                           <fx:include fx:id="modelInfo" source="../propertyeditors/model-info-panel.fxml" />
 
-                          <!-- Composed Document Model: Query Root / Relationship Chain (Document Model only) -->
+                          <!-- Composed Document Model only: Query Root / Relationship Chain -->
                           <fx:include fx:id="cdmQueryRoot" source="../documentmodel/cdm-query-root-panel.fxml" />
                       </VBox>
                   </content>

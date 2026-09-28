@@ -275,7 +275,7 @@ public class StudioKeyEventHandler implements EventHandler<KeyEvent> {
 
   private void triggerRevert() {
     withChangedFileOfActiveTab((project, gitService, item, file) ->
-        VersionControlActions.revert(stage, gitService, item, file));
+        VersionControlActions.revert(stage, gitService, file));
   }
 
   /**

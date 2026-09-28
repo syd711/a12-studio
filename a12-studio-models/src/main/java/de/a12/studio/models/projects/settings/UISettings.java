@@ -30,6 +30,13 @@ public class UISettings extends JsonSettings {
   /** Most-recently-edited files, most recent first, capped at {@link #MAX_RECENT_FILES}. Backs the "Recent Files" palette (Ctrl+E). */
   private List<String> recentFiles = new ArrayList<>();
 
+  /**
+   * {@link de.a12.studio.models.ModelType} names currently checked in the project tree's filter
+   * menu; {@code null} means no filter has ever been saved (every type shown), matching the
+   * editor's own default. An explicit empty list means the user deselected every type.
+   */
+  private List<String> projectTreeModelTypeFilter;
+
   @Override
   public String getSettingsName() {
     return SETTINGS_FILE_NAME;
@@ -107,6 +114,14 @@ public class UISettings extends JsonSettings {
 
   public void removeRecentFile(@NonNull String path) {
     recentFiles.remove(path);
+  }
+
+  public List<String> getProjectTreeModelTypeFilter() {
+    return projectTreeModelTypeFilter;
+  }
+
+  public void setProjectTreeModelTypeFilter(List<String> projectTreeModelTypeFilter) {
+    this.projectTreeModelTypeFilter = projectTreeModelTypeFilter;
   }
 
   public static UISettings load() {

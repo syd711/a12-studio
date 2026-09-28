@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * de.a12.studio.models.documentmodel.ModelConfig#getUniquenessCriteria()} (edited by {@link
  * DocumentUniquenessCriteriaPanelController}): this one addresses its Fields by full path string ({@link
  * ContentUniquenessCriterion.Field#getFullName()}, e.g. {@code "/Person/PersonID"}) rather than by {@code
- * Element} id. Only shown for Document Models (see {@link #setVisible}). Rows here only summarize each
+ * Element} id. Only shown for Composed Document Models (see {@link #setVisible}). Rows here only summarize each
  * criterion; the Fields selection and per-locale Error Messages are edited in a dedicated dialog (see {@link
  * Dialogs#showContentUniquenessCriterion}), opened via Add/Edit - the same structure as {@link
  * DocumentUniquenessCriteriaPanelController}, just addressing Fields differently.
