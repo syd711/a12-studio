@@ -1,4 +1,4 @@
-# Release Notes 2026.06-ext0-0.1.1
+# Release Notes 2026.06-ext0-0.1.2
 
 ## Highlights
 
