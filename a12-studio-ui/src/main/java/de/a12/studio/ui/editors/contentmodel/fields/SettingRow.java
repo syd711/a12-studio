@@ -48,6 +48,7 @@ public abstract class SettingRow extends VBox {
   private boolean loading;
 
   protected SettingRow() {
+    super(6);
     getStyleClass().add("content-setting-row");
     labelNode.getStyleClass().add("content-setting-label");
     labelNode.setMinWidth(LABEL_WIDTH);

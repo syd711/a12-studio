@@ -196,11 +196,13 @@
   };
   Object.defineProperty(window, "opener", { configurable: true, value: host });
 
-  // Element selection. The Content Engine renders an element with its model id as the DOM id (elements that render
-  // nothing of their own, like table rows, have none). When the page is embedded in the editor, the JavaFX side
-  // provides window.studioSelectionBridge: a click in the page reports the model element under it, and the editor
-  // calls window.studioSelect(path) - the ids from the selected element up to the root - to have a frame drawn around
-  // the first of them that is rendered. Without the bridge (a plain browser) the page is left alone.
+  // Element selection. The Content Engine renders most elements with their model id as the DOM id (elements that
+  // render nothing of their own, like table rows, have none). Form Engine elements (com.mgmtp.a12.formengine
+  // namespace: TextLine, Select, Checkbox, ...) are the exception: confirmed by inspecting the actual rendered
+  // markup, they get "a12-{model id}-{field name}" (control) and "a12-{model id}-{field name}-label" (label) -
+  // the model id is embedded verbatim, just wrapped, rather than being the whole id attribute. matchesElementId
+  // checks a DOM id against a model id accounting for that wrapping, used by both directions: resolving a click
+  // back to a model id, and finding the rendered node for a model id to frame it.
   var elementIds = {};
   var selectedPath = [];
   var frame = null;
@@ -216,22 +218,57 @@
     return window.studioSelectionBridge || null;
   }
 
+  function matchesElementId(domId, elementId) {
+    if (domId === elementId) { return true; }
+    var prefix = "a12-" + elementId + "-";
+    return domId.lastIndexOf(prefix, 0) === 0;
+  }
+
+  // The model element id for a DOM node, or null if it is not (part of) a rendered model element.
+  function resolveElementId(node) {
+    if (!node.id) { return null; }
+    if (elementIds[node.id]) { return node.id; }
+    if (node.id.lastIndexOf("a12-", 0) === 0) {
+      for (var key in elementIds) {
+        if (matchesElementId(node.id, key)) { return key; }
+      }
+    }
+    return null;
+  }
+
   document.addEventListener("click", function (event) {
     if (!bridge()) { return; }
     for (var node = event.target; node && node.nodeType === 1; node = node.parentNode) {
-      if (node.id && elementIds[node.id]) {
+      var resolved = resolveElementId(node);
+      if (resolved) {
         // The page only shows the model; following its links or submitting its buttons would leave the editor.
         event.preventDefault();
         event.stopPropagation();
-        bridge().elementClicked(node.id);
+        bridge().elementClicked(resolved);
         return;
       }
     }
   }, true);
 
+  // The rendered DOM node for a model id: its own node if the id is a plain match, else the Form Engine's wrapped
+  // control for it (preferred over its label, which also matches but frames only the label text).
+  function findRenderedElement(id) {
+    var exact = document.getElementById(id);
+    if (exact) { return exact; }
+    var all = document.querySelectorAll("[id]");
+    var fallback = null;
+    for (var i = 0; i < all.length; i++) {
+      if (matchesElementId(all[i].id, id)) {
+        if (!/-label$/.test(all[i].id)) { return all[i]; }
+        if (!fallback) { fallback = all[i]; }
+      }
+    }
+    return fallback;
+  }
+
   function renderedSelection() {
     for (var i = 0; i < selectedPath.length; i++) {
-      var node = document.getElementById(selectedPath[i]);
+      var node = findRenderedElement(selectedPath[i]);
       if (node) { return node; }
     }
     return null;

@@ -608,6 +608,22 @@ class DocumentModelValidatorsTest {
   }
 
   @Test
+  void numberTypeConfigValidatorReportsInvalidAmountFractionalDigits() {
+    DocumentModel model = load("NumberTypeConfigValidator_amountInvalidFractionalDigits");
+    List<ModelValidationError> errors = new NumberTypeConfigValidator().validate(model, TestModels.context(model));
+
+    assertEquals(2, errors.size(), () -> "Unexpected errors: " + errors);
+    assertTrue(errors.stream().anyMatch(error -> error.elementId().equals("typedef_amount_mismatched")),
+        "min (0) != max (2) must be reported");
+    assertTrue(errors.stream().anyMatch(error -> error.elementId().equals("typedef_amount_three")),
+        "3 decimal places is neither 0 nor 2 must be reported");
+    assertFalse(errors.stream().anyMatch(error -> error.elementId().equals("typedef_amount_valid")),
+        "min == max == 2 is valid for the Amount trait");
+    assertFalse(errors.stream().anyMatch(error -> error.elementId().equals("typedef_percent_three")),
+        "the rule only applies to the Amount trait");
+  }
+
+  @Test
   void enumerationTypeConfigValidatorReportsEmptyValueOnATypeDefinition() {
     DocumentModel model = load("EnumerationTypeConfigValidator_typeDefinitionInvalid");
     List<ModelValidationError> errors = new EnumerationTypeConfigValidator().validate(model, TestModels.context(model));
@@ -619,6 +635,15 @@ class DocumentModelValidatorsTest {
   @Test
   void customFieldTypeConfigValidatorReportsMissingCodenameOnATypeDefinition() {
     DocumentModel model = load("CustomFieldTypeConfigValidator_typeDefinitionInvalid");
+    List<ModelValidationError> errors = new CustomFieldTypeConfigValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("typedef_custom", errors.get(0).elementId());
+  }
+
+  @Test
+  void customFieldTypeConfigValidatorReportsMinLengthBiggerThanMaxLength() {
+    DocumentModel model = load("CustomFieldTypeConfigValidator_minLengthBiggerMaxLength");
     List<ModelValidationError> errors = new CustomFieldTypeConfigValidator().validate(model, TestModels.context(model));
 
     assertEquals(1, errors.size());
@@ -642,6 +667,18 @@ class DocumentModelValidatorsTest {
 
     assertEquals(1, errors.size());
     assertEquals("typedef_timestamp", errors.get(0).elementId());
+  }
+
+  @Test
+  void dateYounger1900ConfigValidatorReportsYoungerThan1900CheckWithoutAYearInTheFormat() {
+    DocumentModel model = load("DateYounger1900ConfigValidator_invalid");
+    List<ModelValidationError> errors = new DateYounger1900ConfigValidator().validate(model, TestModels.context(model));
+
+    assertEquals(2, errors.size(), () -> "Unexpected errors: " + errors);
+    assertTrue(errors.stream().anyMatch(error -> error.elementId().equals("typedef_fragment")));
+    assertTrue(errors.stream().anyMatch(error -> error.elementId().equals("typedef_range")));
+    assertFalse(errors.stream().anyMatch(error -> error.elementId().equals("typedef_fragment_valid")),
+        "A format that includes a year must not be reported");
   }
 
   @Test

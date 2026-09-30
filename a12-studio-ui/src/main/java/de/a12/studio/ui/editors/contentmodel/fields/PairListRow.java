@@ -34,7 +34,7 @@ public class PairListRow extends SettingRow {
 
   public PairListRow() {
     add.setText(StudioBundle.get("content_settings.list_add"));
-    add.getStyleClass().add("default-button");
+    add.getStyleClass().add("primary-button");
     add.setOnAction(event -> edited(props -> {
       Map<String, Object> entry = new LinkedHashMap<>();
       entry.put(firstKey, isLocale() ? unusedLocale() : "");

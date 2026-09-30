@@ -381,6 +381,19 @@ public final class LexicalText {
     return true;
   }
 
+  /** Whether the text of the element holds a field or group reference. */
+  public static boolean hasReferences(@NonNull ContentElement element) {
+    List<Object> blocks = blocks(element);
+    if (blocks != null) {
+      for (Object block : blocks) {
+        if (runs(asMap(block)).stream().anyMatch(LexicalText::isReference)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private static List<Map<String, Object>> fieldReferences(ContentElement element) {
     List<Map<String, Object>> result = new ArrayList<>();
     List<Object> blocks = isEditable(element) ? blocks(element) : null;

@@ -9,13 +9,17 @@ import de.a12.studio.models.overviewmodel.FilterConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewConfiguration;
 import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.overviewmodel.OverviewModelContent;
+import de.a12.studio.models.projects.Project;
 import de.a12.studio.ui.editors.formmodel.FxTestSupport;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Files;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,6 +32,27 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 class CustomSelectionOfFieldsPanelControllerTest {
 
   private static final String FXML = "/de/a12/studio/ui/editors/overviewmodel/custom-selection-of-fields-panel.fxml";
+
+  private static boolean toolkitAvailable;
+
+  @BeforeAll
+  static void startToolkit() throws Exception {
+    toolkitAvailable = FxTestSupport.startToolkit();
+    if (toolkitAvailable) {
+      // CustomSelectionOfFieldsPanelController.refreshValidationError() calls Studio.getValidationService();
+      // its ProjectModels walk needs a real (even empty) folder - an unloaded Project's root has no File and NPEs.
+      Project validationProject = new Project();
+      validationProject.load(Files.createTempDirectory("custom-selection-of-fields-validation").toFile());
+      FxTestSupport.setValidationServiceForProject(validationProject);
+    }
+  }
+
+  @AfterAll
+  static void stopValidationService() throws Exception {
+    if (toolkitAvailable) {
+      FxTestSupport.clearValidationService();
+    }
+  }
 
   @Test
   void pickingASubtypeRepointsTheFieldPickerAndClearsTheStaleFieldId() throws Exception {

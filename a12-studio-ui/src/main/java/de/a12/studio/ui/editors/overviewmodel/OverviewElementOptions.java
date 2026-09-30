@@ -220,29 +220,49 @@ public final class OverviewElementOptions {
         .toList();
   }
 
-  /** {@link #elementIds(ElementIndex)} minus repeatable ones, plus the {@link #metaElementIds()} (gap 15) -
-   * used by the Column dialog's Element Reference picker (gap 16 of "Overview Model: gap review": SME's own
-   * picker is non-repeatable only, matching {@link
+  /** {@link #elementIds(ElementIndex)} minus repeatable ones and minus a non-enumeration multi-select group,
+   * plus the {@link #metaElementIds()} (gap 15) - used by the Column dialog's Element Reference picker (gap 16
+   * of "Overview Model: gap review"): SME's own picker is non-repeatable only ({@link
    * de.a12.studio.modelsvalidation.validators.overview.OverviewFieldReferenceValidator}'s own "repeatable"
-   * error). Usability only - it doesn't stop a dangling/repeatable value that's already set on the column from
-   * continuing to display, so an existing invalid file's column can still be opened and fixed. */
+   * error) and, for a multi-select group specifically, offers it only when it is an <em>enumeration</em>
+   * multi-select ({@code DocumentModelApi.isMultiSelect(element) ? isEnumerationMultiSelect(element) : true} -
+   * a String multi-select is not offered, every other element kind, groups included, is unaffected). Usability
+   * only - it doesn't stop a dangling/repeatable/String-multi-select value that's already set on the column
+   * from continuing to display, so an existing invalid file's column can still be opened and fixed. */
   public static List<String> columnElementIds(ElementIndex index) {
     if (index == null) {
       return List.of();
     }
-    List<String> ids = new ArrayList<>(elementIds(index).stream().filter(id -> !index.isInRepeatableGroup(id)).toList());
+    List<String> ids = new ArrayList<>(elementIds(index).stream()
+        .filter(id -> !index.isInRepeatableGroup(id))
+        .filter(id -> index.resolveElement(id)
+            .map(element -> !OverviewElementResolution.isMultiSelect(index, element) || OverviewElementResolution.isEnumerationMultiSelect(index, element))
+            .orElse(true))
+        .toList());
     ids.addAll(metaElementIds());
     return ids;
   }
 
-  /** {@link #elementIds(ElementIndex)} plus the {@link #metaElementIds()} (gap 15) - used by the Custom
-   * Selection Of Fields panel's row picker ({@code filterConfiguration.fields}, {@code custom_list} filter
-   * mode). */
+  /** {@link #elementIds(ElementIndex)} restricted to Fields and enumeration multi-select groups, plus the
+   * {@link #metaElementIds()} (gap 15) - used by the Custom Selection Of Fields panel's row picker ({@code
+   * filterConfiguration.fields}, {@code custom_list} filter mode) and, reusing this same list (gap 16 of
+   * "Overview Model: gap review"), the Section Data field picker ({@link FieldReferencesPanelController}) -
+   * SME's own candidates for both are the same function (`getFilterValuesForSectionData` delegates straight to
+   * `getFilterValuesByFilterMode`). Mirrors {@code isFieldLike(element) || isEnumerationMultiSelect(element,
+   * documentModel)}: a plain (non-multi-select) Group, e.g. an attachment group, is not offered here even
+   * though the Column picker above does offer it - filtering by an attachment blob has no meaning, but
+   * referencing one as a column's display value does. Repeatable fields and dynamic-suffix fields are *not*
+   * excluded here yet (SME's own candidates for this list exclude the latter too; not ported this pass - see
+   * TODO.md). */
   public static List<String> customSelectionFieldIds(ElementIndex index) {
     if (index == null) {
       return new ArrayList<>(metaElementIds());
     }
-    List<String> ids = new ArrayList<>(elementIds(index));
+    List<String> ids = new ArrayList<>(elementIds(index).stream()
+        .filter(id -> index.resolveElement(id)
+            .map(element -> element instanceof FieldElement || OverviewElementResolution.isEnumerationMultiSelect(index, element))
+            .orElse(false))
+        .toList());
     ids.addAll(metaElementIds());
     return ids;
   }

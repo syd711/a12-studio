@@ -50,6 +50,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -177,13 +178,15 @@ class ContentModelEditorPanelsTest {
   void theTextOfHeadingsAndParagraphsIsEditedInAPlainTextField() throws Exception {
     select("Heading");
     ContentElement heading = selected();
-    TextInputControl headingField = FxTestSupport.field(textRow(), "input");
-    assertTrue(headingField instanceof TextField, "a heading is a single line");
-    String before = FxTestSupport.onFx(() -> headingField.getText());
+    javafx.scene.web.HTMLEditor headingEditor = FxTestSupport.field(textRow(), "htmlEditor");
+    assertNotNull(headingEditor, "a heading without references is edited in an HTML editor");
+    String before = LexicalText.getText(heading);
     assertFalse(before.isBlank());
     assertTrue(visibleTitles().contains(title("content")));
 
-    FxTestSupport.onFx(() -> headingField.setText("Brand new headline"));
+    FxTestSupport.onFx(() -> headingEditor.setHtmlText("<h1>Brand new headline</h1>"));
+    FxTestSupport.onFx(() -> headingEditor.fireEvent(new javafx.scene.input.KeyEvent(javafx.scene.input.KeyEvent.KEY_RELEASED,
+        "", "", javafx.scene.input.KeyCode.A, false, false, false, false)));
     assertEquals("Brand new headline", LexicalText.getText(heading));
     assertTrue(String.valueOf(heading.getProps().get("html")).contains("Brand new headline"));
     assertFalse(String.valueOf(heading.getProps().get("html")).contains(before));

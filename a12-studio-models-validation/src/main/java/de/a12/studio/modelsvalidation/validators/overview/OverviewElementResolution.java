@@ -6,6 +6,8 @@ import de.a12.studio.models.ModelType;
 import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModelElements;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.documentmodel.EnumerationFieldType;
+import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupConfig;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.overviewmodel.Column;
@@ -206,6 +208,27 @@ public final class OverviewElementResolution {
   private static boolean isMultiSelectGroup(Element element) {
     return element instanceof GroupElement groupElement && groupElement.getGroup() != null
         && GroupConfig.USAGE_TYPE_MULTI_SELECT.equals(groupElement.getGroup().getUsageType());
+  }
+
+  /**
+   * True when {@code element} is a multi-select group (or a field inside one) whose single value field is
+   * Enumeration-typed - mirrors SME's {@code DocumentModelApi.isEnumerationMultiSelect}, the extra condition
+   * the Column dialog's Element Reference picker and the Custom Selection Of Fields/Section Data pickers apply
+   * on top of {@link #isMultiSelect} (gap 16 of "Overview Model: gap review"): a String multi-select is a
+   * legal Document Model shape, but neither picker offers one.
+   */
+  public static boolean isEnumerationMultiSelect(ElementIndex index, Element element) {
+    GroupElement group = isMultiSelectGroup(element) ? (GroupElement) element : index.parentOf(element);
+    if (group == null || !isMultiSelectGroup(group) || group.getGroup().getElements() == null) {
+      return false;
+    }
+    return group.getGroup().getElements().stream()
+        .filter(FieldElement.class::isInstance)
+        .map(FieldElement.class::cast)
+        .findFirst()
+        .map(field -> field.getField() != null
+            && index.effectiveFieldType(field.getField().getFieldType()) instanceof EnumerationFieldType)
+        .orElse(false);
   }
 
   /**

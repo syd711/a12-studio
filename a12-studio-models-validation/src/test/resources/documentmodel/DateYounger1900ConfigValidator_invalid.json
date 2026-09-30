@@ -1,0 +1,63 @@
+{
+  "header": {
+    "id": "DateYounger1900ConfigValidator_invalid",
+    "modelType": "document",
+    "modelVersion": "29.4.0",
+    "locales": [
+      {
+        "code": "en"
+      }
+    ]
+  },
+  "content": {
+    "modelInfo": {
+      "name": "DateYounger1900ConfigValidator_invalid",
+      "immutable": false
+    },
+    "modelConfig": {
+      "timeZone": "UTC",
+      "decimalSeparator": ".",
+      "conditionLanguage": {
+        "code": "en_US"
+      }
+    },
+    "modelRoot": {
+      "rootGroups": []
+    },
+    "typeDefinitions": [
+      {
+        "id": "typedef_fragment",
+        "name": "Fragment",
+        "fieldType": {
+          "type": "DateFragmentType",
+          "DateFragmentType": {
+            "formatOfFragment": "MM",
+            "youngerThan1900Check": true
+          }
+        }
+      },
+      {
+        "id": "typedef_range",
+        "name": "Range",
+        "fieldType": {
+          "type": "DateRangeType",
+          "DateRangeType": {
+            "format": "MM-dd",
+            "youngerThan1900Check": true
+          }
+        }
+      },
+      {
+        "id": "typedef_fragment_valid",
+        "name": "FragmentValid",
+        "fieldType": {
+          "type": "DateFragmentType",
+          "DateFragmentType": {
+            "formatOfFragment": "yyyy-MM",
+            "youngerThan1900Check": true
+          }
+        }
+      }
+    ]
+  }
+}

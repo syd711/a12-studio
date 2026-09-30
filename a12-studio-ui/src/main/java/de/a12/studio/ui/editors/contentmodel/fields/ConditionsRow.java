@@ -46,7 +46,7 @@ public class ConditionsRow extends SettingRow {
 
   public ConditionsRow() {
     add.setText(StudioBundle.get("content_settings.condition_add"));
-    add.getStyleClass().add("default-button");
+    add.getStyleClass().add("primary-button");
     add.setOnAction(event -> edited(props -> {
       Map<String, Object> condition = new LinkedHashMap<>();
       condition.put("operator", EQUAL);

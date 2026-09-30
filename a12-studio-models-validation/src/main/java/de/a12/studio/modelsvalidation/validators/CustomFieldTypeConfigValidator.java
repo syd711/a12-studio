@@ -18,9 +18,12 @@ import java.util.List;
 
 /**
  * A Custom field type must name the underlying custom field it wraps, ported from SME/kernel's {@code
- * DomainField.json} rule {@code CUSTOM_FIELD_TYPE_CODENAME_MISSING}. Runs both against fields and, since a
- * Type Definition Model's own type definitions aren't reachable through {@link ElementIndex#allElements()},
- * against a model's own {@code typeDefinitions} directly.
+ * DomainField.json} rule {@code CUSTOM_FIELD_TYPE_CODENAME_MISSING}; {@code minLength} must not exceed {@code
+ * maxLength}, ported from the same file's {@code MIN_LENGTH_BIGGER_MAX_LENGTH} rule (re-verified 2026-09-30
+ * against `C:\workspace\sme` directly - String's equivalent check already existed in {@link
+ * StringTypeConfigValidator}, Custom's own was the gap; see "Document Model: gap review", gap 11). Runs both
+ * against fields and, since a Type Definition Model's own type definitions aren't reachable through {@link
+ * ElementIndex#allElements()}, against a model's own {@code typeDefinitions} directly.
  */
 public final class CustomFieldTypeConfigValidator implements ModelValidator {
 
@@ -54,10 +57,20 @@ public final class CustomFieldTypeConfigValidator implements ModelValidator {
 
   private static void checkCodename(A12Model<?> model, String elementId, CustomFieldFieldType customFieldType,
       List<ModelValidationError> errors) {
-    String name = customFieldType.getCustomFieldType() == null ? null : customFieldType.getCustomFieldType().getName();
+    if (customFieldType.getCustomFieldType() == null) {
+      return;
+    }
+    String name = customFieldType.getCustomFieldType().getName();
     if (name == null || name.isBlank()) {
       errors.add(new ModelValidationError(model, elementId, ElementProperty.DATA_TYPE,
           ValidationMessages.get("validation.customFieldTypeConfig.codenameMissing", elementId), Severity.ERROR.name()));
+    }
+
+    Integer minLength = customFieldType.getCustomFieldType().getMinLength();
+    Integer maxLength = customFieldType.getCustomFieldType().getMaxLength();
+    if (minLength != null && maxLength != null && minLength > maxLength) {
+      errors.add(new ModelValidationError(model, elementId, ElementProperty.DATA_TYPE,
+          ValidationMessages.get("validation.customFieldTypeConfig.minLengthBiggerMaxLength", elementId), Severity.ERROR.name()));
     }
   }
 }

@@ -49,7 +49,7 @@ public class ListRow extends SettingRow {
 
   public ListRow() {
     add.setText(StudioBundle.get("content_settings.list_add"));
-    add.getStyleClass().add("default-button");
+    add.getStyleClass().add("primary-button");
     add.setOnAction(event -> edited(props -> {
       current.add("");
       write(props);

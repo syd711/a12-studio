@@ -233,9 +233,12 @@ relevant for `DateRange` and is specifically *required* (not just "valid") when 
 "DD.MM-DD.MM"` **and** the model is year-based (`INTERPRETATION_OF_YEAR_INVALID`/`_MISSING`); plain
 Date/DateTime/Time's `optionalDateType` is only valid for the three formats `DD.MM.YYYY`/`YYYYMMDD`/`YYYY-MM-DD`,
 while DateRange's own `optionalDateType` is restricted to `FULL` only (stricter — a different rule,
-`OPTIONAL_DATE_RANGE_INVALID`). Still not implemented as gating logic in a12-studio's
-`DataTypeDateFragmentConfigurationPanelController`/`DataTypeDateRangeConfigurationPanelController` (both remain
-always-editable) — see "Document Model: gap review (2026-09-27)" below, gap 10.
+`OPTIONAL_DATE_RANGE_INVALID`). **Update (2026-09-30):** these SME conditions are correct, but re-checking them
+against a12-studio's own (already-diverged) data model before implementing found only `YOUNGER1900_CHECK_INVALID`
+actually ports - `optionalDateType` has no a12-studio equivalent at all (a12-studio's similarly-named
+`DateFragmentFieldType` is a real, distinct kernel type, `IDateFragmentType`, not a port of this SME concept) and
+`interpretationOfYear`'s gating needs a "model is year-based" input (`ModelInfo.baseYear`) a12-studio's `ModelInfo`
+doesn't carry. See "Document Model: gap review (2026-09-27)" below, gap 10, for the full corrected write-up.
 
 **4. DONE (2026-09-06).** `RequirednessConfig.errorMessage` (custom "this field is required" message) could be
 toggled off the default but never authored — `TypeDefinitionPanelController`'s "use default error messages"
@@ -285,8 +288,9 @@ rules).
 
 ### Document Model: gap review (2026-09-27)
 
-**Status (2026-09-27): gaps 1-6 and 9 closed, plus the separately-tracked Include-loop picker item ("Features" in
-TODO.md); 7, 8, 10, 11 still open (7-8 no UI needed/low priority, 10-11 need a `DomainField.json` re-read first).**
+**Status (2026-09-30): gaps 1-6, 9, 10 (partial) and 11 closed, plus the separately-tracked Include-loop picker
+item ("Features" in TODO.md); 7, 8, 10 (remainder) still open (7-8 no UI needed/low priority, 10's remainder
+turned out not to be a re-read-and-port job after all - see below).**
 `EnumerationTypeConfigValidator.checkLabels` now only runs once at least one enum value already has at least
 one non-blank label (gap 1); `StringTypeConfigValidator` now requires `linebreaksPermitted` to be explicitly
 set whenever `noValueValidation` is on and rejects `pattern`/`minLength`/`hintList` alongside it (gap 2); new
@@ -359,8 +363,8 @@ cluttered with false leads:
 | **Fixed 2026-09-27** | | | |
 | 9 | ~~`DocumentModelContent.documentUniquenessCriteria` (`ContentUniquenessCriterion`, addresses fields by full path string) has zero editor UI and zero validator~~ — distinct from the fully-built `ModelConfig.uniquenessCriteria` (addresses fields by element id) | Not independently re-verified against SME's own form for this; `ContentUniquenessCriteriaPanelController`/`ContentUniquenessCriterionDialogController` follow `DocumentUniquenessCriteriaPanelController`'s shape exactly, just keying Fields by full path (`ElementIndex.getPath`/`resolveAbsolutePath`) instead of element id, and `ContentUniquenessCriteriaValidator` checks name required/unique, ≥1 field, and every field path resolves — no SME source confirms the Required/non-repeatable *eligibility* restriction the other dialog has, so that restriction was deliberately not copied over | The real `advanced_new/models/10_People/Person_Dc.json` fixture (`PersonIDMustBeUnique`, fields `/Person/Type`/`/Person/PersonID`) is now editable and validated, not just silently round-tripped |
 | **Lower confidence — re-verify against `DomainField.json` before implementing** | | | |
-| 10 | `DataTypeDateFragmentConfigurationPanelController`/`DataTypeDateRangeConfigurationPanelController`'s "expert" fields have no cross-field gating, even though the exact conditions are now known (see the "Resolved (2026-09-27)" note under point 3 in "Field-level & validator gap analysis" above) | SME gates `younger1900`/`interpretationOfYear`/`optionalDateType` validity on `format`/`formatDateRange` as described there | A DateFragment/DateRange field can have a nonsensical combination (e.g. `younger1900Check` on a format with no year) with no warning |
-| 11 | `NumberTypeConfigValidator` may be missing a `trait=Amount ⇒ maxFractionalDigits==2` rule, a `positivesOnly`-vs-negative-`minValue` conflict, and a `maxIntegerDigits`-vs-`maxValue`-digit-count check; `CustomFieldTypeConfigValidator` has no `minLength>maxLength` check (String's equivalent exists) | `DomainField.json`'s Number rules include `A12_AMOUNT_AND_INVALID_FRACT_DIGITS` and related fractional-digit rules whose exact trigger conditions weren't fully re-derived this pass | Re-verify the precise conditions in `DomainField.json` before adding — don't guess at the exact gating |
+| 10 | ~~`DataTypeDateFragmentConfigurationPanelController`/`DataTypeDateRangeConfigurationPanelController`'s "expert" fields have no cross-field gating~~ - `YOUNGER1900_CHECK_INVALID` closed 2026-09-30, the other two SME rules don't port (see below) | SME gates `younger1900`/`interpretationOfYear`/`optionalDateType` validity on `format`/`formatDateRange` | **`YOUNGER1900_CHECK_INVALID` done:** new `DateYounger1900ConfigValidator` requires a format containing a year whenever `youngerThan1900Check` is set, on `DateFragmentFieldType`/`DateRangeFieldType` (the only two a12-studio types with this field). **`OPTIONAL_DATE_TYPE_INVALID`/`OPTIONAL_DATE_RANGE_INVALID` don't port**: both key off SME's `optionalDateType` field (`DAY_OPTIONAL`/`MONTH_OPTIONAL`/`YEAR_OPTIONAL` - a partial-date-with-placeholder-zeros concept, e.g. `00.12.0000`), which has no equivalent in a12-studio at all; `DateFragmentFieldType`/`DateFragmentTypeOptions.formatOfFragment` looked like a plausible match by name but is a different concept on inspection - its own presets (`yyyy`, `MM`, `yyyy-MM`, `MM-dd`) are "capture only this fragment", not "full format with some fragments zeroed", and don't overlap SME's three optionalDateType-eligible formats (`DD.MM.YYYY`/`YYYYMMDD`/`YYYY-MM-DD`) at all - confirmed this is a real, distinct A12 kernel type (`IDateFragmentType`, per `C:\workspace\a12\2606-06-doc\data_services-dataservices-documentation-src.md`'s `datefragment_range` operator), not an SME concept a12-studio ported, so there is nothing to gate here. **`INTERPRETATION_OF_YEAR_INVALID`/`_MISSING` don't port** either, for a different reason: both need a "is this model year-based" input - SME's `ModelInfo.baseYear` (`serializedDocumentModel.ts`) - which a12-studio's `ModelInfo.java` doesn't model at all (only `name`/`immutable`/`comment`/`joinedModelsInfo`); adding `baseYear` (round-trip field + a `ModelInfoPanelController` UI field) is a real, separate, small gap worth its own pass before `interpretationOfYear` gating can be built - not guessed at here |
+| 11 | ~~`NumberTypeConfigValidator` may be missing a `trait=Amount ⇒ maxFractionalDigits==2` rule...~~ - closed 2026-09-30 | `DomainField.json`'s `A12_AMOUNT_AND_INVALID_FRACT_DIGITS`/`MIN_LENGTH_BIGGER_MAX_LENGTH` (Custom section) | **Done:** `NumberTypeConfigValidator` now checks `trait=amount ⇒ minFractionalDigits==maxFractionalDigits∈{0,2}` (a12-studio's `trait` wire value is lowercase, confirmed against real fixtures - a translation detail, not a gap); `CustomFieldTypeConfigValidator` now checks `minLength>maxLength`. Re-verified directly against `DomainField.json`: the doc's prior `positivesOnly`-vs-negative-`minValue` and `maxIntegerDigits`-vs-`maxValue`-digit-count items don't correspond to any real SME rule - dropped as speculative, not implemented. Number's own `minLength`/`maxLength` (string-representation length) has no a12-studio field to hang a check on, same as gap 10's `optionalDateType` - not a gap. `MIN_FRACT_DIGITS_MISSING`/`MAX_FRACT_DIGITS_MISSING` (required-ness) checked and confirmed **not portable**: `DataTypeNumberConfigurationPanelController` deliberately makes these an optional pair behind a "has decimal places" checkbox (a real a12-studio divergence from SME, not an oversight) - 29 of 68 real `NumberType` occurrences in `testing/workspaces` have no fractional digits at all, so porting this rule would flag ~43% of real, valid fields |
 
 **Also checked and found to be a non-issue:** `SchemaVersionValidator`'s errors are model-sourced (`elementId ==
 null`) and `ValidatorRunner` drops model-sourced errors entirely per its own doc comment — this makes the
@@ -383,9 +387,10 @@ keyed by locale), so the shape that would produce a duplicate simply doesn't exi
 **Suggested order.** 1 and 2 first (validator *correctness* bugs — one over-strict causing false positives on
 every unlabeled Enumeration field, one silently accepting a meaningless String configuration); 3–6 next (missing
 validators, all cheap, no design work — 5 and 6 are natural to land together as one pass over
-`BasicConsistencyValidator`/name checks); 9 done (real fixture surfaced needing it); 7, 8 whenever round-trip
-fixtures are next touched (no UI, no urgency); 10 only if the Date/DateRange "expert" panels are touched anyway;
-11 needs a `DomainField.json` re-read first, do not guess at the exact gating.
+`BasicConsistencyValidator`/name checks); 9 done (real fixture surfaced needing it); 10's `YOUNGER1900_CHECK_INVALID`
+slice and 11 done; 7, 8 whenever round-trip fixtures are next touched (no UI, no urgency); 10's `optionalDateType`
+half needs no further work (no a12-studio equivalent exists to gate); its `interpretationOfYear` half needs
+`ModelInfo.baseYear` added first (small, separate task) before it's worth attempting.
 
 ### Load/save/validate flow (SME reference)
 
@@ -1763,8 +1768,8 @@ The parked / rejected list for the whole tool lives in `TODO.md` ("Won't do" and
 
 ### Overview Model: gap review (2026-09-26)
 
-**Status (2026-09-27): gaps 1, 2, 3, 4, 5, 6, 7, 8, 9 (partial), 10, 11, 12, 13, 14, 15 closed; 16 (partial), 17
-(partial) open.** New/changed: `FilterStringFieldsMultiSelectPanelController` gained the
+**Status (2026-09-30): gaps 1, 2, 3, 4, 5, 6, 7, 8, 9 (partial), 10, 11, 12, 13, 14, 15, 16 (partial) closed; 16
+(remainder), 17 (partial) open.** New/changed: `FilterStringFieldsMultiSelectPanelController` gained the
 `enumeratedStringFilter.fields` list editor (String fields only, reusing `CustomSelectionOfFieldsPanelController`'s
 row pattern) plus `OverviewEnumeratedStringFilterValidator` (gap 1). `OverviewConfiguration.actionColumnWidth`
 is now a decimal (`JsonNode`-backed, like `Column.width`) with a real UI field; `Column.MIN_WIDTH`/`OverviewConfiguration.MIN_ACTION_COLUMN_WIDTH`
@@ -1827,11 +1832,24 @@ which re-points that row's Field picker at the sub-type's own elements and clear
 changes; `OverviewFilterCustomFieldsValidator` validates `subModel` itself and resolves `fieldId` through it;
 rename-rewrite is via `ModelReferenceRewriter.REFERENCE_FIELD_NAMES` gaining `"subModel"` rather than a header
 reference (no fixture ever showed what a `sub-document-model-for-overview` reference should look like, and it
-isn't needed for rename-safety - the content-field rewrite already covers that). Gap 16's first item is done:
-`OverviewElementOptions.columnElementIds` excludes repeatable fields from the Column dialog's Element Reference
-picker (matching `OverviewFieldReferenceValidator`'s own "repeatable" error); its other candidate rules
-(multi-select "only when enumeration multi-select" - not modelled, Studio has no such distinction between kinds
-of multi-select group; filter fields; Section Data fields; Screen Reader Column) are not.
+isn't needed for rename-safety - the content-field rewrite already covers that). Gap 16, repeatable-field and
+multi-select/filter-field/Section Data items done: `OverviewElementOptions.columnElementIds` excludes repeatable
+fields from the Column dialog's Element Reference picker (matching `OverviewFieldReferenceValidator`'s own
+"repeatable" error). New `OverviewElementResolution.isEnumerationMultiSelect(ElementIndex, Element)` mirrors
+SME's `DocumentModelApi.isEnumerationMultiSelect` (a multi-select group whose single value field is
+Enumeration-typed); `columnElementIds()` now excludes a multi-select group unless it's an enumeration multi-select
+(`isMultiSelect(element) ? isEnumerationMultiSelect(element) : true`, matching SME) and new
+`customSelectionFieldIds()` (Fields plus enumeration multi-select groups, `isFieldLike(element) ||
+isEnumerationMultiSelect(element, documentModel)`) replaces the unrestricted `elementIds()` at both its prior
+call site (`CustomSelectionOfFieldsPanelController`'s Field picker) and the Section Data field picker
+(`FieldReferencesPanelController` - SME's own candidates for both are the same function,
+`getFilterValuesForSectionData` delegates to `getFilterValuesByFilterMode`). Verified against every real
+multi-select group in `testing/workspaces` (all Enumeration-typed, so nothing currently valid is excluded) and
+`ProductMovie_OM.json`'s `custom_list` field referencing its enum multi-select group directly by id (still
+resolves); `OverviewElementOptionsMultiSelectTest` (4 cases) pins the new restriction. Still open from gap 16:
+the "already-used fields excluded"/"dynamic-suffix fields excluded" sub-clauses of SME's filter-field candidate
+rule (found in SME source, not ported this pass) and the Screen Reader Column candidate rule (no SME source
+recipe found yet).
 
 **Gap 15 (metadata fields), closed:** `OverviewElementResolution.META_FIELDS` (new, 7 entries covering the
 kernel's `__meta` group - docRef/modelReference/modelVersion/creator/createdAt/modifier/modifiedAt) plus

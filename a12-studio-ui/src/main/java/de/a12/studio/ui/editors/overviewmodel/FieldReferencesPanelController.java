@@ -86,7 +86,7 @@ public class FieldReferencesPanelController extends AbstractPropertyEditor {
    * referenced. Empty (not just unresolved) whenever there's no index yet, since there's nothing to add. */
   private Optional<String> firstUnselectedFieldId() {
     List<String> usedIds = getFields().stream().map(FieldRef::getFieldId).toList();
-    return OverviewElementOptions.elementIds(documentModelIndex).stream()
+    return OverviewElementOptions.customSelectionFieldIds(documentModelIndex).stream()
         .filter(id -> !usedIds.contains(id))
         .findFirst();
   }
@@ -117,7 +117,7 @@ public class FieldReferencesPanelController extends AbstractPropertyEditor {
     fieldField.setPromptText(StudioBundle.get("select_a_field"));
     fieldField.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(fieldField, Priority.ALWAYS);
-    fieldField.getItems().setAll(OverviewElementOptions.elementIds(documentModelIndex));
+    fieldField.getItems().setAll(OverviewElementOptions.customSelectionFieldIds(documentModelIndex));
     OverviewElementOptions.applyElementRefConverter(fieldField, documentModelIndex);
 
     updatingFromModel = true;
