@@ -1,6 +1,8 @@
 package de.a12.studio.modelsvalidation.validators.query;
 
 import de.a12.studio.models.documentmodel.DocumentModel;
+import de.a12.studio.models.documentmodel.DocumentModelContent;
+import de.a12.studio.models.documentmodel.ModelRoot;
 import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
@@ -27,6 +29,18 @@ class QueryFilterReferenceCheckerTest {
   private static final DocumentModel REF = TestModels.load("/documentmodel/Ref_DM.json", DocumentModel.class);
   private static final DocumentModel WITH_INCLUDE = TestModels.load("/documentmodel/RefWithInclude_DM.json", DocumentModel.class);
   private static final DocumentModel INCLUDED = TestModels.load("/documentmodel/RefIncluded_DM.json", DocumentModel.class);
+  private static final DocumentModel EMPTY = emptyDocumentModel();
+
+  private static DocumentModel emptyDocumentModel() {
+    DocumentModel model = new DocumentModel();
+    model.setId("Empty_DM");
+    DocumentModelContent content = new DocumentModelContent();
+    ModelRoot modelRoot = new ModelRoot();
+    modelRoot.setRootGroups(List.of());
+    content.setModelRoot(modelRoot);
+    model.setContent(content);
+    return model;
+  }
 
   private final QueryFilterReferenceChecker checker = new QueryFilterReferenceChecker(new Models(
       List.of(REF, WITH_INCLUDE, INCLUDED),
@@ -63,6 +77,32 @@ class QueryFilterReferenceCheckerTest {
     assertTrue(messages.get(0).contains("\"/Root/DoesNotExist\"") && messages.get(0).contains("Ref_DM"), messages.get(0));
     assertTrue(messages.get(1).contains("\"/Root\"") && messages.get(1).contains("not a field"), messages.get(1));
     assertTrue(messages.get(2).contains("\"/Root/Hidden\"") && messages.get(2).contains("indexed = false"), messages.get(2));
+  }
+
+  @Test
+  void anUnknownFieldSuggestsTheClosestIndexableFieldsByEditDistance() {
+    // Ref_DM's indexable fields are /Root/Name and /Root/NoLabel (Hidden is indexed = false, so excluded from
+    // suggestions too, mirroring SME's resolver.ts getBestMatchFields/getAllFields). "/Root/Nam" is one edit
+    // away from "/Root/Name", so it's suggested first.
+    List<String> messages = check("[/Root/Nam] == \"a\"");
+
+    assertEquals(1, messages.size());
+    assertTrue(messages.get(0).contains("Did you mean"), messages.get(0));
+    assertTrue(messages.get(0).contains("[/Root/Name]"), messages.get(0));
+    assertTrue(messages.get(0).contains("[/Root/NoLabel]"), messages.get(0));
+    assertTrue(messages.get(0).indexOf("[/Root/Name]") < messages.get(0).indexOf("[/Root/NoLabel]"),
+        "the closer match comes first: " + messages.get(0));
+    // A non-indexed field (Hidden) is never suggested, even though its own edit distance may be smaller -
+    // SME's getAllFields only walks indexable fields to begin with.
+    assertTrue(!messages.get(0).contains("[/Root/Hidden]"), messages.get(0));
+  }
+
+  @Test
+  void aModelWithNoIndexableFieldsFallsBackToTheMessageWithoutSuggestions() {
+    List<String> messages = checker.check("[/Nope] == \"a\"", EMPTY);
+
+    assertEquals(1, messages.size());
+    assertTrue(!messages.get(0).contains("Did you mean"), messages.get(0));
   }
 
   @Test

@@ -161,6 +161,12 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
   // matching SME's own ephemeral, ask-again-on-reopen handling of the same ambiguity.
   private String selectedContextCombinationModelId;
 
+  // Whether at least one Combination Model references this Additive Document Model, i.e. whether "Ad Hoc
+  // Testing" (see DocumentModelActions#startAdHocTest) has a Combination Model context to test against -
+  // cached here (from #resolveAdditiveState's own candidates lookup) rather than recomputed on every
+  // #updateEditingButtonsState call.
+  private boolean additiveAdHocTestAvailable;
+
   // A synthetic, non-persisted Include-shaped GroupElement standing in for referenceBaseModel's own root
   // content, injected as the tree's first top-level row so its elements are shown read-only for editing
   // context (hidden instead when additiveElementsOnlyCheckBox is checked) - see #applyFilter and
@@ -277,15 +283,18 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     this.additive = projectItem.getModel() instanceof AdditiveDocumentModel;
     additiveToolbarBar.setVisible(additive);
     additiveToolbarBar.setManaged(additive);
-    adHocTestButton.setDisable(additive);
     if (!additive) {
       this.referenceBaseModel = null;
       this.baseModelNode = null;
       this.selectedContextCombinationModelId = null;
+      this.additiveAdHocTestAvailable = false;
+      adHocTestButton.setDisable(false);
       return;
     }
     List<AdditiveDocumentModelResolver.AdditiveContext> candidates =
         AdditiveDocumentModels.findCandidateContexts(projectItem, (DocumentModel) projectItem.getModel());
+    this.additiveAdHocTestAvailable = !candidates.isEmpty();
+    adHocTestButton.setDisable(!additiveAdHocTestAvailable);
     AdditiveDocumentModelResolver.AdditiveContext resolved = resolveContext(candidates, interactive);
     this.referenceBaseModel = resolved == null ? null : resolved.baseModel();
     this.selectedContextCombinationModelId = resolved == null ? null : resolved.combinationModelId();
@@ -928,8 +937,9 @@ public class DocumentModelElementsTreeController implements Initializable, Studi
     copyButton.setDisable(!hasElementSelected || fixedChildrenAncestor);
     pasteButton.setDisable(!hasElementSelected || withinFixedChildrenGroup || !hasClipboardContent);
     deleteButton.setDisable(!hasElementSelected || fixedChildrenAncestor);
-    // An Additive Document Model is only a fragment; SME tests it through the Combination Model it belongs to.
-    adHocTestButton.setDisable(additive);
+    // An Additive Document Model is only a fragment; SME tests it through the Combination Model it belongs to -
+    // enabled once #resolveAdditiveState found at least one Combination Model referencing it.
+    adHocTestButton.setDisable(additive && !additiveAdHocTestAvailable);
   }
 
   private enum DropLocation {ABOVE, BELOW, INTO}

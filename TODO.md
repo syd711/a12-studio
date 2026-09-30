@@ -201,15 +201,62 @@ Full gap review 2026-09-27 against SME's `relationshipModel` module — see "Rel
 
 ### Combined Document Model
 Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap review (2026-09-27)" under "Combined Document Model" in `docs/sme-reference-comparison.md`. The bulk of the gap list is already fixed (see git log).
-- Still open: no user-facing Preview of the expanded/merged Document Model (SME has one, kernel-backed); a partial
-  Addition-only-merge preview is buildable today on the existing `CombinedDocumentModelElements` helper without the
-  kernel dependency — worth considering as a scoped slice of the otherwise kernel-gated feature.
+- **Addition-only merge preview built 2026-09-30 (this pass):** a new "Preview" tab on the Combination Model
+  editor (`CombinedDocumentModelEditorController` now wraps its existing settings content plus a new
+  `CombinationPreviewPanelController`/`combination-preview-panel.fxml` in a `TabPane`, mirroring `TreeModelEditorController`'s
+  own tab shape) shows a read-only tree of the merged Document Model `CombinedDocumentModelElements.resolveForFieldReferences`
+  already builds for every field-reference picker - the exact "scoped slice... buildable today without the kernel
+  dependency" this TODO item called for, not SME's real kernel-backed expand/merge preview (Selection/Decoration
+  steps, and anything needing real semantic join, still aren't reflected - same limitations the helper's own
+  javadoc already documents). The tree itself (`ElementViewModel` + a small dedicated read-only `TreeCell`,
+  `CombinationPreviewElementTreeCell`) closely mirrors `formmodel.documenttree.DocumentSourceTreeController`/
+  `FormSourceElementTreeCell` (read-only Document Model tree, search filter, expand/collapse) minus drag-and-drop
+  (nothing to drop this onto) and the "open Document Model" button (the merged model is synthetic, in-memory
+  only - no file to open). Refreshed on every Base Model change, Combination Step change, and whenever a
+  referenced Document Model is saved in another tab (`onDocumentModelChangedElsewhere`'s existing full reload
+  already covers the last one). Pinned by `CombinationPreviewPanelControllerTest` (2 cases: the real
+  `advanced_new/PersonEmployee_Cm` fixture's merge shown correctly - both root groups, a field from the base
+  model, a field from the Addition step's model; no Base Model shows the placeholder instead) and
+  `CombinedDocumentModelEditorControllerTest` (1 case: the real editor entry point, `AbstractEditorController#load`,
+  populates the Preview tab end to end - catches an `fx:id`/wiring mistake a panel-only test can't). Full
+  `a12-studio-ui` suite green for the touched area (module-wide runs in this sandbox are heap-constrained and
+  flaky independent of this change - see "Environment note" above).
 - **Fixed 2026-09-29 (this pass):** added a cap of 99 Combination Steps on a Combined Document Model, matching
   SME - new `CombinationStepsMaxCountValidator` (registered in `CombinationModelValidationService`), pinned by
   `CombinationValidatorsTest.stepsMaxCountValidatorReportsMoreThan99Steps`/`stepsMaxCountValidatorAllows99Steps`.
 
 ### Query Model
-- Filter expressions are only existence-checked; type and enum-value checking is not done, and there are no "did you mean" candidates.
+- **"Did you mean" suggestions fixed 2026-09-30 (this pass).** Correction to an initial (wrong) finding in this
+  same pass: a first search of `client/src/modules/queryModel`/`commonDocumentModel` for a type-checking or
+  suggestion recipe found nothing, and was about to be written up as "no SME recipe exists, don't guess" - but
+  that search was scoped wrong. The real source is a sibling top-level module, `C:\workspace\sme\moduleSupport\qmm`
+  (referenced elsewhere in this doc's own text, e.g. `QueryFilterReferenceChecker`'s existing javadoc citing SME
+  diagnostics 2023/2024/2036), not under `client/src`. Its `resolver.ts` has exactly the recipe needed:
+  `getBestMatchFields` collects every *indexable* field path in the current Document Model and orders them by
+  plain Levenshtein distance to the unresolved path, no threshold, keeping the closest 2 (`orderByDistance(...,
+  limit=2)`); `resources/diagnostics.json` gives the exact message template ("Field with path {path} not found
+  in document model {documentModel}. Did you mean {candidates}?", code 2024). Ported as `QueryFilterReferenceChecker.bestMatchFieldPaths`
+  (plain Levenshtein DP, no external dependency) - an unresolved `[/Path]` reference's error message now appends
+  up to 2 candidate paths this way; a model with zero indexable fields falls back to the old, suggestion-less
+  message (a deliberate, minor deviation from SME's own literal behavior, which always renders the "Did you
+  mean" clause even with an empty candidate list - judged not worth reproducing verbatim). New `Ref_DM`-fixture
+  tests (`anUnknownFieldSuggestsTheClosestIndexableFieldsByEditDistance` - confirms the closer match ("Name" over
+  "NoLabel" for "Nam") sorts first and a non-indexed field ("Hidden") is never suggested, matching
+  `getAllFields`'s own indexable-only walk; `aModelWithNoIndexableFieldsFallsBackToTheMessageWithoutSuggestions`).
+  Full `a12-studio-models-validation` suite green (only the pre-existing, already-flagged `Company_OM.json`
+  regression remains).
+- **Filter expression type/enum-value checking, investigated 2026-09-30, confirmed real but large - not
+  attempted this pass.** Same `moduleSupport/qmm` module has a genuine, separate type-checking compiler pass
+  (`internal/compiler/{checker,binder,functions}.ts` + `base/type-system.ts`/`base/resolver.ts`'s type-resolution
+  half) - ~4,300 lines of TypeScript across the compiler+utils subset alone, doing real overload resolution
+  (`Functions` registry, per-function argument-type signatures, ambiguous-match scoring) and per-argument
+  validators, not a simple "compare literal type to field type" check. This is a real, portable feature (unlike
+  the "did you mean" half just closed, or the several speculative items corrected elsewhere in this doc) but
+  needs its own dedicated multi-file pass to port responsibly - the function-signature registry and type system
+  would need to be rebuilt in Java and integrated with a12-studio's own `ElementIndex`/field-type model, not
+  guessed at piecemeal. Left open; start from `moduleSupport/qmm/src/internal/compiler/checker.ts`'s own header
+  comment (a good architectural summary) and `functions.ts` for the full function/signature list next time this
+  is prioritized.
 - **Fixed 2026-09-28 (this pass):** `QueryFieldReferenceValidator` now rejects an `indexed = false` field in `content.fields[]`
   (reusing `OverviewElementResolution.isIndexedFalse`/`validation.common.indexedAnnotationFalse`, matching the existing
   filter/aggregation validators' rule for the same annotation), and the tree's "In Result" checkbox
@@ -241,8 +288,8 @@ Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap revie
   New `QueryModelCombinationTargetTest` pins it against the real `advanced_new/PersonEmployee_Cm` fixture.
 
 ### Form Engine preview (built 2026-09-25, see "Form Engine preview" in `docs/sme-reference-comparison.md`)
-- Theme and Data menus of the preview are empty: offer the project's `.theme` files (`request-theme` -> `send-theme`) and sample documents (`request-document` -> `send-document`) from `form-engine-bootstrap.js`/`PreviewServer`; decide whether edits made in the preview (`create-document`/`update-document`) may be saved.
-- Ad hoc testing of an Additive Document Model (needs its Combination Model as context, like SME's `contextData`); today the button is disabled.
+- Theme and Data menus of the preview are empty: offer the project's `.theme` files (`request-theme` -> `send-theme`) and sample documents (`request-document` -> `send-document`) from `form-engine-bootstrap.js`/`PreviewServer`; decide whether edits made in the preview (`create-document`/`update-document`) may be saved. **Not attempted 2026-09-30:** re-checked before starting - a12-studio has zero existing infrastructure for reading a project's `.theme` files or `data/documents/*.json` sample instances (confirmed: no code anywhere reads either), no real `.theme` fixture exists anywhere in `testing/workspaces` to verify a wire format against, and the item's own "decide whether edits may be saved" is an open design question, not an implementation gap - building this now would mean guessing at both the SME wire protocol and a product decision, unlike the Ad Hoc Testing item below which had a concrete, already-verified recipe to port.
+- **Ad hoc testing of an Additive Document Model, built 2026-09-30 (this pass) - needs its Combination Model as context, like SME's `contextData`; the button was unconditionally disabled for any Additive Document Model.** Now enabled whenever at least one Combination Model actually references it, resolved exactly the way the Document Model editor's own "Additive Elements Only" preview already resolves the same ambiguity (`AdditiveDocumentModels.findCandidateContexts` - silently when there's exactly one candidate, via `Dialogs.showAdditiveContext` when there are several, a no-op when there are none) - `DocumentModelActions.startAdHocTest()`/`createAdHocTestMenuItem()` and `DocumentModelElementsTreeController`'s toolbar button (new `additiveAdHocTestAvailable` field, set once per `resolveAdditiveState()`) all route through this. `AdHocTestPreviewSession` gained an optional `combinationModelId` constructor parameter: when set, `snapshot()` expands that Combination Model (via the existing `expansionInput`'s already-built combination branch - no change needed there) instead of the additive model alone, and `render()` maps the ad hoc-selected element ids (raw ids from the additive model's own tree, or - when nothing is explicitly selected - every id in the additive model's own tree, not the whole expanded combination) onto their kernel-rewritten ids in the expanded result (`md5Hex(additiveModelId) + "_" + originalId`) before reducing to the selection. **The exact rewriting scheme is independently verified, not guessed**: `CombinedDocumentModelElements` in a12-studio-models already documents and confirms it against real exported `elementRef`s (`PersonEmployee_Ov.json`/`PersonEmployee_Fm.json` in `testing/workspaces`); re-confirmed here too (`3ebb47b738ad9c6e3c36113ff04df00d_` = `md5("PersonEmployee_Ad")`, matching `PersonEmployee_Ov.json`'s real `elementRef`s). **Caveat this pass could not remove**: this sandbox has no A12 installation configured (`SmeBackend`/`SmeInstallation` need one), so the actual `expandCombination`/`generateAdHocTestInput` round-trip against the real SME backend could not be run end-to-end - only the pure id-mapping logic feeding into it is covered by an automated test (`AdHocTestPreviewSessionAdditiveIdMappingTest`, made package-private specifically so this could be pinned directly); verify the full preview opens correctly against a real installation before trusting this fully. Also pinned: `AdditiveAdHocTestAvailabilityTest` (button/menu item enabled only when a Combination Model references the additive model, real `advanced_new/PersonEmployee_Ad`/`PersonEmployee_Cm` fixtures). Full `a12-studio-ui` suite green for the touched area.
 - The generated ad hoc Form Model comes from `FormScreenGenerator`, not SME's `form-model-generator` (public npm package `@com.mgmtp.a12.formengine/form-model-generator`): compare on a larger model and align labels/grouping if they differ.
 - The preview needs the Simple Model Editor of the configured A12 installation (`SmeInstallation`); without it the Form Model button falls back to the old wireframe and Ad Hoc Testing shows an error page. Decide whether that fallback should say so in the studio itself.
 

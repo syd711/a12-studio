@@ -67,6 +67,19 @@ public class PreviewLauncher {
   }
 
   /**
+   * Used by the Document Model editor's "Ad Hoc Testing" action when the model under test is an {@link
+   * de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel}: same as {@link #openAdHocTest}, but
+   * expands {@code combinationModelId} (resolved by {@link
+   * de.a12.studio.ui.editors.documentmodel.DocumentModelActions#startAdditiveAdHocTest}) as context, since the
+   * additive model alone has no complete tree of its own - see {@link AdHocTestPreviewSession}'s class javadoc.
+   */
+  public static void openAdditiveAdHocTest(@NonNull ProjectItem additiveModelItem, @NonNull String combinationModelId,
+      @NonNull Set<String> selectedElementIds) {
+    openFormEnginePreview("adhoc-" + additiveModelItem.getModel().getId(),
+        new AdHocTestPreviewSession(additiveModelItem, selectedElementIds, combinationModelId), true);
+  }
+
+  /**
    * Used by the Content Model editor's embedded preview: registers a {@link ContentModelPreviewSession} for the
    * Content Model, which the page at the returned URL renders with the real Content Engine. The page is meant to be
    * shown in a {@code WebView}, but works in any browser.

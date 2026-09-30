@@ -4,6 +4,7 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.NewModelFactory;
 import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModel;
+import de.a12.studio.models.additivedocumentmodel.AdditiveDocumentModelResolver.AdditiveContext;
 import de.a12.studio.models.documentmodel.ComputationElement;
 import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.models.documentmodel.Element;
@@ -35,6 +36,7 @@ import de.a12.studio.ui.editors.documentmodel.dialogs.MoveGroupDialogController;
 import de.a12.studio.ui.editors.propertyeditors.RolesEditorPanelController;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.preview.PreviewLauncher;
+import de.a12.studio.ui.util.AdditiveDocumentModels;
 import de.a12.studio.ui.util.Icons;
 import de.a12.studio.ui.util.NameConventionValidation;
 import de.a12.studio.ui.util.ProjectDocumentModels;
@@ -294,8 +296,10 @@ public class DocumentModelActions {
     MenuItem adHocTestItem = createMenuItem(StudioBundle.get("document_model_tree.ad_hoc_testing"), Icons.AD_HOC_TEST);
     adHocTestItem.setOnAction(event -> startAdHocTest());
     adHocTestItem.setAccelerator(AD_HOC_TEST_SHORTCUT);
-    // An Additive Document Model is only a fragment; SME tests it through the Combination Model it belongs to.
-    adHocTestItem.setDisable(projectItem.getModel() instanceof AdditiveDocumentModel);
+    // An Additive Document Model is only a fragment; SME tests it through the Combination Model it belongs to -
+    // only possible once at least one Combination Model actually references it (see #startAdditiveAdHocTest).
+    adHocTestItem.setDisable(projectItem.getModel() instanceof AdditiveDocumentModel additiveModel
+        && AdditiveDocumentModels.findCandidateContexts(projectItem, additiveModel).isEmpty());
     return adHocTestItem;
   }
 
@@ -305,7 +309,35 @@ public class DocumentModelActions {
    * Include, Attachment or Multi-Select stands for that whole group.
    */
   public void startAdHocTest() {
+    if (projectItem.getModel() instanceof AdditiveDocumentModel additiveModel) {
+      startAdditiveAdHocTest(additiveModel);
+      return;
+    }
     PreviewLauncher.openAdHocTest(projectItem, adHocTestElementIds());
+  }
+
+  /**
+   * Ad Hoc Testing of an Additive Document Model needs its Combination Model as context (SME's {@code
+   * contextData}) - the additive model's own content is a fragment, incomplete without the base model it
+   * adds onto (e.g. a Computation's relative-path field reference resolves against the base model, not
+   * anything in the additive model's own tree). Resolves which Combination Model to use exactly the way
+   * the "Additive Elements Only" tree toggle already does (see {@code
+   * DocumentModelElementsTreeController#resolveContext}): silently when there is exactly one Combination
+   * Model referencing this Additive Document Model, by asking via {@link Dialogs#showAdditiveContext} when
+   * there are several, and as a no-op (mirroring the disabled menu item/button, see {@link
+   * #createAdHocTestMenuItem}) when there are none or the user dismisses the picker.
+   */
+  private void startAdditiveAdHocTest(AdditiveDocumentModel additiveModel) {
+    List<AdditiveContext> candidates = AdditiveDocumentModels.findCandidateContexts(projectItem, additiveModel);
+    if (candidates.isEmpty()) {
+      return;
+    }
+    AdditiveContext context = candidates.size() == 1 ? candidates.get(0)
+        : Dialogs.showAdditiveContext(Studio.stage, candidates).orElse(null);
+    if (context == null) {
+      return;
+    }
+    PreviewLauncher.openAdditiveAdHocTest(projectItem, context.combinationModelId(), adHocTestElementIds());
   }
 
   /** The ids {@link #startAdHocTest()} tests: the selected elements and their descendants; empty for the whole model. */
