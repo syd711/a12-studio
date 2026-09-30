@@ -22,18 +22,31 @@
         </ToolBar>
     </right>
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel" BorderPane.alignment="CENTER">
-            <content>
-                <VBox spacing="12.0" styleClass="field-editor">
-                    <children>
-                        <fx:include fx:id="baseModelPanel" source="../propertyeditors/base-model-panel.fxml"/>
-                        <fx:include fx:id="combinationStepsPanel" source="combination-steps-panel.fxml"/>
-                    </children>
-                    <padding>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                    </padding>
-                </VBox>
-            </content>
-        </ScrollPane>
+        <TabPane prefHeight="200.0" prefWidth="200.0" styleClass="sub-tab-panel" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="%combined_document_model_editor.tab_settings">
+                    <content>
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="properties-panel">
+                            <content>
+                                <VBox spacing="12.0" styleClass="field-editor">
+                                    <children>
+                                        <fx:include fx:id="baseModelPanel" source="../propertyeditors/base-model-panel.fxml"/>
+                                        <fx:include fx:id="combinationStepsPanel" source="combination-steps-panel.fxml"/>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                    </padding>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab text="%combined_document_model_editor.tab_preview">
+                    <content>
+                        <fx:include fx:id="previewPanel" source="combination-preview-panel.fxml"/>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
     </center>
 </BorderPane>

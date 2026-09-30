@@ -34,6 +34,9 @@ public class CombinedDocumentModelEditorController extends AbstractEditorControl
   @FXML
   private CombinationStepsPanelController combinationStepsPanelController;
 
+  @FXML
+  private CombinationPreviewPanelController previewPanelController;
+
   private CombinedDocumentModel model;
 
   @Override
@@ -55,6 +58,7 @@ public class CombinedDocumentModelEditorController extends AbstractEditorControl
     this.model = model;
     baseModelPanelController.load(documentModelOptions(), model.getContent().getBaseModelId());
     combinationStepsPanelController.setModel(model);
+    previewPanelController.load(model, projectItem);
   }
 
   /**
@@ -82,6 +86,7 @@ public class CombinedDocumentModelEditorController extends AbstractEditorControl
     syncModelReferences();
     commitChange();
     updateSettingsErrorBadge();
+    previewPanelController.load(model, projectItem);
   }
 
   /**
@@ -92,6 +97,7 @@ public class CombinedDocumentModelEditorController extends AbstractEditorControl
     syncModelReferences();
     commitChange();
     updateSettingsErrorBadge();
+    previewPanelController.load(model, projectItem);
   }
 
   /**

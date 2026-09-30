@@ -5,6 +5,8 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.modelsvalidation.ModelValidationError;
+import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.scene.Node;
@@ -148,6 +150,16 @@ public class RolesEditorPanelController extends AbstractRolesPanelController {
    * are specified but no such file exists.
    */
   private void updateRolesFileWarning() {
+    // Everything HeaderRolesValidator reports for the model (invalid/duplicate/empty roles, roles missing from the
+    // roles file, ...), so the dialog shows the problems the editor's settings badge lists.
+    List<ModelValidationError> issues = model == null ? List.of()
+        : Studio.getValidationService().validateElement(model, HeaderRolesValidator.ELEMENT_ID);
+    if (!issues.isEmpty()) {
+      boolean anyError = issues.stream().anyMatch(issue -> "ERROR".equalsIgnoreCase(issue.severity()));
+      showError(anyError ? "ERROR" : "WARNING",
+          issues.stream().map(ModelValidationError::message).distinct().collect(Collectors.joining("\n")));
+      return;
+    }
     boolean rolesSpecified = roles.stream().anyMatch(role -> !role.isBlank());
     if (rolesSpecified && !workspaceHasRolesFile()) {
       showError("WARNING", MISSING_ROLES_FILE_WARNING);
