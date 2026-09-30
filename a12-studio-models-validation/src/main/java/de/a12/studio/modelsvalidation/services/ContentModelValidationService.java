@@ -4,6 +4,7 @@ import de.a12.studio.models.contentmodel.ContentModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
@@ -23,6 +24,7 @@ import de.a12.studio.modelsvalidation.validators.content.ContentMessageGroupVali
 import de.a12.studio.modelsvalidation.validators.content.ContentGroupReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentNodeShapeValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentRootElementValidator;
+import de.a12.studio.modelsvalidation.validators.content.ContentSettingValueValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentSettingsValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentStructureValidator;
 import de.a12.studio.modelsvalidation.validators.content.ContentWarningsValidator;
@@ -45,6 +47,7 @@ public final class ContentModelValidationService {
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
       new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator(),
       new ContentDocumentModelTypeValidator(),
       new ContentRootElementValidator(),
       new ContentElementIdUniqueValidator(),
@@ -57,6 +60,7 @@ public final class ContentModelValidationService {
       new ContentMessageGroupValidator(),
       new ContentEventNodeValidator(),
       new ContentSettingsValidator(),
+      new ContentSettingValueValidator(),
       new ContentWarningsValidator()));
 
   public void addValidator(ModelValidator validator) {

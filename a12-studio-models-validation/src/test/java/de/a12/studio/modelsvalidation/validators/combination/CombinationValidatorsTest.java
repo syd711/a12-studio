@@ -160,6 +160,31 @@ class CombinationValidatorsTest {
     assertTrue(errors.stream().anyMatch(error -> error.message().contains("Missing_DM")));
   }
 
+  @Test
+  void stepsMaxCountValidatorReportsMoreThan99Steps() {
+    CombinationStep[] steps = new CombinationStep[100];
+    for (int i = 0; i < steps.length; i++) {
+      steps[i] = step(CombinationStepType.ADDITION, "Model_" + i + "_DM", null, null);
+    }
+    CombinedDocumentModel model = modelWithSteps(steps);
+    List<ModelValidationError> errors = new CombinationStepsMaxCountValidator().validate(model, TestModels.context(model));
+
+    assertEquals(1, errors.size());
+    assertEquals("content/combinationSteps", errors.get(0).elementId());
+  }
+
+  @Test
+  void stepsMaxCountValidatorAllows99Steps() {
+    CombinationStep[] steps = new CombinationStep[99];
+    for (int i = 0; i < steps.length; i++) {
+      steps[i] = step(CombinationStepType.ADDITION, "Model_" + i + "_DM", null, null);
+    }
+    CombinedDocumentModel model = modelWithSteps(steps);
+    List<ModelValidationError> errors = new CombinationStepsMaxCountValidator().validate(model, TestModels.context(model));
+
+    assertTrue(errors.isEmpty());
+  }
+
   private static CombinedDocumentModel modelWithSteps(CombinationStep... steps) {
     CombinedDocumentModel model = new CombinedDocumentModel();
     model.setId("Test_CmM");

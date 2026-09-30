@@ -4,6 +4,7 @@ import de.a12.studio.models.documentmodel.DocumentModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.AttachmentGroupValidator;
 import de.a12.studio.modelsvalidation.validators.BasicConsistencyValidator;
 import de.a12.studio.modelsvalidation.validators.ContentUniquenessCriteriaValidator;
@@ -12,6 +13,7 @@ import de.a12.studio.modelsvalidation.validators.DateFormatConfigValidator;
 import de.a12.studio.modelsvalidation.validators.DuplicateIdValidator;
 import de.a12.studio.modelsvalidation.validators.EnumerationTypeConfigValidator;
 import de.a12.studio.modelsvalidation.validators.EnumerationValuesValidator;
+import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.IncludeStructureValidator;
 import de.a12.studio.modelsvalidation.validators.IncludeTypeDefinitionModeValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
@@ -56,6 +58,8 @@ public final class DocumentModelValidationService {
       new ModelSuffixValidator(),
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
+      new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator(),
       new TimeZoneValidator(),
       new StringPatternErrorMessageValidator(),
       new StringTypeConfigValidator(),

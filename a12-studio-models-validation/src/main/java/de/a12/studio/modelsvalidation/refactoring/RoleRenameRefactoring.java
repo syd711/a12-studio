@@ -18,6 +18,11 @@ import de.a12.studio.models.querymodel.operator.HasOperator;
 import de.a12.studio.models.querymodel.operator.NotOperator;
 import de.a12.studio.models.querymodel.operator.Operator;
 import de.a12.studio.models.querymodel.operator.OrOperator;
+import de.a12.studio.models.querymodel.ql.QueryLanguageException;
+import de.a12.studio.models.querymodel.ql.QueryLanguageReferences;
+import de.a12.studio.models.querymodel.ql.QueryLanguageReferences.HasCall;
+import de.a12.studio.models.querymodel.ql.QueryLanguageReferences.Reference;
+import de.a12.studio.models.querymodel.ql.QueryLanguageReferences.Replacement;
 import de.a12.studio.models.relationshipuimodel.RelationshipUiModel;
 import de.a12.studio.models.treemodel.TreeChildRelationshipConfiguration;
 import de.a12.studio.models.treemodel.TreeModel;
@@ -31,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Updates all cross-model references that hold a role name when a role in a Relationship Model is renamed.
@@ -39,7 +45,11 @@ import java.util.Objects;
  * <ul>
  *   <li><b>Query Models</b>: {@code QueryLink.targetRole}, {@code QuerySort.targetRole}, and
  *       {@code HasOperator.targetRole} - every reference that names {@code relationshipModelId} and
- *       {@code oldRole} is updated to {@code newRole}.</li>
+ *       {@code oldRole} is updated to {@code newRole}; also the role argument of every free-text
+ *       {@code Has("<relationshipModelId>", "<oldRole>", ...)} call in a {@code filterDefinition} (root or any
+ *       relationship hop), found through the same Query Language parse tree {@link
+ *       de.a12.studio.models.util.ModelReferenceRewriter} already uses for that call's relationship-id
+ *       argument - text that isn't valid Query Language is left alone, matching that same behavior.</li>
  *   <li><b>Form Models</b>: {@code BindingDetails.targetRole} for bindings whose
  *       {@code relationshipName} matches {@code relationshipModelId}.</li>
  *   <li><b>Relationship UI Models</b>: {@code RelationshipUiModelContent.targetRole} whose
@@ -123,6 +133,8 @@ public final class RoleRenameRefactoring {
     }
     links(query.getContent().getLinks(), relationshipModelId, oldRole, newRole, edits);
     operator(query.getContent().getConstraint(), relationshipModelId, oldRole, newRole, edits);
+    filterEdit(query.getContent().getFilterDefinition(), query.getContent()::setFilterDefinition,
+        relationshipModelId, oldRole, newRole, edits);
   }
 
   private static void links(List<QueryLink> links, String relationshipModelId,
@@ -136,6 +148,49 @@ public final class RoleRenameRefactoring {
       }
       links(link.getLinks(), relationshipModelId, oldRole, newRole, edits);
       operator(link.getConstraint(), relationshipModelId, oldRole, newRole, edits);
+      filterEdit(link.getFilterDefinition(), link::setFilterDefinition, relationshipModelId, oldRole, newRole, edits);
+    }
+  }
+
+  /**
+   * Rewrites the role argument of every {@code Has("<relationshipModelId>", "<oldRole>", ...)} call
+   * (nested ones included) found in {@code text}, mirroring {@link
+   * de.a12.studio.models.util.ModelReferenceRewriter}'s own {@code Has(...)} relationship-id rewrite: parsed
+   * through the real Query Language grammar, so a path-looking string literal elsewhere in the text is never
+   * touched, and invalid Query Language is left alone rather than guessed at.
+   */
+  private static void filterEdit(String text, Consumer<String> setter, String relationshipModelId,
+      String oldRole, String newRole, List<Edit> edits) {
+    if (text == null || text.isBlank()) {
+      return;
+    }
+    List<Reference> references;
+    try {
+      references = QueryLanguageReferences.extract(text);
+    }
+    catch (QueryLanguageException e) {
+      return;
+    }
+    List<Replacement> replacements = new ArrayList<>();
+    collectRoleRewrites(references, relationshipModelId, oldRole, newRole, replacements);
+    if (!replacements.isEmpty()) {
+      edits.add(new Edit(setter, text, QueryLanguageReferences.replace(text, replacements)));
+    }
+  }
+
+  private static void collectRoleRewrites(List<Reference> references, String relationshipModelId,
+      String oldRole, String newRole, List<Replacement> replacements) {
+    if (references == null) {
+      return;
+    }
+    for (Reference reference : references) {
+      if (reference instanceof HasCall has) {
+        if (relationshipModelId.equals(has.relationshipModel()) && oldRole.equals(has.targetRole())) {
+          replacements.add(new Replacement(has.targetRoleStart(), has.targetRoleStop(), '"' + newRole + '"'));
+        }
+        collectRoleRewrites(has.constraint(), relationshipModelId, oldRole, newRole, replacements);
+        collectRoleRewrites(has.linkConstraint(), relationshipModelId, oldRole, newRole, replacements);
+      }
     }
   }
 

@@ -23,6 +23,16 @@ class MasterDetailValidatorsTest {
   }
 
   @Test
+  void referenceValidatorReportsBlankDocumentAndFormModel() {
+    MasterDetailModel model = TestModels.load("/masterdetailmodel/MasterDetailReferenceValidator_blank.json", MasterDetailModel.class);
+    List<ModelValidationError> errors = new MasterDetailReferenceValidator().validate(model, TestModels.context(model));
+
+    assertEquals(2, errors.size());
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Document model is required")));
+    assertTrue(errors.stream().anyMatch(error -> error.message().contains("Form model is required")));
+  }
+
+  @Test
   void typeConsistencyValidatorReportsMissingOverviewModel() {
     MasterDetailModel model = TestModels.load("/masterdetailmodel/MasterDetailTypeConsistencyValidator_invalid.json", MasterDetailModel.class);
     List<ModelValidationError> errors = new MasterDetailTypeConsistencyValidator().validate(model, TestModels.context(model));

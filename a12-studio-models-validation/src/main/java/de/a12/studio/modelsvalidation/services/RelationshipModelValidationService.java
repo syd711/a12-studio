@@ -4,6 +4,7 @@ import de.a12.studio.models.relationshipmodel.RelationshipModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
@@ -36,6 +37,7 @@ public final class RelationshipModelValidationService {
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
       new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator(),
       new RelationshipEntityCountValidator(),
       new RelationshipUniqueRolesValidator(),
       new RelationshipRoleFormatValidator(),

@@ -3,14 +3,18 @@ package de.a12.studio.ui.editors.maindetailmodel;
 import de.a12.studio.models.A12Model;
 import de.a12.studio.models.ModelReference;
 import de.a12.studio.models.ModelType;
+import de.a12.studio.models.composeddocumentmodel.ComposedDocumentModelResolver;
 import de.a12.studio.models.masterdetailmodel.FormMapping;
 import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
+import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.models.relationshipmodel.RelationshipModel;
+import de.a12.studio.models.treemodel.TreeHeterogeneity;
 import de.a12.studio.models.treemodel.TreeModel;
 import de.a12.studio.models.treemodel.TreeNode;
 import de.a12.studio.models.treemodel.TreeNodeAction;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewBindingPurpose;
 import de.a12.studio.ui.editors.AbstractEditorController;
+import de.a12.studio.ui.events.ModelSaveEvent;
 import de.a12.studio.ui.events.StudioEventManager;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import javafx.fxml.FXML;
@@ -20,10 +24,13 @@ import org.jspecify.annotations.NonNull;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * Edits a {@link MasterDetailModel}: whether it presents an {@link de.a12.studio.models.overviewmodel.OverviewModel}
@@ -90,6 +97,23 @@ public class MainDetailModelEditorController extends AbstractEditorController im
   }
 
   /**
+   * {@link AbstractEditorController#modelSaved} only reloads on a saved <em>Document</em> Model - but this
+   * editor's own state (the master model combo's own candidate list, and, once one is selected, the Form
+   * Mapping/Relationship Editors/Link Document Editors panels' Document Model lists) is derived from other
+   * Overview/Tree Models just as much. Without this override, saving the Overview or Tree Model currently
+   * selected as this module's master list elsewhere (e.g. adding a Document Model reference to it) leaves
+   * those panels showing a stale candidate list until this tab is closed and reopened.
+   */
+  @Override
+  public void modelSaved(@NonNull ModelSaveEvent event) {
+    super.modelSaved(event);
+    if (projectItem != null && !event.getItem().equals(projectItem)
+        && (event.getItem().getModel() instanceof OverviewModel || event.getItem().getModel() instanceof TreeModel)) {
+      onDocumentModelChangedElsewhere();
+    }
+  }
+
+  /**
    * Every Overview Model of the project, excluding a Binding Overview Model (the Available/Selected Items
    * overview of a Form Model {@code Binding}/{@code BindingRepeat} or a Relationship UI Model component) -
    * SME's own Master Detail Module BA doc is explicit that those can't be picked as a master module's list.
@@ -119,20 +143,76 @@ public class MainDetailModelEditorController extends AbstractEditorController im
    * don't linger in the saved file.
    */
   private void refreshFormMapping() {
-    mainDetailFormMappingPanelController.load(model, projectItem, referencedDocumentModelIds());
+    mainDetailFormMappingPanelController.load(model, projectItem, resolveAndExpand(referencedDocumentModelIds()));
 
     boolean treeMode = "tree".equals(model.getContent().getType());
     relationshipEditorsPanelController.setVisible(treeMode);
     linkDocumentEditorsPanelController.setVisible(treeMode);
     if (treeMode) {
       TreeModel treeModel = findTypedModel(model.getContent().getTreeModel(), ModelType.TREE, TreeModel.class).orElse(null);
-      relationshipEditorsPanelController.load(model, projectItem, relationshipEditorDocumentModelIds(treeModel));
+      relationshipEditorsPanelController.load(model, projectItem, resolveAndExpand(relationshipEditorDocumentModelIds(treeModel)));
+      // linkDocumentEditorDocumentModelIds is not expanded - SME's own syncLinkDocumentEditors doesn't either.
       linkDocumentEditorsPanelController.load(model, projectItem, linkDocumentEditorDocumentModelIds(treeModel));
     }
     else {
       model.getContent().setRelationshipEditors(null);
       model.getContent().setLinkDocumentEditors(null);
     }
+  }
+
+  /**
+   * Gap 1 of "Master Detail Model: gap review": mirrors SME's {@code resolveAndFilterAbstractDocuments} - a
+   * Composed Document Model reference is replaced by its query root ({@link
+   * ComposedDocumentModelResolver#getQueryRootId}), then the (possibly replaced) id is expanded into its
+   * concrete subtypes, recursively, if it is abstract ({@link TreeHeterogeneity#info}/{@link
+   * TreeHeterogeneity#allDocuments}) - so a heterogeneous or CDM-backed master model gets one Form
+   * Mapping/Relationship Editors row per concrete subtype/query-root instead of one unusable row for the
+   * abstract/CDM-member id itself. An id that isn't a project Document Model at all (a dangling reference) is
+   * kept as-is, unresolved, so {@code MasterDetailReferenceValidator} still flags it.
+   */
+  private List<String> resolveAndExpand(List<String> rawIds) {
+    if (rawIds.isEmpty()) {
+      return rawIds;
+    }
+    List<A12Model<?>> documentModels = ProjectDocumentModels.getOtherModelsOfType(projectItem, ModelType.DOCUMENT);
+    Set<String> result = new LinkedHashSet<>();
+    for (String rawId : rawIds) {
+      result.addAll(expandOne(rawId, documentModels));
+    }
+    return List.copyOf(result);
+  }
+
+  private static List<String> expandOne(String rawId, List<A12Model<?>> documentModels) {
+    String resolvedId = resolveQueryRoot(rawId, documentModels);
+    TreeHeterogeneity.SubTypesInfo info = TreeHeterogeneity.info(documentModels, resolvedId);
+    return info == null ? List.of(resolvedId) : TreeHeterogeneity.allDocuments(documentModels, info, true);
+  }
+
+  /** Follows a chain of Composed Document Model {@code cdm.queryRoot} references to the first non-CDM id. */
+  private static String resolveQueryRoot(String id, List<A12Model<?>> documentModels) {
+    Set<String> seen = new HashSet<>();
+    String current = id;
+    while (seen.add(current)) {
+      A12Model<?> candidate = findById(documentModels, current);
+      if (candidate == null) {
+        return current;
+      }
+      Optional<String> queryRoot = ComposedDocumentModelResolver.getQueryRootId(candidate);
+      if (queryRoot.isEmpty()) {
+        return current;
+      }
+      current = queryRoot.get();
+    }
+    return current; // a query-root reference cycle; give up rather than loop forever
+  }
+
+  private static A12Model<?> findById(List<A12Model<?>> documentModels, String id) {
+    for (A12Model<?> candidate : documentModels) {
+      if (id.equals(candidate.getId())) {
+        return candidate;
+      }
+    }
+    return null;
   }
 
   /**

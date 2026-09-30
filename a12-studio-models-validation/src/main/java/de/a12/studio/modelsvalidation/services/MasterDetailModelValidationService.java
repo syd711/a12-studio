@@ -4,6 +4,7 @@ import de.a12.studio.models.masterdetailmodel.MasterDetailModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
@@ -30,7 +31,8 @@ public final class MasterDetailModelValidationService {
       new NameConventionValidator(),
       new MasterDetailReferenceValidator(),
       new MasterDetailTypeConsistencyValidator(),
-      new HeaderRolesValidator()));
+      new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

@@ -4,6 +4,7 @@ import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
@@ -101,6 +102,7 @@ public final class FormModelValidationService {
       new FormControlIndexRequiredValidator(),
       new FormIncludeProvenanceValidator(),
       new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator(),
       new FormAmountSuffixFieldRefValidator(),
       new FormPlaceholderExpositionConflictValidator(),
       new FormExternalEnumerationExpositionValidator(),

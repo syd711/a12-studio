@@ -4,6 +4,7 @@ import de.a12.studio.models.querymodel.QueryModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
@@ -39,6 +40,7 @@ public final class QueryModelValidationService {
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
       new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator(),
       new QueryTargetDocumentModelRequiredValidator(),
       new QueryFieldReferenceValidator(),
       new QuerySortFieldReferenceValidator(),

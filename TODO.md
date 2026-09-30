@@ -45,6 +45,17 @@ Model** and **Master Detail Model** — both services register `HeaderRolesValid
 had it (see the git log entries for Application/Relationship/Combined Document/Content/Form/Tree/Typesetting/
 Relationship UI Models). No model type is known to still be missing it.
 
+**Correction, fixed 2026-09-29 (this pass):** the line above was wrong - `DocumentModelValidationService`,
+`OverviewModelValidationService`, `SelectionModelValidationService` and `PrintModelValidationService` were still
+missing `HeaderRolesValidator` (confirmed by direct inspection of all 15 `*ValidationService` classes, not just
+re-trusting the earlier claim). All four now register it, matching every other model type; pinned by four new
+tests (`DocumentModelValidationServiceTest`/`OverviewModelValidationServiceTest`/
+`SelectionModelValidationServiceTest`/`PrintModelValidationServiceTest`, mirroring
+`MasterDetailModelValidationServiceTest`'s shape). Full `a12-studio-models-validation` suite and the
+`documentmodel`/`overviewmodel`/`selectionmodel`/`printmodel` slices of `a12-studio-ui`'s suite stay green - no
+real fixture's roles annotation triggers a new finding. **No model type is now actually missing it** (verified
+by grepping every `*ValidationService` file for the registration, not just by memory of prior passes).
+
 Manual checks (no known defect, just not yet verified):
 - Check the SME for references in where in error messages the `$path$` notation is used. (Rename/move rewriting for these is unit-tested; what is left is checking it in the UI.)
 - Drag and drop in general; error handling when dropping from a repeatable group into a regular group; dnd of sections with multi-select.
@@ -69,12 +80,22 @@ Full review 2026-09-27 against SME's Form-Model meta-model (`FormModelFrame.json
 shared `I_Label`/`I_ScreenElementBase`/`I_RepeatOverviewColumnBase`/`I_ButtonStyling` mixins — SME's own ground
 truth, not just fixtures/`.tsx`), the 21 `FMCustomConditions` and the BA doc: "Form Model: gap review
 (2026-09-27)" in `docs/sme-reference-comparison.md` (9 numbered gaps, a table and the suggested order; the numbers
-below are its gap numbers). Gaps 1-7 are done (see git log/doc); gaps 8-9 are still open.
+below are its gap numbers). Gaps 1-7 and 9 are done (see git log/doc); gap 8 is still open.
 - **Gap 8, only when needed:** "Preprocessing Settings" (`FormModelContent.openNewDocumentPreProcessing`/
   `openExistingDocumentPreProcessing`) has fields on the Java model but zero editor panel - the shape is fully known
   from the meta-model, no fixture currently needs a non-default value.
-- **Gap 9, last, pure UX:** no "Copy Hide Condition" / "Paste Hide Condition" context actions (SME has both, with
-  keyboard shortcuts).
+- **Gap 9 fixed 2026-09-29 (this pass):** "Copy Hide Condition"/"Paste Hide Condition" (SME: tree-level actions
+  with Ctrl+H/Ctrl+B) are now on `HideConditionPanelController` itself as two icon buttons, rather than as tree
+  context-menu items - a12-studio already funnels every node type's (Section/Row/ControlGrid/Repeat/Control)
+  Hide Condition editing through this one shared panel, unlike SME where it can also be done purely from the
+  tree without opening an editor, so this is a translate-not-copy fit for the existing architecture rather than
+  new tree/keyboard-shortcut plumbing. A static `copiedHideConditionSource` (the copied-from panel's own
+  getter) mirrors SME's re-resolve-at-paste-time semantics: Paste always reads the source's *current* value,
+  not a Copy-time snapshot, and clones it (JSON round-trip, matching `FormModelActions`' own clipboard clone
+  pattern) so the target gets an independent copy. Pasting onto a node that already has a Hide Condition shows
+  SME's own confirmation dialog before overwriting. Pinned by 5 new
+  `HideConditionPanelControllerTest` cases (button enablement tracking, independent-clone paste, fresh-value-at-
+  paste-time, no-confirmation-on-a-blank-target).
 - Not re-listed as its own gap: the interactive Commit/Edit/Delete refactoring dialog SME shows when deleting a
   Screen/Control that's referenced elsewhere is the same cross-cutting missing feature as Application Model gap 6
   above (a12-studio only catches the dangling reference after the fact, as a validation error) - fix belongs with
@@ -91,10 +112,37 @@ Manual checks (no known defect, just not yet verified):
 Full review 2026-09-27 against SME's Document-Model meta-model (`Domain{Field,Group,Rule,Computation,...}.json` — SME's Document Model editor is itself generated at runtime from these, so they're ground truth for every field/rule it enforces) and `DMValidationService.kt`: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md` (11 numbered gaps, a table and the suggested order; the numbers below are its gap numbers). Gaps 1-6 and 9 are done (see git log/doc).
 - **Gaps 7, 8: round-trip-only fields, no UI needed (SME has none either).** `IncludeConfig.includeLevel` and `ComputationConfig`/`ComputationAlternative.roundingMode` are both unmodeled in the Java classes and silently dropped on load; add only for lossless round-trip when a real fixture needs it.
 - **Gaps 10, 11, lower confidence:** Date/DateRange "expert" field cross-gating (conditions are now known, see the doc) and a few narrower Number/Custom validator checks that need a `DomainField.json` re-read before implementing, not a guess.
-- Cross-cutting, not Document-Model-specific: no model type validates duplicate annotation names (SME's `ANNOTATION_DUPLICATE`) - fold into the same follow-up as the already-tracked cross-cutting `HeaderRolesValidator` gap (now closed for every model type, see "Open issues" above) rather than fixing here alone.
+- **Cross-cutting gap fixed 2026-09-29 (this pass):** no model type validated duplicate annotation names (SME's
+  `annotationNamesNotUnique`, `core/ModelHeader.json`'s `RepetitionNotUnique(annotations/name)`) - not
+  Document-Model-specific, so folded into the same follow-up as the cross-cutting `HeaderRolesValidator` gap
+  rather than fixed here alone. New `AnnotationDuplicateValidator` (header annotations only - a Document Model
+  `Element`'s or a Form Model `ScreenElement`'s own `annotations` list is a separate, larger gap, not covered)
+  is now registered in all 14 model-type validation services, matching `HeaderRolesValidator`'s own rollout.
+  Pinned by `AnnotationDuplicateValidatorTest`. Full `a12-studio-models-validation` suite green; no real fixture
+  trips a new finding.
 
 Manual checks:
 - Check the SME for references in where in error messages the `$path$` notation is used. (Rename/move rewriting for these is unit-tested; what is left is checking it in the UI.)
+
+**New 2026-09-29 (this pass): `FixtureWorkspacesDocumentValidatorsTest` built (real `Project.load()`, no flat
+model list - see the Overview section for why that matters).** One real, ERROR-severity finding across the
+whole fixture corpus, and it's accurate, not a bug: `e-commerce/models/01_Products/ProductMovie_DM.json`'s
+"Languages" multi-select group points its value field at `CommonTypes_TDM`'s shared "Language" Type Definition
+- `MultiSelectGroupValidator` correctly rejects this per the BA doc ("imported and included Type Definitions
+are not allowed" for a multi-select value field), confirmed by tracing the type definition to its owning
+model. Left as a known, named exclusion in the test (not silently dropped) rather than "fixed" by guessing at
+the right correction (inline the type locally vs. drop multi-select) - flag for whoever owns fixture content
+next.
+
+**Same pass: fixture-based regression coverage extended to every remaining model type.** Following the same
+pattern (real `Project.load()` per workspace; only ERROR severity asserted, not WARNING), built
+`FixtureWorkspacesApplicationValidatorsTest`, `FixtureWorkspacesRelationshipValidatorsTest`,
+`FixtureWorkspacesRelationshipUiValidatorsTest`, `FixtureWorkspacesMasterDetailValidatorsTest`,
+`FixtureWorkspacesSelectionValidatorsTest`, `FixtureWorkspacesPrintValidatorsTest` and
+`FixtureWorkspacesTypesettingValidatorsTest`. Combined with the pre-existing Form/Query/Tree/Content/Combination
+tests and this pass's new Overview/Document ones, **all 14 model-type validation services now have a real-fixture
+regression guard** against a rule becoming stricter than SME's own (Application/Relationship/RelationshipUI/
+MasterDetail/Selection/Print/Typesetting: zero findings, nothing more to fix).
 
 ### Type Definition Model
 Gap review 2026-09-27 against SME's dedicated `typeDefinitionModel` module and the type-definition editing code it
@@ -130,7 +178,9 @@ Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap revie
 - Still open: no user-facing Preview of the expanded/merged Document Model (SME has one, kernel-backed); a partial
   Addition-only-merge preview is buildable today on the existing `CombinedDocumentModelElements` helper without the
   kernel dependency — worth considering as a scoped slice of the otherwise kernel-gated feature.
-- Low priority, still open: no cap on the number of Combination Steps (SME caps at 99).
+- **Fixed 2026-09-29 (this pass):** added a cap of 99 Combination Steps on a Combined Document Model, matching
+  SME - new `CombinationStepsMaxCountValidator` (registered in `CombinationModelValidationService`), pinned by
+  `CombinationValidatorsTest.stepsMaxCountValidatorReportsMoreThan99Steps`/`stepsMaxCountValidatorAllows99Steps`.
 
 ### Query Model
 - Filter expressions are only existence-checked; type and enum-value checking is not done, and there are no "did you mean" candidates.
@@ -144,7 +194,17 @@ Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap revie
   needed to resolve the root build's license-report plugin (confirmed via `curl .../__agentproxy/status`, both classed
   as policy denials, not transient) - verify with CI/a full build once merged.
 - The Model Tree tab's root DM is picked in the Settings tab, not through an ER-diagram picker like SME.
-- A role rename propagates to the structured `constraint`/`QueryLink`/`QuerySort` tree (`RoleRenameRefactoring`, since 2026-09-22) but not to a `Has("<relationship>", "<role>", ...)` call written as free-text `filterDefinition` — the two representations of the same filter disagree after a role rename until re-saved from the text side.
+- **Fixed 2026-09-29 (this pass):** a role rename now also propagates to a `Has("<relationship>", "<role>", ...)`
+  call written as free-text `filterDefinition` (root or any relationship hop, nested `Has(...)` inside a
+  `constraint`/`linkConstraint` included), not just the structured `constraint`/`QueryLink`/`QuerySort` tree
+  (`RoleRenameRefactoring`, since 2026-09-22) - the two representations of the same filter no longer disagree
+  after a rename. Implemented by extending `QueryLanguageReferences.HasCall` with `targetRoleStart`/
+  `targetRoleStop` (the role argument's source position, alongside the existing `relationshipStart`/
+  `relationshipStop`) and reusing the same parse-tree-based rewrite approach
+  `de.a12.studio.models.util.ModelReferenceRewriter` already uses for that call's relationship-id argument -
+  text that isn't valid Query Language is left alone, matching that same behavior. Pinned by 4 new
+  `RoleRenameRefactoringTest` cases (root filter, a matching-vs-non-matching link filter, nested `Has(...)`,
+  invalid Query Language left alone).
 - `HeaderRolesValidator` gap fixed 2026-09-27 (this pass) — see "Open issues" above.
 - **Fixed 2026-09-27 (this pass):** a Combination Model can now be picked and resolved as a Query target -
   `QuerySettingsPanelController.documentModelOptions()` now offers combinations too
@@ -163,7 +223,64 @@ Gap review 2026-09-27 against SME's `combinationModel` module — see "Gap revie
 ### Overview Model
 Full review 2026-09-26 against SME's `overviewModel` module, its meta model (every rule) and the A12 2026.06 BA doc: "Overview Model: gap review" in `docs/sme-reference-comparison.md` (17 numbered gaps, a rule-by-rule coverage table and the suggested order; the numbers below are its gap numbers). Gaps 1-15 and 17 (partial) are done (see git log/doc).
 - **Gap 16, still open:** pickers offer every element instead of SME's candidate rules. Partly fixed as a side effect of gap 15's work (the Column dialog's Element Reference picker now excludes repeatable fields). Still open: the multi-select ("only when enumeration multi-select" - not modelled, Studio has no such distinction), filter-field, enumerated-string (done as part of gap 1), Section Data and Screen Reader Column candidate rules.
-- **Gap 17, still open (partial):** 3 of SME's 5 refactoring-dialog behaviors are done (stale Default Sorting pruning, sub-header element pruning on toggle-off, Style rename/delete cascade). Not done: deleting a filter field, and event/model reference cascades.
+- **Gap 17, still open (partial):** 3 of SME's 5 refactoring-dialog behaviors are done (stale Default Sorting pruning, sub-header element pruning on toggle-off, Style rename/delete cascade). Not done: deleting a filter field, and event/model reference cascades. Checked SME source (`overviewRefactoring.ts`) 2026-09-29 looking for a concrete recipe to implement against, unlike Master Detail gap 1's - found no bespoke SME code matching either behavior (that file only handles cross-model rename, not within-model delete cascades), so implementing this now would mean guessing at exact semantics rather than porting a known rule; left open rather than guessed at.
+- **New 2026-09-29 (this pass): `FixtureWorkspacesOverviewValidatorsTest` built and one real bug found/fixed.**
+  No fixture-based regression test existed for the Overview validators (unlike Form/Query/Tree). Built one
+  (real `Project.load()` per workspace, not a flat model list, so Combination Model link-document resolution
+  works correctly) and used it to re-verify the "Re-checked with OverviewBindingPurpose in hand" note in the
+  doc's gap review: its "link-column field resolution" false-positive claim turned out to be an artifact of
+  that investigation's own flat-list test context (see doc), not a real bug - retracted. Its `bindingConfiguration`
+  wire-shape gap is real but currently causes no actual validator misbehavior (also re-verified) - still open,
+  see the doc. Separately found and fixed a genuine bug: `OverviewEnumeratedStringFilterValidator` fires
+  unconditionally whenever `enumeratedStringFilter` is present, but SME's real rule
+  (`OverviewMetaModel.json`'s `fieldIdsMustBeFilled`) also gates on the object's own `enabled` field, which
+  a12-studio's `EnumeratedStringFilter` class doesn't model at all - `FilterStringFieldsMultiSelectPanelController`'s
+  own javadoc already documents the deliberate design choice ("object present = enabled, matching SME's export
+  behavior of never writing a present-but-disabled object"), so this wasn't a validator bug so much as a stale
+  fixture: `testing/workspaces/basic/models/Company_OM.json` had an `enumeratedStringFilter: {pagingSize: 10}`
+  block with no `fields` - impossible to produce through today's editor (which always includes the fields
+  editor) and a leftover from before gap 1's `FilterStringFieldsMultiSelectPanelController` fields-editor was
+  built. Removed the dead block (round-trip-checked, `BasicProjectModelsRoundTripTest` green). The 7 remaining
+  `OverviewColumnHeaderLabelOrIconValidator` WARNINGs found across real fixtures (an attachment-Group-referencing
+  column with neither icon nor label, e.g. "Photo"/"Flag"/"Picture") are checked against SME's own
+  `elementRefHasNoLabel.ts` and are a faithful port, not over-strict - the new test only asserts zero ERRORs,
+  not zero WARNINGs, for this reason (see the test's own javadoc).
+
+**Regression, found 2026-09-30 (not fixed - flagging, not reverting):** `testing/workspaces/basic/models/Company_OM.json`
+changed on disk since the fix above (external edit, not this session's) and the empty, invalid `enumeratedStringFilter`
+block (no `fields`, `enableFilter: true`) is back - `FixtureWorkspacesOverviewValidatorsTest` is red again for
+exactly the reason it was before. Per the same reasoning as the original fix, this is genuinely invalid per
+SME's own rule, not a validator bug. Left the file as-is (the change looked like a real editing-session save,
+not a targeted revert, and unrelated new columns were added alongside it) rather than silently re-removing it -
+whoever owns this fixture should decide whether to add fields to the "Filter String Fields with Multi-Select"
+list or drop the feature again.
+
+### Content Model
+Full review 2026-09-26 against SME's `contentModel` module and the installed client bundle (SME's own validation
+isn't in the SME repo): "Content Model: gap review" in `docs/sme-reference-comparison.md` (17 numbered gaps, a
+table, "What SME reports" and the suggested order - six rounds of "Status" updates the same day closed gaps
+1, 2, 3, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16 and, for Content Models, 17; gap 4 (migration) is Won't Do by
+decision (see below); only gap 9 was left "only partly" done.
+- **Gap 9 mostly closed 2026-09-29/30 (this pass): the CSS length/spacing/numeric half of "per-property setting
+  validation is not re-run on load/raw edit."** `ContentSettingsValidator` already covered required fields, the
+  Image source and unsafe URLs; new `ContentSettingValueValidator` + `ContentPropertyFormatRules` (in
+  `a12-studio-models-validation/.../validators/content`) cover CSS length (`LengthRow`), CSS shorthand spacing
+  (`SpacingRow`) and whole-number (`NumberRow`) settings across the 9 `*-panel.fxml` files that use them
+  (dimensions/appearance/background-image/border/icons/layout/date-picker) - each panel's own `path`/`types`/
+  `keywords`/`units` FXML attributes are the source of truth the rule table transcribes, so this is a port, not
+  a guess. A settings row is checked whenever its path is present, regardless of whether the editing row is
+  currently shown (`showWhen`/`enabledWhen`), matching how SME's own controller validates whatever is stored.
+  **Deliberately still open:** `ColorRow`/`ShadowRow` settings (`color-panel.fxml`, `shadow-panel.fxml`) -
+  cloning CSS color/shadow syntax accurately enough to avoid false positives needs the same "read it out of the
+  installed bundle" treatment the rest of gap 9 review used, not a guess (see `ContentPropertyFormatRules`'s
+  javadoc); this is the only remaining piece of gap 9. The table currently duplicates the FXML rows' own
+  `keywords`/`units` rather than the two sharing one source (the doc's original suggested order called for
+  extracting them into `a12-studio-models` so the UI rows read from there too) - a manual-sync risk worth
+  closing the next time either side is touched, not attempted this pass to keep scope bounded to
+  `a12-studio-models-validation` alone. Pinned by 10 new `ContentSettingValueValidatorTest` cases; the real
+  Content Model fixtures (`FixtureWorkspacesContentValidatorsTest`) trip no new finding.
+- Not in TODO.md before this pass even though the gap review existed since 2026-09-26 - added this section so
+  future passes don't have to rediscover the doc section to find out what's left.
 
 ### Application Model
 Full review 2026-09-27 against SME's `appModel` module, its docs (`docs/modules/appModel/*.adoc`) and every real `*AppModel*.json` fixture: "Application Model: gap review" in `docs/sme-reference-comparison.md` (9 numbered gaps, a table and the suggested order; the numbers below are its gap numbers). Every SME editor screen already has a counterpart, including Model References and cross-model rename propagation. Gaps 1-8 are done (see git log/doc).
@@ -172,7 +289,21 @@ Full review 2026-09-27 against SME's `appModel` module, its docs (`docs/modules/
 ### Master Detail Model
 Full review 2026-09-27 against SME's `masterDetailModel` module, its self-hosted meta-model DM (`ModuleMasterDetail.json`) and the BA doc (`docs/modules/masterDetailModuleModel/index.adoc`): "Master Detail Model: gap review" in `docs/sme-reference-comparison.md` (5 numbered gaps, a table and the suggested order; the numbers below are its gap numbers). `MainDetailModelEditorController` and its five panels already mirror SME's `formMappingMiddleware`/`syncRelationshipEditors`/`syncLinkDocumentEditors`, both reference validators cover every rule in the meta-model DM, `MasterDetailModuleGenerator` is a faithful tested port of `masterDetailModule.ts`, and cross-model rename propagation needs no masterDetailModel-specific code - what is left:
 - **Gap 3 fixed 2026-09-27 (this pass):** `HeaderRolesValidator` is now registered in `MasterDetailModelValidationService` (see "Open issues" above).
-- **Gap 1, the real feature gap: no heterogeneous (abstract/subtype) or CDM expansion in the Form Mapping / Relationship Editors candidate lists.** SME's `resolveAndFilterAbstractDocuments` replaces a Composed Document Model reference with its query root and expands an abstract Document Model into its concrete subtypes, recursively - a documented, cypress-tested feature (BA doc's "Heterogeneous Overview Module"/"Tree Module" sections). a12-studio has the building blocks already (`ComposedDocumentModelResolver.getQueryRootId`, `TreeHeterogeneity.info`/`allDocuments` over `DocumentModelHeterogeneity`'s super/subtype graph, both used elsewhere) but `MainDetailModelEditorController.referencedDocumentModelIds`/`relationshipEditorDocumentModelIds` don't call them - a heterogeneous or CDM-backed master model currently shows one Form Mapping row for the abstract/CDM-member id itself, which usually can't be edited directly, instead of one row per concrete subtype/query-root.
+- **Gap 1 fixed 2026-09-29 (this pass), the real feature gap: no heterogeneous (abstract/subtype) or CDM
+  expansion in the Form Mapping / Relationship Editors candidate lists.** SME's `resolveAndFilterAbstractDocuments`
+  replaces a Composed Document Model reference with its query root and expands an abstract Document Model into
+  its concrete subtypes, recursively - a documented, cypress-tested feature (BA doc's "Heterogeneous Overview
+  Module"/"Tree Module" sections). New `MainDetailModelEditorController.resolveAndExpand` does the same, reusing
+  the existing building blocks (`ComposedDocumentModelResolver.getQueryRootId`, `TreeHeterogeneity.info`/
+  `allDocuments` over `DocumentModelHeterogeneity`'s super/subtype graph) rather than writing new expansion
+  logic, and is applied to `referencedDocumentModelIds` (Form Mapping) and `relationshipEditorDocumentModelIds`
+  (Relationship Editors) - not `linkDocumentEditorDocumentModelIds`, which SME's own `syncLinkDocumentEditors`
+  doesn't expand either. A heterogeneous or CDM-backed master model now gets one row per concrete subtype/query
+  root instead of one unusable row for the abstract/CDM-member id itself; a dangling reference is kept as-is so
+  the existing reference validator still flags it. Pinned by 2 new `MainDetailModelEditorControllerTest` cases
+  (abstract-to-concrete-subtypes expansion, CDM-to-query-root replacement) using in-memory fixtures (no real
+  heterogeneous fixture exists under `testing/workspaces/**` yet - add one there too if this editor needs
+  end-to-end manual verification).
 - **Gap 2 fixed 2026-09-27 (this pass):** Binding Overview Models are now excluded from the Overview Model combo -
   `MainDetailModelEditorController.overviewModelOptions()` filters out any Overview Model id for which
   `OverviewBindingPurpose.resolve(id, otherModels)` returns non-null, gathering `otherModels` from
@@ -182,7 +313,19 @@ Full review 2026-09-27 against SME's `masterDetailModel` module, its self-hosted
   introduced here), while the filtering logic itself (`OverviewBindingPurpose.resolve`) is already covered by
   `OverviewBindingPurposeTest`. Build a proper `MainDetailModelEditorControllerTest` (mirroring e.g.
   `ContentModelSettingsDialogTest`'s FX harness) the next time this editor is touched, and pin this exclusion then.
-- **Gaps 4, 5, last:** low priority (missing-field validator gap only matters for hand-edited JSON; stale-panel-until-reopen only matters while this editor tab is open during an unrelated Overview/Tree Model save elsewhere).
+- **Gap 4 fixed 2026-09-29 (this pass):** `MasterDetailReferenceValidator` now also rejects a blank `documentModel`/
+  `formModel` on any `formMapping`/`relationshipEditors`/`linkDocumentEditors` row (previously only a non-blank,
+  dangling reference was checked) - matters only for a hand-edited or imported file, since the editor itself
+  always fills `documentModel` and blocks saving on a blank `formModel`. Pinned by
+  `MasterDetailValidatorsTest.referenceValidatorReportsBlankDocumentAndFormModel`.
+- **Gap 5 fixed 2026-09-29 (this pass):** `MainDetailModelEditorController` now overrides `modelSaved` (calling
+  `super.modelSaved(event)` first, then also reacting when the saved model is an `OverviewModel`/`TreeModel`,
+  not just a `DocumentModel`) so saving the Overview or Tree Model currently selected as this module's master
+  list, in a different tab, refreshes the Form Mapping/Relationship Editors/Link Document Editors panels
+  immediately instead of only once this tab is closed and reopened. Also built the FX test harness this section
+  called for "the next time this editor is touched" - new `MainDetailModelEditorControllerTest` pins both gap 5
+  (`savingTheSelectedOverviewModelElsewhereRefreshesTheFormMappingPanelImmediately`) and gap 2's previously
+  untested Binding-Overview-Model exclusion (`theOverviewModelComboExcludesABindingOverviewModel`).
 
 ## Blocked (waiting for an input)
 

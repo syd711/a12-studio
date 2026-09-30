@@ -195,6 +195,70 @@ class RoleRenameRefactoringTest {
   }
 
   @Test
+  void aRootFilterDefinitionHasCallFollowsTheRename() {
+    QueryModelContent content = new QueryModelContent();
+    content.setFilterDefinition("Has(\"" + RELATIONSHIP + "\", \"" + OLD_ROLE + "\", [/Person/Address/Street] == \"b\", Null)");
+    QueryModel query = new QueryModel();
+    query.setId("Q");
+    query.setContent(content);
+
+    List<ModelEdits> edits = renameAndApply(query);
+
+    assertEquals(1, edits.size());
+    assertEquals("Has(\"" + RELATIONSHIP + "\", \"" + NEW_ROLE + "\", [/Person/Address/Street] == \"b\", Null)",
+        content.getFilterDefinition());
+  }
+
+  @Test
+  void aQueryLinkFilterDefinitionHasCallFollowsTheRenameOnlyWhenItMatches() {
+    QueryLink hop = link(RELATIONSHIP, "Order");
+    hop.setFilterDefinition("Has(\"" + RELATIONSHIP + "\", \"" + OLD_ROLE + "\", [/Person/Address/Street] == \"b\", Null)"
+        + " OR Has(\"" + RELATIONSHIP + "\", \"Order\", [/Person/Address/Street] == \"c\", Null)");
+    QueryModelContent content = new QueryModelContent();
+    content.getLinks().add(hop);
+    QueryModel query = new QueryModel();
+    query.setId("Q");
+    query.setContent(content);
+
+    List<ModelEdits> edits = renameAndApply(query);
+
+    assertEquals(1, edits.size());
+    assertEquals("Has(\"" + RELATIONSHIP + "\", \"" + NEW_ROLE + "\", [/Person/Address/Street] == \"b\", Null)"
+        + " OR Has(\"" + RELATIONSHIP + "\", \"Order\", [/Person/Address/Street] == \"c\", Null)", hop.getFilterDefinition());
+  }
+
+  @Test
+  void aNestedHasCallInsideAConstraintOrLinkConstraintFollowsTheRename() {
+    QueryModelContent content = new QueryModelContent();
+    content.setFilterDefinition("Has(\"Gone\", \"Order\", "
+        + "Has(\"" + RELATIONSHIP + "\", \"" + OLD_ROLE + "\", [/A] == \"x\", Null), "
+        + "Has(\"" + RELATIONSHIP + "\", \"" + OLD_ROLE + "\", [/B] == \"y\", Null))");
+    QueryModel query = new QueryModel();
+    query.setId("Q");
+    query.setContent(content);
+
+    List<ModelEdits> edits = renameAndApply(query);
+
+    assertEquals(1, edits.size());
+    assertEquals("Has(\"Gone\", \"Order\", "
+        + "Has(\"" + RELATIONSHIP + "\", \"" + NEW_ROLE + "\", [/A] == \"x\", Null), "
+        + "Has(\"" + RELATIONSHIP + "\", \"" + NEW_ROLE + "\", [/B] == \"y\", Null))", content.getFilterDefinition());
+  }
+
+  @Test
+  void anInvalidQueryLanguageFilterDefinitionIsLeftAlone() {
+    QueryModelContent content = new QueryModelContent();
+    String invalid = "Has(\"" + RELATIONSHIP + "\", \"" + OLD_ROLE + "\", [/Person/Address/Street] = 1";
+    content.setFilterDefinition(invalid);
+    QueryModel query = new QueryModel();
+    query.setId("Q");
+    query.setContent(content);
+
+    assertTrue(renameAndApply(query).isEmpty());
+    assertEquals(invalid, content.getFilterDefinition());
+  }
+
+  @Test
   void revertingTheEditsRestoresTheOldRole() {
     QuerySort sort = sort(RELATIONSHIP, OLD_ROLE);
     QueryModel query = query("Q", sort);

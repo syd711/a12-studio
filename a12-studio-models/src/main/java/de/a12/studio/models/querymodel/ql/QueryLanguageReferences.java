@@ -31,10 +31,12 @@ public final class QueryLanguageReferences {
   /**
    * A {@code Has(...)} call; {@code constraint}/{@code linkConstraint} are the nested scopes, or {@code null}
    * when the argument is absent or {@code Null}. {@code relationshipStart}/{@code relationshipStop} delimit the
-   * relationship's string literal including its quotes (same indexing as {@link FieldReference}).
+   * relationship's string literal including its quotes, and {@code targetRoleStart}/{@code targetRoleStop} the
+   * role's string literal including its quotes (same indexing as {@link FieldReference}).
    */
   public record HasCall(String relationshipModel, String targetRole, List<Reference> constraint,
-      List<Reference> linkConstraint, int relationshipStart, int relationshipStop) implements Reference {
+      List<Reference> linkConstraint, int relationshipStart, int relationshipStop,
+      int targetRoleStart, int targetRoleStop) implements Reference {
   }
 
   /** {@code text} replaces the source range {@code start..stop} (same indexing as {@link FieldReference}). */
@@ -106,7 +108,8 @@ public final class QueryLanguageReferences {
     }
     out.add(new HasCall(stringValue(args.get(0)), stringValue(args.get(1)),
         args.size() >= 3 ? scopeOf(args.get(2)) : null, args.size() >= 4 ? scopeOf(args.get(3)) : null,
-        args.get(0).getStart().getStartIndex(), args.get(0).getStop().getStopIndex()));
+        args.get(0).getStart().getStartIndex(), args.get(0).getStop().getStopIndex(),
+        args.get(1).getStart().getStartIndex(), args.get(1).getStop().getStopIndex()));
   }
 
   private static List<Reference> scopeOf(QLParser.ArgumentContext arg) {

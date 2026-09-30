@@ -4,6 +4,7 @@ import de.a12.studio.models.combineddocumentmodel.CombinedDocumentModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
@@ -23,6 +24,7 @@ import de.a12.studio.modelsvalidation.validators.combination.CombinationDecorati
 import de.a12.studio.modelsvalidation.validators.combination.CombinationInvalidReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationSelectionModelMissingValidator;
 import de.a12.studio.modelsvalidation.validators.combination.CombinationSelectionModelNotAllowedValidator;
+import de.a12.studio.modelsvalidation.validators.combination.CombinationStepsMaxCountValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,7 @@ public final class CombinationModelValidationService {
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
       new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator(),
       new CombinationAdditiveModelMissingValidator(),
       new CombinationSelectionModelMissingValidator(),
       new CombinationDecorationModelMissingValidator(),
@@ -53,7 +56,8 @@ public final class CombinationModelValidationService {
       new CombinationAdditiveModelDuplicateValidator(),
       new CombinationInvalidReferenceValidator(),
       new CombinationBaseModelLoopValidator(),
-      new CombinationAdditiveModelLoopValidator()));
+      new CombinationAdditiveModelLoopValidator(),
+      new CombinationStepsMaxCountValidator()));
 
   public void addValidator(ModelValidator validator) {
     validators.add(validator);

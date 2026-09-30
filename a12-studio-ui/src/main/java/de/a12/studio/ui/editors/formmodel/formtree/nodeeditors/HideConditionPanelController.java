@@ -12,15 +12,20 @@ import de.a12.studio.models.formmodel.FormModel;
 import de.a12.studio.models.formmodel.HideCondition;
 import de.a12.studio.models.formmodel.HideConditionCase;
 import de.a12.studio.models.projects.ProjectItem;
+import de.a12.studio.models.util.JsonSettings;
 import de.a12.studio.modelsvalidation.ElementProperty;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.ui.Studio;
 import de.a12.studio.ui.components.ErrorContainerController;
 import de.a12.studio.ui.events.StudioEventManager;
+import de.a12.studio.ui.util.StudioBundle;
 import de.a12.studio.ui.util.TabErrorBadge;
+import de.a12.studio.ui.util.WidgetFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
@@ -31,6 +36,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.util.StringConverter;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
 import java.util.ArrayDeque;
@@ -40,6 +46,7 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -74,12 +81,25 @@ import java.util.stream.Collectors;
  * <p>
  * Call {@link #configure} once per node selection to bind this panel to the node's hide-condition
  * getter/setter and repopulate the field combo for the given {@link MasterFieldScope}.
+ * <p>
+ * {@link #copyHideConditionButton}/{@link #pasteHideConditionButton} port SME's tree-level "Copy Hide
+ * Condition"/"Paste Hide Condition" actions (Ctrl+H/Ctrl+B) as panel buttons instead: since a12-studio already
+ * funnels every node type's Hide Condition editing through this one panel (unlike SME, where it can also be
+ * done purely from the tree without opening an editor), a static {@link #copiedHideConditionSource} - the
+ * copied-from panel's own getter, so a later Paste always reads that node's *current* value, mirroring SME's
+ * own re-resolve-at-paste-time semantics rather than freezing a snapshot at Copy time - lets the user copy on
+ * one node's panel and paste on another's, including across tabs, the same way the tree-level actions would.
  */
+@Slf4j
 public class HideConditionPanelController implements Initializable {
 
   /** Display label for the synthetic "no value" case (stored as a {@code null} masterValue). */
   public static final String DISPLAY_NO_VALUE = "(no value)";
   public static final String DISPLAY_TRUE = "true";
+
+  // Set by whichever panel's Copy Hide Condition button was clicked last; read fresh (not snapshotted) by
+  // Paste, mirroring SME's copyHideConditionSourceDocRef + resolveHideCondition(sourceDoc) re-resolution.
+  private static @Nullable Supplier<HideCondition> copiedHideConditionSource;
 
   @FXML
   private TitledPane root;
@@ -89,6 +109,12 @@ public class HideConditionPanelController implements Initializable {
 
   @FXML
   private ListView<String> valueList;
+
+  @FXML
+  private Button copyHideConditionButton;
+
+  @FXML
+  private Button pasteHideConditionButton;
 
   @FXML
   private ErrorContainerController errorContainerController;
@@ -139,6 +165,9 @@ public class HideConditionPanelController implements Initializable {
       commitChange();
       rebuildValueList();
     });
+
+    copyHideConditionButton.setOnAction(event -> copyHideCondition());
+    pasteHideConditionButton.setOnAction(event -> pasteHideCondition());
   }
 
   /**
@@ -179,6 +208,66 @@ public class HideConditionPanelController implements Initializable {
     }
     rebuildValueList();
     refreshValidation();
+    refreshCopyPasteButtons();
+  }
+
+  /** Stores this panel's own getter as the copy source, so a later Paste (here or on another node) reads it fresh. */
+  private void copyHideCondition() {
+    if (getter == null || getter.get() == null) {
+      return;
+    }
+    copiedHideConditionSource = getter;
+    refreshCopyPasteButtons();
+  }
+
+  /**
+   * Pastes the copy source's *current* {@link HideCondition} (re-resolved now, not a Copy-time snapshot,
+   * matching SME's paste handler) onto this panel's node, confirming first if the node already has one.
+   */
+  private void pasteHideCondition() {
+    if (copiedHideConditionSource == null || setter == null) {
+      return;
+    }
+    HideCondition source = copiedHideConditionSource.get();
+    if (source == null) {
+      return;
+    }
+    if (getter.get() != null) {
+      Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
+          StudioBundle.get("hide_condition_paste_overwrite_confirm"), null, null, StudioBundle.get("hide_condition_paste_overwrite_button"));
+      if (result.isEmpty() || result.get() != ButtonType.OK) {
+        return;
+      }
+    }
+    HideCondition clone = cloneHideCondition(source);
+    if (clone == null) {
+      return;
+    }
+    setter.accept(clone);
+    updatingFromModel = true;
+    try {
+      fieldCombo.setValue(clone.getMasterField());
+    } finally {
+      updatingFromModel = false;
+    }
+    commitChange();
+    rebuildValueList();
+  }
+
+  private static @Nullable HideCondition cloneHideCondition(@NonNull HideCondition source) {
+    try {
+      String json = JsonSettings.objectMapper.writeValueAsString(source);
+      return JsonSettings.objectMapper.readValue(json, HideCondition.class);
+    }
+    catch (Exception e) {
+      log.warn("Failed to clone hide condition for paste: {}", e.getMessage(), e);
+      return null;
+    }
+  }
+
+  private void refreshCopyPasteButtons() {
+    copyHideConditionButton.setDisable(getter == null || getter.get() == null);
+    pasteHideConditionButton.setDisable(copiedHideConditionSource == null || copiedHideConditionSource.get() == null);
   }
 
   private BooleanProperty checkedPropertyFor(String display) {
@@ -285,6 +374,7 @@ public class HideConditionPanelController implements Initializable {
     projectItem.save();
     StudioEventManager.getInstance().fireModelSavedEvent(projectItem);
     refreshValidation();
+    refreshCopyPasteButtons();
   }
 
   /**

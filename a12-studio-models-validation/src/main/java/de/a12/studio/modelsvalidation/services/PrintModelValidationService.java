@@ -4,7 +4,9 @@ import de.a12.studio.models.printmodel.PrintModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderModelReferenceValidator;
+import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.LocaleCodeValidator;
 import de.a12.studio.modelsvalidation.validators.MissingLocaleValidator;
 import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
@@ -34,6 +36,8 @@ public final class PrintModelValidationService {
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
       new HeaderModelReferenceValidator(),
+      new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator(),
       new PrintDocumentModelReferenceValidator(),
       new PrintFieldReferenceValidator(),
       new PrintElementReferenceIntegrityValidator(),

@@ -45,12 +45,12 @@ public final class MasterDetailReferenceValidator implements ModelValidator {
           ValidationMessages.get("validation.masterDetailReference.treeNotFound", treeModel), Severity.ERROR.name()));
     }
 
-    errors.addAll(validateMappings(model, context, masterDetailModel.getContent().getFormMapping()));
+    errors.addAll(validateMappings(model, context, "content/formMapping", masterDetailModel.getContent().getFormMapping()));
     if (masterDetailModel.getContent().getRelationshipEditors() != null) {
-      errors.addAll(validateMappings(model, context, masterDetailModel.getContent().getRelationshipEditors()));
+      errors.addAll(validateMappings(model, context, "content/relationshipEditors", masterDetailModel.getContent().getRelationshipEditors()));
     }
     if (masterDetailModel.getContent().getLinkDocumentEditors() != null) {
-      errors.addAll(validateMappings(model, context, masterDetailModel.getContent().getLinkDocumentEditors()));
+      errors.addAll(validateMappings(model, context, "content/linkDocumentEditors", masterDetailModel.getContent().getLinkDocumentEditors()));
     }
     return errors;
   }
@@ -58,18 +58,29 @@ public final class MasterDetailReferenceValidator implements ModelValidator {
   /**
    * Shared by {@code content.formMapping} and, for a tree-type module, {@code content.relationshipEditors}/
    * {@code content.linkDocumentEditors} — every one of them is a plain Document Model / Form Model mapping.
+   * SME's meta-model (`ModuleMasterDetail.json`) marks both fields required on all three groups; the editor
+   * itself always fills {@code documentModel} and blocks saving on a blank {@code formModel}, so this only
+   * matters for a hand-edited or imported file.
    */
-  private List<ModelValidationError> validateMappings(A12Model<?> model, ValidationContext context, List<FormMapping> mappings) {
+  private List<ModelValidationError> validateMappings(A12Model<?> model, ValidationContext context, String listPath, List<FormMapping> mappings) {
     List<ModelValidationError> errors = new ArrayList<>();
-    for (FormMapping mapping : mappings) {
-      if (mapping.getDocumentModel() != null && !mapping.getDocumentModel().isBlank()
-          && context.findOtherDocumentModel(mapping.getDocumentModel()) == null) {
-        errors.add(new ModelValidationError(model, ELEMENT_ID,
+    for (int index = 0; index < mappings.size(); index++) {
+      FormMapping mapping = mappings.get(index);
+      String rowElementId = listPath + "/" + index;
+      if (mapping.getDocumentModel() == null || mapping.getDocumentModel().isBlank()) {
+        errors.add(new ModelValidationError(model, rowElementId,
+            ValidationMessages.get("validation.masterDetailReference.documentRequired"), Severity.ERROR.name()));
+      }
+      else if (context.findOtherDocumentModel(mapping.getDocumentModel()) == null) {
+        errors.add(new ModelValidationError(model, rowElementId,
             ValidationMessages.get("validation.masterDetailReference.documentNotFound", mapping.getDocumentModel()), Severity.ERROR.name()));
       }
-      if (mapping.getFormModel() != null && !mapping.getFormModel().isBlank()
-          && !(context.findOtherModel(mapping.getFormModel()) instanceof FormModel)) {
-        errors.add(new ModelValidationError(model, ELEMENT_ID,
+      if (mapping.getFormModel() == null || mapping.getFormModel().isBlank()) {
+        errors.add(new ModelValidationError(model, rowElementId,
+            ValidationMessages.get("validation.masterDetailReference.formRequired"), Severity.ERROR.name()));
+      }
+      else if (!(context.findOtherModel(mapping.getFormModel()) instanceof FormModel)) {
+        errors.add(new ModelValidationError(model, rowElementId,
             ValidationMessages.get("validation.masterDetailReference.formNotFound", mapping.getFormModel()), Severity.ERROR.name()));
       }
     }

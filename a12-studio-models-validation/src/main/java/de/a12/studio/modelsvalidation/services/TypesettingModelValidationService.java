@@ -4,6 +4,7 @@ import de.a12.studio.models.typesettingmodel.TypesettingModel;
 import de.a12.studio.modelsvalidation.ModelValidationError;
 import de.a12.studio.modelsvalidation.ValidationContext;
 import de.a12.studio.modelsvalidation.ValidatorRunner;
+import de.a12.studio.modelsvalidation.validators.AnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.HeaderRolesValidator;
 import de.a12.studio.modelsvalidation.validators.ModelIdFilenameValidator;
 import de.a12.studio.modelsvalidation.validators.ModelSuffixValidator;
@@ -30,6 +31,7 @@ public final class TypesettingModelValidationService {
       new UniqueModelIdValidator(),
       new NameConventionValidator(),
       new HeaderRolesValidator(),
+      new AnnotationDuplicateValidator(),
       new TypesettingRuleValueValidator(),
       new TypesettingRuleDuplicateValidator(),
       new TypesettingLineLimitValidator()));
