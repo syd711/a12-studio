@@ -15,6 +15,10 @@ or an A12 installation):
 - **[OWNER]** - needs a decision from the owner first.
 - **[CLOUD]** - can be done with this repo alone.
 
+Cloud build note: the cloud egress policy may block `services.gradle.org`, `plugins.gradle.org` and Maven Central
+(seen 2026-10-01) - then nothing builds and only fixture/doc items are doable; Java changes wait for a session with
+a working build.
+
 Cloud test note: the JavaFX UI tests run headed under Xvfb (`Xvfb :99 -screen 0 1280x1024x24 &`, `export DISPLAY=:99`,
 then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently skipped, so a green run proves nothing.
 
@@ -26,7 +30,6 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 ## Open issues
 
 - **[LOCAL] Regression: `testing/workspaces/basic/models/Company_OM.json`** was edited on disk after the last fix and the invalid `enumeratedStringFilter` block (no `fields`, `enableFilter: true`) is back, so `FixtureWorkspacesOverviewValidatorsTest` is red. The validator is right (SME's `fieldIdsMustBeFilled`). Owner of the fixture decides: add fields to the "Filter String Fields with Multi-Select" list, or drop the block.
-- **[CLOUD] Fixture content: `e-commerce/models/01_Products/ProductMovie_DM.json`** - the "Languages" multi-select group uses `CommonTypes_TDM`'s imported "Language" Type Definition, which `MultiSelectGroupValidator` correctly rejects (imported type definitions are not allowed for a multi-select value field). Currently a named exclusion in `FixtureWorkspacesDocumentValidatorsTest`. Decide: inline the type locally or drop multi-select.
 - **[LOCAL] Four JavaFX tests fail under Xvfb even on a clean checkout:** `StudioTabPaneTest`, `TabPaneControllerTest`, `ContentModelEditorPanelsTest`, `TypeDefinitionTableControllerTest` (layout/timing-sensitive). Re-verify on a real display before trusting any "fixed" claim touching these classes.
 - **[SME] `$path$` notation in error messages:** check in SME where error messages use it (rename/move rewriting is unit-tested; what is left is comparing against SME and checking the UI).
 - **Manual UI checks (no known defect, not yet verified) - [LOCAL]** (same list applied to the Form and Document Model editors):
@@ -45,7 +48,7 @@ Gap review: "Form Model: gap review (2026-09-27)" in `docs/sme-reference-compari
 
 ### Document Model
 Gap review: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-6, 9, 11 done; gap 10 partly.
-- **[CLOUD] Gaps 7, 8 (round-trip only, no UI):** `IncludeConfig.includeLevel` and `ComputationConfig`/`ComputationAlternative.roundingMode` are dropped on load. Add only for lossless round-trip if a real fixture needs it.
+- **[CLOUD] Gaps 7, 8 (round-trip only, no UI):** `IncludeConfig.includeLevel` and `ComputationConfig`/`ComputationAlternative.roundingMode` are dropped on load. Add only for lossless round-trip if a real fixture needs it (checked 2026-10-01: no fixture uses either).
 - **[SME] Gap 10 remainder:** `OPTIONAL_DATE_TYPE_INVALID`/`_RANGE_INVALID` need SME's `optionalDateType` (no a12-studio equivalent); `INTERPRETATION_OF_YEAR_INVALID`/`_MISSING` need `ModelInfo.baseYear`, which a12-studio's `ModelInfo` does not carry (a separate round-trip/UI gap). See the doc's gap 10 for what each needs.
 - **[OWNER] Number `minFractionalDigits`/`maxFractionalDigits` required-ness** (SME's `MIN_FRACT_DIGITS_MISSING`/`MAX_FRACT_DIGITS_MISSING`): deliberately not ported - a12-studio makes them optional behind a "has decimal places" checkbox, and ~43% of real Number fields in the fixtures have none. Only port after deciding to make them mandatory.
 - **[SME] Element-level `annotations` duplicate-name validation:** `AnnotationDuplicateValidator` covers header annotations only; a Document Model `Element`'s or Form Model `ScreenElement`'s own `annotations` list is uncovered.
@@ -54,7 +57,7 @@ Gap review: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-com
 - **[CLOUD] Cosmetic:** `testing/workspaces/advanced_new/models/CommonFieldDefinitions_Td.json` uses `_Td` instead of `_TDM` (hidden because that workspace disables suffix enforcement; three other fixtures reference it by id, so not worth a standalone rename).
 
 ### Relationship Models
-- **[CLOUD] Low priority:** `EntityCharacteristic.navigable`, `Multiplicity.lowerLimit`, `EntityCharacteristic.candidateConstraints` round-trip fields - unreachable from SME's editor UI, unlikely in real files.
+- **[CLOUD] Low priority:** `EntityCharacteristic.navigable`, `Multiplicity.lowerLimit`, `EntityCharacteristic.candidateConstraints` round-trip fields - unreachable from SME's editor UI, unlikely in real files (checked 2026-10-01: no fixture uses any of them).
 
 ### Composed Document Models
 - **[OWNER] Blocked on Open Decision #1:** `BindingRepeat`'s deeper heterogeneous-relationship/repetition-vs-multiplicity checks (`DescendantOfHeterogeneous(ToMany)Relationship`, `InvalidBindingRepeatRepetitionAndMultiplicity`) need kernel-backed DM expansion.

@@ -70,7 +70,7 @@ class FixtureWorkspacesDocumentValidatorsTest {
           ValidationContext context = new ValidationContext(project, item, otherDocumentModels, otherModels, model);
           for (ModelValidator validator : validators) {
             for (ModelValidationError error : validator.validate(model, context)) {
-              if (!"ERROR".equals(error.severity()) || isKnownFixtureIssue(item, validator)) {
+              if (!"ERROR".equals(error.severity())) {
                 continue;
               }
               problems.add(workspace.getFileName() + "/" + item.getFile().getName() + " [" + validator.getClass().getSimpleName()
@@ -82,19 +82,6 @@ class FixtureWorkspacesDocumentValidatorsTest {
     }
     assertTrue(documentModels > 0, "no fixture document models found under " + workspaces);
     assertEquals(List.of(), problems);
-  }
-
-  /**
-   * {@code ProductMovie_DM.json}'s "Languages" multi-select group points its value field at
-   * {@code CommonTypes_TDM}'s shared "Language" Type Definition, which {@link MultiSelectGroupValidator}
-   * correctly rejects - the BA doc is explicit that a multi-select group's value field must use a *local*
-   * Type Definition, "imported and included Type Definitions are not allowed here". This is a genuine,
-   * SME-rule-accurate finding on real fixture content (re-verified 2026-09-29, not a validator bug), so it is
-   * excluded here by name rather than silently weakening the assertion for every other model - remove this
-   * exclusion if the fixture is ever fixed (inlining the type locally, or dropping the multi-select usage).
-   */
-  private static boolean isKnownFixtureIssue(ProjectItem item, ModelValidator validator) {
-    return "ProductMovie_DM.json".equals(item.getFile().getName()) && validator instanceof MultiSelectGroupValidator;
   }
 
   private static void collect(ProjectItem item, List<ProjectItem> out) {
