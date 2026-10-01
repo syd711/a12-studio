@@ -18,18 +18,18 @@
                 <ToggleOption value="row" label="%content_settings.horizontal"/>
                 <ToggleOption value="column" label="%content_settings.vertical"/>
             </ToggleRow>
-            <LengthRow label="%content_settings.distribution" path="style.justifyContent" types="Box" allowUnspecified="false" keywords="start,center,end,space-between,space-around,space-evenly" initial="start"/>
+            <LengthRow label="%content_settings.distribution" path="style.justifyContent" types="Box" allowUnspecified="false" initial="start"/>
             <ToggleRow label="%content_settings.alignment" path="style.alignItems" types="Box,ButtonGroupContainer" initial="flex-start">
                 <ToggleOption value="flex-start" label="%content_settings.start"/>
                 <ToggleOption value="center" label="%content_settings.center"/>
                 <ToggleOption value="flex-end" label="%content_settings.end"/>
             </ToggleRow>
-            <LengthRow label="%content_settings.gap" path="style.gap" types="Box,ButtonGroupContainer,ButtonGroup" units="px:0,%:0"/>
+            <LengthRow label="%content_settings.gap" path="style.gap" types="Box,ButtonGroupContainer,ButtonGroup"/>
             <ToggleRow label="%content_settings.wrap" path="style.flexWrap" types="Box" initial="nowrap">
                 <ToggleOption value="wrap" label="%content_settings.yes"/>
                 <ToggleOption value="nowrap" label="%content_settings.no"/>
             </ToggleRow>
-            <LengthRow label="%content_settings.overflow" path="style.overflow" types="Box" allowUnspecified="false" keywords="visible,hidden,scroll,auto" initial="visible"/>
+            <LengthRow label="%content_settings.overflow" path="style.overflow" types="Box" allowUnspecified="false" initial="visible"/>
             <ToggleRow label="%content_settings.alignment" path="alignment" types="FieldOutput" initial="left">
                 <ToggleOption value="left" label="%content_settings.left"/>
                 <ToggleOption value="center" label="%content_settings.center"/>

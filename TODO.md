@@ -86,7 +86,6 @@ Gap review: "Overview Model: gap review" in `docs/sme-reference-comparison.md`. 
 ### Content Model
 Gap review: "Content Model: gap review" in `docs/sme-reference-comparison.md`. Gap 4 (migration) is Won't Do. Only gap 9 is partly open.
 - **[LOCAL] Gap 9, `ColorRow`/`ShadowRow` setting validation** (`color-panel.fxml`, `shadow-panel.fxml`): needs CSS color/shadow syntax read out of the installed client bundle to avoid false positives.
-- **[CLOUD] Single source for `keywords`/`units`:** `ContentPropertyFormatRules` duplicates the FXML rows' own `keywords`/`units` (manual-sync risk). Extract into `a12-studio-models` so both read from one place.
 
 ### Application Model
 - **[CLOUD] Gap 9, only if needed:** nested subregions beyond one level have no UI (no fixture needs it).

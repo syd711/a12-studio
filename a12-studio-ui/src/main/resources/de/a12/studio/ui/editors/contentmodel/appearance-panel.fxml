@@ -15,7 +15,7 @@
         <center>
             <VBox spacing="2.0">
             <SettingGroup types="Icon">
-            <LengthRow label="%content_settings.size" path="size" keywords="medium,big" units="px:16" initial="medium"/>
+            <LengthRow label="%content_settings.size" path="size" initial="medium"/>
             <ToggleRow label="%content_settings.variant" path="variant">
                 <ToggleOption value="none" label="%content_settings.none"/>
                 <ToggleOption value="info" label="%content_settings.info"/>

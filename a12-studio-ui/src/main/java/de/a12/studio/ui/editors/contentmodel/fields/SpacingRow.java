@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.contentmodel.fields;
 
+import de.a12.studio.models.contentmodel.ContentPropertyFormats;
 import de.a12.studio.models.contentmodel.ContentProps;
 import de.a12.studio.ui.util.StudioBundle;
 import javafx.geometry.Insets;
@@ -18,7 +19,8 @@ import java.util.List;
  * SME's "oriented" setting. The dropdown offers the units (and keywords such as {@code auto} for margins) plus
  * "Mixed"; choosing Mixed opens four fields, top/right/bottom/left ({@code corners="true"}: top-left/top-right/
  * bottom-right/bottom-left), and the value is then written as the four-value shorthand exactly like SME does. A
- * shorthand with 2 or 3 values loads as its 4-value expansion.
+ * shorthand with 2 or 3 values loads as its 4-value expansion. Keywords and units come from {@link
+ * ContentPropertyFormats} by {@code path}; explicit {@code keywords}/{@code units} attributes override them.
  */
 public class SpacingRow extends SettingRow {
 
@@ -27,14 +29,15 @@ public class SpacingRow extends SettingRow {
       "content_settings.edge.bottom", "content_settings.edge.left"};
   private static final String[] CORNER_KEYS = {"content_settings.corner.top_left", "content_settings.corner.top_right",
       "content_settings.corner.bottom_right", "content_settings.corner.bottom_left"};
+  private static final String DEFAULT_UNITS = "px:0,%:0,rem:0";
 
   private final LengthEditor simple = new LengthEditor();
   private final VBox sidesBox = new VBox(4);
   private final List<LengthEditor> sides = new ArrayList<>();
   private final List<Label> sideLabels = new ArrayList<>();
 
-  private String keywords = "";
-  private String units = "px:0,%:0,rem:0";
+  private String keywords;
+  private String units;
   private boolean corners;
   private boolean mixed;
   private String lastSimple = "0px";
@@ -66,6 +69,12 @@ public class SpacingRow extends SettingRow {
     reconfigure();
   }
 
+  @Override
+  public void setPath(String path) {
+    super.setPath(path);
+    reconfigure();
+  }
+
   public String getKeywords() {
     return keywords;
   }
@@ -94,8 +103,11 @@ public class SpacingRow extends SettingRow {
   }
 
   private void reconfigure() {
-    List<String> keywordList = LengthEditor.parseKeywords(keywords);
-    List<LengthEditor.Unit> unitList = LengthEditor.parseUnits(units);
+    ContentPropertyFormats.Format format = ContentPropertyFormats.forPath(getPath());
+    String effectiveKeywords = keywords != null ? keywords : format != null ? format.keywords() : "";
+    String effectiveUnits = units != null ? units : format != null ? format.units() : DEFAULT_UNITS;
+    List<String> keywordList = LengthEditor.parseKeywords(effectiveKeywords);
+    List<LengthEditor.Unit> unitList = LengthEditor.parseUnits(effectiveUnits);
     simple.configure(keywordList, unitList, true, List.of(MIXED));
     String[] keys = corners ? CORNER_KEYS : EDGE_KEYS;
     for (int i = 0; i < sides.size(); i++) {

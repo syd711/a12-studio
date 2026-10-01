@@ -1,18 +1,18 @@
 package de.a12.studio.modelsvalidation.validators.content;
 
+import de.a12.studio.models.contentmodel.ContentPropertyFormats;
+import de.a12.studio.models.contentmodel.ContentPropertyFormats.Format;
+
 import java.util.List;
 import java.util.Set;
 
 /**
- * The CSS-shaped settings SME's own property controllers accept, ported from the a12-studio-ui rows that edit
- * them (their FXML {@code path}/{@code types}/{@code keywords}/{@code units} attributes are the source of
- * truth here - see {@code de.a12.studio.ui.editors.contentmodel.fields.LengthEditor}/{@code SpacingRow}/{@code
- * NumberRow} and the panels under {@code a12-studio-ui/.../editors/contentmodel/*-panel.fxml}). Gap 9 of
- * "Content Model: gap review" ({@code docs/sme-reference-comparison.md}): SME's numeric/length/spacing
- * controllers report {@code Invalid setting for property "..."} when a stored value fails their converter;
- * this table is the model-layer half of the same check, kept independent of the UI rows for now (a manual,
- * documented duplication - see the class-level TODO note in {@link ContentSettingValueValidator}) rather than
- * a shared extraction, to keep this pass's scope bounded.
+ * The CSS-shaped settings SME's own property controllers accept. The keywords/units of each length/spacing
+ * setting come from {@link ContentPropertyFormats}, the same table the a12-studio-ui rows ({@code LengthRow}/{@code
+ * SpacingRow}) configure their editors from; this class only adds which element types each setting applies to and
+ * its kind. Gap 9 of "Content Model: gap review" ({@code docs/sme-reference-comparison.md}): SME's
+ * numeric/length/spacing controllers report {@code Invalid setting for property "..."} when a stored value fails
+ * their converter; this table is the model-layer half of the same check.
  * <p>
  * Deliberately not covered: {@code ColorRow} and {@code ShadowRow} settings. Both accept the full breadth of
  * CSS color/shadow syntax that SME's own {@code Color.web}-equivalent parser understands (hex, named colors,
@@ -40,12 +40,14 @@ final class ContentPropertyFormatRules {
     }
   }
 
-  private static Rule length(String types, String path, String keywords, String units) {
-    return new Rule(typeSet(types), path, Kind.LENGTH, csv(keywords), csv(units));
+  private static Rule length(String types, String path) {
+    Format format = ContentPropertyFormats.require(path);
+    return new Rule(typeSet(types), path, Kind.LENGTH, format.keywordList(), format.unitNames());
   }
 
-  private static Rule spacing(String types, String path, String keywords, String units) {
-    return new Rule(typeSet(types), path, Kind.SPACING, csv(keywords), csv(units));
+  private static Rule spacing(String types, String path) {
+    Format format = ContentPropertyFormats.require(path);
+    return new Rule(typeSet(types), path, Kind.SPACING, format.keywordList(), format.unitNames());
   }
 
   private static Rule number(String types, String path) {
@@ -62,32 +64,32 @@ final class ContentPropertyFormatRules {
 
   // dimensions-panel.fxml
   static final List<Rule> RULES = List.of(
-      length("Box,Grid,GridRow,Table,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer,Video", "style.width", "auto", "px,%"),
-      length("Box,GridRow,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer", "style.height", "auto,fit-content", "px,%"),
+      length("Box,Grid,GridRow,Table,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer,Video", "style.width"),
+      length("Box,GridRow,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer", "style.height"),
       spacing("Box,Grid,GridRow,GridColumn,Paragraph,Heading,ListItem,OrderedList,UnorderedList,Table,MessageBox,Image,Button,"
-          + "ButtonGroup,ButtonGroupContainer,Link,Expandable,FieldOutput,InteractiveList", "style.padding", null, "px,%,rem"),
+          + "ButtonGroup,ButtonGroupContainer,Link,Expandable,FieldOutput,InteractiveList", "style.padding"),
       spacing("Box,Grid,GridRow,Paragraph,Heading,ListItem,OrderedList,UnorderedList,Table,MessageBox,Image,Button,ButtonGroup,"
-          + "ButtonGroupContainer,Link,Expandable,FieldOutput,InteractiveList,InteractiveListItem,InteractiveTile,Video", "style.margin", "auto", "px,%,rem"),
+          + "ButtonGroupContainer,Link,Expandable,FieldOutput,InteractiveList,InteractiveListItem,InteractiveTile,Video", "style.margin"),
 
       // appearance-panel.fxml
-      length("Icon", "size", "medium,big", "px"),
+      length("Icon", "size"),
 
       // background-image-panel.fxml
-      length("Box", "style.backgroundSize", "auto,cover,contain", "px,%"),
-      length("Box", "style.backgroundPositionX", "left,center,right", "px,%"),
-      length("Box", "style.backgroundPositionY", "top,center,bottom", "px,%"),
+      length("Box", "style.backgroundSize"),
+      length("Box", "style.backgroundPositionX"),
+      length("Box", "style.backgroundPositionY"),
 
       // border-panel.fxml
-      length("Box,ListItem,OrderedList,UnorderedList,Image,Button,ButtonGroup", "style.borderWidth", "auto", "px"),
-      spacing("Box,ListItem,OrderedList,UnorderedList,Image,Button,ButtonGroup", "style.borderRadius", null, "px,%,rem"),
+      length("Box,ListItem,OrderedList,UnorderedList,Image,Button,ButtonGroup", "style.borderWidth"),
+      spacing("Box,ListItem,OrderedList,UnorderedList,Image,Button,ButtonGroup", "style.borderRadius"),
 
       // icons-panel.fxml
-      length("Expandable", "icons.size", "medium,big", "px"),
+      length("Expandable", "icons.size"),
 
       // layout-panel.fxml
-      length("Box", "style.justifyContent", "start,center,end,space-between,space-around,space-evenly", null),
-      length("Box,ButtonGroupContainer,ButtonGroup", "style.gap", null, "px,%"),
-      length("Box", "style.overflow", "visible,hidden,scroll,auto", null),
+      length("Box", "style.justifyContent"),
+      length("Box,ButtonGroupContainer,ButtonGroup", "style.gap"),
+      length("Box", "style.overflow"),
 
       // form-element-date-picker-panel.fxml
       number("DatePicker", "datePickerConfig.minYear"),

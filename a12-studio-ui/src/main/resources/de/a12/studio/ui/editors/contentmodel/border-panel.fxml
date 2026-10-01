@@ -21,9 +21,9 @@
                 <ToggleOption value="dashed" label="%content_settings.dashed"/>
                 <ToggleOption value="dotted" label="%content_settings.dotted"/>
             </ToggleRow>
-            <LengthRow label="%content_settings.border_width" path="style.borderWidth" keywords="auto" units="px:1" showWhen="style.borderStyle=solid|dashed|dotted"/>
+            <LengthRow label="%content_settings.border_width" path="style.borderWidth" showWhen="style.borderStyle=solid|dashed|dotted"/>
             <ColorRow label="%content_settings.color" path="style.borderColor" showWhen="style.borderStyle=solid|dashed|dotted"/>
-            <SpacingRow label="%content_settings.border_radius" path="style.borderRadius" corners="true" units="px:0,%:0,rem:0" showWhen="style.borderStyle=solid|dashed|dotted"/>
+            <SpacingRow label="%content_settings.border_radius" path="style.borderRadius" corners="true" showWhen="style.borderStyle=solid|dashed|dotted"/>
             </SettingGroup>
             </VBox>
         </center>
