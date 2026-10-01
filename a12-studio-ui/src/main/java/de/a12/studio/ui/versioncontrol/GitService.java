@@ -1,12 +1,14 @@
 package de.a12.studio.ui.versioncontrol;
 
 import de.a12.studio.models.auth.AuthFileType;
+import de.a12.studio.ui.util.StudioBundle;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.BranchTrackingStatus;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
@@ -15,6 +17,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -22,6 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Wraps a single JGit {@link Git}/{@link Repository} instance for the currently opened project,
@@ -30,6 +37,9 @@ import java.util.Set;
  */
 @Slf4j
 public class GitService implements AutoCloseable {
+
+  private static final long PUSH_TIMEOUT_MINUTES = 5;
+  private static final String DEFAULT_REMOTE = "origin";
 
   private final Git git;
   private final Path repoRootPath;
@@ -121,23 +131,129 @@ public class GitService implements AutoCloseable {
   }
 
   /**
-   * Returns the checked-out branch and how many local commits it has that its upstream (remote
-   * tracking branch) does not. {@link GitBranchStatus#aheadCount()} is {@code null} when the
-   * branch has no upstream configured or HEAD is detached.
+   * Returns the checked-out branch and how many commits it is ahead of/behind its upstream (remote
+   * tracking branch, as of the last fetch). {@link GitBranchStatus#aheadCount()} is {@code null}
+   * when the branch has no upstream configured or HEAD is detached.
    */
   @NonNull
   public GitBranchStatus getBranchStatus() throws IOException {
     Repository repository = git.getRepository();
     String fullBranch = repository.getFullBranch();
     String branch = repository.getBranch();
+    boolean hasRemote = !repository.getRemoteNames().isEmpty();
     if (fullBranch == null || branch == null) {
-      return new GitBranchStatus("", true, null);
+      return new GitBranchStatus("", true, null, null, hasRemote);
     }
     if (!fullBranch.startsWith(Constants.R_HEADS)) {
-      return new GitBranchStatus(branch.length() > 7 ? branch.substring(0, 7) : branch, true, null);
+      return new GitBranchStatus(branch.length() > 7 ? branch.substring(0, 7) : branch, true, null, null, hasRemote);
     }
     BranchTrackingStatus tracking = BranchTrackingStatus.of(repository, branch);
-    return new GitBranchStatus(branch, false, tracking == null ? null : tracking.getAheadCount());
+    return tracking == null
+        ? new GitBranchStatus(branch, false, null, null, hasRemote)
+        : new GitBranchStatus(branch, false, tracking.getAheadCount(), tracking.getBehindCount(), hasRemote);
+  }
+
+  /**
+   * Pushes the checked-out branch to its upstream, or - if it has none yet - to the only remote (else
+   * {@code origin}) under the same name, setting that as its upstream.
+   * <p>
+   * Runs the installed {@code git} executable rather than JGit's transport, so the user's own SSH keys, credential
+   * manager and pre-push hooks apply exactly as on the command line (a12-studio ships only JGit core: no SSH
+   * transport, no credential store). {@code GIT_TERMINAL_PROMPT=0} makes git fail instead of waiting for a password
+   * on a console nobody sees. {@code force} uses {@code --force-with-lease}: it overwrites the remote branch, but
+   * refuses if the remote moved since the last fetch, so nobody else's newer commits are silently dropped.
+   */
+  public void push(boolean force) throws GitAPIException {
+    Repository repository = git.getRepository();
+    List<String> command = new ArrayList<>(List.of("git", "push", "--porcelain"));
+    try {
+      String fullBranch = repository.getFullBranch();
+      if (fullBranch == null || !fullBranch.startsWith(Constants.R_HEADS)) {
+        throw new GitPushException(StudioBundle.get("versioncontrol_push_detached"));
+      }
+      String branch = repository.getBranch();
+      Set<String> remotes = repository.getRemoteNames();
+      if (remotes.isEmpty()) {
+        throw new GitPushException(StudioBundle.get("versioncontrol_push_no_remote"));
+      }
+      BranchConfig branchConfig = new BranchConfig(repository.getConfig(), branch);
+      String upstreamRemote = branchConfig.getRemote();
+      String upstreamMerge = branchConfig.getMerge();
+      if (force) {
+        command.add("--force-with-lease");
+      }
+      if (upstreamRemote != null && upstreamMerge != null && !".".equals(upstreamRemote)) {
+        command.add(upstreamRemote);
+        command.add(Constants.R_HEADS + branch + ":" + upstreamMerge);
+      }
+      else {
+        command.add("--set-upstream");
+        command.add(remotes.size() == 1 ? remotes.iterator().next() : DEFAULT_REMOTE);
+        command.add(branch);
+      }
+    }
+    catch (IOException e) {
+      throw new GitPushException(StudioBundle.get("versioncontrol_push_failed", e.getMessage()), e);
+    }
+    runGit(command);
+  }
+
+  private void runGit(List<String> command) throws GitPushException {
+    ProcessBuilder builder = new ProcessBuilder(command).directory(repoRootPath.toFile()).redirectErrorStream(true);
+    builder.environment().put("GIT_TERMINAL_PROMPT", "0");
+    Process process;
+    try {
+      process = builder.start();
+    }
+    catch (IOException e) {
+      throw new GitPushException(StudioBundle.get("versioncontrol_push_git_missing", e.getMessage()), e);
+    }
+    // Drain git's output on its own thread so the timeout below still applies if git hangs (e.g. an SSH prompt),
+    // and a chatty push can't block on a full pipe buffer.
+    Process running = process;
+    CompletableFuture<String> output = CompletableFuture.supplyAsync(() -> {
+      try {
+        return new String(running.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+      }
+      catch (IOException e) {
+        return "";
+      }
+    });
+    try {
+      process.getOutputStream().close();
+      if (!process.waitFor(PUSH_TIMEOUT_MINUTES, TimeUnit.MINUTES)) {
+        process.destroyForcibly();
+        throw new GitPushException(StudioBundle.get("versioncontrol_push_timeout", PUSH_TIMEOUT_MINUTES));
+      }
+      String text = output.get(10, TimeUnit.SECONDS);
+      if (process.exitValue() != 0) {
+        throw new GitPushException(describeFailure(text, process.exitValue()));
+      }
+      log.info("git push: {}", text);
+    }
+    catch (IOException | ExecutionException | TimeoutException e) {
+      process.destroyForcibly();
+      throw new GitPushException(StudioBundle.get("versioncontrol_push_failed", e.getMessage()), e);
+    }
+    catch (InterruptedException e) {
+      process.destroyForcibly();
+      Thread.currentThread().interrupt();
+      throw new GitPushException(StudioBundle.get("versioncontrol_push_failed", "interrupted"), e);
+    }
+  }
+
+  /** git's own output, with a hint for the common "remote has commits you don't" rejection. */
+  private static String describeFailure(String output, int exitCode) {
+    if (output.isEmpty()) {
+      return StudioBundle.get("versioncontrol_push_failed", "exit code " + exitCode);
+    }
+    if (output.contains("stale info")) {
+      return StudioBundle.get("versioncontrol_push_lease_rejected") + "\n\n" + output;
+    }
+    if (output.contains("non-fast-forward") || output.contains("fetch first")) {
+      return StudioBundle.get("versioncontrol_push_rejected") + "\n\n" + output;
+    }
+    return output;
   }
 
   @NonNull

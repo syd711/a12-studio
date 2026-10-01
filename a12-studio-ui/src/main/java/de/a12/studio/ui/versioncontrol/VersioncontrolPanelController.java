@@ -70,6 +70,12 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   private Button revertButton;
 
   @FXML
+  private Button pushButton;
+
+  @FXML
+  private CheckBox forcePushCheckBox;
+
+  @FXML
   private Button collapseProjectViewButton;
 
   @FXML
@@ -83,6 +89,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
 
   private Project project;
   private List<GitChangedFile> currentChangedFiles = List.of();
+  private GitBranchStatus currentBranchStatus;
   private boolean updatingCommitMessageField = false;
 
   private Runnable collapseProjectViewCallback;
@@ -161,6 +168,8 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       settings.save();
     });
 
+    forcePushCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> updateActionButtons());
+
     updateActionButtons();
     showBranchStatus(null);
 
@@ -195,6 +204,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
    */
   public void setProject(Project project) {
     this.project = project;
+    forcePushCheckBox.setSelected(false);
 
     updatingCommitMessageField = true;
     commitMessageField.setText(project == null
@@ -208,6 +218,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   @Override
   public void projectClosed(@NonNull ProjectClosedEvent event) {
     this.project = null;
+    forcePushCheckBox.setSelected(false);
     currentChangedFiles = List.of();
     setTreeRoot(null);
     showBranchStatus(null);
@@ -266,6 +277,8 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
 
   /** Updates the branch bar above the changes tree; {@code null} hides it (no project/repository). */
   private void showBranchStatus(GitBranchStatus status) {
+    currentBranchStatus = status;
+    updateActionButtons();
     branchBar.setVisible(status != null);
     branchBar.setManaged(status != null);
     if (status == null) {
@@ -405,6 +418,11 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     if (commitButton != null) {
       commitButton.setDisable(!anyChecked || message == null || message.isBlank());
     }
+    if (pushButton != null && forcePushCheckBox != null) {
+      boolean force = forcePushCheckBox.isSelected();
+      pushButton.setDisable(currentBranchStatus == null || !currentBranchStatus.canPush(force));
+      forcePushCheckBox.setDisable(currentBranchStatus == null || currentBranchStatus.detached() || !currentBranchStatus.hasRemote());
+    }
   }
 
   @FXML
@@ -471,6 +489,38 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     else if (!result.isCancelled()) {
       log.error("Failed to commit");
     }
+  }
+
+  @FXML
+  private void onPush() {
+    GitService gitService = Studio.getGitService();
+    if (gitService == null || currentBranchStatus == null) {
+      return;
+    }
+    boolean force = forcePushCheckBox.isSelected();
+    if (!currentBranchStatus.canPush(force)) {
+      return;
+    }
+    if (force) {
+      Optional<ButtonType> confirmation = WidgetFactory.showConfirmation(getStage(),
+          StudioBundle.get("confirm_force_push", currentBranchStatus.branch()), null, null,
+          StudioBundle.get("versioncontrol_force_push"));
+      if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
+        return;
+      }
+    }
+    GitOperationProgressModel progressModel = new GitOperationProgressModel(StudioBundle.get("versioncontrol_pushing"),
+        () -> gitService.push(force));
+    ProgressResultModel result = ProgressDialog.createProgressDialog(getStage(), progressModel);
+    if (result.isSuccess()) {
+      // A force push is a one-off decision, never a sticky mode.
+      forcePushCheckBox.setSelected(false);
+    }
+    else if (!result.isCancelled()) {
+      log.error("Failed to push");
+    }
+    // Ahead/behind counts change on success, and a rejected push may still have updated nothing - refresh either way.
+    StudioEventManager.getInstance().fireGitStatusChangedEvent();
   }
 
   private Stage getStage() {
