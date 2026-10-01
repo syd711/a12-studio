@@ -1,7 +1,14 @@
 package de.a12.studio.ui.editors.formmodel.formtree;
 
 import de.a12.studio.models.formmodel.Control;
+import de.a12.studio.ui.util.StudioBundle;
+import de.a12.studio.ui.util.WidgetFactory;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.layout.HBox;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -17,15 +24,53 @@ import java.util.Map;
  * <p>Works on the built tree (paths are the display names of the ancestors), so it has to be re-applied after
  * every rebuild - see {@link FormModelTreeController}.
  */
-final class FormDependencyBadges {
+public final class FormDependencyBadges {
 
-  static final String UNKNOWN_PATH = "<Unknown>";
+  public static final String UNKNOWN_PATH = "<Unknown>";
 
   private FormDependencyBadges() {
   }
 
   /** One related element: its tree path and what kind of dependency it is ({@code Control}). */
-  record Entry(String path, String kind) {
+  public record Entry(String path, String kind) {
+  }
+
+  /** SME's "dependent on" / "triggering dependency" marks: a "D" and/or "T" badge (with a count above one) whose
+   * tooltip lists the related elements; null if there is nothing to show. */
+  public static Node createBadges(List<Entry> dependentOn, List<Entry> masterOf) {
+    if (dependentOn.isEmpty() && masterOf.isEmpty()) {
+      return null;
+    }
+    StringBuilder tooltip = new StringBuilder();
+    appendDependencies(tooltip, StudioBundle.get("form_model_tree.dependent_on"), dependentOn);
+    appendDependencies(tooltip, StudioBundle.get("form_model_tree.triggering_dependency"), masterOf);
+    HBox badges = new HBox(2);
+    badges.setAlignment(Pos.CENTER_LEFT);
+    if (!dependentOn.isEmpty()) {
+      badges.getChildren().add(createBadge("D", dependentOn.size(), "tree-dependency-badge-dependent"));
+    }
+    if (!masterOf.isEmpty()) {
+      badges.getChildren().add(createBadge("T", masterOf.size(), "tree-dependency-badge-master"));
+    }
+    Tooltip.install(badges, WidgetFactory.createTooltip(tooltip.toString().stripTrailing()));
+    return badges;
+  }
+
+  private static Label createBadge(String letter, int count, String styleClass) {
+    Label badge = new Label(count > 1 ? letter + count : letter);
+    badge.getStyleClass().addAll("tree-dependency-badge", styleClass);
+    return badge;
+  }
+
+  private static void appendDependencies(StringBuilder tooltip, String headline, List<Entry> entries) {
+    if (entries.isEmpty()) {
+      return;
+    }
+    tooltip.append(headline).append('\n');
+    for (Entry entry : entries) {
+      tooltip.append("  ").append(entry.path()).append(" ")
+          .append(StudioBundle.get("form_model_tree.dependency_kind", entry.kind())).append('\n');
+    }
   }
 
   /** Sets {@link FormElementViewModel#getDependentOn()}/{@link FormElementViewModel#getMasterOf()} on every row. */

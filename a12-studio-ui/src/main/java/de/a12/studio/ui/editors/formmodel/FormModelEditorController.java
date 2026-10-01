@@ -560,6 +560,7 @@ public class FormModelEditorController extends AbstractEditorController implemen
     if (event.getItem().equals(projectItem)) {
       formModelTreeController.refreshTreeLabels();
       dataConfigurationController.refreshTreeAppearance();
+      documentSourceTreeController.refreshDependencyMarks();
       return;
     }
     super.modelSaved(event);

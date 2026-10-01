@@ -5,10 +5,16 @@ import de.a12.studio.models.documentmodel.Element;
 import de.a12.studio.models.documentmodel.FieldElement;
 import de.a12.studio.models.documentmodel.GroupElement;
 import de.a12.studio.models.documentmodel.ModelRoot;
+import de.a12.studio.models.formmodel.DependentConfig;
+import de.a12.studio.models.formmodel.FieldConfigEntry;
+import de.a12.studio.models.formmodel.FormModel;
+import de.a12.studio.models.formmodel.GroupConfigEntry;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.components.SearchFieldController;
 import de.a12.studio.ui.editors.documentmodel.ElementViewModel;
 import de.a12.studio.ui.editors.formmodel.FormModelEditorController;
+import de.a12.studio.ui.editors.formmodel.formtree.FormDependencyBadges;
+import de.a12.studio.ui.editors.formmodel.formtree.FormDependencyBadges.Entry;
 import de.a12.studio.ui.editors.formmodel.formtree.FormModelTreeController;
 import de.a12.studio.ui.util.ProjectDocumentModels;
 import de.a12.studio.ui.util.StudioBundle;
@@ -28,6 +34,8 @@ import org.jspecify.annotations.Nullable;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -69,12 +77,21 @@ public class DocumentSourceTreeController implements Initializable {
 
   private Label placeholderLabel;
 
+  private ProjectItem formModelProjectItem;
+
+  /** SME's dependency marks of a Document Model element: which master fields it depends on and which fields
+   * it triggers, by element id; see {@link #refreshDependencyMarks()}. */
+  public record Marks(List<Entry> dependentOn, List<Entry> masterOf) {
+  }
+
+  private Map<String, Marks> marksById = Map.of();
+
   @Override
   public void initialize(URL url, ResourceBundle resourceBundle) {
     searchController.setOnSearch(this::applyFilter);
     tree.setShowRoot(false);
     tree.setCellFactory(view -> {
-      FormSourceElementTreeCell cell = new FormSourceElementTreeCell();
+      FormSourceElementTreeCell cell = new FormSourceElementTreeCell(id -> marksById.get(id));
       setupDragSource(cell);
       return cell;
     });
@@ -83,6 +100,7 @@ public class DocumentSourceTreeController implements Initializable {
   public void load(@Nullable DocumentModel model, @NonNull ProjectItem formModelProjectItem) {
     this.modelRoot = model != null && model.getContent() != null ? model.getContent().getModelRoot() : null;
     this.documentModelId = model != null ? model.getId() : null;
+    this.formModelProjectItem = formModelProjectItem;
     this.otherDocumentModels = ProjectDocumentModels.getOtherDocumentModelsWithCombinations(formModelProjectItem);
     boolean hasModel = modelRoot != null;
     tree.setVisible(hasModel);
@@ -135,6 +153,74 @@ public class DocumentSourceTreeController implements Initializable {
     }
     tree.setRoot(root);
     setExpandedRecursive(root, true);
+    refreshDependencyMarks();
+  }
+
+  /**
+   * Recomputes the "D"/"T" marks (SME's {@code dependencySuffix.tsx}, Document Model case) from the Form Model's
+   * field and group configuration - a field's {@code dependentField}/{@code dependentEnumeration} and a group's
+   * {@code dependentGroup} name a master field - and repaints the rows. Called after every rebuild and whenever
+   * the Form Model is saved, since the dependencies are edited elsewhere in the editor.
+   */
+  public void refreshDependencyMarks() {
+    marksById = computeMarks();
+    tree.refresh();
+  }
+
+  private Map<String, Marks> computeMarks() {
+    if (formModelProjectItem == null || !(formModelProjectItem.getModel() instanceof FormModel formModel)
+        || formModel.getContent() == null || tree.getRoot() == null) {
+      return Map.of();
+    }
+    Map<String, String> pathById = new HashMap<>();
+    collectPaths(tree.getRoot(), pathById);
+    Map<String, List<Entry>> dependentOn = new HashMap<>();
+    Map<String, List<Entry>> masterOf = new HashMap<>();
+    for (FieldConfigEntry entry : formModel.getContent().getFieldConfiguration().getField()) {
+      link(entry.getElementRef(), entry.getDependentField(), "Field", pathById, dependentOn, masterOf);
+      if (entry.getDependentEnumeration() != null) {
+        link(entry.getElementRef(), entry.getDependentEnumeration().getMasterField(), "Enumeration", pathById, dependentOn, masterOf);
+      }
+    }
+    for (GroupConfigEntry entry : formModel.getContent().getGroupConfiguration().getGroup()) {
+      link(entry.getGroupRef(), entry.getDependentGroup(), "Group", pathById, dependentOn, masterOf);
+    }
+    Map<String, Marks> marks = new HashMap<>();
+    java.util.Set<String> ids = new java.util.HashSet<>(dependentOn.keySet());
+    ids.addAll(masterOf.keySet());
+    for (String id : ids) {
+      marks.put(id, new Marks(dependentOn.getOrDefault(id, List.of()), masterOf.getOrDefault(id, List.of())));
+    }
+    return marks;
+  }
+
+  private static void link(String elementRef, DependentConfig dependentConfig, String kind, Map<String, String> pathById,
+      Map<String, List<Entry>> dependentOn, Map<String, List<Entry>> masterOf) {
+    if (dependentConfig != null) {
+      link(elementRef, dependentConfig.getMasterField(), kind, pathById, dependentOn, masterOf);
+    }
+  }
+
+  private static void link(String elementRef, String masterField, String kind, Map<String, String> pathById,
+      Map<String, List<Entry>> dependentOn, Map<String, List<Entry>> masterOf) {
+    if (elementRef == null || masterField == null) {
+      return;
+    }
+    dependentOn.computeIfAbsent(elementRef, id -> new ArrayList<>())
+        .add(new Entry(pathById.getOrDefault(masterField, FormDependencyBadges.UNKNOWN_PATH), kind));
+    masterOf.computeIfAbsent(masterField, id -> new ArrayList<>())
+        .add(new Entry(pathById.getOrDefault(elementRef, FormDependencyBadges.UNKNOWN_PATH), kind));
+  }
+
+  private static void collectPaths(TreeItem<ElementViewModel> item, Map<String, String> pathById) {
+    if (item.getValue() != null) {
+      List<String> names = new ArrayList<>();
+      for (TreeItem<ElementViewModel> current = item; current != null && current.getValue() != null; current = current.getParent()) {
+        names.add(0, current.getValue().getName());
+      }
+      pathById.putIfAbsent(item.getValue().getElement().getId(), String.join("/", names));
+    }
+    item.getChildren().forEach(child -> collectPaths(child, pathById));
   }
 
   @FXML
