@@ -34,7 +34,7 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 - **[LOCAL] `$path$` notation in error messages:** checked 2026-10-01 - SME's own source has no `$path$` handling (the only `$path` hits are Kotlin string templates); the `$...$` parameters are kernel-side. Rename/move rewriting is unit-tested. What is left is only a visual check of the UI.
 - **Manual UI checks (no known defect, not yet verified) - [LOCAL]** (same list applied to the Form and Document Model editors):
   - Drag and drop in general; error handling when dropping from a repeatable group into a regular group; dnd of sections with multi-select.
-  - Trigger and dependency icons on tree rows: SME's T/D flags are not ported - check what is shown and add them. (**[SME]** for the exact flag semantics.)
+  - Trigger and dependency marks on tree rows: done 2026-10-01 for the Form Model tree (`FormDependencyBadges`: "D"/"T" badge with count and tooltip, from SME's `dependencySuffix.tsx`; unit-tested, not looked at on a display). Still open: the same marks on the Document Model source tree of the Form editor for field/enumeration/group dependencies (`FieldConfigEntry`/`GroupConfigEntry` `dependent*`, SME's `dmDocument` case).
   - Merge the Settings and Control tabs of the field editor; dependencies are only shown for fields that have values.
   - Every combo box should offer an empty value so a selection can be reset.
   - When a rule is created, pre-fill its name from the field or group it targets.

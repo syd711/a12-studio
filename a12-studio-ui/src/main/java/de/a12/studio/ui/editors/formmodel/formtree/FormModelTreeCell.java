@@ -24,6 +24,44 @@ class FormModelTreeCell extends TreeCell<FormElementViewModel> {
     this.contextMenuFactory = contextMenuFactory;
   }
 
+  /** SME's "dependent on" / "triggering dependency" marks: a "D" and/or "T" badge (with a count above one) whose
+   * tooltip lists the related elements. */
+  private static void addDependencyBadges(HBox graphic, FormElementViewModel item) {
+    if (item.getDependentOn().isEmpty() && item.getMasterOf().isEmpty()) {
+      return;
+    }
+    StringBuilder tooltip = new StringBuilder();
+    appendDependencies(tooltip, StudioBundle.get("form_model_tree.dependent_on"), item.getDependentOn());
+    appendDependencies(tooltip, StudioBundle.get("form_model_tree.triggering_dependency"), item.getMasterOf());
+    HBox badges = new HBox(2);
+    badges.setAlignment(Pos.CENTER_LEFT);
+    if (!item.getDependentOn().isEmpty()) {
+      badges.getChildren().add(createBadge("D", item.getDependentOn().size(), "tree-dependency-badge-dependent"));
+    }
+    if (!item.getMasterOf().isEmpty()) {
+      badges.getChildren().add(createBadge("T", item.getMasterOf().size(), "tree-dependency-badge-master"));
+    }
+    Tooltip.install(badges, WidgetFactory.createTooltip(tooltip.toString().stripTrailing()));
+    graphic.getChildren().add(badges);
+  }
+
+  private static Label createBadge(String letter, int count, String styleClass) {
+    Label badge = new Label(count > 1 ? letter + count : letter);
+    badge.getStyleClass().addAll("tree-dependency-badge", styleClass);
+    return badge;
+  }
+
+  private static void appendDependencies(StringBuilder tooltip, String headline, java.util.List<FormDependencyBadges.Entry> entries) {
+    if (entries.isEmpty()) {
+      return;
+    }
+    tooltip.append(headline).append('\n');
+    for (FormDependencyBadges.Entry entry : entries) {
+      tooltip.append("  ").append(entry.path()).append(" ")
+          .append(StudioBundle.get("form_model_tree.dependency_kind", entry.kind())).append('\n');
+    }
+  }
+
   @Override
   protected void updateItem(FormElementViewModel item, boolean empty) {
     super.updateItem(item, empty);
@@ -52,6 +90,7 @@ class FormModelTreeCell extends TreeCell<FormElementViewModel> {
       Tooltip.install(includeIcon, WidgetFactory.createTooltip(StudioBundle.get("form_model_tree.included_from", element.getFormModelRef())));
       graphic.getChildren().add(1, includeIcon);
     }
+    addDependencyBadges(graphic, item);
     graphic.setAlignment(Pos.CENTER_LEFT);
     setText(null);
     setGraphic(graphic);

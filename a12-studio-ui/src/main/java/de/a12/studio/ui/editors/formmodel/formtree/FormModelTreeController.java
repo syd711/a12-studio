@@ -802,6 +802,7 @@ public class FormModelTreeController implements Initializable {
    * {@link #onModelChanged}), so there's no need for a separate per-edit validation hook here.
    */
   private void applyValidationState(@NonNull TreeItem<FormElementViewModel> root) {
+    FormDependencyBadges.apply(root);
     Map<String, List<String>> errorMessagesById = errorMessagesByElementId();
     markErrors(root, errorMessagesById);
 

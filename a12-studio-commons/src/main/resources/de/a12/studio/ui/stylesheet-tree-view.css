@@ -34,6 +34,26 @@
     -fx-icon-color: -fx-text-faint;
 }
 
+/* SME's dependency marks in the Form Model tree: "D" = dependent on a control, "T" = triggers other elements. */
+.tree-dependency-badge {
+    -fx-font-size: 0.75em;
+    -fx-font-weight: 700;
+    -fx-padding: 0 4 0 4;
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-border-color: #067b6f;
+}
+
+.tree-dependency-badge-dependent {
+    -fx-background-color: #067b6f;
+    -fx-text-fill: white;
+}
+
+.tree-dependency-badge-master {
+    -fx-background-color: transparent;
+    -fx-text-fill: #067b6f;
+}
+
 /**
  * Tree Table View
  */

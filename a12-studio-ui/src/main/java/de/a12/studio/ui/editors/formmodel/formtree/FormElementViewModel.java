@@ -58,6 +58,11 @@ public class FormElementViewModel {
 
   private List<String> errorMessages = List.of();
 
+  // Set by FormDependencyBadges after every tree rebuild: the controls this element is triggered by / the
+  // elements this control triggers (SME's "D"/"T" decoration).
+  private List<FormDependencyBadges.Entry> dependentOn = List.of();
+  private List<FormDependencyBadges.Entry> masterOf = List.of();
+
   public FormElementViewModel(@NonNull Object node, @Nullable Object parentNode, @Nullable ElementIndex elementIndex) {
     this.node = node;
     this.parentNode = parentNode;
@@ -75,6 +80,19 @@ public class FormElementViewModel {
 
   public void setErrorMessages(@NonNull List<String> errorMessages) {
     this.errorMessages = errorMessages;
+  }
+
+  public List<FormDependencyBadges.Entry> getDependentOn() {
+    return dependentOn;
+  }
+
+  public List<FormDependencyBadges.Entry> getMasterOf() {
+    return masterOf;
+  }
+
+  void setDependencies(@NonNull List<FormDependencyBadges.Entry> dependentOn, @NonNull List<FormDependencyBadges.Entry> masterOf) {
+    this.dependentOn = dependentOn;
+    this.masterOf = masterOf;
   }
 
   public Object getNode() {
