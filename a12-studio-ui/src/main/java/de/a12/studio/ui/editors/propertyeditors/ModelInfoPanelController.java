@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import org.jspecify.annotations.NonNull;
 
 import java.net.URL;
@@ -15,7 +17,7 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 /**
- * Edits {@link ModelInfo#getImmutable()} and {@link ModelInfo#getComment()}. Not bound to a single {@link
+ * Edits {@link ModelInfo#getImmutable()}, {@link ModelInfo#getBaseYear()} and {@link ModelInfo#getComment()}. Not bound to a single {@link
  * de.a12.studio.models.documentmodel.Element} (both live on the model's own {@link ModelInfo}), same as {@link
  * TimezonePanelController}/{@link ModelConfigPanelController} - {@code setElement} is never called, only
  * {@link #setModel}.
@@ -33,6 +35,9 @@ public class ModelInfoPanelController extends AbstractPropertyEditor implements 
   private CheckBox immutableCheckBox;
 
   @FXML
+  private TextField baseYearField;
+
+  @FXML
   private TextArea commentField;
 
   private DocumentModel model;
@@ -48,6 +53,12 @@ public class ModelInfoPanelController extends AbstractPropertyEditor implements 
     immutableCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if (!updatingFromModel) {
         withModelInfo(info -> info.setImmutable(newValue ? true : null));
+      }
+    });
+    baseYearField.setTextFormatter(new TextFormatter<>(change -> change.getControlNewText().matches("\\d{0,4}") ? change : null));
+    baseYearField.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (!updatingFromModel) {
+        withModelInfo(info -> info.setBaseYear(newValue == null || newValue.isBlank() ? null : Integer.valueOf(newValue)));
       }
     });
     commentField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -69,6 +80,7 @@ public class ModelInfoPanelController extends AbstractPropertyEditor implements 
     updatingFromModel = true;
     try {
       immutableCheckBox.setSelected(modelInfo != null && Boolean.TRUE.equals(modelInfo.getImmutable()));
+      baseYearField.setText(modelInfo != null && modelInfo.getBaseYear() != null ? String.valueOf(modelInfo.getBaseYear()) : "");
       commentField.setText(modelInfo != null && modelInfo.getComment() != null ? modelInfo.getComment() : "");
     } finally {
       updatingFromModel = false;

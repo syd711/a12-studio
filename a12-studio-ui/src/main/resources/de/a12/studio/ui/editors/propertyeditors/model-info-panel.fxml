@@ -3,6 +3,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
@@ -13,6 +14,10 @@
  <center>
   <VBox spacing="10.0">
     <CheckBox fx:id="immutableCheckBox" text="%immutable" />
+    <VBox spacing="4.0">
+      <Label styleClass="field-label" text="%base_year" />
+      <TextField fx:id="baseYearField" />
+    </VBox>
     <VBox spacing="4.0">
       <Label styleClass="field-label" text="%comment" />
       <TextArea fx:id="commentField" prefRowCount="3" wrapText="true" />

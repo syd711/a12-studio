@@ -135,7 +135,11 @@ public final class RelationshipDocumentModelGenerator {
       @NonNull ProjectItem contextItem) {
     DocumentModel generated = new DocumentModel();
     DocumentModelContent content = new DocumentModelContent();
-    content.setModelInfo(new ModelInfo());
+    ModelInfo modelInfo = new ModelInfo();
+    if (targetModel.getContent() != null && targetModel.getContent().getModelInfo() != null) {
+      modelInfo.setBaseYear(targetModel.getContent().getModelInfo().getBaseYear());
+    }
+    content.setModelInfo(modelInfo);
     content.setModelConfig(buildModelConfig(targetModel));
     ModelRoot modelRoot = new ModelRoot();
     content.setModelRoot(modelRoot);

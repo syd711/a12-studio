@@ -10,6 +10,7 @@ import de.a12.studio.modelsvalidation.validators.BasicConsistencyValidator;
 import de.a12.studio.modelsvalidation.validators.ContentUniquenessCriteriaValidator;
 import de.a12.studio.modelsvalidation.validators.CustomFieldTypeConfigValidator;
 import de.a12.studio.modelsvalidation.validators.DateFormatConfigValidator;
+import de.a12.studio.modelsvalidation.validators.DateInterpretationOfYearValidator;
 import de.a12.studio.modelsvalidation.validators.DateYounger1900ConfigValidator;
 import de.a12.studio.modelsvalidation.validators.ElementAnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.DuplicateIdValidator;
@@ -71,6 +72,7 @@ public final class DocumentModelValidationService {
       new CustomFieldTypeConfigValidator(),
       new DateFormatConfigValidator(),
       new DateYounger1900ConfigValidator(),
+      new DateInterpretationOfYearValidator(),
       new IncludeTypeDefinitionModeValidator(),
       new IncludeStructureValidator(),
       new SupportedCharactersValidator(),

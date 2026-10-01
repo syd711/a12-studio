@@ -46,8 +46,7 @@ Gap review: "Form Model: gap review (2026-09-27)" in `docs/sme-reference-compari
 - **[SME] Interactive Commit/Edit/Delete refactoring dialog** SME shows when deleting a Screen/Control that is referenced elsewhere. a12-studio only reports the dangling reference afterwards as a validation error. Cross-cutting (same gap for the Application Model) - fix together, not as a Form-Model-only patch.
 
 ### Document Model
-Gap review: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-6, 9, 11 done; gap 10 partly.
-- **[SME] Gap 10 remainder:** `OPTIONAL_DATE_TYPE_INVALID`/`_RANGE_INVALID` need SME's `optionalDateType` (no a12-studio equivalent); `INTERPRETATION_OF_YEAR_INVALID`/`_MISSING` need `ModelInfo.baseYear`, which a12-studio's `ModelInfo` does not carry (a separate round-trip/UI gap). See the doc's gap 10 for what each needs.
+Gap review: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-6 and 9-11 done (gap 10's `OPTIONAL_DATE_*` rules do not port - a12-studio has no `optionalDateType`; `INTERPRETATION_OF_YEAR_INVALID` done 2026-10-01 with `ModelInfo.baseYear`; `_MISSING` not ported, its legacy `DD.MM-DD.MM` format name can't occur).
 - **[OWNER] Number `minFractionalDigits`/`maxFractionalDigits` required-ness** (SME's `MIN_FRACT_DIGITS_MISSING`/`MAX_FRACT_DIGITS_MISSING`): deliberately not ported - a12-studio makes them optional behind a "has decimal places" checkbox, and ~43% of real Number fields in the fixtures have none. Only port after deciding to make them mandatory.
 - **[LOCAL] New fixture failure:** `FixtureWorkspacesDocumentValidatorsTest` reports `e-commerce/ProductMovie_DM.json` (`IncludeTypeDefinitionModeValidator`: included `Product_Common_DM` has a different Type Definition mode). Not caused by recent validator work; owner of the fixture decides.
 
