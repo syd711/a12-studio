@@ -11,6 +11,7 @@ import de.a12.studio.modelsvalidation.validators.ContentUniquenessCriteriaValida
 import de.a12.studio.modelsvalidation.validators.CustomFieldTypeConfigValidator;
 import de.a12.studio.modelsvalidation.validators.DateFormatConfigValidator;
 import de.a12.studio.modelsvalidation.validators.DateYounger1900ConfigValidator;
+import de.a12.studio.modelsvalidation.validators.ElementAnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.DuplicateIdValidator;
 import de.a12.studio.modelsvalidation.validators.EnumerationTypeConfigValidator;
 import de.a12.studio.modelsvalidation.validators.EnumerationValuesValidator;
@@ -61,6 +62,7 @@ public final class DocumentModelValidationService {
       new NameConventionValidator(),
       new HeaderRolesValidator(),
       new AnnotationDuplicateValidator(),
+      new ElementAnnotationDuplicateValidator(),
       new TimeZoneValidator(),
       new StringPatternErrorMessageValidator(),
       new StringTypeConfigValidator(),
