@@ -31,7 +31,7 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 
 - **[LOCAL] Regression: `testing/workspaces/basic/models/Company_OM.json`** was edited on disk after the last fix and the invalid `enumeratedStringFilter` block (no `fields`, `enableFilter: true`) is back, so `FixtureWorkspacesOverviewValidatorsTest` is red. The validator is right (SME's `fieldIdsMustBeFilled`). Owner of the fixture decides: add fields to the "Filter String Fields with Multi-Select" list, or drop the block.
 - **[LOCAL] Four JavaFX tests fail under Xvfb even on a clean checkout:** `StudioTabPaneTest`, `TabPaneControllerTest`, `ContentModelEditorPanelsTest`, `TypeDefinitionTableControllerTest` (layout/timing-sensitive). Re-verify on a real display before trusting any "fixed" claim touching these classes.
-- **[SME] `$path$` notation in error messages:** check in SME where error messages use it (rename/move rewriting is unit-tested; what is left is comparing against SME and checking the UI).
+- **[LOCAL] `$path$` notation in error messages:** checked 2026-10-01 - SME's own source has no `$path$` handling (the only `$path` hits are Kotlin string templates); the `$...$` parameters are kernel-side. Rename/move rewriting is unit-tested. What is left is only a visual check of the UI.
 - **Manual UI checks (no known defect, not yet verified) - [LOCAL]** (same list applied to the Form and Document Model editors):
   - Drag and drop in general; error handling when dropping from a repeatable group into a regular group; dnd of sections with multi-select.
   - Trigger and dependency icons on tree rows: SME's T/D flags are not ported - check what is shown and add them. (**[SME]** for the exact flag semantics.)
@@ -78,7 +78,7 @@ Nothing open.
 
 ### Overview Model
 Gap review: "Overview Model: gap review" in `docs/sme-reference-comparison.md`. Gaps 1-15 done, 16 and 17 partial.
-- **[SME] Gap 16 remainder:** the "already-used fields excluded" and "dynamic-suffix fields excluded" sub-clauses of SME's filter-field candidate rule (found in SME source, not ported), and the Screen Reader Column candidate rule (no SME recipe found yet).
+- **[SME] Gap 16 remainder:** only the Screen Reader Column candidate rule is open (no SME recipe found yet). The filter-field "already used"/"dynamic suffix" exclusions were ported 2026-10-01 for the Custom Selection Of Fields picker.
 - **[SME] Gap 17 remainder:** refactoring-dialog behaviors not done - deleting a filter field, and event/model reference cascades. `overviewRefactoring.ts` only handles cross-model rename, so there is no known recipe; do not guess semantics.
 - **[SME] `bindingConfiguration` wire-shape gap:** real but currently causes no validator misbehavior - see the doc.
 

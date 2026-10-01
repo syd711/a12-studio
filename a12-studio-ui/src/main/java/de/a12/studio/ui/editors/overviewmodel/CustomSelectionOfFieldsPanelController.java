@@ -34,8 +34,11 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Edits an {@link OverviewModel}'s {@code content.configuration.filterConfiguration.fields}: one draggable,
@@ -264,8 +267,34 @@ public class CustomSelectionOfFieldsPanelController extends AbstractPropertyEdit
 
   private void populateFieldCombo(ComboBox<String> fieldField, FieldRef fieldRef) {
     ElementIndex index = effectiveIndexFor(fieldRef);
-    fieldField.getItems().setAll(OverviewElementOptions.customSelectionFieldIds(index));
+    fieldField.getItems().setAll(candidateFieldIds(index, fieldRef));
     OverviewElementOptions.applyElementRefConverter(fieldField, index);
+    // Other rows and the Columns list change while this combo is already built, so refresh on every open.
+    fieldField.setOnShowing(event -> {
+      String current = fieldField.getValue();
+      boolean wasUpdating = updatingFromModel;
+      updatingFromModel = true;
+      try {
+        fieldField.getItems().setAll(candidateFieldIds(effectiveIndexFor(fieldRef), fieldRef));
+        fieldField.setValue(current);
+      }
+      finally {
+        updatingFromModel = wasUpdating;
+      }
+    });
+  }
+
+  /** SME's {@code getCustomFilterValues}: Fields and enumeration multi-selects, minus any column's dynamic
+   * suffix field, minus the fields another row already selects (this row's own selection stays offered). */
+  private List<String> candidateFieldIds(ElementIndex index, FieldRef fieldRef) {
+    Set<String> alreadyUsed = getFields().stream()
+        .filter(other -> other != fieldRef)
+        .map(FieldRef::getFieldId)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toSet());
+    return OverviewElementOptions.customSelectionFieldIds(index, OverviewElementOptions.dynamicSuffixPaths(documentModelIndex, model)).stream()
+        .filter(id -> !alreadyUsed.contains(id) || id.equals(fieldRef.getFieldId()))
+        .toList();
   }
 
   /** {@code documentModelIndex}, or - if {@code fieldRef} has a Subtype set and it resolves to a real project

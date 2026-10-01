@@ -15,7 +15,9 @@ import de.a12.studio.models.documentmodel.NumberFieldType;
 import de.a12.studio.models.documentmodel.StringFieldType;
 import de.a12.studio.models.documentmodel.TimeFieldType;
 import de.a12.studio.models.Label;
+import de.a12.studio.models.overviewmodel.Column;
 import de.a12.studio.models.overviewmodel.FilterOptionToggle;
+import de.a12.studio.models.overviewmodel.OverviewModel;
 import de.a12.studio.modelsvalidation.validators.ElementIndex;
 import de.a12.studio.modelsvalidation.validators.overview.OverviewElementResolution;
 import javafx.scene.control.ComboBox;
@@ -251,20 +253,41 @@ public final class OverviewElementOptions {
    * `getFilterValuesByFilterMode`). Mirrors {@code isFieldLike(element) || isEnumerationMultiSelect(element,
    * documentModel)}: a plain (non-multi-select) Group, e.g. an attachment group, is not offered here even
    * though the Column picker above does offer it - filtering by an attachment blob has no meaning, but
-   * referencing one as a column's display value does. Repeatable fields and dynamic-suffix fields are *not*
-   * excluded here yet (SME's own candidates for this list exclude the latter too; not ported this pass - see
-   * TODO.md). */
+   * referencing one as a column's display value does. Repeatable fields are offered (like SME). */
   public static List<String> customSelectionFieldIds(ElementIndex index) {
+    return customSelectionFieldIds(index, Set.of());
+  }
+
+  /** {@link #customSelectionFieldIds(ElementIndex)} minus every element whose path is in {@code
+   * excludedPaths} - SME's {@code getElementsOfDocumentModelForFilter} drops the fields that are some column's
+   * dynamic suffix ({@link #dynamicSuffixPaths}), compared by display path so it also hits a Subtype's field. */
+  public static List<String> customSelectionFieldIds(ElementIndex index, Set<String> excludedPaths) {
     if (index == null) {
       return new ArrayList<>(metaElementIds());
     }
     List<String> ids = new ArrayList<>(elementIds(index).stream()
         .filter(id -> index.resolveElement(id)
-            .map(element -> element instanceof FieldElement || OverviewElementResolution.isEnumerationMultiSelect(index, element))
+            .map(element -> (element instanceof FieldElement || OverviewElementResolution.isEnumerationMultiSelect(index, element))
+                && !excludedPaths.contains(index.getPath(element)))
             .orElse(false))
         .toList());
     ids.addAll(metaElementIds());
     return ids;
+  }
+
+  /** Paths (in {@code index}) of the fields used as a dynamic suffix by one of {@code model}'s columns (SME's
+   * {@code getAllSuffixPaths}); a dangling {@code suffixRef} contributes nothing. */
+  public static Set<String> dynamicSuffixPaths(ElementIndex index, OverviewModel model) {
+    if (index == null || model == null || model.getContent() == null) {
+      return Set.of();
+    }
+    Set<String> paths = new java.util.HashSet<>();
+    for (Column column : model.getContent().getColumns()) {
+      if (Boolean.TRUE.equals(column.getUseDynamicSuffix()) && column.getSuffixRef() != null) {
+        index.resolveElement(column.getSuffixRef()).ifPresent(element -> paths.add(index.getPath(element)));
+      }
+    }
+    return paths;
   }
 
   /** {@code viewMode} values for a String Filter Item, both fixture-evidenced ({@code
