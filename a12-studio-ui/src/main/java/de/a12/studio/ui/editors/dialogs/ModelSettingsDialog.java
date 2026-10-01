@@ -29,6 +29,7 @@ import de.a12.studio.ui.editors.documentmodel.CdmQueryRootPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralDetachedRepeatSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralInlineRepeatSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.GeneralSettingsPanelController;
+import de.a12.studio.ui.editors.formmodel.modelsettings.PreprocessingSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.RuleConfirmationSettingsPanelController;
 import de.a12.studio.ui.editors.formmodel.StylesPanelController;
 import de.a12.studio.ui.editors.formmodel.modelsettings.SubtitlePanelController;
@@ -82,6 +83,9 @@ public class ModelSettingsDialog implements Initializable, DialogController {
 
   @FXML
   private RuleConfirmationSettingsPanelController ruleConfirmationSettingsController;
+
+  @FXML
+  private PreprocessingSettingsPanelController preprocessingSettingsController;
 
   @FXML
   private SubtitlePanelController subtitleController;
@@ -172,6 +176,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
     generalDetachedRepeatSettingsController.setSaveMode(saveMode);
     generalInlineRepeatSettingsController.setSaveMode(saveMode);
     ruleConfirmationSettingsController.setSaveMode(saveMode);
+    preprocessingSettingsController.setSaveMode(saveMode);
     subtitleController.setSaveMode(saveMode);
     modelStylesController.setSaveMode(saveMode);
     supportedCharactersController.setSaveMode(saveMode);
@@ -275,6 +280,8 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         generalInlineRepeatSettingsController.setVisible(true);
         ruleConfirmationSettingsController.setModel(formModel);
         ruleConfirmationSettingsController.setVisible(true);
+        preprocessingSettingsController.setModel(formModel);
+        preprocessingSettingsController.setVisible(true);
         subtitleController.setModel(formModel);
         subtitleController.setFieldSuggestionSource(generalSettingsController.getFieldIndex());
         subtitleController.setVisible(true);
@@ -286,6 +293,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         generalDetachedRepeatSettingsController.setVisible(false);
         generalInlineRepeatSettingsController.setVisible(false);
         ruleConfirmationSettingsController.setVisible(false);
+        preprocessingSettingsController.setVisible(false);
         subtitleController.setVisible(false);
         modelStylesController.setVisible(false);
       }
@@ -352,6 +360,7 @@ public class ModelSettingsDialog implements Initializable, DialogController {
         generalDetachedRepeatSettingsController,
         generalInlineRepeatSettingsController,
         ruleConfirmationSettingsController,
+        preprocessingSettingsController,
         subtitleController,
         modelStylesController,
         supportedCharactersController,

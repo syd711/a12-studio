@@ -42,8 +42,7 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 ## Open todos
 
 ### Form Model
-Gap review: "Form Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-7 and 9 done.
-- **[SME] Gap 8, only when needed:** "Preprocessing Settings" (`FormModelContent.openNewDocumentPreProcessing`/`openExistingDocumentPreProcessing`) has fields on the Java model but no editor panel. Needs the enum wire values from SME's meta-model; no fixture needs a non-default value today.
+Gap review: "Form Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-9 done (gap 8: `PreprocessingSettingsPanelController`, 2026-10-01; compiled and tests green, but not looked at on a real display).
 - **[SME] Interactive Commit/Edit/Delete refactoring dialog** SME shows when deleting a Screen/Control that is referenced elsewhere. a12-studio only reports the dangling reference afterwards as a validation error. Cross-cutting (same gap for the Application Model) - fix together, not as a Form-Model-only patch.
 
 ### Document Model

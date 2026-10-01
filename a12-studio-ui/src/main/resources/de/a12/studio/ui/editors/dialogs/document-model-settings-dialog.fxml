@@ -46,6 +46,9 @@
                           <!-- Form Model only: Rule Confirmation Settings -->
                           <fx:include fx:id="ruleConfirmationSettings" source="../formmodel/modelsettings/rule-confirmation-settings-panel.fxml" />
 
+                          <!-- Form Model only: Preprocessing Settings -->
+                          <fx:include fx:id="preprocessingSettings" source="../formmodel/modelsettings/preprocessing-settings-panel.fxml" />
+
                           <!-- Form Model only: Subtitle -->
                           <fx:include fx:id="subtitle" source="../formmodel/modelsettings/subtitle-panel.fxml" />
 
