@@ -26,4 +26,8 @@ public class ComputationConfig {
   // present here (e.g. from a file authored elsewhere) round-trips losslessly but isn't otherwise surfaced.
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<String> errorCodesToSuppress = new ArrayList<>();
+  // Round-trip only, no UI - SME's own meta model says it "is not shown in the SME, but needs to be in the model,
+  // so that it will not be overwritten" (an Exact/RoundUp/... enum, kept as the raw string).
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String roundingMode;
 }
