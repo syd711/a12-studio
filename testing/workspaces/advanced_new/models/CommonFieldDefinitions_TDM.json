@@ -1,6 +1,6 @@
 {
   "header": {
-    "id": "CommonFieldDefinitions_Td",
+    "id": "CommonFieldDefinitions_TDM",
     "modelType": "document",
     "modelVersion": "29.4.0",
     "locales": [
@@ -26,7 +26,7 @@
   },
   "content": {
     "modelInfo": {
-      "name": "CommonFieldDefinitions_Td",
+      "name": "CommonFieldDefinitions_TDM",
       "immutable": false
     },
     "modelConfig": {

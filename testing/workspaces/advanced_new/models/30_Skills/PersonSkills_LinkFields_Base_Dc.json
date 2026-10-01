@@ -19,10 +19,10 @@
     ],
     "modelReferences": [
       {
-        "alias": "CommonFieldDefinitions_Td",
+        "alias": "CommonFieldDefinitions_TDM",
         "modelType": "document",
         "purpose": "typeDefinitions",
-        "reference": "CommonFieldDefinitions_Td"
+        "reference": "CommonFieldDefinitions_TDM"
       }
     ]
   },

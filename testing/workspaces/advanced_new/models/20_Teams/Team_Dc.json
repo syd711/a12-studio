@@ -31,7 +31,7 @@
       {
         "modelType": "document",
         "purpose": "typeDefinitions",
-        "reference": "CommonFieldDefinitions_Td"
+        "reference": "CommonFieldDefinitions_TDM"
       }
     ]
   },
