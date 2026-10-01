@@ -36,6 +36,23 @@
     -fx-text-fill: -fx-text-color-inverse;
 }
 
+/* Muted second line under an annotation name in the Annotations panel's name suggestions ("(Source: A12)"). */
+.combo-box-popup .list-view .list-cell .annotation-name-label {
+    -fx-text-fill: -fx-text-color;
+}
+
+.combo-box-popup .list-view .list-cell .annotation-source-label {
+    -fx-font-size: 0.857em;
+    -fx-text-fill: -fx-text-muted;
+}
+
+.combo-box-popup .list-view .list-cell:filled:hover .annotation-name-label,
+.combo-box-popup .list-view .list-cell:filled:selected .annotation-name-label,
+.combo-box-popup .list-view .list-cell:filled:hover .annotation-source-label,
+.combo-box-popup .list-view .list-cell:filled:selected .annotation-source-label {
+    -fx-text-fill: -fx-text-color-inverse;
+}
+
 .combo-box-base:editable > .text-field {
     -fx-background-radius: 8 0 0 8;
     -fx-border-radius: 8 0 0 8;
