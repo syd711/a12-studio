@@ -1,5 +1,6 @@
 package de.a12.studio.ui.editors.contentmodel.fields;
 
+import de.a12.studio.models.contentmodel.ContentPropertyFormats;
 import de.a12.studio.models.contentmodel.ContentProps;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -7,15 +8,17 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * A single CSS length setting (Width, Height, Gap, ...): keywords and numeric units, see {@link LengthEditor}.
- * FXML configures it with {@code keywords="auto,fit-content"} and {@code units="px:400,%:100"} (unit and the number
- * used when switching to it). {@code initial} is what SME's controller shows while the key is absent.
+ * The keywords and units come from {@link ContentPropertyFormats} by {@code path} (shared with the model-layer
+ * validator); {@code keywords="auto,fit-content"} / {@code units="px:400,%:100"} (unit and the number used when
+ * switching to it) override them for a row whose path has no entry there. {@code initial} is what SME's controller
+ * shows while the key is absent.
  */
 public class LengthRow extends SettingRow {
 
   private final LengthEditor editor = new LengthEditor();
 
-  private String keywords = "";
-  private String units = "";
+  private String keywords;
+  private String units;
   private String initial;
   private boolean allowUnspecified = true;
 
@@ -23,6 +26,12 @@ public class LengthRow extends SettingRow {
     HBox.setHgrow(editor, Priority.ALWAYS);
     controls().getChildren().add(editor);
     editor.setOnValue(value -> edited(props -> props.set(getPath(), value)));
+  }
+
+  @Override
+  public void setPath(String path) {
+    super.setPath(path);
+    reconfigure();
   }
 
   public String getKeywords() {
@@ -61,7 +70,11 @@ public class LengthRow extends SettingRow {
   }
 
   private void reconfigure() {
-    editor.configure(LengthEditor.parseKeywords(keywords), LengthEditor.parseUnits(units), allowUnspecified, java.util.List.of());
+    ContentPropertyFormats.Format format = ContentPropertyFormats.forPath(getPath());
+    String effectiveKeywords = keywords != null ? keywords : format != null ? format.keywords() : "";
+    String effectiveUnits = units != null ? units : format != null ? format.units() : "";
+    editor.configure(LengthEditor.parseKeywords(effectiveKeywords), LengthEditor.parseUnits(effectiveUnits), allowUnspecified,
+        java.util.List.of());
   }
 
   @Override

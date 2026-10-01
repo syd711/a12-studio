@@ -20,7 +20,7 @@
                 <ToggleOption value="false" label="%content_settings.left"/>
                 <ToggleOption value="true" label="%content_settings.right"/>
             </ToggleRow>
-            <LengthRow label="%content_settings.size" path="icons.size" types="Expandable" keywords="medium,big" units="px:16" initial="medium"/>
+            <LengthRow label="%content_settings.size" path="icons.size" types="Expandable" initial="medium"/>
             </VBox>
         </center>
     </BorderPane>

@@ -14,10 +14,10 @@
         </top>
         <center>
             <VBox spacing="2.0">
-            <LengthRow label="%content_settings.width" path="style.width" types="Box,Grid,GridRow,Table,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer,Video" keywords="auto" units="px:400,%:100"/>
-            <LengthRow label="%content_settings.height" path="style.height" types="Box,GridRow,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer" keywords="auto,fit-content" units="px:400,%:100"/>
-            <SpacingRow label="%content_settings.padding" path="style.padding" types="Box,Grid,GridRow,GridColumn,Paragraph,Heading,ListItem,OrderedList,UnorderedList,Table,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer,Link,Expandable,FieldOutput,InteractiveList" units="px:0,%:0,rem:0"/>
-            <SpacingRow label="%content_settings.margin" path="style.margin" types="Box,Grid,GridRow,Paragraph,Heading,ListItem,OrderedList,UnorderedList,Table,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer,Link,Expandable,FieldOutput,InteractiveList,InteractiveListItem,InteractiveTile,Video" keywords="auto" units="px:0,%:0,rem:0"/>
+            <LengthRow label="%content_settings.width" path="style.width" types="Box,Grid,GridRow,Table,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer,Video"/>
+            <LengthRow label="%content_settings.height" path="style.height" types="Box,GridRow,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer"/>
+            <SpacingRow label="%content_settings.padding" path="style.padding" types="Box,Grid,GridRow,GridColumn,Paragraph,Heading,ListItem,OrderedList,UnorderedList,Table,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer,Link,Expandable,FieldOutput,InteractiveList"/>
+            <SpacingRow label="%content_settings.margin" path="style.margin" types="Box,Grid,GridRow,Paragraph,Heading,ListItem,OrderedList,UnorderedList,Table,MessageBox,Image,Button,ButtonGroup,ButtonGroupContainer,Link,Expandable,FieldOutput,InteractiveList,InteractiveListItem,InteractiveTile,Video"/>
             </VBox>
         </center>
     </BorderPane>

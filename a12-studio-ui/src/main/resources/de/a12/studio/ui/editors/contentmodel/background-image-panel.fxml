@@ -22,9 +22,9 @@
                 <ToggleOption value="repeat-x" label="%content_settings.horizontal"/>
                 <ToggleOption value="repeat-y" label="%content_settings.vertical"/>
             </ToggleRow>
-            <LengthRow label="%content_settings.size" path="style.backgroundSize" keywords="auto,cover,contain" units="px:512,%:100" initial="auto" enabledWhen="style.backgroundImage"/>
-            <LengthRow label="%content_settings.horizontal_position" path="style.backgroundPositionX" keywords="left,center,right" units="px:512,%:100" initial="0px" enabledWhen="style.backgroundImage"/>
-            <LengthRow label="%content_settings.vertical_position" path="style.backgroundPositionY" keywords="top,center,bottom" units="px:512,%:100" initial="0px" enabledWhen="style.backgroundImage"/>
+            <LengthRow label="%content_settings.size" path="style.backgroundSize" initial="auto" enabledWhen="style.backgroundImage"/>
+            <LengthRow label="%content_settings.horizontal_position" path="style.backgroundPositionX" initial="0px" enabledWhen="style.backgroundImage"/>
+            <LengthRow label="%content_settings.vertical_position" path="style.backgroundPositionY" initial="0px" enabledWhen="style.backgroundImage"/>
             </SettingGroup>
             </VBox>
         </center>
