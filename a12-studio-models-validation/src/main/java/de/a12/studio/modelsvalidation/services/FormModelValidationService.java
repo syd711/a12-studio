@@ -15,6 +15,7 @@ import de.a12.studio.modelsvalidation.validators.NameConventionValidator;
 import de.a12.studio.modelsvalidation.validators.UniqueModelIdValidator;
 import de.a12.studio.modelsvalidation.validators.form.ControlGridLayoutValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormAmountSuffixFieldRefValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormAnnotationDuplicateValidator;
 import de.a12.studio.modelsvalidation.validators.form.DependentControlOptionsMustExistValidator;
 import de.a12.studio.modelsvalidation.validators.form.DependentControlsAtLeastOneOptionValidator;
 import de.a12.studio.modelsvalidation.validators.form.DependentEnumerationMasterRequiredValidator;
@@ -103,6 +104,7 @@ public final class FormModelValidationService {
       new FormIncludeProvenanceValidator(),
       new HeaderRolesValidator(),
       new AnnotationDuplicateValidator(),
+      new FormAnnotationDuplicateValidator(),
       new FormAmountSuffixFieldRefValidator(),
       new FormPlaceholderExpositionConflictValidator(),
       new FormExternalEnumerationExpositionValidator(),

@@ -377,7 +377,7 @@ structurally similar to the already-tracked cross-cutting `HeaderRolesValidator`
 treatment rather than a Document-Model-only fix. New `AnnotationDuplicateValidator` (header annotations only;
 SME's `I_Annotated` mixin is also composed into element-level `annotations` lists - a Document Model `Element`,
 a Form Model `ScreenElement`/`Row`/`Cell` - each of which could independently have a duplicate name, but that is
-a separate per-model-type element-walk gap; Document Model elements were added 2026-10-01 as `ElementAnnotationDuplicateValidator`, Form Model nodes remain uncovered) is now registered in all 14
+a separate per-model-type element-walk gap; Document Model elements were added 2026-10-01 as `ElementAnnotationDuplicateValidator`, Form Model screens/elements/rows/controls/overview columns as `FormAnnotationDuplicateValidator`; buttons, config entries and row actions are not walked) is now registered in all 14
 model-type validation services, matching `HeaderRolesValidator`'s own rollout. Pinned by
 `AnnotationDuplicateValidatorTest`; full `a12-studio-models-validation` suite green, no real fixture trips a new
 finding. Labels/HelperText/Descriptions cannot have SME's "duplicate language row" problem at all
