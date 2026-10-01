@@ -35,6 +35,7 @@ import org.jspecify.annotations.NonNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -52,6 +53,15 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
 
   @FXML
   private Label noChangesLabel;
+
+  @FXML
+  private HBox branchBar;
+
+  @FXML
+  private Label branchLabel;
+
+  @FXML
+  private Label unpushedLabel;
 
   @FXML
   private Button refreshButton;
@@ -152,6 +162,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     });
 
     updateActionButtons();
+    showBranchStatus(null);
 
     StudioEventManager.getInstance().addListener(this);
   }
@@ -199,6 +210,7 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     this.project = null;
     currentChangedFiles = List.of();
     setTreeRoot(null);
+    showBranchStatus(null);
     updateActionButtons();
   }
 
@@ -226,23 +238,59 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
     if (gitService == null || project == null) {
       currentChangedFiles = List.of();
       setTreeRoot(null);
+      showBranchStatus(null);
       updateActionButtons();
       return;
     }
     File projectFolder = project.getFolder();
     JFXFuture.supplyAsync(() -> {
           try {
-            return gitService.getChangedProjectFiles(projectFolder);
+            return new RefreshResult(gitService.getChangedProjectFiles(projectFolder), gitService.getBranchStatus());
           }
-          catch (GitAPIException e) {
+          catch (GitAPIException | IOException e) {
             throw new RuntimeException(e);
           }
         })
-        .thenAcceptLater(this::populateTree)
+        .thenAcceptLater(result -> {
+          showBranchStatus(result.branchStatus());
+          populateTree(result.changedFiles());
+        })
         .onErrorLater(ex -> {
           log.error("Failed to refresh git status for '{}'", projectFolder, ex);
           WidgetFactory.showAlert(getStage(), StudioBundle.get("versioncontrol_refresh_failed"), ex.getMessage());
         });
+  }
+
+  private record RefreshResult(List<GitChangedFile> changedFiles, GitBranchStatus branchStatus) {
+  }
+
+  /** Updates the branch bar above the changes tree; {@code null} hides it (no project/repository). */
+  private void showBranchStatus(GitBranchStatus status) {
+    branchBar.setVisible(status != null);
+    branchBar.setManaged(status != null);
+    if (status == null) {
+      return;
+    }
+    branchLabel.setText(status.detached()
+        ? StudioBundle.get("versioncontrol_detached_head", status.branch())
+        : status.branch());
+    branchLabel.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("versioncontrol_current_branch", branchLabel.getText())));
+
+    Integer ahead = status.aheadCount();
+    if (ahead == null) {
+      unpushedLabel.setText(status.detached() ? "" : StudioBundle.get("versioncontrol_no_upstream"));
+      unpushedLabel.setGraphic(null);
+      unpushedLabel.setTooltip(status.detached() ? null : WidgetFactory.createTooltip(StudioBundle.get("versioncontrol_no_upstream_tooltip")));
+    }
+    else {
+      unpushedLabel.setText(String.valueOf(ahead));
+      unpushedLabel.setGraphic(WidgetFactory.createIcon(Icons.ARROW_UP));
+      unpushedLabel.setTooltip(WidgetFactory.createTooltip(StudioBundle.get("versioncontrol_unpushed_commits", ahead)));
+    }
+    unpushedLabel.getStyleClass().remove("versioncontrol-unpushed-pending");
+    if (ahead != null && ahead > 0) {
+      unpushedLabel.getStyleClass().add("versioncontrol-unpushed-pending");
+    }
   }
 
   private void populateTree(List<GitChangedFile> changedFiles) {

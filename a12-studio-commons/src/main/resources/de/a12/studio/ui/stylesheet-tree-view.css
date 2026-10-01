@@ -485,6 +485,24 @@
     -fx-font-size: 0.964em;
 }
 
+.versioncontrol-branch-bar {
+    -fx-border-color: transparent transparent -fx-box-border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.versioncontrol-branch-label {
+    -fx-font-weight: bold;
+}
+
+.versioncontrol-unpushed-label {
+    -fx-text-fill: -fx-text-faint;
+}
+
+.versioncontrol-unpushed-label.versioncontrol-unpushed-pending {
+    -fx-text-fill: -fx-text-base-color;
+    -fx-font-weight: bold;
+}
+
 /*
  * Elements that were cut (Ctrl+X) and wait for their Paste, which moves them: still in the tree, but dimmed.
  */

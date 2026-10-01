@@ -7,6 +7,8 @@ import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.BranchTrackingStatus;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.jspecify.annotations.NonNull;
@@ -116,6 +118,26 @@ public class GitService implements AutoCloseable {
     }
     String relativePath = projectFolder.toPath().relativize(file.toPath()).toString().replace('\\', '/');
     return Optional.of(new GitChangedFile(file, relativePath, changeStatus));
+  }
+
+  /**
+   * Returns the checked-out branch and how many local commits it has that its upstream (remote
+   * tracking branch) does not. {@link GitBranchStatus#aheadCount()} is {@code null} when the
+   * branch has no upstream configured or HEAD is detached.
+   */
+  @NonNull
+  public GitBranchStatus getBranchStatus() throws IOException {
+    Repository repository = git.getRepository();
+    String fullBranch = repository.getFullBranch();
+    String branch = repository.getBranch();
+    if (fullBranch == null || branch == null) {
+      return new GitBranchStatus("", true, null);
+    }
+    if (!fullBranch.startsWith(Constants.R_HEADS)) {
+      return new GitBranchStatus(branch.length() > 7 ? branch.substring(0, 7) : branch, true, null);
+    }
+    BranchTrackingStatus tracking = BranchTrackingStatus.of(repository, branch);
+    return new GitBranchStatus(branch, false, tracking == null ? null : tracking.getAheadCount());
   }
 
   @NonNull

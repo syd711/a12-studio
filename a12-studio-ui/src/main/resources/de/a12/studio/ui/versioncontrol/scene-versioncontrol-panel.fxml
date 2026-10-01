@@ -67,12 +67,30 @@
         </VBox>
     </top>
     <center>
-        <StackPane BorderPane.alignment="CENTER">
+        <VBox BorderPane.alignment="CENTER">
             <children>
-                <TreeView fx:id="changesTree" showRoot="true" />
-                <Label fx:id="noChangesLabel" mouseTransparent="true" styleClass="versioncontrol-placeholder" text="%versioncontrol_no_changes" />
+                <HBox fx:id="branchBar" alignment="CENTER_LEFT" spacing="8.0" styleClass="versioncontrol-branch-bar">
+                    <children>
+                        <Label fx:id="branchLabel" styleClass="versioncontrol-branch-label">
+                            <graphic>
+                                <FontIcon iconLiteral="mdi2s-source-branch" iconSize="16" styleClass="toolbar-icon" />
+                            </graphic>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="unpushedLabel" styleClass="versioncontrol-unpushed-label" />
+                    </children>
+                    <padding>
+                        <Insets bottom="4.0" left="8.0" right="8.0" top="4.0" />
+                    </padding>
+                </HBox>
+                <StackPane VBox.vgrow="ALWAYS">
+                    <children>
+                        <TreeView fx:id="changesTree" showRoot="true" />
+                        <Label fx:id="noChangesLabel" mouseTransparent="true" styleClass="versioncontrol-placeholder" text="%versioncontrol_no_changes" />
+                    </children>
+                </StackPane>
             </children>
-        </StackPane>
+        </VBox>
     </center>
     <bottom>
         <VBox spacing="6.0">
