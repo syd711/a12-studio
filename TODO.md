@@ -77,8 +77,7 @@ Nothing open.
 - **[OWNER]** Without a configured A12 installation the Form Model button falls back to the old wireframe and Ad Hoc Testing shows an error page - decide whether the fallback should say so in the studio.
 
 ### Overview Model
-Gap review: "Overview Model: gap review" in `docs/sme-reference-comparison.md`. Gaps 1-15 done, 16 and 17 partial.
-- **[SME] Gap 16 remainder:** only the Screen Reader Column candidate rule is open (no SME recipe found yet). The filter-field "already used"/"dynamic suffix" exclusions were ported 2026-10-01 for the Custom Selection Of Fields picker.
+Gap review: "Overview Model: gap review" in `docs/sme-reference-comparison.md`. Gaps 1-16 done, 17 partial.
 - **[SME] Gap 17 remainder:** refactoring-dialog behaviors not done - deleting a filter field, and event/model reference cascades. `overviewRefactoring.ts` only handles cross-model rename, so there is no known recipe; do not guess semantics.
 - **[SME] `bindingConfiguration` wire-shape gap:** real but currently causes no validator misbehavior - see the doc.
 

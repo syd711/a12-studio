@@ -1864,8 +1864,9 @@ resolves); `OverviewElementOptionsMultiSelectTest` (4 cases) pins the new restri
 `getCustomFilterValues` exclusions in the Custom Selection Of Fields picker - fields that are a column's dynamic
 suffix (`OverviewElementOptions.dynamicSuffixPaths`/`customSelectionFieldIds(index, excludedPaths)`, compared by path
 like SME's `getAllSuffixPaths`) and fields another row already selects (own selection stays; combos refresh on open).
-The Section Data picker has no `model` access and only gets the pre-existing unused-first behaviour. Still open
-from gap 16: the Screen Reader Column candidate rule (no SME source recipe found yet).
+The Section Data picker has no `model` access and only gets the pre-existing unused-first behaviour. Screen Reader
+Column candidates (checked 2026-10-01 against the installed 13.0.2 client bundle - the SME source checkout has no such
+provider): every column of the Overview, which is what `OverviewColumnOptions.columnIds` already offers. Gap 16 is closed.
 
 **Gap 15 (metadata fields), closed:** `OverviewElementResolution.META_FIELDS` (new, 7 entries covering the
 kernel's `__meta` group - docRef/modelReference/modelVersion/creator/createdAt/modifier/modifiedAt) plus
