@@ -19,7 +19,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.jspecify.annotations.NonNull;
@@ -32,10 +34,11 @@ import java.util.Optional;
 import de.a12.studio.ui.util.StudioBundle;
 
 /**
- * Edits {@link ApplicationModelContent#getRegion()}'s {@link Region#getSubRegions()}: a list of subregions, each
- * reorderable (move up/down), editable and copyable via {@link SubregionDialogController}, and deletable. Same
- * row-based layout as {@link ModulesPanelController}, with an additional read-only "Layout" column showing each
- * subregion's {@link Layout#getName()}. Not bound to a single {@link de.a12.studio.models.documentmodel.Element}
+ * Edits {@link ApplicationModelContent#getRegion()}'s {@link Region#getSubRegions()} tree: every subregion at any
+ * depth is a row, indented under its parent, reorderable within its own siblings (drag or move up/down), editable
+ * and copyable (deep copy) via {@link SubregionDialogController}, deletable, and can get nested subregions of its
+ * own. Same row-based layout as {@link ModulesPanelController}, with an additional read-only "Layout" column showing
+ * each subregion's {@link Layout#getName()}. Not bound to a single {@link de.a12.studio.models.documentmodel.Element}
  * (the region lives on the model's content), so it follows the model-header pattern used by e.g. {@link
  * RegionPanelController}.
  */
@@ -43,6 +46,7 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
 
   // Identifies a row-reorder drag; the dragboard content is the dragged row's current index into getSubRegions().
   private static final DataFormat SUBREGION_INDEX = new DataFormat("application/x-a12-subregion-index");
+  private static final double INDENT_PER_LEVEL = 24.0;
 
   @FXML
   private HBox columnHeaders;
@@ -51,6 +55,10 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
   private VBox subregionsList;
 
   private ApplicationModel model;
+
+  // The sibling list a row drag started in: the dragboard only carries an index, so drops into another level of
+  // the tree are refused rather than interpreted against the wrong list.
+  private List<Region> draggedSiblings;
 
   public void setModel(@NonNull ApplicationModel model) {
     this.model = model;
@@ -102,16 +110,29 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
       return;
     }
 
-    for (int index = 0; index < subregions.size(); index++) {
-      subregionsList.getChildren().add(createRow(subregions.get(index), index, subregions.size()));
+    addRows(subregions, 0, "");
+  }
+
+  private void addRows(List<Region> siblings, int depth, String idPrefix) {
+    for (int index = 0; index < siblings.size(); index++) {
+      Region subregion = siblings.get(index);
+      String rowId = idPrefix + index;
+      subregionsList.getChildren().add(createRow(siblings, subregion, index, depth, rowId));
+      addRows(subregion.getSubRegions(), depth + 1, rowId + "-");
     }
   }
 
-  private HBox createRow(Region subregion, int index, int rowCount) {
+  private HBox createRow(List<Region> siblings, Region subregion, int index, int depth, String rowId) {
     FontIcon dragHandle = RowFactory.createDragHandle();
+    dragHandle.addEventFilter(MouseEvent.DRAG_DETECTED, event -> draggedSiblings = siblings);
+
+    Pane indent = new Pane();
+    indent.setMinWidth(depth * INDENT_PER_LEVEL);
+    indent.setPrefWidth(depth * INDENT_PER_LEVEL);
+    indent.setMaxWidth(depth * INDENT_PER_LEVEL);
 
     Label nameLabel = new Label(subregion.getName());
-    nameLabel.setId("subregion-" + index);
+    nameLabel.setId("subregion-" + rowId);
     nameLabel.setMaxWidth(Double.MAX_VALUE);
     nameLabel.setCursor(Cursor.HAND);
     HBox.setHgrow(nameLabel, Priority.ALWAYS);
@@ -122,18 +143,24 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     });
 
     Label layoutLabel = new Label(subregion.getLayout() != null ? subregion.getLayout().getName() : "");
-    layoutLabel.setId("subregion-layout-" + index);
+    layoutLabel.setId("subregion-layout-" + rowId);
     layoutLabel.setPrefWidth(140.0);
 
-    HBox row = new HBox(10.0, dragHandle, nameLabel, layoutLabel, createActionsBox(subregion, index, rowCount));
+    HBox row = new HBox(10.0, indent, dragHandle, nameLabel, layoutLabel, createActionsBox(siblings, subregion, index));
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("module-row");
-    RowFactory.setupRowDragAndDrop(row, dragHandle, SUBREGION_INDEX, index, this::moveSubregion);
+    RowFactory.setupRowDragAndDrop(row, dragHandle, SUBREGION_INDEX, index,
+        (fromIndex, insertBeforeIndex) -> draggedSiblings == siblings,
+        (fromIndex, insertBeforeIndex) -> moveSubregion(siblings, fromIndex, insertBeforeIndex));
     return row;
   }
 
-  private void moveSubregion(int fromIndex, int insertBeforeIndex) {
-    if (RowFactory.reorder(getOrCreateSubRegions(), fromIndex, insertBeforeIndex)) {
+  private void moveSubregion(List<Region> siblings, int fromIndex, int insertBeforeIndex) {
+    if (draggedSiblings != siblings) {
+      return;
+    }
+    draggedSiblings = null;
+    if (RowFactory.reorder(siblings, fromIndex, insertBeforeIndex)) {
       rebuildRows();
       commitChange();
     }
@@ -150,40 +177,64 @@ public class SubregionsPanelController extends AbstractPropertyEditor {
     });
   }
 
-  private HBox createActionsBox(Region subregion, int index, int rowCount) {
-    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, rowCount, this::moveRow);
+  private HBox createActionsBox(List<Region> siblings, Region subregion, int index) {
+    VBox moveButtonsBox = RowFactory.createMoveButtonsBox(index, siblings.size(),
+        (fromIndex, toIndex) -> moveRow(siblings, fromIndex, toIndex));
 
     Button editButton = RowFactory.createActionButton(Icons.PENCIL, StudioBundle.get("row_action.edit"), () -> editSubregion(subregion));
 
     Button copyButton = RowFactory.createActionButton(Icons.COPY, StudioBundle.get("copy"), () -> {
-      Region copy = new Region();
-      copy.setName(subregion.getName());
-      copy.setLayout(subregion.getLayout());
-      copy.setSubRegions(new ArrayList<>(subregion.getSubRegions()));
-      List<Region> subregions = getOrCreateSubRegions();
-      subregions.add(subregions.indexOf(subregion) + 1, copy);
+      siblings.add(siblings.indexOf(subregion) + 1, deepCopy(subregion));
       rebuildRows();
       commitChange();
     });
 
+    Button addNestedButton = RowFactory.createActionButton(Icons.PLUS, StudioBundle.get("add_nested_subregion"),
+        () -> Dialogs.showSubregionForAdd(Studio.stage).ifPresent(nested -> {
+          subregion.getSubRegions().add(nested);
+          rebuildRows();
+          commitChange();
+        }));
+
     Button deleteButton = RowFactory.createActionButton(Icons.TRASH, StudioBundle.get("row_action.delete"), () -> {
       Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage, StudioBundle.get("delete_this_subregion"), null, null, "Delete");
       if (result.isPresent() && result.get() == ButtonType.OK) {
-        getOrCreateSubRegions().remove(subregion);
-        ApplicationModelStructuralRefactoring.deleteRegion(model, subregion.getName());
+        siblings.remove(subregion);
+        deleteRegionReferences(subregion);
         rebuildRows();
         commitChange();
       }
     });
 
-    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, copyButton, deleteButton);
+    HBox actionsBox = new HBox(4.0, moveButtonsBox, editButton, addNestedButton, copyButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
   }
 
-  private void moveRow(int fromIndex, int toIndex) {
-    Collections.swap(getOrCreateSubRegions(), fromIndex, toIndex);
+  private void moveRow(List<Region> siblings, int fromIndex, int toIndex) {
+    Collections.swap(siblings, fromIndex, toIndex);
     rebuildRows();
     commitChange();
+  }
+
+  // Deleting a subregion removes its whole subtree, so references to the nested regions are cleared too.
+  private void deleteRegionReferences(Region region) {
+    ApplicationModelStructuralRefactoring.deleteRegion(model, region.getName());
+    for (Region nested : region.getSubRegions()) {
+      deleteRegionReferences(nested);
+    }
+  }
+
+  // The copy must not share nested Region instances with the original, now that nested rows are editable.
+  private static Region deepCopy(Region region) {
+    Region copy = new Region();
+    copy.setName(region.getName());
+    copy.setLayout(region.getLayout());
+    List<Region> nestedCopies = new ArrayList<>();
+    for (Region nested : region.getSubRegions()) {
+      nestedCopies.add(deepCopy(nested));
+    }
+    copy.setSubRegions(nestedCopies);
+    return copy;
   }
 }

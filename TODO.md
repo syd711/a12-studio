@@ -48,16 +48,15 @@ Gap review: "Form Model: gap review (2026-09-27)" in `docs/sme-reference-compari
 
 ### Document Model
 Gap review: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-6, 9, 11 done; gap 10 partly.
-- **[CLOUD] Gaps 7, 8 (round-trip only, no UI):** `IncludeConfig.includeLevel` and `ComputationConfig`/`ComputationAlternative.roundingMode` are dropped on load. Add only for lossless round-trip if a real fixture needs it (checked 2026-10-01: no fixture uses either).
 - **[SME] Gap 10 remainder:** `OPTIONAL_DATE_TYPE_INVALID`/`_RANGE_INVALID` need SME's `optionalDateType` (no a12-studio equivalent); `INTERPRETATION_OF_YEAR_INVALID`/`_MISSING` need `ModelInfo.baseYear`, which a12-studio's `ModelInfo` does not carry (a separate round-trip/UI gap). See the doc's gap 10 for what each needs.
 - **[OWNER] Number `minFractionalDigits`/`maxFractionalDigits` required-ness** (SME's `MIN_FRACT_DIGITS_MISSING`/`MAX_FRACT_DIGITS_MISSING`): deliberately not ported - a12-studio makes them optional behind a "has decimal places" checkbox, and ~43% of real Number fields in the fixtures have none. Only port after deciding to make them mandatory.
 - **[SME] Element-level `annotations` duplicate-name validation:** `AnnotationDuplicateValidator` covers header annotations only; a Document Model `Element`'s or Form Model `ScreenElement`'s own `annotations` list is uncovered.
 
 ### Type Definition Model
-- **[CLOUD] Cosmetic:** `testing/workspaces/advanced_new/models/CommonFieldDefinitions_Td.json` uses `_Td` instead of `_TDM` (hidden because that workspace disables suffix enforcement; three other fixtures reference it by id, so not worth a standalone rename).
+Nothing open.
 
 ### Relationship Models
-- **[CLOUD] Low priority:** `EntityCharacteristic.navigable`, `Multiplicity.lowerLimit`, `EntityCharacteristic.candidateConstraints` round-trip fields - unreachable from SME's editor UI, unlikely in real files (checked 2026-10-01: no fixture uses any of them).
+Nothing open.
 
 ### Composed Document Models
 - **[OWNER] Blocked on Open Decision #1:** `BindingRepeat`'s deeper heterogeneous-relationship/repetition-vs-multiplicity checks (`DescendantOfHeterogeneous(ToMany)Relationship`, `InvalidBindingRepeatRepetitionAndMultiplicity`) need kernel-backed DM expansion.
@@ -88,7 +87,7 @@ Gap review: "Content Model: gap review" in `docs/sme-reference-comparison.md`. G
 - **[LOCAL] Gap 9, `ColorRow`/`ShadowRow` setting validation** (`color-panel.fxml`, `shadow-panel.fxml`): needs CSS color/shadow syntax read out of the installed client bundle to avoid false positives.
 
 ### Application Model
-- **[CLOUD] Gap 9, only if needed:** nested subregions beyond one level have no UI (no fixture needs it).
+Nothing open.
 
 ### Master Detail Model
 All five gaps from the 2026-09-27 review are done. Nothing open.
@@ -104,6 +103,10 @@ All five gaps from the 2026-09-27 review are done. Nothing open.
 - Nothing parked at the moment.
 
 ## Won't do (decided 2026-09-19)
+
+- Relationship Model `EntityCharacteristic.navigable`/`candidateConstraints` and `Multiplicity.lowerLimit` (decided
+  2026-10-01): Relationship Model 4.0.0, the version a12-studio writes, removed them (Data Services docs,
+  "Relationship Model Version 4.0.0 - Unused Properties Removed"), so dropping them on load is correct.
 
 - AI-assisted Document Model generation (SME `documentModel/ai/*`).
 - Model diff/compare editor.
