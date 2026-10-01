@@ -128,7 +128,7 @@ public class QueryDocumentNodePanelController {
     if (referenceChecker == null) {
       return null;
     }
-    List<String> problems = referenceChecker.check(text, scopeModel);
+    List<String> problems = referenceChecker.checkAll(text, scopeModel);
     return problems.isEmpty() ? null : String.join("\n", problems);
   }
 

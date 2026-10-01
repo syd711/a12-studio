@@ -1616,13 +1616,26 @@ diagnostics (the emitter still does no type checking either):
   `indexed = false` check *is* possible - it is done for the filter expression now. The **field projection**
   (`fields[]`, `QueryFieldReferenceValidator`) still does not reject non-indexed fields; not changed here.
 
-**Still remaining**: type checking of a filter expression (operator/value vs. field type, enumeration values -
-SME 2007-2019/2035). Confirmed real and portable (re-investigated 2026-09-30, corrected an initial wrong
-"no SME recipe" finding from searching the wrong directory) but large: SME's own implementation is a genuine
-type-checking compiler pass (`moduleSupport/qmm/src/internal/compiler/{checker,binder,functions}.ts` +
-`base/type-system.ts`, ~4,300 lines across the compiler+utils subset, with real function-signature overload
-resolution) - needs its own dedicated, multi-file pass, not a quick addition; see "Query Model" in TODO.md.
-"Did you mean" suggestions are done, see above. Aggregation is unchanged from the plan below.
+**Filter type checking, done 2026-10-01** (was: "Still remaining", SME 2000-2038). `QueryFilterTypeChecker`
+(`a12-studio-models-validation`, `validators/query`, with `QlTypes`/`QlFunctions`/`QlStrings`/`QlDiagnostic`) is a port of
+SME's `moduleSupport/qmm` binder, checker, `functions.ts` and `base/type-system.ts`; `QueryLanguageTree` (`a12-studio-models`,
+`ql`) is the `parser.ts` equivalent over the existing ANTLR grammar (operators become `Equal`/`And`/`Not`... calls, ranges are
+code-point indexes). It reports unknown functions, argument counts, the best overload mismatch (greedy list matching for
+`And`/`Or`/`Match`, field-first mismatch heuristics, match scores), value-vs-field-type (`Equal` needs `Number | Null` for a
+number field, ...), number ranges/integers, `Date`/`Time`/`DateFragment` validity (impossible days, month names, fragment
+format vs. the field's `formatOfFragment`), `InRange`/`DateRange` bounds in order, enumeration values the field declares
+("do you mean ..."), `Has(...)` arguments, and empty string literals. Like SME it reports binding problems alone and
+type findings only for a filter that binds. `QueryFilterReferenceChecker#checkAll` = its own `check` (unchanged wording) and,
+only when that is clean, the type findings; the Query validators and the Query editor's per-keystroke check call `checkAll`
+(messages `validation.queryFilterType.<code>`, English = SME's text, German added). Verified against SME itself:
+`QueryFilterTypeCheckerGoldenTest` replays all 11,520 syntax-error-free entries of SME's `checker/*.snap` snapshots (messages
+**and** source ranges) and the inline snapshots of the has/match/logical/checker tests against SME's test workspace
+(`resources/workspace/models`, `Team_DM`), skipped when the SME checkout is absent (`SME_QMM_DIR`/`sme.qmm.dir`);
+`QueryFilterTypeCheckerTest` keeps one case per kind where the build always sees it. Differences: a framework `__meta` field
+is untyped (matches any field requirement, as the reference checker already skips its resolution); custom field types and
+unspecified types are untyped too; a field's type is its type-definition-resolved type. Not done: the editor-side helpers of
+the same SME package (completion/inlay hints/hover) - separate feature.
+"Did you mean" suggestions for unresolved paths are done, see above. Aggregation is unchanged from the plan below.
 
 **Status (2026-09-20): reference/rename tracking done** (was: only the root's `fields`/`sort`/`constraint`/filter were
 followed, and a dangling target was an empty tree). Three parts:

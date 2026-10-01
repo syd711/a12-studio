@@ -49,6 +49,8 @@ import java.util.stream.Collectors;
  * reported here - see {@link QueryFilterDefinitionSyntaxValidator}. Shared by that validator's semantic sibling
  * {@link QueryFilterDefinitionReferenceValidator} and the Query editor's per-keystroke filter check.
  *
+ * <p>Type checking (see {@link #checkAll}) is {@link QueryFilterTypeChecker}'s job; this class stays on existence.
+ *
  * <p>Instances cache one {@link ElementIndex} per Document Model, so create one per validation run (or per editor
  * load), not per keystroke.
  */
@@ -87,8 +89,24 @@ public final class QueryFilterReferenceChecker {
   private final Models models;
   private final Map<String, ElementIndex> indexes = new HashMap<>();
 
+  private final QueryFilterTypeChecker typeChecker;
+
   public QueryFilterReferenceChecker(Models models) {
     this.models = models;
+    this.typeChecker = new QueryFilterTypeChecker(models);
+  }
+
+  /**
+   * {@link #check} and, only if that finds nothing, the findings of {@link QueryFilterTypeChecker} (function
+   * names, argument counts and types, value ranges, enumeration values, ...) - SME reports binding problems
+   * without any type findings too. What the Query editor and the Query validators show.
+   */
+  public List<String> checkAll(String filterDefinition, DocumentModel scopeModel) {
+    List<String> references = check(filterDefinition, scopeModel);
+    if (!references.isEmpty()) {
+      return references;
+    }
+    return typeChecker.check(filterDefinition, scopeModel).stream().map(QlDiagnostic::message).toList();
   }
 
   /**
@@ -196,7 +214,7 @@ public final class QueryFilterReferenceChecker {
   /** Every role for a self-referencing relationship (one Document Model plays all roles), otherwise the roles
    * played by a Document Model other than {@code currentDocumentModelId} - SME's {@code
    * Resolver.getExpectedTargetRoles}. */
-  private static List<String> expectedTargetRoles(List<EntityCharacteristic> characteristics, String currentDocumentModelId) {
+  static List<String> expectedTargetRoles(List<EntityCharacteristic> characteristics, String currentDocumentModelId) {
     Set<String> documentModelIds = new HashSet<>();
     characteristics.forEach(characteristic -> documentModelIds.add(characteristic.getDocumentModel()));
     boolean selfReference = documentModelIds.size() == 1;
@@ -212,7 +230,7 @@ public final class QueryFilterReferenceChecker {
    * distance to {@code invalidPath} ascending, the closest {@value #MAX_SUGGESTED_FIELDS} kept - no distance
    * threshold, matching SME exactly (even a wildly dissimilar path still gets its closest matches suggested).
    */
-  private static List<String> bestMatchFieldPaths(ElementIndex index, String invalidPath) {
+  static List<String> bestMatchFieldPaths(ElementIndex index, String invalidPath) {
     return index.allElements().stream()
         .filter(FieldElement.class::isInstance)
         .filter(element -> !isNotIndexed(element))

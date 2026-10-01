@@ -64,7 +64,7 @@ Nothing open.
 - **[OWNER] Kernel-backed preview:** the new Preview tab shows only the addition-only merge (`CombinedDocumentModelElements.resolveForFieldReferences`). Selection/Decoration steps and real semantic join are not reflected - needs Open Decision #1.
 
 ### Query Model
-- **[SME] Filter expression type/enum-value checking:** a real, large feature. SME's `moduleSupport/qmm` has a type-checking compiler pass (`internal/compiler/{checker,binder,functions}.ts`, `base/type-system.ts`, `base/resolver.ts`; ~4,300 lines) with a function-signature registry and overload resolution. Needs its own dedicated multi-file pass; rebuild the registry/type system in Java and integrate with `ElementIndex`. Start from `checker.ts`'s header comment and `functions.ts`.
+- **Filter expression type/enum-value checking: done 2026-10-01** (`QueryFilterTypeChecker`, golden-tested against SME's own snapshots - see "Query Model" in `docs/sme-reference-comparison.md`). Open: nothing in the checker; the editor helpers of SME's qmm package (completion, inlay hints, hover docs) are not ported.
 - **[LOCAL] Wire shape of Query `aggregation` and of a `Has(...)` call inside `filterDefinition`** never checked against a real SME file (see Blocked).
 - Note: the Model Tree tab's root DM is picked in the Settings tab, not through an ER-diagram picker like SME (by design).
 

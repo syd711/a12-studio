@@ -33,7 +33,7 @@ public final class QueryFilterDefinitionReferenceValidator implements ModelValid
     QueryFilterReferenceChecker checker = new QueryFilterReferenceChecker(models);
     List<ModelValidationError> errors = new ArrayList<>();
 
-    report(model, ELEMENT_ID, checker.check(queryModel.getContent().getFilterDefinition(),
+    report(model, ELEMENT_ID, checker.checkAll(queryModel.getContent().getFilterDefinition(),
         QueryElementResolution.targetDocumentModel(queryModel, context)), errors);
     for (QueryLink link : queryModel.getContent().getLinks()) {
       validateLink(model, link, models, checker, errors);
@@ -44,7 +44,7 @@ public final class QueryFilterDefinitionReferenceValidator implements ModelValid
   private void validateLink(A12Model<?> model, QueryLink link, QueryFilterReferenceChecker.Models models,
       QueryFilterReferenceChecker checker, List<ModelValidationError> errors) {
     DocumentModel linkedDocumentModel = models.roleDocumentModel(link.getRelationshipModel(), link.getTargetRole());
-    report(model, LINK_ELEMENT_ID, checker.check(link.getFilterDefinition(), linkedDocumentModel), errors);
+    report(model, LINK_ELEMENT_ID, checker.checkAll(link.getFilterDefinition(), linkedDocumentModel), errors);
     for (QueryLink nested : link.getLinks()) {
       validateLink(model, nested, models, checker, errors);
     }
