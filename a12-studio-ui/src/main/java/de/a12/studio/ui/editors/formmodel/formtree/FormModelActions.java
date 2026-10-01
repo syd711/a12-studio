@@ -349,7 +349,22 @@ class FormModelActions {
 
   void confirmAndDelete(@NonNull FormElementViewModel item) {
     boolean hasChildren = !item.getChildren().isEmpty();
-    String help = hasChildren ? StudioBundle.get("form_model_tree.delete_confirm_help") : null;
+    List<String> references = affectedReferences(item);
+    StringBuilder helpText = new StringBuilder();
+    if (hasChildren) {
+      helpText.append(StudioBundle.get("form_model_tree.delete_confirm_help"));
+    }
+    if (!references.isEmpty()) {
+      if (helpText.length() > 0) {
+        helpText.append("\n\n");
+      }
+      helpText.append(StudioBundle.get("form_model_tree.delete_confirm_references"));
+      references.stream().limit(MAX_LISTED_REFERENCES).forEach(line -> helpText.append("\n \u2022 ").append(line));
+      if (references.size() > MAX_LISTED_REFERENCES) {
+        helpText.append("\n ").append(StudioBundle.get("form_model_tree.delete_confirm_more", references.size() - MAX_LISTED_REFERENCES));
+      }
+    }
+    String help = helpText.length() > 0 ? helpText.toString() : null;
     Optional<ButtonType> result = WidgetFactory.showConfirmation(Studio.stage,
         StudioBundle.get("delete_the_selected_element_s_confirm"), help, null, StudioBundle.get("delete"));
     if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -363,6 +378,58 @@ class FormModelActions {
       commandStack.execute(command);
     }
     onModelChanged.accept(null);
+  }
+
+  private static final int MAX_LISTED_REFERENCES = 10;
+
+  /**
+   * What else a delete of {@code item} takes with it, so the confirmation can say so instead of doing it silently
+   * (SME shows its refactoring dialog here): the navigation buttons that target a deleted screen and the entries
+   * other Controls hold in {@code dependentControls} for a deleted screen element - see {@link
+   * #removeNavigationButtonsTargeting} and {@link #createRemoveCommand}, which do the actual cleanup.
+   */
+  List<String> affectedReferences(@NonNull FormElementViewModel item) {
+    List<String> lines = new ArrayList<>();
+    if (item.getNode() instanceof Screen screen && screen.getId() != null) {
+      List<HeaderFooterBox> boxes = new ArrayList<>();
+      boxes.add(content.getSubHeaderBox());
+      boxes.add(content.getFooterBox());
+      for (Screen other : content.getScreens()) {
+        boxes.add(other.getSubHeaderBox());
+        boxes.add(other.getFooterBox());
+      }
+      for (HeaderFooterBox box : boxes) {
+        if (box == null) {
+          continue;
+        }
+        for (ButtonGroup group : java.util.Arrays.asList(box.getMajorButtons(), box.getMinorButtons())) {
+          if (group == null) {
+            continue;
+          }
+          for (Button button : group.getButton()) {
+            if (button instanceof NavigationButton navigationButton && screen.getId().equals(navigationButton.getTarget())) {
+              lines.add(StudioBundle.get("form_model_tree.delete_ref_navigation_button",
+                  button.getName() != null && !button.getName().isBlank() ? button.getName() : button.getId()));
+            }
+          }
+        }
+      }
+    }
+    Set<String> removedIds = new HashSet<>();
+    FormModelWalker.find(item.getNode(), ScreenElement.class, node -> true).forEach(element -> removedIds.add(element.getId()));
+    removedIds.remove(null);
+    if (!removedIds.isEmpty()) {
+      for (Control control : FormModelWalker.find(content, Control.class)) {
+        if (control.getDependentControls() == null) {
+          continue;
+        }
+        long entries = control.getDependentControls().getScreenElement().stream().filter(entry -> removedIds.contains(entry.getIdref())).count();
+        if (entries > 0 && !FormModelWalker.find(item.getNode(), Control.class, node -> node == control).contains(control)) {
+          lines.add(StudioBundle.get("form_model_tree.delete_ref_dependency", control.getElementRef() != null ? control.getElementRef() : control.getId(), entries));
+        }
+      }
+    }
+    return lines;
   }
 
   /**

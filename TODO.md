@@ -43,7 +43,7 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 
 ### Form Model
 Gap review: "Form Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-9 done (gap 8: `PreprocessingSettingsPanelController`, 2026-10-01; compiled and tests green, but not looked at on a real display).
-- **[SME] Interactive Commit/Edit/Delete refactoring dialog** SME shows when deleting a Screen/Control that is referenced elsewhere. a12-studio only reports the dangling reference afterwards as a validation error. Cross-cutting (same gap for the Application Model) - fix together, not as a Form-Model-only patch.
+- **Interactive Commit/Edit/Delete refactoring dialog (partly done 2026-10-01):** deleting a Form Model node already cleaned up its navigation buttons and `dependentControls` entries silently; the delete confirmation now lists them (`FormModelActions#affectedReferences`), so the user knows what goes. Still open: SME's per-reference choice (keep/edit instead of delete) and references from *other* models (e.g. Application Model entries pointing at a deleted Screen/Control) - a12-studio only reports those afterwards as validation errors. Cross-cutting with the Application Model, needs a design decision.
 
 ### Document Model
 Gap review: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-6 and 9-11 done (gap 10's `OPTIONAL_DATE_*` rules do not port - a12-studio has no `optionalDateType`; `INTERPRETATION_OF_YEAR_INVALID` done 2026-10-01 with `ModelInfo.baseYear`; `_MISSING` not ported, its legacy `DD.MM-DD.MM` format name can't occur).
