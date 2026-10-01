@@ -6,7 +6,10 @@ import de.a12.studio.models.A12Model;
 import de.a12.studio.models.Annotation;
 import de.a12.studio.models.ModelType;
 import de.a12.studio.models.documentmodel.Element;
+import de.a12.studio.models.projects.settings.annotations.A12ReservedAnnotations;
+import de.a12.studio.models.projects.settings.annotations.AnnotationDataSet;
 import de.a12.studio.models.projects.settings.annotations.AnnotationFieldRegistry;
+import de.a12.studio.models.projects.settings.annotations.AnnotationModelSet;
 import de.a12.studio.models.projects.settings.annotations.AnnotationHeaderRegistry;
 import de.a12.studio.models.projects.ProjectItem;
 import de.a12.studio.ui.Studio;
@@ -20,6 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -28,9 +32,12 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -52,6 +59,8 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
 
   // Internal form-engine bookkeeping annotation, not meant to be user-editable; never shown here.
   private static final String BINDING_CONFIGURATION_ANNOTATION_NAME = "bindingConfiguration";
+
+  private static final String A12_SOURCE = "A12";
 
   @FXML
   private GridPane annotationsGrid;
@@ -216,6 +225,7 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     nameField.setId("annotationName-" + index);
     nameField.setEditable(true);
     nameField.setMaxWidth(Double.MAX_VALUE);
+    nameField.setCellFactory(listView -> new AnnotationNameCell());
     nameField.getItems().setAll(suggestedNames);
     setFieldValue(nameField, annotation.getName());
 
@@ -324,6 +334,64 @@ public class AnnotationsPanelController extends AbstractPropertyEditor {
     HBox actionsBox = new HBox(4.0, moveButtonsBox, copyButton, deleteButton);
     actionsBox.setAlignment(Pos.CENTER_LEFT);
     return actionsBox;
+  }
+
+  /**
+   * Where a suggested annotation name comes from: "A12" for platform-reserved names, otherwise the names of the
+   * project's annotation data sets containing it (current model type preferred, then any model type of the same
+   * header/field kind). {@code null} for a name that is only used in the project itself.
+   */
+  private String resolveSource(String name) {
+    if (A12ReservedAnnotations.isReserved(name)) {
+      return A12_SOURCE;
+    }
+    String modelTypeKey = currentModelType == null ? null : currentModelType.name();
+    List<AnnotationDataSet> dataSets = Studio.getCurrentProject().getSettings().getAnnotationSettings().getDataSets();
+    Set<String> exactMatches = new LinkedHashSet<>();
+    Set<String> otherMatches = new LinkedHashSet<>();
+    for (AnnotationDataSet dataSet : dataSets) {
+      Map<String, AnnotationModelSet> modelSets = model != null
+          ? dataSet.getHeaderSet().getModelTypes()
+          : dataSet.getFieldSet().getModelTypes();
+      for (Map.Entry<String, AnnotationModelSet> entry : modelSets.entrySet()) {
+        if (entry.getValue() != null && entry.getValue().getValues().containsKey(name)) {
+          (Objects.equals(entry.getKey(), modelTypeKey) ? exactMatches : otherMatches).add(dataSet.getName());
+        }
+      }
+    }
+    Set<String> matches = exactMatches.isEmpty() ? otherMatches : exactMatches;
+    return matches.isEmpty() ? null : String.join(", ", matches);
+  }
+
+  /**
+   * Popup cell: the annotation name with its source ({@link #resolveSource}) as a muted second line.
+   */
+  private final class AnnotationNameCell extends ListCell<String> {
+    private final Label nameLabel = new Label();
+    private final Label sourceLabel = new Label();
+    private final VBox box = new VBox(nameLabel, sourceLabel);
+
+    AnnotationNameCell() {
+      nameLabel.getStyleClass().add("annotation-name-label");
+      sourceLabel.getStyleClass().add("annotation-source-label");
+    }
+
+    @Override
+    protected void updateItem(String item, boolean empty) {
+      super.updateItem(item, empty);
+      setText(null);
+      if (empty || item == null) {
+        setGraphic(null);
+        return;
+      }
+      nameLabel.setText(item);
+      String source = resolveSource(item);
+      boolean hasSource = source != null;
+      sourceLabel.setText(hasSource ? StudioBundle.get("annotations_panel.source", source) : null);
+      sourceLabel.setVisible(hasSource);
+      sourceLabel.setManaged(hasSource);
+      setGraphic(box);
+    }
   }
 
   private void moveRow(int fromIndex, int toIndex) {
