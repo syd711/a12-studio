@@ -1,0 +1,25 @@
+{
+  "header": {
+    "modelType": "selection",
+    "modelVersion": "2.0.0",
+    "id": "PersonGroups_Se",
+    "annotations": []
+  },
+  "content": {
+    "Data": {
+      "Default": "Unselected",
+      "Selected": [
+        {
+          "path": "/Person/Photo"
+        }
+      ],
+      "Unselected": []
+    },
+    "Computation": {
+      "Default": "Unselected"
+    },
+    "Validation": {
+      "Default": "Unselected"
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "header": {
+    "id": "PersonGroups_Cm",
+    "modelType": "combination",
+    "modelVersion": "1.0.0",
+    "locales": [
+      {
+        "code": "en"
+      },
+      {
+        "code": "de"
+      }
+    ],
+    "labels": [],
+    "annotations": [
+      {
+        "name": "roles",
+        "value": "tester,reviewer"
+      }
+    ],
+    "modelReferences": [
+      {
+        "modelType": "document",
+        "purpose": "combination-base",
+        "reference": "Person_Dc"
+      },
+      {
+        "modelType": "selection",
+        "purpose": "combination-selection",
+        "reference": "PersonGroups_Se"
+      },
+      {
+        "modelType": "document",
+        "purpose": "combination-decoration",
+        "reference": "PersonGroups_Dc"
+      }
+    ]
+  },
+  "content": {
+    "baseModelId": "Person_Dc",
+    "CombinationSteps": [
+      {
+        "type": "DecorationForGroups",
+        "SelectionModel": {
+          "smId": "PersonGroups_Se"
+        },
+        "DecorationModel": {
+          "dmId": "PersonGroups_Dc"
+        }
+      }
+    ]
+  }
+}

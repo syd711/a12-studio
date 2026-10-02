@@ -26,14 +26,15 @@ import tools.jackson.databind.node.ObjectNode;
  * <p>{@code PersonSkills_Selection_Cm} (a Selection-only variant of the workspace's decoration combination) and
  * {@code PersonEmployeeFreelancer_Cm} (the Employee and the Freelancer addition in one combination) and
  * {@code PersonOverwrite_Cm} (an additive model that redefines the reference field {@code FirstName} with another label; SME and the kernel both
- * keep the reference's definition) live
+ * keep the reference's definition) and
+ * {@code PersonGroups_Cm} (a DecorationForGroups step, with its own selection and decoration models) live
  * in the test resources because {@code testing/workspaces} is also the round-trip fixture set.
  */
 class KernelCombinationParityTest {
 
   /** Combinations that live in the test resources instead of {@code testing/workspaces}. */
   private static final List<String> FIXTURES = List.of("PersonSkills_Selection_Cm", "PersonEmployeeFreelancer_Cm",
-      "PersonOverwrite_Cm", "PersonOverwrite_Ad");
+      "PersonOverwrite_Cm", "PersonOverwrite_Ad", "PersonGroups_Cm", "PersonGroups_Se", "PersonGroups_Dc");
 
   private static final ObjectMapper MAPPER = JsonMapper.builder().build();
 
@@ -44,7 +45,8 @@ class KernelCombinationParityTest {
       "PersonSkills_Selection_Cm",   // Selection
       "PersonSkills_LinkFields_Cm",  // DecorationForFields (selection + decoration model)
       "PersonEmployeeFreelancer_Cm", // two Addition steps in one combination
-      "PersonOverwrite_Cm"           // an additive model that redefines a reference field
+      "PersonOverwrite_Cm",          // an additive model that redefines a reference field
+      "PersonGroups_Cm"              // DecorationForGroups (selected group Person/Photo gets a PhotoNote sibling)
   })
   void kernelExpansionMatchesSme(String combinationId) throws IOException {
     JsonNode golden = resource("/sme-combination-golden/" + combinationId + ".json");
