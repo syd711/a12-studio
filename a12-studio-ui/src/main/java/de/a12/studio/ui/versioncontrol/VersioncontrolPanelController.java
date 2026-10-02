@@ -48,10 +48,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -129,6 +131,8 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
   /** File whose history is shown; {@code null} shows the history of the whole project. */
   private File historyScope;
   private boolean updatingCommitMessageField = false;
+  /** True while checkbox state is being propagated programmatically, so the checkbox listeners don't re-enter. */
+  private boolean propagatingChecks = false;
 
   private Consumer<Boolean> historyVisibilityCallback;
   private Runnable collapseProjectViewCallback;
@@ -189,24 +193,42 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       private final Label nameLabel = new Label();
       private final HBox graphic = new HBox(4, checkBox, nameLabel);
       private final ContextMenu fileMenu = createFileContextMenu(this::getItem);
+      private SimpleBooleanProperty boundProp;
+      private final javafx.beans.value.ChangeListener<Boolean> boundListener = (o, ov, nv) -> {
+        boolean wasPropagating = propagatingChecks;
+        propagatingChecks = true;
+        try {
+          checkBox.setSelected(nv);
+        }
+        finally {
+          propagatingChecks = wasPropagating;
+        }
+      };
 
       {
         nameLabel.getStyleClass().add("tree-cell-name-label");
         checkBox.setFocusTraversable(false);
         graphic.setAlignment(Pos.CENTER_LEFT);
         checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
-          if (isEmpty() || getTreeItem() == null) {
+          if (propagatingChecks || isEmpty() || getTreeItem() == null) {
             return;
           }
-          setCheckedRecursive(getTreeItem(), newVal);
-          if (newVal && getTreeItem().getParent() == changesTree.getRoot()) {
-            // Checking one of the two top-level nodes (project / rest of the repository) clears the other one.
-            for (TreeItem<VersioncontrolTreeNode> otherRoot : changesTree.getRoot().getChildren()) {
-              if (otherRoot != getTreeItem()) {
-                setCheckedRecursive(otherRoot, false);
+          propagatingChecks = true;
+          try {
+            setCheckedRecursive(getTreeItem(), newVal);
+            if (newVal && getTreeItem().getParent() == changesTree.getRoot()) {
+              // Checking one of the two top-level nodes (project / rest of the repository) clears the other one.
+              for (TreeItem<VersioncontrolTreeNode> otherRoot : changesTree.getRoot().getChildren()) {
+                if (otherRoot != getTreeItem()) {
+                  setCheckedRecursive(otherRoot, false);
+                }
               }
             }
           }
+          finally {
+            propagatingChecks = false;
+          }
+          // Visible cells of the toggled nodes follow their property via the listener installed in updateItem.
           updateActionButtons();
         });
       }
@@ -215,15 +237,29 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       protected void updateItem(VersioncontrolTreeNode node, boolean empty) {
         super.updateItem(node, empty);
         if (empty || node == null) {
+          if (boundProp != null) {
+            boundProp.removeListener(boundListener);
+            boundProp = null;
+          }
           setGraphic(null);
           setContextMenu(null);
           return;
         }
         setContextMenu(node.isFolder() ? null : fileMenu);
         SimpleBooleanProperty prop = checkedByPath.computeIfAbsent(node.getRelativePath(), p -> new SimpleBooleanProperty(false));
-        checkBox.selectedProperty().unbind();
-        checkBox.setSelected(prop.get());
-        prop.addListener((o, ov, nv) -> checkBox.setSelected(nv));
+        if (boundProp != null) {
+          boundProp.removeListener(boundListener);
+        }
+        boundProp = prop;
+        boolean wasPropagating = propagatingChecks;
+        propagatingChecks = true;
+        try {
+          checkBox.setSelected(prop.get());
+        }
+        finally {
+          propagatingChecks = wasPropagating;
+        }
+        prop.addListener(boundListener);
 
         nameLabel.setText(node.getDisplayName());
         nameLabel.getStyleClass().removeAll("git-new", "git-changed");
@@ -396,12 +432,12 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       return;
     }
     File projectFolder = project.getFolder();
-    File scope = historyScope != null ? historyScope : projectFolder;
+    File scope = historyScope;
     JFXFuture.supplyAsync(() -> {
           try {
             return new RefreshResult(gitService.getChangedProjectFiles(projectFolder),
                 gitService.getChangedFilesOutsideProject(projectFolder), gitService.getBranchStatus(),
-                gitService.getStashes(), gitService.getHistory(scope, HISTORY_LIMIT));
+                gitService.getStashes(), scope == null ? List.<GitCommitInfo>of() : gitService.getHistory(scope, HISTORY_LIMIT));
           }
           catch (GitAPIException | IOException e) {
             throw new RuntimeException(e);
@@ -476,7 +512,20 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
         hiddenRoot.getChildren().add(buildTree(StudioBundle.get("versioncontrol_outside_project"), OUTSIDE_FOLDER_KEY_PREFIX,
             outsideFiles, repoPath));
       }
+      // New folders start expanded, but folders the user collapsed stay collapsed across refreshes
+      // (e.g. when showing a file's history).
+      Set<String> collapsedFolders = new HashSet<>();
+      collectCollapsedFolders(changesTree.getRoot(), collapsedFolders);
       setExpandedRecursive(hiddenRoot, true);
+      restoreCollapsedFolders(hiddenRoot, collapsedFolders);
+      // The non-model changes node starts collapsed; once it's in the tree, the user's choice sticks.
+      boolean outsideNodeShown = changesTree.getRoot() != null && changesTree.getRoot().getChildren().stream()
+          .anyMatch(c -> c.getValue() != null && OUTSIDE_FOLDER_KEY_PREFIX.equals(c.getValue().getRelativePath()));
+      if (!outsideNodeShown) {
+        hiddenRoot.getChildren().stream()
+            .filter(c -> c.getValue() != null && OUTSIDE_FOLDER_KEY_PREFIX.equals(c.getValue().getRelativePath()))
+            .forEach(c -> c.setExpanded(false));
+      }
       setTreeRoot(hiddenRoot);
     }
     updateActionButtons();
@@ -537,6 +586,29 @@ public class VersioncontrolPanelController implements Initializable, StudioEvent
       parent.getChildren().add(new TreeItem<>(VersioncontrolTreeNode.leaf(file)));
     }
     return root;
+  }
+
+  private void collectCollapsedFolders(TreeItem<VersioncontrolTreeNode> item, Set<String> collapsed) {
+    if (item == null) {
+      return;
+    }
+    VersioncontrolTreeNode node = item.getValue();
+    if (node != null && node.isFolder() && !item.isExpanded()) {
+      collapsed.add(node.getRelativePath());
+    }
+    for (TreeItem<VersioncontrolTreeNode> child : item.getChildren()) {
+      collectCollapsedFolders(child, collapsed);
+    }
+  }
+
+  private void restoreCollapsedFolders(TreeItem<VersioncontrolTreeNode> item, Set<String> collapsed) {
+    VersioncontrolTreeNode node = item.getValue();
+    if (node != null && node.isFolder() && collapsed.contains(node.getRelativePath())) {
+      item.setExpanded(false);
+    }
+    for (TreeItem<VersioncontrolTreeNode> child : item.getChildren()) {
+      restoreCollapsedFolders(child, collapsed);
+    }
   }
 
   private void setExpandedRecursive(TreeItem<VersioncontrolTreeNode> item, boolean expanded) {

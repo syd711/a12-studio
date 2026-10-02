@@ -64,6 +64,37 @@
     -fx-padding: 0 0 0 4px;
 }
 
+/*
+ * SplitMenuButton variant: its ".label" part (which hosts the graphic) and ".arrow-button" part each carry an
+ * opaque modena background and the label its own padding/min-width, which squeezes or paints over a graphic-only
+ * icon. Make both transparent so the .default-button background shows through and the icon stays visible.
+ */
+.split-menu-button.default-button {
+    -fx-padding: 0;
+    -fx-min-width: 62px;
+    -fx-pref-width: 62px;
+}
+
+.split-menu-button.default-button > .label {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-alignment: center;
+    -fx-content-display: graphic-only;
+}
+
+.split-menu-button.default-button > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 8px;
+    -fx-pref-width: 24px;
+    -fx-min-width: 24px;
+    -fx-max-width: 24px;
+}
+
+.split-menu-button.default-button .button-icon {
+    -fx-icon-color: #000000 !important;
+    -fx-fill: #000000 !important;
+}
+
 .default-button:hover, .action-button:hover {
     -fx-background-color: derive(-fx-panel-color, -6%);
 }
@@ -81,6 +112,19 @@
     -fx-pref-height: 17px;
     -fx-min-height: 17px;
     -fx-max-height: 17px;
+}
+
+/** Small round variant of .default-button (e.g. a close "x" next to a label). */
+.small-button {
+    -fx-pref-width: 20px;
+    -fx-min-width: 20px;
+    -fx-max-width: 20px;
+    -fx-pref-height: 20px;
+    -fx-min-height: 20px;
+    -fx-max-height: 20px;
+    -fx-padding: 0;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
 }
 
 /*

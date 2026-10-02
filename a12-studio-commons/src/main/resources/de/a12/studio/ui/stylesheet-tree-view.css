@@ -350,10 +350,12 @@
  */
 .tree-cell-name-label.git-new {
     -fx-text-fill: -fx-change-new-bg;
+    -fx-font-weight: 700;
 }
 
 .tree-cell-name-label.git-changed {
     -fx-text-fill: -fx-change-bg;
+    -fx-font-weight: 700;
 }
 
 /*
@@ -523,7 +525,7 @@
     -fx-border-width: 0 0 1 0;
 }
 
-.versioncontrol-branch-label {
+.outliner-headline {
     -fx-font-weight: bold;
 }
 

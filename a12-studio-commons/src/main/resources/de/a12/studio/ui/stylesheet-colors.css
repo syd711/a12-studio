@@ -74,9 +74,9 @@
     -fx-success-bg: #2E9C3F;
 
     /* Outgoing (uncommitted) git change */
-    -fx-change-bg: #1F4FB0;
+    -fx-change-bg: #2F6BFF;
     /* Newly added (untracked) git file */
-    -fx-change-new-bg: #1B7A2B;
+    -fx-change-new-bg: #2E9C3F;
 
     /* Fixed-structure elements (children of attachment/multi-select groups) -
        soft, low-saturation tint distinguishing them from regular, freely editable elements. */

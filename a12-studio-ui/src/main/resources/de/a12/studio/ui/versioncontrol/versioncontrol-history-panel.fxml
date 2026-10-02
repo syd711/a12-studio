@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
@@ -16,17 +17,29 @@
         <ToolBar BorderPane.alignment="CENTER">
             <items>
                 <FontIcon iconLiteral="mdi2h-history" iconSize="16" styleClass="toolbar-icon" />
-                <Label text="%versioncontrol_history" />
+               <Label styleClass="outliner-headline" text="%versioncontrol_history">
+                    <HBox.margin>
+                        <Insets right="6.0" />
+                    </HBox.margin>
+                </Label>
                 <Label fx:id="historyScopeLabel" styleClass="versioncontrol-history-scope" />
-                <Button fx:id="clearHistoryScopeButton" accessibleText="%versioncontrol_history_show_all" mnemonicParsing="false" onAction="#onClearHistoryScope" styleClass="default-button">
+                <Button fx:id="clearHistoryScopeButton" accessibleText="%versioncontrol_history_show_all" mnemonicParsing="false" onAction="#onClearHistoryScope" styleClass="default-button, small-button">
                     <graphic>
-                        <FontIcon iconLiteral="mdi2c-close" iconSize="14" styleClass="toolbar-icon" />
+                        <FontIcon iconLiteral="mdi2c-close" iconSize="12" styleClass="toolbar-icon" />
                     </graphic>
                     <tooltip>
                         <Tooltip text="%versioncontrol_history_show_all" />
                     </tooltip>
                 </Button>
                 <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="restoreVersionButton" accessibleText="%versioncontrol_history_restore_tooltip" disable="true" mnemonicParsing="false" onAction="#onRestoreVersion" styleClass="default-button">
+                    <graphic>
+                        <FontIcon iconLiteral="mdi2u-undo" iconSize="18" styleClass="toolbar-icon" />
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%versioncontrol_history_restore_tooltip" />
+                    </tooltip>
+                </Button>
                 <Button fx:id="collapseHistoryButton" accessibleText="%versioncontrol_history_collapse" mnemonicParsing="false" onAction="#onCollapseHistory" styleClass="default-button">
                     <graphic>
                         <FontIcon iconLiteral="mdi2w-window-minimize" iconSize="18" styleClass="toolbar-icon" />

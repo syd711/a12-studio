@@ -35,6 +35,9 @@ public class VersioncontrolHistoryPanelController implements Initializable {
   private Button clearHistoryScopeButton;
 
   @FXML
+  private Button restoreVersionButton;
+
+  @FXML
   private TableView<GitCommitInfo> historyTable;
 
   @FXML
@@ -83,7 +86,22 @@ public class VersioncontrolHistoryPanelController implements Initializable {
         });
       }
     });
+    historyTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updateRestoreButton());
     setScope(null);
+  }
+
+  /** Restoring needs one chosen commit and a single scoped file (see the row context menu). */
+  private void updateRestoreButton() {
+    restoreVersionButton.setDisable(historyTable.getSelectionModel().getSelectedItem() == null
+        || scope == null || scope.isDirectory());
+  }
+
+  @FXML
+  private void onRestoreVersion() {
+    GitCommitInfo commit = historyTable.getSelectionModel().getSelectedItem();
+    if (commit != null && onRestore != null && scope != null) {
+      onRestore.accept(scope, commit);
+    }
   }
 
   /** Called when the user clears the file scope via the toolbar button. */
@@ -112,6 +130,9 @@ public class VersioncontrolHistoryPanelController implements Initializable {
     clearHistoryScopeButton.setManaged(scoped);
     historyScopeLabel.setText(scoped ? scope.getName() : "");
     historyScopeLabel.setTooltip(scoped ? WidgetFactory.createTooltip(scope.getAbsolutePath()) : null);
+    historyTable.setPlaceholder(new Label(StudioBundle.get(
+        scoped ? "versioncontrol_history_empty" : "versioncontrol_history_no_file")));
+    updateRestoreButton();
   }
 
   /** Called when the user hides the history via the toolbar's collapse button. */

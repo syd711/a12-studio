@@ -43,7 +43,7 @@
                     <Separator orientation="VERTICAL" />
                     <SplitMenuButton fx:id="pullButton" accessibleText="%versioncontrol_pull" mnemonicParsing="false" onAction="#onPull" styleClass="default-button">
                         <graphic>
-                            <FontIcon iconLiteral="mdi2c-cloud-download-outline" iconSize="18" styleClass="toolbar-icon" />
+                            <FontIcon iconLiteral="mdi2c-cloud-download-outline" iconSize="18" styleClass="toolbar-icon, button-icon" />
                         </graphic>
                         <items>
                             <MenuItem mnemonicParsing="false" onAction="#onPullRebase" text="%versioncontrol_pull_rebase" />
@@ -115,7 +115,7 @@
                     <children>
                         <HBox fx:id="branchBar" alignment="CENTER_LEFT" spacing="8.0" styleClass="versioncontrol-branch-bar">
                             <children>
-                                <Label fx:id="branchLabel" styleClass="versioncontrol-branch-label">
+                                <Label fx:id="branchLabel" styleClass="outliner-headline">
                                     <graphic>
                                         <FontIcon iconLiteral="mdi2s-source-branch" iconSize="16" styleClass="toolbar-icon" />
                                     </graphic>

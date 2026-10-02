@@ -550,6 +550,9 @@
                       "locale": "de",
                       "text": "error text for computation of Helper_RefreshPriceAutoComp"
                     }
+                  ],
+                  "errorCodesToSuppress": [
+                    "MVK_INVALID_COMPARE_DEC_PLACES"
                   ]
                 }
               },
