@@ -22,10 +22,8 @@ import java.util.List;
  * count for the repeat to render against. Mirrors the *reason* SME's frontend custom conditions {@code
  * DescendantOfHeterogeneousRelationship}/{@code DescendantOfHeterogeneousToManyRelationship}/{@code
  * InvalidBindingRepeatRepetitionAndMultiplicity} gate on {@code ComposedDocumentModelApi.isComposedDocumentModel(...)}.
- * Full parity with those three conditions - which also reason about heterogeneous-relationship descendants and
- * repetition-vs-multiplicity mismatches inside the CDM's precomputed schema - needs kernel-backed DM expansion
- * a12-studio doesn't have yet (see TODO.md's Open Decision #1 / {@code docs/sme-reference-comparison.md}'s
- * "Kernel dependency spike"); this validator only checks the structural precondition those conditions all share.
+ * The repetition-vs-multiplicity check lives in {@link FormBindingRepeatMultiplicityValidator}; this validator only
+ * checks the structural precondition the conditions share.
  */
 public final class FormBindingRepeatCdmRequiredValidator implements ModelValidator {
 
@@ -48,7 +46,7 @@ public final class FormBindingRepeatCdmRequiredValidator implements ModelValidat
 
   // Mirrors de.a12.studio.ui.editors.formmodel.FormModelEditorController#currentDocumentModelId - a12-studio-ui
   // isn't a dependency here, so the same header ModelReference lookup is duplicated rather than shared.
-  private static String dataBindingDocumentModelId(FormModel formModel) {
+  static String dataBindingDocumentModelId(FormModel formModel) {
     if (formModel.getModelReferences() == null) {
       return null;
     }

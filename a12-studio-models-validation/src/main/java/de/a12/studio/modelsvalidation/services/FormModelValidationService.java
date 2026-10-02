@@ -28,6 +28,8 @@ import de.a12.studio.modelsvalidation.validators.form.FormBindingComponentRefere
 import de.a12.studio.modelsvalidation.validators.form.FormBindingComponentRequiredFieldsValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingRelationshipReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingRepeatCdmRequiredValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormBindingRepeatMultiplicityValidator;
+import de.a12.studio.modelsvalidation.validators.form.FormInitialValueHeterogeneousRelationshipValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormBindingTargetRoleValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormButtonScreenReferenceValidator;
 import de.a12.studio.modelsvalidation.validators.form.FormColumnWidthValidator;
@@ -90,6 +92,8 @@ public final class FormModelValidationService {
       new FormBindingComponentReferenceValidator(),
       new FormBindingComponentRequiredFieldsValidator(),
       new FormBindingRepeatCdmRequiredValidator(),
+      new FormBindingRepeatMultiplicityValidator(),
+      new FormInitialValueHeterogeneousRelationshipValidator(),
       new FormDefaultRowActionValidator(),
       new FormStyleReferenceValidator(),
       new FormDatePickerConfigValidator(),
