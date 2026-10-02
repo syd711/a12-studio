@@ -316,13 +316,12 @@ class DocumentModelValidatorsTest {
     includedModel.setId("Included_DM");
     DocumentModelContent includedContent = new DocumentModelContent();
     includedContent.setModelRoot(new ModelRoot());
+    TypeDefinition includedType = new TypeDefinition();
+    includedType.setId("typedef_included");
+    includedType.setName("IncludedType");
+    includedType.setFieldType(new StringFieldType());
+    includedContent.setTypeDefinitions(new ArrayList<>(List.of(includedType)));
     includedModel.setContent(includedContent);
-    includedModel.setModelReferences(new ArrayList<>(List.of(importReference)));
-
-    TypeDefinition ownType = new TypeDefinition();
-    ownType.setId("typedef_own");
-    ownType.setName("OwnType");
-    ownType.setFieldType(new StringFieldType());
 
     GroupElement includeGroup = new GroupElement();
     includeGroup.setId("include_group");
@@ -339,14 +338,23 @@ class DocumentModelValidatorsTest {
     ModelRoot modelRoot = new ModelRoot();
     modelRoot.setRootGroups(List.of(includeGroup));
     modelContent.setModelRoot(modelRoot);
-    modelContent.setTypeDefinitions(new ArrayList<>(List.of(ownType)));
     model.setContent(modelContent);
+    model.setModelReferences(new ArrayList<>(List.of(importReference)));
 
     List<ModelValidationError> errors = new IncludeTypeDefinitionModeValidator()
         .validate(model, TestModels.contextWithDocumentModels(model, includedModel, importSource));
 
     assertEquals(1, errors.size());
     assertEquals("include_group", errors.get(0).elementId());
+
+    // SME sees an included model that merely imports a TDM as "none" (unexpanded), so the reverse direction -
+    // own local type definitions, included model importing - is not an error.
+    includedModel.getContent().setTypeDefinitions(new ArrayList<>());
+    includedModel.setModelReferences(new ArrayList<>(List.of(importReference)));
+    model.setModelReferences(new ArrayList<>());
+    modelContent.setTypeDefinitions(new ArrayList<>(List.of(includedType)));
+    assertEquals(0, new IncludeTypeDefinitionModeValidator()
+        .validate(model, TestModels.contextWithDocumentModels(model, includedModel, importSource)).size());
   }
 
   /**

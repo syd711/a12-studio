@@ -1815,6 +1815,8 @@ The parked / rejected list for the whole tool lives in `TODO.md` ("Won't do" and
 
 ### Overview Model: gap review (2026-09-26)
 
+**Gap 17 closed (2026-10-02):** SME's `overviewRefactoring.ts` only rewrites model references on a cross-model rename/move (header references, `queryModelReference`, `documentModelReference`, and `filterConfiguration.fields[].subModel`). a12-studio already does this via `ModelReferenceRewriter` (including `subModel`). SME has no behavior for deleting a filter field or for event/model reference cascades, so there is nothing further to port.
+
 **Status (2026-09-30): gaps 1, 2, 3, 4, 5, 6, 7, 8, 9 (partial), 10, 11, 12, 13, 14, 15, 16 (partial) closed; 16
 (remainder), 17 (partial) open.** New/changed: `FilterStringFieldsMultiSelectPanelController` gained the
 `enumeratedStringFilter.fields` list editor (String fields only, reusing `CustomSelectionOfFieldsPanelController`'s

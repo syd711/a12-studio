@@ -49,12 +49,24 @@ public final class IncludeTypeDefinitionModeValidator implements ModelValidator 
       if (included == null) {
         continue;
       }
-      if (!ownMode.isCompatibleWith(TypeDefinitionMode.modeOf(included))) {
+      if (!ownMode.isCompatibleWith(includedModeAsSeenBySme(included))) {
         errors.add(new ModelValidationError(model, groupElement.getId(), ElementProperty.INCLUDE_REFERENCE,
             ValidationMessages.get("validation.includeTypeDefinitionMode.mismatch", included.getId()), Severity.ERROR.name()));
       }
     }
     return errors;
+  }
+
+  /**
+   * SME resolves the included model's mode from the unexpanded explorer model (see {@code ioTransformation.ts}),
+   * where only its own local type definitions exist and none carries {@code source.imported}. A model that merely
+   * imports a Type Definition Model therefore counts as "none" there, never "import" - so including it from a model
+   * with local type definitions is not an error (e.g. e-commerce {@code ProductMovie_DM} including {@code
+   * Product_Common_DM}).
+   */
+  private static TypeDefinitionMode includedModeAsSeenBySme(DocumentModel included) {
+    List<?> typeDefinitions = included.getContent() == null ? null : included.getContent().getTypeDefinitions();
+    return typeDefinitions != null && !typeDefinitions.isEmpty() ? TypeDefinitionMode.LOCAL : TypeDefinitionMode.NONE;
   }
 
   /** Mirrors the strip-path-and-.json-suffix resolution the a12 kernel's reference resolver used (see

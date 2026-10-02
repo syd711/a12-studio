@@ -29,12 +29,10 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 
 ## Open issues
 
-- **[LOCAL] Regression: `testing/workspaces/basic/models/Company_OM.json`** was edited on disk after the last fix and the invalid `enumeratedStringFilter` block (no `fields`, `enableFilter: true`) is back, so `FixtureWorkspacesOverviewValidatorsTest` is red. The validator is right (SME's `fieldIdsMustBeFilled`). Owner of the fixture decides: add fields to the "Filter String Fields with Multi-Select" list, or drop the block.
-- **JavaFX tests that failed under Xvfb: all four green on a real Windows display, 2026-10-02** (`StudioTabPaneTest`, `TabPaneControllerTest`, `ContentModelEditorPanelsTest`, `TypeDefinitionTableControllerTest`). `TabPaneControllerTest`'s hang was the test's own: a one-shot `dismissAlerts()` hid only the progress dialog, not the failure alert after it; the fix polls and dismisses until the tab is dropped, with `Platform.setImplicitExit(false)` because hiding the last window otherwise shuts the toolkit down for every later test (found with a thread dump: no FX thread left). Under Xvfb still unverified.
-- **[LOCAL] `$path$` notation in error messages:** checked 2026-10-01 - SME's own source has no `$path$` handling (the only `$path` hits are Kotlin string templates); the `$...$` parameters are kernel-side. Rename/move rewriting is unit-tested. What is left is only a visual check of the UI.
+- **[LOCAL] `$path$` notation in error messages:** only a visual check of the UI is left (SME has no `$path$` handling of its own; rename/move rewriting is unit-tested).
 - **Manual UI checks (no known defect, not yet verified) - [LOCAL]** (same list applied to the Form and Document Model editors):
   - Drag and drop in general; error handling when dropping from a repeatable group into a regular group; dnd of sections with multi-select.
-  - Trigger and dependency marks on tree rows: done 2026-10-01 for the Form Model tree (`FormDependencyBadges`: "D"/"T" badge with count and tooltip, from SME's `dependencySuffix.tsx`; unit-tested, not looked at on a display). The same marks on the Document Model source tree of the Form editor (field/enumeration/group `dependent*` entries, SME's `dmDocument` case) were added the same day (`DocumentSourceTreeController#refreshDependencyMarks`, refreshed on every save of the Form Model); also not looked at on a display and without a unit test (the computation sits in the FX controller).
+  - D/T dependency marks on the Form Model tree (`FormDependencyBadges`) and on the Document Model source tree of the Form editor (`DocumentSourceTreeController#refreshDependencyMarks`, no unit test): not looked at on a display.
   - Merge the Settings and Control tabs of the field editor; dependencies are only shown for fields that have values.
   - Every combo box should offer an empty value so a selection can be reset.
   - When a rule is created, pre-fill its name from the field or group it targets.
@@ -42,13 +40,13 @@ then `./gradlew ... test`). Without `DISPLAY` every FX-toolkit test is silently 
 ## Open todos
 
 ### Form Model
-Gap review: "Form Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-9 done (gap 8: `PreprocessingSettingsPanelController`, 2026-10-01; compiled and tests green, but not looked at on a real display).
-- **Interactive Commit/Edit/Delete refactoring dialog (partly done 2026-10-01):** deleting a Form Model node already cleaned up its navigation buttons and `dependentControls` entries silently; the delete confirmation now lists them (`FormModelActions#affectedReferences`), so the user knows what goes. Still open: SME's per-reference choice (keep/edit instead of delete) and references from *other* models (e.g. Application Model entries pointing at a deleted Screen/Control) - a12-studio only reports those afterwards as validation errors. Cross-cutting with the Application Model, needs a design decision.
+Gap review: "Form Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. All gaps done; `PreprocessingSettingsPanelController` not yet looked at on a real display.
+- **Interactive Commit/Edit/Delete refactoring dialog:** the delete confirmation already lists the references it cleans up. Open: SME's per-reference choice (keep/edit instead of delete) and references from *other* models (e.g. Application Model entries pointing at a deleted Screen/Control) - a12-studio only reports those afterwards as validation errors. Cross-cutting with the Application Model, needs a design decision.
 
 ### Document Model
-Gap review: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. Gaps 1-6 and 9-11 done (gap 10's `OPTIONAL_DATE_*` rules do not port - a12-studio has no `optionalDateType`; `INTERPRETATION_OF_YEAR_INVALID` done 2026-10-01 with `ModelInfo.baseYear`; `_MISSING` not ported, its legacy `DD.MM-DD.MM` format name can't occur).
+Gap review: "Document Model: gap review (2026-09-27)" in `docs/sme-reference-comparison.md`. All gaps done or deliberately not ported.
 - **[OWNER] Number `minFractionalDigits`/`maxFractionalDigits` required-ness** (SME's `MIN_FRACT_DIGITS_MISSING`/`MAX_FRACT_DIGITS_MISSING`): deliberately not ported - a12-studio makes them optional behind a "has decimal places" checkbox, and ~43% of real Number fields in the fixtures have none. Only port after deciding to make them mandatory.
-- **[LOCAL] New fixture failure:** `FixtureWorkspacesDocumentValidatorsTest` reports `e-commerce/ProductMovie_DM.json` (`IncludeTypeDefinitionModeValidator`: included `Product_Common_DM` has a different Type Definition mode). Not caused by recent validator work; owner of the fixture decides.
+
 
 ### Type Definition Model
 Nothing open.
@@ -64,23 +62,21 @@ Nothing open.
 - **[OWNER] Kernel-backed preview:** the new Preview tab shows only the addition-only merge (`CombinedDocumentModelElements.resolveForFieldReferences`). Selection/Decoration steps and real semantic join are not reflected - needs Open Decision #1.
 
 ### Query Model
-- **Filter expression type/enum-value checking: done 2026-10-01** (`QueryFilterTypeChecker`, golden-tested against SME's own snapshots - see "Query Model" in `docs/sme-reference-comparison.md`). Open: nothing in the checker. **Completion done 2026-10-02** (`QueryFilterCompletion` + `QueryFilterSuggestionProvider`: functions, operators and values by field type, enumeration values, `Has` relationships/roles with nested scopes, `and`/`or`; not looked at on a display). Still not ported from SME's qmm editor: inlay hints, hover docs, call-stack breadcrumb.
+- Filter completion (`QueryFilterCompletion`/`QueryFilterSuggestionProvider`) is not looked at on a display. Not ported from SME's qmm editor: inlay hints, hover docs, call-stack breadcrumb.
 - **[LOCAL] Wire shape of Query `aggregation` and of a `Has(...)` call inside `filterDefinition`** never checked against a real SME file (see Blocked). Re-swept 2026-10-02: neither the repo fixtures nor the A12 2026.06 sample workspaces contain one; still unverifiable.
 - Note: the Model Tree tab's root DM is picked in the Settings tab, not through an ER-diagram picker like SME (by design).
 
 ### Form Engine preview (see "Form Engine preview" in `docs/sme-reference-comparison.md`)
-- **Ad Hoc Testing of an Additive Document Model, backend round trip: verified 2026-10-02** against the installed SME backend (`advanced_new` `PersonEmployee_Cm` + `PersonEmployee_Ad` + `Person_Dc` + `CommonFieldDefinitions_TDM`): `expandCombination` returns the expanded model, it contains the elements with the `md5(additiveId)_` prefix that `AdHocTestPreviewSession#additiveIdPrefix` predicts, and `generateAdHocTestInput` on those ids returns a reduced model and validation code (done with a throwaway test, not kept). **[LOCAL] still open:** looking at the result in the actual preview window on a display.
+- **[LOCAL] Ad Hoc Testing of an Additive Document Model:** backend round trip verified; still open is looking at the result in the actual preview window on a display.
 - **[OWNER] + [LOCAL] Theme and Data menus of the preview are empty:** offer the project's `.theme` files (`request-theme` -> `send-theme`) and sample documents (`request-document` -> `send-document`). No code reads `.theme` or `data/documents/*.json` today, no `.theme` fixture exists to verify the wire format, and whether edits made in the preview (`create-document`/`update-document`) may be saved is an open product decision.
 - **[OWNER]** Without a configured A12 installation the Form Model button falls back to the old wireframe and Ad Hoc Testing shows an error page - decide whether the fallback should say so in the studio.
 
 ### Overview Model
-Gap review: "Overview Model: gap review" in `docs/sme-reference-comparison.md`. Gaps 1-16 done, 17 partial.
-- **[SME] Gap 17 remainder:** refactoring-dialog behaviors not done - deleting a filter field, and event/model reference cascades. `overviewRefactoring.ts` only handles cross-model rename, so there is no known recipe; do not guess semantics.
-- **`bindingConfiguration` wire-shape gap: done 2026-10-02** (`OverviewBindingPurpose` now classifies the header annotation: `candidate` = Available Items, `link` to a header-referenced overview = Selected Items). Verified only by the existing fixture sweep, no dedicated unit test.
+Gap review: "Overview Model: gap review" in `docs/sme-reference-comparison.md`. All gaps closed (gap 17 closed 2026-10-02: SME's `overviewRefactoring.ts` only handles cross-model rename, which a12-studio already covers). Remaining items are under Blocked.
 
 ### Content Model
 Gap review: "Content Model: gap review" in `docs/sme-reference-comparison.md`. Gap 4 (migration) is Won't Do. Only gap 9 is partly open.
-- **[LOCAL] Gap 9, `ColorRow`/`ShadowRow` setting validation** (`color-panel.fxml`, `shadow-panel.fxml`): needs CSS color/shadow syntax read out of the installed client bundle to avoid false positives. Checked 2026-10-02: the installed bundle (`main.*.js`, `ContentMetaModel*.json`) has no color/shadow converter to read; the content editor's grammar is not there. Values in real files: `#333333`, `rgb(107, 107, 134)`, and `rgb(0, 0, 0, 1)` (rgb with 4 args), so any strict grammar would give false positives. Needs the content-engine editor package source, or leave unvalidated.
+- **[LOCAL] Gap 9, `ColorRow`/`ShadowRow` setting validation** (`color-panel.fxml`, `shadow-panel.fxml`): needs CSS color/shadow syntax read out of the installed client bundle to avoid false positives. The installed bundle has no color/shadow converter to read, and real files use `#333333`, `rgb(107, 107, 134)` and `rgb(0, 0, 0, 1)`, so a strict grammar would give false positives. Needs the content-engine editor package source, or leave unvalidated.
 
 ### Application Model
 Nothing open.
